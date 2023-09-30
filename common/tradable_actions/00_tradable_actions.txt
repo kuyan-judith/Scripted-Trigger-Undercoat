@@ -1,0 +1,810 @@
+# These actions can be traded in trade deals to provide the empires with modifiers or other sorts of effects.
+#
+# Example:
+#
+# trade_action_my_example_action = {
+# 	# If this is set to 'yes', then the action will be fired and then removed from the trade deal.
+# 	# If 'no', then the trade deal will be treated as a treaty that lasts for at least 10 years.
+# 	fire_and_forget = no
+#
+# 	# Determines if the action will show up in the list in the trade deals view.
+# 	# SCOPE: Country "giving" the action
+# 	# FROM: Country "receiving" the action
+# 	potential = {
+# 		has_overlord = from
+# 		is_specialist_subject_type = { TYPE = bulwark }
+# 	}
+#
+# 	# If this trigger returns 'no', then the trade deal will be cancelled. Checked on daily tick. Only relevant if fire_and_forget is 'no'.
+# 	# SCOPE: Country "giving" the action
+# 	# FROM: Country "receiving" the action
+# 	active = {
+# 		has_overlord = from
+# 		is_specialist_subject_type = { TYPE = bulwark }
+# 	}
+#
+# 	# Effect that fires when the trade deal is accepted.
+# 	# SCOPE: Country "giving" the action
+# 	# FROM: Country "receiving" the action
+# 	on_traded_effect = {
+# 		from = {
+# 			set_galactic_custodian = yes
+# 		}
+# 	}
+#
+# 	# Effect that fires when the trade deal ends. Only relevant if fire_and_forget is 'no'.
+# 	# SCOPE: Country "giving" the action
+# 	# FROM: Country "receiving" the action. Not guaranteed to be valid, since a trade deal is cancelled if one of the countries dies.
+# 	on_deal_ended_sender_effect = {
+# 	}
+#
+# 	# Effect that fires when the trade deal ends. Only relevant if fire_and_forget is 'no'.
+# 	# SCOPE: Country "receiving" the action
+# 	# FROM: Country "giving" the action. Not guaranteed to be valid, since a trade deal is cancelled if one of the countries dies.
+# 	on_deal_ended_recipient_effect = {
+# 		set_galactic_custodian = no
+# 	}
+#
+# 	# Used to determine how much the AI will value the action in a trade deal.
+# 	ai_weight = {
+# 		weight = 1
+#
+# 		modifier = {
+# 			weight = 2
+# 			from = {
+# 				is_galactic_custodian = no
+# 			}
+# 		}
+# 	}
+# }
+
+trade_action_pledge_loyalty = {
+	fire_and_forget = no
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		FROM = {
+			is_playable = yes
+		}
+		NOT = {
+			is_action_active = {
+				action = trade_action_pledge_loyalty
+				with_country = FROM
+			}
+		}
+	}
+
+	active = {
+		has_overlord = FROM
+	}
+
+	on_traded_effect = {
+		if = {
+			limit = {
+				opinion = {
+					who = FROM
+					value < 150
+				}
+			}
+			add_modifier = {
+				modifier = pledge_loyalty_1
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = pledge_loyalty_2
+			}
+		}
+	}
+
+	on_deal_ended_sender_effect = {
+		switch = {
+			trigger = has_modifier
+			pledge_loyalty_1 = { remove_modifier = pledge_loyalty_1 }
+			pledge_loyalty_2 = { remove_modifier = pledge_loyalty_2 }
+		}
+	}
+
+	ai_weight = {
+		weight = 2
+	}
+}
+
+trade_action_share_empire_data = {
+	fire_and_forget = yes
+
+	potential = {
+		has_overlord_dlc = yes
+		FROM = {
+			is_playable = yes
+		}
+		OR = {
+			AND = {
+				FROM = { has_overlord = ROOT }
+				intel = {
+					who = FROM
+					value <= 80
+				}
+			}
+			AND = {
+				has_overlord = FROM
+				intel = {
+					who = FROM
+					value <= 40
+				}
+			}
+		}
+	}
+
+	on_traded_effect = {
+		FROM = {
+			add_intel = {
+				amount = 20
+				who = ROOT
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+
+		modifier = {
+			factor = 2
+			FROM = { has_overlord = PREV }
+		}
+	}
+}
+
+trade_action_bulwark_prefabs = {
+	fire_and_forget = no
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		NOT = {
+			is_action_active = {
+				action = trade_action_bulwark_prefabs
+				with_country = FROM
+			}
+		}
+		is_specialist_subject_type = { TYPE = bulwark }
+		FROM = { NOT = { has_modifier = bulwark_prefabs_overlord } }
+	}
+
+	active = {
+		has_overlord = FROM
+		is_specialist_subject_type = { TYPE = bulwark }
+	}
+
+	on_traded_effect = {
+		if = {
+			limit = { is_specialist_subject_tier = { TYPE = bulwark TIER = 3 } }
+			ROOT = {
+				add_modifier = {
+					modifier = bulwark_prefabs_subject
+					multiplier = 3
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = bulwark_prefabs_overlord
+					multiplier = 3
+				}
+			}
+		}
+		else_if = {
+			limit = { is_specialist_subject_tier = { TYPE = bulwark TIER = 2 } }
+			ROOT = {
+				add_modifier = {
+					modifier = bulwark_prefabs_subject
+					multiplier = 2
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = bulwark_prefabs_overlord
+					multiplier = 2
+				}
+			}
+		}
+		else = {
+			ROOT = {
+				add_modifier = {
+					modifier = bulwark_prefabs_subject
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = bulwark_prefabs_overlord
+				}
+			}
+		}
+	}
+
+	on_deal_ended_sender_effect = {
+		remove_modifier = bulwark_prefabs_subject
+	}
+
+	on_deal_ended_recipient_effect = {
+		remove_modifier = bulwark_prefabs_overlord
+	}
+
+	ai_weight = {
+		weight = 1
+
+		modifier = {
+			weight = 8
+			OR = {
+				AND = {
+					is_specialist_subject_tier = {
+						TYPE = bulwark
+						TIER = 3
+					}
+					has_monthly_income = {
+						resource = alloys
+						value < 6
+					}
+				}
+				AND = {
+					is_specialist_subject_tier = {
+						TYPE = bulwark
+						TIER = 2
+					}
+					has_monthly_income = {
+						resource = alloys
+						value < 4
+					}
+				}
+				has_monthly_income = {
+					resource = alloys
+					value < 2
+				}
+			}
+		}
+
+		modifier = {
+			weight = 1.5
+			OR = {
+				AND = {
+					is_specialist_subject_tier = {
+						TYPE = bulwark
+						TIER = 3
+					}
+					has_monthly_income = {
+						resource = alloys
+						value < 12
+					}
+				}
+				AND = {
+					is_specialist_subject_tier = {
+						TYPE = bulwark
+						TIER = 2
+					}
+					has_monthly_income = {
+						resource = alloys
+						value < 8
+					}
+				}
+				has_monthly_income = {
+					resource = alloys
+					value < 4
+				}
+			}
+		}
+	}
+}
+
+trade_action_bulwark_technology = {
+	fire_and_forget = yes
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		is_specialist_subject_type = { TYPE = bulwark }
+		FROM = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_ftl_inhibitor = { ROOT = { has_technology = tech_ftl_inhibitor } }
+				tech_planetary_shield_generator = { ROOT = { has_technology = tech_planetary_shield_generator } }
+				tech_starbase_3 = { ROOT = { has_technology = tech_starbase_3 } }
+				tech_modular_engineering = { ROOT = { has_technology = tech_modular_engineering } }
+				tech_starbase_4 = { ROOT = { has_technology = tech_starbase_4 } }
+				tech_starbase_5 = { ROOT = { has_technology = tech_starbase_5 } }
+			}
+			NOR = {
+				has_modifier = bulwark_technology_physics_modifier
+				has_modifier = bulwark_technology_engineering_modifier
+			}
+		}
+	}
+
+	on_traded_effect = {
+		FROM = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_ftl_inhibitor = {
+					add_research_option = tech_ftl_inhibitor
+					ROOT = {
+						add_modifier = {
+							modifier = bulwark_technology_physics_modifier
+							days = 360
+						}
+					}
+				}
+				tech_planetary_shield_generator = {
+					add_research_option = tech_planetary_shield_generator
+					ROOT = {
+						add_modifier = {
+							modifier = bulwark_technology_physics_modifier
+							days = 360
+						}
+					}
+				}
+				tech_starbase_3 = {
+					add_research_option = tech_starbase_3
+					ROOT = {
+						add_modifier = {
+							modifier = bulwark_technology_engineering_modifier
+							days = 360
+						}
+					}
+				}
+				tech_modular_engineering = {
+					add_research_option = tech_modular_engineering
+					ROOT = {
+						add_modifier = {
+							modifier = bulwark_technology_engineering_modifier
+							days = 360
+						}
+					}
+				}
+				tech_starbase_4 = {
+					add_research_option = tech_starbase_4
+					ROOT = {
+						add_modifier = {
+							modifier = bulwark_technology_engineering_modifier
+							days = 360
+						}
+					}
+				}
+				tech_starbase_5 = {
+					add_research_option = tech_starbase_5
+					ROOT = {
+						add_modifier = {
+							modifier = bulwark_technology_engineering_modifier
+							days = 360
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 25
+	}
+}
+
+trade_action_scholarium_hypotheses = {
+	fire_and_forget = no
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		NOT = {
+			is_action_active = {
+				action = trade_action_scholarium_hypotheses
+				with_country = FROM
+			}
+		}
+		is_specialist_subject_type = { TYPE = scholarium }
+		FROM = { NOT = { has_modifier = scholarium_hypotheses_overlord } }
+	}
+
+	active = {
+		has_overlord = FROM
+		is_specialist_subject_type = { TYPE = scholarium }
+	}
+
+	on_traded_effect = {
+		ROOT = {
+			add_modifier = {
+				modifier = scholarium_hypotheses_subject
+			}
+		}
+		custom_tooltip = double_newline
+		FROM = {
+			add_modifier = {
+				modifier = scholarium_hypotheses_overlord
+			}
+		}
+	}
+
+	on_deal_ended_sender_effect = {
+		remove_modifier = scholarium_hypotheses_subject
+	}
+
+	on_deal_ended_recipient_effect = {
+		remove_modifier = scholarium_hypotheses_overlord
+	}
+
+	ai_weight = {
+		weight = 4
+	}
+}
+
+trade_action_scholarium_processors = {
+	fire_and_forget = no
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		NOT = {
+			is_action_active = {
+				action = trade_action_scholarium_processors
+				with_country = FROM
+			}
+		}
+		is_specialist_subject_type = { TYPE = scholarium }
+		FROM = {
+			NOR = {
+				has_modifier = scholarium_processors_overlord_1
+				has_modifier = scholarium_processors_overlord_2
+				has_modifier = scholarium_processors_overlord_3
+			}
+		}
+	}
+
+	active = {
+		has_overlord = FROM
+		is_specialist_subject_type = { TYPE = scholarium }
+	}
+
+	on_traded_effect = {
+		if = {
+			limit = {
+				is_specialist_subject_tier = { TYPE = scholarium TIER = 3 }
+			}
+			ROOT = {
+				add_modifier = {
+					modifier = scholarium_processors_subject_3
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = scholarium_processors_overlord_3
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				is_specialist_subject_tier = { TYPE = scholarium TIER = 2 }
+			}
+			ROOT = {
+				add_modifier = {
+					modifier = scholarium_processors_subject_2
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = scholarium_processors_overlord_2
+				}
+			}
+		}
+		else = {
+			ROOT = {
+				add_modifier = {
+					modifier = scholarium_processors_subject_1
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = scholarium_processors_overlord_1
+				}
+			}
+		}
+	}
+
+	on_deal_ended_sender_effect = {
+		switch = {
+			trigger = has_modifier
+			scholarium_processors_subject_1 = { remove_modifier = scholarium_processors_subject_1 }
+			scholarium_processors_subject_2 = { remove_modifier = scholarium_processors_subject_2 }
+			scholarium_processors_subject_3 = { remove_modifier = scholarium_processors_subject_3 }
+		}
+	}
+
+	on_deal_ended_recipient_effect = {
+		switch = {
+			trigger = has_modifier
+			scholarium_processors_overlord_1 = { remove_modifier = scholarium_processors_overlord_1 }
+			scholarium_processors_overlord_2 = { remove_modifier = scholarium_processors_overlord_2 }
+			scholarium_processors_overlord_3 = { remove_modifier = scholarium_processors_overlord_3 }
+		}
+	}
+
+	ai_weight = {
+		weight = 2.5
+	}
+}
+
+trade_action_prospectorium_techniques = {
+	fire_and_forget = no
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		NOT = {
+			is_action_active = {
+				action = trade_action_prospectorium_techniques
+				with_country = FROM
+			}
+		}
+		is_specialist_subject_type = { TYPE = prospectorium }
+		FROM = {
+			NOR = {
+				has_modifier = prospectorium_techniques_overlord_1
+				has_modifier = prospectorium_techniques_overlord_2
+				has_modifier = prospectorium_techniques_overlord_3
+			}
+		}
+	}
+
+	active = {
+		has_overlord = FROM
+		is_specialist_subject_type = { TYPE = prospectorium }
+	}
+
+	on_traded_effect = {
+		if = {
+			limit = {
+				is_specialist_subject_tier = { TYPE = prospectorium TIER = 3 }
+			}
+			ROOT = {
+				add_modifier = {
+					modifier = prospectorium_techniques_subject_3
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = prospectorium_techniques_overlord_3
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				is_specialist_subject_tier = { TYPE = prospectorium TIER = 2 }
+			}
+			ROOT = {
+				add_modifier = {
+					modifier = prospectorium_techniques_subject_2
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = prospectorium_techniques_overlord_2
+				}
+			}
+		}
+		else = {
+			ROOT = {
+				add_modifier = {
+					modifier = prospectorium_techniques_subject_1
+				}
+			}
+			custom_tooltip = double_newline
+			FROM = {
+				add_modifier = {
+					modifier = prospectorium_techniques_overlord_1
+				}
+			}
+		}
+	}
+
+	on_deal_ended_sender_effect = {
+		switch = {
+			trigger = has_modifier
+			prospectorium_techniques_subject_1 = { remove_modifier = prospectorium_techniques_subject_1 }
+			prospectorium_techniques_subject_2 = { remove_modifier = prospectorium_techniques_subject_2 }
+			prospectorium_techniques_subject_3 = { remove_modifier = prospectorium_techniques_subject_3 }
+		}
+	}
+
+	on_deal_ended_recipient_effect = {
+		switch = {
+			trigger = has_modifier
+			prospectorium_techniques_overlord_1 = { remove_modifier = prospectorium_techniques_overlord_1 }
+			prospectorium_techniques_overlord_2 = { remove_modifier = prospectorium_techniques_overlord_2 }
+			prospectorium_techniques_overlord_3 = { remove_modifier = prospectorium_techniques_overlord_3 }
+		}
+	}
+
+	ai_weight = {
+		weight = 2.5
+	}
+}
+
+trade_action_prospectorium_technology = {
+	fire_and_forget = yes
+
+	potential = {
+		has_overlord_dlc = yes
+		has_overlord = FROM
+		is_specialist_subject_type = { TYPE = prospectorium }
+		FROM = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_mine_volatile_motes = {
+					ROOT = {
+						has_technology = tech_mine_volatile_motes
+						has_resource = {
+							type = volatile_motes
+							amount = 100
+						}
+					}
+				}
+				tech_mine_rare_crystals = {
+					ROOT = {
+						has_technology = tech_mine_rare_crystals
+						has_resource = {
+							type = rare_crystals
+							amount = 100
+						}
+					}
+				}
+				tech_mine_exotic_gases = {
+					ROOT = {
+						has_technology = tech_mine_exotic_gases
+						has_resource = {
+							type = exotic_gases
+							amount = 100
+						}
+					}
+				}
+				tech_mine_zro = {
+					ROOT = {
+						has_technology = tech_mine_zro
+						has_resource = {
+							type = sr_zro
+							amount = 100
+						}
+					}
+				}
+				tech_mine_living_metal = {
+					ROOT = {
+						has_technology = tech_mine_living_metal
+						has_resource = {
+							type = sr_living_metal
+							amount = 100
+						}
+					}
+				}
+				tech_mine_dark_matter = {
+					ROOT = {
+						has_technology = tech_mine_dark_matter
+						has_resource = {
+							type = sr_dark_matter
+							amount = 100
+						}
+					}
+				}
+			}
+			NOR = {
+				has_modifier = prospectorium_technology_physics_modifier
+				has_modifier = prospectorium_technology_society_modifier
+				has_modifier = prospectorium_technology_engineering_modifier
+			}
+		}
+	}
+
+	on_traded_effect = {
+		FROM = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_mine_volatile_motes = {
+					add_research_option = tech_mine_volatile_motes
+					add_resource = {
+						volatile_motes = 100
+					}
+					ROOT = {
+						add_modifier = {
+							modifier = prospectorium_technology_physics_modifier
+							days = 360
+						}
+						add_resource = {
+							volatile_motes = -100
+						}
+					}
+				}
+				tech_mine_rare_crystals = {
+					add_research_option = tech_mine_rare_crystals
+					add_resource = {
+						rare_crystals = 100
+					}
+					ROOT = {
+						add_modifier = {
+							modifier = prospectorium_technology_engineering_modifier
+							days = 360
+						}
+						add_resource = {
+							rare_crystals = -100
+						}
+					}
+				}
+				tech_mine_exotic_gases = {
+					add_research_option = tech_mine_exotic_gases
+					add_resource = {
+						exotic_gases = 100
+					}
+					ROOT = {
+						add_modifier = {
+							modifier = prospectorium_technology_engineering_modifier
+							days = 360
+						}
+						add_resource = {
+							exotic_gases = -100
+						}
+					}
+				}
+				tech_mine_zro = {
+					add_research_option = tech_mine_zro
+					add_resource = {
+						sr_zro = 100
+					}
+					ROOT = {
+						add_modifier = {
+							modifier = prospectorium_technology_society_modifier
+							days = 360
+						}
+						add_resource = {
+							sr_zro = -100
+						}
+					}
+				}
+				tech_mine_living_metal = {
+					add_research_option = tech_mine_living_metal
+					add_resource = {
+						sr_living_metal = 100
+					}
+					ROOT = {
+						add_modifier = {
+							modifier = prospectorium_technology_engineering_modifier
+							days = 360
+						}
+						add_resource = {
+							sr_living_metal = -100
+						}
+					}
+				}
+				tech_mine_dark_matter = {
+					add_research_option = tech_mine_dark_matter
+					add_resource = {
+						sr_dark_matter = 100
+					}
+					ROOT = {
+						add_modifier = {
+							modifier = prospectorium_technology_physics_modifier
+							days = 360
+						}
+						add_resource = {
+							sr_dark_matter = -100
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 25
+	}
+}

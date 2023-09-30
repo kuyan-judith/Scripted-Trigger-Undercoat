@@ -1,0 +1,1038 @@
+###################################################
+#
+# First Contact Espionage Events
+# Written/edited by Giada Zavarise & Gemma Thomson
+#
+###################################################
+
+namespace = preftl_espionage
+
+############################
+# RANDOM SPY NETWORK EVENTS
+############################
+
+# Setup, triggered by on_bi_yearly_pulse_country
+country_event = {
+	id = preftl_espionage.2
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_active_preftl_spynetwork = yes
+	}
+
+	immediate = {
+		random_list = {
+			80 = { }
+			# Pre-existing events (not DLC-locked):
+			1 = { # Rogue Agent
+				modifier = {
+					factor = 0
+					OR = {
+						is_regular_empire = no
+						has_policy_flag = interference_subtle
+						has_policy_flag = interference_not_allowed
+					}
+				}
+				country_event = { id = preftl_espionage.1000 days = 1 random = 20 }
+			}
+			1 = { # Prelude to War
+				modifier = {
+					factor = 0
+					OR = {
+						is_regular_empire = no
+						has_policy_flag = interference_subtle
+						has_policy_flag = interference_not_allowed	
+					}
+				}
+				country_event = { id = preftl_espionage.1100 days = 1 random = 20 }
+			}
+			1 = { # Aliens Did It
+				modifier = {
+					factor = 0
+					OR = {
+						is_regular_empire = no
+						has_policy_flag = interference_not_allowed	
+					}
+				}
+				country_event = { id = preftl_espionage.1150 days = 1 random = 20 }
+			}
+		}
+	}
+}
+
+### ROGUE AGENT
+
+# Setup | triggered randomly via on_bi_yearly_pulse_country / preftl_espionage.2
+country_event = {
+	id = preftl_espionage.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = no
+		is_regular_empire = yes
+		any_spynetwork = {
+			owner = { is_same_value = root }
+			target = {
+				is_country_type = primitive
+				is_gestalt = no
+				is_pre_industrial = no
+				has_country_flag = preftl_espionage_operation_targeted_by@root
+				NOR = {
+					has_country_flag = ongoing_preftl_espionage_chain
+					is_broken_shackles_pre_ftl_to_scope = { SCOPE = root }
+				}
+			}
+			is_running_espionage_operation = no
+		}
+		NOT = { has_country_flag = rogue_agent_chain } # only once per game
+	}
+
+	immediate = {
+		random_country = {
+			limit = {
+				is_country_type = primitive
+				is_gestalt = no
+				is_pre_industrial = no
+				has_country_flag = preftl_espionage_operation_targeted_by@root
+				NOR = {
+					has_country_flag = ongoing_preftl_espionage_chain
+					is_broken_shackles_pre_ftl_to_scope = { SCOPE = root }
+				}
+			}
+			set_country_flag = ongoing_preftl_espionage_chain
+			save_event_target_as = rogue_agent_country
+			capital_scope = {
+				save_event_target_as = rogue_agent_planet
+			}
+		}
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				target = { is_same_value = event_target:rogue_agent_country }
+			}
+			leader = { 
+				save_event_target_as = rogue_agent_spymaster
+				exile_leader_as = rogue_agent_spymaster
+			}
+		}
+		set_country_flag = rogue_agent_chain
+		country_event = { id = preftl_espionage.1001 }
+	}
+}
+
+# Rogue Agent
+country_event = {
+	id = preftl_espionage.1001
+	title = "observation.3101.name"
+	desc = "observation.3101.desc"
+	picture = GFX_evt_infiltration_neutral
+	show_sound = event_conversation
+	location = event_target:rogue_agent_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	option = {
+		name = "observation.3101.a"
+
+	}
+
+	after = { # 450 days
+		hidden_effect = {
+			country_event = { id = preftl_espionage.1002 days = 1 random = 15 }
+		}
+	}
+}
+
+# Incoming Transmission
+country_event = {
+	id = preftl_espionage.1002
+	title = "observation.3103.name"
+	desc = "observation.3103.desc"
+	picture = GFX_evt_satellite_in_orbit
+	show_sound = event_radio_chatter
+	location = event_target:rogue_agent_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	option = {
+		name = "ONSCREEN"
+		country_event = { id = preftl_espionage.1003 }
+	}
+}
+
+# Transmission
+country_event = {
+	id = preftl_espionage.1003
+	title = "TRANSMISSION"
+	desc = "observation.3104.desc"
+
+	diplomatic = yes
+
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = "observation.3104.a"
+		response_text = "observation.3104.a.response"
+		is_dialog_only = yes
+	}
+	option = {
+		name = "observation.3104.b"
+		response_text = "observation.3104.b.response"
+		is_dialog_only = yes
+	}
+	option = {
+		name = "observation.3104.c"
+		response_text = "observation.3104.c.response"
+		hidden_effect = {
+			country_event = { id = preftl_espionage.1005 days = 1 random = 1800 } # 5 years
+			country_event = { id = preftl_espionage.1006 days = 1 random = 1800 } # 5 years
+			country_event = { id = preftl_espionage.1007 days = 1 random = 1800 } # 5 years
+			country_event = { id = preftl_espionage.1010 days = 300 random = 1500 } # 5 years
+		}
+	}
+}
+
+# Operatives Hunted
+country_event = {
+	id = preftl_espionage.1005
+	title = "observation.3106.name"
+	desc = "observation.3106.desc"
+	picture = GFX_evt_cover_blown
+	show_sound = event_radio_chatter
+	location = event_target:rogue_agent_planet
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+		NOR = { 
+			has_country_flag = rogue_agent_chain_rogue_active_1
+			has_country_flag = observation_rogue_sighted 
+			# won't spawn if the final event appeared before this one
+		}
+	}
+
+	immediate = {
+		set_country_flag = rogue_agent_chain_rogue_active_1
+	}
+
+	option = {
+		name = "observation.3106.a"
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				target = { is_same_value = event_target:rogue_agent_country }
+			}
+			add_spy_network_level = -5
+			if = {
+				limit = {
+					exists = leader
+				}
+				leader = { 
+					kill_leader = { show_notification = no }
+				}
+			}
+		}
+	}
+}
+
+# Media Witch Hunt
+country_event = {
+	id = preftl_espionage.1006
+	title = "observation.3108.name"
+	desc = "observation.3108.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_radio_chatter
+	location = event_target:rogue_agent_planet
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+		NOR = {
+			has_country_flag = rogue_agent_chain_rogue_active_2
+			has_country_flag = observation_rogue_sighted 
+			# won't spawn if the final event appeared before this one
+		}
+	}
+
+	immediate = {
+		set_country_flag = rogue_agent_chain_rogue_active_2
+	}
+
+	option = {
+		name = "observation.3108.a"
+		event_target:rogue_agent_country = {
+			add_awareness = 10
+		}
+	}
+}
+
+# Mass Arrests
+country_event = {
+	id = preftl_espionage.1007
+	title = "observation.3110.name"
+	desc = "observation.3110.desc"
+	picture = GFX_evt_smugglers_in_bar
+	show_sound = event_radio_chatter
+	location = event_target:rogue_agent_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+		NOT = { 
+			has_country_flag = rogue_agent_chain_rogue_active_3
+			has_country_flag = observation_rogue_sighted 
+			# won't spawn if the final event appeared before this one
+		}
+	}
+
+	immediate = {
+		set_country_flag = rogue_agent_chain_rogue_active_3
+	}
+
+	option = {
+		name = "observation.3110.a"
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				target = { is_same_value = event_target:rogue_agent_country }
+			}
+			add_spy_network_level = -10
+		}
+	}
+}
+
+# Agent Sighted
+country_event = {
+	id = preftl_espionage.1010
+	title = "observation.3112.name"
+	desc = "observation.3112.desc"
+	picture = GFX_evt_colony_settlement
+	show_sound = event_conversation
+	location = event_target:rogue_agent_planet
+	trackable = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+		NOT = { has_country_flag = observation_rogue_sighted }
+	}
+
+	immediate = {
+		set_country_flag = observation_rogue_sighted
+	}
+
+	option = {
+		name = "observation.3112.a"
+		custom_tooltip = "observation.3112.a.tooltip"
+		hidden_effect = {
+			random_list = {
+				1 = { # Agent Lost
+					country_event = { id = preftl_espionage.1021 days = 5 }
+				}
+				1 = { # Agent Eliminated
+					modifier = {
+						factor = 3
+						OR = {
+							has_tradition = tr_subterfuge_information_security
+							has_tradition = tr_subterfuge_nda # a.k.a. "No Loose Ends"
+						}
+					}
+					country_event = { id = preftl_espionage.1023 days = 5 }
+				}
+			}
+		}
+	}
+	option = {
+		name = "observation.3112.b"
+		custom_tooltip = "observation.3112.b.tooltip"
+		from = {
+			enable_special_project = {
+				name = "ROGUE_BOMBARDMENT_PROJECT"
+				location = event_target:rogue_agent_planet
+				owner = root
+			}
+		}
+	}
+	option = {
+		name = "observation.3112.c"
+		custom_tooltip = "observation.3112.c.tooltip"
+		event_target:rogue_agent_country = {
+			remove_country_flag = ongoing_preftl_espionage_chain
+		}
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				target = { is_same_value = event_target:rogue_agent_country }
+			}
+			add_spy_network_level = -1000
+		}
+	}
+}
+
+# Agent Lost - special project
+country_event = {
+	id = preftl_espionage.1020
+	title = "observation.3113.name"
+	desc = "observation.3113.desc"
+	picture = GFX_evt_infiltration_neutral
+	show_sound = event_radio_chatter
+	location = FROMFROM
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	option = {
+		name = "observation.3113.a"
+		custom_tooltip = "observation.3112.c.tooltip"
+		event_target:rogue_agent_country = {
+			remove_country_flag = ongoing_preftl_espionage_chain
+		}
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				target = { is_same_value = event_target:rogue_agent_country }
+			}
+			add_spy_network_level = -1000
+		}
+	}
+}
+
+# Agent Lost - event
+country_event = {
+	id = preftl_espionage.1021
+	title = "observation.3113.name"
+	desc = "observation.3113.desc"
+	picture = GFX_evt_infiltration_neutral
+	show_sound = event_radio_chatter
+	location = event_target:rogue_agent_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	option = {
+		name = "observation.3113.a"
+		custom_tooltip = "observation.3112.c.tooltip"
+		event_target:rogue_agent_country = {
+			remove_country_flag = ongoing_preftl_espionage_chain
+		}
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				target = { is_same_value = event_target:rogue_agent_country }
+			}
+			add_spy_network_level = -1000
+		}
+	}
+}
+
+# Agent Eliminated through special project
+ship_event = {
+	id = preftl_espionage.1022
+	title = "observation.3114.name"
+	desc = {
+		trigger = { # everything is fiiine
+			event_target:rogue_agent_country = { has_awareness < 30 }
+		}
+		text = "observation.3114.noawareness.desc"
+	}
+	desc = {
+		trigger = { # they realize aliens might be involved
+			event_target:rogue_agent_country = { has_awareness >= 30 }
+		}
+		text = "observation.3114.awareness.desc"
+	}
+	picture = GFX_evt_burning_settlement
+	show_sound = event_space_battle
+	location = event_target:rogue_agent_country.capital_scope
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				event_target:rogue_agent_country = { has_awareness > 30 }
+			}
+			event_target:rogue_agent_country = {
+				add_awareness = 10
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		event_target:rogue_agent_country = {
+			remove_country_flag = ongoing_preftl_espionage_chain
+		}
+	}
+}
+
+# Agent Eliminated through discrete backstabbing
+country_event = {
+	id = preftl_espionage.1023
+	title = "observation.3114.name"
+	desc = "observation.3115.desc"
+	picture = GFX_evt_emergency_workers
+	show_sound = event_space_battle
+	location = event_target:rogue_agent_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:rogue_agent_country
+		event_target:rogue_agent_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	option = {
+		name = "observation.3115.a"
+		add_resource = {
+			unity = 100
+		}
+		event_target:rogue_agent_country = {
+			remove_country_flag = ongoing_preftl_espionage_chain
+		}
+	}
+}
+
+### PRELUDE TO WAR
+
+# Setup | triggered randomly via on_bi_yearly_pulse_country / preftl_espionage.2
+country_event = {
+	id = preftl_espionage.1100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = no
+		is_regular_empire = yes
+		any_country = {
+			is_country_type = primitive
+			is_gestalt = no
+			is_pre_industrial = no
+			has_country_flag = preftl_espionage_operation_targeted_by@root
+			NOR = {
+				has_country_flag = ongoing_preftl_espionage_chain
+				is_broken_shackles_pre_ftl_to_scope = { SCOPE = root }
+			}
+		}
+		NOT = { has_country_flag = prelude_to_war_chain }
+	}
+
+	immediate = {
+		random_country = {
+			limit = {
+				is_country_type = primitive
+				is_gestalt = no
+				is_pre_industrial = no
+				has_country_flag = preftl_espionage_operation_targeted_by@root
+				NOR = {
+					has_country_flag = ongoing_preftl_espionage_chain
+					is_broken_shackles_pre_ftl_to_scope = { SCOPE = root }
+				}
+			}
+			set_country_flag = ongoing_preftl_espionage_chain
+			save_event_target_as = prelude_to_war_country
+			capital_scope = {
+				save_event_target_as = prelude_to_war_planet
+			}
+		}
+		set_country_flag = prelude_to_war_chain
+		country_event = { id = preftl_espionage.1110 }
+	}
+}
+
+# Prelude to War
+country_event = {
+	id = preftl_espionage.1110
+	title = "observation.3131.name"
+	desc = "observation.3131.desc"
+	picture = GFX_evt_burning_settlement
+	show_sound = event_planetary_riot
+	location = event_target:prelude_to_war_planet
+	trackable = yes
+	is_triggered_only = yes
+
+	option = {
+		name = "observation.3101.a"
+		event_target:prelude_to_war_planet = {
+			enable_special_project = {
+				name = "AVERT_PRIMITIVE_WAR_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# War Erupts
+country_event = {
+	id = preftl_espionage.1115
+	title = "observation.3132.name"
+	desc = "observation.3132.desc"
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_air_raid_siren
+	location = event_target:prelude_to_war_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:prelude_to_war_country
+		event_target:prelude_to_war_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	immediate = {
+		event_target:prelude_to_war_planet = {
+			nuke_pre_ftls_effect = yes
+		}
+	}
+
+	option = {
+		name = "observation.3132.a"
+		event_target:prelude_to_war_planet = {
+			observation_outpost = {
+				dismantle = yes
+			}
+		}
+		event_target:prelude_to_war_country = {
+			remove_country_flag = ongoing_preftl_espionage_chain
+		}
+	}
+}
+
+# War Averted
+ship_event = {
+	id = preftl_espionage.1120
+	title = "observation.3133.name"
+	desc = "observation.3133.desc"
+	picture = GFX_evt_galactic_senate
+	show_sound = event_conversation
+	location = FROMFROM
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:prelude_to_war_country
+		event_target:prelude_to_war_planet = {
+			has_observation_outpost = yes
+		}
+	}
+
+	option = {
+		name = "EXCELLENT"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			event_target:prelude_to_war_country = {
+				remove_country_flag = ongoing_preftl_espionage_chain
+			}
+		}
+	}
+}
+
+### THE GREAT PYRAMID (previously labelled "Aliens Did It!")
+
+# Via on_bi_yearly_pulse_country / preftl_espionage.2
+country_event = {
+	id = preftl_espionage.1150
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_regular_empire = yes
+		is_ai = no
+		has_spynetwork = yes
+		any_spynetwork = {
+			owner = { is_same_value = root }
+			is_spynetwork_level > 0
+			target = {
+				is_country_type = primitive
+				is_pre_industrial = yes
+				NOR = {
+					is_broken_shackles_pre_ftl_to_scope = { SCOPE = root }
+					is_hive_empire = yes
+					capital_scope = {
+						has_building = building_great_pyramid
+					}
+				}
+			}
+		}
+		NOR = {
+			has_country_flag = ongoing_preftl_espionage_chain
+			has_country_flag = great_pyramid_chain
+		}
+	}
+
+	immediate = {
+		# Choose a target
+		random_spynetwork = {
+			limit = {
+				owner = { is_same_value = root }
+				is_spynetwork_level > 0
+				target = {
+					is_country_type = primitive
+					is_pre_industrial = yes
+					NOR = {
+						is_broken_shackles_pre_ftl_to_scope = { SCOPE = root }
+						is_hive_empire = yes
+						capital_scope = {
+							has_building = building_great_pyramid
+						}
+					}
+				}
+			}
+			target = {
+				capital_scope = {
+					add_building = building_great_pyramid
+					save_event_target_as = great_pyramid_planet
+				}
+				save_event_target_as = great_pyramid_country
+			}
+			save_event_target_as = great_pyramid_spynetwork
+		}
+		# Event chain begins
+		set_country_flag = great_pyramid_chain
+		country_event = { id = preftl_espionage.1155 }
+	}
+}
+
+# Chief Scientist proclaimed a deity
+country_event = {
+	id = preftl_espionage.1155
+	title = "observation.3135.name"
+	desc = {
+		trigger = {
+			switch = {
+				trigger = has_country_flag
+				great_pyramid_covert = 		{ text = observation.3135.desc.covert }
+				great_pyramid_aggressive = 	{ text = observation.3135.desc.aggressive }
+				great_pyramid_enlighten = 	{ text = observation.3135.desc.enlighten }
+				great_pyramid_passive = 	{ text = observation.3135.desc.passive }
+				default = 					{ text = observation.3135.desc.passive }
+			}
+		}
+	}
+	picture = GFX_evt_enlightenment_failure
+	show_sound = event_pre_ftl_civilization
+	location = event_target:great_pyramid_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:great_pyramid_spynetwork
+	}
+
+	immediate = {
+		# Subtle or Active Interference AND running certain Operations
+		if = {
+			limit = {
+				OR = {
+					has_policy_flag = interference_subtle
+					has_policy_flag = interference_active
+				}
+				event_target:great_pyramid_spynetwork = {
+					is_running_espionage_operation = yes
+					any_espionage_operation = {
+						OR = {
+							has_espionage_type = operation_infiltrate_government
+							has_espionage_type = operation_indoctrinate_society
+						}
+					}
+				}
+			}
+			set_country_flag = great_pyramid_covert
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_policy_flag = interference_subtle
+					has_policy_flag = interference_active
+				}
+				event_target:great_pyramid_spynetwork = {
+					is_running_espionage_operation = yes
+					any_espionage_operation = {
+						has_espionage_type = operation_plant_advanced_knowledge
+					}
+				}
+			}
+			set_country_flag = great_pyramid_enlighten
+		}
+		# Aggressive
+		else_if = {
+			limit = {
+				has_policy_flag = interference_aggressive
+			}
+			set_country_flag = great_pyramid_aggressive
+		}
+		# Subtle or Active Interference and NOT running certain Operations
+		else = {
+			set_country_flag = great_pyramid_passive
+		}
+	}
+
+	# Dismiss the event (lightheartedly)
+	option = {
+		name = "observation.3135.b"
+		custom_tooltip = observation.3135.b.tooltip
+		hidden_effect = {
+			random_list = {
+				50 = {
+					modifier = {
+						factor = 0.5
+						event_target:great_pyramid_country = { is_materialist = yes }
+					}
+					country_event = { id = preftl_espionage.1160 days = 60 } # Religious conflict
+				}
+				50 = { } # Nothing
+			}
+			event_target:great_pyramid_country = {
+				advance_pre_ftl_tech = yes
+			}
+		}
+	}
+	# Erase all traces; keep working
+	option = {
+		name = "observation.3135.c"
+		trigger = {
+			OR = {
+				has_policy_flag = first_contact_attack_allowed
+				is_pacifist = no
+			}
+		}
+		event_target:great_pyramid_spynetwork = {
+			add_spy_network_level = -5
+		}
+		event_target:great_pyramid_planet = {
+			remove_building = building_great_pyramid
+			random_owned_pop = {
+				kill_pop = yes
+			}
+		}
+	}
+	# Do nothing; hope for the best
+	option = {
+		name = "observation.3135.d"
+		trigger = {
+			OR = {
+				NOT = { has_policy_flag = first_contact_attack_allowed }
+				is_pacifist = yes
+			}
+		}
+		hidden_effect = {
+			random_list = {
+				60 = {
+					modifier = {
+						factor = 0.5
+						event_target:great_pyramid_country = { is_materialist = yes }
+					}
+					country_event = { id = preftl_espionage.1160 days = 90 } # Religious conflict
+				}
+				40 = {
+					modifier = {
+						factor = 1.5
+						event_target:great_pyramid_country = { is_materialist = yes }
+					}
+					country_event = { id = preftl_espionage.1165 days = 90 } # Locals dismiss events
+				}
+			}
+		}
+	}
+
+	after = {
+		remove_country_flag = great_pyramid_covert
+		remove_country_flag = great_pyramid_aggressive
+		remove_country_flag = great_pyramid_enlighten
+		remove_country_flag = great_pyramid_passive
+	}
+}
+
+# Religious conflict
+country_event = {
+	id = preftl_espionage.1160
+	title = "observation.3135.name"
+	desc = observation.3136.desc
+	picture = GFX_evt_burning_settlement
+	show_sound = event_planetary_riot
+	location = event_target:great_pyramid_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:great_pyramid_planet
+		exists = event_target:great_pyramid_spynetwork
+	}
+
+	# No deaths
+	option = {
+		name = "CURSES"
+		exclusive_trigger = {
+			event_target:great_pyramid_planet = {
+				count_owned_pop = {
+					count < 2
+				}
+			}
+		}
+		add_resource = { influence = -50 }
+	}
+	# 2 deaths
+	option = {
+		name = "CURSES"
+		exclusive_trigger = {
+			event_target:great_pyramid_planet = {
+				count_owned_pop = {
+					count > 3
+				}
+			}
+		}
+		custom_tooltip = observation.3136.a.tooltip
+		add_resource = { influence = -50 }
+		hidden_effect = {
+			event_target:great_pyramid_planet = {
+				random_owned_pop = {
+					kill_pop = yes
+				}
+				random_owned_pop = {
+					kill_pop = yes
+				}
+			}
+		}
+	}
+	# 1 death
+	option = {
+		name = "CURSES"
+		trigger = {
+			event_target:great_pyramid_planet = {
+				count_owned_pop = {
+					count <= 3
+				}
+			}
+		}
+		custom_tooltip = observation.3136.b.tooltip
+		add_resource = { influence = -50 }
+		hidden_effect = {
+			event_target:great_pyramid_planet = {
+				add_modifier = {
+					modifier = pyramid_wars
+					days = 720
+				}
+				add_building = building_great_pyramid
+				random_owned_pop = {
+					kill_pop = yes
+				}
+			}
+		}
+	}
+
+	after = {
+		event_target:great_pyramid_planet = {
+			add_modifier = {
+				modifier = pyramid_wars
+				days = 720
+			}
+			add_building = building_great_pyramid
+		}
+	}
+}
+
+# Locals dismiss events
+country_event = {
+	id = preftl_espionage.1165
+	title = "observation.3135.name"
+	desc = observation.3137.desc
+	picture = GFX_evt_discovered_hidden_door
+	show_sound = event_administrative_work
+	location = event_target:great_pyramid_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:great_pyramid_planet
+		exists = event_target:great_pyramid_spynetwork
+	}
+
+	option = {
+		name = "observation.3137.a"
+		add_monthly_resource_mult = {
+			resource = influence
+			value = @tier1influencereward
+			min = @tier1influencemin
+			max = @tier1influencemax
+		}
+		# if = {
+		# 	limit = {
+		# 		event_target:great_pyramid_spynetwork = {
+		# 			is_running_espionage_operation = yes
+		# 			any_espionage_operation = {
+		# 				has_espionage_type = operation_plant_advanced_knowledge
+		# 			}
+		# 		}
+		# 	}
+		# 	event_target:great_pyramid_spynetwork = {
+		# 		random_espionage_operation = {
+		# 			limit = {
+		# 				has_espionage_type = operation_plant_advanced_knowledge
+		# 			}
+		# 			#TODO_CD AUG-37011 bonus to Plant Advanced Knowledge
+		# 		}
+		# 	}
+		# }
+		# else = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		# }
+	}
+}

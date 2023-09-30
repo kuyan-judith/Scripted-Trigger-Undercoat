@@ -1,0 +1,813 @@
+#####################################
+#					#
+#  Events for specialist subjects.  #
+#  Written by: Xuanming Zhou	 #
+#					#
+#####################################
+
+@BaseResourceLow = 500
+@BaseResourceLowBoosted = 750
+@BaseResourceMedium = 1000
+@BaseResourceMediumBoosted = 1500
+@BaseResourceHigh = 1500
+@BaseResourceHighBoosted = 2250
+@AlloysResourceLow = 150
+@AlloysResourceLowBoosted = 225
+@AlloysResourceMedium = 300
+@AlloysResourceMediumBoosted = 450
+@AlloysResourceHigh = 450
+@AlloysResourceHighBoosted = 675
+@AdvancedResourceLow = 50
+@AdvancedResourceLowBoosted = 75
+@AdvancedResourceMedium = 100
+@AdvancedResourceMediumBoosted = 150
+@AdvancedResourceHigh = 150
+@AdvancedResourceHighBoosted = 225
+@RareResourceLow = 25
+@RareResourceLowBoosted = 37.5
+@RareResourceMedium = 50
+@RareResourceMediumBoosted = 75
+@RareResourceHigh = 75
+@RareResourceHighBoosted = 112.5
+
+namespace = specialist
+
+# On system gained.
+country_event = {
+	id = specialist.200
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { is_specialist_subject_type = { TYPE = bulwark } }
+			FROM = {
+				if = {
+					limit = { exists = starbase }
+					starbase = { add_bulwark_array = yes }
+					if = {
+						limit = { ROOT = { any_agreement = { specialist_tier >= 3 } } }
+						starbase = { add_disintegrator_field = yes }
+					}
+				}
+			}
+		}
+	}
+}
+
+# On system lost.
+country_event = {
+	id = specialist.300
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { # checks if a new owner exists 
+			limit = { exists = FROMFROM }
+			if = {
+				limit = {
+					is_specialist_subject_type = { TYPE = bulwark }
+					FROMFROM = { NOT = { is_specialist_subject_type = { TYPE = bulwark } } }
+				}
+				FROM = {
+					if = {
+						limit = { exists = starbase }
+						starbase = { remove_bulwark_array = yes }
+						if = {
+							limit = { ROOT = { any_agreement = { specialist_tier >= 3 } } }
+							starbase = { remove_disintegrator_field = yes }
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					is_specialist_subject_tier = { TYPE = bulwark TIER = 3 }
+					FROMFROM = {
+						is_specialist_subject_type = { TYPE = bulwark }
+						NOT = { any_agreement = { specialist_tier = 3 } }
+					}
+				}
+				FROM = {
+					if = {
+						limit = { exists = starbase }
+						starbase = {
+							remove_disintegrator_field = yes
+						}
+					}
+				}
+			}
+		}
+		else = { # if no new owner, always remove the disintegrator field (just a failsafe, systems with no onwer shouldn't have a starbase)
+			FROM = {
+				if = {
+					limit = { exists = starbase }
+					starbase = {
+						remove_disintegrator_field = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# On leader spawned.
+country_event = {
+	id = specialist.400
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { is_specialist_subject = yes }
+			if = {
+				limit = {
+					is_specialist_subject_tier = {
+						TYPE = bulwark
+						TIER = 2
+					}
+				}
+				FROM = {
+					add_specialist_trait_to_leader_in_pool = {
+						TYPE = bulwark
+						CLASS = admiral
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					is_specialist_subject_tier = {
+						TYPE = scholarium
+						TIER = 2
+					}
+				}
+				FROM = {
+					add_specialist_trait_to_leader_in_pool = {
+						TYPE = scholarium
+						CLASS = scientist
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					is_specialist_subject_tier = {
+						TYPE = prospectorium
+						TIER = 2
+					}
+				}
+				FROM = {
+					add_specialist_trait_to_leader_in_pool = {
+						TYPE = prospectorium
+						CLASS = governor
+					}
+				}
+			}
+		}
+	}
+}
+
+# On yearly pulse
+country_event = {
+	id = specialist.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_specialist_subject_type = { TYPE = scholarium }
+		any_planet_within_border = {
+			valid_for_scholarium_sensors = yes
+		}
+	}
+
+	immediate = {
+		random = {
+			chance = 20
+			trigger_scholarium_project_event = yes
+		}
+	}
+}
+
+# On sector released as vassal.
+country_event = {
+	id = specialist.700
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = newly_released_sector_loyalty
+			years = 5
+		}
+	}
+}
+
+# On acquiring tradition finisher.
+country_event = {
+	id = specialist.800
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				is_specialist_subject_tier = {
+					TYPE = bulwark
+					TIER = 3
+				}
+				NOT = { has_country_flag = finished_unyielding_tree }
+				has_tradition = tr_unyielding_finish
+			}
+			set_country_flag = finished_unyielding_tree
+			every_owned_starbase = {
+				limit = { is_normal_starbase = yes }
+				remove_disintegrator_field = yes
+				add_disintegrator_field = yes
+			}
+		}
+	}
+}
+
+## Scholarium planetary sensor.
+country_event = {
+	id = specialist.900
+	title = specialist.900.name
+	desc = {
+		text = specialist.900.desc
+		trigger = { is_gestalt = no }
+	}
+	desc = {
+		text = specialist.900.desc.gestalt
+		trigger = { is_gestalt = yes }
+	}
+
+	is_triggered_only = yes
+	picture = GFX_evt_scholarium_anomaly
+	show_sound = evn_ove_scholarium_anomaly
+	location = FROM
+
+	option = {
+		name = specialist.900.A
+		enable_special_project = {
+			name = SCHOLARIUM_PLANETARY_SENSORS
+			location = ROOT.FROM
+		}
+	}
+}
+
+# Engineering Cache
+country_event = {
+	id = specialist.905
+	title = specialist.905.name
+	desc = {
+		text = specialist.905.desc
+		trigger = { is_gestalt = no }
+	}
+	desc = {
+		text = specialist.905.desc.gestalt
+		trigger = { is_gestalt = yes }
+	}
+
+	is_triggered_only = yes
+	picture = GFX_evt_engineering_cache
+	show_sound = evn_ove_scholarium_cache_engineering
+	location = FROM
+
+	option = {
+		name = EXCELLENT
+		add_scholarium_research = { TYPE = engineering }
+	}
+}
+
+# Society Cache
+country_event = {
+	id = specialist.910
+	title = specialist.910.name
+	desc = {
+		text = specialist.910.desc
+		trigger = { is_gestalt = no }
+	}
+	desc = {
+		text = specialist.910.desc.gestalt
+		trigger = { is_gestalt = yes }
+	}
+
+	is_triggered_only = yes
+	picture = GFX_evt_society_cache
+	show_sound = evn_ove_scholarium_cache_society
+	location = FROM
+
+	option = {
+		name = EXCELLENT
+		add_scholarium_research = { TYPE = society }
+	}
+}
+
+# Physics Cache
+country_event = {
+	id = specialist.915
+	title = specialist.915.name
+	desc = {
+		text = specialist.915.desc
+		trigger = { is_gestalt = no }
+	}
+	desc = {
+		text = specialist.915.desc.gestalt
+		trigger = { is_gestalt = yes }
+	}
+
+	is_triggered_only = yes
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+	location = FROM
+
+	option = {
+		name = EXCELLENT
+		add_scholarium_research = { TYPE = physics }
+	}
+}
+
+# Rare Cache
+country_event = {
+	id = specialist.920
+	title = specialist.920.name
+	desc = {
+		text = specialist.920.desc
+		trigger = { is_gestalt = no }
+	}
+	desc = {
+		text = specialist.920.desc.gestalt
+		trigger = { is_gestalt = yes }
+	}
+
+	is_triggered_only = yes
+	picture = GFX_evt_rare_tech_cache
+	show_sound = evn_ove_scholarium_cache_rare_tech
+	location = FROM
+
+	option = {
+		name = EXCELLENT
+		add_random_research_option = { ignore_rare = no }
+	}
+}
+
+# On government changed.
+country_event = {
+	id = specialist.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { is_megacorp = yes }
+			every_agreement = {
+				limit = { agreement_preset = preset_vassal }
+				set_agreement_preset = {
+					preset = preset_subsidiary
+					apply_terms = no
+				}
+			}
+		}
+		else_if = {
+			limit = { is_megacorp = no }
+			every_agreement = {
+				limit = { agreement_preset = preset_subsidiary }
+				set_agreement_preset = {
+					preset = preset_vassal
+					apply_terms = no
+				}
+			}
+		}
+		if = {
+			limit = { is_feudal_empire = { allow_invalid = yes } }
+			every_subject = {
+				limit = { NOT = { has_modifier = feudal_lord } }
+				add_modifier = { modifier = feudal_lord }
+				erase_modifier = { MOD = divided_patronage }
+			}
+		}
+		else_if = {
+			limit = { is_franchise = { allow_invalid = yes } }
+			every_subject = {
+				limit = { NOT = { has_modifier = corporate_franchise } }
+				add_modifier = { modifier = corporate_franchise }
+				erase_modifier = { MOD = divided_patronage }
+			}
+		}
+	}
+}
+
+### Prospectorium - Resource Discovery ###
+country_event = { # Yearly Pulse
+	id = specialist.1100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_specialist_subject_type = { TYPE = prospectorium }
+		any_planet_within_border = {
+			valid_for_prospectorium_discovery = yes
+		}
+	}
+
+	immediate = {
+		random = {
+			chance = 20
+			random_planet_within_border = {
+				limit = { valid_for_prospectorium_discovery = yes }
+				save_event_target_as = prospectorium_discovery_target
+			}
+			country_event = {
+				id = specialist.1150
+				days = 1
+				random = 180
+			}
+		}
+	}
+}
+
+country_event = { # Special Project Event
+	id = specialist.1150
+	title = specialist.1150.title
+	desc = specialist.1150.desc
+	picture = GFX_evt_crystal_mining
+	show_sound = evn_ove_crystal_mining
+
+	is_triggered_only = yes
+	location = event_target:prospectorium_discovery_target
+
+	trigger = {
+		is_specialist_subject_type = { TYPE = prospectorium }
+		event_target:prospectorium_discovery_target = {
+			valid_for_prospectorium_discovery = yes
+		}
+	}
+
+	immediate = {
+		event_target:prospectorium_discovery_target = { set_planet_flag = resource_discovery_flag }
+		if = {
+			limit = {
+				any_agreement = { specialist_tier = 1 }
+			}
+			set_country_flag = prospectorium_resource_discovery_energy
+			set_country_flag = prospectorium_resource_discovery_minerals
+		}
+		else_if = {
+			limit = {
+				any_agreement = { specialist_tier = 2 }
+			}
+			prospectorium_resource_discovery_flag_tier_2_effect = yes
+		}
+		else_if = {
+			limit = {
+				any_agreement = { specialist_tier = 3 }
+			}
+			prospectorium_resource_discovery_flag_tier_3_effect = yes
+		}
+	}
+
+	option = { # Energy
+		name = specialist.1150.a
+		trigger = { has_country_flag = prospectorium_resource_discovery_energy }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_ENERGY
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.a.tt
+	}
+
+	option = { # Minerals
+		name = specialist.1150.b
+		trigger = { has_country_flag = prospectorium_resource_discovery_minerals }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_MINERALS
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.b.tt
+	}
+
+	option = { # Alloys
+		name = specialist.1150.c
+		trigger = { has_country_flag = prospectorium_resource_discovery_alloys }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_ALLOYS
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.c.tt
+	}
+
+	option = { # Rare Crystals
+		name = specialist.1150.d
+		trigger = { has_country_flag = prospectorium_resource_discovery_rare_crystals }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_RARE_CRYSTALS
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.d.tt
+	}
+
+	option = { # Volatile Motes
+		name = specialist.1150.e
+		trigger = { has_country_flag = prospectorium_resource_discovery_volatile_motes }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_VOLATILE_MOTES
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.e.tt
+	}
+
+	option = { # Exotic Gases
+		name = specialist.1150.f
+		trigger = { has_country_flag = prospectorium_resource_discovery_exotic_gases }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_EXOTIC_GASES
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.f.tt
+	}
+
+	option = { # Zro
+		name = specialist.1150.g
+		trigger = { has_country_flag = prospectorium_resource_discovery_zro }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_ZRO
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.g.tt
+	}
+
+	option = { # Dark Matter
+		name = specialist.1150.h
+		trigger = { has_country_flag = prospectorium_resource_discovery_dark_matter }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_DARK_MATTER
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.h.tt
+	}
+
+	option = { # Living Metal
+		name = specialist.1150.i
+		trigger = { has_country_flag = prospectorium_resource_discovery_living_metal }
+		enable_special_project = {
+			name = PROSPECTORIUM_RESOURCE_DISCOVERY_LIVING_METAL
+			location = event_target:prospectorium_discovery_target
+		}
+		custom_tooltip = specialist.1150.i.tt
+	}
+
+	after = {
+		prospectorium_resource_discovery_remove_flag_effect = yes
+	}
+}
+
+country_event = { # Reward - Energy
+	id = specialist.1200
+	title = specialist.1200.title
+	desc = specialist.1200.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = energy
+				DEPOSIT1 = d_energy_3
+				DEPOSIT2 = d_energy_4
+				DEPOSIT3 = d_energy_5
+				RESOURCELOW = @BaseResourceLow
+				RESOURCELOWBOOSTED = @BaseResourceLowBoosted
+				RESOURCEMEDIUM = @BaseResourceMedium
+				RESOURCEMEDIUMBOOSTED = @BaseResourceMediumBoosted
+				RESOURCEHIGH = @BaseResourceHigh
+				RESOURCEHIGHBOOSTED = @BaseResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Minerals
+	id = specialist.1210
+	title = specialist.1210.title
+	desc = specialist.1210.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = minerals
+				DEPOSIT1 = d_minerals_3
+				DEPOSIT2 = d_minerals_4
+				DEPOSIT3 = d_minerals_5
+				RESOURCELOW = @BaseResourceLow
+				RESOURCELOWBOOSTED = @BaseResourceLowBoosted
+				RESOURCEMEDIUM = @BaseResourceMedium
+				RESOURCEMEDIUMBOOSTED = @BaseResourceMediumBoosted
+				RESOURCEHIGH = @BaseResourceHigh
+				RESOURCEHIGHBOOSTED = @BaseResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Alloys
+	id = specialist.1220
+	title = specialist.1220.title
+	desc = specialist.1220.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = alloys
+				DEPOSIT1 = d_alloys_2
+				DEPOSIT2 = d_alloys_3
+				DEPOSIT3 = d_alloys_4
+				RESOURCELOW = @AlloysResourceLow
+				RESOURCELOWBOOSTED = @AlloysResourceLowBoosted
+				RESOURCEMEDIUM = @AlloysResourceMedium
+				RESOURCEMEDIUMBOOSTED = @AlloysResourceMediumBoosted
+				RESOURCEHIGH = @AlloysResourceHigh
+				RESOURCEHIGHBOOSTED = @AlloysResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Rare Crystals
+	id = specialist.1230
+	title = specialist.1230.title
+	desc = specialist.1230.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = rare_crystals
+				DEPOSIT1 = d_rare_crystals_1
+				DEPOSIT2 = d_rare_crystals_2
+				DEPOSIT3 = d_rare_crystals_3
+				RESOURCELOW = @AdvancedResourceLow
+				RESOURCELOWBOOSTED = @AdvancedResourceLowBoosted
+				RESOURCEMEDIUM = @AdvancedResourceMedium
+				RESOURCEMEDIUMBOOSTED = @AdvancedResourceMediumBoosted
+				RESOURCEHIGH = @AdvancedResourceHigh
+				RESOURCEHIGHBOOSTED = @AdvancedResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Volatile Motes
+	id = specialist.1240
+	title = specialist.1240.title
+	desc = specialist.1240.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = volatile_motes
+				DEPOSIT1 = d_volatile_motes_1
+				DEPOSIT2 = d_volatile_motes_2
+				DEPOSIT3 = d_volatile_motes_3
+				RESOURCELOW = @AdvancedResourceLow
+				RESOURCELOWBOOSTED = @AdvancedResourceLowBoosted
+				RESOURCEMEDIUM = @AdvancedResourceMedium
+				RESOURCEMEDIUMBOOSTED = @AdvancedResourceMediumBoosted
+				RESOURCEHIGH = @AdvancedResourceHigh
+				RESOURCEHIGHBOOSTED = @AdvancedResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Exotic Gases
+	id = specialist.1250
+	title = specialist.1250.title
+	desc = specialist.1250.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = exotic_gases
+				DEPOSIT1 = d_exotic_gases_1
+				DEPOSIT2 = d_exotic_gases_2
+				DEPOSIT3 = d_exotic_gases_3
+				RESOURCELOW = @AdvancedResourceLow
+				RESOURCELOWBOOSTED = @AdvancedResourceLowBoosted
+				RESOURCEMEDIUM = @AdvancedResourceMedium
+				RESOURCEMEDIUMBOOSTED = @AdvancedResourceMediumBoosted
+				RESOURCEHIGH = @AdvancedResourceHigh
+				RESOURCEHIGHBOOSTED = @AdvancedResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Zro
+	id = specialist.1260
+	title = specialist.1260.title
+	desc = specialist.1260.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = sr_zro
+				DEPOSIT1 = d_zro_deposit_1
+				DEPOSIT2 = d_zro_deposit_1
+				DEPOSIT3 = d_zro_deposit_1
+				RESOURCELOW = @RareResourceLow
+				RESOURCELOWBOOSTED = @RareResourceLowBoosted
+				RESOURCEMEDIUM = @RareResourceMedium
+				RESOURCEMEDIUMBOOSTED = @RareResourceMediumBoosted
+				RESOURCEHIGH = @RareResourceHigh
+				RESOURCEHIGHBOOSTED = @RareResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Dark Matter
+	id = specialist.1270
+	title = specialist.1270.title
+	desc = specialist.1270.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = sr_dark_matter
+				DEPOSIT1 = d_dark_matter_deposit_1
+				DEPOSIT2 = d_dark_matter_deposit_1
+				DEPOSIT3 = d_dark_matter_deposit_1
+				RESOURCELOW = @RareResourceLow
+				RESOURCELOWBOOSTED = @RareResourceLowBoosted
+				RESOURCEMEDIUM = @RareResourceMedium
+				RESOURCEMEDIUMBOOSTED = @RareResourceMediumBoosted
+				RESOURCEHIGH = @RareResourceHigh
+				RESOURCEHIGHBOOSTED = @RareResourceHighBoosted
+			}
+		}
+	}
+}
+
+country_event = { # Reward - Living Metal
+	id = specialist.1280
+	title = specialist.1280.title
+	desc = specialist.1280.desc
+	picture = GFX_evt_physics_cache
+	show_sound = evn_ove_scholarium_cache_physics
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:prospectorium_discovery_target = {
+			prospectorium_resource_discovery_reward_effect = {
+				RESOURCE = sr_living_metal
+				DEPOSIT1 = d_living_metal_deposit
+				DEPOSIT2 = d_living_metal_deposit
+				DEPOSIT3 = d_living_metal_deposit
+				RESOURCELOW = @RareResourceLow
+				RESOURCELOWBOOSTED = @RareResourceLowBoosted
+				RESOURCEMEDIUM = @RareResourceMedium
+				RESOURCEMEDIUMBOOSTED = @RareResourceMediumBoosted
+				RESOURCEHIGH = @RareResourceHigh
+				RESOURCEHIGHBOOSTED = @RareResourceHighBoosted
+			}
+		}
+	}
+}

@@ -1,0 +1,347 @@
+# <example_trigger> = {
+#	 is_playable = yes
+#	 num_communications > 0
+# }
+
+# As expressed in a script file:
+# trigger = {
+#	 <example_trigger> = yes
+# }
+
+#Country scope
+has_active_spynetwork = {
+	any_spynetwork = {
+		owner = { is_same_value = prevprev }
+		target = { is_playable = yes }
+		exists = leader
+		is_spynetwork_level > 0
+	}
+}
+
+#Country scope
+has_active_preftl_spynetwork = {
+	any_spynetwork = {
+		owner = { is_same_value = prevprev }
+		target = { is_country_type = primitive }
+		exists = leader
+		is_spynetwork_level > 0
+	}
+}
+
+#Country scope
+#Note: empires which cannot do diplomacy are already excluded from Espionage
+has_hostile_espionage_operation_ethics = {
+	OR = {
+		has_ethic = ethic_xenophobe
+		has_ethic = ethic_fanatic_xenophobe
+		is_machine_empire = yes
+		is_hive_empire = yes
+	}
+}
+
+# Country scope | from = Operation
+espionage_operation_disguise_disadvantage = {
+	OR = {
+		# Lacking appearance-changing tech
+		AND = {
+			species = { is_robotic = no }
+			NOT = { has_technology = tech_gene_tailoring }
+		}
+		AND = {
+			species = { is_robotic = yes } # Machine Intelligences, Synths, etc.
+			NOR = {
+				has_technology = tech_robomodding
+				has_technology = tech_robomodding_m
+			}
+		}
+		# Profound physiological differences
+		AND = {
+			is_gestalt = no
+			root.from.target = { is_gestalt = yes }
+		}
+		AND = {
+			is_gestalt = yes
+			root.from.target = { is_gestalt = no }
+		}
+		AND = {
+			owner_species = {
+				NOT = { has_trait = trait_cybernetic }
+			}
+			root.from.target = {
+				owner_species = { has_trait = trait_cybernetic }
+			}
+		}
+		AND = {
+			owner_species = {
+				NOT = { has_trait = trait_psionic }
+			}
+			root.from.target = {
+				owner_species = { has_trait = trait_psionic }
+			}
+		}
+	}
+	# Lacking the kinds of Asset which can help cover up the above
+	root.from = {
+		target = {
+			is_playable = yes
+		}
+		NOR = {
+			has_espionage_asset = asset_bureaucrat
+			has_espionage_asset = asset_clerk
+			has_espionage_asset = asset_ephapse_relay
+			has_espionage_asset = asset_behavioral_regulator
+			has_espionage_asset = asset_engagement_protocol
+		}
+	}
+}
+
+# Country scope (for use in e.g. Espionage Operation triggers)
+has_appearance_modding_technology = {
+	OR = {
+		AND = {
+			species = { is_robotic = no }
+			has_technology = tech_gene_tailoring
+		}
+		AND = {
+			species = { is_robotic = yes } # Machine Intelligences, Synths, etc.
+			OR = {
+				has_technology = tech_robomodding
+				has_technology = tech_robomodding_m
+			}
+		}
+	}
+}
+
+#Country (target) scope | root = operation
+has_sabotage_starbase_valid_target = {
+	any_owned_starbase = {
+		OR = {
+			AND = {
+				count_starbase_modules = {
+					type != shipyard
+					count > 0
+				}
+				count_starbase_modules = {
+					type != orbital_ring_shipyard
+					count > 0
+				}
+			}
+			has_nonshipyard_starbase_buildings = yes
+			is_orbital_ring = yes
+		}
+	}
+}
+#Starbase scope
+has_nonshipyard_starbase_buildings = {
+	OR = {
+		has_starbase_building = art_college
+		has_starbase_building = black_hole_observatory
+		has_starbase_building = command_center
+		has_starbase_building = communications_jammer
+		has_starbase_building = crew_quarters
+		has_starbase_building = curator_think_tank
+		has_starbase_building = deep_space_black_site
+		has_starbase_building = disruption_field
+		# has_starbase_building = dragon_hatchery #too disruptive
+		has_starbase_building = fleet_academy
+		has_starbase_building = hydroponics_bay
+		has_starbase_building = mining_bay
+		has_starbase_building = ice_mining_station
+		has_starbase_building = listening_post
+		has_starbase_building = mercenary_garrison
+		has_starbase_building = naval_logistics_office
+		has_starbase_building = nebula_refinery
+		has_starbase_building = offspring_outlook
+		has_starbase_building = offworld_trading_company
+		has_starbase_building = resource_silo
+		has_starbase_building = salvager_workshop
+		# has_starbase_building = shroud_beacon #too disruptive
+		has_starbase_building = target_uplink_computer
+		has_starbase_building = trader_proxy_office
+		has_starbase_building = transit_hub
+		has_starbase_building = warp_fluctuator
+		has_starbase_building = ring_alloys_hub
+		has_starbase_building = ring_bureaucracy_hub
+		has_starbase_building = ring_consumer_goods_hub
+		has_starbase_building = ring_energy_hub
+		has_starbase_building = ring_food_hub
+		has_starbase_building = ring_maintenance_hub
+		has_starbase_building = ring_minerals_hub
+		has_starbase_building = ring_synapse_hub
+		has_starbase_building = ring_trade_hub
+		has_starbase_building = dark_matter_listening_post
+		has_starbase_building = dark_matter_detector
+		has_starbase_building = cordyceptic_reanimation_facility
+		has_starbase_building = irassian_naval_yards
+		has_starbase_building = yuht_detection_array
+		has_starbase_building = zroni_storm_caster
+		has_starbase_building = archaeo_overcharger
+		has_starbase_building = cybrex_mining_hub
+	}
+}
+
+#Country scope
+is_galactic_community_noncouncil_member = {
+	is_galactic_community_member = yes
+	# is_part_of_galactic_council left intentionally blank
+	is_galactic_custodian = no
+	is_galactic_emperor = no
+}
+
+#Spy Network/Operation scope
+has_espionage_asset_manipulation = {
+	OR = {
+		has_espionage_asset = asset_agitator
+		has_espionage_asset = asset_newscaster
+		has_espionage_asset = asset_pop_icon
+		has_espionage_asset = asset_academic
+		has_espionage_asset = asset_veteran
+		has_espionage_asset = asset_behavioral_regulator
+		has_espionage_asset = asset_pheromone_emitter
+		has_espionage_asset = asset_resource_distribution_node
+		has_espionage_asset = asset_cortex_node
+		has_espionage_asset = asset_subspace_tendril
+	}
+}
+has_espionage_asset_sabotage = {
+	OR = {
+		has_espionage_asset = asset_criminal_underling
+		has_espionage_asset = asset_attache
+		has_espionage_asset = asset_laborer
+		has_espionage_asset = asset_hacker
+		has_espionage_asset = asset_arms_smuggler
+		has_espionage_asset = asset_command_relay
+		has_espionage_asset = asset_dispatch_uplink
+		has_espionage_asset = asset_resource_pylon
+		has_espionage_asset = asset_memory_cache
+		has_espionage_asset = asset_weapons_platform
+	}
+}
+has_espionage_asset_subterfuge = {
+	OR = {
+		has_espionage_asset = asset_bureaucrat
+		has_espionage_asset = asset_clerk
+		has_espionage_asset = asset_economist
+		has_espionage_asset = asset_scientist
+		has_espionage_asset = asset_junior_officer
+		has_espionage_asset = asset_synapse_drone
+		has_espionage_asset = asset_ephapse_relay
+		has_espionage_asset = asset_labor_drone
+		has_espionage_asset = asset_research_drone
+		has_espionage_asset = asset_warrior_drone
+		has_espionage_asset = asset_coordination_system
+		has_espionage_asset = asset_engagement_protocol
+		has_espionage_asset = asset_logistics_system
+		has_espionage_asset = asset_research_database
+		has_espionage_asset = asset_war_algorithm
+	}
+}
+has_espionage_asset_matching_operation_category = {
+	OR = {
+		AND = {
+			has_espionage_category = op_cat_manipulation
+			has_espionage_asset_manipulation = yes
+		}
+		AND = {
+			has_espionage_category = op_cat_subterfuge
+			has_espionage_asset_subterfuge = yes
+		}
+		AND = {
+			has_espionage_category = op_cat_sabotage
+			has_espionage_asset_sabotage = yes
+		}
+	}
+}
+#Category themes
+has_espionage_asset_government = {
+	OR = {
+		has_espionage_asset = asset_bureaucrat
+		has_espionage_asset = asset_criminal_underling
+		has_espionage_asset = asset_agitator
+		has_espionage_asset = asset_synapse_drone
+		has_espionage_asset = asset_behavioral_regulator
+		has_espionage_asset = asset_coordination_system
+		has_espionage_asset = asset_command_relay
+	}
+}
+has_espionage_asset_diplomacy = {
+	OR = {
+		has_espionage_asset = asset_clerk
+		has_espionage_asset = asset_attache
+		has_espionage_asset = asset_newscaster
+		has_espionage_asset = asset_ephapse_relay
+		has_espionage_asset = asset_pheromone_emitter
+		has_espionage_asset = asset_engagement_protocol
+		has_espionage_asset = asset_dispatch_uplink
+	}
+}
+has_espionage_asset_economy = {
+	OR = {
+		has_espionage_asset = asset_economist
+		has_espionage_asset = asset_laborer
+		has_espionage_asset = asset_pop_icon
+		has_espionage_asset = asset_labor_drone
+		has_espionage_asset = asset_resource_distribution_node
+		has_espionage_asset = asset_logistics_system
+		has_espionage_asset = asset_resource_pylon
+	}
+}
+has_espionage_asset_technology = {
+	OR = {
+		has_espionage_asset = asset_scientist
+		has_espionage_asset = asset_hacker
+		has_espionage_asset = asset_academic
+		has_espionage_asset = asset_research_drone
+		has_espionage_asset = asset_cortex_node
+		has_espionage_asset = asset_research_database
+		has_espionage_asset = asset_memory_cache
+	}
+}
+has_espionage_asset_military = {
+	OR = {
+		has_espionage_asset = asset_junior_officer
+		has_espionage_asset = asset_arms_smuggler
+		has_espionage_asset = asset_veteran
+		has_espionage_asset = asset_warrior_drone
+		has_espionage_asset = asset_subspace_tendril
+		has_espionage_asset = asset_war_algorithm
+		has_espionage_asset = asset_weapons_platform
+	}
+}
+has_espionage_asset_matching_operation_theme = {
+	OR = {
+		AND = {
+			has_espionage_category = op_cat_government
+			has_espionage_asset_government = yes
+		}
+		AND = {
+			has_espionage_category = op_cat_diplomacy
+			has_espionage_asset_diplomacy = yes
+		}
+		AND = {
+			has_espionage_category = op_cat_economy
+			has_espionage_asset_economy = yes
+		}
+		AND = {
+			has_espionage_category = op_cat_technology
+			has_espionage_asset_technology = yes
+		}
+		AND = {
+			has_espionage_category = op_cat_military
+			has_espionage_asset_military = yes
+		}
+	}
+}
+#Non-category themes; purely flavor
+has_espionage_asset_criminal = {
+	OR = {
+		has_espionage_asset = asset_arms_smuggler
+		has_espionage_asset = asset_criminal_underling
+		has_espionage_asset = asset_hacker
+	}
+}
+
+#Operation scope
+is_targeted_espionage_operation = {
+	has_espionage_type = operation_sabotage_starbase
+}

@@ -1,0 +1,4985 @@
+##############################
+# Colony Events
+# by Maximilian Olbers
+##############################
+
+namespace = colony
+
+########################
+# HELPFUL DRONES CHAIN #
+########################
+
+# First event, spawns a special project to awaken/catch the attention of the drones.
+# Checks for uninhabitable moon (where the drones will be in the fiction) before firing
+planet_event = {
+	id = colony.1500
+	title = "colony.1500.name"
+	desc = "colony.1500.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+	trackable = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			NOT = { has_country_flag = FLDrone_country }
+		}
+		num_pops > 0
+		NOR = {
+			is_habitat = yes
+			has_planet_flag = colony_event
+			has_planet_flag = FLDrone_event
+		}
+		has_moon = yes
+		any_moon = {
+			habitable_planet = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = FLDrone_event
+		set_planet_flag = colony_event
+		owner = { set_country_flag = FLDrone_country }
+	}
+
+	option = {
+		name = colony.1500.a
+		enable_special_project = {
+			name = "HELPFUL_DRONES_1_PROJECT"
+			location = this
+			owner = root.owner
+		}
+	}
+}
+
+# Second event, followup to special project. Reveals the drones' existence to the player
+planet_event = {
+	id = colony.1501
+	title = "colony.1501.name"
+	desc = "colony.1501.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+	}
+
+	trigger = {
+		owner = { has_country_flag = FLDrone_country }
+	}
+
+	option = {
+		name = colony.1501.a
+		hidden_effect = {
+			if = {
+				limit = { any_deposit = { is_blocker = yes } }
+				planet_event = { id = colony.1502 days = 360 random = 60 }
+			}
+			else = {
+				planet_event = { id = colony.1503 days = 360 random = 60 }
+			}
+		}
+	}
+}
+
+# Third event, drones awaken and remove a random Blocker from the planet's surface
+planet_event = {
+	id = colony.1502
+	title = "colony.1502.name"
+	desc = "colony.1502.desc"
+	picture = GFX_evt_atmospheric_entry
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1502.a
+		custom_tooltip = colony.1502.a.tooltip
+		random_deposit = {
+			limit = {
+				is_blocker = yes
+				NOR = {
+					is_deposit_type = d_buried_lithoids
+					is_deposit_type = d_lithoid_devastation
+					is_deposit_type = d_terraforming_blocker
+					is_deposit_type = d_archaeological_site
+					is_deposit_type = d_ruined_arcology
+				}
+			}
+			clear_blocker = yes
+		}
+		hidden_effect = { planet_event = { id = colony.1503 days = 360 } }
+	}
+}
+# Fourth event, drones build an old space elevator on the player's planet
+# Gives a negative modifier to production for two years and tier2 Engineering mult
+planet_event = {
+	id = colony.1503
+	title = "colony.1503.name"
+	desc = "colony.1503.desc"
+	picture = GFX_evt_big_landing_ship
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1503.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		add_modifier = {
+			modifier = "drone_space_elevator"
+			days = 3600
+		}
+		hidden_effect = { planet_event = { id = colony.1504 days = 360 } }
+	}
+}
+
+# Fifth event, adds 2 minerals to the colony's moon (mineral cache of unknown origin)
+planet_event = {
+	id = colony.1504
+	title = "colony.1504.name"
+	desc = "colony.1504.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1504.a
+		random_moon = {
+			limit = {
+				habitable_planet = no
+			}
+			if = {
+				limit = { has_deposit_for = shipclass_research_station }
+				root.owner = {
+					add_resource = {
+						minerals = 500
+					}
+				}
+			}
+			else = {
+				set_deposit = d_minerals_4
+			}
+		}
+		hidden_effect = {
+			add_modifier = {
+				modifier = "drone_mineral_gift"
+				days = -1
+			}
+			planet_event = { id = colony.1505 days = 360 }
+		}
+	}
+}
+
+# Sixth event, adds 3 life data to the colony's moon (ancient satellite transmissions)
+planet_event = {
+	id = colony.1505
+	title = "colony.1505.name"
+	desc = "colony.1505.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = FASCINATING
+		random_moon = {
+			limit = {
+				habitable_planet = no
+			}
+			if = {
+				limit = { has_deposit_for = shipclass_mining_station }
+				root.owner = {
+					add_monthly_resource_mult = {
+						resource = society_research
+						value = @tier3researchreward
+						min = @tier3researchmin
+						max = @tier3researchmax
+					}
+				}
+			}
+			else = {
+				set_deposit = d_society_3
+			}
+		}
+		hidden_effect = {
+			add_modifier = {
+				modifier = "drone_fl_satellite"
+				days = -1
+			}
+			planet_event = { id = colony.1506 days = 360 }
+		}
+	}
+}
+
+# Seventh event, some drones destroy themselves
+planet_event = {
+	id = colony.1506
+	title = "colony.1506.name"
+	desc = "colony.1506.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1506.a
+		hidden_effect = { planet_event = { id = colony.1507 days = 360 } }
+	}
+}
+
+# Eighth event, building up the next event
+planet_event = {
+	id = colony.1507
+	title = "colony.1507.name"
+	desc = "colony.1507.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1507.a
+		hidden_effect = { planet_event = { id = colony.1508 days = 360 } }
+	}
+}
+
+# Ninth event, foreign tech is discovered inside the destroyed drones
+planet_event = {
+	id = colony.1508
+	title = "colony.1508.name"
+	desc = "colony.1508.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1508.a
+		hidden_effect = { planet_event = { id = colony.1509 days = 360 } }
+	}
+}
+
+# Tenth event, foreign tech identified as comms devices.
+planet_event = {
+	id = colony.1509
+	title = "colony.1509.name"
+	desc = "colony.1509.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1509.a
+		hidden_effect = { planet_event = { id = colony.1510 days = 360 } }
+	}
+}
+
+# Eleventh event. A dastardly plot is uncovered, and the player has to choose how to proceed.
+planet_event = {
+	id = colony.1510
+	title = "colony.1510.name"
+	desc = "colony.1510.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1510.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier2influencereward
+				min = @tier2influencemin
+				max = @tier2influencemax
+			}
+		}
+		hidden_effect = { planet_event = { id = colony.1514 days = 720 } }
+	}
+
+	option = {
+		name = colony.1510.b
+		hidden_effect = { planet_event = { id = colony.1511 days = 7 } }
+	}
+
+	option = {
+		name = colony.1510.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		hidden_effect = { planet_event = { id = colony.1513 days = 720 } }
+	}
+}
+
+# Branch B (not very intuitive), drones are sent to sabotage the incoming pirate fleet.
+planet_event = {
+	id = colony.1511
+	title = "colony.1511.name"
+	desc = "colony.1511.desc"
+	picture = GFX_evt_asteroid_approaching_planet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1511.a
+		hidden_effect = { planet_event = { id = colony.1512 days = 700 } }
+	}
+}
+
+# Branch B-1, Pirate fleet spawns with reduced strength.
+planet_event = {
+	id = colony.1512
+	title = "colony.1512.name"
+	desc = "colony.1512.desc"
+	picture = GFX_evt_federation_fleet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = BATTLESTATIONS
+		hidden_effect = {
+			set_global_flag = FLDrone_done_global
+			remove_global_flag = FLDrone_doing_global
+			create_country = {
+				name = "NAME_Wounded_Pirates"
+				type = faction
+				auto_delete = yes
+				effect = {
+					set_faction_hostility = { set_hostile = yes }
+					establish_communications_no_message = root.owner
+					create_fleet = {
+						name = "NAME_Wounded_Pirates"
+						effect = {
+							set_owner = PREV
+							create_ship = {
+								name = "NAME_Scorched_Ravager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Damaged_Pillager"
+								design = "NAME_Dagger"
+							}
+							set_location = ROOT
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Branch C, pirate fleet spawns with slightly greater strength
+planet_event = {
+	id = colony.1513
+	title = "colony.1513.name"
+	desc = "colony.1513.desc"
+	picture = GFX_evt_federation_fleet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1513.a
+		hidden_effect = {
+			remove_global_flag = FLDrone_doing_global
+			set_global_flag = FLDrone_done_global
+			create_country = {
+				name = "NAME_Wounded_Pirates"
+				type = faction
+				auto_delete = yes
+				effect = {
+					set_faction_hostility = { set_hostile = yes }
+					establish_communications_no_message = root.owner
+					create_fleet = {
+						name = "NAME_Numerous_Pirates"
+						effect = {
+							set_owner = PREV
+							create_ship = {
+								name = "NAME_First_Ravager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_First_Pillager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Second_Ravager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Second_Pillager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Third_Ravager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Third_Pillager"
+								design = "NAME_Dagger"
+							}
+							set_location = ROOT
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Branch A, pirate fleet arrives unmodified.
+planet_event = {
+	id = colony.1514
+	title = "colony.1514.name"
+	desc = "colony.1514.desc"
+	picture = GFX_evt_federation_fleet
+	location = ROOT
+
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1514.a
+		hidden_effect = {
+			remove_global_flag = FLDrone_doing_global
+			set_global_flag = FLDrone_done_global
+			create_country = {
+				name = "NAME_Cunning_Pirates"
+				type = faction
+				auto_delete = yes
+				effect = {
+					establish_communications_no_message = root.owner
+					create_fleet = {
+						name = "NAME_Wounded_Pirates"
+						effect = {
+							set_owner = PREV
+							create_ship = {
+								name = "NAME_Ravager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Pillager"
+								design = "NAME_Dagger"
+							}
+							create_ship = {
+								name = "NAME_Swashbuckler"
+								design = "NAME_Dagger"
+							}
+							set_location = ROOT
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+############################
+# POLLEN APHRODISIAC CHAIN #
+############################
+
+# First event, spawns a non-mandatory special project the player can research
+planet_event = {
+	id = colony.1520
+	title = "colony.1520.name"
+	desc = "colony.1520.desc"
+	picture = GFX_evt_big_landing_ship
+	location = ROOT
+	trackable = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			NOT = { has_country_flag = pheromone_country }
+			is_gestalt = no
+		}
+		NOR = {
+			has_global_flag = pheromonefrenzy_global
+			has_global_flag = pheromonefrenzy_done_global
+			has_planet_flag = colony_event
+			has_planet_flag = pheromone_planet
+			is_unshattered_ring_habitable_segment = yes
+			is_shattered_ring_habitable = yes
+			is_habitat = yes
+			is_arid_world = yes
+			is_desert_world = yes
+			is_savannah_world = yes
+			is_city_world = yes
+			is_relic_world = yes
+		}
+		num_pops > 0
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = pheromonefrenzy_global
+		set_planet_flag = colony_event
+		set_planet_flag = pheromone_planet
+		owner = { set_country_flag = pheromone_country }
+	}
+
+	option = {
+		name = CURIOUS
+		enable_special_project = {
+			name = "POLLEN_1_PROJECT"
+			location = root
+			owner = root
+		}
+		hidden_effect = { planet_event = { id = colony.1521 days = 360 } }
+	}
+}
+
+# Second event, offers the player the choice to nip the event chain in the bud (if they can afford it). If they do not, the first planet modifier is applied.
+planet_event = {
+	id = colony.1521
+	title = "colony.1521.name"
+	desc = "colony.1521.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		owner = {
+			has_country_flag = pheromone_country
+		}
+		has_planet_flag = pheromone_planet
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	option = {
+		name = REMARKABLE
+		add_modifier = {
+			modifier = "pheromoned_1"
+			days = -1
+		}
+		hidden_effect = { planet_event = { id = colony.1522 days = 400 } }
+	}
+
+	option = {
+		name = colony.1521.b
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 400 }
+			}
+		}
+		owner = {
+			add_resource = { energy = -400 }
+		}
+	}
+
+	option = {
+		name = colony.1521.c
+		trigger = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value < 400 }
+			}
+		}
+		add_modifier = {
+			modifier = "pheromoned_1"
+			days = -1
+		}
+		hidden_effect = { planet_event = { id = colony.1522 days = 500 } }
+	}
+}
+
+# Third event, worker productivity declines. Enables an optional special project that can partially mitigate this.
+planet_event = {
+	id = colony.1522
+	title = "colony.1522.name"
+	desc = "colony.1522.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		owner = {
+			has_country_flag = pheromone_country
+		}
+		has_planet_flag = pheromone_planet
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	option = {
+		name = colony.1522.a
+		add_modifier = {
+			modifier = "pheromoned_2"
+			days = -1
+		}
+		enable_special_project = {
+			name = "POLLEN_2_PROJECT"
+			location = ROOT
+			owner = root
+		}
+		hidden_effect = { planet_event = { id = colony.1524 days = 300 } }
+
+	}
+}
+
+# Event 3-A, followup to optional special project spawned by event 3. Applies a positive modifier and gives 600 Society Research, event chain continues.
+planet_event = {
+	id = colony.1523
+	title = "colony.1523.name"
+	desc = "colony.1523.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		owner = {
+			has_country_flag = pheromone_country
+		}
+		has_planet_flag = pheromone_planet
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	option = {
+		name = colony.1523.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		add_modifier = {
+			modifier = "depheromoned_1"
+			days = -1
+		}
+	}
+}
+
+# Fourth event, colony's pops become much less inclined to migrate
+planet_event = {
+	id = colony.1524
+	title = "colony.1524.name"
+	desc = "colony.1524.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		owner = {
+			has_country_flag = pheromone_country
+		}
+		has_planet_flag = pheromone_planet
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	option = {
+		name = INTRIGUING
+		add_modifier = {
+			modifier = "pheromoned_3"
+			days = -1
+		}
+		hidden_effect = { planet_event = { id = colony.1525 days = 100 } }
+	}
+}
+
+# Fifth event, chain branches. Player can either accept another negative modifier for the sake of stability, or avoid it for now with repercussions down the road.
+planet_event = {
+	id = colony.1525
+	title = "colony.1525.name"
+	desc = "colony.1525.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	auto_opens = yes
+
+	option = {
+		name = colony.1525.a
+		hidden_effect = { planet_event = { id = colony.1529 days = 200 } }
+	}
+
+	option = {
+		name = colony.1525.b
+		add_modifier = {
+			modifier = "pheromoned_4"
+			days = -1
+		}
+		hidden_effect = { planet_event = { id = colony.1526 days = 200 } }
+	}
+}
+
+# Branch A-1, the player's country has to depose the local government and run the colony from the capital.
+planet_event = {
+	id = colony.1526
+	title = "colony.1526.name"
+	desc = "colony.1526.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	auto_opens = yes
+
+	option = {
+		name = colony.1526.a
+		hidden_effect = { planet_event = { id = colony.1527 days = 300 } }
+	}
+}
+
+# Branch A-2, the new government starts taking steps to break the native flower's narcotic hold over the population
+planet_event = {
+	id = colony.1527
+	title = "colony.1527.name"
+	desc = "colony.1527.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	auto_opens = yes
+
+	option = {
+		name = INTRIGUING
+		hidden_effect = { planet_event = { id = colony.1528 days = 360 } }
+	}
+}
+
+# Branch A-3, the new government comes into contact with a still-loyal military force stationed on the planet, and stage a colony-wide purge of the pollen-bearing flower. All modifiers associated with the plant's proliferation are removed and the event chain ends.
+planet_event = {
+	id = colony.1528
+	title = "colony.1528.name"
+	desc = "colony.1528.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	auto_opens = yes
+
+	immediate = {
+		remove_global_flag = pheromonefrenzy_global
+		remove_planet_flag = colony_event
+		remove_planet_flag = pheromone_planet
+		set_global_flag = pheromonefrenzy_done_global
+	}
+
+	option = {
+		name = colony.1528.a
+		hidden_effect = {
+			if = {
+				limit = { has_modifier = pheromoned_1 }
+			remove_modifier = pheromoned_1
+			}
+
+			if = {
+				limit = { has_modifier = pheromoned_2 }
+			remove_modifier = pheromoned_2
+			}
+
+			if = {
+				limit = { has_modifier = pheromoned_3 }
+			remove_modifier = pheromoned_3
+			}
+
+			if = {
+				limit = { has_modifier = pheromoned_4 }
+			remove_modifier = pheromoned_4
+			}
+
+			if = {
+				limit = { has_modifier = depheromoned_1 }
+			remove_modifier = depheromoned_1
+			}
+		}
+		custom_tooltip = colony.1528.a.tooltip
+	}
+}
+
+# Branch B-1, due to the player's hands-off approach to the colony's affairs, a flower-cult has arisen on the planet. Tension increases.
+planet_event = {
+	id = colony.1529
+	title = "colony.1529.name"
+	desc = "colony.1529.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	option = {
+		name = WORRYING
+		hidden_effect = { planet_event = { id = colony.1530 days = 60 } }
+	}
+}
+
+# Branch B-2, something bad is about to happen. A special project is enabled, allowing the player to potentially stave off disaster.
+planet_event = {
+	id = colony.1530
+	title = "colony.1530.name"
+	desc = "colony.1530.desc"
+	picture = GFX_evt_medieval_alien_civilization
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	option = {
+		name = colony.1530.a
+		enable_special_project = {
+			name = "POLLEN_3_PROJECT"
+			location = this
+			owner = root
+		}
+	}
+}
+
+# Branch B-2-1, successfully researched the special project! The planet is purged of the plant and everything returns to normal. Event chain ends.
+planet_event = {
+	id = colony.1531
+	title = "colony.1531.name"
+	desc = "colony.1531.desc"
+	picture = GFX_evt_big_landing_ship
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	immediate = {
+		if = {
+			limit = { has_modifier = pheromoned_1 }
+			remove_modifier = pheromoned_1
+		}
+		if = {
+			limit = { has_modifier = pheromoned_2 }
+			remove_modifier = pheromoned_2
+		}
+		if = {
+			limit = { has_modifier = pheromoned_3 }
+			remove_modifier = pheromoned_3
+		}
+		if = {
+			limit = { has_modifier = pheromoned_4 }
+			remove_modifier = pheromoned_4
+		}
+		if = {
+			limit = { has_modifier = depheromoned_1 }
+			remove_modifier = depheromoned_1
+		}
+		set_planet_flag = pheromonefrenzy_reviving
+	}
+
+	option = {
+		name = colony.1531.a
+		custom_tooltip = colony.1531.a.tooltip
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+}
+
+# Branch B-2-2, failed to research the special project! The planet is purged of the flower, and indeed all life. The player's colony is destroyed, the planet becomes Toxic for two years, and the player's country gains a negative happiness modifier for ten years.
+planet_event = {
+	id = colony.1532
+	title = "colony.1532.name"
+	desc = "colony.1532.desc"
+	picture = GFX_evt_satellite_in_orbit
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_planet_flag = pheromone_planet
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = colony_event
+		num_pops > 0
+	}
+
+	auto_opens = yes
+
+	immediate = {
+		if = {
+			limit = { has_modifier = pheromoned_1 }
+			remove_modifier = pheromoned_1
+		}
+		if = {
+			limit = { has_modifier = pheromoned_2 }
+			remove_modifier = pheromoned_2
+		}
+		if = {
+			limit = { has_modifier = pheromoned_3 }
+			remove_modifier = pheromoned_3
+		}
+		if = {
+			limit = { has_modifier = pheromoned_4 }
+			remove_modifier = pheromoned_4
+		}
+		if = {
+			limit = { has_modifier = depheromoned_1 }
+			remove_modifier = depheromoned_1
+		}
+		set_planet_flag = pheromonefrenzy_reviving
+
+		owner = {
+			add_modifier = {
+				modifier = "pheromoned_grief"
+				days = 3600
+			}
+		}
+	}
+
+	option = {
+		name = colony.1532.a
+		hidden_effect = {
+			owner = {
+				country_event = { id = colony.1533 days = 720 }
+			}
+			every_owned_pop = {
+				kill_pop = yes
+			}
+			change_pc = pc_toxic
+			destroy_colony = yes
+		}
+
+		tooltip = {
+			owner = {
+				add_modifier = {
+					modifier = "pheromoned_grief"
+					days = 3600
+				}
+			}
+		}
+	}
+}
+
+# Branch B-2-3, the planet is no longer toxic and can be re-colonized. Event chain ends.
+country_event = {
+	id = colony.1533
+	title = "colony.1533.name"
+	desc = "colony.1533.desc"
+	picture = GFX_evt_landing_ship
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		has_global_flag = pheromonefrenzy_global
+		from = {
+			is_toxic_world = yes
+		}
+	}
+
+	immediate = {
+		from = {
+			remove_planet_flag = pheromonefrenzy_reviving
+			remove_planet_flag = colony_event
+			remove_planet_flag = pheromone_planet
+			change_pc = pc_desert
+		}
+		set_global_flag = pheromonefrenzy_done_global
+	}
+
+	option = {
+		name = colony.1533.a
+		custom_tooltip = pheromonefrenzy.revived.tooltip
+	}
+}
+
+# Event 1-A, followup event to optional research project. Player gains 600 Society Research.
+planet_event = {
+	id = colony.1534
+	title = "colony.1534.name"
+	desc = "colony.1534.desc"
+	picture = GFX_evt_alien_ruins
+	location = ROOT
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+	}
+
+	trigger = {
+		has_global_flag = pheromonefrenzy_global
+		has_planet_flag = pheromone_planet
+		has_planet_flag = colony_event
+	}
+
+	option = {
+		name = OK
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+
+############################
+#
+# Colony Events
+#
+# Written by Niclas Karlsson
+#
+############################
+
+namespace = colony
+
+#Trouble in Paradise
+planet_event = {
+	id = colony.2001
+	title = colony.2001.name
+	desc = colony.2001.desc
+	picture = GFX_evt_smugglers_in_bar
+	show_sound = event_conversation
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			OR = {
+				has_ethic = ethic_fanatic_militarist
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_pacifist
+				has_ethic = ethic_pacifist
+			}
+			NOR = {
+				has_country_flag = colony_event_ethic_diverge
+				is_gestalt = yes
+			}
+		}
+		num_pops > 0
+		OR = {
+			is_continental_world = yes
+			is_tropical_world = yes
+			is_gaia_world = yes
+		}
+		NOT = {
+			has_planet_flag = colony_event
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = colony_event
+		owner = {
+			set_timed_country_flag = { flag = colony_event_ethic_diverge days = 1800 } # 5 years
+		}
+	}
+
+	option = {
+		name = colony.2001.a
+		custom_tooltip = colony.2001.a.pacifist.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_militarist
+				}
+			}
+		}
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_pacifist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_militarist days = 7 }
+				pop_diverge_ethic = yes #Scripted effect controlled by the pop flag set before it
+			}
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_pacifist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_militarist days = 7 }
+				pop_diverge_ethic = yes
+			}
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_pacifist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_militarist days = 7 }
+				pop_diverge_ethic = yes
+			}
+		}
+	}
+	option = {
+		name = colony.2001.a
+		custom_tooltip = colony.2001.a.military.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_pacifist
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+		}
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_militarist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_pacifist days = 7 }
+				pop_diverge_ethic = yes
+			}
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_militarist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_pacifist days = 7 }
+				pop_diverge_ethic = yes
+			}
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_militarist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_pacifist days = 7 }
+				pop_diverge_ethic = yes
+			}
+		}
+	}
+	option = {
+		name = colony.2001.b
+		custom_tooltip = colony.2001.b.pacifism.tooltip
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_pacifist
+					has_ethic = ethic_pacifist
+					has_ethic = ethic_fanatic_egalitarian
+				}
+			}
+		}
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_pacifist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_militarist days = 7 }
+				pop_diverge_ethic = yes
+			}
+			add_modifier = {
+				modifier = suppressed_opposition
+				days = 3600
+			}
+			set_timed_planet_flag = {
+				flag = suppressed_opposition_flag
+				days = 3600
+			}
+		}
+	}
+	option = {
+		name = colony.2001.b
+		custom_tooltip = colony.2001.b.military.tooltip
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_militarist
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_egalitarian
+				}
+			}
+		}
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					NOR = {
+						has_ethic = ethic_militarist
+						has_pop_flag = pop_changed_ethics
+					}
+				}
+				set_timed_pop_flag = { flag = ethic_diverge_from_pacifist days = 7 }
+				pop_diverge_ethic = yes
+			}
+			add_modifier = {
+				modifier = suppressed_opposition
+				days = 3600
+			}
+			set_timed_planet_flag = {
+				flag = suppressed_opposition_flag
+				days = 3600
+			}
+		}
+	}
+}
+#Follow up if colony is destroyed to remove modifier
+planet_event = {
+	id = colony.2002
+	hide_window = yes
+
+	trigger = {
+		has_planet_flag = suppressed_opposition_flag
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_modifier = suppressed_opposition
+		remove_planet_flag = suppressed_opposition_flag
+	}
+}
+
+#Submerged Cruiser
+planet_event = {
+	id = colony.2005
+	title = colony.2005.name
+	desc = colony.2005.desc
+	picture = GFX_evt_ocean
+	show_sound = event_sensor_ping
+	location = root
+	trackable = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+	
+	trigger = {
+		owner = {
+			has_technology = tech_destroyers
+			NOT = { has_country_flag = colony_submerged_cruiser }
+		}
+		num_pops > 0
+		NOT = {
+			has_planet_flag = colony_event
+		}
+		OR = {
+			is_continental_world = yes
+			is_tropical_world = yes
+			is_gaia_world = yes
+			is_ocean_world = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = colony_event
+		owner = { set_country_flag = colony_submerged_cruiser }
+	}
+	# Salvage the Ship
+	option = {
+		name = colony.2005.a
+		trigger = {
+			owner = {
+				is_scavenger = no
+			}
+		}
+		enable_special_project = {
+			name = "ANCIENT_OCEAN_SHIP"
+			owner = root
+			location = root
+		}
+	}
+	# Scrap the Ship to get tech
+	option = {
+		name = colony.2005.b
+		trigger = {
+			owner = {
+				NOR = {
+					is_scavenger = yes
+					has_technology = tech_destroyers
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					has_tech_option = tech_destroyers
+				}
+				add_tech_progress = {
+					tech = tech_destroyers
+					progress = 0.60
+				}
+			}
+			else = {
+				add_research_option = tech_destroyers
+				add_tech_progress = {
+					tech = tech_destroyers
+					progress = 0.20
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2005.b
+		trigger = {
+			owner = {
+				has_technology = tech_destroyers
+				NOR = {
+					is_scavenger = yes
+					has_technology = tech_cruisers
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					has_tech_option = tech_cruisers
+				}
+				add_tech_progress = {
+					tech = tech_cruisers
+					progress = 0.60
+				}
+			}
+			else = {
+				add_research_option = tech_cruisers
+				add_tech_progress = {
+					tech = tech_cruisers
+					progress = 0.20
+				}
+			}
+		}
+	}
+	# Scavengers get both
+	option = {
+		name = colony.2005.a
+		trigger = {
+			owner = {
+				is_scavenger = yes
+				NOT = {
+					has_technology = tech_destroyers
+				}
+			}
+		}
+		owner = {
+			enable_special_project = {
+				name = "ANCIENT_OCEAN_SHIP"
+				owner = root
+				location = root
+			}
+			if = {
+				limit = {
+					has_tech_option = tech_destroyers
+				}
+				add_tech_progress = {
+					tech = tech_destroyers
+					progress = 0.60
+				}
+			}
+			else = {
+				add_research_option = tech_destroyers
+				add_tech_progress = {
+					tech = tech_destroyers
+					progress = 0.20
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2005.a
+		trigger = {
+			owner = {
+				is_scavenger = yes
+				has_technology = tech_destroyers
+				NOT = {
+					has_technology = tech_cruisers
+				}
+			}
+		}
+		owner = {
+			enable_special_project = {
+				name = "ANCIENT_OCEAN_SHIP"
+				owner = root
+				location = root
+			}
+			if = {
+				limit = {
+					has_tech_option = tech_cruisers
+				}
+				add_tech_progress = {
+					tech = tech_cruisers
+					progress = 0.60
+				}
+			}
+			else = {
+				add_research_option = tech_cruisers
+				add_tech_progress = {
+					tech = tech_cruisers
+					progress = 0.20
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2005.a
+		trigger = {
+			owner = {
+				is_scavenger = yes
+				has_technology = tech_cruisers
+			}
+		}
+		enable_special_project = {
+			name = "ANCIENT_OCEAN_SHIP"
+			owner = root
+			location = root
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}
+#Follow-up 1
+planet_event = {
+	id = colony.2006
+	title = PROJECT_COMPLETE
+	desc = colony.2006.desc
+	picture = GFX_evt_big_landing_ship
+	show_sound = event_ship_thrusters
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			save_event_target_as = "me"
+		}
+	}
+
+	option = {
+		name = colony.2006.a.material
+		custom_tooltip = colony.2006.a.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		hidden_effect = {
+			create_fleet = {
+				name = "NAME_Seaborn_Flotilla"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = event_target:me
+					create_ship_design = {
+						design = "NAME_Sword"
+					}
+					create_ship = {
+						name = "NAME_Seafallen_Cruiser"
+						design = last_created_design
+						upgradable = no
+					}
+					set_location = root
+					add_modifier = {
+						modifier = ship_master_cruiser
+						days = -1
+					}
+				}
+			}
+			owner = {
+				add_modifier = {
+					modifier = streamlined_ship_design
+					days = -1
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2006.a.phile
+		custom_tooltip = colony.2006.a.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_xenophile
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = "me"
+			}
+			create_fleet = {
+				name = "NAME_Seafallen_Cruiser"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = event_target:me
+					create_ship_design = {
+						design = "NAME_Sword"
+					}
+					create_ship = {
+						name = "NAME_Seafallen_Cruiser"
+						design = last_created_design
+						upgradable = no
+					}
+					set_location = root
+					add_modifier = {
+						modifier = ship_master_cruiser
+						days = -1
+					}
+				}
+			}
+			owner = {
+				add_modifier = {
+					modifier = streamlined_ship_design
+					days = -1
+				}
+			}
+		}
+	}
+	option = {
+		name = EXCELLENT
+		custom_tooltip = colony.2006.a.tooltip
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = "me"
+			}
+			create_fleet = {
+				name = "NAME_Seaborn"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = event_target:me
+					create_ship_design = {
+						design = "NAME_Sword"
+					}
+					create_ship = {
+						name = "NAME_Seafallen_Cruiser"
+						design = last_created_design
+						upgradable = no
+					}
+					set_location = root
+					add_modifier = {
+						modifier = ship_master_cruiser
+						days = -1
+					}
+				}
+			}
+			owner = {
+				add_modifier = {
+					modifier = streamlined_ship_design
+					days = -1
+				}
+			}
+		}
+	}
+}
+#Follow-up 2
+planet_event = {
+	id = colony.2007
+	title = PROJECT_COMPLETE
+	desc = colony.2007.desc
+	picture = GFX_evt_hangar_bay
+	show_sound = event_ship_bridge
+	location = root
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.2007.a.phobe
+		custom_tooltip = colony.2007.a
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophobe
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				add_modifier = {
+					modifier = streamlined_ship_design
+					days = -1
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+	option = {
+		name = colony.2007.a.phile
+		custom_tooltip = colony.2007.a
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				add_modifier = {
+					modifier = streamlined_ship_design
+					days = -1
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+	option = {
+		name = GOOD
+		custom_tooltip = colony.2007.a
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				add_modifier = {
+					modifier = streamlined_ship_design
+					days = -1
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+}
+#Follow-up 3
+planet_event = {
+	id = colony.2008
+	title = PROJECT_FAILURE
+	desc = colony.2008.desc
+	picture = GFX_evt_burning_settlement
+	show_sound = event_structural_collapse
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_planet_devastation = 20
+	}
+
+	option = {
+		name = GODDAMNIT
+		tooltip = {
+			add_planet_devastation = 20
+		}
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+	option = {
+		name = CURSES
+		tooltip = {
+			add_planet_devastation = 20
+		}
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+	option = {
+		name = UNFORTUNATE
+		tooltip = {
+			add_planet_devastation = 20
+		}
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+}
+
+#A Change of Heart
+planet_event = {
+	id = colony.2010
+	title = colony.2010.name
+	desc = {
+		trigger = {
+			hidden:owner = {
+				switch = {
+					trigger = has_ethic
+					ethic_fanatic_spiritualist = { text = colony.2010.desc.spirit }
+					ethic_spiritualist = { text = colony.2010.desc.spirit }
+					ethic_fanatic_materialist = { text = colony.2010.desc.material }
+					ethic_materialist = { text = colony.2010.desc.material }
+					default = { text = "ERROR" }
+				}
+			}
+		}
+	}
+	picture = GFX_evt_smugglers_in_bar
+	show_sound = event_conversation
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			is_playable = yes
+			OR = {
+				AND = {
+					OR = {
+						has_ethic = ethic_fanatic_spiritualist
+						has_ethic = ethic_spiritualist
+					}
+					root = {
+						any_owned_pop = {
+							has_ethic = ethic_materialist
+						}
+					}
+				}
+				AND = {
+					OR = {
+						has_ethic = ethic_fanatic_materialist
+						has_ethic = ethic_materialist
+					}
+					root = {
+						any_owned_pop = {
+							has_ethic = ethic_spiritualist
+						}
+					}
+				}
+			}
+			NOT = { has_country_flag = colony_event_ethic_diverge }
+		}
+		count_owned_pop = {
+			limit = { is_non_sapient_robot = no }
+			count > 3
+		}
+		NOR = {
+			has_planet_flag = colony_event
+			is_habitat = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = colony_event
+
+		owner = {
+			set_timed_country_flag = { flag = colony_event_ethic_diverge days = 1800 } # 5 years
+		}
+	}
+
+	option = {
+		name = colony.2010.a.material
+		custom_tooltip = colony.2010.a.material.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		hidden_effect = {
+			#while = {
+			#	limit = {
+			#		any_owned_pop = {
+			#			NOT = {
+			#				has_ethic = ethic_spiritualist
+			#			}
+			#			is_non_sapient_robot = no
+			#		}
+			#	}
+			#	count = 3
+			#	random_owned_pop = {
+			#		limit = {
+			#			NOT = { has_ethic = ethic_spiritualist }
+			#			is_non_sapient_robot = no
+			#		}
+			#		pop_change_ethic = ethic_spiritualist
+			#	}
+			#}
+			add_modifier = {
+			modifier = spiritualist_attraction
+			days = 7200 # 20 years
+			}
+			every_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					has_ethic = ethic_spiritualist
+				}
+				add_modifier = {
+					modifier = opinion_respected
+					days = 7200
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2010.a.spirit
+		custom_tooltip = colony.2010.a.spirit.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		hidden_effect = {
+			#while = {
+			#	limit = {
+			#		any_owned_pop = {
+			#			NOT = {
+			#				has_ethic = ethic_materialist
+			#			}
+			#			is_non_sapient_robot = no
+			#		}
+			#	}
+			#	count = 3
+			#	random_owned_pop = {
+			#		limit = {
+			#			NOT = { has_ethic = ethic_materialist }
+			#			is_non_sapient_robot = no
+			#		}
+			#		pop_change_ethic = ethic_materialist
+			#	}
+			#}
+			add_modifier = {
+			modifier = materialist_attraction
+			days = 7200 # 20 years
+			}
+			every_owned_pop = {
+				limit = {
+					is_non_sapient_robot = no
+					has_ethic = ethic_materialist
+				}
+				add_modifier = {
+					modifier = opinion_respected
+					days = 7200
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2010.b
+		custom_tooltip = colony.2010.b.tooltip
+		trigger = {
+			owner = {
+				#NOT = { has_country_flag = deficit }
+				resource_stockpile_compare = { resource = energy value >= 100 }
+				resource_stockpile_compare = { resource = minerals value >= 100 }
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -100
+				minerals = -100
+			}
+		}
+	}
+
+	option = {
+		name = colony.2010.c.spirit
+		custom_tooltip = colony.2010.c.spirit.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		hidden_effect = {
+			random_list = {
+				40 = { planet_event = { id = colony.2011 days = 160 } } #good results
+				60 = { planet_event = { id = colony.2012 days = 160 } } #bad results
+			}
+			set_planet_flag = event_subjugate_materialists
+		}
+	}
+	option = {
+		name = colony.2010.c.material
+		custom_tooltip = colony.2010.c.material.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		hidden_effect = {
+			random_list = {
+				40 = { planet_event = { id = colony.2011 days = 160 } } #good results
+				60 = { planet_event = { id = colony.2012 days = 160 } } #bad results
+			}
+			set_planet_flag = event_subjugate_spiritualists
+		}
+	}
+}
+
+#good results
+planet_event = {
+	id = colony.2011
+	title = colony.2010.name
+	desc = {
+		trigger = {
+			hidden:owner = {
+				switch = {
+					trigger = has_ethic
+					ethic_fanatic_spiritualist = { text = colony.2011.desc.spirit }
+					ethic_spiritualist = { text = colony.2011.desc.spirit }
+					ethic_fanatic_materialist = { text = colony.2011.desc.material }
+					ethic_materialist = { text = colony.2011.desc.material }
+					default = { text = "ERROR" }
+				}
+			}
+		}
+	}
+	picture = GFX_evt_throne_room
+	show_sound = event_celebration
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					has_planet_flag = event_subjugate_spiritualists
+				}
+				every_owned_pop = {
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+					pop_change_ethic = ethic_materialist
+				}
+
+				add_modifier = {
+					modifier = materialist_attraction
+					days = 7200 # 20 years
+				}
+			}
+			if = {
+				limit = {
+					has_planet_flag = event_subjugate_materialists
+				}
+				every_owned_pop = {
+					limit = {
+						has_ethic = ethic_materialist
+					}
+					pop_change_ethic = ethic_spiritualist
+				}
+				add_modifier = {
+					modifier = spiritualist_attraction
+					days = 7200 # 20 years
+				}
+			}
+		}
+	}
+
+	option = {
+		name = PRAISE
+		custom_tooltip = colony.2011.a.spirit.tooltip
+		trigger = {
+			has_planet_flag = event_subjugate_materialists
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		hidden_effect = {
+			remove_planet_flag = event_subjugate_materialists
+		}
+	}
+	option = {
+		name = OOPS
+		custom_tooltip = colony.2011.a.spirit.tooltip
+		trigger = {
+			has_planet_flag = event_subjugate_spiritualists
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		hidden_effect = {
+			remove_planet_flag = event_subjugate_spiritualists
+		}
+	}
+	option = {
+		name = OOPS
+		custom_tooltip = colony.2011.a.material.tooltip
+		trigger = {
+			has_planet_flag = event_subjugate_materialists
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		hidden_effect = {
+			remove_planet_flag = event_subjugate_materialists
+		}
+	}
+	option = {
+		name = EXCELLENT
+		custom_tooltip = colony.2011.a.material.tooltip
+		trigger = {
+			has_planet_flag = event_subjugate_spiritualists
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_materialist
+				}
+			}
+		}
+		hidden_effect = {
+			remove_planet_flag = event_subjugate_spiritualists
+		}
+	}
+}
+#bad results
+planet_event = {
+	id = colony.2012
+	title = colony.2010.name
+	desc = colony.2012.desc
+	picture = GFX_evt_burning_settlement
+	show_sound = event_planetary_riot
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			remove_planet_flag = event_subjugate_spiritualists
+			remove_planet_flag = event_subjugate_materialists
+			if = {
+				limit = {
+					owner = {
+						OR = {
+							has_ethic = ethic_fanatic_materialist
+							has_ethic = ethic_materialist
+						}
+					}
+				}
+				add_modifier = {
+					modifier = spiritualist_attraction
+					days = 7200 # 20 years
+				}
+				### Add disrespected opinion
+				every_owned_pop = {
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+					add_modifier = {
+						modifier = opinion_disrespected
+						days = 3600
+					}
+				}
+			}
+			if = {
+				limit = {
+					owner = {
+						OR = {
+							has_ethic = ethic_fanatic_spiritualist
+							has_ethic = ethic_spiritualist
+						}
+					}
+				}
+				add_modifier = {
+					modifier = materialist_attraction
+					days = 7200 # 20 years
+				}
+
+				### Add disrespected opinion
+				every_owned_pop = {
+					limit = {
+						has_ethic = ethic_materialist
+					}
+					add_modifier = {
+						modifier = opinion_disrespected
+						days = 3600
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = GODDAMNIT
+		custom_tooltip = colony.2012.a.spirit.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+	}
+	option = {
+		name = CURSES
+		custom_tooltip = colony.2012.a.material.tooltip
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+	}
+}
+
+#Odd Factory
+planet_event = {
+	id = colony.2015
+	title = colony.2015.name
+	desc = colony.2015.desc
+	picture = GFX_evt_alien_city
+	show_sound = event_activating_unknown_technology
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			NOR = {
+				has_country_flag = colony_odd_factory
+				is_machine_empire = yes
+			}
+		}
+		num_pops > 0
+		NOR = {
+			has_planet_flag = colony_event
+			is_unshattered_ring_habitable_segment = yes
+			is_shattered_ring_habitable = yes
+			is_habitat = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = colony_event
+		owner = { set_country_flag = colony_odd_factory }
+		random_owned_pop = { unemploy_pop = yes }
+		add_deposit = d_odd_factory
+		random_list = {
+			30 = { set_planet_flag = colony_factory_kidnap }
+			35 = { set_planet_flag = colony_factory_no_effect }
+		}
+	}
+
+	option = {
+		name = INTRIGUING
+		tooltip = { add_deposit = d_odd_factory }
+	}
+}
+#Follow-up: Kidnap
+planet_event = {
+	id = colony.2016
+	title = colony.2015.name
+	desc = colony.2016.desc
+	picture = GFX_evt_alien_city
+	show_sound = event_ghost_town
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+	}
+
+	trigger = {
+		has_planet_flag = colony_factory_kidnap
+		has_deposit = d_odd_factory
+		num_assigned_jobs = {
+			job = odd_factory_worker
+			value >= 1
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 4
+	}
+
+	immediate = {
+		owner = { set_country_flag = odd_factory_pause }
+		random_owned_pop = {
+			limit = { has_job = odd_factory_worker }
+			kill_pop = yes
+		}
+	}
+
+	option = {
+		name = colony.2016.b
+		custom_tooltip = colony.2016.a.tooltip
+		remove_deposit = d_odd_factory
+		hidden_effect = {
+			owner = { remove_country_flag = odd_factory_pause }
+		}
+	}
+
+	option = {
+		name = colony.2016.a
+		custom_tooltip = colony.2016.a.tooltip
+		hidden_effect = {
+			remove_planet_flag = colony_factory_kidnap
+			owner = { remove_country_flag = odd_factory_pause }
+			random_list = {
+				50 = { set_planet_flag = colony_factory_kidnap_sequel }
+				50 = { set_planet_flag = colony_factory_no_effect }
+			}
+		}
+	}
+}
+#Follow-up: Kidnap 2
+planet_event = {
+	id = colony.2017
+	title = colony.2015.name
+	desc = colony.2017.desc
+	picture = GFX_evt_alien_city
+	show_sound = event_ghost_town
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+	}
+
+	trigger = {
+		has_planet_flag = colony_factory_kidnap_sequel
+		has_deposit = d_odd_factory
+		num_assigned_jobs = {
+			job = odd_factory_worker
+			value >= 1
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 4
+	}
+
+	immediate = {
+		owner = { set_country_flag = odd_factory_pause }
+		random_owned_pop = {
+			limit = { has_job = odd_factory_worker }
+			kill_pop = yes
+		}
+	}
+
+	option = {
+		name = colony.2017.a
+		custom_tooltip = colony.2017.a.tooltip
+		add_modifier = {
+			modifier = scared_population
+			days = 1800
+		}
+		hidden_effect = {
+			owner = { remove_country_flag = odd_factory_pause }
+			remove_planet_flag = colony_factory_kidnap_sequel
+		}
+	}
+	option = {
+		name = colony.2017.b
+		custom_tooltip = colony.2017.b.tooltip
+		add_modifier = {
+			modifier = secured_factory
+			days = 1800
+		}
+		hidden_effect = {
+			owner = { remove_country_flag = odd_factory_pause }
+			remove_planet_flag = colony_factory_kidnap_sequel
+		}
+	}
+}
+
+#Follow-up: No effect
+planet_event = {
+	id = colony.2019
+	title = colony.2015.name
+	desc = colony.2019.desc
+	picture = GFX_evt_alien_city
+	show_sound = event_administrative_work
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+	}
+
+	trigger = {
+		has_planet_flag = colony_factory_no_effect
+		has_deposit = d_odd_factory
+		num_assigned_jobs = {
+			job = odd_factory_worker
+			value >= 1
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 6
+	}
+
+	immediate = {
+	}
+
+	option = {
+		name = GOOD
+		hidden_effect = {
+			remove_planet_flag = colony_factory_no_effect
+		}
+	}
+}
+##Follow-up: Destroyed
+#planet_event = {
+#	id = colony.2020
+#	title = colony.2015.name
+#	desc = colony.2020.desc
+#	picture = GFX_evt_burning_settlement
+#	show_sound = event_structural_collapse
+#	location = root
+#
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		NOT = { has_planet_flag = odd_factory_destroyed }
+#	}
+#
+#	immediate = {
+#		set_planet_flag = odd_factory_destroyed
+#	}
+#
+#	option = {
+#		name = colony.2018.a
+#		add_deposit = d_odd_factory_wreckage_1
+#		hidden_effect = {
+#			remove_planet_flag = colony_factory_found
+#			remove_planet_flag = colony_factory_no_effect
+#			remove_planet_flag = colony_factory_kidnap
+#			remove_planet_flag = colony_factory_kidnap_sequel
+#			if = {
+#				limit = {
+#					has_modifier = secured_factory
+#				}
+#				remove_modifier = secured_factory
+#			}
+#			if = {
+#				limit = {
+#					has_modifier = scared_population
+#				}
+#				remove_modifier = scared_population
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2018.b
+#		add_deposit = d_odd_factory_wreckage_2
+#		hidden_effect = {
+#			remove_planet_flag = colony_factory_found
+#			remove_planet_flag = colony_factory_no_effect
+#			remove_planet_flag = colony_factory_breaks
+#			remove_planet_flag = colony_factory_kidnap
+#			remove_planet_flag = colony_factory_kidnap_sequel
+#			if = {
+#				limit = {
+#					has_modifier = secured_factory
+#				}
+#				remove_modifier = secured_factory
+#			}
+#			if = {
+#				limit = {
+#					has_modifier = scared_population
+#				}
+#				remove_modifier = scared_population
+#			}
+#		}
+#	}
+#}
+
+#What Separates Us
+planet_event = {
+	id = colony.2025
+	title = colony.2025.name
+	desc = {
+		trigger = {
+			hidden:owner = {
+				switch = {
+					trigger = has_ethic
+					ethic_fanatic_xenophobe = { text = colony.2025.phobe.desc }
+					ethic_xenophobe = { text = colony.2025.phobe.desc }
+					ethic_fanatic_xenophile = { text = colony.2025.phile.desc }
+					ethic_xenophile = { text = colony.2025.phile.desc }
+					default = { text = colony.2025.desc }
+				}
+			}
+		}
+	}
+	picture = GFX_evt_burning_settlement
+	show_sound = event_planetary_riot
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			is_gestalt = no
+		}
+		num_pops > 0
+		NOR = {
+			has_planet_flag = colony_event
+			is_habitat = yes
+		}
+		any_owned_pop = {
+			is_enslaved = no
+			is_robotic_species = no
+			NOT = {
+				is_same_species = owner
+			}
+		}
+		any_owned_pop = {
+			is_same_species = owner
+			OR = {
+				has_ethic = ethic_fanatic_xenophobe
+				has_ethic = ethic_xenophobe
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = colony_event
+		owner = { save_event_target_as = MyEmpire }
+	}
+
+	option = {
+		name = colony.2025.a
+		custom_tooltip = colony.2025.a.tooltip
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophobe
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				add_modifier = {
+					modifier = immigrants_protection
+					days = 720
+				}
+				add_monthly_resource_mult = {
+					resource = influence
+					value = @tier2influencereward
+					min = @tier2influencemin
+					max = @tier2influencemax
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					is_same_species = owner
+					OR = {
+						has_ethic = ethic_fanatic_xenophobe
+						has_ethic = ethic_xenophobe
+					}
+				}
+				add_modifier = {
+					modifier = pop_angered
+					days = 720
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2025.a.phobe
+		custom_tooltip = colony.2025.a.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophobe
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = immigrants_protection
+				days = 720
+			}
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier2influencereward
+				min = @tier2influencemin
+				max = @tier2influencemax
+			}
+		}
+		hidden_effect = {
+			every_owned_pop = {
+				limit = {
+					is_same_species = owner
+					OR = {
+						has_ethic = ethic_fanatic_xenophobe
+						has_ethic = ethic_xenophobe
+					}
+				}
+				add_modifier = {
+					modifier = pop_angered
+					days = 720
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2025.a.phile
+		custom_tooltip = colony.2025.a.phile.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_xenophile
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = immigrants_protection
+				days = 720
+			}
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier2influencereward
+				min = @tier2influencemin
+				max = @tier2influencemax
+			}
+		}
+		hidden_effect = {
+			every_owned_pop = {
+				limit = {
+					is_same_species = owner
+					OR = {
+						has_ethic = ethic_fanatic_xenophobe
+						has_ethic = ethic_xenophobe
+					}
+				}
+				add_modifier = {
+					modifier = pop_angered
+					days = 720
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					OR = {
+						NOT = { is_same_species = owner }
+						has_ethic = ethic_xenophile
+						has_ethic = ethic_fanatic_xenophile
+					}
+				}
+				add_modifier = {
+					modifier = pop_pleased
+					days = 360
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2025.b
+		custom_tooltip = colony.2025.b.tooltip
+		trigger = {
+			owner = {
+				NOR = {
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_militarist
+				}
+			}
+		}
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					NOT = { is_same_species = owner }
+				}
+				kill_pop = yes
+			}
+			every_owned_pop = {
+				limit = {
+					OR = {
+						NOT = { is_same_species = owner }
+						has_ethic = ethic_xenophile
+						has_ethic = ethic_fanatic_xenophile
+					}
+				}
+				add_modifier = {
+					modifier = pop_angered
+					days = 360
+				}
+			}
+		}
+	}
+	option = {
+		name = colony.2025.b.phobe
+		custom_tooltip = colony.2025.b.tooltip
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_militarist
+				}
+			}
+		}
+		hidden_effect = {
+			random_owned_pop = {
+				limit = {
+					NOT = { is_same_species = owner }
+				}
+				kill_pop = yes
+			}
+			every_owned_pop = {
+				limit = {
+					OR = {
+						NOT = { is_same_species = owner }
+						has_ethic = ethic_xenophile
+						has_ethic = ethic_fanatic_xenophile
+					}
+				}
+				add_modifier = {
+					modifier = pop_angered
+					days = 360
+				}
+			}
+		}
+	}
+}
+
+#Assassination
+#planet_event = {
+#	id = colony.2030
+#	title = colony.2030.name
+#	desc = {
+#		trigger = {
+#			hidden:owner = {
+#				switch = {
+#					trigger = has_ethic
+#					ethic_fanatic_xenophobe = { text = colony.2030.desc.phobe }
+#					ethic_xenophobe = { text = colony.2030.desc.phobe }
+#					ethic_fanatic_spiritualist = { text = colony.2030.desc.spirit }
+#					ethic_spiritualist = { text = colony.2030.desc.spirit }
+#					ethic_fanatic_militarist = { text = colony.2030.desc.military }
+#					ethic_militarist = { text = colony.2030.desc.military }
+#					default = { text = colony.2030.desc }
+#				}
+#			}
+#		}
+#	}
+#	picture = GFX_evt_smugglers_in_bar
+#	show_sound = event_mystic_reveal
+#	location = root
+#
+#	trigger = {
+#		has_owner = yes
+#		original_owner = yes
+#		is_homeworld = no
+#		owner = {
+#			NOT = {
+#				has_country_flag = colony_assassin
+#				is_machine_empire = yes
+#			}
+#			is_ai = no
+#			any_country = {
+#				is_ai = yes
+#				is_playable = yes
+#				has_communications = prev
+#				their_opinion = {
+#					who = prev
+#					value < -50
+#				}
+#				root = {
+#					owner = {
+#						has_communications = prevprev
+#					}
+#				}
+#			}
+#		}
+#		num_pops > 0
+#		has_ground_combat = no
+#		is_occupied_flag = no
+#		exists = leader
+#		is_capital = no
+#		NOR = {
+#			has_planet_flag = colony_event
+#			is_habitat = yes
+#		}
+#	}
+#
+#	is_triggered_only = yes
+#	#mean_time_to_happen = {
+#	#	months = 40
+#	#}
+#
+#	immediate = {
+#		set_planet_flag = colony_event
+#		owner = {
+#			set_country_flag = colony_assassin
+#			save_event_target_as = MyCountry
+#			random_country = {
+#				limit = {
+#					is_ai = yes
+#					is_playable = yes
+#					has_communications = prev
+#					their_opinion = {
+#						who = prev
+#						value < -50
+#					}
+#					root = {
+#						owner = {
+#							has_communications = prevprev
+#						}
+#					}
+#				}
+#				save_event_target_as = AssassinEmpire
+#			}
+#		}
+#		leader = {
+#			kill_leader = { type = governor show_notification = no}
+#		}
+#	}
+#
+#	option = {
+#		name = colony.2030.a
+#		custom_tooltip = colony.2030.a.tooltip
+#		trigger = {
+#			owner = {
+#				OR = {
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_pacifist
+#				}
+#			}
+#		}
+#		hidden_effect = {
+#			event_target:AssassinEmpire = {
+#				add_opinion_modifier = {
+#					who = event_target:MyCountry
+#					modifier = assassination_forgiven
+#				}
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2030.b
+#		owner = {
+#			add_monthly_resource_mult = {
+#				resource = influence
+#				value = @tier3influencereward
+#				min = @tier3influencemin
+#				max = @tier3influencemax
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2030.c
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 50 }
+#				NOT = {
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_pacifist
+#					has_ethic = ethic_fanatic_pacifist
+#				}
+#			}
+#		}
+#		owner = { add_resource = { influence = -50 } }
+#		add_modifier = {
+#			modifier = fear_as_control
+#			days = 3600
+#		}
+#	}
+#	option = {
+#		name = colony.2030.d
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 50 }
+#				OR = {
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -50 }
+#			add_modifier = {
+#				modifier = fear_as_control_militarist_p2
+#				days = 3600
+#			}
+#		}
+#		add_modifier = {
+#			modifier = fear_as_control_militarist
+#			days = 3600
+#		}
+#	}
+#}
+
+
+##INFECTIOUS DISEASE
+#planet_event = {
+#	id = colony.2035
+#	title = colony.2035.name
+#	desc = {
+#		trigger = {
+#			hidden:owner = {
+#				switch = {
+#					trigger = has_ethic
+#					ethic_fanatic_spiritualist = { text = colony.2035.desc.spirit }
+#					ethic_spiritualist = { text = colony.2035.desc.spirit }
+#					ethic_fanatic_materialist = { text = colony.2035.desc.material }
+#					ethic_materialist = { text = colony.2035.desc.material }
+#					default = { text = colony.2035.desc }
+#				}
+#			}
+#		}
+#	}
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_laboratory_sound
+#	location = root
+#
+#	trigger = {
+#		has_owner = yes
+#		original_owner = yes
+#		is_homeworld = no
+#		is_capital = no
+#		owner = {
+#			is_ai = no
+#			NOR = {
+#				has_country_flag = colony_infected
+#				is_gestalt = yes
+#			}
+#		}
+#		count_owned_pop = {
+#			limit = { is_robot_pop = no }
+#			count > 2
+#		}
+#		has_ground_combat = no
+#		is_occupied_flag = no
+#		NOR = {
+#			has_planet_flag = colony_event
+#			is_habitat = yes
+#		}
+#	}
+#
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		set_planet_flag = colony_event
+#		set_planet_flag = colony_infected_active
+#		owner = {
+#			set_country_flag = colony_infected
+#		}
+#		random_owned_pop = {
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			hidden_effect = {
+#				set_pop_flag = spreading_infection
+#				random_list = {
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#				}
+#			}
+#		}
+#		random_owned_pop = {
+#			limit = {
+#				NOT = { has_modifier = alien_infection }
+#			}
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			hidden_effect = {
+#				set_pop_flag = spreading_infection
+#				random_list = {
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#				}
+#			}
+#		}
+#		random_owned_pop = {
+#			limit = {
+#				NOT = { has_modifier = alien_infection }
+#			}
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			hidden_effect = {
+#				set_pop_flag = spreading_infection
+#				random_list = {
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#					33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#				}
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = colony.2035.a
+#		add_deposit = d_quarantine_hospital
+#		hidden_effect = {
+#			add_modifier = {
+#				modifier = infectious_disease
+#				days = -1
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2035.c
+#		custom_tooltip = colony.2035.c.tooltip
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 100 }
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -100 }
+#		}
+#		hidden_effect = {
+#			owner = { set_country_flag = alien_infection_isolated }
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#			random_list = {
+#				25 = { planet_event = { id = colony.2036 days = 30 } }
+#				25 = { planet_event = { id = colony.2036 days = 60 } }
+#				50 = { }
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2035.c.spirit
+#		custom_tooltip = colony.2035.c.tooltip
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 100 }
+#				OR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#				}
+#				NOR = {
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -100 }
+#		}
+#		hidden_effect = {
+#			owner = { set_country_flag = alien_infection_isolated }
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#			random_list = {
+#				25 = { planet_event = { id = colony.2036 days = 30 } }
+#				25 = { planet_event = { id = colony.2036 days = 60 } }
+#				50 = { }
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2035.c.badguy
+#		custom_tooltip = colony.2035.c.tooltip.kill
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 100 }
+#				OR = {
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#				}
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -100 }
+#		}
+#		hidden_effect = {
+#			owner = { set_country_flag = alien_infection_isolated }
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#			random_list = {
+#				25 = { planet_event = { id = colony.2036 days = 30 } }
+#				25 = { planet_event = { id = colony.2036 days = 60 } }
+#				50 = { }
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2035.c.material
+#		custom_tooltip = colony.2035.c.tooltip.kill
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 100 }
+#				OR = {
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#				}
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -100 }
+#		}
+#		hidden_effect = {
+#			owner = { set_country_flag = alien_infection_isolated }
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#			random_list = {
+#				25 = { planet_event = { id = colony.2036 days = 30 } }
+#				25 = { planet_event = { id = colony.2036 days = 60 } }
+#				50 = { }
+#			}
+#		}
+#	}
+#}
+#
+##NEW INFECTED POPS UP AFTER QUARENTINE
+#planet_event = {
+#	id = colony.2036
+#	title = colony.2035.name
+#	desc = colony.2036.desc
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_red_alert
+#	location = root
+#
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		random_owned_pop = {
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			set_pop_flag = spreading_infection
+#			random_list = {
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#			}
+#		}
+#		random_owned_pop = {
+#			limit = {
+#				NOT = { has_modifier = alien_infection }
+#			}
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			set_pop_flag = spreading_infection
+#			random_list = {
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#			}
+#		}
+#		random_owned_pop = {
+#			limit = {
+#				NOT = { has_modifier = alien_infection }
+#			}
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			set_pop_flag = spreading_infection
+#			random_list = {
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = colony.2035.a
+#		add_deposit = d_quarantine_hospital
+#		hidden_effect = {
+#			owner = { remove_country_flag = alien_infection_isolated }
+#			add_modifier = {
+#				modifier = infectious_disease
+#				days = -1
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2036.c
+#		custom_tooltip = colony.2035.c.tooltip
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 50 }
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -50 }
+#		}
+#		hidden_effect = {
+#			owner = { set_country_flag = alien_infection_isolated }
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2036.c.spirit
+#		custom_tooltip = colony.2035.c.tooltip
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 50 }
+#				OR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#				}
+#				NOR = {
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -50 }
+#		}
+#		hidden_effect = {
+#			remove_planet_flag = colony_infected_active
+#			remove_planet_flag = infection_warning
+#			owner = {
+#				remove_country_flag = alien_infection_1_cured
+#				remove_country_flag = alien_infection_2_cured
+#				remove_country_flag = colony_infected_active
+#				remove_country_flag = alien_infection_isolated
+#			}
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2036.c.badguy
+#		custom_tooltip = colony.2035.c.tooltip.kill
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 50 }
+#				OR = {
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#				}
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -50 }
+#		}
+#		hidden_effect = {
+#			remove_planet_flag = colony_infected_active
+#			remove_planet_flag = infection_warning
+#			owner = {
+#				remove_country_flag = alien_infection_1_cured
+#				remove_country_flag = alien_infection_2_cured
+#				remove_country_flag = colony_infected_active
+#				remove_country_flag = alien_infection_isolated
+#			}
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#		}
+#	}
+#	option = {
+#		name = colony.2036.c.material
+#		custom_tooltip = colony.2035.c.tooltip.kill
+#		trigger = {
+#			owner = {
+#				resource_stockpile_compare = { resource = influence value >= 50 }
+#				OR = {
+#					has_ethic = ethic_fanatic_materialist
+#					has_ethic = ethic_materialist
+#				}
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#					has_ethic = ethic_fanatic_militarist
+#					has_ethic = ethic_militarist
+#					has_ethic = ethic_fanatic_authoritarian
+#					has_ethic = ethic_fanatic_pacifist
+#					has_ethic = ethic_fanatic_egalitarian
+#					has_government = gov_military_dictatorship
+#					has_government = gov_star_empire
+#					has_government = gov_despotic_hegemony
+#					has_government = gov_totalitarian_regime
+#					has_government = gov_despotic_empire
+#					has_government = gov_feudal_empire
+#					has_government = gov_constitutional_dictatorship
+#					has_government = gov_irenic_bureaucracy
+#					has_government = gov_direct_democracy
+#					has_government = gov_rational_consensus
+#					has_government = gov_moral_democracy
+#				}
+#			}
+#		}
+#		owner = {
+#			add_resource = { influence = -50 }
+#		}
+#		hidden_effect = {
+#			remove_planet_flag = colony_infected_active
+#			remove_planet_flag = infection_warning
+#			owner = {
+#				remove_country_flag = alien_infection_1_cured
+#				remove_country_flag = alien_infection_2_cured
+#				remove_country_flag = colony_infected_active
+#				remove_country_flag = alien_infection_isolated
+#			}
+#			every_owned_pop = {
+#				limit = {
+#					OR = {
+#						has_modifier = alien_infection
+#						has_pop_flag = spreading_infection
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#		}
+#	}
+#}
+##SPREAD INFECTION
+#planet_event = {
+#	id = colony.2037
+#	hide_window = yes
+#
+#	mean_time_to_happen = {
+#		days = 20
+#	}
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		any_owned_pop = {
+#			has_pop_flag = spreading_infection
+#		}
+#	}
+#
+#	immediate = {
+#		random_owned_pop = {
+#			limit = {
+#				NOR = {
+#					has_pop_flag = spreading_infection
+#					has_pop_flag = alien_infection_immunity
+#					has_modifier = alien_infection
+#				}
+#			}
+#			set_pop_flag = spreading_infection
+#		}
+#	}
+#}
+##TRIGGER INFECTION
+#planet_event = {
+#	id = colony.2038
+#	hide_window = yes
+#
+#	mean_time_to_happen = {
+#		days = 15
+#	}
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		any_owned_pop = {
+#			has_pop_flag = spreading_infection
+#			NOR = {
+#				has_pop_flag = alien_infection_immunity
+#				has_modifier = alien_infection
+#			}
+#		}
+#	}
+#
+#	immediate = {
+#		random_owned_pop = {
+#			limit = {
+#				has_pop_flag = spreading_infection
+#				NOT = { has_modifier = alien_infection }
+#			}
+#			add_modifier = {
+#				modifier = alien_infection
+#				days = -1
+#			}
+#			random_list = {
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 15 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 30 } }
+#				33 = { set_timed_pop_flag = { flag = alien_infection_timer days = 45 } }
+#			}
+#		}
+#	}
+#}
+##TRIGGER DEATH
+#planet_event = {
+#	id = colony.2039
+#	hide_window = yes
+#
+#	mean_time_to_happen = {
+#		days = 22
+#	}
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		NOT = { has_planet_flag = healing_in_progress }
+#		count_owned_pop = {
+#			limit = { has_modifier = alien_infection }
+#			count > 1
+#		}
+#		any_owned_pop = {
+#			has_modifier = alien_infection
+#			NOT = { has_pop_flag = alien_infection_timer }
+#		}
+#	}
+#
+#	immediate = {
+#		if = {
+#			limit = {
+#				count_owned_pop = {
+#					count > 1
+#				}
+#			}
+#			random_owned_pop = {
+#				limit = {
+#					has_modifier = alien_infection
+#					NOR = {
+#						has_pop_flag = alien_infection_timer
+#						has_pop_flag = alien_infection_immunity
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#		}
+#		else = {
+#			random_owned_pop = {
+#				limit = {
+#					has_modifier = alien_infection
+#					NOR = {
+#						has_pop_flag = alien_infection_timer
+#						has_pop_flag = alien_infection_immunity
+#					}
+#				}
+#				kill_pop = yes
+#			}
+#		}
+#		planet_event = { id = colony.2046 }
+#		planet_event = { id = colony.2047 }
+#	}
+#}
+##WARNING MESSAGE FOR SPREAD
+#planet_event = {
+#	id = colony.2040
+#	title = colony.2035.name
+#	desc = colony.2040.desc
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_red_alert
+#	location = root
+#
+#	mean_time_to_happen = { days = 100 }
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		NOR = {
+#			has_planet_flag = infection_warning
+#			owner = {
+#				has_country_flag = alien_infection_2_cured
+#			}
+#		}
+#		count_owned_pop = {
+#			limit = {
+#				has_modifier = alien_infection
+#				has_pop_flag = spreading_infection
+#			}
+#			count > 4
+#		}
+#	}
+#
+#	immediate = {
+#		set_planet_flag = infection_warning
+#	}
+#
+#	option = {
+#		name = OK
+#	}
+#}
+##WARNING MESSAGE FOR DEATH - FIRST
+#planet_event = {
+#	id = colony.2046
+#	title = colony.2035.name
+#	desc = colony.2046.desc
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_red_alert
+#	location = root
+#
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		NOT = {
+#			has_planet_flag = disease_first_blood
+#		}
+#	}
+#
+#	immediate = {
+#		set_planet_flag = healing_in_progress
+#	}
+#
+#	option = {
+#		name = colony.2046.a
+#		hidden_effect = {
+#			set_planet_flag = disease_first_blood
+#			remove_planet_flag = healing_in_progress
+#		}
+#	}
+#	option = {
+#		name = colony.2046.b
+#		hidden_effect = {
+#			set_planet_flag = disease_no_updates
+#			set_planet_flag = disease_first_blood
+#			remove_planet_flag = healing_in_progress
+#		}
+#	}
+#}
+##WARNING MESSAGE FOR DEATH - REPEATING
+#planet_event = {
+#	id = colony.2047
+#	title = colony.2035.name
+#	desc = colony.2047.desc
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_red_alert
+#	location = root
+#
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		has_planet_flag = disease_first_blood
+#		NOT = { has_planet_flag = disease_no_updates }
+#	}
+#
+#	immediate = {
+#		set_planet_flag = healing_in_progress
+#	}
+#
+#	option = {
+#		name = CURSES
+#		trigger = {
+#			owner = {
+#				NOR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#				}
+#			}
+#		}
+#		hidden_effect = {
+#			remove_planet_flag = healing_in_progress
+#		}
+#	}
+#	option = {
+#		name = GODDAMNIT
+#		trigger = {
+#			owner = {
+#				OR = {
+#					has_ethic = ethic_fanatic_spiritualist
+#					has_ethic = ethic_spiritualist
+#				}
+#			}
+#		}
+#		hidden_effect = {
+#			remove_planet_flag = healing_in_progress
+#		}
+#	}
+#}
+##CURING PEOPLE W. CLINIC
+#planet_event = {
+#	id = colony.2041
+#	title = colony.2035.name
+#	desc = colony.2041.desc
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_laboratory_sound
+#	location = root
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		NOR = {
+#			has_planet_flag = healing_in_progress
+#			has_planet_flag = plague_progress_made
+#		}
+#		owner = {
+#			NOT = {
+#				has_country_flag = alien_infection_2_cured
+#			}
+#		}
+#		#any_tile = {
+#		#	has_building = "building_quarantine"
+#		#	exists = pop
+#		#	pop = {
+#		#		has_modifier = alien_infection
+#		#	}
+#		#}
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 20
+#	}
+#
+#	immediate = {
+#		set_planet_flag = healing_in_progress
+#		set_timed_planet_flag = { flag = plague_progress_made days = 21 }
+#	}
+#
+#	option = {
+#		name = EXCELLENT
+#		hidden_effect = {
+#			remove_planet_flag = healing_in_progress
+#			owner = {
+#				if = {
+#					limit = {
+#						has_country_flag = alien_infection_1_cured
+#						NOT = { has_country_flag = alien_infection_2_cured }
+#					}
+#					set_country_flag = alien_infection_2_cured
+#				}
+#				if = {
+#					limit = {
+#						NOT = { has_country_flag = alien_infection_1_cured }
+#					}
+#					set_country_flag = alien_infection_1_cured
+#				}
+#			}
+#			#random_tile = {
+#			#	limit = {
+#			#		has_building = "building_quarantine"
+#			#		exists = pop
+#			#		pop = {
+#			#			has_modifier = alien_infection
+#			#		}
+#			#	}
+#			#	pop = {
+#			#		remove_modifier = alien_infection
+#			#		remove_pop_flag = spreading_infection
+#			#		remove_pop_flag = alien_infection_timer
+#			#		set_pop_flag = alien_infection_immunity
+#			#	}
+#			#}
+#		}
+#	}
+#}
+##CURING PEOPLE W. OUT CLINIC
+#planet_event = {
+#	id = colony.2045
+#	title = colony.2035.name
+#	desc = colony.2041.b.desc
+#	picture = GFX_evt_microscopic_life
+#	show_sound = event_laboratory_sound
+#	location = root
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		NOR = {
+#			has_planet_flag = healing_in_progress
+#			has_planet_flag = plague_progress_made
+#		}
+#		owner = {
+#			NOT = {
+#				has_country_flag = alien_infection_2_cured
+#			}
+#		}
+#		#any_tile = {
+#		#	exists = pop
+#		#	pop = {
+#		#		has_modifier = alien_infection
+#		#	}
+#		#}
+#		#NOT = {
+#		#	any_tile = {
+#		#		has_building = "building_quarantine"
+#		#		exists = pop
+#		#		pop = {
+#		#			has_modifier = alien_infection
+#		#		}
+#		#	}
+#		#}
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 90
+#	}
+#
+#	immediate = {
+#		set_planet_flag = healing_in_progress
+#		set_timed_planet_flag = { flag = plague_progress_made days = 21 }
+#	}
+#
+#	option = {
+#		name = EXCELLENT
+#		hidden_effect = {
+#			remove_planet_flag = healing_in_progress
+#			owner = {
+#				if = {
+#					limit = {
+#						has_country_flag = alien_infection_1_cured
+#						NOT = { has_country_flag = alien_infection_2_cured }
+#					}
+#					set_country_flag = alien_infection_2_cured
+#				}
+#				if = {
+#					limit = {
+#						NOT = { has_country_flag = alien_infection_1_cured }
+#					}
+#					set_country_flag = alien_infection_1_cured
+#				}
+#			}
+#			#random_tile = {
+#			#	limit = {
+#			#		exists = pop
+#			#		pop = {
+#			#			has_modifier = alien_infection
+#			#		}
+#			#	}
+#			#	pop = {
+#			#		remove_modifier = alien_infection
+#			#		remove_pop_flag = spreading_infection
+#			#		remove_pop_flag = alien_infection_timer
+#			#		set_pop_flag = alien_infection_immunity
+#			#	}
+#			#}
+#		}
+#	}
+#}
+##PLAGUE CURED
+#planet_event = {
+#	id = colony.2042
+#	title = colony.2035.name
+#	desc = colony.2042.desc
+#	picture = GFX_evt_physics_research
+#	show_sound = event_celebration
+#	location = root
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		owner = { has_country_flag = alien_infection_2_cured }
+#		#any_tile = {
+#		#	has_building = "building_quarantine"
+#		#	exists = pop
+#		#	pop = {
+#		#		has_modifier = alien_infection
+#		#	}
+#		#}
+#		#any_tile = {
+#		#	NOT = { has_building = "building_quarantine" }
+#		#	exists = pop
+#		#	pop = {
+#		#		OR = {
+#		#			has_modifier = alien_infection
+#		#			has_pop_flag = spreading_infection
+#		#		}
+#		#	}
+#		#}
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 7
+#	}
+#
+#	immediate = {
+#		remove_planet_flag = colony_infected_active
+#		remove_planet_flag = infection_warning
+#		owner = {
+#			remove_country_flag = alien_infection_1_cured
+#			remove_country_flag = alien_infection_2_cured
+#			remove_country_flag = colony_infected_active
+#		}
+#		every_owned_pop = {
+#			remove_modifier = alien_infection
+#			remove_pop_flag = spreading_infection
+#			remove_pop_flag = alien_infection_timer
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_building = "building_quarantine"
+#		#	}
+#		#	remove_building = yes
+#		#}
+#		remove_modifier = infectious_disease
+#	}
+#
+#	option = {
+#		name = SPLENDID
+#		owner = {
+#			add_monthly_resource_mult = {
+#				resource = influence
+#				value = @tier3influencereward
+#				min = @tier3influencemin
+#				max = @tier3influencemax
+#			}
+#			add_monthly_resource_mult = {
+#				resource = unity
+#				value = @tier3unityreward
+#				min = @tier3unitymin
+#				max = @tier3unitymax
+#			}
+#			add_monthly_resource_mult = {
+#				resource = society_research
+#				value = @tier2researchreward
+#				min = @tier2researchmin
+#				max = @tier2researchmax
+#			}
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_prev_building = building_quarantine
+#		#	}
+#		#	set_building = building_plague_memorial
+#		#}
+#	}
+#}
+##PLAGUE CURED W. OUT CLINIC
+#planet_event = {
+#	id = colony.2048
+#	title = colony.2035.name
+#	desc = colony.2042.desc
+#	picture = GFX_evt_physics_research
+#	show_sound = event_celebration
+#	location = root
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		NOT = { has_planet_flag = healing_in_progress }
+#		owner = {
+#			has_country_flag = alien_infection_2_cured
+#		}
+#		#any_tile = {
+#		#	exists = pop
+#		#	pop = {
+#		#		has_modifier = alien_infection
+#		#	}
+#		#}
+#		#any_tile = {
+#		#	NOT = { has_building = "building_quarantine" }
+#		#	exists = pop
+#		#	pop = {
+#		#		OR = {
+#		#			has_modifier = alien_infection
+#		#			has_pop_flag = spreading_infection
+#		#		}
+#		#	}
+#		#}
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 75
+#	}
+#
+#	immediate = {
+#		remove_planet_flag = colony_infected_active
+#		remove_planet_flag = infection_warning
+#		owner = {
+#			remove_country_flag = alien_infection_1_cured
+#			remove_country_flag = alien_infection_2_cured
+#			remove_country_flag = colony_infected_active
+#		}
+#		every_owned_pop = {
+#			remove_modifier = alien_infection
+#			remove_pop_flag = spreading_infection
+#			remove_pop_flag = alien_infection_timer
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_building = "building_quarantine"
+#		#	}
+#		#	remove_building = yes
+#		#}
+#		remove_modifier = infectious_disease
+#	}
+#
+#	option = {
+#		name = SPLENDID
+#		owner = {
+#			add_monthly_resource_mult = {
+#				resource = influence
+#				value = @tier3influencereward
+#				min = @tier3influencemin
+#				max = @tier3influencemax
+#			}
+#			add_monthly_resource_mult = {
+#				resource = society_research
+#				value = @tier2researchreward
+#				min = @tier2researchmin
+#				max = @tier2researchmax
+#			}
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_prev_building = building_quarantine
+#		#	}
+#		#	set_building = building_plague_memorial
+#		#}
+#	}
+#}
+##PLAGUE ERRADICATED NO POPS LEFT
+#planet_event = {
+#	id = colony.2043
+#	title = colony.2035.name
+#	desc = colony.2044.desc
+#	picture = GFX_evt_city_ruins
+#	show_sound = event_ghost_town
+#	location = root
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		owner = {
+#			NOR = {
+#				has_country_flag = alien_infection_2_cured
+#				has_country_flag = alien_infection_isolated
+#			}
+#		}
+#		count_owned_pop = {
+#			limit = {
+#				OR = {
+#					has_modifier = alien_infection
+#					has_pop_flag = spreading_infection
+#					has_pop_flag = alien_infection_immunity
+#				}
+#			}
+#			count < 1
+#		}
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 7
+#	}
+#
+#	immediate = {
+#		remove_planet_flag = colony_infected_active
+#		remove_planet_flag = infection_warning
+#		owner = {
+#			remove_country_flag = alien_infection_1_cured
+#			remove_country_flag = alien_infection_2_cured
+#			remove_country_flag = colony_infected_active
+#		}
+#		every_owned_pop = {
+#			remove_modifier = alien_infection
+#			remove_pop_flag = spreading_infection
+#			remove_pop_flag = alien_infection_timer
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_building = "building_quarantine"
+#		#	}
+#		#	remove_building = yes
+#		#}
+#		remove_modifier = infectious_disease
+#	}
+#
+#	option = {
+#		name = colony.2043.a
+#	}
+#}
+##PLAGUE ERRADICATED POPS LEFT
+#planet_event = {
+#	id = colony.2044
+#	title = colony.2035.name
+#	desc = colony.2043.desc
+#	picture = GFX_evt_city_ruins
+#	show_sound = event_laboratory_sound
+#	location = root
+#
+#	trigger = {
+#		has_planet_flag = colony_infected_active
+#		owner = {
+#			NOT = {
+#				has_country_flag = alien_infection_isolated
+#			}
+#		}
+#		num_pops > 0
+#		count_owned_pop = {
+#			limit = {
+#				OR = {
+#					has_modifier = alien_infection
+#					has_pop_flag = spreading_infection
+#				}
+#			}
+#			count < 1
+#		}
+#	}
+#
+#	mean_time_to_happen = {
+#		days = 7
+#	}
+#
+#	immediate = {
+#		remove_planet_flag = colony_infected_active
+#		remove_planet_flag = infection_warning
+#		owner = {
+#			remove_country_flag = alien_infection_1_cured
+#			remove_country_flag = alien_infection_2_cured
+#			remove_country_flag = colony_infected_active
+#		}
+#		every_owned_pop = {
+#			remove_modifier = alien_infection
+#			remove_pop_flag = spreading_infection
+#			remove_pop_flag = alien_infection_timer
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_building = "building_quarantine"
+#		#	}
+#		#	remove_building = yes
+#		#}
+#		remove_modifier = infectious_disease
+#	}
+#
+#	option = {
+#		name = colony.2043.a
+#		owner = {
+#			add_monthly_resource_mult = {
+#				resource = influence
+#				value = @tier3influencereward
+#				min = @tier3influencemin
+#				max = @tier3influencemax
+#			}
+#			add_monthly_resource_mult = {
+#				resource = society_research
+#				value = @tier2researchreward
+#				min = @tier2researchmin
+#				max = @tier2researchmax
+#			}
+#		}
+#		#random_tile = {
+#		#	limit = {
+#		#		has_prev_building = building_quarantine
+#		#	}
+#		#	set_building = building_plague_memorial
+#		#}
+#	}
+#}
+
+# Clerical Errors
+planet_event = {
+	id = colony.2050
+	title = colony.2050.name
+	desc = colony.2050.desc
+	picture = GFX_evt_colony_settlement
+	show_sound = event_planetary_riot
+	location = root
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_capital = no
+		has_ground_combat = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		num_pops > 0
+		has_building = yes
+		NOR = {
+			has_planet_flag = colony_event
+			is_habitat = yes
+		}
+		owner = {
+			is_ai = no
+			is_gestalt = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = colony_event
+	}
+
+	option = {
+		name = UNFORTUNATE
+		add_blocker = {
+			type = d_decrepit_dwellings
+			blocked_deposit = random
+		}
+		add_blocker = {
+			type = d_failing_infrastructure
+			blocked_deposit = random
+		}
+	}
+	option = {
+		name = colony.2050.b
+		#custom_tooltip = colony.2050.b.tooltip
+		trigger = {
+			owner = {
+				resource_stockpile_compare = { resource = influence value >= 100 }
+				resource_stockpile_compare = { resource = energy value >= 500 }
+				NOR = {
+					#has_policy = democratic_utopia
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_authoritarian
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -500
+				influence = -100
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+	option = {
+		name = colony.2050.c
+		#custom_tooltip = colony.2050.b.tooltip
+		trigger = {
+			owner = {
+				resource_stockpile_compare = { resource = influence value >= 50 }
+				resource_stockpile_compare = { resource = energy value >= 250 }
+				OR = {
+					#has_government = democratic_utopia
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_authoritarian
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -250
+				influence = -50
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+			}
+		}
+	}
+	option = {
+		name = colony.2050.d
+		add_planet_devastation = 20
+		trigger = {
+			owner = {
+				OR = {
+					has_government = gov_despotic_hegemony
+					has_government = gov_totalitarian_regime
+					has_government = gov_despotic_empire
+					has_government = gov_feudal_empire
+					has_government = gov_constitutional_dictatorship
+					has_government = gov_military_commissariat
+					has_government = gov_citizen_republic
+					has_government = gov_megacorporation
+					has_government = gov_military_dictatorship
+					has_government = gov_star_empire
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier2influencereward
+				min = @tier2influencemin
+				max = @tier2influencemax
+			}
+		}
+		random_owned_pop = {
+			add_modifier = {
+				modifier = pop_angered
+				days = 7200
+			}
+		}
+		random_owned_pop = {
+			limit = {
+				NOT = { has_modifier = pop_angered }
+			}
+			add_modifier = {
+				modifier = pop_angered
+				days = 7200
+			}
+		}
+	}
+}
+
+### Fumongus Colony Events
+
+#Hey we found weird mushrooms
+planet_event = {
+	id = colony.2060
+	title = "colony.2060.name"
+	desc = "colony.2060.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		habitable_planet = yes
+		NOR = {
+			has_global_flag = fumongus_colony
+			has_planet_flag = colony_event
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = fumongus_colony
+		set_planet_flag = colony_event
+	}
+	#Opt: Dispose of Them
+	option = {
+		name = colony.2060.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier2influencereward
+				min = @tier2influencemin
+				max = @tier2influencemax
+			}
+		}
+		owner = {
+			add_resource = { food = 1000 }
+		}
+	}
+	#Opt: Closer Look (haven't dug up the fumongus)
+	option = {
+		name = colony.2060.b
+		trigger = {
+			owner = {
+				NOT = {
+					has_country_flag = fumongus_ours
+				}
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.2065 days = 35 random = 40 }
+		}
+	}
+	#Opt: We Know Them - Already met the Fumongus
+	option = {
+		name = colony.2060.c
+		trigger = {
+			owner = {
+				has_country_flag = fumongus_ours
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.2080 days = 35 random = 40 }
+		}
+	}
+}
+
+#Options if you haven't dug out the fumongus
+#The Spores Have Ears
+planet_event = {
+	id = colony.2065
+	title = "colony.2065.name"
+	desc = "colony.2065.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.2065.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = { has_global_flag = fumongus_active }
+				planet_event = { id = colony.2070 days = 35 random = 40 }
+			}
+			else_if = {
+				limit = { NOT = { has_global_flag = fumongus_active } }
+				planet_event = { id = colony.2075 days = 35 random = 40 }
+			}
+		}
+	}
+	option = {
+		name = colony.2065.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+}
+
+#And Someone is Listening
+planet_event = {
+	id = colony.2070
+	title = "colony.2070.name"
+	desc = "colony.2070.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.2070.a
+		owner = {
+			add_modifier = {
+				modifier = disinformation_protocols
+				days = -1
+			}
+		}
+	}
+}
+
+#But No One Listens
+planet_event = {
+	id = colony.2075
+	title = "colony.2075.name"
+	desc = "colony.2075.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.2075.a
+		add_deposit = d_fungal_study_zone
+		owner = {
+			set_country_flag = fumongus_colony_complete
+		}
+	}
+}
+
+#Events if you have already dug out the Fumongus
+
+#Study the Mycelium Array Further
+planet_event = {
+	id = colony.2080
+	title = "colony.2080.name"
+	desc = "colony.2080.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	#Try to develop the spores
+	option = {
+		trigger = {
+			owner = { has_global_flag = fumongus_active }
+		}
+		name = colony.2080.a
+		hidden_effect = {
+			planet_event = { id = colony.2095 days = 35 random = 40  }
+		}
+	}
+	#Try to tune the network to spy on pops
+	option = {
+		trigger = {
+			owner = {
+				has_global_flag = fumongus_active
+				is_gestalt = no
+			}
+		}
+		name = colony.2080.b
+		hidden_effect = {
+			random_list = {
+				10 = {
+					modifier = {
+						factor = 6
+						owner = { is_egalitarian = yes }
+					}
+					modifier = {
+						factor = 3
+						owner = { has_ethic = ethic_fanatic_egalitarian }
+					}
+					planet_event = { id = colony.2085 days = 10 random = 20  }
+				}
+				90 = {
+					planet_event = { id = colony.2090 days = 35 random = 40  }
+				}
+			}
+		}
+	}
+	#If network dismantled
+	option = {
+		trigger = {
+			owner = { has_global_flag = fumongus_dismantled }
+		}
+		name = colony.2080.c
+		add_deposit = d_fungal_study_zone
+	}
+}
+
+#Pops unhappy about being spied on
+
+planet_event = {
+	id = colony.2085
+	title = "colony.2085.name"
+	desc = "colony.2085.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	#Abort
+	option = {
+		name = colony.2085.a
+	}
+	#Proceed
+	option = {
+		name = colony.2085.b
+		add_modifier = {
+			modifier = "suppressed_opposition"
+			days = 1800
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 500 }
+			}
+		}
+		owner = {
+			add_resource = { energy = -500 }
+			add_resource = { unity = -1000 }
+			add_modifier = {
+				modifier = fumongus_authoritarian
+				years = 10
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.2090 days = 25 random = 20 }
+		}
+	}
+}
+
+#Pop Surveillance active
+planet_event = {
+	id = colony.2090
+	title = "colony.2090.name"
+	desc = "colony.2090.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		add_modifier = {
+			modifier = "fumongus_monitor_pops"
+			days = -1
+		}
+	}
+}
+
+#Trying to grow more spores
+
+planet_event = {
+	id = colony.2095
+	title = "colony.2095.name"
+	desc = "colony.2095.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	#Eat them
+	option = {
+		name = colony.2095.a
+		add_deposit = d_fungal_caves
+	}
+	#Study them
+	option = {
+		name = colony.2095.b
+		add_deposit = d_fungal_study_zone
+	}
+}

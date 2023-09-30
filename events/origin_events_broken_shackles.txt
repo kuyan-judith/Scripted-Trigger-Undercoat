@@ -1,0 +1,4433 @@
+#########################
+
+# First Contact - Origins
+# Broken Shackles
+# By Chad Inglis
+
+#########################
+
+#Gatekeeper events for Homeworlds found
+
+#Main Homeworld Gatekeeper
+ship_event = {
+	id = origin.4997
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = broken_shackles_home_system_@root.owner
+		}
+		NOT = {
+			owner = {
+				has_country_flag = met_broken_shackles_homeworld
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			random_system_planet = {
+				limit = {
+					has_planet_flag = broken_shackles_homeworld_@root.owner
+				}
+				save_event_target_as = bs_main_homeworld_planet
+			}
+		}
+		if = {
+			limit = {
+				from = {
+					exists = owner
+					has_star_flag = broken_shackles_home_system_@root.owner
+				}
+			}
+			ship_event = {
+				id = origin.5000
+				scopes = {
+					from = event_target:bs_main_homeworld_planet
+				}
+			}
+		}
+	}
+}
+
+#Secondary Homeworld Gatekeeper
+ship_event = {
+	id = origin.4998
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			any_system_planet = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+			}
+			NOT = {
+				has_star_flag = broken_shackles_home_system_@root.owner 
+			}
+		}
+		owner = {
+			NOT = {
+				has_country_flag = visited_former_home_world
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			random_system_planet = {
+				limit = {
+					has_planet_flag = broken_shackles_abductees_world@root.owner
+				}
+				save_event_target_as = bs_second_homeworld_planet
+			}
+		}
+		if = {
+			limit = {
+				from = {
+					any_system_planet = {
+						has_planet_flag = broken_shackles_abductees_world@root.owner
+					}
+					exists = owner
+				}
+			}
+			ship_event = {
+				id = origin.5001
+				scopes = {
+					from = event_target:bs_second_homeworld_planet
+				}
+			}
+		}
+	}
+}
+
+#Tertiary Homeworld Gatekeeper
+ship_event = {
+	id = origin.4999
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			has_country_flag = visited_former_home_world # Checking that origin.5001 has fired.
+			NOT = {
+				has_country_flag = recently_found_homeworld
+			}
+		}
+		from = {
+			any_system_planet = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+			}	
+			NOT = {
+				has_star_flag = broken_shackles_home_system_@root.owner 
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			random_system_planet = {
+				limit = {
+					has_planet_flag = broken_shackles_abductees_world@root.owner
+				}
+				save_event_target_as = bs_another_homeworld_planet
+			}
+		}
+		if = {
+			limit = {
+				from = {
+					any_system_planet = {
+						has_planet_flag = broken_shackles_abductees_world@root.owner
+					}
+					exists = owner
+				}
+			}
+			ship_event = {
+				id = origin.5009
+				scopes = {
+					from = event_target:bs_another_homeworld_planet
+				}
+			}
+		}
+	}
+}
+
+# Pre-FTL Main Homeworld Found 
+ship_event = {
+	id = origin.5000
+	title = "origin.5000.name"
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = yes
+				}
+			}
+		}
+		text = origin.5000.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops = 0
+				NOT = {
+					is_nuked_world = yes
+				}
+			}
+		}
+		text = origin.5001.empty.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				is_nuked_world = yes
+			}
+		}
+		text = origin.5001.tomb.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = no
+				}
+				is_same_value = owner.home_planet
+			}
+		}
+		text = origin.5001.uplifted.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = no
+				}
+				NOT = {
+					is_same_value = owner.home_planet
+				}
+			}
+		}
+		text = origin.5001.conquered.desc
+	}
+	picture = {
+		trigger = {
+			from = {
+				OR = {
+					num_pops = 0
+					is_nuked_world = yes
+				}
+			}
+		}
+		picture = GFX_evt_relic_world
+	}
+	picture = {
+		trigger = {
+			from = {
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+			}
+		}
+		picture = GFX_evt_happy_reunion
+	}
+	location = FROM
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			solar_system = {
+				has_star_flag = broken_shackles_home_system_@root.owner
+			}
+			has_planet_flag = broken_shackles_homeworld_@root.owner
+		}
+		NOT = {
+			owner = {
+				has_country_flag = met_broken_shackles_homeworld
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = met_broken_shackles_homeworld
+			if = {
+				limit = {
+					has_event_chain = homeworlds_chain
+				}
+				add_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+					amount = 1
+				}
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = yes
+				}
+			}
+		}
+		name = origin.5000.a
+		owner = {
+			add_modifier = {
+				modifier = "broken_shackles_homeworld_found_01"
+				days = 1800
+			}
+			hidden_effect = {
+				country_event = {
+					id = origin.5002
+					days = 360
+					random = 50
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				OR = {
+					num_pops = 0
+					is_nuked_world = yes
+				}
+			}
+		}
+		name = origin.5000.b
+		owner = {
+			add_modifier = {
+				modifier = "broken_shackles_homeworld_found_08"
+				days = 1000
+			}
+			hidden_effect = {
+				country_event = {
+					id = origin.5002
+					days = 360
+					random = 50
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = no
+				}
+			}
+		}
+		name = UNDERSTOOD
+		owner = {
+			add_modifier = {
+				modifier = "broken_shackles_homeworld_found_08"
+				days = 1000
+			}
+			hidden_effect = {
+				country_event = {
+					id = origin.5002
+					days = 360
+					random = 50
+				}
+			}
+		}
+	}
+
+	after = {
+		owner = {
+			if = {
+				limit = {	
+					has_completed_event_chain_counter = {
+						event_chain = homeworlds_chain
+						counter = found_homeworlds
+					}
+				}
+				country_event = {
+					id = origin.5270
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+#Event fires when player scans the first of their (non-main_species) home worlds
+ship_event = {
+	id = origin.5001
+	title = "origin.5001.name"
+	desc = {
+		trigger = {
+		from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = yes
+				}
+			}
+		}
+		text = origin.5001.homecoming.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops = 0
+				NOT = {
+					is_nuked_world = yes
+				}
+			}
+		}
+		text = origin.5001.empty.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				is_nuked_world = yes
+			}
+		}
+		text = origin.5001.tomb.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = no
+				}
+				is_same_value = owner.home_planet
+			}
+		}
+		text = origin.5001.uplifted.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = no
+				}
+				NOT = {
+					is_same_value = owner.home_planet
+				}
+			}
+		}
+		text = origin.5001.conquered.desc
+	}
+	picture = {
+		trigger = {
+			from = {
+				OR = {
+					num_pops = 0
+					is_nuked_world = yes
+				}
+			}
+		}
+		picture = GFX_evt_relic_world
+	}
+	picture = {
+		trigger = {
+			from = {
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+			}
+		}
+		picture = GFX_evt_happy_reunion
+	}
+	location = FROM
+	show_sound = evn_fc_broken_shackles_origin
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_planet_flag = broken_shackles_abductees_world@root.owner
+			NOT = {
+				solar_system = { 
+					has_star_flag = broken_shackles_home_system_@root.owner 
+				}
+			}
+		}
+		owner = {
+			NOT = {
+				has_country_flag = visited_former_home_world
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = {
+				flag = recently_found_homeworld
+				days = 1
+			}
+			set_country_flag = visited_former_home_world
+		}
+		if = {
+			limit = {
+				owner = {
+					has_event_chain = homeworlds_chain
+				}
+			}
+			owner = {
+				add_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+					amount = 1
+				}
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = yes
+				}
+			}
+		}
+		name = EXCELLENT
+		owner = {
+			add_modifier = {
+				modifier = "broken_shackles_homeworld_found_02"
+				days = 1800
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				OR = {
+					num_pops = 0
+					is_nuked_world = yes
+				}
+			}
+		}
+		name = origin.5000.b
+		owner = {
+			add_modifier = {
+				modifier = "broken_shackles_homeworld_found_08"
+				days = 1000
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = no
+				}
+			}
+		}
+		name = UNDERSTOOD
+		owner = {
+			add_modifier = {
+				modifier = "broken_shackles_homeworld_found_08"
+				days = 1000
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				owner = {
+					has_completed_event_chain_counter = {
+						event_chain = homeworlds_chain
+						counter = found_homeworlds
+					}
+				}
+			}
+			owner = {
+				country_event = {
+					id = origin.5270
+					days = 7
+				}
+				remove_country_flag = visited_former_home_world
+			}
+		}
+	}
+}
+
+# Home Sick - Returners Event Chain (follow-up to origin.5000)
+country_event = {
+	id = origin.5002
+	title = "origin.5002.name"
+	desc = "origin.5002.desc"
+	picture = GFX_evt_alien_segregation
+	show_sound = evn_fc_broken_shackles_origin
+
+	trigger = {
+		NOT = {
+			has_country_flag = homesick_alternate
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_system = {
+			limit = {
+				has_star_flag = broken_shackles_home_system_@root
+			}
+			random_system_planet = {
+				limit = {
+					has_planet_flag = broken_shackles_homeworld@root
+				}
+				save_event_target_as = broken_shackles_homeworld
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					owner = {
+						save_event_target_as = broken_shackles_homeworld_owner
+					}
+				}
+			}
+		}
+		while = {
+			count = value:five_percent_species
+			random_owned_pop = {
+					limit = {
+						is_same_species = owner_main_species
+					}
+				resettle_pop = {
+					pop = this
+					planet = event_target:broken_shackles_homeworld
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = origin.5002.a
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_03"
+			days = -1
+		}
+		tooltip = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+						limit = {
+							is_same_species = owner_main_species
+						}
+					resettle_pop = {
+						pop = this
+						planet = event_target:broken_shackles_homeworld
+					}
+				}
+			}
+		}
+		event_target:broken_shackles_homeworld_owner = {
+			if = {
+				limit = {
+					is_primitive = no
+					NOT = {
+						is_same_value = ROOT
+					}
+				}
+				add_intel = {
+					who = ROOT
+					amount = 10
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5003
+				days = 720
+				random = 50
+			}
+		}
+	}
+	option = {
+		name = origin.5002.b
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_04"
+			days = -1
+		}
+		tooltip = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+						limit = {
+							is_same_species = owner_main_species
+						}
+					resettle_pop = {
+						pop = this
+						planet = event_target:broken_shackles_homeworld
+					}
+				}
+			}
+		}
+		while = {
+			count = value:ten_percent_main_species
+			random_owned_pop = {
+				limit = {
+					is_same_species = owner_main_species
+				}
+				resettle_pop = {
+					pop = this
+					planet = event_target:broken_shackles_homeworld
+				}
+			}
+		}
+		while = {
+			count = value:five_percent_species
+			random_owned_pop = {
+				limit = {
+					NOT = {
+						has_ethic = ethic_egalitarian
+					}
+				}
+				pop_change_ethic = ethic_egalitarian
+			}
+		}
+		if = {
+			limit = {
+				event_target:broken_shackles_homeworld_owner = {
+					is_primitive = yes
+				}
+			}
+			custom_tooltip = origin.5002.b.tt
+		}
+		else = {
+			event_target:broken_shackles_homeworld_owner = {
+				if = {
+					limit = {
+						NOT = {
+							is_same_value = ROOT
+						}
+					}
+					add_intel = {
+						who = ROOT
+						amount = 20
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:broken_shackles_homeworld_owner = {
+				if = {
+					limit = {
+						is_primitive = yes
+					}
+					set_awareness = 100
+					set_timed_country_flag = { 
+						flag = acquired_tech
+						months = 60
+					}
+				}
+			}
+			country_event = {
+				id = origin.5006
+				days = 720
+				random = 50
+			}
+		}
+	}
+}
+
+# Option A Chain - Deny Freedom of Movement
+country_event = {
+	id = origin.5003
+	title = "origin.5003.name"
+	desc = "origin.5003.desc"
+	picture = GFX_evt_civil_action
+	location = ROOT.capital_scope
+	show_sound = event_bad_omen
+
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5003.a
+		hidden_effect = {
+			country_event = {
+				id = origin.5004
+				days = 720
+				random = 50
+			}
+		}
+	}
+}
+country_event = {
+	id = origin.5004
+	title = "origin.5004.name"
+	desc = "origin.5004.desc"
+	picture = GFX_evt_burning_city
+	location = ROOT.capital_scope
+	show_sound = event_screams
+
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5004.a
+		capital_scope = {
+			add_planet_devastation = 10
+			add_modifier = {
+				modifier = "martial_law"
+				days = -1
+			}
+			save_event_target_as = martialed_planet
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5005
+				days = 1080
+				random = 100
+			}
+		}
+	}
+}
+country_event = {
+	id = origin.5005
+	title = "origin.5005.name"
+	desc = "origin.5005.desc"
+	picture = GFX_evt_grand_speech
+	location = ROOT.capital_scope
+	show_sound = event_screams
+
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5005.a
+		event_target:martialed_planet = {
+			remove_modifier = "martial_law"
+		}
+		remove_modifier = broken_shackles_homeworld_found_03
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_05"
+			days = 3600
+		}
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_authoritarian
+						}
+					}
+					pop_change_ethic = ethic_authoritarian
+				}
+			}
+		}
+	}
+}
+
+# Option B Chain - Allow Freedom of Movement
+country_event = {
+	id = origin.5006
+	title = "origin.5006.name"
+	desc = "origin.5006.desc"
+	picture = GFX_evt_alien_segregation
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	immediate = { 
+		random_owned_leader = {
+			limit = {
+				leader_class = scientist
+			}
+			kill_leader = { show_notification = no }
+		}
+		random_owned_leader = {
+			kill_leader = { show_notification = no }
+		}
+		event_target:broken_shackles_homeworld = {
+			create_pop = {
+				species = owner_main_species
+			}
+			if = {
+				limit = {
+					has_owner = yes
+					NOT = {
+						owner = {
+							is_same_value = ROOT
+						}
+					}
+				}
+				owner = {
+					add_intel = {
+						who = ROOT
+						amount = 10
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = origin.5006.a
+		remove_modifier = broken_shackles_homeworld_found_04
+		hidden_effect = {
+			country_event = {
+				id = origin.5003
+				days = 360
+				random = 50
+			}
+		}
+	}
+	option = {
+		name = origin.5006.b
+		hidden_effect = {
+			random_owned_pop = {
+				resettle_pop = {
+					pop = this
+					planet = event_target:broken_shackles_homeworld
+				}
+			}
+		}
+		reroll_random = yes
+		random_list = {
+			50 = {
+				country_event = {
+					id = origin.5007
+					days = 1080
+					random = 50
+				}
+			}
+			50 = { 
+				country_event = {
+					id = origin.5008
+					days = 1080
+					random = 50
+				}
+			}
+		}
+	}
+}
+
+#50% chance
+country_event = {
+	id = origin.5007
+	title = "origin.5007.name"
+	desc = "origin.5007.desc"
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_laboratory_sound
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = broken_shackles_homeworld_found_04
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_06"
+			days = 9000
+		}
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_egalitarian
+						}
+					}
+					pop_change_ethic = ethic_egalitarian
+				}
+			}
+		}
+	}
+}
+
+
+#50% chance
+country_event = {
+	id = origin.5008
+	title = "origin.5008.name"
+	desc = "origin.5008.desc"
+	picture = GFX_evt_obelisk_tourists
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = broken_shackles_homeworld_found_04
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_07"
+			days = 9000
+		}
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_egalitarian
+						}
+					}
+					pop_change_ethic = ethic_egalitarian
+				}
+			}
+		}
+	}
+}
+
+#Event fires when player scans another of their (non-main_species) home worlds
+ship_event = {
+	id = origin.5009
+	title = "origin.5009.name"
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = yes
+				}
+			}
+		}
+		text = origin.5009.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops = 0
+				NOT = {
+					is_nuked_world = yes
+				}
+			}
+		}
+		text = origin.5001.empty.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				is_nuked_world = yes
+			}
+		}
+		text = origin.5001.tomb.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+				owner = {
+					is_primitive = no
+				}
+				is_same_value = owner.home_planet
+			}
+		}
+		text = origin.5001.uplifted.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = no
+				}
+				NOT = {
+					is_same_value = owner.home_planet
+				}
+			}
+		}
+		text = origin.5001.conquered.desc
+	}
+	picture = {
+		trigger = {
+			from = {
+				OR = {
+					num_pops = 0
+					is_nuked_world = yes
+				}
+			}
+		}
+		picture = GFX_evt_relic_world
+	}
+	picture = {
+		trigger = {
+			from = {
+				num_pops > 0
+				NOT = {
+					is_nuked_world = yes
+				}
+			}
+		}
+		picture = GFX_evt_happy_reunion
+	}
+	location = FROM
+	show_sound = evn_fc_broken_shackles_origin
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			has_country_flag = visited_former_home_world # Checking that origin.5001 has fired.
+			NOT = {
+				has_country_flag = recently_found_homeworld
+			}
+		}
+		from = {
+			has_planet_flag = broken_shackles_abductees_world@root.owner
+			NOT = {
+				solar_system = {
+					has_star_flag = broken_shackles_home_system_@root.owner 
+				}
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = three_home_worlds_found
+		}
+		if = {
+			limit = {
+				owner = {
+					has_event_chain = homeworlds_chain
+				}
+			}
+			owner = {
+				add_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+					amount = 1
+				}
+			}
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+
+	after = {
+		if = {
+			limit = {
+				owner = {
+					has_completed_event_chain_counter = {
+						event_chain = homeworlds_chain
+						counter = found_homeworlds
+					}
+				}
+			}
+			owner = {
+				country_event = {
+					id = origin.5270
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+# First Outpost Built 
+ship_event = {
+	id = origin.5010
+	title = "origin.5010.name"
+	desc = "origin.5010.desc"
+	picture = GFX_evt_gas_giant_station
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_broken_shackles_empire = yes
+			NOT = {
+				has_country_flag = broken_shackles_first_outpost
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = broken_shackles_first_outpost
+		}
+	}
+
+	option = {
+		name = origin.5010.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+#Home Sick Alternate Spawn
+
+country_event = {
+	id = origin.5011
+	title = "origin.5002.name"
+	desc = "origin.5011.desc"
+	picture = GFX_evt_alien_segregation
+	show_sound = evn_fc_broken_shackles_origin
+
+	trigger = {
+		is_broken_shackles_empire = yes
+		mid_game_years_passed >= value:halfway_to_mid_game_year
+		NOR = {
+			has_country_flag = met_broken_shackles_homeworld
+			has_country_flag = homesick_alternate
+		}
+		any_system = {
+			has_star_flag = broken_shackles_home_system_@root
+			root = {
+				intel_level = {
+					level > none
+					system = prev
+				}
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = homesick_alternate
+		random_system = {
+			limit = {
+				has_star_flag = broken_shackles_home_system_@root
+			}
+			random_system_planet = {
+				limit = {
+					has_planet_flag = broken_shackles_homeworld_@root
+				}
+				save_event_target_as = broken_shackles_homeworld
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					owner = {
+						save_event_target_as = broken_shackles_homeworld_owner
+					}
+				}
+			}
+		}
+		while = {
+			count = value:five_percent_species
+			random_owned_pop = {
+				limit = {
+					is_same_species = owner_main_species
+				}
+				resettle_pop = {
+					pop = this
+					planet = event_target:broken_shackles_homeworld
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = origin.5002.a
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_03"
+			days = -1
+		}
+		tooltip = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+						limit = {
+							is_same_species = owner_main_species
+						}
+					resettle_pop = {
+						pop = this
+						planet = event_target:broken_shackles_homeworld
+					}
+				}
+			}
+		}
+		event_target:broken_shackles_homeworld_owner = {
+			if = {
+				limit = {
+					is_primitive = no
+					NOT = {
+						is_same_value = ROOT
+					}
+				}
+				add_intel = {
+					who = ROOT
+					amount = 10
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5003
+				days = 720
+				random = 50
+			}
+		}
+	}
+	option = {
+		name = origin.5002.b
+		add_modifier = {
+			modifier = "broken_shackles_homeworld_found_04"
+			days = -1
+		}
+		tooltip = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+						limit = {
+							is_same_species = owner_main_species
+						}
+					resettle_pop = {
+						pop = this
+						planet = event_target:broken_shackles_homeworld
+					}
+				}
+			}
+		}
+		while = {
+			count = value:ten_percent_main_species
+			random_owned_pop = {
+				limit = {
+					is_same_species = owner_main_species
+				}
+				resettle_pop = {
+					pop = this
+					planet = event_target:broken_shackles_homeworld
+				}
+			}
+		}
+		while = {
+			count = value:five_percent_species
+			random_owned_pop = {
+				limit = {
+					NOT = {
+						has_ethic = ethic_egalitarian
+					}
+				}
+				pop_change_ethic = ethic_egalitarian
+			}
+		}
+		if = {
+			limit = {
+				event_target:broken_shackles_homeworld_owner = {
+					is_primitive = yes
+				}
+			}
+			custom_tooltip = origin.5002.b.tt
+		}
+		else = {
+			event_target:broken_shackles_homeworld_owner = {
+				if = {
+					limit = {
+						NOT = {
+							is_same_value = ROOT
+						}
+					}
+					add_intel = {
+						who = ROOT
+						amount = 20
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:broken_shackles_homeworld_owner = {
+				if = {
+					limit = {
+						is_primitive = yes
+					}
+					set_awareness = 100
+					set_timed_country_flag = { 
+						flag = acquired_tech
+						months = 60
+					}
+				}
+			}
+			country_event = {
+				id = origin.5006
+				days = 720
+				random = 50
+			}
+		}
+	}
+}
+
+# Crashed Slaver Ship - Broken Shackles - Initial Arc Site
+
+# Stage 1 - The Bridge
+
+fleet_event = {
+	id = origin.5015
+	title = "origin.5015.name"
+	desc = "origin.5015.desc"
+	picture = GFX_evt_crashed_station
+	show_sound = event_scanner
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner.capital_scope = {
+			random_owned_pop = {
+				limit = {
+					species = {
+						NOT = {
+							is_same_value = root.owner_main_species
+						}
+					}
+					pop_produces_resource = {
+						type = engineering_research
+						amount >= 0.1 
+					}
+				}
+				species = {
+					save_event_target_as = engineering_shackled_species
+					set_species_flag = engineering_species
+				}
+			}
+			if = { #fallback option
+				limit = {
+					NOT = {
+						exists = event_target:engineering_shackled_species
+					}
+				}
+				owner_main_species = {
+					save_event_target_as = engineering_shackled_species
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					is_scavenger = yes
+				}
+			}
+			random_list = {
+				90 = {}
+				10 = {
+					from = { set_archaeology_flag = scavenger_reward }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+		trigger = {
+			NOT = {
+				from = { has_archaeology_flag = scavenger_reward }
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+
+	option = {
+		trigger = {
+			owner = {
+				is_scavenger = yes
+			}
+			from = { has_archaeology_flag = scavenger_reward }
+		}
+		name = UNDERSTOOD
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Stage 2 - The Engineering Bay
+
+fleet_event = {
+	id = origin.5020
+	title = "origin.5020.name"
+	desc = "origin.5020.desc"
+	picture = GFX_evt_crashed_station
+	show_sound = event_scanner
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = {
+			random_owned_species = {
+				limit = {
+					has_species_flag = engineering_species
+				}
+				save_event_target_as = engineering_shackled_species
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					is_scavenger = yes
+				}
+			}
+			random_list = {
+				90 = {}
+				10 = {
+					from = { set_archaeology_flag = scavenger_reward }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			NOT = {
+				from = { has_archaeology_flag = scavenger_reward }
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = {
+				is_scavenger = yes
+			}
+			from = { has_archaeology_flag = scavenger_reward }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+	
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Stage 3 - The Core
+
+fleet_event = {
+	id = origin.5025
+	title = "origin.5025.name"
+	desc = "origin.5025.desc"
+	picture = GFX_evt_sapient_AI
+	show_sound = event_scanner
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = {
+			random_owned_species = {
+				limit = {
+					has_species_flag = engineering_species
+				}
+				save_event_target_as = engineering_shackled_species
+			}
+			add_modifier = {
+				modifier = broken_shackles_arc_site
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					is_scavenger = yes
+				}
+			}
+			random_list = {
+				90 = {}
+				10 = {
+					from = { set_archaeology_flag = scavenger_reward }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = origin.5025.a
+		trigger = {
+			NOT = {
+				from = { has_archaeology_flag = scavenger_reward }
+			}
+		}
+		tooltip = {
+			add_modifier = {
+				modifier = broken_shackles_arc_site
+				days = -1
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+
+	option = {
+		name = origin.5025.a
+		trigger = {
+			owner = {
+				is_scavenger = yes
+			}
+			from = { has_archaeology_flag = scavenger_reward }
+		}
+		tooltip = {
+			add_modifier = {
+				modifier = broken_shackles_arc_site
+				days = -1
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+	
+	after = {
+		from = { 
+			set_site_progress_locked = no
+		}
+	}
+}
+
+# Stage 4 - The Collaborator
+
+fleet_event = {
+	id = origin.5030
+	title = "origin.5030.name"
+	desc = "origin.5030.desc"
+	picture = GFX_evt_decryption
+	show_sound = event_scanner
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = {
+			random_owned_species = {
+				limit = {
+					has_species_flag = engineering_species
+				}
+				save_event_target_as = engineering_shackled_species
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					is_scavenger = yes
+				}
+			}
+			random_list = {
+				90 = {}
+				10 = {
+					from = { set_archaeology_flag = scavenger_reward }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			NOT = {
+				from = { has_archaeology_flag = scavenger_reward }
+			}
+		}
+		owner = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_encryption_1
+				PROGRESS = 0.4
+				CATEGORY = physics_research
+			}
+			add_modifier = {
+				modifier = "unshackled_decryption"
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = {
+				is_scavenger = yes
+			}
+			from = { has_archaeology_flag = scavenger_reward }
+		}
+		owner = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_encryption_1
+				PROGRESS = 0.4
+				CATEGORY = physics_research
+			}
+			add_modifier = {
+				modifier = "unshackled_decryption"
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		owner.capital_scope = {
+			remove_deposit = d_ship_debris_broken_shackles_blocker
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Stage 5 - Data Mine
+
+fleet_event = {
+	id = origin.5035
+	title = "origin.5035.name"
+	desc = {
+		text = "origin.5035.desc"
+		trigger = {
+			owner = {
+				has_communications = event_target:MSI_country
+			}
+		}
+	}
+	desc = {
+		text = "origin.5035.desc.MSInocontact"
+		trigger = {
+			owner = {
+				NOT = { has_communications = event_target:MSI_country }
+			}
+		}
+	}
+	picture = GFX_evt_ancient_databank
+	show_sound = event_scanner
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = {
+			if = {
+				limit = {
+					NOT = { has_communications = event_target:MSI_country }
+				}
+				set_visited = event_target:MSI_country.capital_scope.solar_system
+				create_point_of_interest = {
+					id = MSI_home_system
+					name = "MSI_home_system_poi"
+					desc = MSI_home_system_desc
+					event_chain = MSI_chain
+					location = event_target:MSI_country.capital_scope
+				}
+			}
+			random_owned_species = {
+				limit = {
+					has_species_flag = engineering_species
+				}
+				save_event_target_as = engineering_shackled_species
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					is_scavenger = yes
+				}
+			}
+			random_list = {
+				90 = {}
+				10 = {
+					from = { set_archaeology_flag = scavenger_reward }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			NOT = {
+				from = { has_archaeology_flag = scavenger_reward }
+			}
+		}
+		owner = {
+			remove_modifier = broken_shackles_arc_site
+			enable_special_project = {
+				name = "BROKEN_SHACKLES_PROJECT_01"
+			}
+			if = {
+				limit = {
+					NOT = { has_communications = event_target:MSI_country }
+				}
+				add_modifier = {
+					modifier = "broken_shackles_MSI_found"
+					days = 3600
+				}
+			}
+
+			capital_scope = {
+				remove_deposit = d_ship_debris_broken_shackles_blocker
+			}
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = broken_shackles_scrappers
+				country_event = {
+					id = origin.111
+					days = 120
+					random = 20
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = {
+				is_scavenger = yes
+			}
+			from = { has_archaeology_flag = scavenger_reward }
+		}
+		owner = {
+			remove_modifier = broken_shackles_arc_site
+			enable_special_project = {
+				name = "BROKEN_SHACKLES_PROJECT_01"
+			}
+			if = {
+				limit = {
+					NOT = { has_communications = event_target:MSI_country }
+				}
+				add_modifier = {
+					modifier = "broken_shackles_MSI_found"
+					days = 3600
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+
+			capital_scope = {
+				remove_deposit = d_ship_debris_broken_shackles_blocker
+			}
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = broken_shackles_scrappers
+				country_event = {
+					id = origin.111
+					days = 120
+					random = 20
+				}
+			}
+		}
+	}
+	
+	after = {
+		from = { set_site_progress_locked = no }
+		owner = {
+			end_event_chain = MSI_chain
+		}
+	}
+}
+
+# Home Worlds Project Finished
+
+country_event = {
+	id = origin.5040
+	title = "origin.5040.name"
+	desc = "origin.5040.desc"
+	picture = GFX_evt_city_planet
+	show_sound = event_celebration
+	
+	is_triggered_only = yes
+
+	immediate = {
+		random_system = {
+			limit = {
+				has_star_flag = broken_shackles_home_system_@root
+			}
+			save_event_target_as = abductee_system_1
+			root = { 
+				set_visited = event_target:abductee_system_1
+			}
+		}
+		random_system = {
+			limit = {
+				any_system_planet = {
+					has_planet_flag = broken_shackles_abductees_world@root
+				}
+				NOT = {
+					is_same_value = event_target:abductee_system_1
+				}
+			}
+			save_event_target_as = abductee_system_2
+			root = { 
+				set_visited = event_target:abductee_system_2
+			}
+		}
+		random_system = {
+			limit = {
+				any_system_planet = {
+					has_planet_flag = broken_shackles_abductees_world@root
+				}
+				NOR = {
+					is_same_value = event_target:abductee_system_1
+					is_same_value = event_target:abductee_system_2
+				}
+			}
+			save_event_target_as = abductee_system_3
+			root = { 
+				set_visited = event_target:abductee_system_3
+			}
+		}
+	}
+
+	option = {
+		name = origin.5040.a
+		custom_tooltip = origin.5040.a.tooltip
+		owner = {
+			begin_event_chain = {
+				event_chain = homeworlds_chain
+				target = this
+			}
+			create_point_of_interest = {
+				id = broken_shackles_find_home_01
+				name = "broken_shackles_find_home_01"
+				desc = broken_shackles_find_home_01_desc
+				event_chain = homeworlds_chain
+				location = event_target:abductee_system_1
+			}
+			create_point_of_interest = {
+				id = broken_shackles_find_home_02
+				name = "broken_shackles_find_home_02"
+				desc = "broken_shackles_find_home_02_desc"
+				event_chain = homeworlds_chain
+				location = event_target:abductee_system_2
+			}
+			create_point_of_interest = {
+				id = broken_shackles_find_home_03
+				name = "broken_shackles_find_home_03"
+				desc = "broken_shackles_find_home_03_desc"
+				event_chain = homeworlds_chain
+				location = event_target:abductee_system_3
+			}
+			# If we already visited some of these planets, add the counters
+			if = {
+				limit = {
+					has_country_flag = met_broken_shackles_homeworld
+				}
+				add_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+					amount = 1
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = visited_former_home_world
+				}
+				add_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+					amount = 1
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = three_home_worlds_found
+				}
+				add_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+					amount = 1
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {	
+				has_completed_event_chain_counter = {
+					event_chain = homeworlds_chain
+					counter = found_homeworlds
+				}
+			}
+			country_event = {
+				id = origin.5270
+				days = 7
+			}
+		}
+	}
+}
+
+### Internal Politics Events ###
+
+# Unshackled Politics - Factions Founded
+
+country_event = {
+	id = origin.5041
+	title = "origin.5041.name"
+	desc = "origin.5041.desc"
+	picture = GFX_evt_assembly_fight
+	show_sound = evn_fc_broken_shackles_origin
+	location = owner.capital_scope
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_broken_shackles_empire = yes
+		NOT = {
+			has_country_flag = broken_shackles_internal_politics
+		}
+	}
+
+	immediate = {
+		set_country_flag = broken_shackles_internal_politics
+		every_owned_species = {
+			random_list = {
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = spiritualist } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = materialist } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = pacifist } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = militarist } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = xenophobe } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = xenophile } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = authoritarian } }
+				1 = { broken_shackles_start_pop_ethic_effect = { ETHIC = egalitarian } }
+			}
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+		custom_tooltip = origin.5041.tt
+		add_modifier = {
+			modifier = unshackled_politics_broken_shackles
+			days = 3600
+		}
+	}
+}
+
+# The Cost of Freedom - Mid-Game Chain
+
+event = {
+	id = origin.5045
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		any_country = {
+			is_broken_shackles_empire = yes
+		}
+		NOT = {
+			has_country_flag = cost_of_freedom_chain
+		}
+	}
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				is_broken_shackles_empire = yes
+			}
+			country_event = {
+				id = origin.5046
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5046
+	title = "origin.5046.name"
+	desc = "origin.5046.desc"
+	picture = GFX_evt_civil_action
+	show_sound = evn_fc_broken_shackles_origin
+	location = owner.capital_scope
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = cost_of_freedom_chain
+	}
+
+	option = {
+		name = origin.5046.a
+		add_modifier = {
+			modifier = cost_of_freedom_01
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5200
+				days = 360
+				random = 60
+			}
+		}
+	}
+	option = {
+		name = origin.5046.b
+		add_modifier = {
+			modifier = cost_of_freedom_02
+			days = -1
+		}
+		enable_special_project = {
+			name = "COST_OF_FREEDOM_PROJECT"
+			location = owner.capital_scope
+			owner = root
+		}
+	}
+}
+
+# Complimentary Thinking 
+
+country_event = {
+	id = origin.5047
+	title = "origin.5047.name"
+	desc = "origin.5047.desc"
+	picture = GFX_evt_partition
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_broken_shackles_empire = yes
+		any_owned_leader = {
+			leader_class = scientist
+			is_councilor = yes
+			species = {
+				NOT = {
+					is_same_value = root.species
+				}
+			}
+		}
+		NOT = {
+			has_country_flag = shackled_science
+		}
+	}
+
+	immediate = {
+		set_country_flag = shackled_science
+	}
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			if = {
+				limit = {
+					NOT = {
+						has_technology = tech_basic_science_lab_1
+					}
+				}
+				add_research_option = tech_basic_science_lab_1
+				add_tech_progress = {
+					tech = tech_basic_science_lab_1
+					progress = 0.4
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = {
+						has_technology = tech_basic_science_lab_2
+					}
+				}
+				add_research_option = tech_basic_science_lab_2
+				add_tech_progress = {
+					tech = tech_basic_science_lab_2
+					progress = 0.4
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+# Diverse Design
+
+country_event = {
+	id = origin.5048
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = broken_shackles_internal_politics
+		any_owned_planet = {
+			OR = {
+				has_building = building_commercial_megaplex
+				has_building = building_holo_theatres
+				has_building = building_factory_2			
+			}
+		}
+		NOT = {
+			has_country_flag = diverse_design
+		}
+	}
+
+	immediate = {
+		set_country_flag = diverse_design
+		hidden_effect = {
+			country_event = {
+				id = origin.5049
+				days = 90
+				random = 30
+			}
+		}
+	}
+}
+
+country_event = {
+	id = "origin.5049"
+	title = "origin.5049.name"
+	desc = "origin.5049.desc"
+	picture = GFX_evt_surreal_visions
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5049.a
+		add_modifier = {
+			modifier = diverse_design
+			days = 3600
+		}
+	}
+}
+
+#Built First Science Ship
+
+ship_event = {
+	id = origin.5060
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_ship_class = shipclass_science_ship
+		owner = {
+			is_broken_shackles_empire = yes
+			NOT = {
+				has_country_flag = built_first_science_ship
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = built_first_science_ship
+		}
+	}
+}
+
+## First Contact with MSI
+
+# Comms Study 1
+first_contact_event = {
+	id = origin.5065
+	title = origin.5065.name
+	desc = origin.5065.desc
+	picture = GFX_evt_announcement
+	show_sound = evn_fc_slaver_empire
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_first_contact_flag = seen_aliens
+		set_name = NAME_MSI_country
+		set_site_progress_locked = yes
+		owner = {
+			set_country_flag = met_MSI
+		}
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = origin.5065.a
+		owner = {
+			add_modifier = {
+				modifier = broken_shackles_MSI_contact_01
+				days = 1800
+			}
+		}
+		hidden_effect = {
+			set_first_contact_stage = slavers_stage_2
+		}
+	}
+}
+
+# Comms Study 2
+first_contact_event = {
+	id = origin.5070
+	title = origin.5070.name
+	desc = origin.5070.desc
+	picture = GFX_evt_acquire_asset
+	show_sound = evn_fc_slaver_empire
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = origin.5070.a
+		hidden_effect = {
+			set_first_contact_stage = slavers_finish
+		}
+	}
+}
+
+# Comms Study Finale
+first_contact_event = {
+	id = origin.5075
+	title = origin.5075.name
+	desc = origin.5075.desc
+	picture = GFX_evt_announcement
+	show_sound = evn_fc_slaver_empire
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = origin.5075.a
+		owner = {
+			if = {
+				limit = {
+					has_modifier = broken_shackles_MSI_contact_01
+				}
+				remove_modifier = broken_shackles_MSI_contact_01
+			}
+			add_modifier = {
+				modifier = broken_shackles_MSI_contact_02
+				days = 3600
+			}
+			add_opinion_modifier = {
+				who = event_target:MSI_country
+				modifier = contact_with_MSI_02
+			}
+		}
+		finish_first_contact_effect = yes
+		first_contact_inform_intel = yes
+	}
+}
+
+# Contact Established through GalCom
+
+country_event = {
+	id = origin.5079
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		is_broken_shackles_empire = yes
+	}
+
+	immediate = {
+		country_event = {
+			id = origin.5080
+			days = 5
+		}
+	}
+}
+
+country_event = {
+	id = origin.5080
+	title = origin.5080.name
+	desc = origin.5080.desc
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_slaver_empire
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		is_broken_shackles_empire = yes
+		any_country = {
+			is_minamar = yes
+			is_galactic_community_member = yes
+		}
+		NOT = {
+			has_country_flag = met_MSI
+			has_country_flag = met_MSI_at_GalCom
+		}
+	}
+
+	immediate = {
+		set_country_flag = met_MSI_at_GalCom
+	}
+
+	option = {
+		name = origin.5075.a
+		add_opinion_modifier = {
+			who = event_target:MSI_country
+			modifier = contact_with_MSI_01
+		}
+		add_modifier = {
+			modifier = broken_shackles_MSI_contact_01
+			days = 1800
+		}
+	}
+}
+
+#Generate Planetary Blockers
+
+country_event = {
+	id = origin.5081
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_broken_shackles_empire = yes
+	}
+
+	immediate = {
+		capital_scope = {
+			clear_blockers = yes
+			add_deposit = d_crashed_slaver_ship
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+			while = {
+				count = 5
+				add_deposit = d_ship_debris_broken_shackles_blocker
+			}
+		}
+	}
+}
+
+## GalCom Events ##
+
+#Resolution - Greater Than Ourselves - Proposed
+
+country_event = {
+	id = "origin.5094"
+	title = "origin.5094.name"
+	desc = "origin.5094.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		is_voting_on_resolution = resolution_greatergood_greater_than_ourselves
+		NOT = {
+			has_country_flag = greater_than_ourselves
+			has_country_flag = greater_than_resolution_proposed
+		}
+	}
+
+	immediate = {
+		set_country_flag = greater_than_resolution_proposed
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+}
+
+#Resolution - Greater Than Ourselves - Passed
+
+country_event = {
+	id = "origin.5095"
+	title = "origin.5095.name"
+	desc = "origin.5095.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = greater_than_ourselves
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_main_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophile
+						}
+					}
+					pop_change_ethic = ethic_xenophile
+				}
+			}
+		}
+		set_country_flag = greater_than_ourselves
+	}
+
+	option = {
+		name = origin.5095.a
+		add_modifier = {
+			modifier = broken_shackles_slavery_outlawed
+			days = 3600
+		}
+	}
+}
+
+#Resolution - Greater Than Ourselves - Failed
+
+country_event = {
+	id = "origin.5100"
+	title = "origin.5100.name"
+	desc = "origin.5100.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = greater_than_ourselves_fail
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_main_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophobe
+						}
+					}
+					pop_change_ethic = ethic_xenophobe
+				}
+			}
+		}
+		set_country_flag = greater_than_ourselves_fail
+	}
+
+	option = {
+		name = origin.5100.a
+		add_modifier = {
+			modifier = broken_shackles_slavery_continues
+			days = 3600
+		}
+	}
+}
+
+#Resolution - Balance in the Middle - Proposed
+
+country_event = {
+	id = "origin.5104"
+	title = "origin.5094.name"
+	desc = "origin.5104.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		is_voting_on_resolution = resolution_greatergood_balance_in_the_middle
+		NOT = {
+			has_country_flag = balanced_middle
+			has_country_flag = balanced_middle_resolution_proposed
+		}
+	}
+
+	immediate = {
+		set_country_flag = balanced_middle_resolution_proposed
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+}
+
+#Resolution - Balance in the Middle - Passed
+
+country_event = {
+	id = "origin.5105"
+	title = "origin.5105.name"
+	desc = "origin.5105.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = balanced_middle
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophile
+						}
+					}
+					pop_change_ethic = ethic_xenophile
+				}
+			}
+		}
+		set_country_flag = balanced_middle
+	}
+
+	option = {
+		name = EXCELLENT
+		add_modifier = {
+			modifier = broken_shackles_slavery_outlawed
+			days = 1800
+		}
+	}
+}
+
+#Resolution - Balance in the Middle - Failed
+
+country_event = {
+	id = "origin.5110"
+	title = "origin.5110.name"
+	desc = "origin.5110.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = balanced_middle_fail
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophobe
+						}
+					}
+					pop_change_ethic = ethic_xenophobe
+				}
+			}
+		}
+		set_country_flag = balanced_middle_fail
+	}
+
+	option = {
+		name = origin.5110.a
+		add_modifier = {
+			modifier = broken_shackles_slavery_continues
+			days = 1800
+		}
+	}
+}
+
+#Resolution - Organic Slavery Ban - Proposed
+
+country_event = {
+	id = "origin.5114"
+	title = "origin.5094.name"
+	desc = "origin.5114.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		is_voting_on_resolution = resolution_galactic_market_ban_sentient_organic_slave_trade
+		NOT = {
+			has_country_flag = organic_slavery_ban
+			has_country_flag = organic_slavery_resolution_proposed
+		}
+	}
+
+	immediate = {
+		set_country_flag = organic_slavery_resolution_proposed
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+}
+
+#Resolution - Organic Slavery Ban - Passed
+
+country_event = {
+	id = "origin.5115"
+	title = "origin.5115.name"
+	desc = "origin.5115.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = organic_slavery_ban
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_main_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophile
+						}
+					}
+					pop_change_ethic = ethic_xenophile
+				}
+			}
+		}
+		set_country_flag = organic_slavery_ban
+	}
+
+	option = {
+		name = EXCELLENT
+		add_modifier = {
+			modifier = broken_shackles_slavery_outlawed
+			days = 3600
+		}
+	}
+}
+
+#Resolution - Organic Slavery Ban - Failed
+
+country_event = {
+	id = "origin.5120"
+	title = "origin.5120.name"
+	desc = "origin.5120.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = organic_slavery_ban_fail
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_main_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophobe
+						}
+					}
+					pop_change_ethic = ethic_xenophobe
+				}
+			}
+		}
+		set_country_flag = organic_slavery_ban_fail
+	}
+
+	option = {
+		name = origin.5120.a
+		add_modifier = {
+			modifier = broken_shackles_slavery_continues
+			days = 3600
+		}
+	}
+}
+
+#Resolution - Sentient Slavery Ban - Proposed
+
+country_event = {
+	id = "origin.5124"
+	title = "origin.5094.name"
+	desc = "origin.5124.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		is_voting_on_resolution = resolution_galactic_market_ban_sentient_slave_trade
+		NOT = {
+			has_country_flag = sentient_slavery_ban
+			has_country_flag = sentient_slavery_resolution_proposed
+		}
+	}
+
+	immediate = {
+		set_country_flag = sentient_slavery_resolution_proposed
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+}
+
+#Resolution - Sentient Slavery Ban - Passed
+
+country_event = {
+	id = "origin.5125"
+	title = "origin.5125.name"
+	desc = "origin.5125.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = sentient_slavery_ban
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophile
+						}
+					}
+					pop_change_ethic = ethic_xenophile
+				}
+			}
+		}
+		set_country_flag = sentient_slavery_ban
+	}
+
+	option = {
+		name = EXCELLENT
+		add_modifier = {
+			modifier = broken_shackles_slavery_outlawed
+			days = 1800
+		}
+	}
+}
+
+#Resolution - Sentient Slavery Ban - Failed
+
+country_event = {
+	id = "origin.5130"
+	title = "origin.5130.name"
+	desc = "origin.5130.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = sentient_slavery_ban_fail
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = {
+							has_ethic = ethic_xenophobe
+						}
+					}
+					pop_change_ethic = ethic_xenophobe
+				}
+			}
+		}
+		set_country_flag = sentient_slavery_ban_fail
+	}
+
+	option = {
+		name = origin.5120.a
+		add_modifier = {
+			modifier = broken_shackles_slavery_continues
+			days = 1800
+		}
+	}
+}
+
+#Resolution - Repealed 
+
+country_event = {
+	id = "origin.5131"
+	title = "origin.5131.name"
+	desc = "origin.5131.desc"
+	picture = GFX_evt_arguing_senate
+	show_sound = evn_fc_broken_shackles_origin
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = resolution_repealed
+		}
+	}
+
+	immediate = {
+		set_country_flag = resolution_repealed
+	}
+
+	option = {
+		name = origin.5131.a
+		add_modifier = {
+			modifier = broken_shackles_slavery_repeal
+			days = 2400
+		}
+	}
+}
+
+# War Declared vs MSI
+
+country_event = {
+	id = origin.5135
+	title = origin.5135.name
+	desc = { 
+		trigger = {
+			from = {
+				is_war_participant = { who = event_target:MSI_country side = defenders }
+			}
+		}
+		text = origin.5135.attackers.desc #Player declares war on MSI
+	}
+	desc = { 
+		trigger = {
+			from = {
+				is_war_participant = { who = event_target:MSI_country side = attackers }
+			}
+		}
+		text = origin.5135.defenders.desc #MSI declares war on player
+	}
+	picture = GFX_evt_announcement
+	show_sound = event_red_alert
+	is_triggered_only = yes
+
+	trigger = {
+		is_broken_shackles_empire = yes
+		from = { 
+			OR = {
+				AND = {
+					is_war_participant = { who = event_target:MSI_country side = defenders }
+					is_war_participant = { who = root side = attackers }
+				}
+				AND = {
+					is_war_participant = { who = event_target:MSI_country side = attackers }
+					is_war_participant = { who = root side = defenders }
+				}
+			}
+		}
+		NOT = {
+			has_country_flag = war_of_freedom
+		}
+	}
+
+	option = {
+		name = origin.5135.a
+		add_modifier = {
+			modifier = broken_shackles_war_01
+			days = -1 #remove at conclusion of war
+		}
+	}
+
+	after = {
+		set_country_flag = war_of_freedom
+	}
+}
+
+# Lost War Against MSI
+
+country_event = {
+	id = origin.5140
+	title = origin.5140.name
+	desc = origin.5140.desc
+	picture = GFX_evt_archaeologists_escaping
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+
+	trigger = { 
+		is_broken_shackles_empire = yes
+		has_country_flag = war_of_freedom
+		NOT = {
+			has_country_flag = lost_war_with_slavers
+		}
+		from = {
+			is_minamar = yes
+		}
+	}
+
+	immediate = {
+		set_timed_country_flag = { flag = lost_war_with_slavers days = 1800 }
+	}
+
+	option = {
+		name = origin.5140.a
+		remove_modifier = broken_shackles_war_01
+		add_modifier = {
+			modifier = broken_shackles_war_02
+			days = 3600
+		}
+	}
+}
+
+# Status Quo With MSI
+
+country_event = {
+	id = origin.5141
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				root = { is_broken_shackles_empire = yes }
+				from = { is_minamar = yes }
+			}
+			AND = {
+				root = { is_minamar = yes }
+				from = { is_broken_shackles_empire = yes }
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				is_broken_shackles_empire = yes
+			}
+			country_event = { id = origin.5142 days = 1 }
+		}
+		else_if = {
+			limit = {
+				from = { is_broken_shackles_empire = yes }
+			}
+			from = { country_event = { id = origin.5142 days = 1 } }
+		}
+		set_timed_country_flag = { flag = status_quo_with_slavers days = 1800 }
+	}
+}
+
+country_event = {
+	id = origin.5142
+	title = origin.5142.name
+	desc = origin.5142.desc
+	picture = GFX_evt_announcement
+	show_sound = evn_fc_slaver_empire
+
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5140.a
+		remove_modifier = broken_shackles_war_01
+		add_modifier = {
+			modifier = broken_shackles_war_04
+			days = 3600
+		}
+	}
+}
+
+# Won War Against MSI
+
+country_event = {
+	id = origin.5145
+	title = origin.5145.name
+	desc = origin.5145.desc
+	picture = GFX_evt_grand_speech
+	show_sound = event_celebration
+	is_triggered_only = yes
+
+	trigger = { 
+		is_broken_shackles_empire = yes
+		has_country_flag = war_of_freedom
+		NOT = {
+			has_country_flag = won_war_with_slavers
+		}
+		from = {
+			is_minamar = yes
+		}
+	}
+
+	immediate = {
+		set_timed_country_flag = { flag = won_war_with_slavers days = 1800 }
+	}
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = broken_shackles_war_01
+		add_modifier = {
+			modifier = broken_shackles_war_03
+			days = 3600
+		}
+	}
+}
+
+# Second War w/MSI
+
+country_event = {
+    id = origin.5146
+    title = origin.5146.name
+    desc = { 
+        trigger = {
+            from = {
+                is_war_participant = { who = event_target:MSI_country side = defenders }
+            }
+        }
+        text = origin.5146.attackers.desc #Player declares war on MSI
+    }
+    desc = { 
+        trigger = {
+            from = {
+                is_war_participant = { who = event_target:MSI_country side = attackers }
+            }
+        }
+        text = origin.5146.defenders.desc #MSI declares war on player
+    }
+    picture = GFX_evt_announcement
+    show_sound = event_red_alert
+    is_triggered_only = yes
+
+    trigger = {
+        is_broken_shackles_empire = yes
+		has_country_flag = war_of_freedom
+        from = { 
+            OR = {
+                AND = {
+                    is_war_participant = { who = event_target:MSI_country side = defenders }
+                    is_war_participant = { who = root side = attackers }
+                }
+                AND = {
+                    is_war_participant = { who = event_target:MSI_country side = attackers }
+                    is_war_participant = { who = root side = defenders }
+                }
+            }
+        }
+		NOT = {
+			has_country_flag = second_war_of_freedom
+		}
+    }
+
+	immediate = {
+		if ={
+			limit = {
+				from = {
+					is_war_participant = { who = root side = attackers }
+				}
+			}
+			hidden_effect = {
+				while = {
+					count = value:ten_percent_species
+					random_owned_pop = {
+						limit = {
+							NOT = { has_ethic = "ethic_militarist" }
+						}
+						pop_change_ethic = "ethic_militarist"
+					}
+				}
+			}
+		}
+	}
+
+    option = {
+        name = origin.5146.a
+        add_modifier = {
+            modifier = broken_shackles_war_01
+            days = 1080
+        }
+    }
+
+	after = {
+		set_country_flag = second_war_of_freedom
+	}
+}
+
+# War Against Generic Slavers
+
+country_event = {
+    id = origin.5147
+    title = origin.5147.name
+    desc = origin.5147.desc
+    picture = GFX_evt_announcement
+    show_sound = event_red_alert
+    is_triggered_only = yes
+
+    trigger = {
+        is_broken_shackles_empire = yes
+		allows_slavery = no
+        from = { 
+            OR = {
+                AND = {
+                    is_war_participant = { who = root side = defenders }
+                    any_attacker = { 
+						allows_slavery = yes
+						is_gestalt = no
+						NOT = {
+							is_minamar = yes
+						}
+					}
+				}
+                AND = {
+                    is_war_participant = { who = root side = attackers }
+                    any_defender= { 
+						allows_slavery = yes
+						is_gestalt = no
+						NOT = {
+							is_minamar = yes
+						}
+					}
+				}
+            }
+        }
+		NOT = {
+			has_country_flag = war_against_slavers
+		}
+    }
+
+    option = {
+        name = origin.5147.a
+        add_modifier = {
+            modifier = broken_shackles_war_01
+            days = 1080
+        }
+    }
+
+	after = {
+		set_country_flag = war_against_slavers
+	}
+}
+
+# Federation Formed With MSI
+
+country_event = {
+	id = origin.5150
+	title = origin.5150.name
+	desc = origin.5150.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_fc_slaver_empire
+	is_triggered_only = yes
+
+	trigger = { 
+		is_broken_shackles_empire = yes
+		NOT = {
+			has_country_flag = federation_with_MSI
+		}
+		any_federation_ally = {
+			is_minamar = yes
+		}
+	}
+
+	immediate = {
+		set_country_flag = federation_with_MSI
+	}
+
+	option = {
+		name = origin.5150.a
+		add_modifier = {
+			modifier = broken_shackles_federated_02
+			days = 3600
+		}
+	}
+}
+
+# Federation Formed With Generic Slavers
+
+country_event = {
+	id = origin.5151
+	title = origin.5151.name
+	desc = origin.5151.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = event_default
+	is_triggered_only = yes
+
+	trigger = { 
+		is_broken_shackles_empire = yes
+		NOT = {
+			has_country_flag = federation_with_slavers
+		}
+		any_federation_ally = {
+			allows_slavery = yes
+			NOT = {
+				is_minamar = yes
+			}
+		}
+	}
+
+	immediate = {
+		set_country_flag = federation_with_slavers
+	}
+
+	option = {
+		name = origin.5150.a
+		add_modifier = {
+			modifier = broken_shackles_federated_01
+			days = 3600
+		}
+	}
+}
+
+#The Cost of Freedom - Mid Game Events
+
+country_event = {
+	id = origin.5200
+	title = origin.5200.name
+	desc = origin.5200.desc
+	picture = GFX_evt_civil_action
+	show_sound = event_factions
+	
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5200.a
+		hidden_effect = {
+			country_event = {
+				id = origin.5210
+				days = 360
+				random = 60
+			}
+		}
+	}
+
+	option = {
+		name = origin.5200.b
+		remove_modifier = cost_of_freedom_01
+		add_modifier = {
+			modifier = cost_of_freedom_03
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5210
+				days = 720
+				random = 60
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5205
+	title = origin.5205.name
+	desc = origin.5205.desc
+	picture = GFX_evt_bribery
+	show_sound = event_conversation
+	
+	is_triggered_only = yes
+
+	immediate = {
+		remove_modifier = cost_of_freedom_02
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = { has_ethic = "ethic_egalitarian" }
+					}
+					pop_change_ethic = "ethic_egalitarian"
+				}
+			}
+		}
+	}
+
+	option = {
+		name = origin.5205.a
+		custom_tooltip = origin.5205.a.tooltip
+		allow = {
+			resource_stockpile_compare = { 
+				resource = energy 
+				value >= 5000 
+			}
+		}
+		add_resource = { energy = -5000 }
+		add_modifier = {
+			modifier = cost_of_freedom_08
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5240
+				days = 1800
+				random = 200
+			}
+		}
+	}
+
+	option = {
+		name = origin.5205.b
+		custom_tooltip = origin.5205.b.tooltip
+		allow = {
+			resource_stockpile_compare = { 
+				resource = energy 
+				value >= 5000 
+			}
+		}
+		add_resource = { energy = -5000 }
+		add_modifier = {
+			modifier = cost_of_freedom_09
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5245
+				days = 1800
+				random = 200
+			}
+		}
+	}
+
+	option = {
+		name = origin.5205.c
+		custom_tooltip = origin.5205.c.tooltip
+		allow = {
+			resource_stockpile_compare = { 
+				resource = energy 
+				value >= 5000 
+			}
+		}
+		add_resource = { energy = -5000 }
+		add_modifier = {
+			modifier = cost_of_freedom_10
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5250
+				days = 1800
+				random = 200
+			}
+		}
+	}
+	
+	option = {
+		name = origin.5205.d
+		custom_tooltip = origin.5205.d.tooltip
+		allow = {
+			resource_stockpile_compare = { 
+				resource = energy 
+				value >= 5000 
+			}
+		}
+		add_resource = { energy = -5000 }
+		allow = {
+			resource_stockpile_compare = { 
+				resource = unity 
+				value >= 3000 
+			}
+		}
+		add_resource = { unity = -3000 }
+		add_modifier = {
+			modifier = cost_of_freedom_11
+			days = -1
+		}
+		hidden_effect = {
+			reroll_random = yes
+			random_list = {
+				1 = { country_event = { id = origin.5225 days = 1800 random = 200 } }
+				1 = { country_event = { id = origin.5230 days = 1800 random = 200 } }
+				1 = { country_event = { id = origin.5235 days = 1800 random = 200 } }
+			}
+		}
+	}
+
+	option = {
+		name = origin.5205.e
+		custom_tooltip = origin.5205.e.tooltip
+		hidden_effect = {
+			country_event = {
+				id = origin.5210
+				days = 720
+				random = 80
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5210
+	title = origin.5210.name
+	desc = origin.5210.desc
+	picture = GFX_evt_news_room
+	show_sound = event_cityscape
+	
+	is_triggered_only = yes
+
+	option = {
+		name = origin.5210.a
+		remove_modifier = cost_of_freedom_01
+		remove_modifier = cost_of_freedom_03
+		allow = {
+			resource_stockpile_compare = { 
+				resource = energy 
+				value >= 7000 
+			}
+		}
+		add_resource = { energy = -7000 }
+		allow = {
+			resource_stockpile_compare = { 
+				resource = unity 
+				value >= 5000 
+			}
+		}
+		add_resource = { unity = -5000 }
+		add_modifier = {
+			modifier = cost_of_freedom_04
+			days = -1
+		}
+		reroll_random = yes
+		hidden_effect = {
+			random_list = {
+				1 = { country_event = { id = origin.5225 days = 1800 random = 200 } }
+				1 = { country_event = { id = origin.5230 days = 1800 random = 200 } }
+				1 = { country_event = { id = origin.5235 days = 1800 random = 200 } }
+			}
+		}
+	}
+	option = {
+		name = origin.5210.b
+		remove_modifier = cost_of_freedom_01
+		remove_modifier = cost_of_freedom_03
+		add_modifier = {
+			modifier = cost_of_freedom_05
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5215
+				days = 360
+				random = 60
+			}
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = { has_ethic = "ethic_authoritarian" }
+					}
+					pop_change_ethic = "ethic_authoritarian"
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5215
+	title = origin.5215.name
+	desc = origin.5215.desc
+	picture = GFX_evt_night_raid
+	show_sound = event_planetary_riot
+	
+	is_triggered_only = yes
+
+	immediate = {
+		capital_scope = {
+			add_planet_devastation = 15
+		}
+		every_owned_planet = {
+			add_planet_devastation = 10
+		}
+		hidden_effect = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = { has_ethic = "ethic_authoritarian" }
+					}
+					pop_change_ethic = "ethic_authoritarian"
+				}
+			}
+		}
+	}
+
+	option = {
+		name = origin.5215.a
+		remove_modifier = cost_of_freedom_05
+		add_modifier = {
+			modifier = cost_of_freedom_06
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5220
+				days = 1080
+				random = 100
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5220
+	title = origin.5220.name
+	desc = origin.5220.desc
+	picture = GFX_evt_announcement
+	show_sound = event_bad_omen
+	
+	is_triggered_only = yes
+
+	immediate = {
+		shift_ethic = "ethic_authoritarian"
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = { has_ethic = "ethic_authoritarian" }
+					}
+					pop_change_ethic = "ethic_authoritarian"
+				}
+			}
+		}
+	}
+
+	option = {
+		name = origin.5220.a
+		remove_modifier = cost_of_freedom_06
+		add_modifier = {
+			modifier = cost_of_freedom_07
+			days = 1080
+		}
+	}
+}
+
+country_event = {
+	id = origin.5225
+	title = origin.5225.name
+	desc = origin.5225.desc
+	picture = GFX_evt_smear_campaign
+	show_sound = event_conversation
+	
+	is_triggered_only = yes
+
+	option = {
+		name = UNDERSTOOD
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_04
+			}
+			remove_modifier = cost_of_freedom_04
+		}
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_11
+			}
+			remove_modifier = cost_of_freedom_11
+		}
+		add_modifier = {
+			modifier = cost_of_freedom_12_a
+			days = 1080
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5255
+				days = 1080
+				random = 200
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5230
+	title = origin.5230.name
+	desc = origin.5230.desc
+	picture = GFX_evt_open_revolt
+	show_sound = event_planetary_riot
+	
+	is_triggered_only = yes
+
+	option = {
+		name = UNDERSTOOD
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_04
+			}
+			remove_modifier = cost_of_freedom_04
+		}
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_11
+			}
+			remove_modifier = cost_of_freedom_11
+		}
+		add_modifier = {
+			modifier = cost_of_freedom_12_b
+			days = 1080
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5255
+				days = 1080
+				random = 200
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5235
+	title = origin.5235.name
+	desc = origin.5235.desc
+	picture = GFX_evt_financial_instruments
+	show_sound = event_cityscape
+	
+	is_triggered_only = yes
+
+	option = {
+		name = UNDERSTOOD
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_04
+			}
+			remove_modifier = cost_of_freedom_04
+		}
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_11
+			}
+			remove_modifier = cost_of_freedom_11
+		}
+		add_modifier = {
+			modifier = cost_of_freedom_12_c
+			days = 1080
+		}
+		hidden_effect = {
+			country_event = {
+				id = origin.5255
+				days = 1080
+				random = 200
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5240
+	title = origin.5240.name
+	desc = origin.5240.desc
+	picture = GFX_evt_grand_speech
+	show_sound = event_default
+	
+	is_triggered_only = yes
+
+	option = { 
+		name = EXCELLENT
+		remove_modifier = cost_of_freedom_08
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+		add_modifier = {
+			modifier = cost_of_freedom_13
+			days = 7200
+		}
+	}
+}
+
+country_event = {
+	id = origin.5245
+	title = origin.5245.name
+	desc = origin.5245.desc
+	picture = GFX_evt_grand_speech
+	show_sound = event_default
+	
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = cost_of_freedom_09
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+		add_modifier = {
+			modifier = cost_of_freedom_14
+			days = 7200
+		}
+	}
+}
+
+country_event = {
+	id = origin.5250
+	title = origin.5250.name
+	desc = origin.5250.desc
+	picture = GFX_evt_grand_speech
+	show_sound = event_celebration
+	
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = cost_of_freedom_10
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+		add_modifier = {
+			modifier = cost_of_freedom_15
+			days = 7200
+		}
+	}
+}
+
+country_event = {
+	id = origin.5255
+	title = origin.5255.name
+	desc = origin.5255.desc
+	picture = GFX_evt_voting
+	show_sound = event_celebration
+	
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			while = {
+				count = value:ten_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = { has_ethic = "ethic_egalitarian" }
+					}
+					pop_change_ethic = "ethic_egalitarian"
+				}
+			}
+		}
+	}
+
+	option = {
+		name = origin.5255.a
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_12_a
+			}
+			remove_modifier = cost_of_freedom_12_a
+		}
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_12_b
+			}
+			remove_modifier = cost_of_freedom_12_b
+		}
+		if = {
+			limit = {
+				has_modifier = cost_of_freedom_12_c
+			}
+			remove_modifier = cost_of_freedom_12_c
+		}
+		if = {
+			limit = {
+				is_egalitarian = no
+			}
+			shift_ethic = "ethic_egalitarian"
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+		add_modifier = {
+			modifier = gains_of_freedom
+			days = -1
+		}
+	}
+}
+
+#Finished Find Home Worlds Chain
+country_event = {
+	id = origin.5270
+	title = "origin.5270.name"
+	desc = "origin.5270.desc"
+	picture = GFX_evt_hyper_relay_conjunction
+	show_sound = event_celebration
+
+	is_triggered_only = yes
+
+	immediate = {
+		end_event_chain = homeworlds_chain
+	}
+
+	option = {
+		name = EXCELLENT
+		if = {
+			limit = {
+				has_modifier = broken_shackles_homeworld_found_01
+			}
+			remove_modifier = broken_shackles_homeworld_found_01
+		}
+		if = {
+			limit = {
+				has_modifier = broken_shackles_homeworld_found_02
+			}
+			remove_modifier = broken_shackles_homeworld_found_02
+		}
+		if = {
+			limit = {
+				has_modifier = broken_shackles_homeworld_found_03
+			}
+			remove_modifier = broken_shackles_homeworld_found_03
+		}
+		add_modifier = {
+			modifier = "broken_shackles_homeworlds_found"
+			days = 3600
+		}
+	}
+}
+
+# Diplomatic Agreement w/MSI
+
+country_event = {
+	id = origin.5275
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				is_broken_shackles_empire = yes
+				NOT = {
+					has_country_flag = broken_shackles_reconciliation
+				}
+				from = {
+					is_minamar = yes
+				}
+			}
+			from = {
+				AND = {
+					is_broken_shackles_empire = yes
+					NOT = {
+						has_country_flag = broken_shackles_reconciliation
+					}
+					root = {
+						is_minamar = yes
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				is_broken_shackles_empire = yes
+				NOT = {
+					has_country_flag = broken_shackles_reconciliation
+				}
+			}
+			country_event = { 
+				id = origin.5276 
+				days = 3
+				scopes = {
+					from = from # this refers to MSI
+				}
+			}
+		}
+		else = {
+			from = {
+				country_event = { 
+					id = origin.5276 
+					days = 3
+					scopes = { 
+						from = root #this refers to MSI
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = origin.5276
+	title = "origin.5276.name"
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = federation_with_MSI
+			}
+		}
+		text = "origin.5276.federation.desc"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOT = {
+					has_country_flag = federation_with_MSI
+				}
+			}
+		}
+		text = "origin.5276.desc"
+	}
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_fc_slaver_empire
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = broken_shackles_reconciliation
+	}
+
+	option = {
+		name = UNDERSTOOD
+		add_modifier = {
+			modifier = "broken_shackles_reconciliation"
+			days = 1080
+		}
+	}
+}
+
+# Upgrading Research Labs
+country_event = {
+	id =  origin.5500
+	title = origin.5500.name
+	desc = origin.5500.desc
+	picture = GFX_evt_physics_research
+	show_sound = event_celebration
+	is_triggered_only = yes
+
+	trigger = {
+		is_broken_shackles_empire = yes
+		last_increased_tech = tech_basic_science_lab_1
+		capital_scope = {
+			has_active_building = building_low_tech_research_lab
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = origin.5500.tt
+		hidden_effect = {
+			capital_scope = {
+				remove_building = building_low_tech_research_lab
+				add_building = building_research_lab_1
+			}
+		}
+	}
+}
+
+# Upgrading Admin Hub
+country_event = {
+	id =  origin.5505
+	title = origin.5505.name
+	desc = origin.5505.desc
+	picture = GFX_evt_partition
+	show_sound = event_celebration
+	is_triggered_only = yes
+
+	trigger = {
+		is_broken_shackles_empire = yes
+		last_increased_tech = tech_planetary_government
+		capital_scope = {
+			has_active_building = building_low_tech_admin_hub
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		if = {
+			limit = {
+				is_spiritualist = no
+			}
+			custom_tooltip = origin.5505.regular.tt
+			hidden_effect = {
+				capital_scope = {
+					remove_building = building_low_tech_admin_hub
+					add_building = building_bureaucratic_1
+				}
+			}
+		}
+		else = {
+			custom_tooltip = origin.5505.spiritualist.tt
+			hidden_effect = {
+				capital_scope = {
+					remove_building = building_low_tech_admin_hub
+					add_building = building_temple
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = origin.5510
+	title = "origin.5510.name"
+	picture = GFX_evt_big_landing_ship
+	desc = { # Continental
+		text = progress.3.desc_01
+		trigger = {
+			is_continental_world = yes
+		}
+	}
+	desc = { # Ocean
+		text = progress.3.desc_02
+		trigger = {
+			is_ocean_world = yes
+		}
+	}
+	desc = { # Desert
+		text = progress.3.desc_03
+		trigger = {
+			is_desert_world = yes
+		}
+	}
+	desc = { # Tropical
+		text = progress.3.desc_04
+		trigger = {
+			is_tropical_world = yes
+		}
+	}
+	desc = { # Arid
+		text = progress.3.desc_05
+		trigger = {
+			is_arid_world = yes
+		}
+	}
+	desc = { # Tundra
+		text = progress.3.desc_06
+		trigger = {
+			is_tundra_world = yes
+		}
+	}
+	desc = { # Arctic
+		text = progress.3.desc_07
+		trigger = {
+			is_arctic_world = yes
+		}
+	}
+	desc = { # Savanna
+		text = progress.3.desc_08
+		trigger = {
+			is_savannah_world = yes
+		}
+	}
+	desc = { # Alpine
+		text = progress.3.desc_09
+		trigger = {
+			is_alpine_world = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			is_gaia_world = yes
+			is_habitat = yes
+			is_unshattered_ring_habitable_segment = yes
+			is_relic_world = yes
+			is_nuked_world = yes
+		}
+		owner = {
+			NOT = { has_country_flag = first_colony }
+			num_owned_planets < 3
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = first_colony
+		}
+	}
+
+	option = {
+		name = "origin.5510.a"
+		owner = {
+			#end_event_chain = "establish_colony"
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# Observation Post Built on Main Home World
+
+ship_event = {
+	id =  origin.5515
+	title = origin.5515.name
+	desc = origin.5515.desc
+	picture = GFX_evt_failed_observation
+	show_sound = evn_fc_slaver_empire
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_broken_shackles_empire = yes
+			NOT = {
+				has_country_flag = uplifting_decision_main
+			}
+			from = {
+				has_planet_flag = broken_shackles_homeworld_@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = yes
+				}
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = uplifting_decision_main
+		}
+	}
+
+	option = {
+		name = origin.5515.a
+	}
+}
+
+# Observation Post Built on (non-main species) Home World
+
+ship_event = {
+	id =  origin.5520
+	title = origin.5520.name
+	desc = origin.5520.desc
+	picture = GFX_evt_failed_observation
+	show_sound = evn_fc_slaver_empire
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_broken_shackles_empire = yes
+			NOT = {
+				has_country_flag = uplifting_decision
+			}
+			from = {
+				has_planet_flag = broken_shackles_abductees_world@root.owner
+				num_pops > 0
+				owner = {
+					is_primitive = yes
+				}
+				NOT = {
+					has_planet_flag = broken_shackles_homeworld_@root.owner
+				}
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = uplifting_decision
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+}
+
+# Successfully Uplifted a Homeworld
+
+country_event = {
+	id =  origin.5525
+	title = origin.5525.name
+	desc = origin.5525.desc
+	picture = GFX_evt_early_space_age
+	show_sound = event_celebration
+	location = FROM.capital_scope
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = homeworld_uplifted
+		}
+	}
+
+	immediate = {
+		set_country_flag = homeworld_uplifted
+	}
+
+	option = {
+		name = EXCELLENT
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+		add_modifier = {
+			modifier = broken_shackles_homeworld_uplifted
+			days = 7200
+		}
+	}
+}
+

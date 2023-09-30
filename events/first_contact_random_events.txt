@@ -1,0 +1,647 @@
+
+################################
+#
+# First Contact Random Events
+#
+# Written by Pierre du Plessis
+#
+################################
+
+
+### Random events for the First Contact feature
+
+# Extra clear signal found, gain clues.
+first_contact_event = {
+	id = first_contact.5000
+	title = first_contact.5000.name
+	desc = first_contact.5000.desc
+	desc = first_contact.5000.desc2
+	picture = GFX_evt_mysterious_signal
+	is_triggered_only = yes
+	first_contact = yes
+
+	inline_script = first_contact_event_sounds
+
+	immediate = {
+		add_stage_clues = 2
+	}
+
+	option = {
+		name = EXCELLENT
+		tooltip = { add_stage_clues = 2 }
+	}
+}
+
+# They are just really, really good at stopping you from picking up their signals.
+first_contact_event = {
+	id = first_contact.5005
+	title = first_contact.5005.name
+	desc = first_contact.5005.desc
+	picture = GFX_evt_mysterious_signal
+	is_triggered_only = yes
+	first_contact = yes
+
+	show_sound = event_comms_cutoff
+
+	immediate = {
+		add_stage_clues = -2
+	}
+
+	option = {
+		name = first_contact.5005.A
+		tooltip = { add_stage_clues = -2 }
+	}
+}
+
+# The thing we thought was language was actually really not
+first_contact_event = {
+	id = first_contact.5010
+	title = first_contact.5010.name
+	desc = first_contact.5010.desc
+	picture = GFX_evt_worrying_signal
+	is_triggered_only = yes
+	first_contact = yes
+
+	show_sound = event_comms_cutoff
+
+	immediate = {
+		add_stage_clues = -2
+	}
+
+	option = {
+		name = first_contact.5010.A
+		tooltip = { add_stage_clues = -2 }
+	}
+}
+
+# They just scanned our capital! How dare they?
+first_contact_event = {
+	id = first_contact.5015
+	title = first_contact.5015.name
+	desc = {
+		text = first_contact.5015.desc
+		trigger = {
+			owner = {
+				is_gestalt = no
+				is_xenophile = no
+				is_xenophobe = no
+			}
+		}
+	}
+	desc = {
+		text = first_contact.5015.desc.xenophile
+		trigger = { owner = { is_xenophile = yes } }
+	}
+	desc = {
+		text = first_contact.5015.desc.xenophobe
+		trigger = { owner = { is_xenophobe = yes } }
+	}
+	desc = {
+		text = first_contact.5015.desc.gestalt
+		trigger = {
+			owner = {
+				is_gestalt = yes
+				is_homicidal = no
+			}
+		}
+	}
+	desc = {
+		text = first_contact.5015.desc.gestalt.homicidal
+		trigger = {
+			owner = {
+				is_gestalt = yes
+				is_homicidal = yes
+			}
+		}
+	}
+	picture = GFX_evt_worrying_signal
+	show_sound = event_alien_abduction
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = first_contact.5015.A
+		owner = {
+			add_modifier = {
+				modifier = preventive_war_economy
+				days = 5400
+			}
+		}
+		allow = {
+			owner = {
+				is_xenophile = no
+			}
+		}
+	}
+	option = {
+		name = first_contact.5015.B
+		owner = {
+			add_modifier = {
+				modifier = alien_friendship_society
+				days = 5400
+			}
+		}
+		allow = {
+			owner = {
+				is_xenophobe = no
+				is_homicidal = no
+				is_inwards_perfection_empire = no
+			}
+		}
+	}
+}
+
+# We just scanned their capital... what a bonus!
+first_contact_event = {
+	id = first_contact.5020
+	title = first_contact.5020.name
+	desc = first_contact.5020.desc
+	picture = GFX_evt_inhabited_solar_system
+	is_triggered_only = yes
+	first_contact = yes
+	show_sound = event_alien_abduction
+
+	immediate = {
+		add_stage_clues = 3
+	}
+
+	option = {
+		name = EXCELLENT
+		tooltip = { add_stage_clues = 3 }
+	}
+}
+
+# Trail gone cold
+first_contact_event = {
+	id = first_contact.5025
+	title = first_contact.5025.name
+	desc = first_contact.5025.desc
+	picture = GFX_evt_wormhole
+	is_triggered_only = yes
+	first_contact = yes
+	show_sound = event_comms_cutoff
+
+	immediate = {
+		add_stage_clues = -2
+	}
+
+	option = {
+		name = first_contact.5025.A
+		tooltip = { add_stage_clues = -2 }
+	}
+}
+
+
+# We see their visual feed; the people react with dismay or find them really cute (but beware the Aprahanti - appearances can be deceiving)
+# Positive reaction to sight of aliens
+first_contact_event = {
+	id = first_contact.5030
+	title = first_contact.5030.name
+	desc = {
+		text = first_contact.5030.desc
+		trigger = {
+			contact_country = {
+				is_machine_empire = no
+			}
+		}
+	}
+	desc = {
+		text = first_contact.5030.desc.machine
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = yes
+			}
+		}
+	}
+	picture = {
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = yes
+			}
+		}
+		picture = GFX_evt_robot_encounter
+	}
+	picture = {
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = no
+			}
+		}
+		picture = GFX_evt_hand_shake
+	}
+	show_sound = {
+		sound = event_robot_encounter
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = yes
+			}
+		}
+	}
+	show_sound = {
+		sound = event_celebration
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = no
+			}
+		}
+	}
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_first_contact_flag = seen_aliens
+
+		hidden_effect = {
+			owner = {
+				add_opinion_modifier = {
+					who = root.contact_country
+					modifier = opinion_first_contact_delightful_aliens
+				}
+			}
+		}
+		if = {
+			limit = {
+				contact_country = {
+					is_synthetic_empire = yes
+				}
+			}
+			owner = {
+				add_modifier = {
+					modifier = robot_appreciation
+					days = 3600
+				}
+			}
+		}
+		else = {
+			owner = {
+				add_modifier = {
+					modifier = alien_appreciation
+					days = 3600
+				}
+			}
+		}
+	}
+
+	option = {
+		name = first_contact.5030.A
+		custom_tooltip = first_contact.5030.A.tooltip
+
+		tooltip = {
+			if = {
+				limit = {
+					contact_country = {
+						is_synthetic_empire = yes
+					}
+				}
+				owner = {
+					add_modifier = {
+						modifier = robot_appreciation
+						days = 3600
+					}
+				}
+			}
+			else = {
+				owner = {
+					add_modifier = {
+						modifier = alien_appreciation
+						days = 3600
+					}
+				}
+			}
+		}
+	}
+}
+
+# Negative reaction to sight of aliens
+first_contact_event = {
+	id = first_contact.5035
+	title = first_contact.5035.name
+	desc = {
+		text = first_contact.5035.desc
+		trigger = {
+			contact_country = {
+				is_machine_empire = no
+			}
+		}
+	}
+	desc = {
+		text = first_contact.5035.desc.machine
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = yes
+			}
+		}
+	}
+	picture = {
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = yes
+			}
+		}
+		picture = GFX_evt_robot_encounter
+	}
+	picture = {
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = no
+			}
+		}
+		picture = GFX_evt_worrying_signal
+	}
+	show_sound = {
+		sound = event_robot_encounter
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = yes
+			}
+		}
+	}
+	show_sound = {
+		sound = event_worrying_signal
+		trigger = {
+			contact_country = {
+				is_synthetic_empire = no
+			}
+		}
+	}
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+		set_first_contact_flag = seen_aliens
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = first_contact.5035.A
+		hidden_effect = {
+			owner = {
+				add_opinion_modifier = {
+					who = root.contact_country
+					modifier = opinion_first_contact_repulsive_aliens
+				}
+			}
+		}
+		if = {
+			limit = {
+				contact_country = {
+					is_synthetic_empire = yes
+				}
+			}
+			owner = {
+				add_modifier = {
+					modifier = robot_revulsion
+					days = 3600
+				}
+			}
+		}
+		else = {
+			owner = {
+				add_modifier = {
+					modifier = alien_revulsion
+					days = 3600
+				}
+			}
+		}
+		ai_chance = {
+			factor = 2
+		}
+	}
+	option = {
+		name = first_contact.5035.B
+		if = {
+			limit = {
+				contact_country = {
+					is_synthetic_empire = yes
+				}
+				owner = { has_faction = traditionalist }
+			}
+			owner = {
+				random_pop_faction = {
+					limit = { is_pop_faction_type = traditionalist }
+					add_modifier = {
+						modifier = repulsive_robot_contact
+						days = 3600
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				contact_country = {
+					is_synthetic_empire = no
+				}
+				owner = {
+					OR = {
+						has_faction = isolationist
+						has_faction = supremacist
+					}
+				}
+			}
+			owner = {
+				every_pop_faction = {
+					limit = {
+						OR = {
+							is_pop_faction_type = isolationist
+							is_pop_faction_type = supremacist
+						}
+					}
+					add_modifier = {
+						modifier = repulsive_alien_contact
+						days = 3600
+					}
+				}
+			}
+		}
+		else = {
+			owner = {
+				add_modifier = {
+					modifier = repulsive_aliens_uncondemned
+					days = 3600
+				}
+			}
+		}
+	}
+}
+
+# Very confusing interpretation of their signals because they are so different ethically
+first_contact_event = {
+	id = first_contact.5040
+	title = first_contact.5040.name
+	desc = {
+		trigger = { owner = { is_regular_empire = yes } }
+		text = first_contact.5040.desc
+	}
+	desc = {
+		trigger = { owner = { is_hive_empire = yes } }
+		text = first_contact.5040.desc.hive
+	}
+	desc = {
+		trigger = { owner = { is_machine_empire = yes } }
+		text = first_contact.5040.desc.machine
+	}
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_encrypted_comms
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		add_stage_clues = -2
+		set_first_contact_flag = seen_aliens
+	}
+
+	option = {
+		name = first_contact.5040.A
+		tooltip = { add_stage_clues = -2 }
+	}
+}
+
+# Surprisingly easy to work out common ground due to ethical similarity
+first_contact_event = {
+	id = first_contact.5045
+	title = first_contact.5045.name
+	desc = {
+		trigger = { owner = { is_regular_empire = yes } }
+		text = first_contact.5045.desc
+	}
+	desc = {
+		trigger = { owner = { is_hive_empire = yes } }
+		text = first_contact.5045.desc.hive
+	}
+	desc = {
+		trigger = { owner = { is_machine_empire = yes } }
+		text = first_contact.5045.desc.machine
+	}
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_celebration
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		add_stage_clues = 2
+	}
+
+	option = {
+		name = {
+			text = first_contact.5045.A
+			trigger = {
+				owner = {
+					NOR = {
+						is_xenophobe = yes
+						is_gestalt = yes
+					}
+				}
+			}
+		}
+		name = {
+			text = first_contact.5045.B
+			trigger = {
+				owner = {
+					is_xenophobe = yes
+				}
+			}
+		}
+		name = {
+			text = first_contact.5045.C
+			trigger = {
+				owner = {
+					is_gestalt = yes
+				}
+			}
+		}
+		tooltip = { add_stage_clues = 2 }
+	}
+}
+
+# Setback in interpreting their language
+first_contact_event = {
+	id = first_contact.5050
+	title = first_contact.5050.name
+	desc = first_contact.5050.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_comms_cutoff
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		add_stage_clues = -2
+	}
+
+	option = {
+		name = UNFORTUNATE
+		tooltip = { add_stage_clues = -2 }
+	}
+}
+
+# Advances in interpreting their language
+first_contact_event = {
+	id = first_contact.5055
+	title = first_contact.5055.name
+	desc = first_contact.5055.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_celebration
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		add_stage_clues = 2
+	}
+
+	option = {
+		name = first_contact.5055.A
+		tooltip = { add_stage_clues = 2 }
+	}
+}
+
+# For cautious: We have picked up a strong feed from them
+first_contact_event = {
+	id = first_contact.5065
+	title = first_contact.5065.name
+	desc = first_contact.5065.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_celebration
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		add_stage_clues = 3
+	}
+
+	option = {
+		name = EXCELLENT
+		tooltip = { add_stage_clues = 3 }
+	}
+}
+
+# Communication Obfuscation
+first_contact_event = {
+	id = first_contact.5075
+	title = first_contact.5075.name
+	desc = first_contact.5075.desc
+	picture = GFX_evt_mysterious_signal
+	is_triggered_only = yes
+	first_contact = yes
+
+	show_sound = event_comms_cutoff
+
+	immediate = {
+		add_stage_clues = 3
+	}
+
+	option = {
+		name = UNDERSTOOD
+		tooltip = { add_stage_clues = 3 }
+	}
+}

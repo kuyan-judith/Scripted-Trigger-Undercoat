@@ -1,0 +1,208 @@
+########################
+# FIRST CONTACT FEATURE
+########################
+
+# "First Contact" Story Pack scripted triggers may be found in 02_scripted_triggers_fircon.txt
+
+first_contact_handled = {
+	OR = {
+		# First Contact System
+		can_have_first_contact_site_with = from
+		has_country_flag = suppress_first_contact_comms
+		from = {
+			OR = {
+				can_have_first_contact_site_with = root
+				has_country_flag = suppress_first_contact_comms
+			}
+		}
+	}
+}
+
+#planet_scope, used in generate_number_planet_in_system_flags
+is_planet_and_closer_to_than_prevprev = {
+	is_moon = no
+	is_star = no
+	is_asteroid = no
+	is_artificial = no
+	prev = {
+		compare_distance = {
+			closer_object = prev
+			further_object = prevprevprev
+		}
+	}
+}
+
+first_contact_can_capture_ship = {
+	contact_country = {
+		any_controlled_fleet = {
+			first_contact_can_be_captured = yes
+		}
+	}
+}
+
+#fleet scope
+first_contact_can_be_captured = {
+	exists = solar_system
+	is_civilian = yes
+	NOR = {
+		is_ship_class = shipclass_mining_station
+		is_ship_class = shipclass_research_station
+		is_ship_class = shipclass_observation_station
+		is_ship_class = shipclass_starbase
+		is_ship_class = shipclass_military_station
+	}
+	is_in_sensor_range_of_country = root.owner
+}
+
+first_contact_can_see_their_system = {
+	contact_country = {
+		any_system_within_border = {
+			OR = {
+				is_in_sensor_range_of_country = root.owner
+				root.owner = {
+					intel_level = {
+						level > low
+						system = prev
+					}
+				}
+			}
+		}
+	}
+}
+
+first_contact_default_desc = {
+	owner = {
+		has_militarist_government = no
+		has_pacifist_government = no
+		has_spiritualist_government = no
+		has_materialist_government = no
+		NOR = {
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_fanatic_xenophobe
+		}
+	}
+}
+
+first_contact_militarist_desc = {
+	owner = {
+		has_militarist_government = yes
+		NOR = {
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_fanatic_xenophobe
+		}
+	}
+}
+
+first_contact_pacifist_desc = {
+	owner = {
+		has_pacifist_government = yes
+		NOR = {
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_fanatic_xenophobe
+		}
+	}
+}
+
+first_contact_spiritualist_desc = {
+	owner = {
+		has_spiritualist_government = yes
+		NOR = {
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_fanatic_xenophobe
+		}
+	}
+}
+
+first_contact_materialist_desc = {
+	owner = {
+		has_materialist_government = yes
+		NOR = {
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_fanatic_xenophobe
+		}
+	}
+}
+
+first_contact_xenophobe_desc = {
+	owner = {
+		has_ethic = ethic_fanatic_xenophobe
+	}
+}
+
+first_contact_xenophile_desc = {
+	owner = {
+		has_ethic = ethic_fanatic_xenophile
+	}
+}
+
+first_contact_authoritarian_desc = {
+	owner = {
+		has_ethic = ethic_fanatic_authoritarian
+	}
+}
+
+first_contact_egalitarian_desc = {
+	owner = {
+		has_ethic = ethic_fanatic_egalitarian
+	}
+}
+
+first_contact_custom_greeting = {
+	OR = {
+		has_opinion_modifier = {
+			who = event_target:contact_empire
+			modifier = opinion_hostile_first_contact_vivisection
+		}
+		has_opinion_modifier = {
+			who = event_target:contact_empire
+			modifier = opinion_hostile_first_contact_hungry
+		}
+		event_target:contact_empire = {
+			OR = {
+				AND = {
+					is_homicidal = no
+					has_opinion_modifier = {
+						who = root
+						modifier = opinion_caught_hacking
+					}
+				}
+				has_opinion_modifier = {
+					who = root
+					modifier = opinion_hostile_first_contact
+				}
+				has_opinion_modifier = {
+					who = root
+					modifier = opinion_hostile_first_contact_vivisection
+				}
+				has_opinion_modifier = {
+					who = root
+					modifier = opinion_hostile_first_contact_hungry
+				}
+				# Special case for MSI (pre-scripted slavers empire)
+				is_minamar = yes
+				AND = {
+					has_country_flag = human_1
+					root = {
+						has_country_flag = human_lithoid
+					}
+				}
+				AND = {
+					has_country_flag = human_lithoid
+					root = {
+						has_country_flag = human_1
+					}
+				}
+			}
+		}
+	}
+}

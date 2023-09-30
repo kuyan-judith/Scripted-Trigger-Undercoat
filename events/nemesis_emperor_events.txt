@@ -1,0 +1,2339 @@
+##################################
+#
+# Nemesis Galactic Emperor Events
+#
+# Written by Henrik Thyrwall
+#
+##################################
+
+namespace = emperor
+
+# Test Event
+country_event = {
+	id = emperor.499
+	hide_window = yes
+	is_test_event = yes
+
+	trigger = { always = no }
+
+	immediate = {
+		if = {
+			limit = { is_galactic_council_established = no }
+			set_council_size = 3
+			random_playable_country = {
+				limit = {
+					is_galactic_community_member = yes
+					is_galactic_custodian = no
+					is_part_of_galactic_council = no
+				}
+				add_to_galactic_council = yes
+			}
+			random_playable_country = {
+				limit = {
+					is_galactic_community_member = yes
+					is_part_of_galactic_council = no
+					is_galactic_custodian = no
+				}
+				add_to_galactic_council = yes
+			}
+			random_playable_country = {
+				limit = {
+					is_galactic_community_member = yes
+					is_part_of_galactic_council = no
+					is_galactic_custodian = no
+				}
+				add_to_galactic_council = yes
+			}
+		}
+		country_event = { id = emperor.1 }
+	}
+}
+
+# Test Event
+country_event = {
+	id = emperor.498
+	hide_window = yes
+	is_test_event = yes
+
+	trigger = { always = no }
+
+	immediate = {
+		remove_from_galactic_community = yes
+	}
+}
+
+# Test Event
+country_event = {
+	id = emperor.497
+	hide_window = yes
+	is_test_event = yes
+
+	trigger = { always = no }
+
+	immediate = {
+		set_timed_country_flag = { flag = imperial_crusade_target days = 3600 }
+	}
+}
+
+# Test Event
+country_event = {
+	id = emperor.496
+	hide_window = yes
+	is_test_event = yes
+
+	trigger = { always = no }
+
+	immediate = {
+		add_to_galactic_community = yes
+	}
+}
+
+# Test Event
+country_event = {
+	id = emperor.495
+	hide_window = yes
+	is_test_event = yes
+
+	trigger = { always = no }
+
+	immediate = {
+		set_global_flag = imperial_charter_granted
+		add_modifier = { modifier = imperial_charter }
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+		random_playable_country = {
+			limit = { has_modifier = imperial_charter }
+			save_event_target_as = charter_corp
+		}
+		every_playable_country = {
+			limit = { is_ai = no }
+			country_event = { id = emperor.60 }
+		}
+	}
+}
+
+# Rise of the Galactic Empire - HIDDEN
+country_event = {
+	id = emperor.1
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		# Deal with existing Custodian resolutions
+		if = {
+			limit = { is_active_resolution = resolution_custodian_united_front }
+			set_country_flag = united_front_active
+		}
+		if = {
+			limit = { is_active_resolution = resolution_custodian_ina }
+			set_country_flag = custodian_ina_active
+		}
+		if = {
+			limit = { is_active_resolution = resolution_custodian_gto }
+			set_country_flag = custodian_gto_active
+		}
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = resolution_custodian_gdf
+					is_active_resolution = resolution_custodian_expand_gdf
+				}
+			}
+			set_timed_country_flag = { # To avoid duplicate IA events
+				flag = gdf_turned_into_armada
+				days = 11
+			}
+			country_event = { id = emperor.51 days = 10 }
+		}
+		if = {
+			limit = { is_active_resolution = resolution_custodian_galpol }
+			set_timed_country_flag = { # To avoid duplicate ISD events
+				flag = galpol_turned_into_isd
+				days = 5
+			}
+			country_event = { id = emperor.71 days = 4 }
+		}
+
+		# Coronation
+		save_event_target_as = gal_emperor
+		country_event = { id = emperor.2 }
+	}
+}
+
+# Rise of the Galactic Empire
+country_event = {
+	id = emperor.2
+	title = "emperor.2.name"
+	desc = {
+		trigger = { is_gestalt = no }
+		text = "emperor.2.normal.desc"
+	}
+	desc = {
+		trigger = { is_machine_empire = yes }
+		text = "emperor.2.machine.desc"
+	}
+	desc = {
+		trigger = { is_hive_empire = yes }
+		text = "emperor.2.hive.desc"
+	}
+	picture = GFX_evt_coronation
+	show_sound = event_coronation
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_modifier = gal_custodian
+		if = {
+			limit = { has_federation = yes }
+			leave_alliance = { override_requirements = yes }
+		}
+		set_galactic_emperor = yes
+		if = {
+			limit = { has_country_flag = united_front_active }
+			pass_resolution_no_cooldown = resolution_emperor_united_front
+			remove_country_flag = united_front_active
+		}
+		if = {
+			limit = { has_country_flag = custodian_ina_active }
+			pass_resolution_no_cooldown = resolution_emperor_ina
+			remove_country_flag = custodian_ina_active
+		}
+		if = {
+			limit = { has_country_flag = custodian_gto_active }
+			pass_resolution_no_cooldown = resolution_emperor_gto
+			remove_country_flag = custodian_gto_active
+		}
+		random_country = {
+			limit = { is_country_type = global_event }
+			change_variable = {
+				which = galactic_empires
+				value = 1
+			}
+		}
+		store_galactic_community_leader_backup_data = {
+			FLAG = yes
+			NAME = yes
+			ETHICS = yes
+			GOVERNMENT = yes
+		}
+		if = {
+			limit = {
+				is_gestalt = no
+				is_megacorp = no
+			}
+			if = {
+				limit = {
+					has_origin = origin_legendary_leader_dictatorial
+				}
+				set_origin = origin_legendary_leader_imperial
+			}
+			shift_ethic = "ethic_fanatic_authoritarian"
+			change_government = {
+				authority = auth_imperial
+				cooldown = no
+				remove_invalid_civics = yes
+			}
+			force_add_civic = civic_galactic_sovereign
+		}
+		else_if = {
+			limit = { is_gestalt = yes }
+			force_add_civic = civic_galactic_sovereign
+		}
+		else_if = {
+			limit = { is_megacorp = yes }
+			shift_ethic = "ethic_fanatic_authoritarian"
+			force_add_civic = civic_galactic_sovereign_megacorp
+			change_government = {
+				authority = auth_imperial
+				cooldown = no
+				remove_invalid_civics = yes
+			}
+		}
+		set_government_cooldown = no
+		set_name = random
+		room_name_override = ""
+		change_country_flag = {
+			icon = {
+				category = "special"
+				file = "the_empire.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "00_solid.dds"
+			}
+			colors={
+				"red"
+				"red"
+				"null"
+				"null"
+			}
+		}
+		every_playable_country = {
+			limit = {
+				NOT = { is_same_value = root }
+			}
+			country_event = { id = emperor.3 }
+		}
+		pass_resolution_no_cooldown = resolution_emperor_by_election
+	}
+
+	option = {
+		name = emperor.2.a
+		add_resource = {
+			influence = 250
+		}
+		if = {
+			limit = {
+				is_gestalt = yes
+			}
+			custom_tooltip = emperor.2.a.tooltip.gestalt
+		}
+		else_if = {
+			limit = {
+				is_megacorp = yes
+			}
+			custom_tooltip = emperor.2.a.tooltip.megacorp
+		}
+		else = {
+			custom_tooltip = emperor.2.a.tooltip
+		}
+	}
+}
+
+# Rise of the Galactic Empire (Others)
+country_event = {
+	id = emperor.3
+	title = "emperor.2.name"
+	desc = {
+		trigger = {
+			event_target:gal_emperor = { is_gestalt = no }
+		}
+		text = "emperor.3.normal.desc"
+	}
+	desc = {
+		trigger = {
+			event_target:gal_emperor = { is_machine_empire = yes }
+		}
+		text = "emperor.3.machine.desc"
+	}
+	desc = {
+		trigger = {
+			event_target:gal_emperor = { is_hive_empire = yes }
+		}
+		text = "emperor.3.hive.desc"
+	}
+	picture = GFX_evt_coronation
+	show_sound = event_coronation
+
+	is_triggered_only = yes
+
+	after = {
+		if = {
+			limit = {
+				is_galactic_community_member = yes
+				is_subject = yes
+				overlord = { is_galactic_community_member = no }
+			}
+			country_event = { id = emperor.10 }
+		}
+		else_if = {
+			limit = { is_galactic_community_member = yes }
+			country_event = { id = emperor.4 }
+		}
+		if = {
+			limit = {
+				is_galactic_community_member = yes
+				has_federation = yes
+			}
+			country_event = { id = emperor.5 days = 5 }
+		}
+	}
+
+	option = {
+		trigger = { is_galactic_community_member = yes }
+		name = emperor.3.a
+		custom_tooltip = emperor.3.a.tooltip
+	}
+	option = {
+		trigger = { is_galactic_community_member = no }
+		name = emperor.3.b
+		custom_tooltip = emperor.3.a.tooltip
+	}
+}
+
+# Proclamation of Empire
+country_event = {
+	id = emperor.4
+	title = "emperor.4.title"
+	desc = {
+		trigger = {
+			event_target:gal_emperor = { is_gestalt = no }
+		}
+		text = "emperor.4.a.desc"
+	}
+	desc = {
+		trigger = {
+			event_target:gal_emperor = { is_machine_empire = yes }
+		}
+		text = "emperor.4.b.desc"
+	}
+	desc = {
+		trigger = {
+			event_target:gal_emperor = { is_hive_empire = yes }
+		}
+		text = "emperor.4.c.desc"
+	}
+
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = event_target:gal_emperor
+		planet_background = event_target:gal_emperor
+		graphical_culture = event_target:gal_emperor
+		city_level = event_target:gal_emperor
+		room = event_target:gal_emperor.ruler
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.4.a
+	}
+}
+
+# Leave Federation
+country_event = {
+	id = emperor.5
+	title = "emperor.5.name"
+	desc = "emperor.5.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_member = yes
+		has_federation = yes
+	}
+
+	option = {
+		name = emperor.5.a
+		tooltip = {
+			leave_alliance = { override_requirements = yes }
+		}
+	}
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					exists = federation #last empire to leave is no longer in a federation
+				}
+				leave_alliance = { override_requirements = yes }
+			}
+		}
+	}
+}
+
+# Vassals leave Imperium if Overlord not member
+country_event = {
+	id = emperor.10
+	title = "emperor.10.name"
+	desc = "emperor.10.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	immediate = {
+		overlord = { save_event_target_as = overlord }
+		remove_from_galactic_community = yes
+	}
+
+	option = {
+		name = emperor.10.a
+		tooltip = {
+			remove_from_galactic_community = yes
+		}
+	}
+}
+
+## Left Empire - Emperor informed
+#country_event = {
+#	id = emperor.6
+#	title = "emperor.6.name"
+#	desc = "emperor.6.desc"
+#	picture = GFX_evt_arguing_senate
+#	show_sound = event_announcement
+#
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		add_opinion_modifier = {
+#			who = from
+#			modifier = opinion_traitor_to_empire
+#		}
+#	}
+#
+#	option = {
+#		name = emperor.6.a
+#	}
+#}
+
+# Imperial Armada Founded
+country_event = {
+	id = emperor.50
+	title = "emperor.50.name"
+	desc = "emperor.50.desc"
+	picture = GFX_evt_salute
+	show_sound = event_salute
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = gdf_turned_into_armada }
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+	}
+
+	option = {
+		name = emperor.50.a
+		trigger = {
+			is_galactic_emperor = yes
+			is_gestalt = no
+		}
+	}
+	option = {
+		name = emperor.50.b
+		trigger = {
+			is_galactic_emperor = yes
+			is_gestalt = yes
+		}
+	}
+	option = {
+		name = emperor.50.c
+		trigger = {
+			is_galactic_emperor = no
+		}
+	}
+}
+
+# GDF Becomes Imperial Armada (HIDDEN)
+country_event = {
+	id = emperor.51
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+		if = {
+			limit = {
+				 NOT = { is_active_resolution = resolution_custodian_expand_gdf }
+			}
+			pass_resolution_no_cooldown = resolution_emperor_imperial_armada
+			cancel_resolution = "resolution_custodian_gdf"
+		}
+		else = {
+			pass_resolution_no_cooldown = resolution_emperor_imperial_armada
+			pass_resolution_no_cooldown = resolution_emperor_expand_ia
+			cancel_resolution = "resolution_custodian_gdf"
+			cancel_resolution = "resolution_custodian_expand_gdf"
+		}
+		every_playable_country = {
+			limit = { is_galactic_community_member = yes }
+			country_event = { id = emperor.52 }
+		}
+	}
+}
+
+# GDF Becomes Imperial Armada
+country_event = {
+	id = emperor.52
+	title = "emperor.50.name"
+	desc = "emperor.52.desc"
+	picture = GFX_evt_salute
+	show_sound = event_salute
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+	}
+
+	option = {
+		name = emperor.50.a
+		trigger = {
+			is_galactic_emperor = yes
+			is_gestalt = no
+		}
+	}
+	option = {
+		name = emperor.50.b
+		trigger = {
+			is_galactic_emperor = yes
+			is_gestalt = yes
+		}
+	}
+	option = {
+		name = emperor.50.c
+		trigger = {
+			is_galactic_emperor = no
+		}
+	}
+}
+
+# Imperial Legions Founded
+country_event = {
+	id = emperor.55
+	title = "emperor.55.name"
+	desc = "emperor.55.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_salute
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+	}
+
+	option = {
+		name = emperor.55.a
+		trigger = {
+			is_galactic_emperor = yes
+			is_gestalt = no
+		}
+	}
+	option = {
+		name = emperor.55.b
+		trigger = {
+			is_galactic_emperor = yes
+			is_gestalt = yes
+		}
+	}
+	option = {
+		name = emperor.55.c
+		trigger = {
+			is_galactic_emperor = no
+		}
+	}
+}
+
+# Imperial Charter Granted
+country_event = {
+	id = emperor.60
+	title = "emperor.60.name"
+	desc = "emperor.60.desc"
+	picture = GFX_evt_ship_offloading_cargo
+	show_sound = event_inhabited_solar_system
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+		random_playable_country = {
+			limit = { has_modifier = imperial_charter }
+			save_event_target_as = charter_corp
+		}
+	}
+
+	option = {
+		name = emperor.60.a
+	}
+}
+
+# Imperial Concession Port Built
+planet_event = {
+	id = emperor.61
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_branch_office = yes
+		branch_office_owner = { has_modifier = imperial_charter }
+		last_building_changed = building_imperial_concession_port
+	}
+
+	immediate = {
+		set_planet_flag = imp_concession_port
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			change_variable = {
+				which = imp_concession_ports
+				value = 1
+			}
+			country_event = { id = emperor.65 }
+		}
+	}
+}
+
+# Imperial Concession Port Removed
+planet_event = {
+	id = emperor.62
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_planet_flag = imp_concession_port
+		NOT = {
+			has_holding = {
+				holding = building_imperial_concession_port
+				owner = galactic_emperor
+			}
+		}
+	}
+
+	immediate = {
+		remove_planet_flag = imp_concession_port
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			change_variable = {
+				which = imp_concession_ports
+				value = -1
+			}
+			country_event = { id = emperor.65 }
+		}
+	}
+}
+
+# Imperial Charter Country Destroyed
+country_event = {
+	id = emperor.63
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = imperial_charter
+	}
+
+	immediate = {
+		remove_global_flag = imperial_charter_granted
+		every_galaxy_planet = {
+			limit = { has_planet_flag = imp_concession_port }
+			remove_planet_flag = imp_concession_port
+		}
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			set_variable = {
+				which = "imp_concession_ports"
+				value = 0
+			}
+			add_imp_concession_ports_0 = yes
+		}
+	}
+}
+
+# Tally Imperial Concession Ports
+country_event = {
+	id = emperor.65
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value < 1
+				}
+			}
+			add_imp_concession_ports_0 = yes
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 1
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 2
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_1 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 3
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 4
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_2 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 5
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 6
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_3 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 7
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 8
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_4 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 9
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 10
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_5 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 11
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 12
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_6 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 13
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 14
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_7 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 15
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 16
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_8 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 17
+				}
+				check_variable = {
+					which = imp_concession_ports
+					value <= 18
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_9 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = imp_concession_ports
+					value >= 19
+				}
+			}
+			add_imp_concession_ports = { MODIFIER = imp_concession_ports_10 }
+		}
+	}
+}
+
+# Imperial Security Directorate Founded
+country_event = {
+	id = emperor.70
+	title = "emperor.70.name"
+	desc = "emperor.70.desc"
+	picture = GFX_evt_spymaster
+	show_sound = event_spymaster
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = galpol_turned_into_isd }
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+	}
+
+	option = {
+		name = emperor.70.a
+		trigger = { is_galactic_emperor = yes }
+	}
+	option = {
+		name = DISCONCERTING
+		trigger = { is_galactic_emperor = no }
+	}
+}
+
+# GALPOL Becomes ISD (HIDDEN)
+country_event = {
+	id = emperor.71
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+		pass_resolution_no_cooldown = resolution_emperor_isd
+		cancel_resolution = "resolution_custodian_galpol"
+		every_playable_country = {
+			limit = { is_galactic_community_member = yes }
+			country_event = { id = emperor.72 }
+		}
+	}
+}
+
+# GALPOL Becomes ISD
+country_event = {
+	id = emperor.72
+	title = "emperor.70.name"
+	desc = "emperor.72.desc"
+	picture = GFX_evt_spymaster
+	show_sound = event_spymaster
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+	}
+
+	option = {
+		name = emperor.70.a
+		trigger = { is_galactic_emperor = yes }
+	}
+	option = {
+		name = DISCONCERTING
+		trigger = { is_galactic_emperor = no }
+	}
+}
+
+# New Vassal Joins Imperium
+country_event = {
+	id = emperor.80
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_galactic_emperor = yes
+		from = { is_galactic_community_member = yes }
+		is_galactic_community_member = no
+	}
+
+	immediate = {
+		add_to_galactic_community = yes
+	}
+}
+
+# Emperor Announces Crisis (HIDDEN)
+country_event = {
+	id = emperor.90
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				NOT = { is_same_value = root }
+				is_galactic_community_member = yes
+				is_ai = no
+			}
+			country_event = { id = emperor.91 }
+		}
+		if = {
+			limit = {
+				any_playable_country = {
+					NOT = { is_same_value = root }
+					is_galactic_community_member = yes
+					is_ai = yes
+					#any_neighbor_country = { is_same_value = event_target:crisis_country }
+				}
+			}
+			random_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+					is_galactic_community_member = yes
+					is_ai = yes
+					#any_neighbor_country = { is_same_value = event_target:crisis_country }
+				}
+				save_event_target_as = unfortunate_crisis_neighbor
+			}
+			country_event = { id = emperor.93 }
+		}
+	}
+}
+
+# Emperor Announces Crisis
+country_event = {
+	id = emperor.91
+	title = "emperor.91.title"
+	desc = "emperor.91.desc"
+
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = custodian.51.a
+	}
+}
+
+# Community Member Pleads for Help
+country_event = {
+	id = emperor.93
+	title = BLANK_STRING
+	desc = "emperor.93.desc"
+
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = event_target:unfortunate_crisis_neighbor
+		planet_background = event_target:unfortunate_crisis_neighbor
+		graphical_culture = event_target:unfortunate_crisis_neighbor
+		city_level = event_target:unfortunate_crisis_neighbor
+		room = event_target:unfortunate_crisis_neighbor
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.93.a
+	}
+}
+
+# Trial of Advancement: New Council Member
+country_event = {
+	id = emperor.95
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				is_active_resolution = "resolution_emperor_trial_of_advancement"
+				is_permanent_councillor = no
+			}
+			add_permanent_councillor = yes
+		}
+	}
+}
+
+# Rebellion!
+# via operation.6120 (Operation Spark Rebellion) | this = instigating country
+country_event = {
+	id = emperor.101
+	title = "emperor.101.name"
+	desc = "emperor.101.desc"
+	picture = GFX_evt_open_revolt
+	show_sound = event_open_revolt
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			save_event_target_as = gal_emperor
+		}
+		# Remove from ongoing wars except War in Heaven and Crisis
+		rebellion_remove_from_wars = yes
+	}
+
+	option = {
+		name = emperor.101.a
+		custom_tooltip = joined_galactic_empire_rebellion
+		hidden_effect = {
+			set_country_flag = empire_rebel
+			save_event_target_as = rebel_leader
+
+			# Subjects join
+			if = {
+				limit = { is_overlord = yes }
+				every_subject = {
+					country_event = { id = emperor.108 }
+				}
+			}
+
+			# Recruit others
+			if = {
+				limit = {
+					any_playable_country = {
+						is_galactic_community_member = yes
+						is_galactic_emperor = no
+						is_subject = no
+						NOR = {
+							has_country_flag = empire_loyalist
+							has_country_flag = empire_rebel
+						}
+					}
+				}
+				random_playable_country = {
+					limit = {
+						is_galactic_community_member = yes
+						is_galactic_emperor = no
+						is_subject = no
+						has_been_declared_crisis = no
+						NOR = {
+							has_country_flag = empire_loyalist
+							has_country_flag = empire_rebel
+						}
+					}
+					country_event = { id = emperor.103 }
+				}
+			}
+
+			# We stand alone
+			else = {
+				country_event = { id = emperor.104 days = 3 } # the call goes out but none reply
+			}
+		}
+	}
+
+	after = {
+		destroy_espionage_operation = from
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = operation_complete_spark_rebellion }
+				}
+				change_variable = {
+					which = tinker_tailor_soldier_blorg_achievement_count
+					value = 1
+				}
+				set_country_flag = operation_complete_spark_rebellion
+			}
+			set_timed_global_flag = {
+				flag = abort_spark_rebellion
+				days = 10
+			}
+		}
+	}
+}
+
+# Rebellion! Join?
+country_event = {
+	id = emperor.103
+	title = "emperor.101.name"
+	desc = "emperor.103.desc"
+	picture = GFX_evt_open_revolt
+	show_sound = event_open_revolt
+
+	is_triggered_only = yes
+
+	immediate = {
+		# Remove from ongoing wars except War in Heaven and Crisis
+		rebellion_remove_from_wars = yes
+	}
+
+	# Join Rebels
+	option = {
+		name = emperor.103.a
+		ai_chance = {
+			factor = 2
+			modifier = {
+				factor = 4
+				opinion_level = {
+					who = event_target:gal_emperor
+					level <= poor
+				}
+			}
+			modifier = {
+				factor = 20
+				OR = {
+					any_envoy = {
+						has_envoy_task = { task = undermine_imperial_authority }
+					}
+					has_modifier = undermining_efforts_stalled
+				}
+			}
+		}
+		custom_tooltip = joins_rebels
+		hidden_effect = {
+			set_country_flag = empire_rebel
+
+			# Form federation if it doesn't exist yet
+			if = {
+				limit = {
+					event_target:rebel_leader = { has_federation = no }
+				}
+				join_alliance = {
+					who = event_target:rebel_leader
+					name = NAME_Rebellion
+					override_requirements = yes
+				}
+				set_federation_leader = event_target:rebel_leader
+				federation = {
+					set_federation_flag = empire_rebels
+					add_cohesion = 150
+					add_federation_experience = 4200
+				}
+			}
+
+			# Join existing federation
+			else = {
+				join_alliance = { who = event_target:rebel_leader override_requirements = yes }
+			}
+
+			# Subjects join
+			if = {
+				limit = { is_overlord = yes }
+				every_subject = {
+					country_event = { id = emperor.108 }
+				}
+			}
+
+			# Recruit others
+			if = {
+				limit = {
+					any_playable_country = {
+						is_galactic_community_member = yes
+						is_galactic_emperor = no
+						is_subject = no
+						NOR = {
+							has_country_flag = empire_loyalist
+							has_country_flag = empire_rebel
+						}
+					}
+				}
+				random_playable_country = {
+					limit = {
+						is_galactic_community_member = yes
+						is_galactic_emperor = no
+						is_subject = no
+						has_been_declared_crisis = no
+						NOR = {
+							has_country_flag = empire_loyalist
+							has_country_flag = empire_rebel
+						}
+					}
+					country_event = { id = emperor.103 }
+				}
+			}
+			else = {
+				# Tally rebels
+				event_target:rebel_leader = {
+					country_event = { id = emperor.105 }
+				}
+			}
+		}
+	}
+	# Join Loyalists
+	option = {
+		name = emperor.103.b
+		ai_chance = {
+			factor = 2
+			modifier = {
+				factor = 4
+				is_part_of_galactic_council = yes
+			}
+			modifier = {
+				factor = 4
+				opinion_level = {
+					who = event_target:gal_emperor
+					level >= good
+				}
+			}
+			modifier = {
+				factor = 20
+				any_envoy = {
+					has_envoy_task = { task = strengthen_imperial_authority }
+				}
+			}
+		}
+		custom_tooltip = joins_loyalists
+		hidden_effect = {
+			set_country_flag = empire_loyalist
+
+			# Recruit others
+			if = {
+				limit = {
+					any_playable_country = {
+						is_galactic_community_member = yes
+						is_galactic_emperor = no
+						is_subject = no
+						has_been_declared_crisis = no
+						NOR = {
+							has_country_flag = empire_loyalist
+							has_country_flag = empire_rebel
+						}
+					}
+				}
+				random_playable_country = {
+					limit = {
+						is_galactic_community_member = yes
+						is_galactic_emperor = no
+						is_subject = no
+						has_been_declared_crisis = no
+						NOR = {
+							has_country_flag = empire_loyalist
+							has_country_flag = empire_rebel
+						}
+					}
+					country_event = { id = emperor.103 }
+				}
+			}
+			# Tally rebels
+			else = {
+				event_target:rebel_leader = {
+					country_event = { id = emperor.105 }
+				}
+			}
+		}
+	}
+}
+
+# We Stand Alone
+country_event = {
+	id = emperor.104
+	title = "emperor.104.name"
+	desc = "emperor.104.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.104.a
+		hidden_effect = {
+			country_event = { id = emperor.105 }
+		}
+	}
+}
+
+# Tally Rebels (HIDDEN)
+country_event = {
+	id = emperor.105
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		# Emperor's subjects join Loyalists
+		event_target:gal_emperor = {
+			if = {
+				limit = { is_overlord = yes }
+				every_subject = {
+					country_event = { id = emperor.108 }
+				}
+			}
+		}
+
+		if = {
+			# No one else joined
+			limit = { has_federation = no }
+			remove_from_galactic_community = yes
+			country_event = { id = emperor.104 }
+
+			event_target:gal_emperor = {
+				country_event = { id = emperor.106 }
+			}
+		}
+		else = {
+			every_playable_country = {
+				limit = {
+					is_galactic_community_member = yes
+					has_country_flag = empire_rebel
+				}
+				remove_from_galactic_community = yes
+			}
+
+			# Inform Emperor
+			event_target:gal_emperor = {
+				country_event = { id = emperor.106 }
+			}
+
+
+		}
+	}
+}
+
+# Open Revolt!
+country_event = {
+	id = emperor.106
+	title = "emperor.106.name"
+	desc = {
+		trigger = {
+			from = { has_federation = no }
+			any_playable_country = {
+				is_galactic_community_member = yes
+				has_country_flag = empire_loyalist
+			}
+		}
+		text = "emperor.106.a.desc"
+	}
+	desc = {
+		trigger = {
+			from = { has_federation = yes }
+			any_playable_country = {
+				is_galactic_community_member = yes
+				has_country_flag = empire_loyalist
+			}
+		}
+		text = "emperor.106.b.desc"
+	}
+	desc = {
+		trigger = {
+			NOT = {
+				any_playable_country = {
+					is_galactic_community_member = yes
+					has_country_flag = empire_loyalist
+				}
+			}
+		}
+		text = "emperor.106.c.desc"
+	}
+	picture = GFX_evt_open_revolt
+	show_sound = event_open_revolt
+
+	is_triggered_only = yes
+
+	immediate = {
+		# Remove from ongoing wars except War in Heaven and Crisis
+		rebellion_remove_from_wars = yes
+		# All declared crisis wars end
+		if = {
+			limit = {
+				any_country = { has_country_flag = declared_crisis }
+			}
+			random_country = {
+				limit = { has_country_flag = declared_crisis }
+				remove_country_flag = declared_crisis
+			}
+		}
+		# Form Loyalist federation
+		if = {
+			limit = {
+				any_playable_country = {
+					is_galactic_community_member = yes
+					has_country_flag = empire_loyalist
+					has_been_declared_crisis = no
+				}
+			}
+			random_playable_country = {
+				limit = {
+					is_galactic_community_member = yes
+					has_country_flag = empire_loyalist
+					has_been_declared_crisis = no
+				}
+				join_alliance = {
+					who = root
+					name = NAME_Loyalists
+					override_requirements = yes
+				}
+				set_federation_leader = root
+			}
+			every_playable_country = {
+				limit = {
+					is_galactic_community_member = yes
+					has_country_flag = empire_loyalist
+					has_federation = no
+					has_been_declared_crisis = no
+				}
+				join_alliance = { who = root override_requirements = yes }
+			}
+			federation = {
+				set_federation_flag = empire_loyalists
+				set_federation_type = imperial_loyalists_federation
+				add_cohesion = 200
+				set_federation_law = centralization_imperial_loyalists
+				set_federation_law = succession_type_none
+				set_federation_law = succession_term_perpetual
+				set_federation_law = fleet_contribution_none
+				set_federation_law = treaties_separate_no_imperial_loyalists
+				set_federation_law = declare_war_president_vote_imperial_loyalists
+				set_federation_law = invite_members_president_vote_imperial_loyalists
+				set_federation_law = kick_members_president_vote_imperial_loyalists
+				set_federation_law = vote_weight_diplomatic_imperial_loyalists
+				set_federation_law = allow_subjects_to_join_yes_imperial_loyalists
+			}
+		}
+
+		add_imperial_authority = 50 # Disruptive elements left Empire
+
+		# Declare War
+		declare_war = {
+			target = event_target:rebel_leader
+			name = "NAME_The_Civil_War"
+			attacker_war_goal = "wg_galactic_civil_war_loyalists"
+		}
+
+		# Inform non-members of civil war
+		every_playable_country = {
+			limit = {
+				is_ai = no
+				is_galactic_community_member = no
+				NOT = { has_country_flag = empire_rebel }
+			}
+			country_event = { id = emperor.107 }
+		}
+	}
+
+	option = {
+		name = emperor.106.a
+	}
+}
+
+# Galactic Civil War - Outsiders Informed
+country_event = {
+	id = emperor.107
+	title = "emperor.107.name"
+	desc = {
+		trigger = {
+			event_target:rebel_leader = { has_federation = no }
+		}
+		text = "emperor.107.a.desc"
+	}
+	desc = {
+		trigger = {
+			event_target:rebel_leader = { has_federation = no }
+		}
+		text = "emperor.107.b.desc"
+	}
+	picture = GFX_evt_open_revolt
+	show_sound = event_open_revolt
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.107.a
+	}
+}
+
+# Galactic Civil War - Subject joins Overlord
+country_event = {
+	id = emperor.108
+	title = "emperor.107.name"
+	desc = {
+		trigger = {
+			overlord = { has_country_flag = empire_loyalist }
+		}
+		text = "emperor.108.a.desc"
+	}
+	desc = {
+		trigger = {
+			overlord = { has_country_flag = empire_rebel }
+		}
+		text = "emperor.108.b.desc"
+	}
+	desc = {
+		trigger = {
+			overlord = { is_galactic_emperor = yes }
+		}
+		text = "emperor.108.c.desc"
+	}
+	picture = GFX_evt_open_revolt
+	show_sound = event_open_revolt
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				overlord = { has_country_flag = empire_rebel }
+			}
+			set_country_flag = empire_rebel
+			# Form federation if it doesn't exist yet
+			if = {
+				limit = {
+					overlord = { has_federation = no }
+				}
+				join_alliance = {
+					who = event_target:rebel_leader
+					name = NAME_Rebellion
+					override_requirements = yes
+				}
+				set_federation_leader = overlord
+				federation = {
+					set_federation_flag = empire_rebels
+					add_cohesion = 150
+					add_federation_experience = 4200
+				}
+			}
+
+			# Join existing federation
+			else = {
+				join_alliance = { who = overlord override_requirements = yes }
+			}
+		}
+		if = {
+			limit = {
+				overlord = {
+					OR = {
+						has_country_flag = empire_loyalist
+						is_galactic_emperor = yes
+					}
+				}
+			}
+			set_country_flag = empire_loyalist
+		}
+	}
+
+	option = {
+		name = emperor.108.a
+	}
+}
+
+# Loyalist Victory (Emperor)
+country_event = {
+	id = emperor.150
+	title = "emperor.150.name"
+	desc = "emperor.150.desc"
+	picture = GFX_evt_surrender
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	after = {
+		every_playable_country = {
+			limit = { has_country_flag = empire_loyalist }
+			country_event = { id = emperor.151 }
+		}
+		every_playable_country = {
+			limit = { has_country_flag = empire_rebel }
+			country_event = { id = emperor.152 }
+		}
+		every_playable_country = {
+			limit = {
+				is_ai = no
+				is_galactic_community_member = no
+			}
+			country_event = { id = emperor.153 }
+		}
+	}
+
+	option = {
+		name = emperor.150.a
+		add_imperial_authority = 100
+		hidden_effect = {
+			set_country_flag = civil_war_leniency
+			every_playable_country = {
+				limit = { has_country_flag = empire_rebel }
+				add_modifier = {
+					modifier = "former_rebel"
+					days = 2160
+				}
+			}
+		}
+	}
+	option = {
+		name = emperor.150.b
+		add_imperial_authority = 100
+		hidden_effect = {
+			set_country_flag = civil_war_punishment
+			every_playable_country = {
+				limit = { has_country_flag = empire_rebel }
+				add_modifier = {
+					modifier = "former_rebel"
+					days = 2160
+				}
+			}
+		}
+	}
+}
+
+# Loyalist Victory (Loyalists)
+country_event = {
+	id = emperor.151
+	title = "emperor.150.name"
+	desc = {
+		trigger = {
+			from = { has_country_flag = civil_war_leniency }
+		}
+		text = "emperor.151.a.desc"
+	}
+	desc = {
+		trigger = {
+			from = { has_country_flag = civil_war_punishment }
+		}
+		text = "emperor.151.b.desc"
+	}
+	picture = GFX_evt_surrender
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = empire_loyalist
+	}
+
+	option = {
+		name = emperor.151.a
+	}
+}
+
+# Loyalist Victory (Rebels)
+country_event = {
+	id = emperor.152
+	title = "emperor.152.name"
+	desc = {
+		trigger = {
+			from = { has_country_flag = civil_war_leniency }
+		}
+		text = "emperor.152.a.desc"
+	}
+	desc = {
+		trigger = {
+			from = { has_country_flag = civil_war_punishment }
+		}
+		text = "emperor.152.b.desc"
+	}
+	picture = GFX_evt_surrender
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = empire_rebel
+	}
+
+	option = {
+		name = emperor.152.a
+		trigger = {
+			from = { has_country_flag = civil_war_leniency }
+		}
+	}
+	option = {
+		name = emperor.152.b
+		trigger = {
+			from = { has_country_flag = civil_war_punishment }
+		}
+	}
+}
+
+# Loyalist Victory (Others)
+country_event = {
+	id = emperor.153
+	title = "emperor.153.name"
+	desc = "emperor.153.desc"
+	picture = GFX_evt_surrender
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.153.a
+	}
+}
+
+# Rebel Victory (Rebels)
+country_event = {
+	id = emperor.200
+	title = "emperor.200.name"
+	desc = "emperor.200.desc"
+	picture = GFX_evt_crisis_defeated
+	show_sound = event_celebration
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.200.a
+	}
+}
+
+# Rebel Victory (Loyalists)
+country_event = {
+	id = emperor.201
+	title = "emperor.200.name"
+	desc = "emperor.201.desc"
+	picture = GFX_evt_burning_city
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = "former_loyalist"
+			days = 2160
+		}
+	}
+
+	option = {
+		name = emperor.201.a
+	}
+}
+
+# Rebel Victory (Emperor)
+country_event = {
+	id = emperor.202
+	title = "emperor.200.name"
+	desc = "emperor.202.desc"
+	picture = GFX_evt_burning_city
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = "former_emperor"
+			days = 2880
+		}
+	}
+
+	option = {
+		name = emperor.202.a
+	}
+}
+
+# Rebel Victory (Others)
+country_event = {
+	id = emperor.203
+	title = "emperor.200.name"
+	desc = "emperor.203.desc"
+	picture = GFX_evt_crisis_defeated
+	show_sound = event_celebration
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.153.a
+	}
+}
+
+# Status Quo (Emperor and Loyalists)
+country_event = {
+	id = emperor.250
+	title = "emperor.250.name"
+	desc = "emperor.250.desc"
+	picture = GFX_evt_signing
+	show_sound = event_hand_shake
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = empire_loyalist
+	}
+
+	option = {
+		name = emperor.250.a
+	}
+}
+
+# Status Quo (Rebels)
+country_event = {
+	id = emperor.251
+	title = "emperor.250.name"
+	desc = "emperor.251.desc"
+	picture = GFX_evt_signing
+	show_sound = event_hand_shake
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = empire_rebel
+	}
+
+	option = {
+		name = emperor.251.a
+	}
+}
+
+# Status Quo (Others)
+country_event = {
+	id = emperor.252
+	title = "emperor.250.name"
+	desc = "emperor.252.desc"
+	picture = GFX_evt_signing
+	show_sound = event_hand_shake
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.153.a
+	}
+}
+
+# Restore Community (Winner)
+country_event = {
+	id = emperor.300
+	title = "emperor.300.name"
+	desc = "emperor.300.desc"
+	picture = GFX_evt_galactic_community
+	show_sound = event_galactic_community
+
+	is_triggered_only = yes
+
+	immediate = {
+		save_event_target_as = dissolve_winner
+		add_to_galactic_community = yes
+	}
+
+	option = {
+		name = emperor.300.a
+	}
+}
+
+# Restore Community (Imperials)
+country_event = {
+	id = emperor.301
+	title = "emperor.301.name"
+	desc = "emperor.301.desc"
+	picture = GFX_evt_galactic_community
+	show_sound = event_galactic_community
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.301.a
+	}
+}
+
+
+# Restore Community (Others)
+country_event = {
+	id = emperor.302
+	title = "emperor.301.name"
+	desc = "emperor.302.desc"
+	picture = GFX_evt_galactic_community
+	show_sound = event_galactic_community
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.302.a
+	}
+	option = {
+		name = emperor.302.b
+	}
+}
+
+## Seize the Throne (Winners)
+#country_event = {
+#	id = emperor.310
+#	title = "emperor.310.name"
+#	desc = "emperor.310.desc"
+#	picture = GFX_evt_coronation
+#	show_sound = event_coronation
+#
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		add_to_galactic_community = yes
+#	}
+#
+#	option = {
+#		name = emperor.310.a
+#	}
+#}
+#
+## Seize the Throne (Imperials)
+#country_event = {
+#	id = emperor.311
+#	title = "emperor.310.name"
+#	desc = "emperor.311.desc"
+#	picture = GFX_evt_coronation
+#	show_sound = event_coronation
+#
+#	is_triggered_only = yes
+#
+#	option = {
+#		name = emperor.311.a
+#	}
+#}
+#
+## Seize the Throne (New Emperor)
+#country_event = {
+#	id = emperor.312
+#	title = "emperor.310.name"
+#	desc = "emperor.312.desc"
+#	picture = GFX_evt_coronation
+#	show_sound = event_coronation
+#
+#	is_triggered_only = yes
+#
+#	option = {
+#		name = emperor.312.a
+#	}
+#}
+
+# Imperial Crusade Declared - Victim
+country_event = {
+	id = emperor.350
+	title = "emperor.350.name"
+	desc = "emperor.350.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.350.a
+	}
+}
+
+# Imperial Crusade Declared - Imperium and outsiders
+country_event = {
+	id = emperor.351
+	title = "emperor.351.name"
+	desc = {
+		trigger = {
+			event_target:crusade_target = { is_fallen_empire = no }
+		}
+		text = "emperor.351.a.desc"
+	}
+	desc = {
+		trigger = {
+			event_target:crusade_target = { is_fallen_empire = yes }
+		}
+		text = "emperor.351.b.desc"
+	}
+	picture = GFX_evt_fleet_from_surface
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.351.a
+		trigger = {
+			is_galactic_emperor = yes
+		}
+	}
+	option = {
+		name = emperor.351.b
+		trigger = {
+			is_galactic_emperor = no
+			is_galactic_community_member = yes
+		}
+	}
+	option = {
+		name = emperor.351.c
+		trigger = {
+			is_galactic_community_member = no
+		}
+	}
+}
+
+# Pax Galactica - Wars End
+country_event = {
+	id = emperor.360
+	title = "emperor.360.name"
+	desc = "emperor.360.desc"
+	picture = GFX_evt_undertaker
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.360.a
+	}
+}
+
+# Emperor asked to defend member
+country_event = {
+	id = emperor.370
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_galactic_emperor = yes
+		is_war_leader = yes
+		is_galactic_community_member = no
+		from = {
+			any_attacker = { is_same_value = root }
+			any_defender = {
+				AND = {
+					is_war_leader = yes
+					is_galactic_community_member = yes
+				}
+			}
+			NOT = { any_war_participant = { is_galactic_emperor = yes } }
+		}
+	}
+
+	immediate = {
+		save_event_target_as = attacking_country
+		from = {
+			random_defender = {
+				limit = {
+					is_war_leader = yes
+					is_galactic_community_member = yes
+				}
+				save_event_target_as = victim_country
+			}
+		}
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			country_event = { id = emperor.371 days = 10 }
+		}
+	}
+}
+
+# Emperor asked to defend member (Emperor)
+country_event = {
+	id = emperor.371
+	title = "emperor.371.name"
+	desc = "emperor.371.desc"
+	picture = GFX_evt_undertaker
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = { # Defend Imperial Member
+		name = emperor.371.a
+		ai_chance = {
+			factor = 2
+			modifier = {
+				factor = 6
+				opinion_level = {
+					who = event_target:victim_country
+					level >= good
+				}
+			}
+		}
+		add_imperial_authority = 20
+		event_target:victim_country = {
+			add_opinion_modifier = {
+				who = root
+				modifier = opinion_emperor_support_us
+			}
+		}
+		custom_tooltip = emperor.371.a.tooltip
+		hidden_effect = {
+			join_war_on_side = {
+				war = fromfrom
+				side = defenders
+			}
+			every_playable_country = {
+				limit = {
+					NOT = {
+						is_same_value = root
+						is_same_value = event_target:victim_country
+						is_war_participant = {
+							war = fromfrom
+							side = attackers
+						}
+					}
+					is_galactic_community_member = yes
+				}
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_emperor_supported_member
+				}
+			}
+			event_target:victim_country = {
+				country_event = { id = emperor.372 }
+			}
+			event_target:attacking_country = {
+				country_event = { id = emperor.373 }
+			}
+		}
+	}
+	option = { # Abandon Imperial Member
+		name = emperor.371.b
+		ai_chance = {
+			factor = 2
+			modifier = {
+				factor = 6
+				opinion_level = {
+					who = event_target:victim_country
+					level <= poor
+				}
+			}
+		}
+		add_imperial_authority = -20
+		event_target:victim_country = {
+			add_opinion_modifier = {
+				who = root
+				modifier = opinion_emperor_abandoned_us
+			}
+		}
+		hidden_effect = {
+			every_playable_country = {
+				limit = {
+					NOT = {
+						is_same_value = root
+						is_same_value = event_target:victim_country
+						is_war_participant = {
+							war = fromfrom
+							side = attackers
+						}
+					}
+					is_galactic_community_member = yes
+				}
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_emperor_abandoned_member
+				}
+			}
+			event_target:victim_country = {
+				country_event = { id = emperor.374 }
+			}
+		}
+	}
+}
+
+# Emperor Joins War (Victim)
+country_event = {
+	id = emperor.372
+	title = "emperor.372.name"
+	desc = "emperor.372.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.372.a
+		custom_tooltip = emperor.372.a.tooltip
+	}
+}
+
+# Emperor Joins War (Attacker)
+country_event = {
+	id = emperor.373
+	title = "emperor.373.name"
+	desc = "emperor.373.desc"
+	picture = GFX_evt_galactic_empire
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.373.a
+		custom_tooltip = emperor.373.a.tooltip
+	}
+}
+
+# Emperor Refuses To Join War (Victim)
+country_event = {
+	id = emperor.374
+	title = "emperor.374.name"
+	desc = "emperor.374.desc"
+	picture = GFX_evt_undertaker
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.374.a
+	}
+
+}
+
+# Empire Destroyed
+country_event = {
+	id = emperor.400
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_emperor = yes
+	}
+
+	immediate = {
+		set_country_flag = silence_destroy_event
+		every_playable_country = {
+			limit = { is_ai = no }
+			country_event = { id = emperor.401 }
+		}
+		set_galactic_emperor = no
+		set_council_size = 0
+	}
+}
+
+# Empire Destroyed
+country_event = {
+	id = emperor.401
+	title = "emperor.401.name"
+	desc = "emperor.401.desc"
+	picture = GFX_evt_burning_city
+	show_sound = event_burning_city
+
+	is_triggered_only = yes
+
+	option = {
+		name = emperor.401.a
+	}
+}
+
+
+# De-increment variable for counting imperial legion armies
+country_event = {
+	id = emperor.450
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { army_type = imperial_legion }
+	}
+
+	immediate = {
+		change_variable = {
+			which = imperial_legion_soldier_count
+			value = -1
+		}
+	}
+}

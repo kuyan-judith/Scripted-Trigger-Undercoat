@@ -1,0 +1,871 @@
+has_mod_scripted_trigger_undercoat = { always = yes }
+
+$trigger$ = { always = yes }
+
+can_have_trade_routes = {
+	is_gestalt = no
+}
+
+is_playable = {
+	OR = {
+		is_country_type = default
+		has_country_flag = is_playable
+	}
+}
+is_empire = {
+	OR = {
+		is_country_type = default
+		is_country_type = awakened_fallen_empire
+		is_country_type = fallen_empire
+		has_country_flag = is_playable
+		has_country_flag = is_empire
+	}
+}
+
+uses_regular_empire_jobs = {
+	OR = {
+		is_empire = yes
+		is_fear_of_the_dark_empire = yes
+	}
+	is_gestalt = no
+}
+
+planet_gives_aquatics_bonus = {
+	OR = {
+		is_planet_class = pc_ocean
+		has_modifier = flooded_habitat
+	}
+}
+
+planet_gives_aquatics_malus = {
+	is_ideal = no
+	NOR = {
+		has_climate = wet
+		has_modifier = flooded_habitat
+	}
+}
+
+is_endgame_crisis = {
+	OR = {
+		is_country_type = extradimensional
+		is_country_type = extradimensional_2
+		is_country_type = extradimensional_3
+		is_country_type = swarm
+		is_country_type = ai_empire
+	}
+}
+
+is_shielded = {
+	OR = {
+		is_planet_class = pc_shielded
+		is_planet_class = pc_ringworld_shielded
+		is_planet_class = pc_habitat_shielded
+	}
+}
+
+homicidal_diplomacy_restrictions = {
+	custom_tooltip = {
+		fail_text = "requires_actor_not_fanatic_purifiers"
+		OR = {
+			is_same_species = $recipient|from$
+			NOT = { has_valid_civic = civic_fanatic_purifiers	}
+		}
+	}
+	[[mirror]custom_tooltip = {
+		fail_text = "requires_recipient_not_fanatic_purifiers"
+		OR = {
+			is_same_species = $recipient|from$
+			$recipient|from$ = { NOT = { has_valid_civic = civic_fanatic_purifiers } }
+		}
+	}]
+	[[mirror_with_intel]if = {
+		limit = { $recipient|from$ = { has_valid_civic = civic_fanatic_purifiers } }
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_fanatic_purifiers
+				OR = {
+					is_same_species = $recipient|from$
+					$recipient|from$ = { NOT = { has_valid_civic = civic_fanatic_purifiers } }
+				}
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				OR = {
+					is_same_species = $recipient|from$
+					NOT = { has_valid_civic = civic_fanatic_purifiers }
+				}
+			}
+		}
+	}]
+	custom_tooltip = {
+		fail_text = "requires_actor_not_devouring_swarm"
+		NOT = { has_valid_civic = civic_hive_devouring_swarm	}
+	}
+	[[mirror]custom_tooltip = {
+		fail_text = "requires_recipient_not_devouring_swarm"
+		$recipient|from$ = { NOT = { has_valid_civic = civic_hive_devouring_swarm } }
+	}]
+	[[mirror_with_intel]if = {
+		limit = { $recipient|from$ = { has_valid_civic = civic_hive_devouring_swarm } }
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_devouring_swarm
+				always = no
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				always = no
+			}
+		}
+	}]
+	custom_tooltip = {
+		fail_text = "requires_actor_not_machine_terminator"
+		OR = {
+			is_same_species = $recipient|from$
+			NOT = { has_civic = civic_machine_terminator }
+			AND = {
+				has_civic = civic_machine_terminator
+				$recipient|from$ = {
+					OR = {
+						has_country_flag = synthetic_empire
+						is_machine_empire = yes
+					}
+				}
+			}
+		}
+	}
+	[[mirror]custom_tooltip = {
+		fail_text = "requires_recipient_not_machine_terminator"
+		OR = {
+			is_same_species = $recipient|from$
+			$recipient|from$ = { NOT = { has_civic = civic_machine_terminator } }
+			AND = {
+				$recipient|from$ = { has_civic = civic_machine_terminator }
+				OR = {
+					has_country_flag = synthetic_empire
+					is_machine_empire = yes
+				}
+			}
+		}
+	}]
+	[[mirror_with_intel]if = {
+		limit = { $recipient|from$ = { has_valid_civic = civic_machine_terminator } }
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_machine_terminator
+				AND = {
+					$recipient|from$ = { has_civic = civic_machine_terminator }
+					OR = {
+						has_country_flag = synthetic_empire
+						is_machine_empire = yes
+					}
+				}
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				AND = {
+					$recipient|from$ = { has_civic = civic_machine_terminator }
+					OR = {
+						has_country_flag = synthetic_empire
+						is_machine_empire = yes
+					}
+				}
+			}
+		}
+	}]
+}
+
+machine_assimilator_diplomacy_restrictions = {
+	custom_tooltip = {
+		fail_text = "requires_actor_not_machine_assimilator"
+		NOT = { has_valid_civic = civic_machine_assimilator }
+	}
+	[[mirror]custom_tooltip = {
+		fail_text = "requires_recipient_not_machine_assimilator"
+		$recipient|from$ = { NOT = { has_valid_civic = civic_machine_assimilator } }
+	}]
+	[[mirror_with_intel]if = {
+		limit = { $recipient|from$ = { has_valid_civic = civic_machine_assimilator } }
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_machine_assimilator
+				always = no
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				always = no
+			}
+		}
+	}]
+}
+
+barbaric_despoilers_diplomacy_restrictions = {
+	custom_tooltip = {
+		fail_text = "requires_actor_not_barbaric_despoilers"
+		NOT = { has_valid_civic = civic_barbaric_despoilers }
+	}
+	[[mirror]custom_tooltip = {
+		fail_text = "requires_recipient_not_barbaric_despoilers"
+		$recipient|from$ = { NOT = { has_valid_civic = civic_barbaric_despoilers } }
+	}]
+	[[mirror_with_intel]if = {
+		limit = { $recipient|from$ = { has_valid_civic = civic_barbaric_despoilers } }
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_barbaric_despoilers
+				always = no
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				always = no
+			}
+		}
+	}]
+}
+
+inwards_perfection_diplomacy_restrictions = {
+	custom_tooltip = {
+		fail_text = "requires_actor_not_inward_perfection"
+		NOT = { has_valid_civic = civic_inwards_perfection }
+	}
+	[[mirror]custom_tooltip = {
+		fail_text = "requires_recipient_not_inward_perfection"
+		$recipient|from$ = { NOT = { has_valid_civic = civic_inwards_perfection } }
+	}]
+	[[mirror_with_intel]if = {
+		limit = { $recipient|from$ = { has_valid_civic = civic_inwards_perfection } }
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_inward_perfection
+				always = no
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				always = no
+			}
+		}
+	}]
+}
+
+pompous_diplomacy_restrictions = {
+	if = {
+		limit = {
+			$recipient|from$ = { is_pompous_empire = yes }
+			NOT = { this = { is_overlord_to = $recipient|from$ } }
+			root = { is_same_value = prevprev } # Bypass check if we are proposing on behalf of recipient
+		}
+		if = {
+			limit = {
+				has_intel = {
+					who = $recipient|from$
+					intel = civics
+				}
+			}
+			custom_tooltip = {
+				fail_text = requires_recipient_not_pompous
+				always = no
+			}
+		}
+		else = {
+			custom_tooltip = {
+				fail_text = diplo_action_no_low_intel
+				always = no
+			}
+		}
+	}
+}
+
+pompous_sender_diplomacy_restrictions = {
+	custom_tooltip = {
+		fail_text = "requires_actor_not_pompous"
+		is_pompous_empire = no
+	}
+}
+
+has_secondary_species = {
+	OR = {
+		check_modifier_value = {
+			modifier = secondary_species_starting_pops
+			value > 0
+		}
+		has_civic = civic_machine_assimilator
+		has_civic = civic_machine_servitor
+		has_origin = origin_syncretic_evolution
+		has_origin = origin_necrophage
+	}
+}
+
+gets_prosperous_unification_bonus = {
+	has_origin = origin_default
+}
+
+has_default_pre_ftl_origin = {
+	has_origin = origin_default_pre_ftl
+}
+
+is_calamitous_birth_empire = {
+	has_origin = origin_lithoid
+}
+
+is_resource_consolidator_empire = {
+	has_origin = origin_machine
+}
+
+is_current_or_former_necrophage_empire = {
+	has_origin = origin_necrophage
+}
+
+has_federation_origin = {
+	OR = {
+		has_origin = origin_common_ground
+		has_origin = origin_hegemon
+	}
+}
+
+is_hegemon_origin_empire = {
+	has_origin = origin_hegemon
+}
+
+is_common_ground_empire = {
+	has_origin = origin_common_ground
+}
+
+has_imperial_vassal_origin = {
+	has_origin = origin_imperial_vassal
+}
+
+is_vassal_origin_overlord = {
+	has_origin = origin_imperial_vassal_overlord
+}
+
+is_separatist_empire = {
+	has_origin = origin_separatists
+}
+
+is_mechanist_empire = {
+	has_origin = origin_mechanists
+}
+
+is_syncretic_evolution_empire = {
+	has_origin = origin_syncretic_evolution
+}
+
+is_life_seeded_empire = {
+	has_origin = origin_life_seeded
+}
+
+is_post_apocalyptic_empire = {
+	has_origin = origin_post_apocalyptic
+}
+
+is_remnants_empire = {
+	has_origin = origin_remnants
+}
+
+is_shattered_ring_empire = {
+	has_origin = origin_shattered_ring
+}
+
+has_void_dweller_origin = {
+	has_origin = origin_void_dwellers
+}
+
+is_scion_empire = {
+	has_origin = origin_scion
+}
+
+is_galactic_doorstep_empire = {
+	has_origin = origin_galactic_doorstep
+}
+
+is_tree_of_life_empire = {
+	has_origin = origin_tree_of_life
+}
+
+is_shoulders_of_giants_empire = {
+	has_origin = origin_shoulders_of_giants
+}
+
+
+is_doomsday_empire = {
+	has_origin = origin_doomsday
+}
+
+is_lost_colony_empire = {
+	has_origin = origin_lost_colony
+}
+
+is_necrophage_empire = {
+	has_origin = origin_necrophage
+	has_trait = trait_necrophage
+}
+
+is_clone_army_empire = {
+	has_origin = origin_clone_army
+}
+
+is_here_be_dragons_empire = {
+	has_origin = origin_here_be_dragons
+}
+
+is_ocean_paradise_empire = {
+	has_origin = origin_ocean_paradise
+}
+
+is_progenitor_hive_empire = {
+	has_origin = origin_progenitor_hive
+}
+
+is_star_slingshot_empire = {
+	has_origin = origin_star_slingshot
+}
+
+is_shroudwalker_apprentice_empire = {
+	has_origin = origin_shroudwalker_apprentice
+}
+
+is_overtuned_empire = {
+	has_origin = origin_overtuned
+}
+
+is_toxic_knights_empire = {
+	has_origin = origin_toxic_knights
+}
+
+is_fear_of_the_dark_empire = {
+	has_origin = origin_fear_of_the_dark
+}
+
+is_payback_empire = {
+	has_origin = origin_payback
+}
+
+is_broken_shackles_empire = {
+	has_origin = origin_broken_shackles
+}
+
+is_enlightened_empire = {
+	has_origin = origin_enlightened
+}
+
+is_minamar = {
+	has_origin = origin_slavers
+}
+
+is_servitor_empire = {
+	has_civic = civic_machine_servitor
+}
+
+has_legendary_leader_origin_not_set = {
+	has_origin = origin_legendary_leader
+}
+
+has_legendary_leader_origin_active = {
+	OR = {
+		has_origin = origin_legendary_leader
+		has_origin = origin_legendary_leader_dictatorial
+		has_origin = origin_legendary_leader_imperial
+	}
+}
+
+is_fruitful_empire = {
+	has_origin = origin_fruitful
+}
+
+# has_organic_armies = {
+# 	OR = {
+# 		is_machine_empire = no
+# 		is_machine_assimilator = yes
+# 	}
+# }
+
+has_reanimated_armies = {
+	has_[[!allow_invalid]valid_]civic = civic_reanimated_armies
+}
+
+has_permanent_employment = {
+	has_[[!allow_invalid]valid_]civic = civic_permanent_employment
+}
+
+is_inwards_perfection_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_inwards_perfection
+}
+
+is_despoiler_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_barbaric_despoilers
+}
+
+is_agrarian_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_agrarian_idyll
+}
+
+is_aristocratic_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_aristocratic_elite
+}
+
+is_shared_burden_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_shared_burden
+}
+
+is_environmentalist_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_environmentalist
+}
+
+is_megachurch_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_gospel_of_the_masses
+}
+
+is_machine_assimilator = {
+	has_valid_civic = civic_machine_assimilator
+}
+
+has_citizen_service = {
+	has_[[!allow_invalid]valid_]civic = civic_citizen_service
+}
+
+is_franchise = {
+	has_[[!allow_invalid]valid_]civic = civic_franchising
+}
+
+is_cordyceptic_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_hive_cordyceptic_drones
+}
+
+is_pompous_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_pompous_purists
+}
+
+is_feudal_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_feudal_realm
+}
+
+uses_private_colony_ships = {
+	OR = {
+		has_civic = civic_corporate_dominion
+		has_civic = civic_private_prospectors
+	}
+}
+
+is_technocracy = {
+	has_[[!allow_invalid]valid_]civic = civic_technocracy
+}
+
+has_exalted_priesthood = {
+	has_[[!allow_invalid]valid_]civic = civic_exalted_priesthood
+}
+
+has_capital_merchants = {
+	has_civic = civic_merchant_guilds
+}
+
+has_warrior_culture = {
+	has_[[!allow_invalid]valid_]civic = civic_warrior_culture
+}
+
+has_slaver_civic = {
+	OR = {
+		has_valid_civic = civic_slaver_guilds
+		has_valid_civic = civic_indentured_assets
+	}
+}
+
+has_natural_neural_network = {
+	has_[[!allow_invalid]valid_]civic = civic_hive_natural_neural_network
+}
+
+has_efficient_bureaucracy = {
+	has_valid_civic = civic_efficient_bureaucracy
+}
+
+has_byzantine_bureaucracy = {
+	has_valid_civic = civic_byzantine_bureaucracy
+}
+
+has_maintenance_protocols = {
+	has_valid_civic = civic_machine_maintenance_protocols
+}
+
+has_dystopian_society = {
+	has_[[!allow_invalid]valid_]civic = civic_dystopian_society
+}
+
+is_private_healthcare_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_private_healthcare_corporate
+}
+
+is_privateer_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_crusader_spirit_corporate
+}
+
+has_crusader_spirit = {
+	has_[[!allow_invalid]valid_]civic = civic_crusader_spirit
+}
+
+has_parliamentary_system = {
+	has_valid_civic = civic_parliamentary_system
+}
+
+has_philosopher_king = {
+	has_[[!allow_invalid]valid_]civic = civic_philosopher_king
+}
+
+has_heroic_tales = {
+	has_[[!allow_invalid]valid_]civic = civic_heroic_tales
+}
+
+is_void_hive_empire = {
+	has_valid_civic = civic_void_hive
+}
+
+is_selective_kinship_empire = {
+	has_[[!allow_invalid]valid_]civic = civic_selective_kinship
+}
+
+is_city_world = {
+	is_planet_class = pc_city
+}
+
+is_habitat = {
+	is_planet_class = pc_habitat
+}
+
+is_shattered_ring_habitable = {
+	is_planet_class = pc_shattered_ring_habitable
+}
+
+is_unshattered_ring_habitable_segment = {
+	is_planet_class = pc_ringworld_habitable
+}
+
+is_damaged_ring_segment = {
+	is_planet_class = pc_ringworld_habitable_damaged
+}
+
+is_gaia_world = {
+	is_planet_class = pc_gaia
+}
+
+is_hive_world = {
+	is_planet_class = pc_hive
+}
+
+is_machine_world = {
+	is_planet_class = pc_machine
+}
+
+is_nuked_world = {
+	is_planet_class = pc_nuked
+}
+
+is_relic_world = {
+	is_planet_class = pc_relic
+}
+
+is_continental_world = {
+	is_planet_class = pc_continental
+}
+is_tropical_world = {
+	is_planet_class = pc_tropical
+}
+is_ocean_world = {
+	is_planet_class = pc_ocean
+}
+is_desert_world = {
+	is_planet_class = pc_desert
+}
+is_arid_world = {
+	is_planet_class = pc_arid
+}
+is_savannah_world = {
+	is_planet_class = pc_savannah
+}
+is_arctic_world = {
+	is_planet_class = pc_arctic
+}
+is_tundra_world = {
+	is_planet_class = pc_tundra
+}
+is_alpine_world = {
+	is_planet_class = pc_alpine
+}
+
+is_gas_giant = {
+	is_planet_class = pc_gas_giant
+}
+is_toxic_world = {
+	is_planet_class = pc_toxic
+}
+is_frozen_world = {
+	is_planet_class = pc_frozen
+}
+is_barren_cold_world = {
+	is_planet_class = pc_barren_cold
+}
+is_barren_dry_world = {
+	is_planet_class = pc_barren
+}
+is_barren_world = {
+	is_planet_class = pc_barren
+}
+is_molten_world = {
+	is_planet_class = pc_molten
+}
+is_rocky_asteroid = {
+	is_planet_class = pc_asteroid
+}
+is_ice_asteroid = {
+	is_planet_class = pc_ice_asteroid
+}
+is_rare_crystal_asteroid = {
+	is_planet_class = pc_rare_crystal_asteroid
+}
+
+is_broken_world = {
+	is_planet_class = pc_broken
+}
+is_shattered_world = {
+	OR = {
+		is_planet_class = pc_shattered
+		is_planet_class = pc_shattered_2
+	}
+}
+is_gray_goo_world = {
+	is_planet_class = pc_gray_goo
+}
+is_infested_world = {
+	is_planet_class = pc_infested
+}
+is_shrouded_world = {
+	is_planet_class = pc_shrouded
+}
+
+planet_is_standard_star = {
+	OR = {
+		is_planet_class = pc_a_star
+		is_planet_class = pc_b_star
+		is_planet_class = pc_f_star
+		is_planet_class = pc_g_star
+		is_planet_class = pc_k_star
+		is_planet_class = pc_m_star
+		is_planet_class = pc_m_giant_star
+		is_planet_class = pc_t_star
+	}
+}
+planet_is_dwarf_star = {
+	OR = {
+		is_planet_class = pc_a_star
+		is_planet_class = pc_b_star
+		is_planet_class = pc_f_star
+		is_planet_class = pc_g_star
+		is_planet_class = pc_k_star
+		is_planet_class = pc_m_star
+		is_planet_class = pc_t_star
+	}
+}
+planet_is_neutron_star_including_pulsar = {
+	OR = {
+		is_planet_class = pc_neutron_star
+		is_planet_class = pc_pulsar
+	}
+}
+planet_is_nonstandard_star = {
+	OR = {
+		is_planet_class = pc_neutron_star
+		is_planet_class = pc_pulsar
+		is_planet_class = pc_black_hole
+	}
+}
+planet_is_black_hole = {
+	is_planet_class = pc_black_hole
+}
+
+stu_star_spectrum_index = {
+	check_variable_arithmetic = {
+		which = value:stu_star_spectrum_index
+		value >= $min|1$
+	}
+	check_variable_arithmetic = {
+		which = value:stu_star_spectrum_index
+		value <= $max|8$
+	}
+}
+
+can_have_defense_platforms = {
+	is_scope_type = starbase
+	OR = {
+		has_starbase_size >= starbase_outpost
+		has_starbase_size >= orbital_ring_tier_1
+	}
+}
+
+has_authority_democratic = {
+	has_authority = auth_democratic
+}
+has_authority_oligarchic = {
+	has_authority = auth_oligarchic
+}
+has_authority_dictatorial = {
+	has_authority = auth_dictatorial
+}
+has_authority_imperial = {
+	has_authority = auth_imperial
+}
+has_authority_corporate = {
+	has_authority = auth_corporate
+}
+has_regular_authority = {
+	OR = {
+		has_authority = auth_democratic
+		has_authority = auth_oligarchic
+		has_authority = auth_dictatorial
+		has_authority = auth_imperial
+	}
+}

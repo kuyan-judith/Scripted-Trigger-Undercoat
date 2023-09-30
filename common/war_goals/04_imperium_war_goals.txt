@@ -1,0 +1,684 @@
+wg_imperial_crusade = {
+	casus_belli = cb_event
+
+	hide_if_no_cb = yes
+	release_occupied_systems_on_status_quo = yes
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -100
+
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+	}
+	on_accept = {
+		from = {
+			add_to_galactic_community = yes
+		}
+	}
+
+	on_status_quo = {
+		if = {
+			limit = {
+				exists = last_created_country
+				last_created_country = {
+					has_country_flag = released_empire
+				}
+			}
+
+			last_created_country = {
+				set_origin_effect = yes
+				add_to_galactic_community = yes
+			}
+
+			if = {
+				limit = {
+					root = { is_megacorp = yes }
+					last_created_country = { is_megacorp = yes }
+				}
+				last_created_country = {
+					set_merchant_government_effect = yes
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+	}
+}
+
+wg_seize_council_seat = {
+	casus_belli = cb_trial_of_advancement
+
+	cede_claims = no
+	hide_if_no_cb = yes
+	release_occupied_systems_on_status_quo = no
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -100
+
+	potential = {
+	}
+	possible = {
+	}
+	on_accept = {
+		from = { remove_from_galactic_council = yes }
+		add_to_galactic_council = yes
+		add_permanent_councillor = yes
+	}
+
+	on_status_quo = {
+	}
+
+	ai_weight = {
+		weight = 10
+	}
+}
+
+wg_restore_the_community = {
+	casus_belli = cb_galactic_empire
+	hide_if_no_cb = yes
+	cede_claims = no
+	galactic_empire_joins_defender = { always = yes }
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	war_exhaustion = 0.25
+
+	potential = {
+	}
+	possible = {
+	}
+
+	on_accept = {
+		custom_tooltip = war_goal_wg_dissolve_the_empire_accept
+		hidden_effect = {
+			save_event_target_as = dissolve_winner
+			fromfrom = {
+				every_war_participant = {
+					limit = { is_galactic_community_member = yes }
+					country_event = { id = emperor.301 }
+				}
+				every_war_participant = {
+					limit = {
+						is_galactic_community_member = no
+						prev = {
+							using_war_goal = {
+								type = wg_restore_the_community
+								owner = prev
+							}
+						}
+					}
+					country_event = { id = emperor.300 }
+				}
+			}
+			from = {
+				restore_galactic_community_leader_backup_data = yes
+				set_galactic_emperor = no
+			}
+			every_playable_country = {
+				limit = {
+					is_ai = no
+					fromfrom = {
+						NOT = {
+							is_war_participant = { who = prev }
+						}
+					}
+				}
+				country_event = { id = emperor.302 }
+			}
+			set_council_size = 0
+			remove_global_flag = galactic_council_formed
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+#wg_seize_imperial_throne = {
+#	casus_belli = cb_galactic_empire
+#	hide_if_no_cb = yes
+#	cede_claims = no
+#	galactic_empire_joins_defender = { always = yes }
+#
+#	allowed_peace_offers = {
+#		status_quo
+#		surrender
+#		demand_surrender
+#	}
+#
+#	war_exhaustion = 0.25
+#
+#	potential = {
+#	}
+#	possible = {
+#	}
+#
+#	on_accept = {
+#		custom_tooltip = wg_seize_imperial_throne_accept
+#		hidden_effect = {
+#			save_event_target_as = new_emperor
+#			random_country = {
+#				limit = { is_country_type = global_event }
+#				change_variable = {
+#					which = galactic_empires
+#					value = 1
+#				}
+#			}
+#			fromfrom = {
+#				every_war_participant = {
+#					limit = { is_galactic_community_member = yes }
+#					country_event = { id = emperor.311 }
+#				}
+#				every_war_participant = {
+#					limit = {
+#						NOT = { is_same_value = prevprev }
+#						prev = {
+#							using_war_goal = {
+#								type = wg_seize_imperial_throne
+#								owner = prev
+#							}
+#						}
+#					}
+#					country_event = { id = emperor.310 }
+#					add_to_galactic_community = yes
+#				}
+#			}
+#			set_council_size = 0
+#			add_to_galactic_community = yes
+#			store_galactic_community_leader_backup_data = {
+#				flag = yes
+#				name = yes
+#				ethics = yes
+#				government = yes
+#			}
+#			set_galactic_emperor = yes
+#			if = {
+#				limit = { is_gestalt = no }
+#				shift_ethic = "ethic_fanatic_authoritarian"
+#				change_government = {
+#					authority = auth_imperial
+#					civics = {
+#						civic = civic_galactic_sovereign
+#					}
+#				}
+#			}
+#			else = {
+#				change_government = {
+#					civics = {
+#						civic = civic_galactic_sovereign
+#					}
+#				}
+#			}
+#			set_name = random
+#			room_name_override = ""
+#			change_country_flag = {
+#				icon = {
+#					category = "special"
+#					file = "the_empire.dds"
+#				}
+#				background= {
+#					category = "backgrounds"
+#					file = "00_solid.dds"
+#				}
+#				colors={
+#					"red"
+#					"red"
+#					"null"
+#					"null"
+#				}
+#			}
+#			country_event = { id = emperor.312 }
+#		}
+#	}
+#
+#	ai_weight = {
+#		weight = 100
+#	}
+#}
+
+# Imperial rebuke
+wg_imperial_rebuke = {
+	casus_belli = cb_humiliation
+
+	cede_claims = no
+	hide_if_no_cb = no
+	set_defender_wargoal = wg_humiliation_imperium
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -25
+
+	potential = {
+		has_total_war_cb = no
+		is_galactic_emperor = yes
+		from = { is_galactic_community_member = yes }
+	}
+	possible = {
+		custom_tooltip = {
+			fail_text = pax_galactica_active
+			NOT = { is_active_resolution = resolution_emperor_pax_galactica }
+		}
+	}
+	on_accept = {
+		custom_tooltip = wg_humiliation_accept
+		hidden_effect = {
+			add_resource = { influence = 100 }
+			from = {
+				add_modifier = { modifier = humiliated days = 3600 }
+				if = {
+					limit = { has_policy_flag = diplo_stance_supremacist }
+					set_policy = {
+						policy = diplomatic_stance
+						option = diplo_stance_belligerent
+						cooldown = yes
+					}
+					prev = {
+						set_country_flag = humble_pie_achievement
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+
+#### Special war goals for the Emperor and counter war goals for Imperium members
+
+# Defending Imperials get this war goal if the Emperor attacks them
+wg_humiliation_imperium = {
+	casus_belli = cb_event
+	cede_claims = no
+	hide_if_no_cb = no
+	set_defender_wargoal = wg_imperial_rebuke
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -50
+
+	potential = {
+		always = no
+	}
+	possible = {
+		always = yes
+	}
+	on_accept = {
+		custom_tooltip = wg_humiliation_imperium_accept
+		hidden_effect = {
+			add_imperial_authority = -25
+			add_resource = { influence = 100 }
+			from = {
+				add_modifier = { modifier = humiliated days = 3600 }
+				if = {
+					limit = { has_policy_flag = diplo_stance_supremacist }
+					set_policy = {
+						policy = diplomatic_stance
+						option = diplo_stance_belligerent
+						cooldown = yes
+					}
+					prev = {
+						set_country_flag = humble_pie_achievement
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+
+# Emperor's version where defender war goal is set to wg_humiliation_imperium
+wg_take_galatron_imperium = {
+	casus_belli = cb_galatron
+	hide_if_no_cb = yes
+	release_occupied_systems_on_status_quo = no
+	set_defender_wargoal = wg_humiliation_imperium
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -40
+
+
+	potential = {
+		is_galactic_emperor = yes
+		from = { is_galactic_community_member = yes }
+	}
+	possible = {
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = cannot_use_against_emperor
+			OR = {
+				from = { is_galactic_emperor = no }
+				is_galactic_community_member = no
+			}
+		}
+		custom_tooltip = {
+			fail_text = pax_galactica_active
+			NOT = { is_active_resolution = resolution_emperor_pax_galactica }
+		}
+	}
+	on_accept = {
+		hidden_effect = {
+			from = {
+				add_threat = {
+					who = root
+					amount = 0.5
+				}
+			}
+		}
+		from = {
+			add_modifier = { modifier = humiliated days = 3600 }
+			hidden_effect = { country_event = { id = cara.951 } }
+			hidden_effect = { remove_relic = r_galatron }
+		}
+		hidden_effect = { country_event = { id = cara.950 } }
+		add_relic = r_galatron
+	}
+
+	on_status_quo = {
+		from = {
+			set_closed_borders = {
+				who = prev
+				status = no
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			is_gestalt = yes
+		}
+	}
+}
+
+# Emperor's version where defender war goal is set to wg_humiliation_imperium
+wg_expel_corp_imperium = {
+	casus_belli = cb_expel_corp
+	hide_if_no_cb = yes
+	release_occupied_systems_on_status_quo = no
+	set_defender_wargoal = wg_humiliation_imperium
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -50
+
+	potential = {
+		is_galactic_emperor = yes
+		from = { is_galactic_community_member = yes }
+	}
+	possible = {
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = cannot_use_against_emperor
+			OR = {
+				from = { is_galactic_emperor = no }
+				is_galactic_community_member = no
+			}
+		}
+		custom_tooltip = {
+			fail_text = pax_galactica_active
+			NOT = { is_active_resolution = resolution_emperor_pax_galactica }
+		}
+	}
+	on_status_quo = {
+		hidden_effect = {
+			every_owned_planet = {
+				limit = { has_branch_office = from }
+				branch_office_owner = { add_resource = { energy = 1000 } }
+				close_branch_office = yes
+			}
+		}
+		custom_tooltip = wg_expel_corp_status_quo_effects
+	}
+	on_accept = {
+		hidden_effect = {
+			every_owned_planet = {
+				limit = { has_branch_office = from }
+				close_branch_office = yes
+				owner = { add_resource = { energy = 1000 } }
+			}
+		}
+		custom_tooltip = wg_expel_corp_effects
+	}
+
+	ai_weight = {
+		weight = 10
+	}
+}
+
+# Emperor's version where defender war goal is set to wg_humiliation_imperium
+wg_hostile_takeover_imperium = {
+	casus_belli = cb_hostile_takeover
+	hide_if_no_cb = yes
+	release_occupied_systems_on_status_quo = no
+	set_defender_wargoal = wg_humiliation_imperium
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -75
+
+	potential = {
+		is_galactic_emperor = yes
+		from = { is_galactic_community_member = yes }
+	}
+	possible = {
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = cannot_use_against_emperor
+			OR = {
+				from = { is_galactic_emperor = no }
+				is_galactic_community_member = no
+			}
+		}
+		custom_tooltip = {
+			fail_text = pax_galactica_active
+			NOT = { is_active_resolution = resolution_emperor_pax_galactica }
+		}
+	}
+	on_accept = {
+		every_country = {
+			limit = {
+				OR = {
+					has_commercial_pact = root
+					is_in_federation_with = root
+				}
+			}
+			every_owned_planet = {
+				limit = {
+					has_branch_office = from
+				}
+				hidden_effect = {
+					close_branch_office = yes
+					establish_branch_office = root
+					custom_tooltip = wg_seize_branch_office_effects
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+	}
+}
+
+# Emperor's version where defender war goal is set to wg_humiliation_imperium
+wg_steal_galatron_imperium = {
+	casus_belli = cb_steal_galatron
+	hide_if_no_cb = yes
+	release_occupied_systems_on_status_quo = no
+	set_defender_wargoal = wg_humiliation_imperium
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -40
+
+	potential = {
+		is_galactic_emperor = yes
+		from = { is_galactic_community_member = yes }
+	}
+	possible = {
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = cannot_use_against_emperor
+			OR = {
+				from = { is_galactic_emperor = no }
+				is_galactic_community_member = no
+			}
+		}
+		custom_tooltip = {
+			fail_text = pax_galactica_active
+			NOT = { is_active_resolution = resolution_emperor_pax_galactica }
+		}
+	}
+	on_accept = {
+		hidden_effect = {
+			from = {
+				add_threat = {
+					who = root
+					amount = 0.5
+				}
+			}
+		}
+		if = {
+			limit = { has_ancrel = yes }
+			from = {
+			add_modifier = { modifier = humiliated days = 3600 }
+
+			hidden_effect = { country_event = { id = cara.951 } }
+			hidden_effect = { remove_relic = r_galatron }
+			}
+
+			hidden_effect = { country_event = { id = cara.950 } }
+			add_relic = r_galatron
+		}
+		else = {
+			from = {
+			remove_modifier = galatron_modifier
+			add_modifier = { modifier = humiliated days = 3600 }
+
+			hidden_effect = { country_event = { id = cara.951 } }
+			}
+
+			hidden_effect = { country_event = { id = cara.950 } }
+			add_modifier = { modifier = galatron_modifier days = -1 }
+		}
+	}
+
+	on_status_quo = {
+		hidden_effect = { add_resource = { energy = 1000 } }
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			is_gestalt = yes
+		}
+	}
+}

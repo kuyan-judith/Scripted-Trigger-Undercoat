@@ -1,0 +1,3654 @@
+generate_pre_ftls_on_planet = {
+	optimize_memory
+	select_pre_ftl_origin = yes
+	create_pre_ftl_species = yes
+	create_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+generate_very_early_pre_ftls_on_planet = {
+	optimize_memory
+	set_default_origin = yes
+	create_pre_ftl_species = yes
+	create_very_early_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+generate_early_pre_ftls_on_planet = {
+	optimize_memory
+	select_pre_ftl_origin = yes
+	create_pre_ftl_species = yes
+	create_early_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+generate_late_pre_ftls_on_planet = {
+	optimize_memory
+	select_pre_ftl_origin = yes
+	create_pre_ftl_species = yes
+	create_late_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+generate_subterranean_pre_ftls_on_planet = {
+	optimize_memory
+	set_planet_flag = pre_ftl_subterranean
+	create_pre_ftl_species = yes
+	create_late_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+generate_chosen_pre_ftls_on_planet = {
+	set_planet_flag = pre_ftl_default
+	#Don't create species. Last created species is already correct
+	create_very_early_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+# This is called before the pre-ftl species is created due to interactions between various origins and the pop creation effect.
+select_pre_ftl_origin = {
+	# Void Dwellers
+	if = {
+		limit = {
+			is_habitat = yes
+		}
+		set_planet_flag = pre_ftl_void_dwellers
+	}
+	else_if = {
+		limit = {
+			is_unshattered_ring_habitable_segment = yes
+		}
+		# Do nothing!
+	}
+	else_if = {
+		limit = { is_shattered_ring_habitable = yes }
+		set_planet_flag = pre_ftl_shattered_ring
+	}
+	else = {
+		random_list = {
+			# Default pre-ftl origin
+			# All other origins require First Contact.
+			100 = { set_planet_flag = pre_ftl_default }
+
+			# Mechanists (requires Utopia)
+			5 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_first_contact_dlc = no
+						has_utopia = no
+						has_planet_flag = pre_ftl_hive_mind
+						any_galaxy_planet = {
+							has_planet_flag = pre_ftl_mechanists
+						}
+					}
+				}
+				set_planet_flag = pre_ftl_mechanists
+			}
+
+			# Life-Seeded (requires Apocalypse)
+			5 = {
+				modifier = {
+					factor = 0
+					NOT = {
+						host_has_dlc = "Apocalypse"
+					}
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						has_first_contact_dlc = no
+						any_galaxy_planet = {
+							has_planet_flag = pre_ftl_life_seeded
+						}
+						any_country = {
+							is_life_seeded_empire = yes
+						}
+					}
+				}
+				set_planet_flag = pre_ftl_life_seeded
+				change_pc = pc_gaia
+				create_life_seeded_planet = yes
+			}
+
+			# Ocean Paradise (Requires Aquatics)
+			5 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_aquatics = no
+						has_first_contact_dlc = no
+					}
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						any_galaxy_planet = {
+							has_planet_flag = pre_ftl_ocean_paradise
+						}
+						any_country = {
+							is_ocean_paradise_empire = yes
+						}
+					}
+				}
+				set_planet_flag = pre_ftl_ocean_paradise
+				change_pc = pc_ocean
+				set_planet_size = 30
+				create_ocean_paradise_planet = yes
+			}
+
+			# Subterranean (requires Overlord)
+			5 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_overlord_dlc = no
+						has_first_contact_dlc = no
+					}
+
+				}
+				modifier = {
+					factor = 0
+					any_galaxy_planet = {
+						has_planet_flag = pre_ftl_subterranean
+					}
+				}
+				set_planet_flag = pre_ftl_subterranean
+			}
+		}
+	}
+}
+
+#This option is here for things like Necrophages where we don't want your guaranteed pre-FTLs to start with a size 30 ocean world
+set_default_origin = {
+	set_planet_flag = pre_ftl_default
+}
+
+# This is called as part of create_FOO_BAR_pre_ftl_empire to set the correct origin on the pre-ftl country.
+# These origins are so that the correct origin is shown when the pre-ftl civilization achieves FTL tech.
+# Some origins are also checked during their technological progression.
+set_pre_ftl_origin = {
+	switch = {
+		trigger = has_planet_flag
+		pre_ftl_default = {
+			owner = {
+				set_origin = origin_default_pre_ftl
+			}
+		}
+		pre_ftl_mechanists = {
+			owner = {
+				shift_ethic = "ethic_fanatic_materialist"
+				set_origin = origin_mechanists
+			}
+		}
+		pre_ftl_life_seeded = {
+			owner = {
+				set_origin = origin_life_seeded
+			}
+		}
+		pre_ftl_ocean_paradise = {
+			owner = {
+				set_origin = origin_ocean_paradise
+			}
+		}
+		pre_ftl_subterranean = {
+			owner = {
+				set_origin = origin_subterranean
+			}
+		}
+		pre_ftl_void_dwellers = {
+			owner = {
+				set_origin = origin_void_dwellers
+			}
+		}
+		pre_ftl_shattered_ring = {
+			owner = {
+				set_origin = origin_shattered_ring
+			}
+		}
+	}
+}
+
+pre_ftl_clean_up_effect = {
+	owner = {
+		if = {
+			limit = {
+				is_subterranean_empire = yes
+			}
+			# If you're not in the industrial age, we'll accelerate your progress.
+			if = {
+				limit = {
+					is_pre_industrial = yes
+				}
+				remove_pre_ftl_flags = yes
+				set_pre_ftl_age = industrial_age
+				set_country_flag = industrial_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_industrial_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"beige"
+						"yellow"
+						"null"
+						"null"
+					}
+				}
+				capital_scope = {
+					remove_all_buildings = yes
+				}
+				if = {
+					limit = {
+						is_hive_empire = no
+					}
+					change_government = {
+						civics = {
+							civic = civic_increasing_urbanization
+							civic = civic_atmospheric_pollution
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_farm
+						add_building = building_primitive_factory
+						add_building = building_primitive_mine
+						add_building = building_primitive_power_plant
+						add_building = building_primitive_capital
+						add_building = building_urban_dwellings
+					}
+				}
+				else = {
+					change_government = {
+						civics = {
+							civic = civic_hive_centralized_consciousness
+							civic = civic_hive_atmospheric_pollution
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_farm
+						add_building = building_hive_primitive_factory
+						add_building = building_hive_primitive_mine
+						add_building = building_hive_primitive_power_plant
+						add_building = building_hive_primitive_capital
+						add_building = building_hive_urban_dwellings
+					}
+				}
+
+				capital_scope = {
+					if = {
+						limit = {
+							num_pops > @industrial_age_pops
+						}
+						while = {
+							limit = {
+								num_pops > @industrial_age_pops
+							}
+							random_owned_pop = {
+								kill_pop = yes
+							}
+						}
+					}
+					else_if = {
+						limit = { num_pops < @industrial_age_pops }
+						while = {
+							limit = {
+								num_pops < @industrial_age_pops
+							}
+							create_pop = {
+								species = owner_main_species
+							}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				is_mechanist_empire = yes
+			}
+			# If you're not in the industrial age, we'll accelerate your progress.
+			if = {
+				limit = {
+					is_pre_industrial = yes
+				}
+				remove_pre_ftl_flags = yes
+				set_pre_ftl_age = industrial_age
+				set_country_flag = industrial_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_industrial_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"beige"
+						"yellow"
+						"null"
+						"null"
+					}
+				}
+				capital_scope = {
+					remove_all_buildings = yes
+				}
+				change_government = {
+					civics = {
+						civic = civic_increasing_urbanization
+						civic = civic_atmospheric_pollution
+					}
+				}
+				capital_scope = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+				}
+			}
+
+			create_built_robot_species = yes
+			last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+			set_country_flag = created_robots
+
+			capital_scope = {
+				while = {
+					count = 4
+					create_pop = {
+						species = event_target:pre_ftl_mechanist_robot
+					}
+				}
+				if = {
+					limit = {
+						num_pops > @industrial_age_pops
+					}
+					while = {
+						limit = {
+							num_pops > @industrial_age_pops
+						}
+						random_owned_pop = {
+							kill_pop = yes
+						}
+					}
+				}
+				else_if = {
+					limit = { num_pops < @industrial_age_pops }
+					while = {
+						limit = {
+							num_pops < @industrial_age_pops
+						}
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+create_pre_ftl_species = {
+	if = {
+		limit = {
+			has_planet_flag = pre_ftl_ocean_paradise
+		}
+		create_species = {
+			name = random
+			class = random_pre_ftl
+			portrait = random
+			homeworld = THIS
+			traits = {
+				trait = trait_aquatic
+				trait = random_traits
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = pre_ftl_subterranean
+		}
+		create_species = {
+			name = random
+			class = random_pre_ftl
+			portrait = random
+			homeworld = THIS
+			traits = {
+				trait = trait_cave_dweller
+				trait = random_traits
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = pre_ftl_void_dwellers
+		}
+		create_species = {
+			name = random
+			class = random_pre_ftl
+			portrait = random
+			homeworld = THIS
+			traits = {
+				trait = trait_void_dweller_1
+				trait = random_traits
+			}
+		}
+	}
+	else = {
+		random_list = {
+			99 = {
+				create_species = {
+					name = random
+					class = random_pre_ftl
+					portrait = random
+					homeworld = THIS
+					traits = {
+						trait = random_traits
+					}
+				}
+			}
+			1 = {
+				set_global_flag = forcefully_devolved_pre_ftl_rolled
+				create_species = {
+					name = random
+					class = random_pre_ftl
+					portrait = random
+					homeworld = THIS
+					traits = {
+						trait = random_traits
+						trait = "trait_presapient_forcefully_devolved"
+					}
+				}
+				modifier = {
+					factor = 0
+					has_global_flag = forcefully_devolved_pre_ftl_rolled
+				}
+			}
+		}
+	}
+}
+
+create_very_early_pre_ftl_empire = {
+	create_country = {
+		name = random
+		authority = random
+		day_zero_contact = no
+
+		civics = {
+			civic = civic_landed_nobility
+			civic = civic_flat_world_theory
+		}
+		species = last_created_species
+		ethos = random
+		flag = {
+			icon = {
+				category = "pre_ftl"
+				file = "preftl_stone_age.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "new_dawn.dds"
+			}
+			colors={
+				"turquoise"
+				"green"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_default"
+		type = primitive
+		effect = {
+			set_graphical_culture = preindustrial_01
+			random_list = {
+				2 = {
+					set_country_flag = stone_age
+					set_pre_ftl_age = stone_age
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_secret_of_fire
+							civic = civic_the_wheel
+						}
+					}
+				}
+				1 = {
+					set_country_flag = bronze_age
+					set_pre_ftl_age = bronze_age
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_secret_of_fire
+							civic = civic_the_wheel
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_bronze_age.dds"
+						}
+						background= {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors={
+							"green"
+							"dark_green"
+							"null"
+							"null"
+						}
+					}
+				}
+				1 = {
+					set_country_flag = iron_age
+					set_pre_ftl_age = iron_age
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_iron_age.dds"
+						}
+						background= {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors={
+							"purple"
+							"dark_purple"
+							"null"
+							"null"
+						}
+					}
+				}
+			}
+		}
+	}
+	set_pre_ftl_origin = yes
+}
+
+create_early_pre_ftl_empire = {
+	create_country = {
+		name = random
+		authority = random
+		civics = {
+			civic = civic_landed_nobility
+			civic = civic_flat_world_theory
+		}
+		species = last_created_species
+		ethos = random
+		flag = {
+			icon = {
+				category = "pre_ftl"
+				file = "preftl_stone_age.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "new_dawn.dds"
+			}
+			colors={
+				"turquoise"
+				"green"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_default"
+		type = primitive
+	}
+	last_created_country = {
+		set_graphical_culture = preindustrial_01
+		random_list = {
+			20 = {
+				set_country_flag = stone_age
+				set_pre_ftl_age = stone_age
+				change_government = {
+					authority = random
+					civics = {
+						civic = civic_secret_of_fire
+						civic = civic_the_wheel
+					}
+				}
+			}
+			20 = {
+				set_country_flag = bronze_age
+				set_pre_ftl_age = bronze_age
+				change_government = {
+					authority = random
+					civics = {
+						civic = civic_secret_of_fire
+						civic = civic_the_wheel
+					}
+				}
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_bronze_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"green"
+						"dark_green"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = iron_age
+				set_pre_ftl_age = iron_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_iron_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"purple"
+						"dark_purple"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = late_medieval_age
+				set_pre_ftl_age = late_medieval_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_medieval_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"light_blue"
+						"blue"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = renaissance_age
+				set_pre_ftl_age = renaissance_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_renaissance_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"pink"
+						"burgundy"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = steam_age
+				set_pre_ftl_age = steam_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_steam_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"orange"
+						"red"
+						"null"
+						"null"
+					}
+				}
+			}
+		}
+	}
+	set_pre_ftl_origin = yes
+}
+
+create_late_pre_ftl_empire = {
+	create_country = {
+		name = random
+		authority = random
+		civics = {
+			civic = civic_increasing_urbanization
+			civic = civic_atmospheric_pollution
+		}
+		species = last_created_species
+		ethos = random
+		flag = {
+			icon = {
+				category = "pre_ftl"
+				file = "preftl_industrial_age.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "new_dawn.dds"
+			}
+			colors={
+				"turquoise"
+				"green"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_default"
+		type = primitive
+	}
+	last_created_country = {
+		set_graphical_culture = industrial_01
+		random_list = {
+			25 = {
+				set_country_flag = industrial_age
+				set_pre_ftl_age = industrial_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_industrial_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"beige"
+						"yellow"
+						"null"
+						"null"
+					}
+				}
+			}
+			25 = {
+				set_country_flag = machine_age
+				set_pre_ftl_age = machine_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_machine_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"yellow"
+						"orange"
+						"null"
+						"null"
+					}
+				}
+			}
+			25 = {
+				set_country_flag = atomic_age
+				set_pre_ftl_age = atomic_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_atomic_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"beige"
+						"brown"
+						"null"
+						"null"
+					}
+				}
+			}
+			25 = {
+				set_country_flag = early_space_age
+				set_pre_ftl_age = early_space_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_early_space_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"grey"
+						"dark_grey"
+						"null"
+						"null"
+					}
+				}
+			}
+		}
+	}
+	set_pre_ftl_origin = yes
+}
+
+create_pre_ftl_empire = {
+	random_list = {
+		# Industrial Civilization
+		35 = {
+			create_late_pre_ftl_empire = yes
+		}
+		# Medieval Civilization
+		65 = {
+			create_early_pre_ftl_empire = yes
+		}
+	}
+}
+
+add_tech_progress_situation = {
+	if = {
+		limit = {
+			NOT = {
+				any_situation = {
+					is_situation_type = pre_ftl_tech_progress_situation
+				}
+			}
+		}
+		start_situation = {
+			type = pre_ftl_tech_progress_situation
+		}
+		# Early Space Age Pre-FTLs are capped at 50% progress.
+		if = {
+			limit = {
+				has_country_flag = early_space_age
+			}
+			random_situation = {
+				limit = { is_situation_type = pre_ftl_tech_progress_situation }
+				set_variable = {
+					which = initial_tech_progress
+					value = 0
+				}
+				set_variable_to_random_value = {
+					which = initial_tech_progress
+					min = 0
+					max = 960
+					rounded = yes
+				}
+				add_situation_progress = initial_tech_progress
+				clear_variable = initial_tech_progress
+			}
+		}
+		else = {
+			random_situation = {
+				limit = { is_situation_type = pre_ftl_tech_progress_situation }
+				set_variable = {
+					which = initial_tech_progress
+					value = 0
+				}
+				set_variable_to_random_value = {
+					which = initial_tech_progress
+					min = 0
+					max = 1900
+					rounded = yes
+				}
+				add_situation_progress = initial_tech_progress
+				clear_variable = initial_tech_progress
+			}
+		}
+	}
+}
+
+setup_pre_ftl_planet = {
+	set_owner = last_created_country
+	set_capital = yes
+
+	remove_building = building_colony_shelter
+	last_created_country = {
+		switch = {
+			trigger = has_country_flag
+			stone_age = {
+				prev = {
+					add_building = building_crude_huts
+					remove_building = building_colony_shelter
+					while = {
+						count = @stone_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			bronze_age = {
+				prev = {
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+					remove_building = building_colony_shelter
+					while = {
+						count = @bronze_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			iron_age = {
+				prev = {
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+					remove_building = building_colony_shelter
+					while = {
+						count = @iron_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			late_medieval_age = {
+				prev = {
+					add_building = building_primitive_dwellings
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+					remove_building = building_colony_shelter
+					while = {
+						count = @late_medieval_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			renaissance_age = {
+				prev = {
+					add_building = building_primitive_dwellings
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+					remove_building = building_colony_shelter
+					while = {
+						count = @renaissance_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			steam_age = {
+				prev = {
+					add_building = building_urban_dwellings
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_stone_palace
+					remove_building = building_colony_shelter
+					while = {
+						count = @steam_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			industrial_age = {
+				prev = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+					remove_building = building_colony_shelter
+					while = {
+						count = @industrial_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+				if = {
+					limit = {
+						is_mechanist_empire = yes
+					}
+					create_built_robot_species = yes
+					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+					set_country_flag = created_robots
+					prev = {
+						while = {
+							count = 2
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+			machine_age = {
+				prev = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+					remove_building = building_colony_shelter
+					while = {
+						count = @machine_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+				if = {
+					limit = {
+						is_mechanist_empire = yes
+					}
+					create_built_robot_species = yes
+					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+					set_country_flag = created_robots
+					prev = {
+						while = {
+							count = 4
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+			atomic_age = {
+				prev = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+					remove_building = building_colony_shelter
+					while = {
+						count = @atomic_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+				if = {
+					limit = {
+						is_mechanist_empire = yes
+					}
+					create_built_robot_species = yes
+					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+					set_country_flag = created_robots
+					prev = {
+						while = {
+							count = 6
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+			early_space_age = {
+				prev = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+					remove_building = building_colony_shelter
+					while = {
+						count = @early_space_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+				if = {
+					limit = {
+						is_mechanist_empire = yes
+					}
+					create_built_robot_species = yes
+					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+					set_country_flag = created_robots
+					prev = {
+						while = {
+							count = 8
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			last_created_country = {
+				OR = {
+					has_country_flag = machine_age
+					has_country_flag = atomic_age
+					has_country_flag = early_space_age
+				}
+			}
+		}
+		create_pre_ftl_blockers = yes
+	}
+}
+
+setup_pre_ftl_broken_shackles_planet = {
+	set_owner = event_target:broken_shackles_parent
+	set_capital = yes
+
+	remove_building = building_colony_shelter
+	event_target:broken_shackles_parent = {
+		start_situation = {
+			type = pre_ftl_tech_progress_situation
+		}
+		# Early Space Age Pre-FTLs are capped at 50% progress.
+		if = {
+			limit = {
+				has_country_flag = early_space_age
+			}
+			random_situation = {
+				limit = { is_situation_type = pre_ftl_tech_progress_situation }
+				set_variable = {
+					which = initial_tech_progress
+					value = 0
+				}
+				set_variable_to_random_value = {
+					which = initial_tech_progress
+					min = 0
+					max = 960
+					rounded = yes
+				}
+				add_situation_progress = initial_tech_progress
+				clear_variable = initial_tech_progress
+			}
+		}
+		else = {
+			random_situation = {
+				limit = { is_situation_type = pre_ftl_tech_progress_situation }
+				set_variable = {
+					which = initial_tech_progress
+					value = 0
+				}
+				set_variable_to_random_value = {
+					which = initial_tech_progress
+					min = 0
+					max = 1916
+					rounded = yes
+				}
+				add_situation_progress = initial_tech_progress
+				clear_variable = initial_tech_progress
+			}
+		}
+		switch = {
+			trigger = has_country_flag
+			stone_age = {
+				prev = {
+					while = {
+						count = @stone_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_crude_huts
+				}
+			}
+
+			bronze_age = {
+				prev = {
+					while = {
+						count = @bronze_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_stone_palace
+					add_building = building_primitive_dwellings
+				}
+			}
+
+			iron_age = {
+				prev = {
+					while = {
+						count = @iron_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_stone_palace
+					add_building = building_primitive_dwellings
+				}
+			}
+
+			late_medieval_age = {
+				prev = {
+					while = {
+						count = @late_medieval_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_stone_palace
+					add_building = building_primitive_dwellings
+					add_building = building_primitive_dwellings
+				}
+			}
+
+			renaissance_age = {
+				prev = {
+					while = {
+						count = @renaissance_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_stone_palace
+					add_building = building_primitive_dwellings
+					add_building = building_primitive_dwellings
+				}
+			}
+
+			steam_age = {
+				prev = {
+					while = {
+						count = @steam_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_stone_palace
+					add_building = building_urban_dwellings
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+				}
+			}
+
+			industrial_age = {
+				prev = {
+					while = {
+						count = @industrial_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_primitive_capital
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_urban_dwellings
+				}
+			}
+
+			machine_age = {
+				prev = {
+					while = {
+						count = @machine_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_primitive_capital
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_urban_dwellings
+				}
+			}
+
+			atomic_age = {
+				prev = {
+					while = {
+						count = @atomic_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_primitive_capital
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_urban_dwellings
+				}
+			}
+
+			early_space_age = {
+				prev = {
+					while = {
+						count = @early_space_age_pops
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					add_building = building_primitive_capital
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_urban_dwellings
+				}
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			event_target:broken_shackles_parent = {
+				OR = {
+					has_country_flag = machine_age
+					has_country_flag = atomic_age
+					has_country_flag = early_space_age
+				}
+			}
+		}
+		create_pre_ftl_blockers = yes
+	}
+}
+
+remove_pre_ftl_flags = {
+	remove_country_flag = stone_age
+	remove_country_flag = bronze_age
+	remove_country_flag = iron_age
+	remove_country_flag = late_medieval_age
+	remove_country_flag = renaissance_age
+	remove_country_flag = steam_age
+	remove_country_flag = industrial_age
+	remove_country_flag = machine_age
+	remove_country_flag = atomic_age
+	remove_country_flag = early_space_age
+}
+
+set_species_graphical_culture = {
+	switch = {
+		trigger = is_species_class
+		MAM = { set_graphical_culture = mammalian_01 }
+		REP = { set_graphical_culture = reptilian_01 }
+		AVI = { set_graphical_culture = avian_01 }
+		ART = { set_graphical_culture = arthropoid_01 }
+		MOL = { set_graphical_culture = molluscoid_01 }
+		FUN = { set_graphical_culture = fungoid_01 }
+		PLANT = { set_graphical_culture = plantoid_01 }
+		HUM = { set_graphical_culture = humanoid_01 }
+		LITHOID = { set_graphical_culture = lithoid_01 }
+		NECROID = { set_graphical_culture = necroid_01 }
+		AQUATIC = { set_graphical_culture = aquatic_01 }
+		TOX = { set_graphical_culture = toxoid_01 }
+		default =  { set_graphical_culture = mammalian_01  }
+	}
+}
+
+# Use in primitive country scope:
+# set_pre_ftl_age_effect = { PRE_FTL_AGE = stone_age }
+set_pre_ftl_age_effect = {
+	hidden_effect = {
+		remove_pre_ftl_flags = yes
+		set_pre_ftl_age = $PRE_FTL_AGE$
+		set_country_flag = $PRE_FTL_AGE$
+		set_country_flag = recently_advanced
+		capital_scope = {
+			remove_all_buildings = yes
+		}
+		start_situation = {
+			type = pre_ftl_tech_progress_situation
+		}
+		if = {
+			limit = {
+				is_gestalt = no
+			}
+			switch = {
+				trigger = has_country_flag
+				stone_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_secret_of_fire
+							civic = civic_the_wheel
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_stone_age.dds"
+						}
+						background= {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors={
+							"turquoise"
+							"green"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_crude_huts
+					}
+				}
+				bronze_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_secret_of_fire
+							civic = civic_the_wheel
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_bronze_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"green"
+							"dark_green"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_dwellings
+						add_building = building_stone_palace
+					}
+				}
+				iron_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_landed_nobility
+							civic = civic_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_iron_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"purple"
+							"dark_purple"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_dwellings
+						add_building = building_stone_palace
+					}
+				}
+				late_medieval_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_landed_nobility
+							civic = civic_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_medieval_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"light_blue"
+							"blue"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_dwellings
+						add_building = building_primitive_dwellings
+						add_building = building_stone_palace
+					}
+				}
+				renaissance_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_landed_nobility
+							civic = civic_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_renaissance_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"pink"
+							"burgundy"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_dwellings
+						add_building = building_primitive_dwellings
+						add_building = building_stone_palace
+					}
+				}
+				steam_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_landed_nobility
+							civic = civic_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_steam_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"orange"
+							"red"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_urban_dwellings
+						add_building = building_primitive_factory
+						add_building = building_primitive_mine
+						add_building = building_stone_palace
+					}
+				}
+				industrial_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_increasing_urbanization
+							civic = civic_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_industrial_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"beige"
+							"yellow"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_farm
+						add_building = building_primitive_factory
+						add_building = building_primitive_mine
+						add_building = building_primitive_power_plant
+						add_building = building_primitive_capital
+						add_building = building_urban_dwellings
+					}
+				}
+				machine_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_increasing_urbanization
+							civic = civic_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_machine_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"yellow"
+							"orange"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_farm
+						add_building = building_primitive_factory
+						add_building = building_primitive_mine
+						add_building = building_primitive_power_plant
+						add_building = building_primitive_capital
+						add_building = building_urban_dwellings
+						add_deposit = d_decrepit_dwellings
+						add_deposit = d_failing_infrastructure
+					}
+				}
+				atomic_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_increasing_urbanization
+							civic = civic_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_atomic_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"beige"
+							"brown"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_farm
+						add_building = building_primitive_factory
+						add_building = building_primitive_mine
+						add_building = building_primitive_power_plant
+						add_building = building_primitive_capital
+						add_building = building_urban_dwellings
+						add_deposit = d_decrepit_dwellings
+						add_deposit = d_failing_infrastructure
+					}
+				}
+				early_space_age = {
+					change_government = {
+						authority = random
+						civics = {
+							civic = civic_increasing_urbanization
+							civic = civic_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_early_space_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"grey"
+							"dark_grey"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_primitive_farm
+						add_building = building_primitive_factory
+						add_building = building_primitive_mine
+						add_building = building_primitive_power_plant
+						add_building = building_primitive_capital
+						add_building = building_urban_dwellings
+						add_deposit = d_decrepit_dwellings
+						add_deposit = d_failing_infrastructure
+					}
+				}
+			}
+		}
+		else = {
+			switch = {
+				trigger = has_country_flag
+				stone_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_secret_of_fire
+							civic = civic_hive_the_wheel
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_stone_age.dds"
+						}
+						background= {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors={
+							"turquoise"
+							"green"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_crude_huts
+					}
+				}
+				bronze_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_secret_of_fire
+							civic = civic_hive_the_wheel
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_bronze_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"green"
+							"dark_green"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_dwellings
+						add_building = building_hive_stone_palace
+					}
+				}
+				iron_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_burgeoning_nodes
+							civic = civic_hive_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_iron_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"purple"
+							"dark_purple"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_dwellings
+						add_building = building_hive_stone_palace
+					}
+				}
+				late_medieval_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_burgeoning_nodes
+							civic = civic_hive_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_medieval_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"light_blue"
+							"blue"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_dwellings
+						add_building = building_hive_primitive_dwellings
+						add_building = building_hive_stone_palace
+					}
+				}
+				renaissance_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_burgeoning_nodes
+							civic = civic_hive_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_renaissance_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"pink"
+							"burgundy"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_dwellings
+						add_building = building_hive_primitive_dwellings
+						add_building = building_hive_stone_palace
+					}
+				}
+				steam_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_burgeoning_nodes
+							civic = civic_hive_flat_world_theory
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_steam_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"orange"
+							"red"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_urban_dwellings
+						add_building = building_hive_primitive_factory
+						add_building = building_hive_primitive_mine
+						add_building = building_hive_stone_palace
+					}
+				}
+				industrial_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_centralized_consciousness
+							civic = civic_hive_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_industrial_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"beige"
+							"yellow"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_farm
+						add_building = building_hive_primitive_factory
+						add_building = building_hive_primitive_mine
+						add_building = building_hive_primitive_power_plant
+						add_building = building_hive_primitive_capital
+						add_building = building_hive_urban_dwellings
+					}
+				}
+				machine_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_centralized_consciousness
+							civic = civic_hive_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_machine_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"yellow"
+							"orange"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_farm
+						add_building = building_hive_primitive_factory
+						add_building = building_hive_primitive_mine
+						add_building = building_hive_primitive_power_plant
+						add_building = building_hive_primitive_capital
+						add_building = building_hive_urban_dwellings
+						add_deposit = d_collapsed_burrows
+						add_deposit = d_failing_infrastructure
+					}
+				}
+				atomic_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_centralized_consciousness
+							civic = civic_hive_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_atomic_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"beige"
+							"brown"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_farm
+						add_building = building_hive_primitive_factory
+						add_building = building_hive_primitive_mine
+						add_building = building_hive_primitive_power_plant
+						add_building = building_hive_primitive_capital
+						add_building = building_hive_urban_dwellings
+						add_deposit = d_collapsed_burrows
+						add_deposit = d_failing_infrastructure
+					}
+				}
+				early_space_age = {
+					change_government = {
+						civics = {
+							civic = civic_hive_centralized_consciousness
+							civic = civic_hive_atmospheric_pollution
+						}
+					}
+					change_country_flag = {
+						icon = {
+							category = "pre_ftl"
+							file = "preftl_early_space_age.dds"
+						}
+						background = {
+							category = "backgrounds"
+							file = "new_dawn.dds"
+						}
+						colors = {
+							"grey"
+							"dark_grey"
+							"null"
+							"null"
+						}
+					}
+					capital_scope = {
+						add_building = building_hive_primitive_farm
+						add_building = building_hive_primitive_factory
+						add_building = building_hive_primitive_mine
+						add_building = building_hive_primitive_power_plant
+						add_building = building_hive_primitive_capital
+						add_building = building_hive_urban_dwellings
+						add_deposit = d_collapsed_burrows
+						add_deposit = d_failing_infrastructure
+					}
+				}
+			}
+		}
+	}
+}
+
+# Use in primitive country scope:
+# increase_pre_ftl_pops_by_age_effect = { PRE_FTL_AGE = stone_age }
+increase_pre_ftl_pops_by_age_effect = {
+	set_country_flag = $PRE_FTL_AGE$_pops
+	hidden_effect = {
+		switch = {
+			trigger = has_country_flag
+			stone_age_pops = {
+				# Do nothing
+			}
+			bronze_age_pops = {
+				capital_scope = {
+					while = {
+						count = @ancient_or_medieval_era_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+				}
+			}
+			iron_age_pops = {
+				capital_scope = {
+					while = {
+						count = @ancient_or_medieval_era_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+				}
+			}
+			late_medieval_age_pops = {
+				capital_scope = {
+					while = {
+						count = @ancient_or_medieval_era_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+				}
+			}
+			renaissance_age_pops = {
+				capital_scope = {
+					while = {
+						count = @ancient_or_medieval_era_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+				}
+			}
+			steam_age_pops = {
+				capital_scope = {
+					while = {
+						count = @victorian_era_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+				}
+			}
+			industrial_age_pops = {
+				capital_scope = {
+					if = {
+						limit = {
+							owner = { is_mechanist_empire = yes }
+						}
+						owner = {
+							if = {
+								limit = {
+									NOT = { has_country_flag = created_robots }
+								}
+								set_country_flag = created_robots
+								create_built_robot_species = yes
+								last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+							}
+						}
+						while = {
+							count = 2
+							while = {
+								count = @victorian_era_growth
+								create_pop = {
+									species = event_target:pre_ftl_mechanist_robot
+								}
+							}
+						}
+					}
+					else = {
+						while = {
+							count = @victorian_era_growth
+							create_pop = {
+								species = owner_main_species
+							}
+						}
+					}
+				}
+			}
+			machine_age_pops = {
+				capital_scope = {
+					while = {
+						count = @machine_age_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					random_list = {
+						25 = {
+							# One fewer pop gained
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+						}
+						50 = {
+							# DO NOTHING
+						}
+						25 = {
+							# One extra pop gained
+							create_pop = {
+								species = owner_main_species
+							}
+						}
+					}
+					if = {
+						limit = {
+							owner = { is_mechanist_empire = yes }
+						}
+						owner = {
+							if = {
+								limit = {
+									NOT = { has_country_flag = created_robots }
+								}
+								set_country_flag = created_robots
+								create_built_robot_species = yes
+								last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+							}
+						}
+						while = {
+							count = 2
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+			atomic_age_pops = {
+				capital_scope = {
+					while = {
+						count = @atomic_age_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					random_list = {
+						25 = {
+							# One fewer pop gained
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+						}
+						50 = {
+							# DO NOTHING
+						}
+						25 = {
+							# One extra pop gained
+							create_pop = {
+								species = owner_main_species
+							}
+						}
+					}
+					if = {
+						limit = {
+							owner = { is_mechanist_empire = yes }
+						}
+						owner = {
+							if = {
+								limit = {
+									NOT = { has_country_flag = created_robots }
+								}
+								set_country_flag = created_robots
+								create_built_robot_species = yes
+								last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+							}
+						}
+						while = {
+							count = 2
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+			early_space_age_pops = {
+				capital_scope = {
+					while = {
+						count = @early_space_age_growth
+						create_pop = {
+							species = owner_main_species
+						}
+					}
+					random_list = {
+						25 = {
+							# One fewer pop gained
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+						}
+						50 = {
+							# DO NOTHING
+						}
+						25 = {
+							# One extra pop gained
+							create_pop = {
+								species = owner_main_species
+							}
+						}
+					}
+					if = {
+						limit = {
+							owner = { is_mechanist_empire = yes }
+						}
+						owner = {
+							if = {
+								limit = {
+									NOT = { has_country_flag = created_robots }
+								}
+								set_country_flag = created_robots
+								create_built_robot_species = yes
+								last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
+							}
+						}
+						while = {
+							count = 2
+							random_owned_pop = {
+								limit = {
+									is_robotic_species = no
+								}
+								kill_pop = yes
+							}
+							create_pop = {
+								species = event_target:pre_ftl_mechanist_robot
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	remove_country_flag = $pre_ftl_age$_pops
+}
+
+create_pre_ftl_blockers = {
+	add_deposit = d_decrepit_dwellings
+	add_deposit = d_failing_infrastructure
+}
+
+### PRE-SAPIENT / UPLIFTING EFFECTS
+
+spawn_presapient_species_randomizer_effect = {
+	random_list = {
+		1 = { create_generic_presapient_species = { UPLIFT_TO = MAM } }
+		1 = { create_generic_presapient_species = { UPLIFT_TO = REP } }
+		1 = { create_generic_presapient_species = { UPLIFT_TO = AVI } }
+		1 = { create_generic_presapient_species = { UPLIFT_TO = ART } }
+		1 = { create_generic_presapient_species = { UPLIFT_TO = MOL } }
+		1 = { create_generic_presapient_species = { UPLIFT_TO = FUN } }
+		1 = {
+			modifier = { factor = 0 has_plantoids = no }
+			create_generic_presapient_species = { UPLIFT_TO = PLANT }
+		}
+		1 = {
+			modifier = { factor = 0 has_lithoids = no }
+			create_generic_presapient_species = { UPLIFT_TO = LITHOID }
+		}
+		#1 = {
+		#	modifier = { factor = 0 has_necroids = no }
+		#	create_generic_presapient_species = { UPLIFT_TO = NECROID }
+		#}
+		1 = {
+			modifier = { factor = 0 has_aquatics = no }
+			create_generic_presapient_species = { UPLIFT_TO = AQUATIC }
+		}
+		1 = {
+			modifier = { factor = 0 has_toxoids = no }
+			create_generic_presapient_species = { UPLIFT_TO = TOX }
+		}
+	}
+}
+
+create_generic_presapient_species = {
+	solar_system = {
+		set_star_flag = pre_sapient_system
+	}
+	create_species = {
+		name = random
+		class = PRE_$UPLIFT_TO$
+		portrait = random
+		traits = { trait = random_presapient_trait }
+		homeworld = event_target:pre_sapient_planet
+		sapient = no
+		effect = { save_event_target_as = latest_presapient }
+	}
+	while = {
+		count = 3
+		create_pop = { species = event_target:latest_presapient }
+	}
+	event_target:pre_sapient_planet = {
+		set_planet_flag = pre_sapient_planet
+	}
+}
+
+generate_pre_ftl_hive_on_planet = {
+	optimize_memory
+	select_pre_ftl_origin = yes
+	create_pre_ftl_hive_species = yes
+	create_pre_ftl_hive_empire = yes
+	setup_pre_ftl_hive_planet = yes
+}
+
+generate_very_early_pre_ftl_hive_on_planet = {
+	optimize_memory
+	set_default_origin = yes
+	create_pre_ftl_hive_species = yes
+	create_very_early_pre_ftl_hive_empire = yes
+	setup_pre_ftl_hive_planet = yes
+}
+
+create_pre_ftl_hive_species = {
+	if = {
+		limit = {
+			has_planet_flag = pre_ftl_ocean_paradise
+		}
+		create_species = {
+			name = random
+			class = random_pre_ftl
+			portrait = random
+			homeworld = THIS
+			traits = {
+				trait = trait_hive_mind
+				trait = trait_aquatic
+				trait = random_traits
+			}
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = pre_ftl_subterranean
+		}
+		create_species = {
+			name = random
+			class = random_pre_ftl
+			portrait = random
+			homeworld = THIS
+			traits = {
+				trait = trait_hive_mind
+				trait = trait_cave_dweller
+				trait = random_traits
+			}
+		}
+	}
+	else = {
+		create_species = {
+			name = random
+			class = random_pre_ftl
+			portrait = random
+			homeworld = THIS
+			traits = {
+				trait = trait_hive_mind
+				trait = random_traits
+			}
+		}
+	}
+}
+
+create_pre_ftl_hive_empire = {
+	random_list = {
+		# Industrial Civilization
+		35 = {
+			create_late_pre_ftl_hive_empire = yes
+		}
+		# Medieval Civilization
+		65 = {
+			create_early_pre_ftl_hive_empire = yes
+		}
+	}
+}
+
+create_early_pre_ftl_hive_empire = {
+	create_country = {
+		name = random
+		authority = auth_hive_mind
+		civics = {
+			civic = civic_hive_burgeoning_nodes
+			civic = civic_hive_flat_world_theory
+		}
+		species = last_created_species
+		ethos = {
+			ethic = ethic_gestalt_consciousness
+		}
+		flag = {
+			icon = {
+				category = "pre_ftl"
+				file = "preftl_stone_age.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "new_dawn.dds"
+			}
+			colors={
+				"turquoise"
+				"green"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_default"
+		type = primitive
+	}
+	last_created_country = {
+		set_graphical_culture = preindustrial_01
+		random_list = {
+			20 = {
+				set_country_flag = stone_age
+				set_pre_ftl_age = stone_age
+				change_government = {
+					authority = auth_hive_mind
+					civics = {
+						civic = civic_hive_secret_of_fire
+						civic = civic_hive_the_wheel
+					}
+				}
+			}
+			20 = {
+				set_country_flag = bronze_age
+				set_pre_ftl_age = bronze_age
+				change_government = {
+					authority = auth_hive_mind
+					civics = {
+						civic = civic_hive_secret_of_fire
+						civic = civic_hive_the_wheel
+					}
+				}
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_bronze_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"green"
+						"dark_green"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = iron_age
+				set_pre_ftl_age = iron_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_iron_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"purple"
+						"dark_purple"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = late_medieval_age
+				set_pre_ftl_age = late_medieval_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_medieval_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"light_blue"
+						"blue"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = renaissance_age
+				set_pre_ftl_age = renaissance_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_renaissance_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"pink"
+						"burgundy"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = steam_age
+				set_pre_ftl_age = steam_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_steam_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"orange"
+						"red"
+						"null"
+						"null"
+					}
+				}
+			}
+		}
+	}
+	set_pre_ftl_origin = yes
+}
+
+create_late_pre_ftl_hive_empire = {
+	create_country = {
+		name = random
+		authority = auth_hive_mind
+		civics = {
+			civic = civic_hive_centralized_consciousness
+			civic = civic_hive_atmospheric_pollution
+		}
+		species = last_created_species
+		ethos = {
+			ethic = ethic_gestalt_consciousness
+		}
+		flag = {
+			icon = {
+				category = "pre_ftl"
+				file = "preftl_industrial_age.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "new_dawn.dds"
+			}
+			colors={
+				"turquoise"
+				"green"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_default"
+		type = primitive
+	}
+	last_created_country = {
+		set_graphical_culture = industrial_01
+		random_list = {
+			25 = {
+				set_country_flag = industrial_age
+				set_pre_ftl_age = industrial_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_industrial_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"beige"
+						"yellow"
+						"null"
+						"null"
+					}
+				}
+			}
+			25 = {
+				set_country_flag = machine_age
+				set_pre_ftl_age = machine_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_machine_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"yellow"
+						"orange"
+						"null"
+						"null"
+					}
+				}
+			}
+			25 = {
+				set_country_flag = atomic_age
+				set_pre_ftl_age = atomic_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_atomic_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"beige"
+						"brown"
+						"null"
+						"null"
+					}
+				}
+			}
+			25 = {
+				set_country_flag = early_space_age
+				set_pre_ftl_age = early_space_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_early_space_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"grey"
+						"dark_grey"
+						"null"
+						"null"
+					}
+				}
+			}
+		}
+	}
+	set_pre_ftl_origin = yes
+}
+
+create_very_early_pre_ftl_hive_empire = {
+	create_country = {
+		name = random
+		authority = auth_hive_mind
+		civics = {
+			civic = civic_hive_burgeoning_nodes
+			civic = civic_hive_flat_world_theory
+		}
+		species = last_created_species
+		ethos = {
+			ethic = ethic_gestalt_consciousness
+		}
+		flag = {
+			icon = {
+				category = "pre_ftl"
+				file = "preftl_stone_age.dds"
+			}
+			background= {
+				category = "backgrounds"
+				file = "new_dawn.dds"
+			}
+			colors={
+				"turquoise"
+				"green"
+				"null"
+				"null"
+			}
+		}
+		origin = "origin_default"
+		type = primitive
+	}
+	last_created_country = {
+		set_graphical_culture = preindustrial_01
+		random_list = {
+			20 = {
+				set_country_flag = stone_age
+				set_pre_ftl_age = stone_age
+				change_government = {
+					authority = auth_hive_mind
+					civics = {
+						civic = civic_hive_secret_of_fire
+						civic = civic_hive_the_wheel
+					}
+				}
+			}
+			20 = {
+				set_country_flag = bronze_age
+				set_pre_ftl_age = bronze_age
+				change_government = {
+					authority = auth_hive_mind
+					civics = {
+						civic = civic_hive_secret_of_fire
+						civic = civic_hive_the_wheel
+					}
+				}
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_bronze_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"green"
+						"dark_green"
+						"null"
+						"null"
+					}
+				}
+			}
+			20 = {
+				set_country_flag = iron_age
+				set_pre_ftl_age = iron_age
+				change_country_flag = {
+					icon = {
+						category = "pre_ftl"
+						file = "preftl_iron_age.dds"
+					}
+					background= {
+						category = "backgrounds"
+						file = "new_dawn.dds"
+					}
+					colors={
+						"purple"
+						"dark_purple"
+						"null"
+						"null"
+					}
+				}
+			}
+		}
+	}
+	set_pre_ftl_origin = yes
+}
+
+
+setup_pre_ftl_hive_planet = {
+	set_owner = last_created_country
+	set_capital = yes
+
+	remove_building = building_colony_shelter
+	last_created_country = {
+		switch = {
+			trigger = has_country_flag
+			stone_age = {
+				prev = {
+					add_building = building_hive_crude_huts
+					while = {
+						count = @stone_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			bronze_age = {
+				prev = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+					while = {
+						count = @bronze_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			iron_age = {
+				prev = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+					while = {
+						count = @iron_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			late_medieval_age = {
+				prev = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+					while = {
+						count = @late_medieval_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			renaissance_age = {
+				prev = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+					while = {
+						count = @renaissance_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			steam_age = {
+				prev = {
+					add_building = building_hive_urban_dwellings
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_stone_palace
+					while = {
+						count = @steam_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			industrial_age = {
+				prev = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					while = {
+						count = @industrial_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			machine_age = {
+				prev = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					while = {
+						count = @machine_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			atomic_age = {
+				prev = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					while = {
+						count = @atomic_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+			early_space_age = {
+				prev = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					while = {
+						count = @early_space_age_pops
+						create_pop = {
+							species = last_created_species
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			last_created_country = {
+				OR = {
+					has_country_flag = machine_age
+					has_country_flag = atomic_age
+					has_country_flag = early_space_age
+				}
+			}
+		}
+		create_pre_ftl_blockers = yes
+	}
+}
+
+achieve_ftl_effect = {
+	country_event = { id = game_start.8 }
+	remove_country_flag = early_space_age
+	set_country_flag = primitives_can_into_space
+	set_country_type = default
+	change_country_flag = random
+	set_species_graphical_culture = yes
+	change_government = {
+		authority = random
+		civics = random
+	}
+	set_name = random
+
+	if = {
+		limit = {
+			has_country_flag = was_enlightened
+			has_default_pre_ftl_origin = yes
+		}
+		set_origin = origin_enlightened
+	}
+
+	if = {
+		limit = {
+			has_default_pre_ftl_origin = yes
+		}
+		set_origin = origin_default
+		if = {
+			limit = {
+				is_gestalt = no
+			}
+			capital_scope = {
+				add_modifier = { modifier = prosp_uni_mod days = 7200 }
+			}
+		}
+		else = {
+			capital_scope = {
+				add_modifier = { modifier = prosp_uni_mod_gestalt days = 7200 }
+			}
+		}
+		capital_scope = {
+			while = {
+				count = 4
+				create_pop = {
+					species = owner
+				}
+			}
+		}
+	}
+
+	add_resource = {
+		energy = 500
+		minerals = 500
+		alloys = 125
+		influence = 50
+		unity = 250
+		volatile_motes = 50
+		exotic_gases = 50
+		rare_crystals = 50
+		mult = trigger:years_passed
+	}
+	if = {
+		limit = {
+			is_hive_empire = no
+		}
+		add_resource = {
+			consumer_goods = 250
+			mult = trigger:years_passed
+		}
+	}
+	if = {
+		limit = {
+			is_lithoid_empire = no
+		}
+		add_resource = {
+			food = 500
+			mult = trigger:years_passed
+		}
+	}
+	else = {
+		add_resource = {
+			minerals = 500
+			mult = trigger:years_passed
+		}
+	}
+
+	create_fleet = {
+		effect = {
+			set_owner = prev
+
+			create_ship = {
+				name = random
+				random_existing_design = science
+			}
+
+			set_fleet_stance = evasive
+			set_location = prev.capital_scope.star
+
+			owner = {
+				create_leader = {
+					class = scientist
+					sub_type = survey
+					name = random
+					species = owner_main_species
+				}
+			}
+			set_leader = last_created_leader
+		}
+	}
+
+	create_fleet = {
+		effect = {
+			set_owner = prev
+
+			create_ship = {
+				name = random
+				random_existing_design = constructor
+			}
+
+			set_fleet_stance = evasive
+			set_location = prev.capital_star
+		}
+	}
+
+	while = {
+		count = 3
+		create_leader = {
+			class = scientist
+			name = random
+			species = owner_main_species
+		}
+	}
+
+	create_leader = {
+		class = governor
+		name = random
+		species = owner_main_species
+	}
+
+	capital_scope = {
+		clear_blockers = yes
+		remove_all_buildings = yes
+		if = {
+			limit = {
+				NOT = {
+					is_habitat = yes
+				}
+			}
+			generate_start_buildings_and_districts = yes
+		}
+		else_if = {
+			limit = {
+				is_habitat = yes
+			}
+			owner = {
+				give_technology = {
+					tech = tech_habitat_1
+					message = no
+				}
+				add_research_option = tech_habitat_2
+				if = {
+					limit = {
+						OR = {
+							is_lithoid_empire = no
+							is_catalytic_empire = yes
+						}
+					}
+					give_technology = {
+						tech = tech_eco_simulation
+						message = no
+					}
+					give_technology = {
+						tech = tech_hydroponics
+						message = no
+					}
+				}
+				else = {
+					give_technology = {
+						tech = tech_powered_exoskeletons
+						message = no
+					}
+					give_technology = {
+						tech = tech_space_mining_1
+						message = no
+					}
+				}
+			}
+			add_building = building_hab_major_capital
+			# 2 jobs
+			if = {
+				limit = {
+					owner = {
+						is_lithoid_empire = no
+					}
+				}
+				add_building = building_hydroponics_farm
+			}
+			# 2 jobs
+			add_district = district_hab_science
+			# 2 jobs
+			if = {
+				limit = { owner = { is_spiritualist = no } }
+				add_building = building_bureaucratic_1
+			}
+			# 2 jobs
+			if = {
+				limit = {
+					owner = {
+						is_spiritualist = yes
+						is_death_cult_empire = yes
+					}
+				}
+				add_building = building_sacrificial_temple_1
+			}
+			# 2 jobs
+			if = {
+				limit = {
+					owner = {
+						is_spiritualist = yes
+						NOT = { has_valid_civic = civic_death_cult }
+					}
+				}
+				add_building = building_temple
+			}
+		}
+
+		while = {
+			limit = {
+				num_pops < 8
+				#free_housing > 0
+			}
+			create_pop = {
+				species = owner
+			}
+		}
+		if = {
+			limit = {
+				is_desert_world = yes
+			}
+			set_planet_flag = tasty_desert
+		}
+		remove_all_armies = yes
+		solar_system = {
+			save_event_target_as = enlightened_system
+			if = {
+				limit = {
+					exists = owner
+				}
+				owner = {
+					save_event_target_as = previous_system_owner
+				}
+			}
+			if = {
+				limit = {
+					NOT = { exists = starbase }
+				}
+				create_starbase = {
+					size = starbase_starport
+					module = shipyard
+					module = shipyard
+					owner = root
+				}
+			}
+		}
+	}
+	random_controlled_ship = {
+		limit = { is_ship_size = primitive_space_station }
+		fleet = { destroy_fleet = THIS }
+	}
+	# countries with intel on this system get a notification and establish communications
+	every_country = {
+		limit = {
+			is_country_type_with_subjects = yes
+			NOR = {
+				AND = {
+					exists = event_target:previous_system_owner
+					is_same_value = event_target:previous_system_owner
+				}
+				is_same_value = $OWNER$
+			}
+			intel_level = {
+				level > medium
+				system = event_target:enlightened_system
+			}
+		}
+		country_event = { id = preftl.1111 days = 1 scopes = { from = $PRE_FTL$ } }
+	}
+	if = {
+		limit  = {
+			exists = event_target:previous_system_owner
+		}
+		establish_communications_no_message = event_target:previous_system_owner
+	}
+}
+
+spawn_old_foes_effect = {
+	random_system_planet = {
+		limit = {
+			has_planet_flag = czyrni_planet
+		}
+		random_list = {
+			1 = { change_pc = pc_tropical }
+			1 = { change_pc = pc_arid }
+			1 = { change_pc = pc_continental }
+			1 = { change_pc = pc_ocean }
+			1 = { change_pc = pc_tundra }
+			1 = { change_pc = pc_arctic }
+			1 = { change_pc = pc_alpine }
+			1 = { change_pc = pc_savannah }
+			1 = { change_pc = pc_desert }
+		}
+		create_species = {
+			name = "NAME_Czyrni"
+			plural = "NAME_Czyrni"
+			class = HUM
+			portrait = humanoid_02
+			namelist = "HUM3"
+			traits = {
+				trait = trait_survivor
+				trait = trait_intelligent
+				trait = trait_quarrelsome
+				trait = trait_solitary
+				trait = trait_charismatic
+				trait = trait_talented
+			}
+			homeworld = this
+		}
+		change_pc = pc_nuked
+		create_country = {
+			name = random
+			authority = random
+			civics = {
+				civic = civic_secret_of_fire
+				civic = civic_the_wheel
+			}
+			species = last_created_species
+			ethos = random
+			origin = "origin_post_apocalyptic"
+			flag = {
+				icon = {
+					category = "pre_ftl"
+					file = "preftl_bronze_age.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "new_dawn.dds"
+				}
+				colors={
+					"turquoise"
+					"green"
+					"null"
+					"null"
+				}
+			}
+			type = primitive
+		}
+		last_created_country = {
+			set_country_flag = bronze_age
+			set_pre_ftl_age = bronze_age
+			set_graphical_culture = preindustrial_01
+		}
+		set_owner = last_created_country
+		set_capital = yes
+		while = {
+			count = @bronze_age_pops
+			create_pop = {
+				species = last_created_species
+			}
+		}
+		add_building = building_primitive_dwellings
+		add_building = building_stone_palace
+	}
+	random_system_planet = {
+		limit = {
+			has_planet_flag = pyorun_planet
+		}
+		random_list = {
+			1 = { change_pc = pc_tropical }
+			1 = { change_pc = pc_arid }
+			1 = { change_pc = pc_continental }
+			1 = { change_pc = pc_ocean }
+			1 = { change_pc = pc_tundra }
+			1 = { change_pc = pc_arctic }
+			1 = { change_pc = pc_alpine }
+			1 = { change_pc = pc_savannah }
+			1 = { change_pc = pc_desert }
+		}
+		create_species = {
+			name = "NAME_Pyorun"
+			plural = "NAME_Pyorun"
+			class = HUM
+			portrait = humanoid_03
+			namelist = "HUM2"
+			traits = {
+				trait = trait_survivor
+				trait = trait_strong
+				trait = trait_quarrelsome
+				trait = trait_charismatic
+				trait = trait_resilient
+			}
+			homeworld = this
+		}
+		change_pc = pc_nuked
+		create_country = {
+			name = random
+			authority = random
+			civics = {
+				civic = civic_secret_of_fire
+				civic = civic_the_wheel
+			}
+			species = last_created_species
+			ethos = random
+			origin = "origin_post_apocalyptic"
+			flag = {
+				icon = {
+					category = "pre_ftl"
+					file = "preftl_bronze_age.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "new_dawn.dds"
+				}
+				colors={
+					"turquoise"
+					"green"
+					"null"
+					"null"
+				}
+			}
+			type = primitive
+		}
+		last_created_country = {
+			set_country_flag = bronze_age
+			set_pre_ftl_age = bronze_age
+			set_graphical_culture = preindustrial_01
+		}
+		set_owner = last_created_country
+		set_capital = yes
+		while = {
+			count = @bronze_age_pops
+			create_pop = {
+				species = last_created_species
+			}
+		}
+		add_building = building_primitive_dwellings
+		add_building = building_stone_palace
+	}
+}
+
+# Script effect to add the correct buildings to a pre-ftl planet.
+# Run in country scope.
+add_pre_ftl_buildings = {
+	capital_scope = {
+		remove_all_buildings = yes
+	}
+	if = {
+		limit = {
+			owner = {
+				is_hive_empire = no
+			}
+		}
+		switch = {
+			trigger = has_country_flag
+			stone_age = {
+				capital_scope = {
+					add_building = building_crude_huts
+				}
+			}
+			bronze_age = {
+				capital_scope = {
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+				}
+			}
+			iron_age = {
+				capital_scope = {
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+				}
+			}
+			late_medieval_age = {
+				capital_scope = {
+					add_building = building_primitive_dwellings
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+				}
+			}
+			renaissance_age = {
+				capital_scope = {
+					add_building = building_primitive_dwellings
+					add_building = building_primitive_dwellings
+					add_building = building_stone_palace
+				}
+			}
+			steam_age = {
+				capital_scope = {
+					add_building = building_urban_dwellings
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_stone_palace
+				}
+			}
+			industrial_age = {
+				capital_scope = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+				}
+			}
+			machine_age = {
+				capital_scope = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+				}
+			}
+			atomic_age = {
+				capital_scope = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+				}
+			}
+			early_space_age = {
+				capital_scope = {
+					add_building = building_primitive_farm
+					add_building = building_primitive_factory
+					add_building = building_primitive_mine
+					add_building = building_primitive_power_plant
+					add_building = building_primitive_capital
+					add_building = building_urban_dwellings
+				}
+			}
+		}
+	}
+	else = {
+		switch = {
+			trigger = has_country_flag
+			stone_age = {
+				capital_scope = {
+					add_building = building_hive_crude_huts
+				}
+			}
+			bronze_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+				}
+			}
+			iron_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+				}
+			}
+			late_medieval_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+				}
+			}
+			renaissance_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_primitive_dwellings
+					add_building = building_hive_stone_palace
+				}
+			}
+			steam_age = {
+				capital_scope = {
+					add_building = building_hive_urban_dwellings
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_stone_palace
+				}
+			}
+			industrial_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+				}
+			}
+			machine_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					add_deposit = d_collapsed_burrows
+					add_deposit = d_failing_infrastructure
+				}
+			}
+			atomic_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					add_deposit = d_collapsed_burrows
+					add_deposit = d_failing_infrastructure
+				}
+			}
+			early_space_age = {
+				capital_scope = {
+					add_building = building_hive_primitive_farm
+					add_building = building_hive_primitive_factory
+					add_building = building_hive_primitive_mine
+					add_building = building_hive_primitive_power_plant
+					add_building = building_hive_primitive_capital
+					add_building = building_hive_urban_dwellings
+					add_deposit = d_collapsed_burrows
+					add_deposit = d_failing_infrastructure
+				}
+			}
+		}
+	}
+}

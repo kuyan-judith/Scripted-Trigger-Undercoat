@@ -1,0 +1,1197 @@
+
+#To use one of them, refer to them elsewhere in script via "value:<value>" e.g. value:example_value
+#IMPORTANT NOTE: Be mindful of performance when using these in triggers that are checked often!
+
+# example_value = {
+# 	base = 10 #default: 0
+
+# 	# List of valid mathematical operations:
+# 	# 	Numerical (modifying by a number):
+# 	# 	- set/weight (both do the same, replaces the current result with this value)
+# 	# 	- add
+# 	# 	- subtract
+# 	# 	- factor/mult/multiply ("multiply" fits the name scheme of the rest better, but the other two were kept for historical reasons)
+# 	# 	- divide
+# 	# 	- modulo
+# 	# 	- round_to (rounds to nearest of that value, e.g. 10.7 round_to 5 gives you 10)
+# 	# 	- max (sets to specified value if currently above it)
+# 	# 	- min (sets to specified value if currently below it)
+# 	# 	- pow (value is multiplied by itself to the power of x; be careful, you can get overflows if you are not careful)
+# 	# 	Simple (do not need a number, but just "yes", e.g. "round = yes")
+# 	# 	- round (sets to nearest full number)
+# 	# 	- ceiling (rounds up)
+# 	# 	- floor (rounds down)
+# 	# 	- abs (multiply by -1 if negative)
+# 	# 	- square (multiply by itself)
+# 	# 	- square_root
+
+# 	#All mathematical operations except weight and factor can be used inline e.g.
+# 	add = 100
+# 	multiply = value:some_other_script_value
+# 	round = yes
+# 	#(Note: weight and factor will instead overwrite the base value - use set, mult or multiply instead)
+
+# 	#They can also be used in modifier = {} fields, which lets you only apply them if triggers are true
+# 	modifier = {
+# 		max = owner.max_example_variable 					#Variable set by set_variable
+# 		owner = { is_variable_set = max_example_variable }	#Only applied if this trigger is true
+# 	}
+# 	# What works for right hand side values of mathematical operations? See events/00_how_to_use_variables for full list.
+
+# 	complex_trigger_modifier = { 	#This lets you get the value of a trigger that you can't use in one-liners because it uses {}
+# 		trigger = count_owned_planet
+# 		trigger_scope = owner 		#Lets you get the result of the trigger on a different scope. Default is "this"
+# 		parameters = { 				#Stick any further information necessary in here, like you'd do within the {} of the trigger normally
+# 			limit = { num_pops > 10 }
+# 		}
+# 		mode = add 					#Allows all numerical operations
+# 		mult = 5 					#Multiplies the outcome by this. In this example, this means adding 5 for each planet with more than 10 pops
+# 	}
+# }
+
+# Final note: script_values use the same metascript system as scripted_triggers and scripted_effects
+# This means that you can input parameters into them, in a similar fashion as described in scripted_effects/99_advanced_documentation.txt
+# For format for doing so is value:my_value|PARAM1|value1|PARAM2|value2|.
+# Then you can use $PARAM1$ in the script value and it will replace it with value1
+
+employed_pops_with_trade_mult = {
+	add = trigger:num_pops
+	subtract = trigger:num_unemployed
+	mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
+}
+
+ethic_leader_lower_chance = {
+	add = 3
+	mult = paragon_chance_negative
+}
+
+ethic_leader_randomizer = {
+	modifier = {
+		add = 1
+		is_$ETHIC$ = yes
+	}
+	modifier = {
+		factor = 0
+		has_global_flag = $LEADER_ID$
+	}
+	modifier = {
+		factor = 0
+		has_country_flag = dismissed_$LEADER_ID$
+	}
+}
+
+# At   0% progress, returns 1.00
+# At  10% progress, returns 0.75
+# At  50% progress, returns 0.10
+# At  70% progress, returns 0.03, tweaked affordable target point
+# At 100% progress, returns 0.02
+# 0.008 + 1 / (POW(progress * 3, 5) + 1.008) 
+council_agenda_early_activation_cost_curve = {
+	base = 0
+	add = trigger:council_agenda_progress_percent
+	mult = 3
+
+	# Fixedpoint precision is too low for small numbers.
+	# Multiply by 10 before POW to work on larger number, then divide by 10^5 after POW.
+	mult = 10
+	pow = 5
+	divide = 100000
+
+	add = 1.008
+	pow = -1	# Same as 1 / Value
+	add = 0.008
+	max = 1
+}
+
+leader_faction_support_election_bonus = {
+	base = 0
+	modifier = {
+		add = trigger:support
+	}
+	mult = 100
+	round = yes
+}
+
+leader_class_government_match_bonus_mult = {
+	# Though primarily used for Elections, this holds non-Election Government types too and can be used for e.g. generating rulers.
+	base = 1
+	modifier = {
+		# Check Leader Class vs PROMOTING Governments.
+		mult = 1.2
+		OR = {
+			AND = { # ADMIRAL good.
+				leader_class = admiral
+				owner = {
+					OR = {
+						has_government = gov_star_empire
+						has_government = gov_military_dictatorship
+						has_government = gov_military_junta
+						has_government = gov_military_commissariat
+						has_government = gov_martial_empire
+						has_government = gov_martial_dictatorship
+						has_government = gov_war_council
+						has_government = gov_assembly_of_clans
+						has_government = gov_citizen_stratocracy
+						has_government = gov_citizen_republic
+						has_government = gov_bandit_kingdom
+						has_government = gov_bandit_commune
+						has_government = gov_band_blood
+					}
+				}
+			}
+			AND = { # GENERAL good.
+				leader_class = general
+				owner = {
+					OR = {
+						has_government = gov_star_empire
+						has_government = gov_military_dictatorship
+						has_government = gov_military_junta
+						has_government = gov_military_commissariat
+						has_government = gov_martial_empire
+						has_government = gov_martial_dictatorship
+						has_government = gov_war_council
+						has_government = gov_assembly_of_clans
+						has_government = gov_citizen_stratocracy
+						has_government = gov_citizen_republic
+						has_government = gov_bandit_kingdom
+						has_government = gov_bandit_commune
+						has_government = gov_band_blood
+					}
+				}
+			}
+			AND = { # SCIENTIST good.
+				leader_class = scientist
+				owner = {
+					OR = {
+						has_government = gov_irenic_monarchy
+						has_government = gov_irenic_dictatorship
+						has_government = gov_irenic_bureaucracy
+						has_government = gov_moral_democracy
+						has_government = gov_illuminated_autocracy
+						has_government = gov_technocratic_dictatorship
+						has_government = gov_science_directorate
+						has_government = gov_rational_consensus
+					}
+				}
+			}
+			AND = { # GOVERNOR good.
+				leader_class = governor
+				owner = {
+					OR = {
+						has_government = gov_theocratic_monarchy
+						has_government = gov_theocratic_dictatorship
+						has_government = gov_theocratic_oligarchy
+						has_government = gov_theocratic_republic						
+						has_government = gov_divine_empire
+						has_government = gov_holy_tribunal
+						has_government = gov_megachurch
+						has_government = gov_military_commissariat
+						has_government = gov_citizen_republic
+						has_government = gov_irenic_dictatorship
+						has_government = gov_irenic_bureaucracy
+						has_government = gov_moral_democracy
+						has_government = gov_celestial_empire
+						has_government = gov_megacorporation
+						has_government = gov_worker_coop
+						has_government = gov_trade_league
+						has_government = gov_criminal_syndicate
+						has_government = gov_pirate_haven
+						has_government = gov_subversive_cult
+						has_government = gov_mortal_empire
+						has_government = gov_grim_council
+						has_government = gov_band_blood
+						has_government = gov_sacrificial_megachurch
+					}
+				}
+			}
+		}
+	}
+}
+
+leader_traits_election_bonus_mult = {
+	base = 0
+	# Add number of Positive Councilor Traits.
+	complex_trigger_modifier = {
+		trigger = num_leader_traits
+		parameters = {
+			is_councilor = yes
+			negative = no
+			count_tiers = yes
+		}
+		mode = add
+	}
+	# Subtract number of Negative Councilor Traits.
+	complex_trigger_modifier = {
+		trigger = num_leader_traits
+		parameters = {
+			is_councilor = yes
+			negative = yes
+			count_tiers = yes
+		}
+		mode = subtract
+	}
+	
+	# Scale to 5% per Trait, then normalize.
+	mult = 0.05
+	add = 1
+}
+
+leader_skill_election_bonus_mult = {
+	base = 0
+	add = trigger:has_skill
+
+	# Scale to 2% per Level, then normalize.
+	mult = 0.02
+	add = 1
+}
+
+leader_election_candidate_supported_mult = {
+	base = 2
+	add = trigger:num_candidate_supported
+	mult = 0.5
+}
+
+
+balanced_researchers_skrand = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_pop
+		parameters = {
+			limit = {
+				has_job = researcher
+			}
+		}
+		mult = 0.05
+		mode = add
+	}
+}
+
+minimal_researchers_skrand = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_pop
+		parameters = {
+			limit = {
+				has_job = researcher
+			}
+		}
+		mult = 0.01
+		mode = add
+	}
+}
+
+# Once Eligible, starts at 5% and caps at 25% yearly chance.
+leader_yearly_chance_for_negative_trait = {
+	base = @negative_trait_yearly_chance_when_eligible
+	mult = value:leader_eligible_for_negative_trait
+	min = 0
+	max = @negative_trait_yearly_chance_when_eligible_max
+}
+
+# Eligibility increases for every full 20 years of AGE, every LEVEL, and every PENDING Negative trait.
+# Eligibility decreases for every CURRENT negative trait.
+leader_eligible_for_negative_trait = {
+	# Eligibility = floor(AGE / 20) + LEVEL + PENDINGNegativeTraits - 8 - CURRENTNegativeTraitTiers * 2
+	add = trigger:leader_age
+	divide = 20		# 1 for every full 20 years
+	floor = yes
+	add = trigger:has_skill
+	add = value:leader_pending_negative_traits_modified
+	subtract = 8
+
+	# Subtract 2 for every Current Negative Trait tier.
+	divide = 2	# Temporary. Multiplied by 2 further down.
+	complex_trigger_modifier = {
+		trigger = num_leader_traits
+		parameters = {
+			negative = yes
+			count_tiers = yes
+		}
+		mode = subtract
+	}
+	mult = 2
+}
+
+# Eligibility increases for every LEVEL, and every PENDING Negative trait.
+# Eligibility decreases for every CURRENT negative trait.
+leader_eligible_for_negative_trait_immortal = {
+	# Eligibility = LEVEL + PENDINGNegativeTraits - 7 - CURRENTNegativeTraitTiers
+	add = trigger:has_skill
+	add = value:leader_pending_negative_traits_modified
+	subtract = 7
+	complex_trigger_modifier = {
+		trigger = num_leader_traits
+		parameters = {
+			negative = yes
+			count_tiers = yes
+		}
+		mode = subtract
+	}
+}
+
+leader_pending_negative_traits_modified = {
+	add = this.leader_pending_negative_traits_unmodified
+	add = modifier:negative_traits_leader
+	modifier = {
+		exists = owner
+		add = owner.modifier:negative_traits_country
+	}
+	modifier = {
+		exists = species
+		add = species.modifier:negative_leader_traits_species
+	}
+}
+
+country_salvage_ships_from_debris_chance = {
+	add = modifier:salvage_chance_add
+	mult = 100	# Since "salvage_chance_add" is a Percentage 0-1, but we want 0-100. 
+	add = 10	# This is the Base 
+	add = $BONUS|0$
+	modifier = {
+		root = {
+			any_owned_leader = {
+				has_trait = leader_trait_salvager_2
+				exists = solar_system
+				solar_system = {
+					is_same_value = from.solar_system
+				}
+			}
+		}
+		mult = 2
+	}
+	modifier = {
+		root = {
+			any_owned_leader = {
+				has_trait = leader_trait_salvager_3
+				exists = solar_system
+				solar_system = {
+					is_same_value = from.solar_system
+				}
+			}
+		}
+		mult = 3
+	}
+	modifier = {
+		root = {
+			any_owned_leader = {
+				has_trait = leader_trait_master_salvager
+				exists = solar_system
+				solar_system = {
+					is_same_value = from.solar_system
+				}
+			}
+		}
+		mult = 1.5
+	}
+}
+
+country_num_unlockable_council_slots = {
+	# How many Civics do we have.
+	add = trigger:has_total_civic_points
+	subtract = trigger:has_unused_civic_points
+
+	# Exclude Galactic Sovereign which doesn't add a Councilor position.
+	modifier = {
+		OR = {
+			has_civic = civic_galactic_sovereign
+			has_civic = civic_galactic_sovereign_megacorp
+			has_civic = civic_psionic_sovereign
+		}
+		subtract = 1
+	}
+
+	# We only support unlocking 3 positions, even if we have more normal civics for some reason.
+	max = @max_unlocked_council_positions
+
+	# Subtract how many we've already unlocked.
+	subtract = trigger:has_unlocked_council_positions
+	min = 0
+}
+
+agenda_gestalt_purge_traits_exp_change_total = {
+	base = @agenda_gestalt_purge_traits_exp_change
+	complex_trigger_modifier = {
+		trigger = num_leader_traits
+		parameters = {
+			negative = yes
+			count_tiers = no	# Only costs Exp per TRAIT, ignoring Tiers.
+		}
+		mode = add
+	}
+}
+
+leader_num_negative_leader_trait_tiers = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = num_leader_traits
+		parameters = {
+			negative = yes
+			count_tiers = yes
+		}
+		mode = add
+	}
+}
+
+leader_age_percentage_of_lifespan = {
+    base = 85	# Starts dying at 80, but can live for longer.
+    complex_trigger_modifier = {
+        trigger = check_modifier_value
+        parameters = {
+            modifier = leader_age
+        }
+        mode = add
+    }
+	divide = trigger:leader_age
+	# Change: [Lifespan / LeaderAge] into: [LeaderAge / Lifespan] to get a percentage.
+	pow = -1
+}
+
+country_assigned_priests = {
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = high_priest
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = priest
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = death_priest
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = preacher
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = low_tech_priest
+		}
+		mode = add
+	}
+
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = numistic_priest
+		}
+		mode = add
+	}
+}
+
+tenth_of_leader_lifespan = {
+	base = 100
+	complex_trigger_modifier = {
+		trigger = check_modifier_value
+		parameters = {
+			modifier = leader_age
+		}
+		mode = add
+	}
+	divide = 10
+}
+
+perc_of_planet_pop = {
+	add = trigger:num_pops
+	modifier = {
+		event_target:attacking_general = { has_trait = leader_trait_kidnapper }
+		factor = 0.1
+	}
+	modifier = {
+		event_target:attacking_general = { has_trait = leader_trait_kidnapper_2 }
+		factor = 0.2
+	}
+	modifier = {
+		event_target:attacking_general = { has_trait = leader_trait_kidnapper_3 }
+		factor = 0.3
+	}
+}
+
+industrial_espionage_chance = {
+	base = 5
+	add = value:mult_research_jobs|MULT|5|
+}
+
+mult_research_jobs = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = researcher
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = brain_drone
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = calculator
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = dimensional_portal_researcher
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = dimensional_portal_researcher_gestalt
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = space_time_anomaly_researcher
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = space_time_anomaly_researcher_gestalt
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = necromancer
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = xeno_zoo_keeper
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		trigger_scope = FROMFROM
+		parameters = {
+			job = head_researcher
+		}
+		mode = add
+	}
+	mult = $MULT$
+}
+
+count_districts = {
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_$TYPE$
+		}
+		mode = add
+	}
+}
+
+count_ecu_districts_equiv = {
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_$TYPE$
+		}
+		mode = add
+	}
+	mult = 2
+}
+
+count_ringworld_districts_equiv = {
+	complex_trigger_modifier = {
+		trigger = num_districts
+		parameters = {
+			type = district_$TYPE$
+		}
+		mode = add
+	}
+	mult = 5
+}
+
+income_mult = {
+	complex_trigger_modifier = {
+		trigger = has_monthly_income
+		parameters = {
+			resource = $RESOURCE$
+		}
+		mode = add
+	}
+	mult = $MULT$
+}
+
+income_mult_plus_val = {
+	complex_trigger_modifier = {
+		trigger = has_monthly_income
+		parameters = {
+			resource = $RESOURCE$
+		}
+		mode = add
+	}
+	mult = $MULT$
+	add = $VAL$
+}
+
+scripted_modifier_councilor_level_mult = {
+	base = 1
+	mult = value:councilor_level|TYPE|$TYPE$|
+	mult = value:scripted_modifier_mult|MODIFIER|$MODIFIER$|
+}
+
+councilor_level = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = get_councilor_level
+		trigger_scope = owner
+		parameters = {
+			type = $TYPE$
+		}
+		mode = add
+	}
+}
+
+councilor_level_combo = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = get_councilor_level
+		trigger_scope = owner
+		parameters = {
+			type = $COUNCILOR_1$
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = get_councilor_level
+		trigger_scope = owner
+		parameters = {
+			type = $COUNCILOR_2$
+		}
+		mode = add
+	}
+}
+
+branch_office_councilor_level = {
+	complex_trigger_modifier = {
+		trigger = get_councilor_level
+		trigger_scope = branch_office_owner
+		parameters = {
+			type = $TYPE$
+		}
+		mode = add
+	}
+}
+
+pop_branch_office_councilor_level = {
+	complex_trigger_modifier = {
+		trigger = get_councilor_level
+		trigger_scope = planet.branch_office_owner
+		parameters = {
+			type = $TYPE$
+		}
+		mode = add
+	}
+}
+
+empire_size_councilor_barbaric_despoilers = {
+	base = 1
+	mult = value:councilor_level|TYPE|councilor_barbaric_despoilers|
+	mult = -0.02
+}
+
+sacrifice_edict_power_councilor_death_cult = {
+	base = 0.02
+	mult = value:councilor_level_combo|COUNCILOR_1|councilor_death_cult|COUNCILOR_2|councilor_death_cult_corporate|
+	add = 1
+}
+
+naval_cap_vassals_councilor_feudal_realm = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_subject
+		trigger_scope = owner
+		parameters = {
+		}
+		mode = add
+	}
+	mult = value:councilor_level|TYPE|councilor_feudal_realm|
+	mult = 2
+}
+
+# Monthly energy income x3, rounded to the nearest 100
+# Capped between 400 and 8000
+funeral_cost_high = {
+	add = value:income_mult|RESOURCE|energy|MULT|0.03|
+	round = yes
+	mult = 100
+	min = 400
+	max = 8000
+}
+
+# Monthly energy income x1.5, rounded to the nearest 100
+# Capped between 200 and 4000
+funeral_cost_medium = {
+	add = value:income_mult|RESOURCE|energy|MULT|0.015|
+	round = yes
+	mult = 100
+	min = 200
+	max = 4000
+}
+
+# Monthly energy income x0.75, rounded to the nearest 100
+# Capped between 100 and 2000
+funeral_cost_low = {
+	add = value:income_mult|RESOURCE|energy|MULT|0.0075|
+	round = yes
+	mult = 100
+	min = 100
+	max = 2000
+}
+
+origin_promise_reward_count = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_planet
+		trigger_scope = owner
+		mult = 5
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = count_system_within_border
+		trigger_scope = owner
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_defensive_pacts
+		trigger_scope = owner
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = count_federation_ally
+		trigger_scope = owner
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = subjects
+		trigger_scope = owner
+		mode = add
+	}
+	modifier = {
+		factor = 0.5
+		is_subject = yes
+	}
+	modifier = {
+		add = 10
+		is_federation_leader = yes
+	}
+	modifier = {
+		add = 4
+		has_federation = yes
+	}
+}
+
+count_councilors_with_ethic = {
+	base = 1
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		parameters = {
+			limit = {
+				OR = {
+					is_ruler = yes
+					is_councilor = yes
+				}
+				has_ethic = ethic_$ETHIC$
+			}
+		}
+		mult = @council_ethic_attraction
+		mode = add
+	}
+}
+
+add_planet_ascension_tier = {
+	base = 1
+	complex_trigger_modifier = {
+		trigger = has_planetary_ascension_tier
+		trigger_scope = planet
+		mode = add
+	}
+}
+
+paragon_origin_count_egalitarians = {
+	base = 1
+	complex_trigger_modifier = {
+		trigger = count_owned_pop
+		parameters = {
+			limit = {
+				pop_has_ethic = ethic_egalitarian
+			}
+		}
+		mode = add
+	}
+}
+
+paragon_take_10pr_pops = {
+	base = 0
+	add = trigger:num_pops
+	mult = 0.1
+	round = yes
+}
+
+count_ethics_on_council = {
+	base = 0
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = xenophile
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = xenophobe
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = materialist
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = spiritualist
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = pacifist
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = militarist
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = egalitarian
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = authoritarian
+		}
+	}
+	modifier = {
+		add = 1
+		ruler_or_councilor_has_ethic = {
+			ETHIC = gestalt_consciousness
+		}
+	}
+}
+
+calculate_ethics_divergence = {
+	base = 1
+	complex_trigger_modifier = {
+		trigger = opposing_ethics_divergence
+		parameters = { who = FROM }
+		mode = add
+	}
+}
+
+prev_has_skill = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = has_skill
+		trigger_scope = prev
+		mode = add
+	}
+}
+
+# Weights for Imperial Heir classes
+
+heir_class_weight_admiral = {
+	base = 10
+	modifier = {
+		add = 20
+		owner = {
+			has_valid_civic = civic_distinguished_admiralty
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_crusader_spirit = yes			
+		}
+	}
+	modifier = {
+		add = 40
+		owner = {
+			is_privateer_empire = yes			
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_tradition = tr_supremacy_war_games		
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_philosopher_king = yes
+			ruler = {
+				leader_class = admiral
+			}		
+		}
+	}
+}
+
+heir_class_weight_general = {
+	base = 10
+	modifier = {
+		add = 20
+		owner = {
+			has_valid_civic = civic_distinguished_admiralty
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_crusader_spirit = yes
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_philosopher_king = yes
+			ruler = {
+				leader_class = general
+			}
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_tradition = tr_unyielding_resistance_is_frugal
+		}
+	}
+}
+
+heir_class_weight_governor = {
+	base = 10
+	modifier = {
+		add = 40
+		owner = {
+			is_aristocratic_empire = yes
+		}
+	}
+	modifier = {
+		add = 40
+		owner = {
+			is_feudal_empire = yes
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_tradition = tr_domination_colonial_viceroys
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_philosopher_king = yes
+			ruler = {
+				leader_class = governor
+			}
+		}
+	}
+}
+
+heir_class_weight_scientist = {
+	base = 10
+	modifier = {
+		add = 40
+		owner = {
+			is_technocracy = yes
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_tradition = tr_discovery_science_division
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_philosopher_king = yes
+			ruler = {
+				leader_class = scientist
+			}
+		}
+	}
+}
+
+luminary_age_lifespan = {
+    base = 60 #Standard is 80, but but we want to be sure that luminary won't die before this event
+    complex_trigger_modifier = {
+        trigger = check_modifier_value
+        parameters = {
+            modifier = leader_age
+        }
+        mode = add
+    }
+}
+
+restored_node_additional_skills = {
+    modifier = {
+        check_variable_arithmetic = {
+            which = value:new_node_initial_skill
+            add = value:leader_skill_modifier
+            value > value:culled_node_skill
+        }
+        add = value:node_skill_delta
+    }
+    modifier = {
+        check_variable_arithmetic = {
+            which = value:new_node_initial_skill
+            add = value:leader_skill_modifier
+            value <= value:culled_node_skill
+        }
+        add = value:leader_skill_modifier
+    }
+    min = 0
+}
+
+node_skill_delta = {
+    add = value:culled_node_skill
+    subtract = value:new_node_initial_skill
+}
+
+new_node_initial_skill = {
+	base = 0
+	add = trigger:has_skill
+}
+
+leader_skill_modifier = {
+	base = 0
+	modifier = {
+		exists = owner
+		add = owner.modifier:restored_node_bonus_skill
+	}
+	modifier = {
+		leader_class = admiral
+		exists = owner
+		add = owner.modifier:restored_admiral_node_bonus_skill
+	}
+	modifier = {
+		leader_class = general
+		exists = owner
+		add = owner.modifier:restored_general_node_bonus_skill
+	}
+	modifier = {
+		leader_class = governor
+		exists = owner
+		add = owner.modifier:restored_governor_node_bonus_skill
+	}
+	modifier = {
+		leader_class = scientist
+		exists = owner
+		add = owner.modifier:restored_scientist_node_bonus_skill
+	}
+}
+
+culled_node_skill = {
+	base = 0
+	add = event_target:culled_node.trigger:has_skill
+}
+
+# This is only used to show the new node's level in the agenda tooltip.
+# Make sure it is updated if the above changes.
+restored_node_skill = {
+	base = 1
+	modifier = {
+		exists = owner
+		add = owner.modifier:restored_node_bonus_skill
+	}
+	modifier = {
+		leader_class = admiral
+		exists = owner
+		add = owner.modifier:restored_admiral_node_bonus_skill
+	}
+	modifier = {
+		leader_class = general
+		exists = owner
+		add = owner.modifier:restored_general_node_bonus_skill
+	}
+	modifier = {
+		leader_class = governor
+		exists = owner
+		add = owner.modifier:restored_governor_node_bonus_skill
+	}
+	modifier = {
+		leader_class = scientist
+		exists = owner
+		add = owner.modifier:restored_scientist_node_bonus_skill
+	}
+	modifier = {
+		OR = {
+			leader_class = admiral
+			leader_class = general
+		}
+		owner = {
+			OR = {
+				has_valid_civic = civic_distinguished_admiralty
+				has_valid_civic = civic_machine_warbots
+				has_valid_civic = civic_hive_strength_of_legions
+			}
+		}
+		add = 2
+	}
+	modifier = {
+		owner = {
+			is_memory_vault_empire = yes
+		}
+		add = 1
+	}
+	max = trigger:has_skill
+}

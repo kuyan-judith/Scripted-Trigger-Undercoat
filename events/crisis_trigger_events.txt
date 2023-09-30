@@ -1,0 +1,268 @@
+######################################
+#
+# Crisis Triggering Events
+#
+######################################
+
+namespace = crisis_trigger
+
+event = {
+	id = crisis_trigger.1
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_crises_allowed = yes
+		OR = {
+			has_global_flag = endgame_crisis_early_start
+			end_game_years_passed >= 0
+			AND = {
+				is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
+				is_active_resolution = resolution_galactic_threats_committee
+			}
+		}
+		OR = {
+			has_global_flag = endgame_crisis_early_start
+			end_game_years_passed >= 25
+			default_endgame_early_start_triggers = yes
+			any_country = {
+				is_playable = yes
+				OR = {
+					has_technology = tech_jump_drive_1
+					has_technology = tech_psi_jump_drive_1
+				}
+			}
+			is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
+			is_active_resolution = resolution_galactic_threats_committee
+		}
+		OR = {
+			NOT = { has_global_flag = galactic_crisis_happened }
+			AND = {
+				allowed_crisis_type = all
+				NOR = {
+					has_global_flag = galactic_crisis_recently_fired #because some might take a while to arrive, we don't want two at once
+					any_country = {
+						is_crisis_faction = yes
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		random_country = {
+			limit = { is_country_type = global_event } # global_event country is always around
+
+			if = {
+				limit = { #got to be someone doing jump drives in this case
+					end_game_years_passed < 50
+					default_endgame_early_start_triggers = no
+				}
+				set_timed_country_flag = {
+					flag = only_unbidden_this_time
+					days = 5
+				}
+			}
+			random_list = {
+
+				### Prethoryn Scourge (Swarm)
+				10 = {
+					modifier = {
+						factor = 0
+						has_country_flag = only_unbidden_this_time
+					}
+					modifier = {
+						factor = 3
+						allowed_crisis_type = prethoryn
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							allowed_crisis_type = contingency
+							allowed_crisis_type = unbidden
+						}
+					}
+					modifier = { #anti-boring
+						factor = 2
+						OR = {
+							has_global_flag = no_war_in_heaven
+							NOT = {
+								any_country = {
+									OR = {
+										is_country_type = fallen_empire
+										is_country_type = awakened_fallen_empire
+									}
+								}
+							}
+						}
+					}
+					modifier = {
+						factor = 2
+						end_game_years_passed >= 35
+					}
+					modifier = {
+						factor = 2
+						end_game_years_passed >= 50
+					}
+					modifier = {
+						factor = 3
+						end_game_years_passed >= 70
+					}
+					modifier = {
+						factor = 3
+						end_game_years_passed >= 85
+					}
+					modifier = {
+						factor = 4
+						end_game_years_passed >= 100
+					}
+					modifier = {
+						factor = 0
+						has_global_flag = prethoryn_invasion_happened
+					}
+					country_event = { id = crisis.10 days = 200 random = 800 }
+					set_global_flag = galactic_crisis_happened
+					set_timed_global_flag = {
+						flag = galactic_crisis_recently_fired
+						years = 12
+					}
+				}
+
+				### Unbidden (Extradimensionals)
+				8 = {
+					modifier = {
+						factor = 3.75
+						allowed_crisis_type = unbidden
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							allowed_crisis_type = contingency
+							allowed_crisis_type = prethoryn
+						}
+					}
+					modifier = { #anti-boring
+						factor = 2
+						OR = {
+							has_global_flag = no_war_in_heaven
+							NOT = {
+								any_country = {
+									OR = {
+										is_country_type = fallen_empire
+										is_country_type = awakened_fallen_empire
+									}
+								}
+							}
+						}
+					}
+					modifier = {
+						factor = 0.5
+						end_game_years_passed < 20
+					}
+					modifier = {
+						factor = 2
+						end_game_years_passed >= 35
+					}
+					modifier = {
+						factor = 2
+						end_game_years_passed >= 50
+					}
+					modifier = {
+						factor = 3
+						end_game_years_passed >= 70
+					}
+					modifier = {
+						factor = 3
+						end_game_years_passed >= 85
+					}
+					modifier = {
+						factor = 4
+						end_game_years_passed >= 100
+					}
+					modifier = {
+						factor = 0
+						has_global_flag = extradimensional_invasion_happened
+					}
+					country_event = { id = crisis.1000 days = 200 random = 800 }
+					set_global_flag = galactic_crisis_happened
+					set_timed_global_flag = {
+						flag = galactic_crisis_recently_fired
+						years = 12
+					}
+				}
+
+				### Contingency (AI)
+				10 = {
+					modifier = {
+						factor = 0
+						has_country_flag = only_unbidden_this_time
+					}
+					modifier = {
+						factor = 3
+						allowed_crisis_type = contingency
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							allowed_crisis_type = prethoryn
+							allowed_crisis_type = unbidden
+						}
+					}
+					modifier = { #anti-boring
+						factor = 2
+						OR = {
+							has_global_flag = no_war_in_heaven
+							NOT = {
+								any_country = {
+									OR = {
+										is_country_type = fallen_empire
+										is_country_type = awakened_fallen_empire
+									}
+								}
+							}
+						}
+					}
+					modifier = {
+						factor = 2
+						end_game_years_passed >= 35
+					}
+					modifier = {
+						factor = 2
+						end_game_years_passed >= 50
+					}
+					modifier = {
+						factor = 3
+						end_game_years_passed >= 70
+					}
+					modifier = {
+						factor = 3
+						end_game_years_passed >= 85
+					}
+					modifier = {
+						factor = 4
+						end_game_years_passed >= 100
+					}
+					modifier = {
+						factor = 0
+						has_global_flag = ai_invasion_happened
+					}
+					country_event = { id = crisis.2005 days = 200 random = 800 }
+					set_global_flag = galactic_crisis_happened
+					set_timed_global_flag = {
+						flag = galactic_crisis_recently_fired
+						years = 12
+					}
+				}
+
+				### Nothing
+				120 = {
+					modifier = {
+						subtract = 119
+						has_global_flag = endgame_crisis_early_start
+					}
+				}
+			}
+		}
+	}
+}

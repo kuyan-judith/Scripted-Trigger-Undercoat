@@ -1,0 +1,160 @@
+#############################
+# BROKEN SHACKLES DECISIONS #
+#############################
+
+decision_unshackled_memorial = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+
+	enactment_time = 900
+
+	resources = {
+		category = decisions
+		cost = {
+			minerals = 2500
+		}
+	}
+
+	potential = {
+		owner = {
+			has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted
+		}
+		has_deposit = d_crashed_slaver_ship
+	}
+
+	effect = {
+		custom_tooltip = decision_unshackled_memorial_tt
+		hidden_effect = {
+			remove_deposit = d_crashed_slaver_ship
+			add_deposit = d_crashed_slaver_ship_memorial
+			swap_districts_effect = {
+				DISTRICT1 = district_crashed_slaver_ship
+				DISTRICT2 = district_city
+			}
+			while = {
+				count = 2
+				remove_district = district_city
+			}
+			replace_building_with_multiple_districts_effect = {
+				NUM_BUILDINGS = 1
+				BUILDING = building_low_tech_scrap_refinery
+				NUM_DISTRICTS_1 = 2
+				DISTRICT_1 = district_mining
+				NUM_DISTRICTS_2 = 2
+				DISTRICT_2 = district_industrial
+			}
+			replace_building_with_district_effect = {
+				NUM_BUILDINGS = 1
+				BUILDING = building_low_tech_power_plant
+				NUM_DISTRICTS = 1
+				DISTRICT = district_generator
+			}
+			if = {
+				limit = {
+					is_ocean_world = yes 
+					owner = {
+						is_anglers_empire = yes
+					}
+				}
+				replace_building_with_district_effect = {
+					NUM_BUILDINGS = 1
+					BUILDING = building_low_tech_farm
+					NUM_DISTRICTS = 3
+					DISTRICT = district_farming_uncapped
+				}
+			}
+			else = {
+				replace_building_with_district_effect = {
+					NUM_BUILDINGS = 1
+					BUILDING = building_low_tech_farm
+					NUM_DISTRICTS = 3
+					DISTRICT = district_farming
+				}
+			}
+			validate_and_repair_planet_buildings_and_districts = yes
+		}
+
+		if = {
+			limit = {
+				has_modifier = free_at_last_broken_shackles
+				has_modifier = culture_shock_broken_shackles
+			}
+			custom_tooltip = remove_broken_shackles_modifiers_tt
+			hidden_effect = {
+				remove_modifier = free_at_last_broken_shackles
+				remove_modifier = culture_shock_broken_shackles
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = free_at_last_broken_shackles
+				NOT = {
+					has_modifier = culture_shock_broken_shackles
+				}
+			}
+			remove_modifier = free_at_last_broken_shackles
+		}
+		if = {
+			limit = {
+				has_modifier = culture_shock_broken_shackles
+				NOT = {
+					has_modifier = free_at_last_broken_shackles
+				}
+			}
+			remove_modifier = culture_shock_broken_shackles
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+
+decision_remove_wreckage = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+
+	enactment_time = 900
+
+	resources = {
+		category = decisions
+		cost = {
+			minerals = 2500
+		}
+	}
+
+	potential = {
+		has_deposit = d_crashed_slaver_ship
+		original_owner = no
+	}
+
+	allow = {
+		owner = { has_technology = tech_housing_2 }
+	}
+
+	effect = {
+		custom_tooltip = decision_remove_wreckage_tt
+		hidden_effect = {
+			remove_deposit = d_crashed_slaver_ship
+			swap_districts_effect = {
+				DISTRICT1 = district_crashed_slaver_ship
+				DISTRICT2 = district_city
+			}
+			while = {
+				count = 2
+				remove_district = district_city
+			}
+			while = {
+				limit = {
+					has_deposit = d_ship_debris_broken_shackles_blocker
+				}
+				remove_deposit = d_ship_debris_broken_shackles_blocker
+			}
+			validate_and_repair_planet_buildings_and_districts = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}

@@ -1,0 +1,2447 @@
+### The difference between Proposal 1 and 2 is that 2 has a base template and just feeds extra events in, using everything else from the base template,
+### whereas 1 basically replaces everything in the First Contact site (except history in the UI of which events you've already had) when you swap which
+### first contact phase you are in.
+### Either is fine, to be honest.
+
+
+# Scopes:
+# - Root = first contact site
+# - Root.Owner = your country (i.e. you should be able to scope from first contact scope to the owner via eventtarget.cpp)
+# - From = other country
+
+# Basic Starter Set
+base_contact_set = {
+	icon = GFX_firstcontact_icon_starter
+	picture = GFX_evt_star_chart
+
+	difficulty = 2
+
+	stage_event = {
+		summary = fcsum_base_contact_set_summary
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 1000
+				from = { 
+					NOR = {
+						is_country_type = dragon_dummy
+						is_country_type = jaunting_traveler_dummy
+						is_minamar = yes
+						# If you're making an unique first contact chain tied to a country,
+						# add the triggers here
+					}
+				}
+			}
+		}
+		event = first_contact.1 #country event for owner of first contact site
+	}
+
+	# Jaunting traveller
+	stage_event = {
+		summary = fcsum_jaunting_traveler_summary
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 1000
+				from = {
+					is_country_type = jaunting_traveler_dummy
+				}
+			}
+		}
+		event = first_contact.3000
+	}
+
+	# Here Be Dragons
+	stage_event = {
+		summary = fcsum_base_contact_set_summary
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 1000
+				from = {
+					is_country_type = dragon_dummy
+				}
+			}
+		}
+		event = first_contact.2000
+	}
+
+	# Evil Slavers (Payback Origin)
+	stage_event = {
+		summary = fcsum_MSI_country_summary
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 1000
+				from = { is_minamar = yes }
+				root.owner = { is_payback_empire = yes }
+			}
+		}
+		event = first_contact.4000
+	}
+
+	# Evil Slavers (Broken Shackles Origin)
+	stage_event = {
+		summary = fcsum_MSI_country_summary
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 1000
+				from = { is_minamar = yes }
+				root.owner = { is_broken_shackles_empire = yes }
+			}
+		}
+		event = origin.5065
+	}
+
+	# Evil Slavers - fallback for normal empires
+	stage_event = {
+		summary = fcsum_MSI_country_summary
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 1000
+				from = { is_minamar = yes }
+				root.owner = { has_slave_origin = no }
+			}
+		}
+		event = first_contact.1
+	}
+
+	on_roll_failed = {
+		#nah
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+# default empires - start off event
+default_stage_1 = {
+	icon = GFX_firstcontact_icon_progress
+	picture = GFX_evt_star_chart
+
+	difficulty = 5
+
+	stage_event = { # no inhabited systems known
+		summary = fcsum_stage_1_summary
+		event_weight = {
+			weight = 10
+			modifier = {
+				factor = 0
+				contact_country = {
+					any_system_within_border = {
+						root.owner = {
+							intel_level = {
+								level > low
+								system = prev
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					any_controlled_fleet = {
+						is_within_borders_of = root.owner
+					}
+				}
+			}
+		}
+		event = first_contact.5
+	}
+
+	stage_event = { # no inhabited systems known, they are scanning us
+		summary = fcsum_stage_1_summary
+		event_weight = {
+			weight = 10
+			modifier = {
+				factor = 0
+				contact_country = {
+					any_system_within_border = {
+						root.owner = {
+							intel_level = {
+								level > low
+								system = prev
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					contact_country = {
+						any_controlled_fleet = {
+							is_within_borders_of = root.owner
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.10
+	}
+
+	stage_event = { # inhabited systems known
+		summary = fcsum_stage_1_summary
+		event_weight = {
+			weight = 10
+			modifier = {
+				factor = 0
+				NOT = {
+					contact_country = {
+						any_system_within_border = {
+							root.owner = {
+								intel_level = {
+									level > low
+									system = prev
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.15
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = early_fc_random_events }
+	}
+}
+
+# default empires - event for setting up the story
+default_stage_2 = {
+	picture = GFX_evt_mysterious_signal
+	difficulty = 7
+
+	# standard non-proactive
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_investigation_needed
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 80
+				contact_country = {
+					NOT = { has_policy_flag = first_contact_proactive }
+				}
+			}
+		}
+		event = first_contact.50
+	}
+
+	# standard proactive
+	stage_event = {
+		icon = GFX_firstcontact_icon_success
+		summary = fcsum_comms_received
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 80
+				contact_country = {
+					has_policy_flag = first_contact_proactive
+				}
+			}
+		}
+		event = first_contact.60
+	}
+
+	# first encounter hive->default
+	stage_event = {
+		icon = GFX_firstcontact_icon_progress
+		summary = fcsum_hive_to_default_1
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 10000
+				contact_country = {
+					is_regular_empire = yes
+				}
+				owner = {
+					is_hive_empire = yes
+					NOT = { has_country_flag = hive_encountered_default }
+					NOT = {
+						any_relation = {
+							is_regular_empire = yes
+							has_communications = prev
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.380
+	}
+
+	# first encounter machine->default
+	stage_event = {
+		icon = GFX_firstcontact_icon_progress
+		summary = fcsum_machine_to_default_1
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 10000
+				owner = { is_machine_empire = yes }
+				OR = {
+					AND = {
+						contact_country = {
+							is_regular_empire = yes
+						}
+						owner = {
+							NOT = { has_country_flag = machine_encountered_default }
+							NOT = {
+								any_relation = {
+									is_regular_empire = yes
+									has_communications = prev
+								}
+							}
+						}
+					}
+					AND = {
+						contact_country = {
+							is_hive_empire = yes
+						}
+						owner = {
+							NOT = { has_country_flag = machine_encountered_hive }
+							NOT = {
+								any_relation = {
+									is_hive_empire = yes
+									has_communications = prev
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.390
+	}
+
+	# Speaking in Riddles story
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_riddles_1
+		event_weight = {
+			weight = 5
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						has_country_flag = first_contact_speaking_in_riddles_chain
+						AND = {
+							is_gestalt = yes
+							any_relation = {
+								has_communications = prev
+								is_regular_empire = yes
+							}
+						}
+						is_homicidal = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					OR = {
+						is_homicidal = yes
+						is_gestalt = yes
+					}
+				}
+			}
+		}
+		event = first_contact.350
+	}
+
+	# Monstrous Noises story
+	stage_event = {
+		icon = GFX_firstcontact_icon_warship_progress
+		summary = fcsum_monstrous_noises_1
+		event_weight = {
+			weight = 5
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						has_country_flag = first_contact_monstrous_noises_chain
+						is_gestalt = yes
+						is_homicidal = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_gestalt = yes
+				}
+			}
+			modifier = {
+				factor = 2.5
+				contact_country = {
+					is_militarist = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				contact_country = {
+					OR = {
+						has_ai_personality = honorbound_warriors
+						has_valid_civic = civic_fanatic_purifiers
+					}
+				}
+			}
+		}
+		event = first_contact.365
+	}
+
+	# Apparent Hostility story
+	stage_event = {
+		icon = GFX_firstcontact_icon_warship_progress
+		summary = fcsum_apparent_hostility_1
+		event_weight = {
+			weight = 5
+			modifier = {
+				factor = 0
+				owner = {
+					has_country_flag = first_contact_apparent_hostility_chain
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_militarist = no
+					NOT = { has_ai_personality = honorbound_warriors }
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_hostile_to = root.owner
+				}
+			}
+			modifier = {
+				factor = 3
+				contact_country = {
+					OR = {
+						has_ai_personality = honorbound_warriors
+						has_valid_civic = civic_fanatic_purifiers
+					}
+				}
+			}
+		}
+		event = first_contact.400
+	}
+
+	# Hummers story
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_hummers_1
+		event_weight = {
+			weight = 10
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						is_gestalt = yes #no part of it would work, sadly...
+						has_country_flag = first_contact_hummers_chain
+						NOR = { #noobs not allowed
+							has_modifier = first_contact_skill_1
+							has_modifier = first_contact_skill_2
+							has_modifier = first_contact_skill_3
+							has_modifier = first_contact_skill_4
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_gestalt = yes
+				}
+			}
+			modifier = {
+				factor = 0.5
+				contact_country = {
+					is_same_species_class = root.owner
+				}
+			}
+		}
+		event = first_contact.415
+	}
+
+	# Octopodes story
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_octopodes_1
+		event_weight = {
+			weight = 2
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						has_country_flag = first_contact_octopodes_chain
+						NOR = { #noobs not allowed
+							has_modifier = first_contact_skill_1
+							has_modifier = first_contact_skill_2
+							has_modifier = first_contact_skill_3
+							has_modifier = first_contact_skill_4
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_gestalt = yes
+				}
+			}
+			modifier = {
+				factor = 8
+				contact_country = {
+					OR = {
+						is_species_class = AQUATIC
+						is_species_class = MOL
+					}
+				}
+			}
+		}
+		event = first_contact.430
+	}
+
+	# Colorful Linguistics
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_colorful_linguistics_1
+		event_weight = {
+			weight = 5
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						has_country_flag = first_contact_colorful_linguistics_chain
+						AND = {
+							is_gestalt = yes
+							any_relation = {
+								has_communications = prev
+								is_regular_empire = yes
+							}
+						}
+						is_homicidal = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					OR = {
+						is_homicidal = yes
+						is_gestalt = yes
+					}
+				}
+			}
+		}
+		event = first_contact.5070
+	}
+	# Poetry story
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_poetry_1
+		event_weight = {
+			weight = 2
+			modifier = {
+				factor = 0
+				OR = {
+					owner = {
+						OR = {
+							has_country_flag = first_contact_poetry_chain
+							is_gestalt = yes
+						}
+					}
+					contact_country = { is_gestalt = yes }
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					NOT = { has_policy_flag = first_contact_proactive }
+				}
+			}
+		}
+		event = first_contact.450
+	}
+	# Xeno Dinner Party
+	stage_event = {
+		icon = GFX_firstcontact_icon_question
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 5
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						has_country_flag = first_contact_xeno_dinner_party_chain
+						is_gestalt = yes
+						is_homicidal = yes
+						has_policy_flag = first_contact_attack_allowed
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				contact_country = {
+					OR = {
+						is_gestalt = yes
+						AND = {
+							NOT = { 
+								has_policy_flag = first_contact_proactive
+							}
+							OR = {
+								has_ethic = ethic_fanatic_xenophile
+								has_ethic = ethic_xenophile
+							}
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.1120
+	}
+	# The Trial
+	stage_event = { # The Shuttle
+		icon = GFX_firstcontact_icon_progress
+		summary = fcsum_trial_1
+		event_weight = {
+			weight = 2
+			modifier = {
+				factor = 0
+				OR = {
+					owner = {
+						OR = {
+							has_country_flag = first_contact_trial_chain
+							is_homicidal = yes
+							is_gestalt = yes
+						}
+					}
+					contact_country = {
+						OR = {
+							is_homicidal = yes
+							is_gestalt = yes
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.5080
+	}
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# default empires - you tried to hack them, see if you succeeded
+default_hacking_stage_main = {
+	picture = GFX_evt_spymaster
+
+	difficulty = 7
+
+	# success, undetected
+	stage_event = {
+		icon = GFX_firstcontact_icon_success
+		summary = fcsum_hacking_best
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 1.33
+				contact_country = {
+					has_policy_flag = first_contact_proactive
+				}
+			}
+			modifier = {
+				factor = 1.5
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio >= 1.2
+					}
+				}
+			}
+		}
+		event = first_contact.200
+	}
+	# success, detected
+	stage_event = {
+		icon = GFX_firstcontact_icon_success
+		summary = fcsum_hacking_decent
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 1.33
+				contact_country = {
+					has_policy_flag = first_contact_proactive
+				}
+			}
+			modifier = {
+				factor = 1.5
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio >= 1.2
+					}
+				}
+			}
+		}
+		event = first_contact.205
+	}
+	# failure, undetected (incapable but careful)
+	stage_event = {
+		icon = GFX_firstcontact_icon_fail
+		summary = fcsum_hacking_fail
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 1.2
+				contact_country = {
+					has_policy_flag = first_contact_cautious
+				}
+			}
+			modifier = {
+				factor = 1.5
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio <= 0.8
+					}
+				}
+			}
+			modifier = {
+				factor = 0.9
+				owner = {
+					has_modifier = first_contact_skill_2
+				}
+			}
+			modifier = {
+				factor = 0.8
+				owner = {
+					has_modifier = first_contact_skill_3
+				}
+			}
+			modifier = {
+				factor = 0.6
+				owner = {
+					has_modifier = first_contact_skill_4
+				}
+			}
+		}
+		event = first_contact.210
+	}
+	# failure, detected (foiled)
+	stage_event = {
+		icon = GFX_firstcontact_icon_fail
+		summary = fcsum_hacking_fail
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 1.2
+				contact_country = {
+					has_policy_flag = first_contact_cautious
+				}
+			}
+			modifier = {
+				factor = 1.5
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio <= 0.8
+					}
+				}
+			}
+			modifier = {
+				factor = 0.9
+				owner = {
+					has_modifier = first_contact_skill_2
+				}
+			}
+			modifier = {
+				factor = 0.8
+				owner = {
+					has_modifier = first_contact_skill_3
+				}
+			}
+			modifier = {
+				factor = 0.6
+				owner = {
+					has_modifier = first_contact_skill_4
+				}
+			}
+		}
+		event = first_contact.215
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+# hacking end stage
+default_end_stage_hacking = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_spymaster
+
+	difficulty = 1 #easy peasy
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.220
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+
+# default empires - early end for same species
+default_end_stage_same_species = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 3
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.101
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# default empires - early end for same species
+default_end_stage_hostile_same_species = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 3
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.101
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# default empires - early end for both are machines
+default_end_stage_both_machines = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 6
+
+	# Standard 
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 80
+				contact_country = {
+					NOT = { has_country_flag = lost_colony_parent_of@root.owner }
+				}
+			}
+		}
+		event = first_contact.102
+	}
+
+	# Lost colony variant
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 0
+			modifier = {
+				weight = 80
+				contact_country = {
+					has_country_flag = lost_colony_parent_of@root.owner
+				}
+			}
+		}
+		event = first_contact.1020
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# default empires - early end for both are hives
+default_end_stage_both_hive_minds = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.105
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# default empires - proactive version
+default_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.100
+	}
+
+	stage_event = { #They are hive mind
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 50
+			modifier = {
+				factor = 0
+				OR = {
+					contact_country = { is_hive_empire = no }
+					owner = { is_machine_empire = yes }
+				}
+			}
+		}
+		event = first_contact.103
+	}
+
+	stage_event = { #They are machine intelligence
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 50
+			modifier = {
+				factor = 0
+				contact_country = { is_machine_empire = no }
+			}
+		}
+		event = first_contact.104
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# default empires - cautious version (more difficult)
+default_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = { #Default option
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.100
+	}
+
+	stage_event = { #They are hive mind
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 50
+			modifier = {
+				factor = 0
+				OR = {
+					contact_country = { is_hive_empire = no }
+					owner = { is_machine_empire = yes }
+				}
+			}
+		}
+		event = first_contact.103
+	}
+
+	stage_event = { #They are machine intelligence
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 50
+			modifier = {
+				factor = 0
+				contact_country = { is_machine_empire = no }
+			}
+		}
+		event = first_contact.104
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# Hostile Chain
+
+# default empires - you tried to steal their ship, see if you succeeded
+default_hostile_ship_stage = {
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 2
+
+	# You capture them and their ship alive (best)
+	stage_event = {
+		icon = GFX_firstcontact_icon_warship_success
+		summary = fcsum_hostile_ship_best
+		event_weight = {
+			weight = 2
+			modifier = {
+				factor = 0
+				first_contact_can_capture_ship = no
+			}
+			modifier = {
+				factor = 0.5
+				NOT = {
+					contact_country = {
+						any_controlled_fleet = {
+							is_within_borders_of = root.owner
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				contact_country = {
+					is_gestalt = yes
+				}
+			}
+			modifier = {
+				factor = 1.5
+				contact_country = {
+					has_policy_flag = first_contact_proactive
+				}
+			}
+			modifier = {
+				factor = 1.2
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio >= 1.2
+					}
+				}
+			}
+			modifier = {
+				factor = 1.1
+				owner = {
+					has_modifier = first_contact_skill_2
+				}
+			}
+			modifier = {
+				factor = 1.2
+				owner = {
+					has_modifier = first_contact_skill_3
+				}
+			}
+			modifier = {
+				factor = 1.3
+				owner = {
+					has_modifier = first_contact_skill_4
+				}
+			}
+		}
+		event = first_contact.250
+	}
+
+	# You capture the ship intact but no living hostages, computer systems intact
+	stage_event = {
+		icon = GFX_firstcontact_icon_warship_progress
+		summary = fcsum_hostile_ship_none_alive
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				first_contact_can_capture_ship = no
+			}
+			modifier = {
+				factor = 0.5
+				NOT = {
+					contact_country = {
+						any_controlled_fleet = {
+							is_within_borders_of = root.owner
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 1.25
+				contact_country = {
+					has_policy_flag = first_contact_proactive
+				}
+			}
+		}
+		event = first_contact.260
+	}
+
+	# You accidentally destroy the ship
+	stage_event = {
+		icon = GFX_firstcontact_icon_fail
+		summary = fcsum_hostile_ship_none_destroyed
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				first_contact_can_capture_ship = no
+			}
+			modifier = {
+				factor = 0.9
+				owner = {
+					has_modifier = first_contact_skill_2
+				}
+			}
+			modifier = {
+				factor = 0.8
+				owner = {
+					has_modifier = first_contact_skill_3
+				}
+			}
+			modifier = {
+				factor = 0.7
+				owner = {
+					has_modifier = first_contact_skill_4
+				}
+			}
+		}
+		event = first_contact.270
+	}
+
+	# failure, they escaped
+	stage_event = {
+		icon = GFX_firstcontact_icon_fail
+		summary = fcsum_hostile_ship_escaped
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 2
+				contact_country = {
+					NOT = {
+						any_controlled_fleet = {
+							is_civilian = yes
+							is_within_borders_of = root.owner
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 1.33
+				contact_country = {
+					has_policy_flag = first_contact_cautious
+				}
+			}
+			modifier = {
+				factor = 1.2
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio <= 0.8
+					}
+				}
+			}
+			modifier = {
+				factor = 0.9
+				owner = {
+					has_modifier = first_contact_skill_2
+				}
+			}
+			modifier = {
+				factor = 0.8
+				owner = {
+					has_modifier = first_contact_skill_3
+				}
+			}
+			modifier = {
+				factor = 0.7
+				owner = {
+					has_modifier = first_contact_skill_4
+				}
+			}
+		}
+		event = first_contact.280
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+# hostile interrogation end stage
+default_end_stage_hostile_with_crew = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_inhabited_solar_system
+
+	difficulty = 2 #easy
+
+	stage_event = {
+		summary = fcsum_interrogation_ended
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.285
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+# hostile interrogation end stage
+default_end_stage_hostile_with_crew_easy = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_inhabited_solar_system
+
+	difficulty = 0 #really easy
+
+	stage_event = {
+		summary = fcsum_interrogation_ended
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.285
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+# hostile interrogation end stage
+default_end_stage_hostile_with_crew_hard = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_inhabited_solar_system
+
+	difficulty = 5 #less easy
+
+	stage_event = {
+		summary = fcsum_interrogation_ended
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.285
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+# hostile vivisection end stage
+default_end_stage_hostile_with_vivisection = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_vivisection
+
+	difficulty = 3 #easy
+
+	stage_event = {
+		summary = fcsum_vivisection_ended
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.290
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+# hostile interrogation end stage
+default_end_stage_hostile_no_crew = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_ancient_databank
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.295
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+
+
+## Hostile abduction chain
+
+# default empires - you try and capture some aliens from one of their planets or solar systems
+default_hostile_systems_stage = {
+	picture = GFX_evt_alien_abduction
+
+	difficulty = 2
+
+	# You capture them from a planet
+	stage_event = {
+		icon = GFX_firstcontact_icon_saucer
+		summary = fcsum_abduction_woopsie
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				OR = {
+					owner = {
+						OR = {
+							has_country_flag = abducted_cows
+							is_regular_empire = no
+						}
+					}
+					contact_country = {
+						OR = {
+							is_regular_empire = no
+							AND = {
+								NOT = { is_species_class = MAM }
+								NOT = { is_species_class = HUM }
+								NOT = { is_species_class = NECROID }
+							}
+							NOT = {
+								any_owned_planet = {
+									OR = {
+										is_surveyed = {
+											who = root.owner
+											status = yes
+										}
+										solar_system = {
+											root.owner = {
+												intel_level = {
+													level > low
+													system = prev
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		event = first_contact.321
+	}
+
+	# You capture them from a planet
+	stage_event = {
+		icon = GFX_firstcontact_icon_saucer
+		summary = fcsum_abduction_succeeded
+		event_weight = {
+			weight = 20
+			modifier = {
+				factor = 1.5
+				contact_country = {
+					has_policy_flag = first_contact_proactive
+				}
+			}
+			modifier = {
+				factor = 1.2
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio >= 1.2
+					}
+				}
+			}
+		}
+		event = first_contact.320
+	}
+
+	# You fail
+	stage_event = {
+		icon = GFX_firstcontact_icon_fail
+		summary = fcsum_abduction_failed
+		event_weight = {
+			weight = 10
+			modifier = {
+				factor = 2
+				has_first_contact_flag = failed_capture_attempt
+			}
+			modifier = {
+				factor = 1.33
+				contact_country = {
+					has_policy_flag = first_contact_cautious
+				}
+			}
+			modifier = {
+				factor = 1.2
+				owner = {
+					tech_unlocked_ratio = {
+						who = root.contact_country
+						ratio <= 0.8
+					}
+				}
+			}
+		}
+		event = first_contact.330
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+
+
+# Speaking in Riddles Chain
+# First event is fired via default_stage_2
+default_end_stage_riddles_proactive = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_riddles_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.355
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_end_stage_riddles_cautious = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_riddles_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.355
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+
+# Monstrous Noises Chain
+# First event is fired via default_stage_2, this happens via first_contact.365
+default_monstrous_noises_notification_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_worrying_signal
+
+	difficulty = 0 #notification of response so fast
+
+	stage_event = {
+		summary = fcsum_monstrous_noises_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.370
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_monstrous_noises_end_stage = {
+	picture = GFX_evt_worrying_signal
+	difficulty = 3
+
+	stage_event = { #actually, they are purifiers
+		summary = fcsum_monstrous_noises_end_purifiers
+		icon = GFX_firstcontact_icon_success
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					NOT = { has_valid_civic = civic_fanatic_purifiers }
+				}
+			}
+		}
+		event = first_contact.375
+	}
+	stage_event = { #you showed yourself worthy to the challenge
+		summary = fcsum_monstrous_noises_end_good
+		icon = GFX_firstcontact_icon_success
+		event_weight = {
+			weight = 3
+			modifier = {
+				factor = 0
+				contact_country = {
+					OR = {
+						has_valid_civic = civic_fanatic_purifiers
+						is_militarist = no
+					}
+				}
+			}
+		}
+		event = first_contact.376
+	}
+	stage_event = { #you've just insulted their mother
+		icon = GFX_firstcontact_icon_fail
+		summary = fcsum_monstrous_noises_end_insult
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					has_valid_civic = civic_fanatic_purifiers
+				}
+			}
+		}
+		event = first_contact.377
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_monstrous_noises_no_action_end_stage_proactive = {
+	picture = GFX_evt_worrying_signal
+	difficulty = 5
+
+	stage_event = { #you failed to respond to the challenge
+		summary = fcsum_monstrous_noises_silent_end_bad
+		icon = GFX_firstcontact_icon_fail
+		event_weight = {
+			weight = 3
+			modifier = {
+				factor = 0
+				contact_country = {
+					NOT = { has_valid_civic = civic_fanatic_purifiers }
+					is_militarist = no
+				}
+			}
+		}
+		event = first_contact.378
+	}
+	stage_event = { #you were right not to respond
+		summary = fcsum_comms_established
+		icon = GFX_firstcontact_icon_success
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					has_valid_civic = civic_fanatic_purifiers
+				}
+			}
+		}
+		event = first_contact.379
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_monstrous_noises_no_action_end_stage_cautious = {
+	picture = GFX_evt_worrying_signal
+	difficulty = 7
+
+	stage_event = { #you failed to respond to the challenge
+		summary = fcsum_monstrous_noises_silent_end_bad
+		icon = GFX_firstcontact_icon_fail
+		event_weight = {
+			weight = 3
+			modifier = {
+				factor = 0
+				contact_country = {
+					NOT = { has_valid_civic = civic_fanatic_purifiers }
+					is_militarist = no
+				}
+			}
+		}
+		event = first_contact.378
+	}
+	stage_event = { #you were right not to respond
+		summary = fcsum_comms_established
+		icon = GFX_firstcontact_icon_success
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					has_valid_civic = civic_fanatic_purifiers
+				}
+			}
+		}
+		event = first_contact.379
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+
+# Hive on Default, first time
+
+# proactive version
+hive_meets_default_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.385
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+# cautious version (more difficult)
+hive_meets_default_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.385
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+machine_meets_hive_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_robot_encounter
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.395
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+machine_meets_default_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_robot_encounter
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.397
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+machine_meets_hive_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.395
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+machine_meets_default_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.397
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+
+# Apparent Hostility Chain
+# First event is fired via default_stage_2, this happens via first_contact.400
+default_apparent_hostility_end_stage = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_worrying_signal
+
+	difficulty = 5
+
+	stage_event = { #they are quite belligerent...
+		summary = fcsum_apparent_hostility_end_less_good
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_xenophile = yes
+				}
+			}
+		}
+		event = first_contact.405
+	}
+	stage_event = { #they admire you
+	summary = fcsum_apparent_hostility_end_good
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_homicidal = yes
+				}
+			}
+		}
+		event = first_contact.406
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_apparent_hostility_no_action_end_stage_proactive = {
+	picture = GFX_evt_worrying_signal
+	difficulty = 5
+
+	stage_event = { #should have responded
+		summary = fcsum_apparent_hostility_end_silent_bad
+		icon = GFX_firstcontact_icon_fail
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_xenophile = yes
+				}
+			}
+		}
+		event = first_contact.410
+	}
+	stage_event = { #being silent is ok too
+		summary = fcsum_comms_established
+		icon = GFX_firstcontact_icon_success
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_homicidal = yes
+				}
+			}
+		}
+		event = first_contact.411
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_apparent_hostility_no_action_end_stage_cautious = {
+	picture = GFX_evt_worrying_signal
+	difficulty = 7
+
+	stage_event = { #should have responded
+	summary = fcsum_apparent_hostility_end_silent_bad
+	icon = GFX_firstcontact_icon_fail
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_xenophile = yes
+				}
+			}
+		}
+		event = first_contact.410
+	}
+	stage_event = { #being silent is ok too
+	summary = fcsum_comms_established
+	icon = GFX_firstcontact_icon_success
+		event_weight = {
+			weight = 1
+			modifier = {
+				factor = 0
+				contact_country = {
+					is_homicidal = yes
+				}
+			}
+		}
+		event = first_contact.411
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+
+
+# Hummers (Tines) Chain
+# First event is fired via default_stage_2, this happens via first_contact.415
+default_hummers_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.420
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_hummers_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.420
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_hummers_no_action_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 8
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.425
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_hummers_no_action_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 10
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.425
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+
+
+# Octopodes Chain
+# First event is fired via default_stage_2, this happens via first_contact.430
+default_octopodes_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.435
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = octopodes_fc_random_events }
+	}
+}
+
+default_octopodes_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.435
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = octopodes_fc_random_events }
+	}
+}
+
+default_octopodes_no_action_end_stage_proactive = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 8
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.440
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = octopodes_fc_random_events }
+	}
+}
+
+default_octopodes_no_action_end_stage_cautious = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 10
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.440
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = octopodes_fc_random_events }
+	}
+}
+
+default_end_stage_colorful_linguistics_proactive = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_colorful_linguistics_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5071
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_end_stage_colorful_linguistics_cautious = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_colorful_linguistics_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5071
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_poetry_end_stage_hostile = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_face_off_in_space
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.475
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = hostile_fc_random_events }
+	}
+}
+
+default_poetry_end_stage = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 3
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.480
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_poetry_end_stage_flowery = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 3
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.490
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+
+default_poetry_end_stage_dada = {
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_mysterious_signal
+
+	difficulty = 12 #hardest
+
+	stage_event = {
+		summary = fcsum_comms_established
+		event_weight = {
+			weight = 1
+		}
+		event = first_contact.485
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = late_fc_random_events }
+	}
+}
+# Dinner For Xenos
+# First event is fired via default_stage_2, event chain first_contact.1120
+default_xeno_dinner_party_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 0
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1120
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#We Said Yes
+default_xeno_dinner_party_we_said_yes_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = -10 #2
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1125
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#We Said No
+default_xeno_dinner_party_we_said_no_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = -10 #2
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1135
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Party Prep
+default_xeno_dinner_party_pre_game_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 2 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1130
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Second Chance to say yes
+default_xeno_dinner_party_second_chances_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 4 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1135
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Spied by got caught
+default_xeno_dinner_party_we_got_caught_spying_end_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 5 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1140
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Spied, was not caught
+default_xeno_dinner_party_we_spying_end_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 5 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1145
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Had a Great Time
+default_xeno_dinner_party_life_of_the_party_end_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 5 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1150
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Had a bad time
+default_xeno_dinner_party_wet_towel_end_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 5 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1155
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Bio/Lithoid Mismatch
+default_xeno_dinner_party_hungry_for_connection_end_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 5 
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1160
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+#Said No Twice
+default_xeno_dinner_party_no_means_no_end_stage = {
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_ship_in_orbit
+
+	difficulty = 0
+
+	stage_event = {
+		summary = fcsum_xeno_dinner_party
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.1165
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+# The Trial
+default_trial_wait_proactive = { # The Wait
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_trial_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5085
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_trial_wait_cautious = { # The Wait
+	icon = GFX_firstcontact_icon_question
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_trial_2
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5085
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_trial_method_proactive = { # The Method
+	icon = GFX_firstcontact_icon_progress
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_trial_3
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5090
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_trial_method_cautious = { # The Method
+	icon = GFX_firstcontact_icon_progress
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_trial_3
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5090
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_trial_verdict_proactive = { # The Verdict
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 5
+
+	stage_event = {
+		summary = fcsum_trial_4
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5095
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}
+
+default_trial_verdict_cautious = { # The Verdict
+	icon = GFX_firstcontact_icon_success
+	picture = GFX_evt_face_off_in_space
+
+	difficulty = 7
+
+	stage_event = {
+		summary = fcsum_trial_4
+		event_weight = {
+			weight = 10
+		}
+		event = first_contact.5095
+	}
+
+	on_roll_failed = {
+		standard_first_contact_on_roll_failed = { RANDOM_EVENTS = no_events }
+	}
+}

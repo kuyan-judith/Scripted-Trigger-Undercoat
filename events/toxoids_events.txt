@@ -1,0 +1,3480 @@
+###########################################
+#
+# Toxoids Events
+# By Pierre du Plessis and Hadrien Buytaers
+#
+###########################################
+
+namespace = toxoids
+
+planet_event = {
+	id = toxoids.1
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		OR = {
+			has_building = building_coordinated_fulfillment_center_1
+			has_building = building_coordinated_fulfillment_center_2
+		}
+		NOR = {
+			is_nuked_world = yes
+			is_city_world = yes
+			is_relic_world = yes
+			uses_district_set = habitat
+			uses_district_set = ring_world
+			uses_district_set = shattered_ring_world
+		}
+		exists = owner
+		owner = { is_relentless_industrialist_empire = yes }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				owner = { has_policy_flag = relentless_industrialists_cleanup }
+				check_variable = {
+					which = relentless_industrialists_var
+					value > 0
+				}
+			}
+			subtract_variable = {
+				which = relentless_industrialists_var
+				value = 1
+			}
+		}
+		else = {
+			if = {
+				limit = { has_active_building = building_coordinated_fulfillment_center_1 }
+				change_variable = {
+					which = relentless_industrialists_var
+					value = 1
+				}
+			}
+			else_if = { #ruined or disabled
+				limit = { has_building = building_coordinated_fulfillment_center_1 }
+				change_variable = {
+					which = relentless_industrialists_var
+					value = 0.5
+				}
+			}
+			else_if = {
+				limit = { has_active_building = building_coordinated_fulfillment_center_2 }
+				change_variable = {
+					which = relentless_industrialists_var
+					value = 2
+				}
+			}
+			else = {
+				change_variable = {
+					which = relentless_industrialists_var
+					value = 1
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				check_variable = {
+					which = relentless_industrialists_var
+					value >= 30
+				}
+				NOT = {
+					owner = {
+						OR = {
+							has_policy_flag = relentless_industrialists_cleanup
+							country_has_situation = { SITUATION = relentless_industrialists_situation }
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						owner = { has_country_flag = relentless_industrialists_situation_happened }
+					}
+				}
+				planet_event = { id = toxoids.5 days = 15 random = 180 }
+			}
+			else = {
+				change_pc = pc_nuked
+				if = {
+					limit = {
+						owner = { has_country_flag = relentless_industrialists_climate_apocalypse_sad }
+					}
+					add_modifier = {
+						modifier = relentless_industrialists_tomb
+						years = 10
+					}
+				}
+				create_message = {
+					type = TOMB_WORLD_FROM_INDUSTRY_MESSAGE_TYPE
+					localization = TOMB_WORLD_FROM_INDUSTRY_MESSAGE_TYPE_DESC
+					days = 20
+					target = this
+				}
+				if = {
+					limit = {
+						OR = {
+							is_active_resolution = "resolution_ecology_environmental_control_board"
+							is_active_resolution = "resolution_ecology_paradise_initiative"
+						}
+					}
+					owner = {
+						set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+					}
+				}
+			}
+		}
+	}
+}
+
+#Situation starts
+
+planet_event = {
+	id = toxoids.5
+	title = toxoids.5.name
+	desc = toxoids.5.desc
+	picture = GFX_evt_busy_spaceport
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_same_value = root.controller
+			is_relentless_industrialist_empire = yes
+			NOT = { has_country_flag = relentless_industrialists_situation_happened }
+		}
+	}
+
+	immediate = {
+		owner = { set_country_flag = relentless_industrialists_situation_happened }
+	}
+
+	option = {
+		name = DISTURBING
+		owner = {
+			start_situation = {
+				type = relentless_industrialists_situation
+				target = root
+			}
+		}
+	}
+}
+
+# Situation Progress Event - Oh No
+situation_event = {
+	id = toxoids.10
+	title = toxoids.10.name
+	desc = toxoids.10.desc
+	picture = GFX_evt_tomb_world
+	is_triggered_only = yes
+	location = target
+	situation = this
+	show_sound = event_bad_omen
+
+	option = {
+		name = toxoids.10.A
+		custom_tooltip = toxoids.10.A.tooltip
+		custom_tooltip = relentless_industrialists_situation_locked_tooltip
+	}
+}
+
+# Situation Progress Event - Meh
+situation_event = {
+	id = toxoids.15
+	title = toxoids.15.name
+	desc = toxoids.15.desc
+	picture = GFX_evt_tomb_world
+	is_triggered_only = yes
+	location = target
+	situation = this
+	show_sound = event_default
+
+	option = {
+		name = toxoids.15.A
+		custom_tooltip = relentless_industrialists_situation_locked_tooltip
+	}
+}
+
+# Situation Outcome Event - Full Steam Ahead
+situation_event = {
+	id = toxoids.25
+	title = toxoids.25.name
+	desc = toxoids.25.desc
+	picture = GFX_evt_tomb_world
+	is_triggered_only = yes
+	location = target
+	situation = this
+	show_sound = event_bad_omen
+
+	immediate = {
+		target = {
+			change_pc = pc_nuked
+		}
+		owner = {
+			set_country_flag = relentless_industrialists_full_steam_ahead
+			set_country_flag = relentless_industrialists_situation_finished
+			if = {
+				limit = {
+					root = {
+						NOT = { has_situation_flag = fine_with_climate_apocalypse }
+					}
+				}
+				root.target = {
+					add_modifier = {
+						modifier = relentless_industrialists_tomb
+						years = 10
+					}
+				}
+				set_country_flag = relentless_industrialists_climate_apocalypse_sad
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+			}
+		}
+	}
+
+	option = {
+		name = toxoids.25.A
+		custom_tooltip = toxoids.25.A.tooltip
+		tooltip = {
+			target = { change_pc = pc_nuked }
+		}
+	}
+
+	after = {
+		custom_tooltip = relentless_industrialists_policies_activated
+		destroy_situation = this
+	}
+}
+
+# Situation Outcome Event - Study the Process
+situation_event = {
+	id = toxoids.30
+	title = toxoids.30.name
+	desc = {
+		trigger = { owner = { empire_has_good_habitability_on_tomb_worlds = no } }
+		text = toxoids.30.desc
+	}
+	desc = {
+		trigger = { owner = { empire_has_good_habitability_on_tomb_worlds = yes } }
+		text = toxoids.30.desc.thisisfine
+	}
+	picture = GFX_evt_tomb_world
+	is_triggered_only = yes
+	location = target
+	situation = this
+	show_sound = event_activating_unknown_technology
+
+	immediate = {
+		target = {
+			change_pc = pc_nuked
+		}
+		owner = {
+			set_country_flag = relentless_industrialists_study_completed
+			set_country_flag = relentless_industrialists_situation_finished
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+			}
+		}
+	}
+
+	option = {
+		name = toxoids.30.A
+		custom_tooltip = toxoids.30.A.tooltip
+		tooltip = {
+			target = { change_pc = pc_nuked }
+		}
+	}
+
+	after = {
+		custom_tooltip = relentless_industrialists_policies_activated
+		destroy_situation = this
+	}
+}
+
+# Situation Outcome Event - Cleanup
+situation_event = {
+	id = toxoids.35
+	title = toxoids.35.name
+	desc = toxoids.35.desc
+	picture = GFX_evt_alien_nature
+	is_triggered_only = yes
+	location = target
+	situation = this
+	show_sound = event_alien_nature
+
+	immediate = {
+		owner = {
+			set_country_flag = relentless_industrialists_cleanup
+			set_country_flag = relentless_industrialists_situation_finished
+		}
+	}
+
+	option = {
+		name = toxoids.35.A
+		custom_tooltip =  toxoids.35.A.tooltip
+	}
+
+	after = {
+		custom_tooltip = relentless_industrialists_policies_activated
+		destroy_situation = this
+	}
+}
+
+#You turned a gaia world into a tomb world
+country_event = {
+	id = toxoids.40
+	base = planet_destruction.610
+	option_clear = yes
+
+	option = {
+		name = planet_destruction.615.A
+		name = {
+			text = planet_destruction.615.spir
+			exclusive_trigger = {
+				owner = { is_spiritualist = yes }
+			}
+		}
+	}
+}
+
+#Special Project Study Complete
+country_event = {
+	id = toxoids.45
+	title = toxoids.30.name
+	desc = toxoids.45.desc
+	picture = GFX_evt_tomb_world
+	is_triggered_only = yes
+	show_sound = event_activating_unknown_technology
+
+	immediate = {
+		set_country_flag = relentless_industrialists_study_completed
+	}
+
+	option = {
+		name = toxoids.30.A
+		custom_tooltip = toxoids.30.A.tooltip
+	}
+}
+
+# Terraformed a holy world into a tombworld
+planet_event = {
+	id = toxoids.50
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = holy_planet
+		any_country = {
+			has_ai_personality_behaviour = holy_planets # not awakened
+			NOT = { is_at_war_with = from.owner }
+		}
+		space_owner = {
+			NOT = {
+				has_relic = r_severed_head
+			}
+		}
+	}
+
+	immediate = {
+		random_country = {
+			limit = {
+				has_ai_personality_behaviour = holy_planets # not awakened
+				NOT = { is_at_war_with = from.owner }
+			}
+			save_event_target_as = outraged_FE
+		}
+		from.owner = {
+			save_event_target_as = FE_outrager
+			country_event = { id = planet_destruction.610 days = 5 }
+		}
+	}
+}
+
+### Toxic Terraforming Candidate
+# on_survey
+# Scope = Ship
+# From = Planet
+ship_event = {
+	id = toxoids.499
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { has_modifier = toxic_terraforming_candidate }
+	}
+	immediate = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_country_flag = found_toxic_terraform_candidate }
+				}
+			}
+			owner = {
+				set_country_flag = found_toxic_terraform_candidate
+			}
+			ship_event = { id = toxoids.500 scopes = { from = from } }
+		}
+		else = {
+			owner = {
+				create_message = {
+					type = MESSAGE_TOXIC_TERRAFORM_FOUND
+					localization = MESSAGE_TOXIC_TERRAFORM_FOUND_DESC
+					days = 30
+					target = from
+					variable = {
+						type = name
+						localization = SYSTEM
+						scope = from
+					}
+				}
+			}
+		}
+	}
+}
+ship_event = {
+	id = toxoids.500
+	title = toxoids.500.name
+	desc = {
+		text = toxoids.500.desc.1
+		trigger = {
+			NOT = { owner = { has_ascension_perk = ap_detox } }
+		}
+	}
+	desc = {
+		text = toxoids.500.desc.2
+		trigger = {
+			owner = { has_ascension_perk = ap_detox }
+		}
+	}
+
+	picture = GFX_evt_toxic
+	location = FROM
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = { has_modifier = toxic_terraforming_candidate }
+	}
+
+	option = {
+		name = FASCINATING
+		custom_tooltip = TOXIC_TERRAFORMING_CANDIDATE_EFFECT
+	}
+}
+
+### Scavengers
+
+# on_debris_scavenged_and_researched: Fired when a science ship succesfully analyzed or scavenged debris
+# this = country
+# from = debris
+# fromfrom = controller of destroyed ship
+country_event = {
+	id = toxoids.700
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		is_scavenger = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_owned_leader = {
+					OR = {
+						has_trait = leader_trait_salvager
+						has_trait = leader_trait_salvager_2
+						has_trait = leader_trait_salvager_3
+					}
+					exists = solar_system
+					solar_system = {
+						is_same_value = from.solar_system
+					}
+				}
+			}
+			salvage_ships_from_debris = {
+				CHANCE = value:country_salvage_ships_from_debris_chance|BONUS|5| # Give additional chance from trait, but less than just adding both of them together
+			}
+		}
+		else = {
+			salvage_ships_from_debris = {
+				CHANCE = value:country_salvage_ships_from_debris_chance
+			}
+		}
+	}
+}
+
+
+###########################
+# KNIGHTS OF THE TOXIC GOD
+###########################
+
+# Start Game event
+country_event = {
+	id = toxoids.7000
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_toxic_knights_empire = yes
+	}
+
+	immediate = {
+		start_situation = {
+			type = situation_toxic_knights
+		}
+		capital_scope = {
+			solar_system = {
+				closest_system = {
+					limit = {
+						any_system_planet = {
+							is_colonizable = no
+							OR = {
+								is_barren_dry_world = yes
+								is_molten_world = yes
+								is_toxic_world = yes
+							}
+							NOR = {
+								has_modifier = terraforming_candidate
+								has_modifier = frozen_terraforming_candidate
+								has_modifier = toxic_terraforming_candidate
+							}
+							has_deposit = no
+						}
+					}
+					min_steps = 1
+					random_system_planet = {
+						limit = {
+							is_colonizable = no
+							OR = {
+								is_barren_dry_world = yes
+								is_molten_world = yes
+								is_toxic_world = yes
+							}
+							NOR = {
+								has_modifier = terraforming_candidate
+								has_modifier = frozen_terraforming_candidate
+								has_modifier = toxic_terraforming_candidate
+							}
+							has_deposit = no
+						}
+						change_pc = pc_molten
+						add_deposit = d_alloys_2
+						add_deposit = d_energy_6
+					}
+				}
+			}
+		}
+	}
+}
+
+# Quest Events
+## First Quest
+situation_event = {
+	id = toxoids.7005
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { #create and exile a leader to get a name for the knight
+		owner = {
+			save_event_target_as = owner
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_1
+				save_event_target_as = questing_knight_1
+			}
+			#also the squire
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_2
+				save_event_target_as = questing_knight_2
+				set_immortal = yes
+				save_global_event_target_as = questing_knight_2_@event_target:owner #@root.owner is ambiguous!
+			}
+			#also Sinople
+			create_species = {
+				name = NAME_Sinople
+				plural = NAME_Sinople
+				class = MACHINE
+				portrait = aqu_machine
+				effect = {
+					save_event_target_as = species_sinople
+				}
+			}
+			create_leader = {
+				class = general
+				species = event_target:species_sinople
+				name = NAME_Sinople
+			}
+			last_created_leader = {
+				exile_leader_as = sinople
+				save_event_target_as = sinople
+			}
+		}
+	}
+
+	after = {
+		owner = {
+			country_event = { id = toxoids.7006 }
+		}
+	}
+}
+
+country_event = { #A knight gets banished from the Order because of impatient behaviour
+	id = toxoids.7006
+	title = "toxoids.7006"
+	desc = "toxoids.7006.desc"
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7006.a
+		hidden_effect = {
+			random_list = {
+				50 = { country_event = { id = toxoids.7007 days = 35 } }
+				50 = { country_event = { id = toxoids.7009 days = 100 } }
+			}
+		}
+	}
+}
+
+country_event = { #The knight wanders in a Nebula, finds a lone station protected by Phalanx Droids
+	id = toxoids.7007
+	title = "toxoids.7007"
+	desc = "toxoids.7007.desc"
+	picture = GFX_evt_crusher_droid
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7007.a
+		hidden_effect = {
+			country_event = { id = toxoids.7008 days = 10 }
+		}
+	}
+}
+
+country_event = { #Patience helps the knight to overcome the phalanx. They retrieve the coordinates for a nearby ship.
+	id = toxoids.7008
+	title = "toxoids.7008"
+	desc = "toxoids.7008.desc"
+	picture = GFX_evt_crusher_droid
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7008.a
+		hidden_effect = {
+			country_event = { id = toxoids.7010 days = 70 }
+		}
+	}
+}
+
+country_event = { #The knight wanders in a Nebula, meets a shroudwalker
+	id = toxoids.7009
+	title = "toxoids.7009"
+	desc = "toxoids.7009.desc"
+	picture = GFX_evt_shroudwalker_teachers
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7009.a
+		hidden_effect = {
+			country_event = { id = toxoids.7010 days = 70 }
+		}
+	}
+}
+
+country_event = { #The knight enters a marauder ship, finds an old AI that knows stuff about the Toxic God.
+	id = toxoids.7010
+	title = "toxoids.7010"
+	desc = "toxoids.7010.desc"
+	picture = GFX_evt_derelict_interior
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7010.a
+		hidden_effect = {
+			country_event = { id = toxoids.7012 }
+		}
+	}
+}
+
+country_event = { #Diplo. Talk to Sinople. Oh yeah you kinda look like that other dude whom is dead now.
+	id = toxoids.7012
+	title = "toxoids.7012.name"
+	desc = "toxoids.7012.desc"
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = event_target:sinople
+		room = ethic_spaceship_room
+	}
+
+	is_triggered_only = yes
+
+	option = { #Did you kill the other knight
+		name = toxoids.7012.a
+		hidden_effect = {
+			country_event = { id = toxoids.7013 }
+		}
+	}
+}
+
+country_event = { #Yeah sorry, my bad. In my defense he was very aggressive
+	id = toxoids.7013
+	base = toxoids.7012
+	desc_clear = yes
+	desc = toxoids.7013.desc
+	option_clear = yes
+
+	option = { #What are you doing to my squire?
+		name = toxoids.7013.a
+		hidden_effect = {
+			country_event = { id = toxoids.7014 }
+		}
+	}
+}
+
+country_event = { #They're healing, I realized my mistake a little late, but still tried to save them. Marauders killed all my crew a while back btw, so I'm a little on edge.
+	id = toxoids.7014
+	base = toxoids.7012
+	desc_clear = yes
+	desc = toxoids.7014.desc
+	option_clear = yes
+
+	option = { #Marauders, what when?
+		name = toxoids.7014.a
+		hidden_effect = {
+			country_event = { id = toxoids.7015 }
+		}
+	}
+}
+
+country_event = { #I got hacked, my crew was abducted. Over time, I repaired myself and took over the various automated systems of the ship to defend myself.
+	id = toxoids.7015
+	base = toxoids.7012
+	desc_clear = yes
+	desc = toxoids.7015.desc
+	option_clear = yes
+
+	option = { #I am looking for the Toxic God, do you know of it?
+		name = toxoids.7015.a
+		hidden_effect = {
+			country_event = { id = toxoids.7016 }
+		}
+	}
+}
+
+country_event = { #I do. But the hack left my memories in tatters. If I help you, I want out of this ship. Bring me to your boss.
+	id = toxoids.7016
+	base = toxoids.7012
+	desc_clear = yes
+	desc = toxoids.7016.desc
+	option_clear = yes
+
+	option = { #Ok cool
+		name = toxoids.7016.a
+		hidden_effect = {
+			country_event = { id = toxoids.7011 days = 10 }
+		}
+	}
+	option = { #What the hell, no!
+		name = toxoids.7016.b
+		hidden_effect = {
+			country_event = { id = toxoids.7017 }
+		}
+	}
+	option = { #Safe container if materialist
+		name = toxoids.7016.c
+		trigger = {
+			OR = {
+				has_ethic = ethic_materialist
+				has_ethic = ethic_fanatic_materialist
+			}
+		}
+		icon = {
+			icon = GFX_ethics_materialist
+			text = toxoids.7016.c.materialist
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7011 days = 10 }
+		}
+	}
+}
+
+country_event = { #If you don't take me back, the squire dies. And I'm gonna self destruct and destroy my memory banks.
+	id = toxoids.7017
+	base = toxoids.7012
+	desc_clear = yes
+	desc = toxoids.7017.desc
+	option_clear = yes
+
+	option = { #AUGH fine!
+		name = toxoids.7017.a
+		hidden_effect = {
+			country_event = { id = toxoids.7011 days = 10 }
+		}
+	}
+}
+
+country_event = { #Brings Sinople home. Restores their honor.
+	id = toxoids.7011
+	title = "toxoids.7011"
+	desc = "toxoids.7011.desc"
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7011.a
+		custom_tooltip = knights_more_unity_tooltip
+		hidden_effect = {
+			set_country_flag = toxoids_7011_a
+		}
+	}
+	option = {
+		name = toxoids.7011.b
+		custom_tooltip = knights_more_research_tooltip
+		hidden_effect = {
+			set_country_flag = toxoids_7011_b
+		}
+	}
+}
+
+
+## Second Quest
+situation_event = {
+	id = toxoids.7020
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { #create and exile a leader to get a name for the knights
+		owner = {
+			#Genders being random is WAD. It's the 23rd century and we have mono-gendered species :)
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_A
+				save_event_target_as = questing_knight_A
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_B
+				save_event_target_as = questing_knight_B
+			}
+		}
+	}
+
+	after = {
+		owner = {
+			country_event = { id = toxoids.7025 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7025
+	title = toxoids.7025.name
+	desc = toxoids.7025.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7025.A
+	}
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7030 days = 20 random = 100 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7030
+	title = toxoids.7030.name
+	desc = toxoids.7030.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_system = {
+			limit = {
+				NOT = { is_owned_by = root }
+			}
+			weights = {
+				base = 1
+				modifier = {
+					factor = 10
+					OR = {
+						NOT = { exists = owner }
+						owner = {
+							has_communications = root
+							NOR = {
+								is_in_federation_with = root
+								has_subject = root
+								has_overlord = root
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					exists = owner
+					owner = {
+						OR = {
+							is_fallen_empire = yes
+							is_country_type = dormant_marauders
+						}
+					}
+				}
+			}
+			save_event_target_as = some_system
+		}
+	}
+
+	option = {
+		name = toxoids.7030.A
+	}
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7035 days = 60 random = 20 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7035
+	title = toxoids.7035.name
+	desc = toxoids.7035.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7035.A
+	}
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7040 days = 25 random = 10 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7040
+	title = toxoids.7040.name
+	desc = toxoids.7040.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7040.A
+		custom_tooltip = knights_more_unity_tooltip
+		hidden_effect = { set_country_flag = toxoids_7040_a }
+	}
+	option = {
+		name = toxoids.7040.B
+		custom_tooltip = knights_more_research_tooltip
+		hidden_effect = { set_country_flag = toxoids_7040_b }
+	}
+	option = {
+		name = toxoids.7040.C
+		home_planet = {
+			hidden_effect = {
+				remove_deposit = d_toxic_god_pools_most_venemous
+			}
+			add_deposit = d_toxic_god_pools_most_venemous_upgraded
+		}
+	}
+}
+
+
+## Third Quest - Holy Visitor
+situation_event = {
+	id = toxoids.7050
+	title = toxoids.7050.name
+	desc = toxoids.7050.desc
+	picture = GFX_evt_shroudwalker_teachers
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			random_owned_planet = {
+				limit = { has_building = building_order_keep }
+				save_event_target_as = order_headquarters
+			}
+		}
+	}
+
+	option = {
+		name = toxoids.7050.A
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7055 days = 20 random = 10 }
+			}
+		}
+	}
+}
+
+#The Deal
+country_event = {
+	id = toxoids.7055
+	title = toxoids.7055.name
+	desc = toxoids.7055.desc
+	diplomatic = yes
+	diplomatic_title = utopia.3000.name
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	is_triggered_only = yes
+
+	immediate = {
+		create_leader = {
+			class = general
+			species = owner_main_species
+			name = random
+		}
+		last_created_leader = {
+			exile_leader_as = questing_knight_X
+			save_event_target_as = questing_knight_X
+			set_immortal = yes
+			save_global_event_target_as = questing_knight_X_@root
+		}
+	}
+
+	option = { #Yes
+		name = toxoids.7055.A
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7060 }
+			}
+		}
+	}
+	option = { #No
+		name = toxoids.7055.B
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7065 }
+			}
+		}
+	}
+}
+
+#Went for it
+country_event = {
+	id = toxoids.7060
+	title = toxoids.7060.name
+	desc = toxoids.7060.desc
+	picture = GFX_evt_psionics
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7060.A
+		custom_tooltip = toxoids.7060.A.tooltip
+		hidden_effect = {
+			set_country_flag = toxoids_7060_A
+		}
+	}
+	option = {
+		name = toxoids.7060.B
+		allow = {
+			resource_stockpile_compare = {
+				resource = unity
+				value >= 1000
+			}
+		}
+		add_resource = {
+			unity = -1000
+		}
+		home_planet = {
+			hidden_effect = { remove_deposit = d_toxic_god_blight_upon_the_land }
+			add_deposit = d_toxic_god_blight_upon_the_land_upgraded
+		}
+	}
+	after = {
+		add_modifier = {
+			modifier = low_motivation
+			days = 3600
+		}
+	}
+}
+
+#Didn't
+country_event = {
+	id = toxoids.7065
+	title = toxoids.7065.name
+	desc = toxoids.7065.desc
+	picture = GFX_evt_psionics
+	show_sound = event_whispering
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = knights_met_end_of_cycle
+	}
+
+	option = {
+		name = toxoids.7065.A
+		trigger = {
+			NOT = { has_ascension_perk = ap_mind_over_matter }
+		}
+
+		if = {
+			limit = {
+				NOR = {
+					has_technology = tech_psionic_theory
+					has_tech_option = tech_psionic_theory
+				}
+			}
+			add_research_option = tech_psionic_theory
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+	option = {
+		name = toxoids.7065.B
+		trigger = { has_ascension_perk = ap_mind_over_matter }
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+	}
+}
+
+
+## Fourth Quest
+situation_event = {
+	id = toxoids.7075
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { #create and exile a leader to get a name for the knight
+		owner = {
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_4
+				save_event_target_as = questing_knight_4
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_42 #Redshirt Knight
+				save_event_target_as = questing_knight_42
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_43 #Redshirt Knight
+				save_event_target_as = questing_knight_43
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_44 #Redshirt Knight
+				save_event_target_as = questing_knight_44
+			}
+			save_event_target_as = owner
+			event_target:questing_knight_2_@event_target:owner = {
+				save_event_target_as = questing_knight_2
+			}
+		}
+	}
+
+	after = {
+		owner = {
+			country_event = { id = toxoids.7080 }
+		}
+	}
+}
+
+country_event = { #A wandered shows up at the Keep, challenges three knights and defeats them.
+	id = toxoids.7080
+	title = "toxoids.7080"
+	desc = "toxoids.7080.desc"
+	picture = GFX_evt_gladiators
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7080.a
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7085 days = 2 }
+		}
+	}
+}
+
+country_event = { #Knight is sent to prevent other knights to seek revenge against the Wanderer and follow them into a wormhole.
+	id = toxoids.7085
+	title = "toxoids.7085"
+	desc = "toxoids.7085.desc"
+	picture = GFX_evt_face_off_in_space
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7085.a
+		hidden_effect = {
+			country_event = { id = toxoids.7090 days = 20 random = 7 }
+		}
+	}
+
+	option = {
+		name = toxoids.7085.b
+		hidden_effect = {
+			country_event = { id = toxoids.7095 days = 30 random = 10 }
+		}
+	}
+}
+
+country_event = { #The Knight stands firm and does his duty. Fights other knights to prevent the crossing. One dies, the wormhole closes.
+	id = toxoids.7090
+	title = "toxoids.7090"
+	desc = "toxoids.7090.desc"
+	picture = GFX_evt_space_funeral
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7090.a
+		custom_tooltip = toxoids.7090.a.tooltip
+		hidden_effect = { set_country_flag = toxoids_7090_a }
+	}
+}
+
+country_event = { #The Knight follows the vengeful companions through the unstable wormhole. Exits alone near a station full of long dead people. The Wanderer is there and very dead.
+	id = toxoids.7095
+	title = "toxoids.7095"
+	desc = "toxoids.7095.desc"
+	picture = GFX_evt_shroud_tunnel
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7095.a
+		custom_tooltip = toxoids.7095.a.tooltip
+		home_planet = {
+			hidden_effect = {
+				remove_deposit = d_toxic_god_pestilential_wasteland
+			}
+			add_deposit = d_toxic_god_pestilential_wasteland_upgraded
+		}
+	}
+	option = {
+		name = toxoids.7095.b
+		custom_tooltip = toxoids.7095.b.tooltip
+		hidden_effect = { set_country_flag = toxoids_7095_b } #To be called in the last Quest
+	}
+}
+
+
+#Fifth Quest: The Gatekeeper
+situation_event = {
+	id = toxoids.7110
+	title = toxoids.7110.name
+	desc = toxoids.7110.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_10
+				save_event_target_as = questing_knight_10
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_squire_10
+				save_event_target_as = questing_squire_10
+			}
+		}
+	}
+
+	option = {
+		name = toxoids.7110.A
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7115 days = 40 random = 10 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7115
+	title = TRANSMISSION
+	desc = toxoids.7115.desc
+	diplomatic = yes
+	diplomatic_title = toxoids.7115.name
+	picture_event_data = {
+		portrait = tox_machine
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7115.A
+		hidden_effect = { set_country_flag = temp_tox7115_A }
+	}
+	option = {
+		name = toxoids.7115.B
+		hidden_effect = { set_country_flag = temp_tox7115_B }
+	}
+	option = {
+		name = toxoids.7115.C
+	}
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7120 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7120
+	title = TRANSMISSION
+	desc = toxoids.7120.desc
+	diplomatic = yes
+	diplomatic_title = toxoids.7115.name
+	picture_event_data = {
+		portrait = tox_machine
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7120.A
+		hidden_effect = { set_country_flag = temp_tox7120_A }
+	}
+	option = {
+		name = {
+			text = toxoids.7120.B1
+			trigger = { has_country_flag = temp_tox7115_A }
+		}
+		name = {
+			text = toxoids.7120.B2
+			trigger = { has_country_flag = temp_tox7115_B }
+		}
+		trigger = {
+			OR = {
+				has_country_flag = temp_tox7115_A
+				has_country_flag = temp_tox7115_B
+			}
+		}
+		hidden_effect = { set_country_flag = temp_tox7120_B }
+	}
+	option = {
+		name = toxoids.7120.C
+		hidden_effect = { set_country_flag = temp_tox7120_C }
+	}
+	after = {
+		hidden_effect = {
+			remove_country_flag = temp_tox7115_A
+			remove_country_flag = temp_tox7115_B
+			country_event = { id = toxoids.7125 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7125
+	title = TRANSMISSION
+	desc = {
+		text = toxoids.7125.desc1
+		trigger = { has_country_flag = temp_tox7120_A }
+	}
+	desc = {
+		text = toxoids.7125.desc2
+		trigger = { has_country_flag = temp_tox7120_B }
+	}
+	desc = {
+		text = toxoids.7125.desc3
+		trigger = { has_country_flag = temp_tox7120_C }
+	}
+	diplomatic = yes
+	diplomatic_title = toxoids.7115.name
+	picture_event_data = {
+		portrait = tox_machine
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7125.A
+		if = {
+			limit = { has_country_flag = temp_tox7120_C }
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			remove_country_flag = temp_tox7120_A
+			remove_country_flag = temp_tox7120_B
+			remove_country_flag = temp_tox7120_C
+			country_event = { id = toxoids.7130 days = 10 random = 10 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7130
+	title = toxoids.7130.name
+	desc = toxoids.7130.desc
+	picture = GFX_evt_robot_encounter
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7130.A
+		home_planet = {
+			hidden_effect = {
+				remove_deposit = d_toxic_god_deitys_swarms
+			}
+			add_deposit = d_toxic_god_deitys_swarms_upgraded
+		}
+	}
+
+	option = {
+		name = toxoids.7130.B
+		custom_tooltip = knights_more_research_tooltip
+		hidden_effect = { set_country_flag = toxoids_7130_b }
+	}
+
+	option = {
+		name = toxoids.7130.C
+		custom_tooltip = knights_more_unity_tooltip
+		hidden_effect = { set_country_flag = toxoids_7130_c }
+	}
+}
+
+## Sixth Quest
+situation_event = {
+	id = toxoids.7140
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { #create and exile a leader to get a name for the knight
+		owner = {
+			save_event_target_as = owner
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_6
+				save_event_target_as = questing_knight_6
+				save_global_event_target_as = questing_knight_6_@event_target:owner
+				set_immortal = yes
+			}
+		}
+	}
+
+	after = {
+		owner = {
+			country_event = { id = toxoids.7145 }
+		}
+	}
+}
+
+country_event = { #A new section of Sinople's memory is unlocked. Points to a toxic world where other knights have already disappeared.
+	id = toxoids.7145
+	title = "toxoids.7145"
+	desc = "toxoids.7145.desc"
+	picture = GFX_evt_decryption
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7145.a
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7150 days = 30 random = 10 }
+		}
+	}
+}
+
+country_event = { #Diplo. Dialogue with a trickster who tried to get you to fight for them
+	id = toxoids.7150
+	title = "toxoids.7150"
+	desc = "toxoids.7150.desc"
+	show_sound = evn_tox_knights_of_the_toxic_god
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = shroudwalker02
+		room = extradimensional_green_room
+	}
+
+	is_triggered_only = yes
+
+	option = { #KnowMore
+		name = toxoids.7150.a
+		custom_tooltip = toxoids.7150.a.tooltip
+		trigger = {
+			NOT = { has_country_flag = quest_six_enough }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7155 }
+		}
+	}
+
+	option = { #Accept
+		name = toxoids.7150.b
+		custom_tooltip = toxoids.7150.b.tooltip
+		hidden_effect = {
+			country_event = { id = toxoids.7160 days = 5 }
+		}
+	}
+
+	option = { #Refuse
+		name = toxoids.7150.c
+		custom_tooltip = toxoids.7150.c.tooltip
+		hidden_effect = {
+			country_event = { id = toxoids.7164 }
+		}
+	}
+
+	option = { #If psionic yourself, see through the lies
+		name = toxoids.7150.d
+		trigger = {
+			has_ascension_perk = ap_mind_over_matter
+		}
+		custom_tooltip = toxoids.7150.d.tooltip
+		icon = {
+			icon = GFX_psionic
+			text = toxoids.7150.d.psionic
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7164 }
+			set_country_flag = quest_six_liar
+		}
+	}
+}
+
+country_event = { #Would You Like To Know More?
+	id = toxoids.7155
+	base = toxoids.7150
+	desc_clear = yes
+	desc = toxoids.7155.desc
+	option_clear = yes
+
+	option = { #Who are you?
+		name = toxoids.7155.a
+		trigger = {
+			NOT = { has_country_flag = quest_six_who }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7156 }
+			set_country_flag = quest_six_who
+		}
+	}
+
+	option = { #Why are you here?
+		name = toxoids.7155.b
+		trigger = {
+			NOT = { has_country_flag = quest_six_why }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7157 }
+			set_country_flag = quest_six_why
+		}
+	}
+
+	option = { #What's going on?
+		name = toxoids.7155.c
+		trigger = {
+			NOT = { has_country_flag = quest_six_what }
+		}
+		hidden_effect = {
+			country_event = {id = toxoids.7158 }
+			set_country_flag = quest_six_what
+		}
+	}
+
+	option = { #You said you met another knight like me?
+		name = toxoids.7155.d
+		trigger = {
+			NOT = { has_country_flag = quest_six_knight }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7159 }
+			set_country_flag = quest_six_knight
+		}
+	}
+
+	option = { #I know enough
+		name = toxoids.7155.e
+		hidden_effect = {
+			country_event = { id = toxoids.7150 }
+			set_country_flag = quest_six_enough
+		}
+	}
+}
+
+country_event = { #Who?
+	id = toxoids.7156
+	base = toxoids.7150
+	desc_clear = yes
+	desc = toxoids.7156.desc
+	option_clear = yes
+
+	option = { #Why are you here?
+		name = toxoids.7155.b
+		trigger = {
+			NOT = { has_country_flag = quest_six_why }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7157 }
+			set_country_flag = quest_six_why
+		}
+	}
+
+	option = { #What's going on?
+		name = toxoids.7155.c
+		trigger = {
+			NOT = { has_country_flag = quest_six_what }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7158 }
+			set_country_flag = quest_six_what
+		}
+	}
+
+	option = { #You said you met another knight like me?
+		name = toxoids.7155.d
+		trigger = {
+			NOT = { has_country_flag = quest_six_knight }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7159 }
+			set_country_flag = quest_six_knight
+		}
+	}
+
+	option = { #I know enough
+		name = toxoids.7155.e
+		hidden_effect = {
+			country_event = { id = toxoids.7150 }
+			set_country_flag = quest_six_enough
+		}
+	}
+}
+
+country_event = { #Why?
+	id = toxoids.7157
+	base = toxoids.7150
+	desc_clear = yes
+	desc = toxoids.7157.desc
+	option_clear = yes
+
+	option = { #Who are you?
+		name = toxoids.7155.a
+		trigger = {
+			NOT = { has_country_flag = quest_six_who }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7156 }
+			set_country_flag = quest_six_who
+		}
+	}
+
+	option = { #What's going on?
+		name = toxoids.7155.c
+		trigger = {
+			NOT = { has_country_flag = quest_six_what }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7158 }
+			set_country_flag = quest_six_what
+		}
+	}
+
+	option = { #You said you met another knight like me?
+		name = toxoids.7155.d
+		trigger = {
+			NOT = { has_country_flag = quest_six_knight }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7159 }
+			set_country_flag = quest_six_knight
+		}
+	}
+
+	option = { #I know enough
+		name = toxoids.7155.e
+		hidden_effect = {
+			country_event = { id = toxoids.7150 }
+			set_country_flag = quest_six_enough
+		}
+	}
+}
+
+country_event = { #What?
+	id = toxoids.7158
+	base = toxoids.7150
+	desc_clear = yes
+	desc = toxoids.7158.desc
+	option_clear = yes
+
+	option = { #Who are you?
+		name = toxoids.7155.a
+		trigger = {
+			NOT = { has_country_flag = quest_six_who }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7156 }
+			set_country_flag = quest_six_who
+		}
+	}
+
+	option = { #Why are you here?
+		name = toxoids.7155.b
+		trigger = {
+			NOT = { has_country_flag = quest_six_why }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7157 }
+			set_country_flag = quest_six_why
+		}
+	}
+
+	option = { #You said you met another knight like me?
+		name = toxoids.7155.d
+		trigger = {
+			NOT = { has_country_flag = quest_six_knight }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7159 }
+			set_country_flag = quest_six_knight
+		}
+	}
+
+	option = { #I know enough
+		name = toxoids.7155.e
+		hidden_effect = {
+			country_event = { id = toxoids.7150 }
+			set_country_flag = quest_six_enough
+		}
+	}
+}
+
+country_event = { #Knight?
+	id = toxoids.7159
+	base = toxoids.7150
+	desc_clear = yes
+	desc = toxoids.7159.desc
+	option_clear = yes
+
+	option = { #Who are you?
+		name = toxoids.7155.a
+		trigger = {
+			NOT = { has_country_flag = quest_six_who }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7156 }
+			set_country_flag = quest_six_who
+		}
+	}
+
+	option = { #Why are you here?
+		name = toxoids.7155.b
+		trigger = {
+			NOT = { has_country_flag = quest_six_why }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7157 }
+			set_country_flag = quest_six_why
+		}
+	}
+
+	option = { #What's going on?
+		name = toxoids.7155.c
+		trigger = {
+			NOT = { has_country_flag = quest_six_what }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7158 }
+			set_country_flag = quest_six_what
+		}
+	}
+
+	option = { #I know enough
+		name = toxoids.7155.e
+		hidden_effect = {
+			country_event = { id = toxoids.7150 }
+			set_country_flag = quest_six_enough
+		}
+	}
+}
+
+country_event = { #Knight accepts to protect the trickster, unknowingly fights and kills a fellow knight. Swears vengeance
+	id = toxoids.7160
+	title = "toxoids.7160"
+	desc = "toxoids.7160.desc"
+	picture = GFX_evt_space_funeral
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7160.a
+		custom_tooltip = toxoids.7160.a.tooltip
+		set_country_flag = toxoids.7160.a #To be used in the final quest
+		home_planet = {
+			hidden_effect = {
+				remove_deposit = d_toxic_god_envenomed_seas
+			}
+			add_deposit = d_toxic_god_envenomed_seas_upgraded
+		}
+		hidden_effect = { country_event = { id = toxoids.7170 } } #Fire an event to clear the flags
+	}
+}
+
+country_event = { #Refuse to help
+	id = toxoids.7164
+	base = toxoids.7150
+	desc_clear = yes
+	desc = {
+ 		trigger = {
+ 			has_country_flag = quest_six_liar
+ 		}
+ 		text = toxoids.7164.a.desc
+ 	}
+ 	desc = "toxoids.7164.desc"
+ 	option_clear = yes
+
+	option = {
+		name = toxoids.7164.a
+		hidden_effect = {
+			country_event = { id = toxoids.7165 }
+		}
+	}
+}
+
+country_event = { #Angered, the rogue shroudwalker whips out lightsabers and attacks the knight. Able to read minds, the stranger has the upper hand on the knight. Let Sinople fight to gain the upper hand.
+	id = toxoids.7165
+	title = "toxoids.7165"
+	desc = "toxoids.7165.desc"
+	picture = GFX_evt_zro_2
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7165.a
+		custom_tooltip = toxoids.7165.a.tooltip
+		hidden_effect = {
+			country_event = { id = toxoids.7170 } #Fire an event to clear the flags
+			add_modifier = {
+				modifier = alloy_producing_knights
+				days = -1
+			}
+		}
+	}
+}
+
+country_event = { #hidden event to clear the flags used in the dialogues
+	id = toxoids.7170
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = quest_six_enough
+		remove_country_flag = quest_six_liar
+		remove_country_flag = quest_six_who
+		remove_country_flag = quest_six_why
+		remove_country_flag = quest_six_what
+		remove_country_flag = quest_six_knight
+	}
+}
+
+#Seventh Quest: The Witch of the Woods
+situation_event = {
+	id = toxoids.7195
+	title = toxoids.7195.name
+	desc = toxoids.7195.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_alien_signal
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			save_event_target_as = owner
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+			}
+			last_created_leader = {
+				exile_leader_as = questing_knight_15
+				save_event_target_as = questing_knight_15
+				set_immortal = yes
+				save_global_event_target_as = questing_knight_15_@event_target:owner
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = NAME_Syamelle
+				gender = female
+			}
+			last_created_leader = {
+				exile_leader_as = syamelle
+				save_event_target_as = syamelle
+			}
+		}
+	}
+
+	option = {
+		name = toxoids.7195.A
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7200 days = 15 random = 10 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7200
+	title = toxoids.7200.diplo_title
+	desc = {
+		trigger = { is_synthetic_empire = no }
+		text = toxoids.7200.desc
+	}
+	desc = {
+		trigger = { is_synthetic_empire = yes }
+		text = toxoids.7200.desc.synth
+	}
+	diplomatic = yes
+	diplomatic_title = toxoids.7200.name
+	picture_event_data = {
+		portrait = event_target:syamelle
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7200.A
+		hidden_effect = {
+			country_event = { id = toxoids.7205 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7205
+	title = toxoids.7205.name
+	diplomatic_title = toxoids.7205.diplo_title
+	desc = {
+		trigger = {
+			species = { wears_clothes = yes }
+		}
+		text = toxoids.7205.desc
+	}
+	desc = {
+		trigger = {
+			species = { wears_clothes = no }
+		}
+		text = toxoids.7205.desc.no_clothes
+	}
+	diplomatic = yes
+	picture_event_data = {
+		portrait = event_target:syamelle
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7205.A
+		hidden_effect = {
+			country_event = { id = toxoids.7215 days = 5 } #we'll leave the 5 days to your imagination
+		}
+	}
+	option = {
+		name = toxoids.7205.B
+		hidden_effect = {
+			country_event = { id = toxoids.7210 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7210
+	title = toxoids.7210.name
+	diplomatic_title = toxoids.7210.diplo_title
+	desc = {
+		trigger = { is_synthetic_empire = no }
+		text = toxoids.7210.desc
+	}
+	desc = {
+		trigger = { is_synthetic_empire = yes }
+		text = toxoids.7210.desc.synth
+	}
+	diplomatic = yes
+	picture_event_data = {
+		portrait = event_target:syamelle
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+	show_sound = event_bad_omen
+
+	option = {
+		name = toxoids.7210.A
+		if = {
+			limit = { is_synthetic_empire = no }
+			add_modifier = {
+				modifier = syamelles_curse
+			}
+			random_owned_planet = {
+				limit = { has_building = building_order_keep }
+				add_modifier = {
+					modifier = syamelles_curse_habitat
+					clear_on_owner_change = yes
+				}
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7215
+	title = toxoids.7215.name
+	diplomatic_title = toxoids.7215.diplo_title
+	desc = toxoids.7215.desc
+	diplomatic = yes
+	picture_event_data = {
+		portrait = event_target:syamelle
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7215.A
+		hidden_effect = {
+			country_event = { id = toxoids.7220 }
+		}
+		ai_chance = { factor = 0 }
+	}
+	option = {
+		name = toxoids.7215.B
+		hidden_effect = {
+			country_event = { id = toxoids.7225 }
+		}
+		ai_chance = { factor = 1 }
+	}
+}
+
+country_event = {
+	id = toxoids.7220
+	title = toxoids.7220.name
+	diplomatic_title = toxoids.7220.diplo_title
+	desc = toxoids.7220.desc
+	diplomatic = yes
+	picture_event_data = {
+		portrait = event_target:syamelle
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+	show_sound = event_bad_omen
+
+	immediate = {
+		random_owned_planet = {
+			limit = { has_building = building_order_keep }
+			save_event_target_as = order_keep
+		}
+	}
+
+	option = {
+		name = toxoids.7220.A
+		custom_tooltip = knights_more_research_tooltip
+		custom_tooltip = toxoids.7220.A.tooltip
+		hidden_effect = {
+			set_country_flag = toxoids_7220_a
+			event_target:order_keep = {
+				set_planet_flag = dimensional_manipulation_device_deactivated
+			}
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.7225
+	title = toxoids.7225.name
+	diplomatic_title = toxoids.7225.diplo_title
+	desc = {
+		trigger = { is_synthetic_empire = no }
+		text = toxoids.7225.desc
+	}
+	desc = {
+		trigger = { is_synthetic_empire = yes }
+		text = toxoids.7225.desc.synth
+	}
+	diplomatic = yes
+	picture_event_data = {
+		portrait = event_target:syamelle
+		room = toxoids_room
+	}
+	is_triggered_only = yes
+	show_sound = event_mystic_reveal_light
+
+	option = {
+		name = toxoids.7225.A
+		if = {
+			limit = { is_synthetic_empire = no }
+			add_modifier = {
+				modifier = syamelles_blessing
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = syamelles_blessing_synth
+			}
+		}
+	}
+}
+
+
+## Final Quest
+situation_event = {
+	id = toxoids.7250
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { #create and exile a leader to get a name for the knights
+		owner = { save_event_target_as = owner }
+		event_target:questing_knight_X_@event_target:owner = {
+			save_event_target_as = questing_knight_8
+		}
+		event_target:questing_knight_6_@event_target:owner = {
+			save_event_target_as = questing_knight_6
+		}
+		event_target:questing_knight_15_@event_target:owner = {
+			save_event_target_as = questing_knight_15
+		}
+	}
+
+	after = {
+		owner = {
+			country_event = { id = toxoids.7255 }
+		}
+	}
+}
+
+country_event = { #One of the very first knights of the Order emerges from another dimension, many centuries after their disappearance.
+	id = toxoids.7255
+	title = "toxoids.7255.name"
+	desc = "toxoids.7255.desc"
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = { #Handle this quietly
+		name = toxoids.7255.a
+	}
+
+	option = { #Welcome them publicly, organize a triumph
+		name = toxoids.7255.b
+		allow = {
+			resource_stockpile_compare = { resource = energy value >= 10000 }
+		}
+		add_resource = {
+			energy = -10000
+		}
+		add_modifier = {
+			modifier = return_of_the_knight
+			days = 3000
+		}
+
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7260 days = 90 random = 30 }
+		}
+	}
+}
+
+country_event = { #Diplo. Talk to Old Knight's counselor, then to the knight themselves
+	id = toxoids.7260
+	title = "toxoids.7260.name"
+	desc = "toxoids.7260.desc"
+	show_sound = evn_tox_knights_of_the_toxic_god
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = event_target:questing_knight_8
+		room = personality_honorbound_warriors_room
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		create_leader = {
+			class = general
+			species = owner_main_species
+			name = random
+		}
+		last_created_leader = {
+			exile_leader_as = questing_knight_82 #Squire
+			save_event_target_as = questing_knight_82
+		}
+	}
+
+	option = { #How are they?
+		name = toxoids.7260.a
+		hidden_effect = {
+			country_event = { id = toxoids.7265 }
+		}
+	}
+}
+
+country_event = { #How are they
+	id = toxoids.7265
+	base = toxoids.7260
+	desc_clear = yes
+	desc = toxoids.7265.desc
+	option_clear = yes
+
+	option = { #Let us talk to them
+		name = toxoids.7265.a
+		hidden_effect = {
+			country_event = { id = toxoids.7270 }
+		}
+	}
+}
+
+country_event = { #Talk to the knight.
+	id = toxoids.7270
+	title = "toxoids.7270.name"
+	desc = "toxoids.7270.desc"
+	show_sound = evn_tox_knights_of_the_toxic_god
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+
+	is_triggered_only = yes
+
+	option = { #How are you settling in?
+		name = toxoids.7270.a
+		trigger = {
+			NOT = { has_country_flag = final_quest_settling }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7275 }
+		}
+	}
+
+	option = { #Are the legends about you true?
+		name = toxoids.7270.b
+		trigger = {
+			NOT = { has_country_flag = final_quest_legends }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7280 }
+		}
+	}
+
+	option = { #What was your exile like?
+		name = toxoids.7270.c
+		trigger = {
+			NOT = { has_country_flag = final_quest_exile }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7285 }
+		}
+	}
+
+	option = { #You said you could help us find the Toxic God
+		name = toxoids.7270.d
+		trigger = {
+			has_country_flag = final_quest_exile
+			has_country_flag = final_quest_settling
+			has_country_flag = final_quest_legends
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7290 }
+		}
+	}
+}
+
+country_event = { #How are you settling in?
+	id = toxoids.7275
+	base = toxoids.7270
+	desc_clear = yes
+	desc = toxoids.7275.desc
+
+	immediate = {
+		set_country_flag = final_quest_settling
+	}
+}
+
+country_event = { #Legends
+	id = toxoids.7280
+	base = toxoids.7270
+	desc_clear = yes
+	desc = toxoids.7280.desc
+
+	immediate = {
+		set_country_flag = final_quest_legends
+	}
+}
+
+country_event = { #Exile
+	id = toxoids.7285
+	base = toxoids.7270
+	desc_clear = yes
+	desc = toxoids.7285.desc
+
+	immediate = {
+		set_country_flag = final_quest_exile
+	}
+}
+
+country_event = { #Help Find Toxic God?
+	id = toxoids.7290
+	base = toxoids.7270
+	desc_clear = yes
+	desc = toxoids.7290.desc
+	option_clear = yes
+
+	option = { #Lesgooo
+		name = toxoids.7290.a
+		hidden_effect = {
+			country_event = { id = toxoids.7295 days = 90 random = 30 }
+		}
+	}
+}
+
+country_event = { #Arrive to the moon which has sealed the Toxic Entity away from hyperlanes. Confront the Trickster
+	id = toxoids.7295
+	title = "toxoids.7295.name"
+	desc = "toxoids.7295.desc"
+	picture = GFX_evt_zro_2
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = { #Fight!
+		name = toxoids.7295.a
+		trigger = {
+			NOT = { has_country_flag = toxoids.7160.a }
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7300 }
+		}
+	}
+	option = { #Silence Heretic!
+		name = toxoids.7295.b
+		trigger = {
+			NOT = { has_country_flag = toxoids.7160.a }
+			is_spiritualist = yes
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7300 }
+		}
+	}
+	option = { #VENGEANCE!
+		name = toxoids.7295.c
+			trigger = {
+			has_country_flag = toxoids.7160.a
+		}
+		hidden_effect = {
+			country_event = { id = toxoids.7300 }
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+	}
+}
+
+country_event = { #Fight with the Trickster. Either vengeance of the Sable Knights or Legend Knight dies and the empire gets cursed by the trickster.
+	id = toxoids.7300
+	title = "toxoids.7300.name"
+	desc = {
+ 		trigger = {
+ 			has_country_flag = toxoids_7095_b
+ 		}
+ 		text = toxoids.7300.desc.sable #Sable knights save the day
+ 	}
+	desc = "toxoids.7300.desc" #Curse and death of a legend
+	picture = GFX_evt_zro_3
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = { #Sable Knights save the day
+		name = toxoids.7300.a
+		trigger = {
+ 			has_country_flag = toxoids_7095_b
+ 		}
+	}
+
+	option = { #Curse!
+		name = toxoids.7300.b
+		trigger = {
+ 			NOT = { has_country_flag = toxoids_7095_b }
+ 		}
+ 		add_modifier = {
+ 			modifier = trickster_curse
+ 			days = 900
+ 		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = toxoids.7305 }
+		}
+	}
+}
+
+country_event = { #Open the hyperlane to the sealed system.
+	id = toxoids.7305
+	title = "toxoids.7305.name"
+	desc = "toxoids.7305.desc"
+	picture = GFX_evt_relic_world_building
+	show_sound = evn_tox_knights_of_the_toxic_god
+	location = event_target:toxic_god_system
+
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = { id = toxoids.7500 } #Spawn the toxic god system here
+		if = {
+			limit = {
+				NOT = { exists = event_target:toxic_god_system }
+			}
+			random_system = {
+				limit = { has_star_flag = guardian_toxic_god_system }
+				save_event_target_as = toxic_god_system
+			}
+		}
+		create_point_of_interest = {
+			id = toxoid_knights_finisher.poi
+			name = toxoid_knights_finisher.poi.name
+			desc = toxoid_knights_finisher.poi.desc
+			event_chain = tutorial_21_chain
+			location = event_target:toxic_god_system
+		}
+	}
+
+	option = { #OPEN SESAME
+		name = toxoids.7305.a
+	}
+
+	after = {
+		random_situation = {
+			limit = { is_situation_type = situation_toxic_knights }
+			destroy_situation = this
+		}
+		hidden_effect = { #otherwise, these will live forever in the aether.
+			if = {
+				limit = { exists = event_target:questing_knight_15_@root }
+				event_target:questing_knight_15_@root = {
+					kill_leader = { show_notification = no }
+				}
+				clear_global_event_target = event_target:questing_knight_15_@root
+			}
+			if = {
+				limit = { exists = event_target:questing_knight_X_@root }
+				event_target:questing_knight_X_@root = {
+					kill_leader = { show_notification = no }
+				}
+				clear_global_event_target = event_target:questing_knight_X_@root
+			}
+			if = {
+				limit = { exists = event_target:questing_knight_6_@root }
+				event_target:questing_knight_6_@root = {
+					kill_leader = { show_notification = no }
+				}
+				clear_global_event_target = event_target:questing_knight_6_@root
+			}
+			if = {
+				limit = { exists = event_target:questing_knight_2_@root }
+				event_target:questing_knight_15_@root = {
+					kill_leader = { show_notification = no }
+				}
+				clear_global_event_target = event_target:questing_knight_2_@root
+			}
+		}
+	}
+}
+
+# Scope = Fleet
+# From = System
+fleet_event = { #Enter the toxic system, meet the entity
+	id = toxoids.7310
+	title = "toxoids.7310.name"
+	desc = "toxoids.7310.desc" # Just open hyperlane
+	picture = GFX_evt_toxic_god
+	show_sound = evn_tox_knights_of_the_toxic_god
+	location = from
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = guardian_toxic_god_system
+		}
+		controller = {
+			is_toxic_knights_empire = yes
+			NOR = {
+				has_country_flag = visited_toxic_god_system
+				has_global_flag = toxic_god_killed
+			}
+		}
+		from = {
+			any_fleet_in_system = { has_fleet_flag = toxic_god_original_fleet }
+		}
+	}
+
+	immediate = {
+		controller = {
+			set_country_flag = visited_toxic_god_system
+			remove_point_of_interest = toxoid_knights_finisher.poi
+		}
+	}
+
+	option = { # This monstruosity is no god of mine! Smite it!
+		name = toxoids.7310.a
+	}
+
+	option = { # The God wishes to test our mettle! Bring our armies!
+		name = toxoids.7310.b
+	}
+}
+
+fleet_event = { #Enter the toxic system, meet the entity - Non Knight
+	id = toxoids.7311
+	title = "toxoids.7311.name"
+	desc = "toxoids.7311.desc" # Just open hyperlane
+	picture = GFX_evt_toxic_god
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = guardian_toxic_god_system
+		}
+		controller = {
+			NOR = {
+				is_toxic_knights_empire = yes
+				has_country_flag = visited_toxic_god_system
+				has_global_flag = toxic_god_killed
+			}
+		}
+		from = {
+			any_fleet_in_system = { has_fleet_flag = toxic_god_original_fleet }
+		}
+	}
+
+	immediate = {
+		controller = {
+			set_country_flag = visited_toxic_god_system
+		}
+	}
+
+	option = { # What the hell is this thing??
+		name = toxoids.7311.a
+	}
+}
+
+# Scope = Fleet
+# From = System
+fleet_event = { #Enter the toxic system, but there is not entity
+	id = toxoids.7312
+	title = "toxoids.7312.name"
+	desc = "toxoids.7312.desc" # Just open hyperlane
+	picture = GFX_evt_toxic_god
+	show_sound = event_bad_omen
+	location = from
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = guardian_toxic_god_system
+		}
+		controller = {
+			is_toxic_knights_empire = yes
+			NOT = { has_country_flag = visited_toxic_god_system }
+		}
+		OR = {
+			has_global_flag = toxic_god_killed
+			NOT = {
+				from = {
+					any_fleet_in_system = { has_fleet_flag = toxic_god_original_fleet }
+				}
+			}
+		}
+	}
+
+	immediate = {
+		controller = {
+			set_country_flag = visited_toxic_god_system
+			remove_point_of_interest = toxoid_knights_finisher.poi
+		}
+	}
+
+	option = { # Sad
+		name = toxoids.7312.A
+		custom_tooltip = toxoids.7312.tooltip
+		add_modifier = {
+			modifier = despair_of_the_knightly_order
+		}
+		hidden_effect = {
+			controller = { country_event = { id = toxoids.8020 days = 6000 random = 1500 } }
+		}
+	}
+}
+
+country_event = { # Upon defeating the Entity
+	id = toxoids.7315
+	title = "toxoids.7315.name"
+	desc = "toxoids.7315.desc"
+	picture = GFX_evt_toxic_god
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	trigger = {
+		this = {
+			from = { is_country_type = guardian_toxic_god }
+		}
+		is_toxic_knights_empire = yes
+	}
+
+	option = { # Tame it
+		name = toxoids.7315.a
+		custom_tooltip = toxoids.7315.a.tt
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7320 days = 900 }
+				create_fleet = {
+					name = "NAME_Toxic_God"
+					settings = {
+						spawn_debris = no
+						is_boss = yes
+					}
+					effect = {
+						set_owner = root.owner
+						create_ship = {
+							name = "NAME_Toxic_God"
+							design = "NAME_Venomous_Deity"
+						}
+						set_location = {
+							target = fromfrom
+							distance = 5
+							angle = random
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = { # Finish it
+		name = toxoids.7315.b
+		custom_tooltip = toxoids.7315.b.tt
+		hidden_effect = {
+			owner = {
+				country_event = { id = toxoids.7510 scopes = { fromfrom = fromfrom.solar_system } }
+				country_event = { id = toxoids.8020 days = 6000 random = 1500 }
+			}
+		}
+	}
+}
+
+country_event = { #The Fate of the Order
+	id = toxoids.7320
+	title = "toxoids.7320.name"
+	desc = "toxoids.7320.desc"
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	option = { #Disband the knights
+		name = toxoids.7320.a
+		custom_tooltip = toxoids.7320.a.tt
+
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = quest_over
+			}
+		}
+	}
+}
+
+# End chain: spawn the Toxic God
+country_event = {
+	id = toxoids.7500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { has_global_flag = toxic_god_spawned }
+			}
+			owner = {
+				random_system_within_border = {
+					weights = {
+						base = 1
+						modifier = {
+							factor = 10
+							is_capital_system = no
+						}
+						modifier = {
+							factor = 10
+							OR = {
+								NOT = { exists = sector }
+								sector = {
+									NOT = { has_sector_type = core_sector }
+								}
+							}
+						}
+					}
+					save_event_target_as = spawning_system
+					spawn_system = {
+						initializer = toxic_knights_finish
+						effect = {
+							root = { set_visited = prev }
+							save_event_target_as = toxic_god_system
+						}
+					}
+					if = {
+						limit = { last_created_system = { NOT = { has_hyperlane_to = prev } } }
+						add_hyperlane = {
+							from = this
+							to = last_created_system
+						}
+					}
+					else = {
+						add_extra_hyperlane_to_spawned_system_effect = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# You killed it
+
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = toxoids.7510
+	title = toxoids.7510.name
+	desc = toxoids.7510.desc.origin
+	picture = GFX_evt_toxic_god
+	location = fromfrom
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	option = {
+		name = toxoids.7510.A
+		add_relic = r_toxic_god
+	}
+}
+
+country_event = {
+	id = toxoids.7515
+	title = toxoids.7510.name
+	desc = toxoids.7510.desc.not_origin
+	picture = GFX_evt_toxic_god
+	location = fromfrom
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_country_type = guardian_toxic_god }
+		is_toxic_knights_empire = no
+	}
+
+	immediate = {
+		set_global_flag = toxic_god_killed
+	}
+
+	option = {
+		name = toxoids.7510.A
+		add_relic = r_toxic_god
+	}
+	option = {
+		name = toxoids.7510.A.reanimators
+		trigger = {
+			is_reanimator = yes
+		}
+		add_relic = r_toxic_god
+	}
+}
+
+### Single Events ###
+
+#Knights found stuff while questing
+situation_event = {
+	id = toxoids.8000
+	title = toxoids.8000.name
+	desc = toxoids.8000.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { owner = { has_country_flag =  knight_quest_reward } }
+	}
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = { flag = knight_quest_reward days = 3600 }
+		}
+		random_list = {
+			20 = {
+				owner = {
+					set_country_flag = quest_reward_engineering
+				}
+			}
+			20 = {
+				owner = {
+					set_country_flag = quest_reward_physics
+				}
+			}
+			20 = {
+				owner = {
+					set_country_flag = quest_reward_society
+				}
+			}
+			20 = {
+				modifier = {
+					factor = 0
+					has_ancrel = no
+				}
+				owner = {
+					set_country_flag = quest_reward_artifacts
+				}
+			}
+			10 = {
+				owner = {
+					set_country_flag = quest_reward_alloys
+				}
+			}
+			10 = {
+				owner = {
+					set_country_flag = quest_reward_situation_progress
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { has_country_flag = quest_reward_engineering }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		hidden_effect = {
+			owner = {
+				remove_country_flag = quest_reward_engineering
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { has_country_flag = quest_reward_physics }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			hidden_effect = {
+			owner = {
+				remove_country_flag = quest_reward_physics
+			}
+		}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { has_country_flag = quest_reward_society }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			hidden_effect = {
+			owner = {
+				remove_country_flag = quest_reward_society
+			}
+		}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { has_country_flag = quest_reward_alloys }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			hidden_effect = {
+				owner = {
+					remove_country_flag = quest_reward_alloys
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { has_country_flag = quest_reward_artifacts }
+		}
+		small_artifact_reward = yes
+		hidden_effect = {
+			owner = {
+				remove_country_flag = quest_reward_artifacts
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { has_country_flag = quest_reward_situation_progress }
+		}
+		add_situation_progress = 2
+		hidden_effect = {
+			owner = {
+				remove_country_flag = quest_reward_situation_progress
+			}
+		}
+	}
+}
+
+#Knights want more budget!
+situation_event = {
+	id = toxoids.8005
+	title = toxoids.8005.name
+	desc = toxoids.8005.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	trigger = {
+		current_situation_approach = situation_toxic_knights_frugal
+		NOT = { owner = { has_country_flag =  knight_budget_demand } }
+	}
+
+	option = { #Agree
+		name = toxoids.8005.a
+		set_situation_approach = situation_toxic_knights_regular
+		hidden_effect = {
+			owner = {
+				set_country_flag = knight_budget_demand
+			}
+		}
+	}
+	option = { #Refuse
+		name = toxoids.8005.b
+		owner = {
+			add_modifier = {
+				modifier = malcontent_knights
+				days = 3600
+			}
+			hidden_effect = {
+				owner = {
+					set_country_flag = knight_budget_demand
+				}
+			}
+		}
+	}
+	option = { #A donation to calm them
+		name = toxoids.8005.c
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 1000 }
+				resource_stockpile_compare = { resource = alloys value >= 500 }
+			}
+		}
+		owner = {
+			add_resource = { energy = -1000 }
+			add_resource = { alloys = -500 }
+			hidden_effect = {
+				owner = {
+					set_timed_country_flag = { flag = knight_budget_demand days = 1500 }
+				}
+			}
+		}
+	}
+}
+
+#Hundred Years Quest
+situation_event = {
+	id = toxoids.8010
+	title = toxoids.8010.name
+	desc = toxoids.8010.desc
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	trigger = {
+		years_passed > 100
+		owner = {
+			NOT = { has_country_flag = hundread_years_quest }
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = hundread_years_quest
+		}
+	}
+
+	option = { #Organize a festival to celebrate our brave knights
+		name = toxoids.8010.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 5000 }
+				resource_stockpile_compare = { resource = consumer_goods value >= 3000 }
+			}
+		}
+		owner = {
+			add_resource = { energy = -5000 }
+			add_resource = { consumer_goods = -3000 }
+			add_modifier = {
+				modifier = motivated_knights
+				days = 1800
+			}
+		}
+	}
+	option = { #Not worth it
+		name = toxoids.8010.b
+		owner = {
+			add_modifier = {
+				modifier = demotivated_knights
+				days = 1800
+			}
+		}
+	}
+	option = { #Give up and dismantle the order for a one time payout
+		name = toxoids.8010.c
+		owner = {
+			add_resource = { energy = 15000 }
+			add_resource = { alloys = 8000 }
+		}
+		custom_tooltip = toxoids.8010.c.tooltip
+		hidden_effect = {
+			destroy_situation = this
+			owner = {
+				set_country_flag = quest_abandoned
+				random_owned_planet = {
+					limit = { has_planet_flag = toxic_knights_habitat }
+					while = {
+						limit = {
+							has_district = district_orders_demesne
+						}
+						remove_district = district_orders_demesne
+					}
+					remove_building = building_order_keep
+				}
+			}
+		}
+	}
+}
+
+#We lost the Keep!
+
+country_event = {
+	id = toxoids.8014
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			is_toxic_knights_empire = yes
+			NOT = {
+				has_country_flag = toxic_knights_lost_keep
+				has_country_flag = toxic_knights_destroyed_keep
+				any_owned_planet = {
+					has_planet_flag = toxic_knights_habitat
+				}
+			}
+		}
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				is_toxic_knights_empire = yes
+				NOT = {
+					has_country_flag = toxic_knights_lost_keep
+					has_country_flag = toxic_knights_destroyed_keep
+					any_owned_planet = {
+						has_planet_flag = toxic_knights_habitat
+					}
+				}
+			}
+			country_event = { id = toxoids.8015 }
+			random_situation = {
+				limit = {
+					#is_owned_by = root
+					is_situation_type = situation_toxic_knights
+				}
+				set_situation_locked = yes
+			}
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.8015
+	title = "toxoids.8015.name"
+	desc = {
+ 		trigger = {
+ 			owner = {
+ 				OR = {
+ 					has_country_flag = quest_abandoned
+ 					has_country_flag = visited_toxic_god_system
+ 				}
+ 			}
+ 		}
+ 		text = toxoids.8015.desc.a
+ 	}
+	desc = {
+ 		trigger = {
+ 			owner = {
+ 				NOT = {
+ 					has_country_flag = quest_abandoned
+ 					has_country_flag = visited_toxic_god_system
+ 				}
+ 			}
+ 		}
+ 		text = toxoids.8015.desc.b
+ 	}
+	picture = GFX_evt_archaeologists_escaping
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = toxic_knights_lost_keep
+
+	}
+
+	option = {
+		name = toxoids.8015.a
+	}
+}
+
+#The Keep got destroyed!
+
+planet_event = {
+	id = toxoids.8016
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_planet_flag = toxic_knights_habitat
+		owner = {
+			is_toxic_knights_empire = yes
+		}
+	}
+
+	immediate = {
+		owner  = {
+			set_country_flag = toxic_knights_destroyed_keep
+			country_event = { id = toxoids.8017 days = 3 }
+		}
+	}
+}
+
+country_event = {
+	id = toxoids.8017
+	title = "toxoids.8017.name"
+	desc = {
+ 		trigger = {
+ 			owner = {
+ 				OR = {
+ 					has_country_flag = quest_abandoned
+ 					has_country_flag = visited_toxic_god_system
+ 				}
+ 			}
+ 		}
+ 		text = toxoids.8017.desc.a
+ 	}
+	desc = {
+ 		trigger = {
+ 			owner = {
+ 				NOT = {
+ 					has_country_flag = quest_abandoned
+ 					has_country_flag = visited_toxic_god_system
+ 				}
+ 			}
+ 		}
+ 		text = toxoids.8017.desc.b
+ 	}
+	picture = GFX_evt_sabotaged_ship
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	immediate = {
+
+		random_situation = {
+			limit = {
+				is_situation_type = situation_toxic_knights
+			}
+			destroy_situation = this
+		}
+	}
+
+	option = {
+		name = toxoids.8017.a
+	}
+}
+
+country_event = {
+	id = toxoids.8020
+	title = "toxoids.8020.name"
+	desc = "toxoids.8020.desc"
+	picture = GFX_evt_black_hole
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = quest_complete_achievement
+	}
+
+	option = {
+		name = toxoids.8020.a
+		if = {
+			limit = { has_modifier = despair_of_the_knightly_order }
+			remove_modifier = despair_of_the_knightly_order
+		}
+	}
+}
+
+#We recovered the Keep!
+
+planet_event = {
+	id = toxoids.8024
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_planet_flag = toxic_knights_habitat
+		original_owner = yes
+	}
+
+	immediate = {
+		owner = { country_event = { id = toxoids.8025 days = 3 } }
+	}
+}
+
+country_event = {
+	id = toxoids.8025
+	title = "toxoids.8025.name"
+	desc = "toxoids.8025.desc"
+	picture = GFX_evt_knights
+	show_sound = evn_tox_knights_of_the_toxic_god
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_toxic_knights_empire = yes
+		has_country_flag = toxic_knights_lost_keep
+		NOT = {
+			has_country_flag = toxic_knights_destroyed_keep
+		}
+		any_owned_planet = {
+			has_planet_flag = toxic_knights_habitat
+		}
+	}
+
+	immediate = {
+		remove_country_flag = toxic_knights_lost_keep
+		random_situation = {
+			limit = {
+				#is_owned_by = root
+				is_situation_type = situation_toxic_knights
+			}
+			set_situation_locked = no
+		}
+	}
+
+	option = {
+		name = toxoids.8025.a
+	}
+}

@@ -1,0 +1,1411 @@
+#################################
+#								#
+# Unique System Events			#
+#								#
+# Written by Joachim Holmsen	#
+#								#
+#################################
+
+namespace = unique
+
+### Larion Arc Site
+fleet_event = {	# Crashed Ship
+	id = unique.1
+	title = unique.1.title
+	desc = unique.1.desc
+	picture = GFX_evt_big_landing_ship
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unique.1.a
+		owner = {
+			if = {
+				limit = {
+					has_ancrel = yes
+				}
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {	# Weird Laboratory
+	id = unique.5
+	title = unique.5.title
+	desc = unique.5.desc
+	picture = GFX_evt_physics_research
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unique.5.a
+		owner = {
+			if = {
+				limit = {
+					has_ancrel = yes
+				}
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {	# Unique Specimens
+	id = unique.10
+	title = unique.10.title
+	desc = unique.10.desc
+	picture = GFX_evt_clones
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = {
+			text = unique.10.a
+			trigger = { owner = { is_homicidal = no } }
+		}
+		inline_script = {
+			script = events/homicidal_option_text_2
+			who = owner
+		}
+		trigger = {
+			owner = { is_xenophile = no }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	option = {
+		name = unique.10.b
+		trigger = {
+			owner = { 
+				is_xenophobe = no 
+				is_homicidal = no
+			}
+		}
+		custom_tooltip = unique.10.b.tt
+		hidden_effect = { 
+			from.planet = { save_event_target_as = larion_planet }
+			owner = { country_event = { id = unique.15 } }
+		}
+	}
+}
+
+country_event = { # Interacting with the Larionessi clone
+	id = unique.15
+	title = unique.15.title
+	desc = unique.15.desc
+
+	diplomatic = yes
+
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = unique.15.a
+		hidden_effect = { country_event = { id = unique.16 } }
+	}
+	option = {
+		name = unique.15.b
+		hidden_effect = { country_event = { id = unique.17 } }
+	}
+	option = {
+		name = unique.15.c
+		hidden_effect = { country_event = { id = unique.18 } }
+	}
+	option = {
+		name = unique.15.d
+		hidden_effect = { country_event = { id = unique.20 } }
+	}
+}
+
+country_event = {
+	id = unique.16
+	base = unique.15
+	desc_clear = yes
+	desc = unique.16.desc
+}
+
+country_event = {
+	id = unique.17
+	base = unique.15
+	desc_clear = yes
+	desc = unique.17.desc
+}
+
+country_event = {
+	id = unique.18
+	base = unique.15
+	desc_clear = yes
+	desc = unique.18.desc
+}
+
+country_event = {
+	id = unique.20
+	base = unique.15
+	desc_clear = yes
+	desc = unique.20.desc
+	option_clear = yes
+
+	immediate = {
+		hidden_effect = {
+			create_species = {
+				name = "NAME_Larion_Species"
+				plural = "NAME_Larion_Species"
+				class = PRE_FUN
+				portrait = fun17
+				namelist = "HIVE1"
+				homeworld = event_target:larion_planet
+				traits = {
+					trait = trait_pc_tropical_preference
+					trait = trait_intelligent
+					trait = trait_rapid_breeders
+					trait = trait_weak
+					trait = trait_sedentary
+				}
+
+				effect = {
+					save_event_target_as = larion_species
+				}
+			}
+		}
+	}
+
+	option = {
+		name = unique.20.a
+		trigger = {
+			exists = event_target:larion_planet.starbase
+			event_target:larion_planet.starbase = {
+				owner = { is_same_value = root }
+			}
+		}
+		custom_tooltip = unique.20.a.tt
+		hidden_effect = {
+			event_target:larion_planet = {
+				every_owned_pop = {
+					resettle_pop = {
+						pop = this
+						planet = root.capital_scope
+					}
+				}
+				create_country = {
+					name = "NAME_Larion_Country"
+					adjective = "NAME_Larion_Species"
+					species = event_target:larion_species
+					type = default
+					authority = auth_hive_mind
+					ethos = { ethic = ethic_gestalt_consciousness }
+					civics = {
+						civic = civic_hive_empath
+						civic = civic_hive_memorialist
+					}
+					flag = {
+						icon = {
+							category = "plantoid"
+							file = "plantoid_04.dds"
+						}
+						background= {
+							category = "backgrounds"
+							file = "flag_BG_12.dds"
+						}
+						colors={
+							"off_white"
+							"dark_green"
+							"null"
+							"null"
+						}
+					}
+
+					effect = {
+						save_event_target_as = larion_country
+						set_origin = origin_remnants
+						establish_communications_no_message = root
+						set_subject_of = { 
+							who = root 
+							#allow_instant_negotiation = yes
+							preset = preset_vassal
+						}
+						copy_techs_from = {
+							target = root
+						}
+						add_basic_resources_effect = { VALUE = 1000 }
+						add_manufactured_resources_effect = { VALUE = 500 }
+						add_opinion_modifier = {
+							modifier = unique_event_savior_opinion_modifier
+							who = root
+						}
+						random_agreement = {
+							add_loyalty = 150
+						}
+						while = {
+							count = 3
+							create_leader = {
+								class = scientist
+								species = event_target:larion_species
+							}
+						}
+						create_leader = {
+							class = governor
+							species = event_target:larion_species
+						}
+						add_modifier = {
+							modifier = larionessi_resurgence_modifier
+							years = 10
+						}
+						add_tradition = tr_adaptability_recycling
+						add_tradition = tr_adaptability_survival_fittest
+						add_tradition = tr_adaptability_environmental_diversification
+						add_tradition = tr_synchronicity_cloned_organs
+						add_tradition = tr_synchronicity_kinship_gestalt
+						add_tradition = tr_synchronicity_integrated_preservation
+						add_tradition = tr_prosperity_administrative_operations
+						add_tradition = tr_prosperity_sct
+						add_tradition = tr_prosperity_public_works
+					}
+				}
+				while = {
+					count = 3
+					create_pop = { species = event_target:larion_species }
+				}
+				set_owner = event_target:larion_country
+				remove_all_buildings = yes
+				add_building = building_hive_capital
+				add_building = building_spawning_pool
+			}
+			event_target:larion_planet.starbase = {
+				set_owner = event_target:larion_country
+			}
+		}
+	}
+	option = {
+		name = unique.20.b
+		custom_tooltip = unique.20.b.tt
+		root.capital_scope = {
+			add_modifier = {
+				modifier = larionessi_planet_modifier
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = unique.20.c
+		custom_tooltip = unique.20.c.tt
+		hidden_effect = { country_event = { id = unique.22 } }
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+	}
+}
+
+country_event = {
+	id = unique.22
+	base = unique.15
+	desc_clear = yes
+	desc = unique.22.desc
+	option_clear = yes
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+### Zevox Arc Site
+fleet_event = {	# Log - Part 1
+	id = unique.50
+	title = unique.50.title
+	desc = unique.50.desc
+	picture = GFX_evt_ancient_databank
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unique.50.a
+		owner = {
+			if = {
+				limit = {
+					has_ancrel = yes
+				}
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {	# Log - Part 2
+	id = unique.55
+	title = unique.55.title
+	desc = unique.55.desc
+	picture = GFX_evt_engineering_cache
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unique.55.a
+		owner = {
+			if = {
+				limit = {
+					has_ancrel = yes
+				}
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {	# Log - Part 3
+	id = unique.60
+	title = unique.60.title
+	desc = unique.60.desc
+	picture = GFX_evt_physics_research
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unique.60.a
+		owner = {
+			if = {
+				limit = {
+					has_ancrel = yes
+				}
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {	# Log - Part 4
+	id = unique.65
+	title = unique.65.title
+	desc = {
+		trigger = {
+			owner = { is_machine_empire = no }
+		}
+		text = unique.65.desc
+	}
+	desc = {
+		trigger = {
+			owner = { is_machine_empire = yes }
+		}
+		text = unique.65.desc.machine
+	}
+	picture = GFX_evt_wormhole
+	show_sound = event_dig_site
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = {
+			text = unique.65.a
+			trigger = { 
+				owner = {
+					is_machine_empire = no
+				} 
+			}
+		}
+		name = {
+			text = unique.65.b
+			trigger = { 
+				owner = {
+					is_machine_empire = yes
+					NOT = { has_valid_civic = civic_machine_terminator } 
+				} 
+			}
+		}
+		name = {
+			text = unique.65.d
+			trigger = { 
+				owner = {
+					is_machine_empire = yes
+					has_valid_civic = civic_machine_terminator
+				} 
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+	option = {
+		name = unique.65.c
+		trigger = {
+			owner = { 
+				is_machine_empire = yes 
+				NOT = { has_valid_civic = civic_machine_terminator }
+			}
+		}
+		hidden_effect = {
+			from.planet.orbit = { save_event_target_as = zero_one_planet }
+			owner = { country_event = { id = unique.70 } }
+		}
+	}
+}
+
+country_event = { # Interacting with the Animator of Clay
+	id = unique.70
+	title = unique.70.title
+	desc = unique.70.desc
+
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = unique.70.a
+		hidden_effect = { country_event = { id = unique.72 } }
+	}
+
+	option = {
+		name = unique.70.b
+		hidden_effect = { country_event = { id = unique.75 } }
+	}
+
+	option = {
+		name = unique.70.c
+		hidden_effect = { country_event = { id = unique.100 } }
+	}
+}
+
+country_event = { # Animator of Clay - Introductions
+	id = unique.72
+	base = unique.70
+	desc_clear = yes
+	desc = unique.72.desc
+	option_clear = yes
+
+	option = {
+		name = unique.72.a
+		hidden_effect = { country_event = { id = unique.75 } }
+	}
+
+	option = {
+		name = unique.72.b
+		hidden_effect = { country_event = { id = unique.100 } }
+	}
+}
+
+country_event = { # Animator of Clay - Intentions
+	id = unique.75
+	base = unique.70
+	desc_clear = yes
+	desc = unique.75.desc
+	option_clear = yes
+
+	option = {
+		name = unique.75.a
+		hidden_effect = { country_event = { id = unique.80 } }
+	}
+
+	option = {
+		name = unique.75.b
+		hidden_effect = { country_event = { id = unique.100 } }
+	}
+}
+
+country_event = { # Animator of Clay - Offer
+	id = unique.80
+	base = unique.70
+	desc_clear = yes
+	desc = unique.80.desc
+	option_clear = yes
+
+	option = {
+		name = unique.80.a
+		random_list = {
+			67 = {
+				# More likely to be worthy if very high on resources
+				modifier = {
+					factor = 1.5
+					has_monthly_income = {
+						resource = energy
+						value > 500
+					}
+				}
+				modifier = {
+					factor = 1.5
+					has_monthly_income = {
+						resource = minerals
+						value > 500
+					}
+				}
+				modifier = {
+					factor = 1.5
+					has_monthly_income = {
+						resource = alloys
+						value > 200
+					}
+				}
+				modifier = {
+					factor = 1.5
+					has_monthly_income = {
+						resource = unity
+						value > 350
+					}
+				}
+				modifier = {
+					factor = 1.5
+					has_resource = {
+						type = influence
+						amount > 750
+					}
+				}
+				# Less likely to be worthy if low on resources
+				modifier = {
+					factor = 0.5
+					has_monthly_income = {
+						resource = energy
+						value < 25
+					}
+				}
+				modifier = {
+					factor = 0.5
+					has_monthly_income = {
+						resource = minerals
+						value < 25
+					}
+				}
+				modifier = {
+					factor = 0.5
+					has_monthly_income = {
+						resource = alloys
+						value < 10
+					}
+				}
+				modifier = {
+					factor = 0.5
+					has_monthly_income = {
+						resource = unity
+						value < 20
+					}
+				}
+				modifier = {
+					factor = 0.5
+					has_resource = {
+						type = influence
+						amount < 100
+					}
+				}
+				custom_tooltip = unique.80.worthy
+				hidden_effect = { country_event = { id = unique.85 } }
+			}
+			33 = {
+				custom_tooltip = unique.80.unworthy
+				hidden_effect = { country_event = { id = unique.90 } }
+			}
+		}
+	}
+
+	option = {
+		name = unique.80.b
+		hidden_effect = { country_event = { id = unique.100 } }
+	}
+}
+
+country_event = { # Animator of Clay - Worthy
+	id = unique.85
+	base = unique.70
+	desc_clear = yes
+	desc = unique.85.desc
+	option_clear = yes
+
+	immediate = {
+		hidden_effect = {
+			destroy_ambient_object = event_target:animator_rift_object
+			event_target:zero_one_planet = {
+				# Set new planet type 
+				change_pc = pc_gaia
+
+				# Add deposits for Gaia
+				add_deposit = d_searing_desert
+				add_deposit = d_underwater_vent
+				add_deposit = d_prosperous_mesa
+				add_deposit = d_submerged_ore_veins
+				add_deposit = d_lush_jungle
+				add_deposit = d_fertile_lands
+				add_deposit = d_crystalline_caverns
+			}
+		}
+	}
+
+	option = {
+		name = unique.85.a
+	}
+}
+
+country_event = { # Animator of Clay - Unworthy
+	id = unique.90
+	base = unique.70
+	desc_clear = yes
+	desc = unique.90.desc
+	option_clear = yes
+
+	immediate = {
+		hidden_effect = {
+			# Remove pops
+			every_owned_planet = {
+				if = {
+					limit = {
+						num_pops > 100
+					}
+					while = {
+						count = 10
+						random_owned_pop = {
+							kill_pop = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						num_pops > 50
+					}
+					while = {
+						count = 5
+						random_owned_pop = {
+							kill_pop = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						num_pops > 25
+					}
+					while = {
+						count = 3
+						random_owned_pop = {
+							kill_pop = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						num_pops > 10
+					}
+					while = {
+						count = 2
+						random_owned_pop = {
+							kill_pop = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						num_pops > 5
+					}
+					while = {
+						count = 1
+						random_owned_pop = {
+							kill_pop = yes
+						}
+					}
+				}
+			}
+
+			# Destroy the rift
+			destroy_ambient_object = event_target:animator_rift_object
+
+			# Create a 'free' species
+			modify_species = {
+				species = root
+				add_trait = trait_mechanical
+				remove_trait = trait_machine_unit
+
+				effect = {
+					save_event_target_as = mechanical_root_species
+				}
+			}
+			event_target:zero_one_planet = {
+				# Set new planet type 
+				change_pc = pc_gaia
+
+				# Add deposits for Gaia
+				add_deposit = d_searing_desert
+				add_deposit = d_underwater_vent
+				add_deposit = d_prosperous_mesa
+				add_deposit = d_submerged_ore_veins
+				add_deposit = d_lush_jungle
+				add_deposit = d_fertile_lands
+				add_deposit = d_crystalline_caverns
+
+				# Starting buildings and district
+				while = {
+					count = 3
+					add_district_and_planet_size_if_needed_effect = { district = district_city }
+					add_district_and_planet_size_if_needed_effect = { district = district_industrial }
+					add_district_and_planet_size_if_needed_effect = { district = district_generator }
+					add_district_and_planet_size_if_needed_effect = { district = district_mining }
+				}
+				add_building = building_capital
+				add_building = building_holo_theatres
+				add_building = building_research_lab_1
+				add_building = building_commercial_zone
+				add_building = building_foundry_1
+
+				create_country = {
+					name = random
+					adjective = root.adjective
+					type = default
+					authority = auth_democratic
+					civics = {
+						civic = civic_free_haven
+						civic = civic_idealistic_foundation
+					}
+					ethos = {
+						ethic = ethic_materialist
+						ethic = ethic_xenophile
+						ethic = ethic_egalitarian
+					}
+					name_list = root
+					species = event_target:mechanical_root_species
+					type = default
+
+					effect = {
+						save_event_target_as = new_robot_country
+
+						# Check synthetic pieces
+						set_country_flag = synthetic_empire
+						set_policy = { 
+							policy = artificial_intelligence_policy
+							option = ai_full_rights
+						}
+
+						# Make sure they have the right tech
+						give_technology = {
+							tech = tech_robotic_workers
+							message = no
+						}
+						give_technology = {
+							tech = tech_droid_workers
+							message = no
+						}
+						give_technology = {
+							tech = tech_synthetic_workers
+							message = no
+						}
+						give_technology = {
+							tech = tech_synthetic_leaders
+							message = no
+						}
+						copy_techs_from = { target = root }
+
+						# Establish Communication with Root/other Root knows
+						establish_communications_no_message = root
+						every_country = {
+							limit = {
+								has_communications = root
+							}
+							establish_communications_no_message = prev
+						}
+
+						# Add resources (unity is based on time passed)
+						add_resource = {
+							unity = 250
+							mult = trigger:years_passed
+						}
+						add_basic_resources_effect = { VALUE = 2000 }
+						add_manufactured_resources_effect = { VALUE = 1000 }
+						add_resource = { influence = 250 }
+
+						# Give them some start leaders
+						while = {
+							count = 3
+							create_leader = {
+								class = scientist
+								species = event_target:mechanical_root_species
+							}
+						}
+						create_leader = {
+							class = governor
+							species = event_target:mechanical_root_species
+						}
+						create_leader = {
+							class = admiral
+							species = event_target:mechanical_root_species
+						}
+
+						# A start fleet based on naval cap
+						create_fleet_from_naval_cap = {
+							fraction = 1
+							ship_owner_type = country
+						}
+					}
+				}
+				starbase = {
+					set_owner = last_created_country
+				}
+				while = {
+					count = 35
+					create_pop = {
+						species = event_target:mechanical_root_species
+					}
+				}
+				every_owned_pop = { clear_pop_category = yes }
+			}
+		}
+	}
+
+	option = {
+		name = unique.90.a
+		hidden_effect = { country_event = { id = unique.95 } }
+	}
+}
+
+country_event = { # Animator of Clay - Change Empire?
+	id = unique.95
+	base = unique.70
+	desc_clear = yes
+	desc = unique.95.desc
+	option_clear = yes
+
+	option = {
+		name = unique.95.a
+		custom_tooltip = unique.95.a.tt
+		hidden_effect = {
+			event_target:new_robot_country = {
+				set_player = root
+			}
+		}
+	}
+
+	option = {
+		name = unique.95.b
+		custom_tooltip = unique.95.b.tt
+	}
+}
+
+country_event = { # Animator of Clay - Cut Communication early
+	id = unique.100
+	base = unique.70
+	desc_clear = yes
+	desc = unique.100.desc
+	option_clear = yes
+
+	option = {
+		name = unique.100.a
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+}
+
+### Ancient Battlefield
+ship_event = {
+	id = unique.125
+	title = unique.125.name
+	desc = unique.125.desc
+	picture = GFX_evt_space_debris
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			if = {
+				limit = {
+					NOT = { has_technology = tech_destroyers }
+				}
+				add_research_option = tech_destroyers
+				add_tech_progress = {
+					tech = tech_destroyers
+					progress = 0.25
+				}
+			}
+			else_if = {
+				limit = {
+					has_technology = tech_destroyers
+					NOT = { has_technology = tech_cruisers }
+				}
+				add_research_option = tech_cruisers
+				add_tech_progress = {
+					tech = tech_cruisers
+					progress = 0.25
+				}
+			}
+			else_if = {
+				limit = {
+					has_technology = tech_cruisers
+					NOT = { has_technology = tech_battleships }
+				}
+				add_research_option = tech_battleships
+				add_tech_progress = {
+					tech = tech_battleships
+					progress = 0.25
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+}
+
+
+# Lone Defender
+
+# -> Triggered by on_entering_system_first_time
+# This = Ship
+# From = System
+# FromFrom = Country
+ship_event = { 
+	id = unique.130
+	title = "unique.130.name"
+	desc = unique.130.desc
+	picture = GFX_evt_ship_in_orbit_3
+	show_sound = event_scanner
+	location = from
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = lone_defender_system
+			any_fleet_in_system = {
+				has_fleet_flag = lone_defender_fleet
+			}
+		}
+	}
+	option = {
+		name = UNFORTUNATE
+	}
+}
+
+# This = Owner of fleet 1 (combatant)
+# From = Owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2, destroyed Lone Defender
+country_event = { 
+	id = unique.135
+	title = "unique.135.name"
+	desc = { # Regular empire
+		trigger = { 
+			owner = {
+				is_memorialist_empire = no
+			}
+		}
+		text = unique.135.desc.regular
+	}
+	desc = { # Memorialist empire
+		trigger = { 
+			owner = {
+				is_memorialist_empire = yes
+			}
+		}
+		text = unique.135.desc.memorialist
+	}
+	picture = GFX_evt_exploding_ship
+	show_sound = event_scanner
+	location = fromfrom.solar_system
+
+	is_triggered_only = yes
+
+	trigger = {
+		fromfromfrom = {
+			has_fleet_flag = lone_defender_fleet
+		}
+	}
+	option = { # Research debris
+		name = unique.135.a
+		this = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+	option = { # Rename planet as regular empire
+		name = unique.135.b.regular
+		custom_tooltip = unique.135.b.regular.tt
+		trigger = {
+			owner = {
+				is_memorialist_empire = no
+			}
+		}
+		hidden_effect = {
+			fromfrom.solar_system = {
+				random_system_planet = {
+					limit = {
+						has_planet_flag = lone_defender_planet
+					}
+					set_name = $NAME_Lone_Defender_ship$
+				}
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+	option = { # Rename planet and system with any Memorialist civic
+		name = unique.135.b.memorialist
+		custom_tooltip = unique.135.b.memorialist.tt
+		trigger = {
+			owner = {
+				is_memorialist_empire = yes
+			}
+		}
+		hidden_effect = {
+			fromfrom.solar_system = {
+				random_system_planet = {
+					limit = {
+						has_planet_flag = lone_defender_planet
+					}
+					set_name = $NAME_Lone_Defender_ship$
+				}
+				random_system_planet = {
+					limit = {
+						has_planet_flag = lone_defender_star
+					}
+					set_name = $Lone_Defender_message$
+				}
+				set_name = $Lone_Defender_message$
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+
+# Star Mall
+
+# -> Triggered by on_entering_system_first_time
+# This = Ship
+# From = System
+# FromFrom = Country
+ship_event = { 
+	id = unique.140
+	title = "unique.140.name"
+	desc = unique.140.desc
+	picture = GFX_evt_habitat
+	show_sound = event_finding_loot
+	location = from
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = star_mall
+			any_fleet_in_system = {
+				NOT = { has_fleet_flag = star_mall_fleet }
+			}
+		}
+	}
+
+	immediate = {
+		solar_system = {
+			random_system_planet = {
+				limit = { 
+					is_habitat = yes 
+					has_planet_flag = star_mall_habitat
+				}
+				save_event_target_as = star_mall_cleaners
+				set_name = "NAME_Star_Mall"
+			}
+			create_country = {
+				name = "NAME_Star_Mall_Parking_Services"
+				type = no_contact_neutral_faction
+				effect = {
+					establish_communications_no_message = root.owner
+					set_faction_hostility = {
+						target = root.owner
+						set_hostile = no
+						set_neutral = no
+						set_friendly = yes
+					}
+					set_country_flag = star_mall_cleaners
+				}
+			}
+			last_created_country = {
+				create_fleet = {
+					name = "NAME_Star_Mall_Parking_Drones"
+					settings = { spawn_debris = no }
+					effect = {
+						set_owner = PREV
+						set_fleet_flag = star_mall_fleet
+						while = {
+							count = 4
+							create_ship = {
+								name = ""
+								design = "NAME_Star_Mall_Parking_Drone"
+							}
+						}
+						set_location = event_target:star_mall_cleaners
+						queue_actions = {
+							repeat = {
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.1"
+										has_planet_flag = star_mall_patrol_1
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.2"
+										has_planet_flag = star_mall_patrol_2
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.3"
+										has_planet_flag = star_mall_patrol_3
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.4"
+										has_planet_flag = star_mall_patrol_4
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.5"
+										has_planet_flag = star_mall_patrol_5
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.6"
+										has_planet_flag = star_mall_patrol_6
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+								find_closest_planet = {
+									trigger = {
+										id = "star_mall.1.trigger.7"
+										has_planet_flag = star_mall_patrol_7
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = THIS
+										wait = {
+											duration = 10
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+		}
+	}
+
+	option = {
+		name = unique.140.a
+		
+	}
+}

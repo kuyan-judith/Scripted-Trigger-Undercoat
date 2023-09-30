@@ -1,0 +1,851 @@
+##################################
+#
+# Fallen Empire Events
+# Written by Martin Anward et al.
+#
+##################################
+
+namespace = fallen_empires
+
+# Fallen Empire gets some fleet back
+situation_event = {
+	id = fallen_empires.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_country_type = fallen_empire
+			is_at_war = no
+			fleet_power < 5000
+			NOT = { has_country_flag = fallen_empire_fleet_spawn }
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = { flag = fallen_empire_fleet_spawn days = 3600 }
+			capital_scope = {
+				create_fallen_empire_reinforcements = yes
+			}
+		}
+	}
+}
+
+# Fallen Empire executes enemy Ruler after winning war
+# A war has been lost
+# This = Loser Warleader
+# From = Winner Warleader
+country_event = {
+	id = fallen_empires.2
+	title = fallen_empires.2.name
+	desc = fallen_empires.2.desc
+	picture = GFX_evt_fallen_empire
+	show_sound = event_planetary_riot
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_country_type = fallen_empire
+			is_machine_empire = no
+		}
+		is_gestalt = no
+		exists = ruler
+	}
+
+	immediate = {
+		ruler = {
+			save_event_target_as = rulername
+			kill_leader = {
+				ruler = yes
+				show_notification = no
+			}
+		}
+	}
+
+	option = {
+		name = fallen_empires.2.a
+		custom_tooltip = fallen_empires.2.a.tooltip
+	}
+}
+
+# Fallen Empire sends a warning
+situation_event = {
+	id = fallen_empires.3
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_country_type = fallen_empire
+			is_at_war = no
+			NOT = { has_country_flag = fallen_empire_lost_war }
+			NOT = { has_country_flag = fallen_empire_sent_warning }
+			fleet_power > 20000
+			any_playable_country = {
+				is_playable = yes
+				has_communications = root.owner
+				root.owner = { opinion = { who = prev value < -99 } }
+				NOT = { root.owner = { has_opinion_modifier = { who = prev modifier = opinion_refused_fallen_empire_demand } } }
+				NOT = { has_country_flag = fe_demand_made }
+			}
+		}
+	}
+
+	immediate = {
+		owner = { set_timed_country_flag = { flag = fallen_empire_sent_warning days = 360 } }
+		random_playable_country = {
+			limit = {
+				is_playable = yes
+				has_communications = root.owner
+				root.owner = { opinion = { who = prev value < -99 } }
+				NOT = { root.owner = { has_opinion_modifier = { who = prev modifier = opinion_refused_fallen_empire_demand } } }
+				NOT = { has_country_flag = fe_demand_made }
+			}
+
+			root.owner = { set_country_flag = fe_demand_made }
+
+			# Demand - abandon holy worlds (spiritualist)
+			if = {
+				limit = {
+					root.owner = {
+						has_ai_personality_behaviour = holy_planets
+					}
+					is_valid_target_fe_cleanse_holy_worlds = yes
+				}
+				country_event = { id = fallen_empires.4 scopes = { from = root.owner } }
+			}
+
+			# Demand - ban AI research (spiritualist)
+			else_if = {
+				limit = {
+					root.owner = {
+						has_ethic = ethic_fanatic_spiritualist
+					}
+					is_valid_target_fe_stop_ai = yes
+				}
+				country_event = { id = fallen_empires.5 scopes = { from = root.owner } }
+			}
+
+			# Demand - ban slavery and purging (xenophile)
+			else_if = {
+				limit = {
+					root.owner = {
+						has_ethic = ethic_fanatic_xenophile
+					}
+					is_valid_target_fe_stop_atrocities = yes
+				}
+				country_event = { id = fallen_empires.6 scopes = { from = root.owner } }
+			}
+
+			# Demand - abandon colonies nearby (xenophobe)
+			else_if = {
+				limit = {
+					root.owner = {
+						has_ai_personality_behaviour = demands_clear_borders
+					}
+					any_system_within_border = {
+						root.owner = {
+							any_system_within_border = {
+								has_hyperlane_to = prevprev
+							}
+						}
+					}
+				}
+				country_event = { id = fallen_empires.7 }
+			}
+
+			# Demand - prostrate yourself, mere mortal!
+			else_if = {
+				limit = { NOT = { has_modifier = humiliated } }
+				country_event = { id = fallen_empires.8 scopes = { from = root.owner } }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = fallen_empires.4
+	title = fallen_empires.4.name
+	desc = fallen_empires.4.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+
+	option = {
+		name = fallen_empires.4.a
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 0
+				fleet_power > 100000
+			}
+		}
+		from = { save_event_target_as = fallen_empire_humiliator }
+		fallen_empire_cleanse_holy_worlds_effect = yes
+		fallen_empire_humiliate_effect = yes
+		hidden_effect = { remove_country_flag = fe_demand_made }
+	}
+
+	option = {
+		name = fallen_empires.4.b
+		ai_chance = {
+			factor = 10
+		}
+		custom_tooltip = fallen_empire_refuse_tooltip
+		hidden_effect = {
+			from = { add_opinion_modifier = { who = root modifier = opinion_refused_fallen_empire_demand } }
+			remove_country_flag = fe_demand_made
+		}
+	}
+}
+
+country_event = {
+	id = fallen_empires.5
+	title = fallen_empires.5.name
+	desc = fallen_empires.5.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+
+	option = {
+		name = fallen_empires.5.a
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 0
+				fleet_power > 100000
+			}
+		}
+		allow = {
+			can_set_policy = {
+				policy = artificial_intelligence_policy
+				option = ai_outlawed
+			}
+		}
+		custom_tooltip = fallen_empires.5.a.tooltip
+		from = { save_event_target_as = fallen_empire_humiliator }
+		fallen_empire_stop_ai_effect = yes
+		fallen_empire_humiliate_effect = yes
+		hidden_effect = { remove_country_flag = fe_demand_made }
+	}
+
+	option = {
+		name = fallen_empires.5.b
+		ai_chance = {
+			factor = 10
+		}
+		custom_tooltip = fallen_empire_refuse_tooltip
+		hidden_effect = {
+			from = { add_opinion_modifier = { who = root modifier = opinion_refused_fallen_empire_demand } }
+			remove_country_flag = fe_demand_made
+		}
+	}
+}
+
+country_event = {
+	id = fallen_empires.6
+	title = fallen_empires.6.name
+	desc = fallen_empires.6.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+
+	option = {
+		name = fallen_empires.6.a
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 0
+				fleet_power > 100000
+			}
+		}
+		custom_tooltip = fallen_empires.6.a.tooltip
+		from = { save_event_target_as = fallen_empire_humiliator }
+		fallen_empire_stop_atrocities_effect = yes
+		fallen_empire_humiliate_effect = yes
+		hidden_effect = { remove_country_flag = fe_demand_made }
+	}
+
+	option = {
+		name = fallen_empires.6.b
+		ai_chance = {
+			factor = 10
+		}
+		custom_tooltip = fallen_empire_refuse_tooltip
+		hidden_effect = {
+			from = { add_opinion_modifier = { who = root modifier = opinion_refused_fallen_empire_demand } }
+			remove_country_flag = fe_demand_made
+		}
+	}
+}
+
+country_event = {
+	id = fallen_empires.7
+	title = fallen_empires.7.name
+	desc = fallen_empires.7.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+
+	option = {
+		name = fallen_empires.7.a
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 0
+				fleet_power > 100000
+			}
+		}
+		from = { save_event_target_as = fallen_empire_humiliator }
+		fallen_empire_cleanse_border_worlds_effect = yes
+		fallen_empire_humiliate_effect = yes
+		hidden_effect = { remove_country_flag = fe_demand_made }
+	}
+
+	option = {
+		name = fallen_empires.7.b
+		ai_chance = {
+			factor = 10
+		}
+		custom_tooltip = fallen_empire_refuse_tooltip
+		hidden_effect = {
+			from = { add_opinion_modifier = { who = root modifier = opinion_refused_fallen_empire_demand } }
+			remove_country_flag = fe_demand_made
+		}
+	}
+}
+
+country_event = {
+	id = fallen_empires.8
+	title = fallen_empires.8.name
+	desc = fallen_empires.8.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+
+	immediate = {
+		from = { save_event_target_as = fallen_empire_humiliator }
+	}
+
+	option = {
+		name = fallen_empires.8.a
+		ai_chance = {
+			factor = 90
+			modifier = {
+				factor = 0
+				fleet_power > 100000
+			}
+		}
+		fallen_empire_humiliate_effect = yes
+		from = { save_event_target_as = fallen_empire_humiliator }
+		tooltip = {
+			add_modifier = { modifier = humiliated days = 3600 }
+		}
+		custom_tooltip = "fallen_empires.8.a.tooltip"
+		hidden_effect = { remove_country_flag = fe_demand_made }
+	}
+
+	option = {
+		name = fallen_empires.8.b
+		ai_chance = {
+			factor = 10
+		}
+		custom_tooltip = fallen_empire_refuse_tooltip
+		hidden_effect = {
+			from = { add_opinion_modifier = { who = root modifier = opinion_refused_fallen_empire_demand } }
+			remove_country_flag = fe_demand_made
+		}
+	}
+}
+
+# Fallen Empire establishes communications
+situation_event = {
+	id = fallen_empires.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			OR = {
+				is_country_type = fallen_empire
+				is_country_type = awakened_fallen_empire
+			}
+			is_at_war = no
+			any_playable_country = {
+				OR = {
+					is_playable = yes
+					is_country_type = fallen_empire
+				}
+				NOT = { has_communications = root.owner }
+				OR = {
+					AND = {
+						root.owner = { has_ai_personality = fallen_empire_spiritualist }
+						any_owned_planet = {
+							has_modifier = "holy_planet"
+						}
+					}
+					AND = {
+						root.owner = { has_ai_personality = fallen_empire_materialist }
+						OR = {
+							has_technology = tech_sapient_ai
+							has_technology = tech_synthetic_workers
+						}
+						any_system_within_border = {
+							distance = {
+								source = root.owner.capital_scope
+								max_distance <= 200
+							}
+						}
+					}
+					# if we're both fallen empires, we know of each other
+					is_country_type = fallen_empire
+					# also contact if we border them
+					any_system_within_border = {
+						any_neighbor_system = {
+							has_hyperlane_to = prev
+							is_owned_by = root.owner
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				OR = {
+					is_playable = yes
+					is_country_type = fallen_empire
+				}
+				NOT = { has_communications = root.owner }
+				OR = {
+					AND = {
+						root.owner = { has_ai_personality = fallen_empire_spiritualist }
+						any_owned_planet = {
+							has_modifier = "holy_planet"
+						}
+					}
+					AND = {
+						root.owner = { has_ai_personality = fallen_empire_materialist }
+						OR = {
+							has_technology = tech_sapient_ai
+							has_technology = tech_synthetic_workers
+						}
+						any_system_within_border = {
+							distance = {
+								source = root.capital_scope
+								max_distance <= 200
+							}
+						}
+					}
+					# if we're both fallen empires, we know of each other
+					is_country_type = fallen_empire
+					# also contact if we border them
+					any_system_within_border = {
+						any_neighbor_system = {
+							has_hyperlane_to = prev
+							is_owned_by = root
+						}
+					}
+				}
+			}
+
+			establish_communications_no_message = root.owner
+			root.owner = { save_event_target_as = contact_empire }
+			country_event = { id = action.1 }
+		}
+	}
+}
+
+# Fallen Empire gets a construction ship if it's lost all construction ships
+situation_event = {
+	id = fallen_empires.11
+	title = OK
+	desc = OK
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_country_type = fallen_empire
+			is_at_war = no
+			count_controlled_ship = {
+				limit = { is_ship_size = constructor }
+				count < 1
+			}
+			NOT = { has_country_flag = fallen_empire_constructor_spawn }
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = { flag = fallen_empire_constructor_spawn days = 1800 }
+			capital_scope = {
+				create_fleet = {
+					effect = {
+						set_owner = root.owner
+						if = {
+							limit = {
+								root.owner = { has_ethic = ethic_fanatic_xenophobe }
+							}
+							create_ship = {
+								name = random
+								design = "NAME_Servitor"
+								graphical_culture = "fallen_empire_04"
+							}
+						}
+						if = {
+							limit = {
+								root.owner = { has_ethic = ethic_fanatic_xenophile }
+							}
+							create_ship = {
+								name = random
+								design = "NAME_Builder"
+								graphical_culture = "fallen_empire_03"
+							}
+						}
+						if = {
+							limit = {
+								root.owner = { has_ethic = ethic_fanatic_spiritualist }
+							}
+							create_ship = {
+								name = random
+								design = "NAME_Penitent"
+								graphical_culture = "fallen_empire_01"
+							}
+						}
+						if = {
+							limit = {
+								root.owner = { has_ethic = ethic_fanatic_materialist }
+							}
+							create_ship = {
+								name = random
+								design = "NAME_Librarian"
+								graphical_culture = "fallen_empire_02"
+							}
+						}
+						if = {
+							limit = {
+								root.owner = { is_machine_empire = yes }
+							}
+							create_ship = {
+								name = random
+								design = "NAME_Theta"
+								graphical_culture = "fallen_empire_02"
+							}
+						}
+						set_location = {
+							target = PREV
+							distance = 80
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = fallen_empires.12
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = fallen_empire
+		NOT = { has_global_flag = fallen_empire_lost_war }
+	}
+
+	immediate = {
+		set_global_flag = fallen_empire_lost_war
+	}
+}
+
+# Fallen Empire fleet spawning event
+country_event = {
+	id = fallen_empires.13
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		capital_scope = {
+			create_fallen_empire_fleet = yes
+		}
+	}
+}
+
+# Fallen Empire lost planets - should stop making ultimatums
+country_event = {
+	id = fallen_empires.14
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = fallen_empire
+		NOT = { has_country_flag = fallen_empire_lost_war }
+		any_country = {
+			NOT = { is_same_value = root }
+			any_owned_planet = {
+				is_original_owner = root
+			}
+		}
+	}
+
+	immediate = {
+		set_country_flag = fallen_empire_lost_war
+	}
+}
+
+# Encountered Holy World (via on_survey)
+# this = Science vessel | from = planet
+ship_event = {
+	id = fallen_empires.100
+	title = fallen_empires.100.name
+	# Owner has yet to make contact with the FE (string type A)
+	desc = {
+		trigger = {
+			owner = {
+				is_gestalt = no
+				is_spiritualist = no
+				NOT = { has_communications = event_target:spi_fallen_empire }
+			}
+		}
+		text = fallen_empires.100.A.desc
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+				NOT = { has_communications = event_target:spi_fallen_empire }
+			}
+		}
+		text = fallen_empires.100.A.desc.spi
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_gestalt = yes
+				NOT = { has_communications = event_target:spi_fallen_empire }
+			}
+		}
+		text = fallen_empires.100.A.desc.gestalt
+	}
+	# Owner has met the Spiritualist Fallen Empire (string type B)
+	desc = {
+		trigger = {
+			owner = {
+				is_gestalt = no
+				is_spiritualist = no
+				has_communications = event_target:spi_fallen_empire
+			}
+		}
+		text = fallen_empires.100.B.desc
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+				has_communications = event_target:spi_fallen_empire
+			}
+		}
+		text = fallen_empires.100.B.desc.spi
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_gestalt = yes
+				has_communications = event_target:spi_fallen_empire
+			}
+		}
+		text = fallen_empires.100.B.desc.gestalt
+	}
+	picture = GFX_evt_ship_in_orbit
+	show_sound = event_mystic_reveal_light
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			NOR = {
+				is_ai = yes
+				has_country_flag = encountered_holy_world
+				is_scion_empire = yes # see 'origin.11'
+			}
+		}
+		any_country = {
+			is_country_type = fallen_empire # excludes 'awakened_fallen_empire'
+			has_country_flag = fallen_empire_2
+		}
+		from = {
+			has_modifier = holy_planet
+			is_colony = no
+		}
+	}
+
+	immediate = {
+		random_country = {
+			limit = {
+				is_country_type = fallen_empire
+				has_country_flag = fallen_empire_2
+			}
+			save_event_target_as = spi_fallen_empire
+		}
+		owner = {
+			set_country_flag = encountered_holy_world
+		}
+	}
+
+	option = { # "Curious."
+		name = CURIOUS
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+	option = { # Respectful
+		name = fallen_empires.100.a
+		trigger = {
+			owner = {
+				OR = {
+					is_spiritualist = yes
+					has_policy_flag = diplo_stance_cooperative
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+	option = { # "Ours for the taking."
+		name = fallen_empires.100.b
+		trigger = {
+			owner = {
+				OR = {
+					has_policy_flag = diplo_stance_expansionist
+					is_gestalt = yes
+				}
+				has_communications = event_target:spi_fallen_empire
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+	option = { # "We could thrive there."
+		name = fallen_empires.100.c
+		trigger = {
+			owner = {
+				has_policy_flag = diplo_stance_expansionist
+				NOT = { has_communications = event_target:spi_fallen_empire }
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+	option = { # Insult
+		name = fallen_empires.100.d
+		trigger = {
+			owner = {
+				is_spiritualist = no
+				has_communications = event_target:spi_fallen_empire
+				OR = {
+					has_policy_flag = diplo_stance_belligerent
+					is_xenophobe = yes
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+	option = { # Spiritualist insult
+		name = fallen_empires.100.e
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+				has_communications = event_target:spi_fallen_empire
+				OR = {
+					has_policy_flag = diplo_stance_belligerent
+					is_xenophobe = yes
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+}

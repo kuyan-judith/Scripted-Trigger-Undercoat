@@ -1,0 +1,1380 @@
+##########################
+#
+# ARCHAEOLOGY SITE EVENTS
+#
+##########################
+
+namespace = arcsite
+
+################################
+# "Ice Trauma" by Gemma Thomson
+################################
+
+# Camps established | from = arcsite
+fleet_event = {
+	id = arcsite.1000
+	title = arcsite.1000.name
+	desc = arcsite.1000.desc
+	picture = GFX_evt_icelocked_settlement
+	location = from
+	show_sound = event_wind_ruins
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DIG
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+	# Insights into Climate Control Network
+	option = {
+		name = arcsite.1000.a
+		trigger = {
+			owner = {
+				NOT = { has_technology = tech_massive_glacier }
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 400
+				}
+			}
+		}
+		owner = {
+			add_resource = { energy = -400 }
+			add_research_option = tech_massive_glacier
+			add_tech_progress = {
+				tech = tech_massive_glacier
+				progress = 0.3
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Computer Terminal | from = arcsite
+fleet_event = {
+	id = arcsite.1005
+	title = arcsite.1005.name
+	desc = arcsite.1005.desc
+	picture = GFX_evt_glitchy_matrix
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTRIGUING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Pioneer Crews | from = arcsite
+fleet_event = {
+	id = arcsite.1010
+	title = arcsite.1010.name
+	desc = arcsite.1010.desc
+	picture = GFX_evt_underwater_ruins
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = arcsite.1010.a
+	}
+	# Insights into Ocean Ecology Management
+	option = {
+		name = arcsite.1010.b
+		trigger = {
+			owner = {
+				NOT = { has_technology = tech_toxic_kelp }
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 400
+				}
+			}
+		}
+		owner = {
+			add_resource = { energy = -400 }
+			add_research_option = tech_toxic_kelp
+			add_tech_progress = {
+				tech = tech_toxic_kelp
+				progress = 0.2
+			}
+		}
+		from = {
+			set_archaeology_flag = ocean_tech
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Submarine's Fate (branching event)
+fleet_event = {
+	id = arcsite.1015
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		# Fixed outcomes if the arc site is abandoned part way or inherited from another empire.
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					from = {
+						OR = {
+							has_archaeology_flag = genes
+							has_archaeology_flag = politics
+						}
+					}
+				}
+				fleet_event = { id = arcsite.1016 } # fire
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					from = {
+						OR = {
+							has_archaeology_flag = fire
+							has_archaeology_flag = genes
+						}
+					}
+				}
+				fleet_event = { id = arcsite.1017 } # internal politics
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					from = {
+						OR = {
+							has_archaeology_flag = ocean_tech # blocked if the player has also earned Ocean Ecology Tech from this site
+							has_archaeology_flag = fire
+							has_archaeology_flag = politics
+						}
+					}
+				}
+				fleet_event = { id = arcsite.1018 } # gene-modding
+			}
+		}
+	}
+}
+# Submarine Lodged in a Lava Vent | fromfrom = arcsite
+fleet_event = {
+	id = arcsite.1016
+	title = arcsite.1016.name
+	desc = arcsite.1016.desc
+	picture = GFX_evt_molten
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = {
+			set_archaeology_flag = fire
+		}
+	}
+
+	option = {
+		name = OK
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+# Internal Politics | fromfrom = arcsite
+fleet_event = {
+	id = arcsite.1017
+	title = arcsite.1017.name
+	desc = arcsite.1017.desc
+	picture = GFX_evt_sentry_guns
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = {
+			set_archaeology_flag = politics
+		}
+	}
+
+	# Authoritarians & Egalitarians both benefit
+	option = {
+		name = {
+			text = arcsite.1017.auth.a
+			trigger = {
+				owner = { is_authoritarian = yes }
+			}
+		}
+		name = {
+			text = FASCINATING
+			trigger = {
+				owner = { is_egalitarian = yes }
+			}
+		}
+		trigger = {
+			owner = {
+				OR = {
+					is_authoritarian = yes
+					is_egalitarian = yes
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+	# Standard insights
+	option = {
+		name = INTERESTING
+		trigger = {
+			owner = {
+				is_authoritarian = no
+				is_egalitarian = no
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+# Genetic Tomfoolery | fromfrom = arcsite
+fleet_event = {
+	id = arcsite.1018
+	title = arcsite.1018.name
+	desc = arcsite.1018.desc
+	picture = GFX_evt_scientific_experiments
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = {
+			set_archaeology_flag = genes
+		}
+	}
+
+	option = {
+		name = arcsite.1018.phobe.a
+		trigger = {
+			owner = { is_xenophobe = yes }
+		}
+	}
+	option = {
+		name = FASCINATING
+		trigger = {
+			owner = { is_xenophobe = no }
+		}
+		# Receive society research or progress on early-tier gene techs
+		owner = {
+			if = {
+				limit = {
+					has_technology = tech_epigenetic_triggers
+				}
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+				fromfrom = {
+					set_archaeology_flag = gene_tech #not particular to Epigentic Triggers
+				}
+			}
+			else_if = {
+				limit = {
+					has_technology = tech_genome_mapping
+				}
+				add_research_option = tech_epigenetic_triggers
+				add_tech_progress = {
+					tech = tech_epigenetic_triggers
+					progress = 0.4
+				}
+				fromfrom = {
+					set_archaeology_flag = gene_tech #not particular to Genome Mapping
+				}
+			}
+			else = {
+				add_research_option = tech_genome_mapping
+				add_tech_progress = {
+					tech = tech_genome_mapping
+					progress = 0.6
+				}
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+# Finalé | from = arcsite
+fleet_event = {
+	id = arcsite.1020
+	title = arcsite.1020.name
+	desc = {
+		trigger = {
+			from = {
+				OR = {
+					has_archaeology_flag = gene_tech
+					has_archaeology_flag = ocean_tech
+				}
+			}
+		}
+		text = arcsite.1020.tech.desc
+	}
+	desc = {
+		trigger = {
+			from = {
+				has_archaeology_flag = politics
+			}
+		}
+		text = arcsite.1020.default.desc
+	}
+	picture = GFX_evt_ship_offloading_cargo
+	location = from
+	show_sound = event_dig_site
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	# Improved colonial economies
+	option = {
+		name = arcsite.1020.a
+		trigger = {
+			owner = {
+				NOR = {
+					has_valid_civic = civic_free_traders
+					has_valid_civic = civic_indentured_assets
+					has_valid_civic = civic_private_prospectors
+					is_memorialist_empire = yes
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = ice_trauma_insights_colony
+				years = 20
+			}
+		}
+	}
+	# Subterranean colonization
+	option = {
+		name = arcsite.1020.b
+		trigger = {
+			from = {
+				NOR = {
+					has_archaeology_flag = gene_tech
+					has_archaeology_flag = ocean_tech
+				}
+			}
+			owner = {
+				NOR = {
+					has_valid_civic = civic_free_traders
+					has_valid_civic = civic_indentured_assets
+					has_valid_civic = civic_private_prospectors
+					is_memorialist_empire = yes
+					has_technology = tech_deep_sinkhole
+				}
+			}
+		}
+		owner = {
+			add_research_option = tech_deep_sinkhole
+			add_tech_progress = {
+				tech = tech_deep_sinkhole
+				progress = 0.3
+			}
+		}
+	}
+	# Submarine weaponry
+	option = {
+		name = arcsite.1020.c
+		trigger = {
+			from = {
+				NOR = {
+					has_archaeology_flag = gene_tech
+					has_archaeology_flag = ocean_tech
+				}
+			}
+			owner = {
+				NOR = {
+					has_valid_civic = civic_free_traders
+					has_valid_civic = civic_indentured_assets
+					has_valid_civic = civic_private_prospectors
+					is_memorialist_empire = yes
+					has_technology = tech_mass_drivers_3
+				}
+				has_technology = tech_mass_drivers_2
+			}
+		}
+		owner = {
+			add_research_option = tech_mass_drivers_3
+			add_tech_progress = {
+				tech = tech_mass_drivers_3
+				progress = 0.6
+			}
+		}
+	}
+	# Megacorp flavor
+	option = {
+		name = arcsite.1020.a.prospectors
+		trigger = {
+			owner = {
+				OR = {
+					has_valid_civic = civic_free_traders
+					has_valid_civic = civic_indentured_assets
+					has_valid_civic = civic_private_prospectors
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = ice_trauma_insights_engineering
+				years = 5
+			}
+		}
+	}
+	# Memorialist (Necroids) flavor
+	option = {
+		name = arcsite.1020.a.memorialist
+		trigger = {
+			owner = {
+				is_memorialist_empire = yes
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = ice_trauma_memorialist_unity
+				years = 10
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+##########################################
+# "Engineered Species" by Marek Kozlowski
+##########################################
+
+fleet_event = { #1st step
+	id = arcsite.2000
+	title = arcsite.2000.name
+	desc = arcsite.2000.desc
+	picture = GFX_evt_alien_wildlife
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		set_variable = {
+			which = studied_engineered_species
+			value = 0
+		}
+	}
+
+	option = { #Study
+		name = arcsite.2000.study
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = studied_engineered_species
+					value = 1
+				}
+			}
+		}
+		fleet_event = { id = arcsite.2001 days = 30 }
+	}
+	option = { #Use
+		name = arcsite.2000.use
+		fleet_event = { id = arcsite.2002 days = 30 }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Study answer
+	id = arcsite.2001
+	title = arcsite.2001.name
+	desc = arcsite.2001.desc
+	picture = GFX_evt_alien_wildlife
+	location = fromfrom
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			add_monthly_resource_mult = { # Values for rewards are intentional, to have a better control on min and max value
+				resource = society_research
+				value = 4
+				min = 300
+				max = 2000
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Use answer
+	id = arcsite.2002
+	title = arcsite.2002.name
+	desc = arcsite.2002.desc
+	picture = GFX_evt_alien_wildlife
+	location = fromfrom
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 4
+				min = 300
+				max = 2000
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd step
+	id = arcsite.2010
+	title = arcsite.2010.name
+	desc = arcsite.2010.desc
+	picture = GFX_evt_ancient_records
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = { #Study
+		name = arcsite.2010.study
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = studied_engineered_species
+					value = 1
+				}
+			}
+		}
+		fleet_event = { id = arcsite.2011 days = 30 }
+	}
+	option = { #Use
+		name = arcsite.2010.use
+		fleet_event = { id = arcsite.2012 days = 30 }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Study answer
+	id = arcsite.2011
+	title = arcsite.2011.name
+	desc = arcsite.2011.desc
+	picture = GFX_evt_ancient_records
+	location = fromfrom
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			if = {
+				limit = {
+					NOR = {
+						has_technology = tech_genome_mapping
+						is_machine_empire = yes
+					}
+				}
+				add_research_option = tech_genome_mapping
+				add_tech_progress = {
+					tech = tech_genome_mapping
+					progress = 0.2
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = 8
+					min = 1000
+					max = 10000
+				}
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Use answer
+	id = arcsite.2012
+	title = arcsite.2012.name
+	desc = arcsite.2012.desc
+	picture = GFX_evt_ancient_records
+	location = fromfrom
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 2
+				min = 100
+				max = 1000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 6
+				min = 400
+				max = 3000
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd step
+	id = arcsite.2020
+	title = arcsite.2020.name
+	desc = arcsite.2020.desc
+	picture = GFX_evt_bone_building
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = { #Study
+		name = arcsite.2020.study
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = studied_engineered_species
+					value = 1
+				}
+			}
+		}
+		fleet_event = { id = arcsite.2021 days = 30 }
+	}
+	option = { #Use
+		name = arcsite.2020.use
+		fleet_event = { id = arcsite.2022 days = 30 }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Study answer
+	id = arcsite.2021
+	title = arcsite.2021.name
+	desc = arcsite.2021.desc
+	picture = GFX_evt_bone_building
+	location = fromfrom
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			if = {
+				limit = {
+					NOR = {
+						has_technology = tech_gene_tailoring
+						is_machine_empire = yes
+					}
+				}
+				add_research_option = tech_gene_tailoring
+				add_tech_progress = {
+					tech = tech_gene_tailoring
+					progress = 0.2
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = 8
+					min = 1000
+					max = 10000
+				}
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Use answer
+	id = arcsite.2022
+	title = arcsite.2022.name
+	desc = arcsite.2022.desc
+	picture = GFX_evt_bone_building
+	location = fromfrom
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 3
+				min = 100
+				max = 1000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 8
+				min = 500
+				max = 4000
+			}
+		}
+	}
+
+	after = {
+		fromfrom = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #4th step
+	id = arcsite.2030
+	title = arcsite.2030.name
+	desc = arcsite.2030.desc
+	picture = GFX_evt_archaeological_dig
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = { #Study
+		name = arcsite.2030.proceed
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Ending - Revelation, Ignorance, Classified
+	id = arcsite.2040
+	title = arcsite.2040.name
+	desc = { #Revelation
+		trigger = {
+			owner = {
+				check_variable = {
+					which = "studied_engineered_species"
+					value >= 2
+				}
+			}
+		}
+		text = arcsite.2040.revelation.desc
+	}
+	desc = { #Ignorance
+		trigger = {
+			owner = {
+				check_variable = {
+					which = "studied_engineered_species"
+					value < 2
+				}
+			}
+		}
+		text = arcsite.2040.ignorance.desc
+	}
+	picture = GFX_evt_genetic_modification
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = { #Revelation
+		name = arcsite.2040.revelation
+		trigger = {
+			owner = {
+				check_variable = {
+					which = "studied_engineered_species"
+					value >= 2
+				}
+			}
+		}
+		owner = {
+			give_next_tech_society_option_effect = yes
+			add_modifier = {
+				modifier = "engineered_species_revelation"
+				days = -1
+			}
+		}
+	}
+	option = { #Ignorance
+		name = arcsite.2040.ignorance
+		trigger = {
+			owner = {
+				check_variable = {
+					which = "studied_engineered_species"
+					value < 2
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 4
+				min = 100
+				max = 1000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 10
+				min = 600
+				max = 5000
+			}
+			add_modifier = {
+				modifier = "engineered_species_ignorance"
+				days = -1
+			}
+		}
+	}
+	option = { #Xenophobic Response
+		name = arcsite.2040.phobe
+		trigger = {
+			owner = {
+				is_xenophobe = yes
+				check_variable = {
+					which = "studied_engineered_species"
+					value < 2
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 4
+				min = 100
+				max = 1000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 10
+				min = 600
+				max = 5000
+			}
+			add_modifier = {
+				modifier = "engineered_species_ownway"
+				days = -1
+			}
+		}
+	}
+	option = { #Xenophilic Response
+		name = arcsite.2040.phile
+		trigger = {
+			owner = {
+				is_xenophile = yes
+				check_variable = {
+					which = "studied_engineered_species"
+					value >= 2
+				}
+			}
+		}
+		owner = {
+			give_next_tech_society_option_effect = yes
+			add_modifier = {
+				modifier = "engineered_species_ownway"
+				days = -1
+			}
+		}
+	}
+
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+		hidden_effect = {
+			owner = {
+				clear_variable = studied_engineered_species
+			}
+		}
+	}
+}
+
+##########################################
+# "Debris Belt" by Pierre du Plessis
+##########################################
+
+fleet_event = { #1st step
+	id = arcsite.2500
+	title = arcsite.2500.name
+	desc = arcsite.2500.desc
+	picture = GFX_evt_space_debris
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		small_artifact_reward = yes
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd step
+	id = arcsite.2505
+	title = arcsite.2505.name
+	desc = arcsite.2505.desc
+	picture = GFX_evt_ancient_records
+	location = from
+	show_sound = event_administrative_work
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = arcsite.2505.A
+		small_artifact_reward = yes
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd step
+	id = arcsite.2515
+	title = arcsite.2515.name
+	desc = arcsite.2515.desc
+	picture = GFX_evt_worrying_signal
+	location = from
+	show_sound = event_worrying_signal
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		leader = {
+			save_event_target_as = event_leader
+		}
+	}
+
+	option = {
+		name = DISTURBING
+		if = {
+			limit = {
+				owner = { is_gestalt = no }
+			}
+			event_target:event_leader = {
+				locked_random_list = {
+					1 = {}
+					1 = {
+						modifier = {
+							factor = 0
+							has_trait_tier1or2 = { TRAIT = leader_trait_paranoid }
+						}
+						add_trait = leader_trait_paranoid
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							has_trait_tier1or2or3 = { TRAIT = leader_trait_maniacal }
+						}
+						add_trait = leader_trait_maniacal
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Outcome
+	id = arcsite.2520
+	title = arcsite.2520.name
+	desc = arcsite.2520.desc
+	picture = GFX_evt_crystal_mining
+	location = from
+	show_sound = event_mystic_reveal
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = { #Study
+		name = arcsite.2520.A
+		owner = {
+			add_relic = r_odryskan_crystal
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+#####################################
+# "The Chosen" by Pierre du Plessis #
+#####################################
+
+fleet_event = {
+	id = arcsite.3000
+	title = arcsite.3000.name
+	desc = arcsite.3000.desc
+	picture = GFX_evt_ancient_databank
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = arcsite.3000.A
+		small_artifact_reward = yes
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {
+	id = arcsite.3005
+	title = arcsite.3005.name
+	desc = arcsite.3005.desc
+	picture = GFX_evt_medieval_alien_civilization
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		trigger = {
+			owner = {
+				is_homicidal = no
+				is_xenophobe = no
+			}
+		}
+		small_artifact_reward = yes
+	}
+
+	option = {
+		name = arcsite.3005.B
+		trigger = {
+			owner = {
+				OR = {
+					is_homicidal = yes
+					is_xenophobe = yes
+				}
+			}
+		}
+		small_artifact_reward = yes
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {
+	id = arcsite.3010
+	title = arcsite.3010.name
+	desc = arcsite.3010.desc
+	picture = GFX_evt_busy_spaceport
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DISTURBING
+		medium_artifact_reward = yes
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+#Outcome
+fleet_event = {
+	id = arcsite.3015
+	title = arcsite.3015.name
+	desc = arcsite.3015.desc
+	picture = GFX_evt_wormhole
+	location = from
+	show_sound = event_mystic_reveal
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = arcsite.3015.A
+		allow = {
+			owner = { is_homicidal = no }
+		}
+
+		from.planet.orbit = {
+			enable_special_project = {
+				name = SHIELD_PRIMITIVE_PLANET_PROJECT
+				owner = root.owner
+			}
+		}
+	}
+
+	option = {
+		name = arcsite.3015.B
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+		}
+	}
+
+	option = {
+		name = arcsite.3015.C
+		exclusive_trigger = {
+			from.planet.orbit = {
+				OR = {
+					is_owned_by = root.owner
+					is_colony = no
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = { is_gestalt = yes }
+				add_modifier = {
+					modifier = bane_of_the_prophetess_gestalt
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = bane_of_the_prophetess
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Special project's follow-up
+country_event = {
+	id = arcsite.3020
+	title = arcsite.3020.name
+	desc = arcsite.3020.desc
+	is_triggered_only = yes
+	location = fromfrom
+
+	picture = GFX_evt_shielded_planet
+	show_sound = event_mystic_reveal
+
+	option = {
+		name = arcsite.3020.desc.A
+		add_modifier = {
+			modifier = charynoi_redemption
+		}
+	}
+}

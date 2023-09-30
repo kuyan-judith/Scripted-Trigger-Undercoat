@@ -1,0 +1,137 @@
+#my_casus_belli = {
+#	potential = { ... }		# trigger to make some CBs invalid for certain types of countries; this = attacker (CB owner); default: { always = yes }
+#	is_valid = { ... }		# trigger, evaluated daily to check if CB should be created or destroyed automatically, does not affect CBs granted via script;
+#								# this = attacker (CB owner), from = defender (target country); default: { always = yes }
+#	destroy_if = { ... }	# trigger, evaluated daily to destroy CBs that have been granted via script ahead of expiration date;
+#								# this = attacker (CB owner), from = defender (target country); default: { always = no }
+#	show_notification = no/yes	# optional (default = yes), flag to control whether this CB will generate a notification (to avoid duplicate
+#								# notification when a claim CB is generated)
+#}
+
+cb_galatron = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		has_global_flag = galatron_activated_first_time
+		is_playable = yes
+		NOR = {
+			is_berserk_fallen_machine_empire = yes
+			is_homicidal = yes
+			is_machine_assimilator = yes
+		}
+	}
+	is_valid = {
+		from = {
+			OR = {
+				has_modifier = galatron_modifier
+				has_relic = r_galatron
+			}
+			has_closed_borders = prev
+		}
+		has_total_war_cb = no
+		NOR = { 
+			is_overlord_to = from 
+			from = { is_overlord_to = root }
+		}
+	}
+}
+
+cb_megacorp_subjugate = {
+	show_in_diplomacy = yes
+	show_notification = no
+	potential = {
+		is_playable = yes
+		is_megacorp = yes
+		is_subject = no
+	}
+	is_valid = {
+		NOT = { is_overlord_to = FROM }
+		from = { is_subject = no }
+		relative_power = {
+			who = FROM
+			category = all
+			value > equivalent
+		}
+	}
+	destroy_if = {
+		relative_power = {
+			who = FROM
+			category = all
+			value < superior
+		}
+	}
+}
+
+cb_hostile_takeover = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_playable = yes
+		is_megacorp = yes
+		NOT = { has_valid_civic = civic_criminal_heritage }
+	}
+	is_valid = {
+		from = { is_megacorp = yes }
+		NOT = { is_in_federation_with = from }
+		NOT = { from = { is_overlord_to = root } }
+		any_country = {
+			OR = {
+				has_commercial_pact = root
+				is_in_federation_with = root
+			}
+			any_owned_planet = {
+				has_branch_office = from
+			}
+		}
+	}
+}
+
+cb_expel_corp = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_playable = yes
+		from = { is_megacorp = yes }
+		is_megacorp = no
+	}
+	is_valid = {
+		NOT = { has_commercial_pact = from }
+		NOT = { is_in_federation_with = from }
+		NOT = { from = { is_overlord_to = root } }
+		NOT = { root = { is_overlord_to = from } }
+		if = {
+			limit = {
+				exists = from.overlord
+			}
+			NOT = { from.overlord = { is_same_value = root.overlord } }
+		}
+		any_owned_planet = {
+			has_branch_office = from
+		}
+	}
+}
+
+cb_steal_galatron = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_playable = yes
+		is_gestalt = no
+		has_policy_flag = unrestricted_wars
+		has_global_flag = galatron_activated_first_time
+	}
+	is_valid = {
+		from = {
+			OR = {
+				has_modifier = galatron_modifier
+				has_relic = r_galatron
+			}
+			NOT = { has_closed_borders = prev }
+		}
+		has_total_war_cb = no
+		NOR = { 
+			is_overlord_to = from 
+			from = { is_overlord_to = root }
+		}
+	}
+}

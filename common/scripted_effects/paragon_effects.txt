@@ -1,0 +1,2445 @@
+refresh_class_cost_mod = {
+	erase_modifier = { MOD = $CLASS$s_cost_mod }
+	add_modifier = {
+		modifier = $CLASS$s_cost_mod
+		multiplier = $MULT$
+	}
+}
+
+random_kill_army_if_supreme_warrior = {
+	if = {
+		limit = {
+			# Check if the general on side A has the supreme warrior trait
+			any_ground_combat_$SIDE_A$ = {
+				exists = leader
+				leader = {
+					has_trait = leader_trait_supreme_warrior
+				}
+			}
+		}
+
+		# 15% of the time: kill a random frontline unit
+		random_list = {
+			# NOTE: Update custom loc for effect when changing probablity
+			85 = {}
+			15 = {
+				random_ground_combat_$SIDE_B$ = {
+					limit = {
+						is_in_frontline = yes
+					}
+					remove_army = yes
+				}
+			}
+		}
+	}
+}
+
+add_ship_type_from_debris = {
+	while = {
+		count = value:ships_of_size_in_fromscoped_debris|SIZE|$USES$|
+		random = {
+			chance = $CHANCE$
+			create_ship = {
+				name = random
+				random_existing_design = $GIVES$
+			}
+		}
+	}
+}
+
+salvage_ships_from_debris = {
+	create_fleet = {
+		name = NAME_Salvaged_Fleet
+		effect = {
+			set_owner = root
+			set_location = from
+
+			# Standard ships
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = corvette						GIVES = corvette }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = frigate						GIVES = frigate }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = destroyer					GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = cruiser						GIVES = cruiser }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = battleship					GIVES = battleship }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = titan						GIVES = titan }
+
+			# Offspring Ships
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = offspring_corvette			GIVES = corvette }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = offspring_destroyer			GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = offspring_cruiser			GIVES = cruiser }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = offspring_battleship			GIVES = battleship }
+
+			# Pirate ships
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = pirate_corvette				GIVES = corvette }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = pirate_destroyer 			GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = pirate_cruiser				GIVES = cruiser }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = bemat_corvette				GIVES = corvette }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = bemat_destroyer				GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = bemat_cruiser				GIVES = cruiser }
+
+			# Marauder ships
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = marauder_corvette			GIVES = corvette }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = marauder_destroyer			GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = marauder_cruiser				GIVES = cruiser }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = marauder_galleon				GIVES = battleship }
+
+			# Fallen empire ships
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = small_ship_fallen_empire		GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = large_ship_fallen_empire		GIVES = battleship }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = massive_ship_fallen_empire	GIVES = titan }
+
+			# Crisis ships
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = crisis_corvette				GIVES = corvette }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = crisis_destroyer				GIVES = destroyer }
+			add_ship_type_from_debris = { CHANCE = $CHANCE$ USES = crisis_cruiser				GIVES = cruiser }
+		}
+	}
+	if = {
+		limit = {
+			last_created_fleet = { num_ships = 0 }
+		}
+		delete_fleet = last_created_fleet
+	}
+	else = {
+		last_created_fleet = {
+			set_variable = { which = num_ships_salvaged value = trigger:num_ships }
+		}
+		create_message = {
+			type = MESSAGE_SALVAGED_SHIPS_FROM_DEBRIS
+			localization = MESSAGE_SALVAGED_SHIPS_FROM_DEBRIS_DESC
+			days = 20
+			target = last_created_fleet
+			variable = {
+				type = name
+				localization = SYSTEM
+				scope = from.solar_system
+			}
+			variable = {
+				type = variable
+				varname = num_ships_salvaged
+				localization = NUM_SHIPS
+				scope = last_created_fleet
+			}
+		}
+		last_created_fleet = {
+			clear_variable = num_ships_salvaged
+		}
+	}
+}
+
+create_variable_if_not_exists = {
+	if = {
+		limit = {
+			not = { is_variable_set = $VARIABLE$ }
+		}
+		set_variable = {
+			which = $VARIABLE$
+			value = $VALUE_IF_CREATED$
+		}
+	}
+}
+
+# Updates the multiplier for a modifier if needed
+# And removes it if the multiplier is 0
+update_modifier_amount_if_needed = {
+	if = {
+		limit = {
+			check_variable = { which = $MULT_VAR$ value > 0 }
+		}
+
+		# Remove old modifier if the multiplier amount should change
+		if = {
+			limit = {
+				not = { check_variable = { which = $MULT_VAR$ value = $PREV_MULT_VAR$ } }
+				has_modifier = $MODIFIER$
+			}
+			remove_modifier = $MODIFIER$
+		}
+
+		# Add modifier with a multiplier based on the amount of overseers
+		if = {
+			limit = {
+				not = { has_modifier = $MODIFIER$ }
+			}
+			add_modifier = {
+				modifier = $MODIFIER$
+				multiplier = $MULT_VAR$
+			}
+		}
+	}
+	else_if = { # Remove modifier since there are no overseers
+		limit = { has_modifier = $MODIFIER$ }
+		remove_modifier = $MODIFIER$
+	}
+
+	# Keep track of multiplier amount applied so we only need to update the
+	# modifier if the amount is changed.
+	if = {
+		limit = { check_variable = { which = $MULT_VAR$ value > 0 } }
+		set_variable = {
+			which = $PREV_MULT_VAR$
+			value = $MULT_VAR$
+		}
+	}
+	else = {
+		clear_variable = $PREV_MULT_VAR$ # No need to bloat variable list if it's 0
+	}
+
+	clear_variable = $MULT_VAR$
+}
+
+ethic_leader_hire_event = {
+	set_global_flag = $LEADER_ID$
+	country_event = {
+		id = $EVENT_ID$
+	}
+}
+
+ethic_leader_creator = {
+	create_country = {
+		name = "NAME_leader_country"
+		type = faction
+		auto_delete = yes
+		flag = {
+			icon = {
+				category = "special"
+				file = "unknown.dds"
+			}
+			background = {
+				category = "backgrounds"
+				file = "00_solid.dds"
+			}
+			colors = {
+				"red"
+				"red"
+				"null"
+				"null"
+			}
+		}
+		effect = {
+			save_event_target_as = leader_country
+		}
+	}
+	event_target:leader_country = {
+		create_species = {
+			name = UNKNOWN
+			class = $SPECIES_CLASS$
+			portrait = $LEADER_PORTRAIT$
+			traits = {
+				trait = "trait_enduring"
+			}
+			allow_negative_traits = no
+			effect = {
+				save_event_target_as = leader_species
+			}
+		}
+		create_leader = {
+			class = $CLASS$
+			species = event_target:leader_species
+			name = $NAME$
+			skill = $LEVEL$
+			gender = $GENDER$
+			event_leader = no # Leader is allowed to lead factions and win elections
+			background_ethic = ethic_$ETHIC$
+			skip_background_generation = yes
+			custom_description = $DESC$
+			custom_catch_phrase = $CATCH_PHRASE$
+			immortal = $IMMORTAL$
+			hide_age = $IMMORTAL$ # Right now it will always match immortal
+
+			randomize_traits = no
+			effect = {
+				set_skill = $LEVEL$
+				save_event_target_as = ethic_leader
+				set_leader_flag = renowned_leader
+				set_leader_flag = is_in_recruit_window
+				set_variable = { which = leader_pending_negative_traits_unmodified value = 1 }
+			}
+		}
+	}
+	event_target:ethic_leader = {
+		set_owner = root
+		# This is a hack to make the leader not be added to player country.
+		# We must call ethic_leader_hire on the hire event
+		# We must call ethic_leader_kill on the dismiss event
+		exile_leader_as = ethic_leader_exile
+	}
+}
+
+ethic_leader_hire_effect = {
+	random_owned_planet = {
+		limit = {
+			is_variable_set = paragon_memory_vault
+		}
+		change_variable = {
+			which = paragon_memory_vault
+			value = 1
+		}
+	}
+
+	lower_leader_chance = yes
+	set_country_flag = spawning_renowned_leader
+
+	clone_leader = {
+		target = event_target:ethic_leader
+	}
+	last_created_leader = {
+		save_global_event_target_as = $GLOBAL_EVENT_TARGET$
+		set_leader_flag = $GLOBAL_EVENT_TARGET$
+		set_leader_flag = renowned_leader
+	}
+
+	remove_country_flag = spawning_renowned_leader
+
+	create_message = {
+		type = MESSAGE_RECRUITED_LEADER
+		localization =  MESSAGE_RECRUITED_LEADER_DESC
+		days = @toast_message_days
+		target = event_target:ethic_leader
+		variable = {
+			type = name
+			localization = LEADER
+			scope = event_target:ethic_leader
+		}
+		variable = {
+				key = "border"
+				value = "GFX_border_veteran" #TODO Add real rarity frame gfx
+		}
+	}
+}
+
+ethic_leader_kill_effect = {
+	event_target:ethic_leader = {
+		kill_leader = { show_notification = no }
+	}
+	if = {
+		limit = {
+			check_variable = {
+				which = paragon_chance_negative
+				value > 0
+			}
+		}
+		change_variable = {
+			which = paragon_chance_negative
+			value = -1
+		}
+	}
+}
+
+hire_event_leader_effect = {
+
+	clone_leader = {
+		target = event_target:$LEADER$
+	}
+	last_created_leader = {
+		set_leader_flag = renowned_leader
+	}
+
+	hire_event_leader_message = {
+		LEADER = $LEADER$
+	}
+}
+
+hire_event_leader_message = {
+	create_message = {
+		type = MESSAGE_RECRUITED_LEADER
+		localization =  MESSAGE_RECRUITED_LEADER_DESC
+		days = @toast_message_days
+		target = event_target:$LEADER$
+		variable = {
+			type = name
+			localization = LEADER
+			scope = event_target:$LEADER$
+		}
+		variable = {
+				key = "border"
+				value = "GFX_border_veteran" #TODO Add real rarity frame gfx
+		}
+	}
+}
+
+country_create_gestalt_councilor = {
+	create_leader = {
+		class = $CLASS$
+		species = this
+		name = $COUNCIL_POS$
+		skill = 1
+		gender = indeterminable
+		event_leader = yes
+		skip_background_generation = yes
+		can_manually_change_location = no
+		hide_leader = yes
+		custom_description = $DESC$
+		randomize_traits = no
+		background_ethic = ethic_gestalt_consciousness
+		effect = {
+			save_event_target_as = gestalt_councilor
+		}
+	}
+	event_target:gestalt_councilor = {
+		set_owner = prev
+		change_leader_portrait = councilor_hive_$CLASS$_1
+		set_council_position = $COUNCIL_POS$
+		set_immortal = yes
+		set_leader_flag = leader_death_events_blocked
+		if = {
+			limit = {
+				has_paragon_dlc = yes
+			}
+			switch = {
+				trigger = leader_class
+				admiral = {
+					add_trait_no_notify = subclass_admiral_strategist
+				}
+				scientist = {
+					add_trait_no_notify = subclass_scientist_researcher
+				}
+				general = {
+					add_trait_no_notify = subclass_general_marshall
+				}
+				governor = {
+					add_trait_no_notify = subclass_governor_visionary
+				}
+			}
+		}
+	}
+}
+
+set_gestalt_node_protrait_effect = {
+	switch = {
+		trigger = leader_class
+		admiral = {
+			if = {
+				limit = { has_skill >= 8 }
+				change_leader_portrait = councilor_hive_admiral_3
+			}
+			else_if = {
+				limit = { has_skill >= 4 }
+				change_leader_portrait = councilor_hive_admiral_2
+			}
+			else_if = {
+				limit = { has_skill >= 1 }
+				change_leader_portrait = councilor_hive_admiral_1
+			}
+		}
+		scientist = {
+			if = {
+				limit = { has_skill >= 8 }
+				change_leader_portrait = councilor_hive_scientist_3
+			}
+			else_if = {
+				limit = { has_skill >= 4 }
+				change_leader_portrait = councilor_hive_scientist_2
+			}
+			else_if = {
+				limit = { has_skill >= 1 }
+				change_leader_portrait = councilor_hive_scientist_1
+			}
+		}
+		general = {
+			if = {
+				limit = { has_skill >= 8 }
+				change_leader_portrait = councilor_hive_general_3
+			}
+			else_if = {
+				limit = { has_skill >= 4 }
+				change_leader_portrait = councilor_hive_general_2
+			}
+			else_if = {
+				limit = { has_skill >= 1 }
+				change_leader_portrait = councilor_hive_general_1
+			}
+		}
+		governor = {
+			if = {
+				limit = { has_skill >= 8 }
+				change_leader_portrait = councilor_hive_governor_3
+			}
+			else_if = {
+				limit = { has_skill >= 4 }
+				change_leader_portrait = councilor_hive_governor_2
+			}
+			else_if = {
+				limit = { has_skill >= 1 }
+				change_leader_portrait = councilor_hive_governor_1
+			}
+		}
+	}
+}
+
+restore_gestalt_councilor_effect = {
+	every_owned_leader = {
+		limit = {
+			is_councilor_type = $COUNCIL_POS$
+		}
+		custom_tooltip = restore_gestalt_councilor_effect_tooltip
+		save_global_event_target_as = culled_node
+		hidden_effect = {
+			set_leader_flag = culled_node # This blocks paragon.600 from generated an unused node.
+			owner = {
+				create_restored_node = {
+					CLASS = $CLASS$
+					COUNCIL_POS = $COUNCIL_POS$
+					DESC = $DESC$
+				}
+				prev = {
+					kill_leader = {
+						show_notification = no
+					}
+				}
+				assign_restored_node = {
+					CLASS = $CLASS$
+					COUNCIL_POS = $COUNCIL_POS$
+				}
+				last_created_leader = {
+					add_bonus_skills_effect = yes
+					add_skill_without_trait_selection = value:restored_node_additional_skills
+				}
+			}
+		}
+	}
+}
+
+add_bonus_skills_effect = {
+	# Aptitude Tradition bonus trait
+	if = {
+		limit = {
+			owner = {
+				has_tradition = tr_aptitude_adopt
+			}
+		}
+		add_trait_no_notify = "random_common"
+	}
+
+	# Memory Vaults
+	if = {
+		limit = {
+			owner = {
+				is_memory_vault_empire = yes
+			}
+		}
+		add_skill_without_trait_selection = 1
+	}
+
+	# Warbots/Strength of Legions/Distinguisted Admiralty
+	# Admirals and Generals
+	if = {
+		limit = {
+			owner = {
+				OR = {
+					has_valid_civic = civic_distinguished_admiralty
+					has_valid_civic = civic_machine_warbots
+					has_valid_civic = civic_hive_strength_of_legions
+				}
+			}
+			OR = {
+				leader_class = admiral
+				leader_class = general
+			}
+		}
+		add_skill_without_trait_selection = 2
+	}
+}
+
+
+create_restored_node = {
+	create_leader = {
+		class = $CLASS$
+		species = this
+		name = $COUNCIL_POS$
+		skill = 1
+		gender = indeterminable
+		event_leader = yes
+		skip_background_generation = yes
+		can_manually_change_location = no
+		hide_leader = yes
+		custom_description = $DESC$
+		randomize_traits = no
+		background_ethic = ethic_gestalt_consciousness
+		effect = {
+			save_event_target_as = restored_node
+			set_leader_flag = restored_node
+		}
+	}
+}
+
+assign_restored_node = {
+	event_target:restored_node = {
+		set_owner = prev
+		change_leader_portrait = councilor_hive_$CLASS$_1
+		set_council_position = $COUNCIL_POS$
+		set_immortal = yes
+		set_leader_flag = leader_death_events_blocked
+		if = {
+			limit = {
+				has_paragon_dlc = yes
+			}
+			switch = {
+				trigger = leader_class
+				admiral = {
+					add_trait_no_notify = subclass_admiral_strategist
+				}
+				scientist = {
+					add_trait_no_notify = subclass_scientist_researcher
+				}
+				general = {
+					add_trait_no_notify = subclass_general_marshall
+				}
+				governor = {
+					add_trait_no_notify = subclass_governor_visionary
+				}
+			}
+		}
+	}
+}
+
+lower_leader_chance = { #increase the wait time between getting new ethic leaders
+	change_variable = {
+		which = paragon_chance_negative
+		value = 1
+	}
+	set_timed_country_flag = {
+		flag = leader_recruited_recently
+		days = 7250
+	}
+}
+
+remove_subclass = {
+	switch = {
+		trigger = has_trait
+		subclass_admiral_aggressor = { remove_trait = subclass_admiral_aggressor }
+		subclass_admiral_tactician = { remove_trait = subclass_admiral_tactician }
+		subclass_admiral_strategist = { remove_trait = subclass_admiral_strategist }
+		subclass_general_invader = { remove_trait = subclass_general_invader }
+		subclass_general_protector = { remove_trait = subclass_general_protector }
+		subclass_general_marshall = { remove_trait = subclass_general_marshall }
+		subclass_scientist_explorer = { remove_trait = subclass_scientist_explorer }
+		subclass_scientist_analyst = { remove_trait = subclass_scientist_analyst }
+		subclass_scientist_researcher = { remove_trait = subclass_scientist_researcher }
+		subclass_governor_visionary = { remove_trait = subclass_governor_visionary }
+		subclass_governor_pioneer = { remove_trait = subclass_governor_pioneer }
+		subclass_governor_economist = { remove_trait = subclass_governor_economist }
+	}
+}
+
+paragon_origin_create_pirates = {
+	random_system_planet = {
+		save_event_target_as = ship_location
+		create_country = {
+			name = "NAME_Pirates"
+			type = pirate
+			species = random
+			name_list = "PRT1"
+			flag = {
+				background = {
+					category = "backgrounds"
+					file = "00_solid.dds"
+				}
+				colors = {
+					"black"
+					"black"
+					"null"
+					"null"
+				}
+			}
+			effect = {
+				save_event_target_as = paragon_origin_pirate_country
+			}
+		}
+		event_target:paragon_origin_pirate_country = {
+			set_name = random
+			randomize_flag_symbol = "pirate"
+			every_country = {
+				establish_communications_no_message = prev
+			}
+			create_fleet = {
+				name = "NAME_Pirate_Station"
+				effect = {
+					set_owner = event_target:paragon_origin_pirate_country
+					create_ship = {
+						name = random
+						design = "NAME_Pirate_Nest"
+						graphical_culture = "pirate_01"
+					}
+					set_location = event_target:ship_location
+				}
+			}
+			create_fleet = {
+				name = "NAME_Pirate_Fleet"
+				effect = {
+					set_owner = event_target:paragon_origin_pirate_country
+					create_ship_design = {
+						design = "NAME_Reaver"
+					}
+					while = {
+						count = 8
+						create_ship = {
+							name = random
+							design = last_created_design
+							graphical_culture = "pirate_01"
+						}
+					}
+					create_ship_design = {
+						design = "NAME_Brigand"
+					}
+					while = {
+						count = 4
+						create_ship = {
+							name = random
+							design = last_created_design
+							graphical_culture = "pirate_01"
+						}
+					}
+					last_created_ship = {
+						add_modifier = { modifier = "ahab_power" days = -1 }
+					}
+					set_location = event_target:ship_location
+					set_fleet_stance = passive
+					set_aggro_range_measure_from = self
+					set_aggro_range = 150
+				}
+			}
+		}
+	}
+}
+
+paragon_origin_reformists_negotiations_effect = {
+	optimize_memory
+	ruler = { #Remove Delusion Trait If It Is Low
+		if = {
+			limit = {
+				has_trait = leader_trait_legendary_delusional
+				check_variable = {
+					which = paragon_origin_delusion_tier
+					value <= 5
+				}
+			}
+			remove_trait = leader_trait_legendary_delusional
+		}
+	}
+	if = {
+		limit = { #Did reformist finished their situation?
+			has_country_flag = reformists_situation_finished
+		}
+		if = {
+			limit = {
+				NOR = { #Was player a bad ruler?
+					has_country_flag = took_reformists_side
+					ruler = {
+						check_variable = {
+							which = paragon_origin_delusion_tier
+							value < 4
+						}
+					}
+				}
+			}
+			hidden_effect = { #Ruler was bad - force them to revert Imperial
+				set_origin = origin_legendary_leader_dictatorial
+			}
+			change_government = {
+				authority = auth_dictatorial
+				remove_invalid_civics = yes
+			}
+			switch = { #Ruler was bad, so throw some more pains for him
+				trigger = has_ethic
+				ethic_materialist = { shift_ethic = ethic_spiritualist }
+				ethic_xenophile = { shift_ethic = ethic_xenophobe }
+				ethic_militarist = { shift_ethic = ethic_pacifist }
+				ethic_xenophobe = { shift_ethic = ethic_xenophile }
+				ethic_pacifist = { shift_ethic = ethic_militarist }
+				ethic_spiritualist = { shift_ethic = ethic_materialist }
+			}
+			if = {
+				limit = {
+					NOT = { has_civic = civic_shadow_council }
+				}
+				if = { #Down with the aristocracy and their oppression
+					limit = {
+						is_aristocratic_empire = yes
+					}
+					force_remove_civic = civic_aristocratic_elite
+					force_add_civic = civic_shadow_council
+				}
+				if = { #Eat the rich
+					limit = {
+						has_civic = civic_merchant_guilds
+					}
+					force_remove_civic = civic_merchant_guilds
+					force_add_civic = civic_shadow_council
+				}
+			}
+		}
+		else = { #Was player a good ruler?
+			if = {
+				limit = { #Some carrot to be a good guy, using situation approach
+					has_country_flag = took_reformists_side
+					ruler = {
+						check_variable = {
+							which = paragon_origin_delusion_tier
+							value < 4
+						}
+					}
+				}
+				paragon_origin_gain_modifier = yes
+			}
+			if = {
+				limit = {
+					has_efficient_bureaucracy = no
+				}
+				if = { #Down with the aristocracy and their oppression
+					limit = {
+						is_aristocratic_empire = yes
+					}
+					force_remove_civic = civic_aristocratic_elite
+					force_add_civic = civic_efficient_bureaucracy
+				}
+				if = { #Eat the rich
+					limit = {
+						has_civic = civic_merchant_guilds
+					}
+					force_remove_civic = civic_merchant_guilds
+					force_add_civic = civic_efficient_bureaucracy
+				}
+			}
+		}
+		if = { #People wants some more say in ruling the country
+            limit = { has_modifier = paragon_origin_forgotten_deal }
+            hidden_effect = { remove_modifier = paragon_origin_forgotten_deal }
+            add_modifier = {
+                modifier = paragon_origin_reformists_deal
+                days = -1
+            }
+        }
+        else = { #People wants some more say in ruling the country
+            add_modifier = {
+                modifier = paragon_origin_forgotten_deal
+                days = -1
+            }
+        }
+		if = { #People don't want to be slaves anymore
+			limit = {
+				has_civic = civic_slaver_guilds
+			}
+			force_remove_civic = civic_slaver_guilds
+			if = {
+				limit = {
+					has_philosopher_king = no
+				}
+				force_add_civic = civic_philosopher_king
+			}
+			else_if = {
+				limit = {
+					NOT = { has_civic = civic_mining_guilds }
+				}
+				force_add_civic = civic_mining_guilds
+			}
+			else_if = {
+				limit = {
+					has_efficient_bureaucracy = no
+				}
+				force_add_civic = civic_efficient_bureaucracy
+			}
+		}
+		if = { #People want some amenities
+			limit = {
+				has_dystopian_society = yes
+			}
+			force_remove_civic = civic_dystopian_society
+			if = {
+				limit = {
+					has_efficient_bureaucracy = no
+				}
+				force_add_civic = civic_efficient_bureaucracy
+			}
+			else_if = {
+				limit = {
+					NOT = { has_civic = civic_mining_guilds }
+				}
+				force_add_civic = civic_mining_guilds
+			}
+			else_if = {
+				limit = {
+					has_philosopher_king = no
+				}
+				force_add_civic = civic_philosopher_king
+			}
+		}
+		if = { #People want better living standards
+			limit = {
+				owner_main_species = {
+					OR = {
+						has_living_standard = { type = living_standard_academic_privilege country = root }
+						has_living_standard = { type = living_standard_stratified country = root }
+						has_living_standard = { type = living_standard_subsistence country = root }
+					}
+				}
+			}
+			owner_main_species = {
+				set_living_standard = {
+					type = living_standard_good
+					country = root.owner
+				}
+			}
+		}
+		if = { #If player imprisoned people, they deserve freedom!
+			limit = { has_country_flag = forgotten_imprisoned }
+			add_modifier = {
+				modifier = paragon_origin_prisoners
+				days = 3600
+			}
+		}
+		set_government_cooldown = default
+	}
+	else = { #Lower reformists expectation if they did not finish their situation
+		if = { #People wants some more say in ruling the country, but not too much
+            limit = { has_modifier = paragon_origin_forgotten_deal }
+            hidden_effect = { remove_modifier = paragon_origin_forgotten_deal }
+            add_modifier = {
+                modifier = paragon_origin_reformists_deal
+                days = -1
+				multiplier = 0.5
+            }
+        }
+        else = { #People wants some more say in ruling the country
+            add_modifier = {
+                modifier = paragon_origin_forgotten_deal
+                days = -1
+				multiplier = 0.5
+            }
+        }
+		if = { #People want better living standards
+			limit = {
+				owner_main_species = {
+					OR = {
+						has_living_standard = { type = living_standard_academic_privilege country = root }
+						has_living_standard = { type = living_standard_stratified country = root }
+						has_living_standard = { type = living_standard_subsistence country = root }
+					}
+				}
+			}
+			owner_main_species = {
+				set_living_standard = {
+					type = living_standard_good
+					country = root.owner
+				}
+			}
+		}
+		if = { #People don't want to be slaves anymore
+			limit = {
+				has_civic = civic_slaver_guilds
+			}
+			force_remove_civic = civic_slaver_guilds
+			if = {
+				limit = {
+					has_philosopher_king = no
+				}
+				force_add_civic = civic_philosopher_king
+			}
+			else_if = {
+				limit = {
+					NOT = { has_civic = civic_mining_guilds }
+				}
+				force_add_civic = civic_mining_guilds
+			}
+			else_if = {
+				limit = {
+					has_efficient_bureaucracy = no
+				}
+				force_add_civic = civic_efficient_bureaucracy
+			}
+		}
+		if = { #People want some amenities
+			limit = {
+				has_dystopian_society = yes
+			}
+			force_remove_civic = civic_dystopian_society
+			if = {
+				limit = {
+					has_efficient_bureaucracy = no
+				}
+				force_add_civic = civic_efficient_bureaucracy
+			}
+			else_if = {
+				limit = {
+					NOT = { has_civic = civic_mining_guilds }
+				}
+				force_add_civic = civic_mining_guilds
+			}
+			else_if = {
+				limit = {
+					has_philosopher_king = no
+				}
+				force_add_civic = civic_philosopher_king
+			}
+		}
+		hidden_effect = {
+			set_government_cooldown = default
+		}
+	}
+}
+
+paragon_origin_civil_war = {
+	if = {
+		limit = {
+			any_system_within_border = {
+				is_capital_system = no
+				any_system_colony = { has_modifier = paragon_origin_reformists }
+			}
+		}
+		set_country_flag = paragon_origin_reformists_war
+		random_system_within_border = {
+			limit = {
+				any_system_colony = {
+					has_modifier = paragon_origin_reformists
+					has_owner = yes
+					is_owned_by = root
+				}
+			}
+			random_system_colony = {
+				limit = {
+					has_modifier = paragon_origin_reformists
+					has_owner = yes
+					is_owned_by = root
+				}
+				save_event_target_as = rebel_planet
+				create_rebels = {
+					name = random
+					authority = auth_democratic
+					civics = { civic = civic_distinguished_admiralty civic = civic_idealistic_foundation civic = civic_citizen_service }
+					species = root
+					ethos = { ethic = ethic_fanatic_egalitarian ethic = ethic_militarist }
+					origin = "origin_legendary_leader_death"
+					flag = random
+					effect = {
+						set_country_flag = rebel_empire_@root
+						set_country_flag = origin_rebel_empire
+						add_modifier = {
+							modifier = paragon_origin_rebel_player
+							days = -1
+						}
+						set_country_type = default
+						save_event_target_as = rebel_empire
+						add_resource = {
+							minerals = 7500
+							energy = 7500
+							food = 7500
+							consumer_goods = 5000
+							alloys = 5000
+							rare_crystals = 500
+							volatile_motes = 500
+							exotic_gases = 500
+							influence = 500
+							unity = 5000
+						}
+						establish_communications_no_message = root
+						declare_war = {
+							target = root
+							attacker_war_goal = wg_independence
+						}
+						create_fleet_from_naval_cap = 0.4
+					}
+				}
+				set_owner = event_target:rebel_empire
+				hidden_effect = {
+					solar_system = {
+						if = {
+							limit = { exists = starbase }
+							starbase = {
+								if = {
+									limit = { is_owned_by = root.owner }
+									set_owner = event_target:rebel_empire
+									if = {
+										limit = { has_starbase_size = starbase_outpost }
+										set_starbase_size = starbase_starport
+										set_starbase_module = {
+											slot = 1
+											module = shipyard
+										}
+										set_starbase_module = {
+											slot = 2
+											module = shipyard
+										}
+									}
+									else_if = {
+										limit = {
+											NOT = { has_starbase_module = shipyard }
+										}
+										set_starbase_module = {
+											slot = 1
+											module = shipyard
+										}
+										set_starbase_module = {
+											slot = 2
+											module = shipyard
+										}
+									}
+								}
+							}
+						}
+						else = {
+							create_starbase = {
+								size = starbase_starport
+								module = shipyard
+								module = shipyard
+								owner = event_target:rebel_empire
+							}
+						}
+						add_claims = {
+							who = root.owner
+							show_notification = no
+						}
+						every_system_planet = {
+							limit = {
+								is_colony = yes
+								NOT = { is_same_value = event_target:rebel_planet }
+								is_owned_by = root.owner
+							}
+							set_owner = event_target:rebel_empire
+						}
+						every_fleet_in_system = {
+							limit = { is_owned_by = root.owner }
+							set_mia = mia_return_home
+						}
+					}
+				}
+			}
+		}
+		every_system_within_border = {
+			limit = {
+				has_owner = yes
+				is_owned_by = root
+				any_system_colony = {
+					has_modifier = paragon_origin_reformists
+					has_owner = yes
+					is_owned_by = root
+				}
+			}
+			every_system_colony = {
+				limit = {
+					has_modifier = paragon_origin_reformists
+					has_owner = yes
+					is_owned_by = root
+				}
+				save_event_target_as = rebel_planet
+				set_owner = event_target:rebel_empire
+				hidden_effect = {
+					solar_system = {
+						if = {
+							limit = { exists = starbase }
+							starbase = {
+								if = {
+									limit = { is_owned_by = root.owner }
+									set_owner = event_target:rebel_empire
+									if = {
+										limit = { has_starbase_size = starbase_outpost }
+										set_starbase_size = starbase_starport
+										set_starbase_module = {
+											slot = 1
+											module = shipyard
+										}
+										set_starbase_module = {
+											slot = 2
+											module = shipyard
+										}
+									}
+									else_if = {
+										limit = {
+											NOT = { has_starbase_module = shipyard }
+										}
+										set_starbase_module = {
+											slot = 1
+											module = shipyard
+										}
+										set_starbase_module = {
+											slot = 2
+											module = shipyard
+										}
+									}
+								}
+							}
+						}
+						else = {
+							create_starbase = {
+								size = starbase_starport
+								module = shipyard
+								module = shipyard
+								owner = event_target:rebel_empire
+							}
+						}
+						add_claims = {
+							who = root.owner
+							show_notification = no
+						}
+						every_system_planet = {
+							limit = {
+								is_colony = yes
+								NOT = { is_same_value = event_target:rebel_planet }
+								is_owned_by = root.owner
+							}
+							set_owner = event_target:rebel_empire
+						}
+						every_fleet_in_system = {
+							limit = { is_owned_by = root.owner }
+							set_mia = mia_return_home
+						}
+					}
+				}
+			}
+		}
+		event_target:rebel_empire = {
+			create_leader = {
+				class = admiral
+				species = owner_main_species
+				name = random
+				skill = 5
+				effect = {
+					change_background_ethic = ethic_militarist
+				}
+			}
+			create_leader = {
+				class = governor
+				species = owner_main_species
+				name = random
+				skill = 5
+				effect = {
+					change_background_ethic = ethic_egalitarian
+				}
+			}
+			create_leader = {
+				class = general
+				species = owner_main_species
+				name = random
+				skill = 5
+				effect = {
+					change_background_ethic = ethic_xenophobe
+				}
+			}
+			create_leader = {
+				class = scientist
+				species = owner_main_species
+				name = random
+				skill = 5
+				effect = {
+					change_background_ethic = ethic_egalitarian
+				}
+			}
+			every_owned_pop = {
+				random_list = {
+					2 = {
+						pop_change_ethic = ethic_egalitarian
+					}
+					1 = {
+						pop_change_ethic = ethic_xenophobe
+					}
+					2 = {
+						pop_change_ethic = ethic_militarist
+					}
+				}
+			}
+		}
+	}
+	else = {
+		set_country_flag = paragon_origin_reformists_war
+		add_modifier = {
+			modifier = paragon_origin_one_system_war
+			days = 1800
+		}
+		set_country_flag = one_planet_civil_war
+		country_event = {
+			id = paragon.5223 days = 1800
+		}
+	}
+}
+
+paragon_origin_bad_trait_giver = {
+	optimize_memory
+	locked_random_list = {
+		1 = {
+			modifier = {
+				factor = 2
+				is_militarist = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					ruler = { has_trait = leader_trait_legendary_warmonger }
+					is_pacifist = yes
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_warmonger }
+		}
+		1 = {
+			modifier = {
+				factor = 2
+				is_spiritualist = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					ruler = { has_trait = leader_trait_legendary_dreamlike }
+					is_materialist = yes
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_dreamlike }
+		}
+		1 = {
+			modifier = {
+				factor = 2
+				is_authoritarian = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					ruler = { has_trait = leader_trait_legendary_harsh_ruler }
+					is_egalitarian = yes #Impossible to get, but to keep the structure
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_harsh_ruler }
+		}
+		1 = {
+			modifier = {
+				factor = 2
+				is_xenophile = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					is_xenophobe = yes
+					ruler = { has_trait = leader_trait_legendary_too_open }
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_too_open }
+		}
+		1 = {
+			modifier = {
+				factor = 2
+				is_pacifist = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					is_militarist = yes
+					ruler = { has_trait = leader_trait_legendary_hoplofobia }
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_hoplofobia }
+		}
+		1 = {
+			modifier = {
+				factor = 2
+				is_materialist = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					is_spiritualist = yes
+					ruler = { has_trait = leader_trait_legendary_bad_meritocracy }
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_bad_meritocracy }
+		}
+		1 = {
+			modifier = {
+				factor = 2
+				is_xenophobe = yes
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					is_xenophile = yes
+					ruler = { has_trait = leader_trait_legendary_unfriendly }
+				}
+			}
+			ruler = { add_trait = leader_trait_legendary_unfriendly }
+		}
+	}
+}
+
+paragon_origin_ascension_flag_flipping = {
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_$perk$ }
+		change_variable = {
+			which = paragon_origin_ascension
+			value = -1
+		}
+		remove_country_flag = paragon_origin_ascension_flag_flipping_$perk$
+	}
+	else = {
+		set_country_flag = paragon_origin_ascension_flag_flipping_$perk$
+		change_variable = {
+			which = paragon_origin_ascension
+			value = 1
+		}
+	}
+}
+
+paragon_origin_ascension_effect = {
+	optimize_memory
+	if = { #Focus - same for everyone
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_focus }
+		country_event = { id = paragon.5265 }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_focus
+	}
+	if = { #Psionic
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_psychic_beacon }
+		ruler = { set_leader_flag = psychic_beacon }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_psychic_beacon
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_astropath }
+		ruler = { set_leader_flag = astropath }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_astropath
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_all_seeing }
+		ruler = { set_leader_flag = all_seeing }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_all_seeing
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_the_voice }
+		ruler = { set_leader_flag = the_voice }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_the_voice
+	}
+	if = { #Cybernetic
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_permanent_transmitters }
+		ruler = { set_leader_flag = permanent_transmitters }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_permanent_transmitters
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_sleep_inhibitors }
+		ruler = { set_leader_flag = sleep_inhibitors }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_sleep_inhibitors
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_tactical_interface }
+		ruler = { set_leader_flag = tactical_interface }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_tactical_interface
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_cognitive_analyzers }
+		ruler = { set_leader_flag = cognitive_analyzers }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_cognitive_analyzers
+	}
+	if = { #Synthetic
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_shared_learning_network }
+		ruler = { set_leader_flag = shared_learning_network }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_shared_learning_network
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_battle_calculation_systems }
+		ruler = { set_leader_flag = battle_calculation_systems }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_battle_calculation_systems
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_recycling_algorithms }
+		ruler = { set_leader_flag = recycling_algorithms }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_recycling_algorithms
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_vast_engineering_database }
+		ruler = { set_leader_flag = vast_engineering_database }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_vast_engineering_database
+	}
+	if = { #Genetic
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_brain_growth }
+		ruler = { set_leader_flag = brain_growth }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_brain_growth
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_gene_splicing }
+		ruler = { set_leader_flag = gene_splicing }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_gene_splicing
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_irresistible_charisma }
+		ruler = { set_leader_flag = irresistible_charisma }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_irresistible_charisma
+	}
+	if = {
+		limit = { has_country_flag = paragon_origin_ascension_flag_flipping_divided_attention }
+		ruler = { set_leader_flag = divided_attention }
+		remove_country_flag = paragon_origin_ascension_flag_flipping_divided_attention
+	}
+	ruler = {
+		if = {
+			limit = { has_leader_flag = paragon_origin_legendary_leader }
+			set_immortal = yes
+			remove_leader_flag = legendary_leader_coma
+			paragon_origin_delusion_trait_lowerer = yes
+		}
+	}
+	remove_country_flag = increase_leader_upkeep
+}
+
+scientist_prospector_effect = {
+	FROM = {
+		set_planet_flag = prospected_by@root.owner
+	}
+	random = {
+		chance = $CHANCE$
+		random_list = {
+			# Mineral Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2005
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_mineral_deposits = no
+					}
+				}
+			}
+			# Energy Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2010
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_energy_deposits = no
+					}
+				}
+			}
+		}
+	}
+}
+
+scientist_observant_effect = {
+	FROM = {
+		set_planet_flag = prospected_by@root.owner
+	}
+	random = {
+		chance = $CHANCE$
+		random_list = {
+			# Physics Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2030
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_physics_deposits = no
+					}
+				}
+			}
+			# Society Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2035
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_society_deposits = no
+					}
+				}
+			}
+			# Engineering Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2040
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_engineering_deposits = no
+					}
+				}
+			}
+		}
+	}
+}
+
+scientist_midas_touch_effect = {
+	FROM = {
+		set_planet_flag = prospected_by@root.owner
+	}
+	random = {
+		chance = $CHANCE$
+		random_list = {
+			# Volatile Motes Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2015
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_volatile_motes_deposit = no
+					}
+				}
+			}
+			# Exotic Gases Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2020
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_exotic_gases_deposits = no
+					}
+				}
+			}
+			# Rare Crystals Deposit
+			1 = {
+				ship_event = {
+					id = paragon_2.2025
+					scopes = {
+						from = from
+					}
+				}
+				modifier = {
+					factor = 0
+					from = {
+						can_have_rare_crystals_deposits = no
+					}
+				}
+			}
+		}
+	}
+}
+
+paragon_origin_gain_delusion = { #Use on leader scope
+	if = {
+		limit = {
+			has_trait = leader_trait_legendary_delusional
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = paragon_origin_delusion_tier
+					value < 20
+				}
+			}
+			hidden_effect = {
+				change_variable = {
+					which = paragon_origin_delusion_tier
+					value = 1
+				}
+			}
+		}
+	}
+	else = {
+		add_trait = leader_trait_legendary_delusional
+	}
+}
+
+paragon_origin_delusion_trait_lowerer = { #Use on leader scope
+	if = {
+		limit = {
+			check_variable = {
+				which = paragon_origin_delusion_tier
+				value > 1
+			}
+		}
+		change_variable = {
+			which = paragon_origin_delusion_tier
+			value = -1
+		}
+	}
+	else = {
+		remove_trait = leader_trait_legendary_delusional
+	}
+}
+
+paragon_origin_launch_rebelion = {
+	every_system_within_border = {
+		limit = {
+			any_system_colony = {
+				has_modifier = paragon_origin_reformists
+				has_owner = yes
+				is_owned_by = root
+			}
+		}
+		set_star_flag = your_rebel_planet
+	}
+	random_system_within_border = {
+		limit = {
+			NOT = { has_star_flag = your_rebel_planet }
+			any_system_colony = {
+				has_owner = yes
+				is_owned_by = root
+			}
+		}
+		set_star_flag = rebels_1
+	}
+	every_system_within_border = {
+		limit = {
+			NOT = { has_star_flag = your_rebel_planet }
+		}
+		set_star_flag = rebels_1
+	}
+	random_system_within_border = {
+		limit = {
+			NOT = { has_star_flag = your_rebel_planet }
+			has_star_flag = rebels_1
+			any_system_colony = {
+				has_owner = yes
+				is_owned_by = root
+			}
+		}
+		random_system_colony = {
+			limit = {
+				has_owner = yes
+				is_owned_by = root
+			}
+			save_event_target_as = rebel_planet
+			create_rebels = {
+				name = random
+				authority = auth_imperial
+				ethos = { ethic = ethic_fanatic_authoritarian ethic = ethic_militarist }
+				civics = { civic = random civic = random }
+				species = root
+				origin = "origin_legendary_leader_death"
+				flag = random
+				effect = {
+					add_modifier = {
+						modifier = paragon_origin_one_system_war
+						days = -1
+					}
+					set_country_type = default
+					set_country_flag = rebel_empire_@root
+					set_country_flag = origin_rebel_empire
+					save_event_target_as = rebel_empire_1
+					add_resource = {
+						minerals = 15000
+						energy = 15000
+						food = 15000
+						consumer_goods = 10000
+						alloys = 10000
+						rare_crystals = 1000
+						volatile_motes = 1000
+						exotic_gases = 1000
+						influence = 1000
+						unity = 10000
+					}
+					establish_communications_no_message = root
+					create_fleet_from_naval_cap = 0.6
+				}
+			}
+			set_owner = event_target:rebel_empire_1
+			hidden_effect = {
+				solar_system = {
+					if = {
+						limit = { exists = starbase }
+						starbase = {
+							if = {
+								limit = { is_owned_by = root.owner }
+								set_owner = event_target:rebel_empire_1
+								if = {
+									limit = { has_starbase_size = starbase_outpost }
+									set_starbase_size = starbase_starport
+									set_starbase_module = {
+										slot = 1
+										module = shipyard
+									}
+									set_starbase_module = {
+										slot = 2
+										module = shipyard
+									}
+								}
+								else_if = {
+									limit = {
+										NOT = { has_starbase_module = shipyard }
+									}
+									set_starbase_module = {
+										slot = 1
+										module = shipyard
+									}
+									set_starbase_module = {
+										slot = 2
+										module = shipyard
+									}
+								}
+							}
+						}
+					}
+					else = {
+						create_starbase = {
+							size = starbase_starport
+							module = shipyard
+							module = shipyard
+							owner = event_target:rebel_empire_1
+						}
+					}
+					add_claims = {
+						who = root.owner
+						show_notification = no
+					}
+					every_system_planet = {
+						limit = {
+							is_colony = yes
+							NOT = { is_same_value = event_target:rebel_planet }
+							is_owned_by = root.owner
+						}
+						set_owner = event_target:rebel_empire_1
+					}
+					every_fleet_in_system = {
+						limit = { is_owned_by = root.owner }
+						set_mia = mia_return_home
+					}
+				}
+			}
+		}
+	}
+	every_system_within_border = {
+		limit = {
+			has_owner = yes
+			is_owned_by = root
+			has_star_flag = rebels_1
+		}
+		every_system_colony = {
+			limit = {
+				has_owner = yes
+				is_owned_by = root
+			}
+			save_event_target_as = rebel_planet
+			set_owner = event_target:rebel_empire_1
+			hidden_effect = {
+				solar_system = {
+					if = {
+						limit = { exists = starbase }
+						starbase = {
+							if = {
+								limit = { is_owned_by = root.owner }
+								set_owner = event_target:rebel_empire_1
+								if = {
+									limit = { has_starbase_size = starbase_outpost }
+									set_starbase_size = starbase_starport
+									set_starbase_module = {
+										slot = 1
+										module = shipyard
+									}
+									set_starbase_module = {
+										slot = 2
+										module = shipyard
+									}
+								}
+								else_if = {
+									limit = {
+										NOT = { has_starbase_module = shipyard }
+									}
+									set_starbase_module = {
+										slot = 1
+										module = shipyard
+									}
+									set_starbase_module = {
+										slot = 2
+										module = shipyard
+									}
+								}
+							}
+						}
+					}
+					else = {
+						create_starbase = {
+							size = starbase_starport
+							module = shipyard
+							module = shipyard
+							owner = event_target:rebel_empire_1
+						}
+					}
+					add_claims = {
+						who = root.owner
+						show_notification = no
+					}
+					every_system_planet = {
+						limit = {
+							is_colony = yes
+							NOT = { is_same_value = event_target:rebel_planet }
+							is_owned_by = root.owner
+						}
+						set_owner = event_target:rebel_empire_1
+					}
+					every_fleet_in_system = {
+						limit = { is_owned_by = root.owner }
+						set_mia = mia_return_home
+					}
+				}
+			}
+		}
+	}
+	# Declare wars
+	declare_war = {
+		target = event_target:rebel_empire_1
+		attacker_war_goal = wg_end_threat
+	}
+	event_target:rebel_empire_1 = {
+		create_leader = {
+			class = admiral
+			species = owner_main_species
+			name = random
+			skill = 5
+			effect = {
+				change_background_ethic = ethic_militarist
+			}
+		}
+		create_leader = {
+			class = governor
+			species = owner_main_species
+			name = random
+			skill = 5
+			effect = {
+				change_background_ethic = ethic_authoritarian
+			}
+		}
+		create_leader = {
+			class = general
+			species = owner_main_species
+			name = random
+			skill = 5
+			effect = {
+				change_background_ethic = ethic_xenophobe
+			}
+		}
+		create_leader = {
+			class = scientist
+			species = owner_main_species
+			name = random
+			skill = 5
+			effect = {
+				change_background_ethic = ethic_authoritarian
+			}
+		}
+		every_owned_pop = {
+			random_list = {
+				2 = {
+					pop_change_ethic = ethic_authoritarian
+				}
+				1 = {
+					pop_change_ethic = ethic_xenophobe
+				}
+				2 = {
+					pop_change_ethic = ethic_militarist
+				}
+			}
+		}
+	}
+	# Remove Reformists modifiers
+	every_system_within_border = {
+		limit = {
+			any_system_colony = {
+				has_modifier = paragon_origin_reformists
+			}
+		}
+		remove_modifier = paragon_origin_reformists
+	}
+}
+
+paragon_origin_trait_giver_authoritarian = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_egalitarian = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_commanding_presence } }
+				}
+			}
+			add_trait = leader_trait_legendary_commanding_presence
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_egalitarian = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_high_king } }
+				}
+			}
+			add_trait = leader_trait_legendary_high_king
+		}
+	}
+}
+paragon_origin_trait_giver_xenophile = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophobe = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_scientific_diplomacy } }
+				}
+			}
+			add_trait = leader_trait_legendary_scientific_diplomacy
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophobe = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_gunboat_diplomacy } }
+				}
+			}
+			add_trait = leader_trait_legendary_gunboat_diplomacy
+		}
+	}
+}
+paragon_origin_trait_giver_xenophobe = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophile = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_genetic_purist } }
+				}
+			}
+			add_trait = leader_trait_legendary_genetic_purist
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophile = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_evervigilant } }
+				}
+			}
+			add_trait = leader_trait_legendary_evervigilant
+		}
+	}
+}
+paragon_origin_trait_giver_militarist = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_pacifist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_military_knowledge } }
+				}
+			}
+			add_trait = leader_trait_legendary_military_knowledge
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_pacifist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_foe_hammer } }
+				}
+			}
+			add_trait = leader_trait_legendary_foe_hammer
+		}
+	}
+}
+paragon_origin_trait_giver_pacifist = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_militarist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_natural_ruler } }
+				}
+			}
+			add_trait = leader_trait_legendary_natural_ruler
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_militarist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_autarky } }
+				}
+			}
+			add_trait = leader_trait_legendary_autarky
+		}
+	}
+}
+paragon_origin_trait_giver_spiritualist = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_materialist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_pious_ascet } }
+				}
+			}
+			add_trait = leader_trait_legendary_pious_ascet
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_materialist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_teacher } }
+				}
+			}
+			add_trait = leader_trait_legendary_great_teacher
+		}
+	}
+}
+paragon_origin_trait_giver_materialist = {
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_spiritualist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_industry_titan } }
+				}
+			}
+			add_trait = leader_trait_legendary_industry_titan
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_spiritualist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_inventor } }
+				}
+			}
+			add_trait = leader_trait_legendary_great_inventor
+		}
+	}
+}
+
+paragon_origin_legendary_leader_trait_giver = {
+	optimize_memory
+	locked_random_list = {
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_egalitarian = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_commanding_presence } }
+				}
+			}
+			add_trait = leader_trait_legendary_commanding_presence
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophile = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_genetic_purist } }
+				}
+			}
+			add_trait = leader_trait_legendary_genetic_purist
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophobe = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_scientific_diplomacy } }
+				}
+			}
+			add_trait = leader_trait_legendary_scientific_diplomacy
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_militarist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_natural_ruler } }
+				}
+			}
+			add_trait = leader_trait_legendary_natural_ruler
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_pacifist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_military_knowledge } }
+				}
+			}
+			add_trait = leader_trait_legendary_military_knowledge
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_materialist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_pious_ascet } }
+				}
+			}
+			add_trait = leader_trait_legendary_pious_ascet
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_spiritualist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_industry_titan } }
+				}
+			}
+			add_trait = leader_trait_legendary_industry_titan
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_egalitarian = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_high_king } }
+				}
+			}
+			add_trait = leader_trait_legendary_high_king
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophile = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_evervigilant } }
+				}
+			}
+			add_trait = leader_trait_legendary_evervigilant
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_xenophobe = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_gunboat_diplomacy } }
+				}
+			}
+			add_trait = leader_trait_legendary_gunboat_diplomacy
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_militarist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_autarky } }
+				}
+			}
+			add_trait = leader_trait_legendary_autarky
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_pacifist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_foe_hammer } }
+				}
+			}
+			add_trait = leader_trait_legendary_foe_hammer
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_materialist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_teacher } }
+				}
+			}
+			add_trait = leader_trait_legendary_great_teacher
+		}
+		0 = {
+			modifier = {
+				add = 1
+				AND = {
+					owner = { is_spiritualist = no }
+					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_inventor } }
+				}
+			}
+			add_trait = leader_trait_legendary_great_inventor
+		}
+	}
+}
+
+paragon_origin_gain_modifier = { #Use on country scope
+	switch = {
+		trigger = has_modifier
+		paragon_origin_strengthened_government_i = {
+			hidden_effect = {
+				remove_modifier = paragon_origin_strengthened_government_i
+			}
+			add_modifier = {
+				modifier = paragon_origin_strengthened_government_ii
+				days = -1
+			}
+		}
+		paragon_origin_strengthened_government_ii = {
+			hidden_effect = {
+				remove_modifier = paragon_origin_strengthened_government_ii
+			}
+			add_modifier = {
+				modifier = paragon_origin_strengthened_government_iii
+				days = -1
+			}
+		}
+		paragon_origin_strengthened_government_iii = {
+		}
+		default = {
+			add_modifier = {
+				modifier = paragon_origin_strengthened_government_i
+				days = -1
+			}
+		}
+	}
+}
+
+create_random_species = {
+	create_species = {
+		name = random
+		class = random_non_machine
+		portrait = random
+		traits = random
+	}
+}
+
+add_random_expertise_trait_effect = {
+	random_list = {
+		10 = { add_trait_no_notify = leader_trait_expertise_materials }
+		10 = { add_trait_no_notify = leader_trait_expertise_propulsion }
+		10 = { add_trait_no_notify = leader_trait_expertise_voidcraft }
+		10 = { add_trait_no_notify = leader_trait_expertise_industry }
+		10 = { add_trait_no_notify = leader_trait_expertise_field_manipulation }
+		10 = { add_trait_no_notify = leader_trait_expertise_particles }
+		10 = { add_trait_no_notify = leader_trait_expertise_computing }
+		10 = { add_trait_no_notify = leader_trait_expertise_new_worlds }
+		10 = { add_trait_no_notify = leader_trait_expertise_statecraft }
+		10 = { add_trait_no_notify = leader_trait_expertise_biology }
+		10 = { add_trait_no_notify = leader_trait_expertise_military_theory }
+		1 = {
+			modifier = {
+				add = 4
+				owner = {
+					OR = {
+						is_remnants_empire = yes
+						has_ascension_perk = ap_archaeoengineers
+						any_system_within_border = {
+							any_archaeological_site = {
+								is_site_completed = yes
+							}
+						}
+						any_owned_planet = {
+							has_active_building = building_archaeostudies_faculty
+						}
+					}
+				}
+			}
+			add_trait_no_notify = leader_trait_expertise_archaeostudies
+		}
+		1 = {
+			modifier = {
+				add = 4
+				owner = {
+					OR = {
+						is_shroudwalker_apprentice_empire = yes # This might be possible, somehow.
+						has_technology = tech_psionic_theory
+					}
+				}
+			}
+			add_trait_no_notify = leader_trait_expertise_psionics
+		}
+	}
+}
+
+# Run in leader scope
+add_expertise_trait_effect = {
+	if = {
+		limit = {
+			NOT = {
+				has_trait_tier1or2or3 = {
+					TRAIT = $TRAIT$
+				}
+			}
+		}
+		add_trait = $TRAIT$
+	}
+	else_if = {
+		limit = {
+			has_trait = $TRAIT$
+		}
+		add_trait = $TRAIT$_2
+	}
+	else = {
+		add_experience = 200
+	}
+}
+
+add_expertise_trait_to_leader_or_research_node_effect  = {
+	if = {
+		limit = {
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		owner = {
+			random_owned_leader = {
+				limit = {
+					is_councilor_type = councilor_gestalt_scientist
+				}
+				add_expertise_trait_effect = {
+					TRAIT = $TRAIT$
+				}
+			}
+		}
+	}
+	else = {
+		leader = {
+			add_expertise_trait_effect = {
+				TRAIT = $TRAIT$
+			}
+		}
+	}
+}
+
+
+set_random_admiral_background_effect = {
+	random_list = {
+		1 = { change_background_job = captain }
+		1 = { change_background_job = chief_navigator }
+		1 = { change_background_job = principal_pilot }
+		1 = { change_background_job = ship_weapons_officer }
+		1 = { change_background_job = ship_logistics_officer }
+	}
+}
+
+set_random_general_background_effect = {
+	random_list = {
+		1 = { change_background_job = special_operations_commander }
+		1 = { change_background_job = commanding_officer }
+		1 = { change_background_job = chief_supply_officer }
+		1 = { change_background_job = intelligence_officer }
+		1 = { change_background_job = chief_security_officer }
+	}
+}
+
+set_random_governor_background_effect = {
+	random_list = {
+		1 = { change_background_job = bureaucrat }
+		1 = { change_background_job = politician }
+		1 = { change_background_job = government_employee }
+		1 = { change_background_job = clerk }
+	}
+}
+
+set_random_scientist_background_effect = {
+	random_list = {
+		1 = { change_background_job = chemist }
+		1 = { change_background_job = head_researcher }
+		1 = { change_background_job = researcher }
+		1 = { change_background_job = government_employee }
+		1 = { change_background_job = clerk }
+	}
+}

@@ -1,0 +1,489 @@
+######################
+# "Overlord" Enclaves
+######################
+
+#NB: Mercenary enclaves are created after galaxy start, and not as part of system initialisers.
+
+#Fleet scope | owner = original empire
+create_mercenary_enclave_country = {
+	create_country = {
+		name = random
+		type = enclave_mercenary
+		authority = "auth_oligarchic"
+		civics = {
+			civic = civic_mercenary_enclave
+		}
+		origin = "origin_default"
+		species = event_target:mercenary_enclave_species
+		flag = random
+		ethos = {
+			ethic = ethic_fanatic_militarist
+			ethic = $INHERITED_ETHIC$
+		}
+		ignore_initial_colony_error = yes
+		effect = {
+			save_event_target_as = mercenary_enclave_country
+			set_country_flag = mercenary_enclave_country
+			set_graphical_culture = root.owner
+			create_fleet = {
+				settings = { spawn_debris = no }
+				effect = {
+					set_owner = prev
+					create_ship = {
+						name = random
+						design = "NAME_Mercenary_Enclave_Station"
+						graphical_culture = reptilian_01
+					}
+					set_location = {
+						target = event_target:mercenary_enclave_planet
+						distance = 90
+					}
+					save_event_target_as = mercenary_enclave_station
+				}
+			}
+			set_custom_capital_location = event_target:mercenary_enclave_planet
+			#Create ruler
+			set_leader = event_target:mercenary_enclave_leader
+			establish_communications_no_message = root.from
+		}
+	}
+}
+
+upgrade_mercenary_starbase = {
+	random_owned_fleet = {
+		limit = {
+			is_ship_size = enclave_mercenary_station
+		}
+		solar_system = {
+			random_system_planet = {
+				limit = {
+					has_planet_flag = mercenary_enclave_planet
+				}
+				save_event_target_as = mercenary_enclave_planet
+			}
+		}
+		create_fleet = {
+			settings = { spawn_debris = no }
+			effect = {
+				save_event_target_as = upgraded_mercenary_enclave
+				set_owner = prev
+				create_ship = {
+					name = random
+					design = NAME_Mercenary_Enclave_Station_$TIER$
+					graphical_culture = prev
+				}
+				set_location = {
+					target = event_target:mercenary_enclave_planet
+					distance = 90
+				}
+			}
+		}
+		delete_fleet = this
+	}
+	set_timed_country_flag = { flag = upgraded_station days = 360 }
+	set_saved_date = {
+		key = upgraded_station_timer
+		days_from_present = 360
+		expires = 360
+	}
+}
+
+create_salvager_enclave_country = {
+	create_country = {
+		name = random
+		type = enclave
+		authority = "auth_oligarchic"
+		civics = {
+			civic = civic_salvager_enclave
+		}
+		origin = "origin_default"
+		species = event_target:salvager_enclave_species
+		flag = {
+			icon = {
+				category = "special"
+				file = "salvagers.dds"
+			}
+			background = {
+				category = "backgrounds"
+				file = "double_triangles.dds"
+			}
+			colors = {
+				"brown"
+				"yellow"
+				"null"
+				"null"
+			}
+		}
+		ethos = {
+			ethic = ethic_fanatic_materialist
+			ethic = ethic_pacifist
+		}
+		ignore_initial_colony_error = yes
+		effect = {
+			save_global_event_target_as = salvager_enclave_country
+			set_country_flag = salvager_enclave_country
+			set_graphical_culture = mammalian_01
+			#Create capital starbase
+			create_fleet = {
+				name = "NAME_Asters_Workshop"
+				settings = { spawn_debris = no }
+				effect = {
+					set_owner = prev
+					create_ship = {
+						name = "NAME_Asters_Workshop"
+						design = "NAME_Salvager_Enclave_Station"
+						graphical_culture = prev
+					}
+					set_location = {
+						target = event_target:salvager_enclave_planet
+						distance = 40
+						angle = 70
+					}
+					save_global_event_target_as = salvager_enclave_starbase
+				}
+			}
+			create_ambient_object = {
+				type = large_debris_object
+				location = event_target:salvager_enclave_planet
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = event_target:salvager_enclave_planet
+					distance = 20
+					angle = 70
+				}
+				set_ambient_object_flag = salvager_debris_field
+			}
+			set_custom_capital_location = event_target:salvager_enclave_planet
+			#Create ruler
+			create_leader = {
+				name = random
+				class = random_ruler
+				species = event_target:salvager_enclave_species
+				skill = 5
+				traits = {
+					trait = leader_trait_spark_of_genius
+					trait = leader_trait_expertise_voidcraft
+				}
+			}
+			set_leader = last_created_leader
+		}
+	}
+}
+
+create_shroudwalker_enclave_country = {
+	create_country = {
+		name = random
+		type = enclave
+		authority = "auth_oligarchic"
+		civics = {
+			civic = civic_shroudwalker_enclave
+		}
+		origin = "origin_default"
+		species = event_target:shroudwalker_enclave_species
+		flag = {
+			icon = {
+				category = "special"
+				file = "shroudwalkers.dds"
+			}
+			background = {
+				category = "backgrounds"
+				file = "sinus.dds"
+			}
+			colors = {
+				"black"
+				"purple"
+				"null"
+				"null"
+			}
+		}
+		ethos = {
+			ethic = ethic_fanatic_spiritualist
+			ethic = ethic_egalitarian
+		}
+		ignore_initial_colony_error = yes
+		effect = {
+			save_global_event_target_as = shroudwalker_enclave_country
+			set_country_flag = shroudwalker_enclave_country
+			set_graphical_culture = mammalian_01
+			#Create capital starbase
+			create_fleet = {
+				name = "NAME_Shroud_Teachers"
+				settings = { spawn_debris = no }
+				effect = {
+					set_owner = prev
+					create_ship = {
+						name = random
+						design = "NAME_Shroudwalker_Enclave_Station"
+						graphical_culture = prev
+					}
+					set_location = {
+						target = event_target:shroudwalker_enclave_planet
+						distance = 20
+					}
+					save_event_target_as = CustomCapital
+				}
+			}
+			set_custom_capital_location = event_target:shroudwalker_enclave_planet
+			#Create ruler
+			create_leader = {
+				name = random
+				class = random_ruler
+				species = event_target:shroudwalker_enclave_species
+				skill = 5
+				traits = {
+					trait = leader_trait_expertise_psionics
+					trait = leader_trait_inspiring
+				}
+			}
+			set_leader = last_created_leader
+		}
+	}
+}
+
+#For use in overlord initializer; enclave country scope
+create_shroudwalker_enclave_starbase = {
+	create_fleet = {
+		name = "NAME_Shroud_Teachers"
+		settings = { spawn_debris = no }
+		effect = {
+			set_owner = prev
+			create_ship = {
+				name = random
+				design = "NAME_Shroudwalker_Enclave_Station"
+				graphical_culture = prev
+			}
+			set_location = {
+				target = event_target:shroudwalker_enclave_planet
+				distance = 20
+			}
+			save_global_event_target_as = shroudwalker_starbase
+		}
+	}
+}
+
+#Fleet scope | this = fleet; root = fleet owner; event_target:salvager_enclave_country = enclave
+salvager_enclave_scrap_fleet_estimate = {
+	#One-off vessels
+	if = {
+		limit = {
+			OR = {
+				is_ship_class = shipclass_colonizer
+				is_ship_class = shipclass_constructor
+				is_ship_class = shipclass_science_ship
+			}
+		}
+		set_variable = {
+			which = scrap_value
+			value = @ScrapTier1Alloys
+		}
+	}
+	#Military vessels (shipclass_military)
+	else = {
+		export_trigger_value_to_variable = {
+			trigger = fleet_power
+			variable = scrap_value
+		}
+		#If Fleet Power exceeds @ScrapFleetPowerCap, set a ceiling on the scrap value
+		if = {
+			limit = {
+				check_variable = {
+					which = scrap_value
+					value > @ScrapFleetPowerCap
+				}
+			}
+			set_variable = {
+				which = scrap_value
+				value = @ScrapFleetPowerCap
+			}
+		}
+		#If FLeet Power is so low it would round to 0, set a safe minimum instead
+		else_if = {
+			limit = {
+				check_variable_arithmetic = {
+					which = scrap_value
+					multiply = @ScrapValueMultiplier
+					value < 6 #See 'round_variable_to_closest', below. This should be just over half whatever we are rounding to.
+				}
+			}
+			set_variable = {
+				which = scrap_value
+				value = 125 #See 'round_variable_to_closest', below. One should be able to multiply this value by @ScrapValueMultiplier and receive a value which won't round to 0.
+			}
+		}
+		#Proceed as normal
+		multiply_variable = {
+			which = scrap_value
+			value = @ScrapValueMultiplier
+		}
+		round_variable_to_closest = {
+			which = scrap_value
+			value = 10
+		}
+	}
+	#Organic vessels
+	if = {
+		limit = {
+			OR = {
+				has_fleet_flag = scrap_organic_fleet
+				is_organic_controllable_ship = yes
+			}
+		}
+		multiply_variable = {
+			which = scrap_value
+			value = @ScrapValueOrganicMult
+		}
+		set_fleet_flag = scrap_organic_fleet
+		root = {
+			set_country_flag = has_organic_scrappable_fleet
+		}
+	}
+}
+
+#Country scope
+salvager_enclave_find_reclaimed_corvette_design = {
+	random_playable_country = {
+		limit = {
+			NOR = {
+				has_ascension_perk = ap_enigmatic_engineering
+				is_same_value = root
+			}
+			any_controlled_ship = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = corvette
+			}
+		}
+		save_event_target_as = salvager_reclaimed_corvette_country
+		random_controlled_ship = {
+			limit = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = corvette
+			}
+			save_event_target_as = salvager_reclaimed_corvette
+		}
+	}
+}
+salvager_enclave_find_reclaimed_destroyer_design = {
+	random_playable_country = {
+		limit = {
+			NOR = {
+				has_ascension_perk = ap_enigmatic_engineering
+				is_same_value = root
+			}
+			any_controlled_ship = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = destroyer
+			}
+		}
+		save_event_target_as = salvager_reclaimed_destroyer_country
+		random_controlled_ship = {
+			limit = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = destroyer
+			}
+			save_event_target_as = salvager_reclaimed_destroyer
+		}
+	}
+}
+salvager_enclave_find_reclaimed_cruiser_design = {
+	random_playable_country = {
+		limit = {
+			NOR = {
+				has_ascension_perk = ap_enigmatic_engineering
+				is_same_value = root
+			}
+			any_controlled_ship = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = cruiser
+			}
+		}
+		save_event_target_as = salvager_reclaimed_cruiser_country
+		random_controlled_ship = {
+			limit = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = cruiser
+			}
+			save_event_target_as = salvager_reclaimed_cruiser
+		}
+	}
+}
+salvager_enclave_find_reclaimed_battleship_design = {
+	random_playable_country = {
+		limit = {
+			NOR = {
+				has_ascension_perk = ap_enigmatic_engineering
+				is_same_value = root
+			}
+			any_controlled_ship = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = battleship
+			}
+		}
+		save_event_target_as = salvager_reclaimed_battleship_country
+		random_controlled_ship = {
+			limit = {
+				fleet = { is_alliance_fleet = no }
+				is_ship_size = battleship
+			}
+			save_event_target_as = salvager_reclaimed_battleship
+		}
+	}
+}
+
+#Starbase scope | this = starbase;
+shroudwalker_enclave_starbase_create_shroud_tunnel = {
+	solar_system = {
+		spawn_natural_wormhole = {
+			bypass_type = shroud_tunnel
+			random_pos = yes
+			orbit_angle = 360
+		}
+		save_event_target_as = shroud_tunnel_node
+		set_star_flag = spawned_shroud_tunnel
+		set_star_flag = shroud_tunnel_node
+	}
+
+	owner = {
+		if = {
+			limit = {
+				NAND = {
+					exists = event_target:shroud_tunnel_nexus
+					event_target:shroud_tunnel_nexus = {
+						has_star_flag = shroud_tunnel_nexus
+					}
+				}
+			}
+			random_system = {
+				limit = {
+					has_star_flag = shroudwalker_enclave_system
+				}
+				link_wormholes = event_target:shroud_tunnel_node
+			}
+		}
+	}
+}
+
+#Fleet scope | event_target:shattered_frontier_colony_ship
+shattered_frontier_colony_depart = {
+	optimize_memory
+	queue_actions = {
+		move_to = event_target:shroudwalker_enclave_system
+		find_closest_planet = {
+			trigger = {
+				id = shattered_frontier_colony_trigger@this
+				is_shrouded_world = yes
+			}
+			found_planet = {
+				orbit_planet = this
+				wait = { duration = 25 }
+				effect = {
+					id = shattered_frontier_colony_effect@this
+					set_planet_flag = shattered_frontier_colonized_planet #FAO: Shroudwalkers
+					prevprev = {
+						destroy_fleet = this
+					}
+				}
+			}
+		}
+	}
+}

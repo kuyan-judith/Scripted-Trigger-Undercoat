@@ -1,0 +1,949 @@
+wg_machine_uprising = {
+	casus_belli = cb_event
+
+	total_war = yes
+
+	allowed_peace_offers = {
+		status_quo
+	}
+
+	surrender_acceptance = -1000
+	war_exhaustion = 0.5
+
+	set_defender_wargoal = wg_machine_uprising
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_war_in_heaven = {
+	casus_belli = cb_event
+
+	total_war = yes
+
+	allowed_peace_offers = {
+		status_quo
+	}
+
+	surrender_acceptance = -1000
+	war_exhaustion = 0.25
+
+	set_defender_wargoal = wg_war_in_heaven
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	on_accept = {
+		hidden_effect = {
+			if = {
+				limit = {
+					is_country_type = awakened_fallen_empire
+				}
+				save_event_target_as = WarInHeavenFEOne
+				remove_global_flag = war_in_heaven_ongoing
+				set_global_flag = war_in_heaven_ended
+				every_playable_country = {
+					country_event = { id = war_in_heaven.5 }
+				}
+				observer_event = { id = observer.77 }
+				from = {
+					if = {
+						limit = {
+							any_war = {
+								NOT = { is_war_participant = { who = root } }
+								any_war_participant = {
+									prev = {
+										using_war_goal = {
+											type = wg_war_in_heaven
+											owner = prev
+										}
+									}
+								}
+							}
+						}
+						every_war = { #End War in Heaven
+							limit = {
+								NOT = { is_war_participant = { who = root } }
+								any_war_participant = {
+									prev = {
+										using_war_goal = {
+											type = wg_war_in_heaven
+											owner = prev
+										}
+									}
+								}
+							}
+							end_war_effect = yes
+						}
+					}
+				}
+			}
+		}
+	}
+
+	on_status_quo = {
+		hidden_effect = {
+			save_event_target_as = WarInHeavenFEOne
+			from = { save_event_target_as = WarInHeavenFETwo }
+			every_playable_country = {
+				country_event = { id = war_in_heaven.6 }
+			}
+			observer_event = { id = observer.78 }
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_assert_overlordship = {
+	casus_belli = cb_event
+
+	cede_claims = occupied_only
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	on_accept = {
+		custom_tooltip = wg_assert_overlordship_accept
+		hidden_effect = {
+			from = {
+				every_system_within_border = {
+					limit = {
+						root = { has_claim = prev }
+					}
+					remove_claims = { who = root }
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_assert_hegemony = {
+	casus_belli = cb_event
+
+	cede_claims = occupied_only
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	on_accept = {
+		custom_tooltip = wg_assert_hegemony_accept
+		hidden_effect = {
+			from = {
+				every_system_within_border = {
+					limit = {
+						root = { has_claim = prev }
+					}
+					remove_claims = { who = root }
+				}
+				join_alliance = { who = root override_requirements = yes }
+			}
+			if = {
+				limit = {
+					has_opinion_modifier = {
+						who = from
+						modifier = opinion_broke_federation
+					}
+				}
+				remove_opinion_modifier = {
+					who = from
+					modifier = opinion_broke_federation
+				}
+			}
+			if = {
+				limit = {
+					from = {
+						federation = {
+							check_variable = {
+								which = federation_secession_war
+								value > 0
+							}
+						}
+					}
+				}
+				from = {
+					federation = {
+						change_variable = {
+							which = federation_secession_war
+							value = -1
+						}
+					}
+				}
+			}
+			add_opinion_modifier = {
+				who = from
+				modifier = opinion_tried_to_secede
+			}
+			from = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_forced_to_remain
+				}
+				set_timed_country_flag = {
+					flag = failed_hegemony_rebellion
+					days = 7200
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_galactic_civil_war_loyalists = {
+	casus_belli = cb_event
+
+	cede_claims = no
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	war_exhaustion = 0.25
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	set_defender_wargoal = wg_galactic_civil_war_rebels
+
+	on_accept = {
+		custom_tooltip = wg_galactic_civil_war_loyalists_accept
+		hidden_effect = {
+			save_event_target_as = gal_emperor
+			from = {
+				save_event_target_as = rebel_leader
+				federation = {
+					every_member = {
+						add_to_galactic_community_no_message = yes
+					}
+					dissolve_federation = yes
+				}
+			}
+			federation = {
+				dissolve_federation = yes
+			}
+			country_event = { id = emperor.150 }
+		}
+	}
+
+	on_status_quo = {
+		# Rebels become independent
+		custom_tooltip = wg_galactic_civil_war_loyalists_status_quo
+		hidden_effect = {
+			random_playable_country = {
+				limit = { is_galactic_emperor = yes }
+				save_event_target_as = gal_emperor
+			}
+			federation = {
+				every_member = {
+					country_event = { id = emperor.250 }
+				}
+				dissolve_federation = yes
+			}
+			from = {
+				federation = {
+					every_member = {
+						country_event = { id = emperor.251 }
+					}
+				}
+			}
+			every_playable_country = {
+				limit = {
+					is_ai = no
+					is_galactic_community_member = no
+				}
+				country_event = { id = emperor.252 }
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_galactic_civil_war_rebels = {
+	casus_belli = cb_event
+
+	cede_claims = no
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	war_exhaustion = 0.25
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	on_accept = {
+		custom_tooltip = wg_galactic_civil_war_rebels_accept
+		hidden_effect = {
+			save_event_target_as = rebel_leader
+			random_playable_country = {
+				limit = { is_galactic_emperor = yes }
+				save_event_target_as = gal_emperor
+				country_event = { id = emperor.202 }
+				restore_galactic_community_leader_backup_data = yes
+				set_galactic_emperor = no
+			}
+			set_council_size = 0
+			remove_global_flag = galactic_council_formed
+			cancel_resolution = resolution_galacticreforms_form_council
+			set_country_flag = sic_semper_tyrannis_achievement
+			federation = {
+				every_member = {
+					country_event = { id = emperor.200 }
+					remove_country_flag = empire_rebel
+					add_to_galactic_community = yes
+				}
+				dissolve_federation = yes
+			}
+			from = {
+				federation = {
+					every_member = {
+						remove_country_flag = empire_loyalist
+						country_event = { id = emperor.201 }
+					}
+					dissolve_federation = yes
+				}
+			}
+			every_playable_country = {
+				limit = {
+					is_ai = no
+					is_galactic_community_member = no
+				}
+				country_event = { id = emperor.203 }
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_declared_crisis = {
+	casus_belli = cb_event
+
+	total_war = yes
+
+	allowed_peace_offers = {
+		#status_quo
+	}
+
+	surrender_acceptance = -1000
+	war_exhaustion = 0.25
+
+	set_defender_wargoal = wg_declared_crisis
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_defend_allegiance = {
+	casus_belli = cb_event
+
+	cede_claims = occupied_only
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	potential = {
+		always = no # event only
+	}
+	
+	possible = {
+		always = yes
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+
+	on_accept = {
+		every_subject = {
+			limit = {
+				has_secret_fealty_with = FROM
+			}
+			remove_secret_fealty = FROM
+			add_modifier = {
+				modifier = failed_betrayal
+				years = 5
+			}
+		}
+	}
+}
+
+wg_fotd_really_bad_contact = {
+	casus_belli = cb_event
+	hide_if_no_cb = yes
+	total_war = yes
+	set_defender_wargoal = wg_fotd_really_bad_contact
+
+	allowed_peace_offers = {
+		status_quo
+	}
+
+	surrender_acceptance = -1000
+
+	potential = {
+		always = no # event only
+	}
+	possible = {
+		always = yes
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+wg_payback_wipe_them_out = {
+	casus_belli = cb_payback
+	hide_if_no_cb = no
+	total_war = yes
+	set_defender_wargoal = wg_payback_msi
+
+	allowed_peace_offers = {
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -1000
+
+	war_exhaustion = 0.25
+
+	potential = {
+		is_playable = yes
+		is_payback_empire = yes
+		has_event_chain = payback_make_them_pay_swords_chain
+		is_pacifist = no
+		from = {
+			OR = {
+				is_minamar = yes
+				has_country_flag = payback_stole_revenge
+			}
+		}
+	}
+
+	possible = {
+		always = yes
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+wg_payback_force_ideology = {
+	casus_belli = cb_payback
+	hide_if_no_cb = no
+	set_defender_wargoal = wg_payback_msi
+
+	allowed_peace_offers = {
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -100
+
+	war_exhaustion = 0.25
+
+	potential = {
+		is_playable = yes
+		is_payback_empire = yes
+		has_event_chain = payback_make_them_pay_swords_chain
+		has_total_war_cb = no
+		NOT = { is_in_federation_with = from }
+		NAND = {
+			is_galactic_emperor = yes
+			from = { is_galactic_community_member = yes }
+		}
+		from = {
+			OR = {
+				is_minamar = yes
+				has_country_flag = payback_stole_revenge
+			}
+		}
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+	}
+
+	on_accept = {
+		from = {
+			if = {
+				limit = {
+					is_gestalt = no
+				}
+				custom_tooltip = wg_force_ideology_accept
+				custom_tooltip = wg_force_ideology_accept_2
+			}
+
+			every_subject = {
+				set_subject_of = {
+					who = none
+				}
+				custom_tooltip = wg_independence_accept
+			}
+
+			every_system_within_border = {
+				limit = {
+					Root.from = { has_claim = prev }
+				}
+				remove_claims = { who = Root.from }
+			}
+		}
+
+		if = {
+			limit = {
+				from = { has_federation = yes }
+			}
+			custom_tooltip = wg_force_ideology_accept_3
+		}
+
+		hidden_effect = {
+			from = {
+				if = {
+					limit = {
+						is_gestalt = no
+					}
+					impose_ideology_effect = yes
+				}
+	
+				every_subject = {
+					limit = {
+						is_gestalt = no
+					}
+					impose_ideology_effect = yes
+				}
+			}
+			end_rivalry = from
+			from = { end_rivalry = root }
+			every_system_within_border = {
+				limit = {
+					from = { has_claim = prev }
+				}
+				remove_claims = { who = from }
+			}
+			every_country = {
+				limit = {
+					OR = {
+						is_in_federation_with = root
+						AND = {
+							is_subject = yes
+							exists = overlord
+							overlord = { is_same_value = root }
+						}
+					}
+				}
+				end_rivalry = from
+				from = { end_rivalry = prev }
+				add_opinion_modifier = { modifier = opinion_we_liberated who = from }
+				from = { add_opinion_modifier = { modifier = opinion_liberated_us who = prev } }
+				every_system_within_border = {
+					limit = {
+						from = { has_claim = prev }
+					}
+					remove_claims = { who = from }
+				}
+			}
+			from = {
+				add_threat = {
+					who = root
+					amount = 0.10
+				}
+			}
+			from = {
+				leave_alliance = { override_requirements = yes }
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+wg_payback_tribute = {
+	casus_belli = cb_payback
+	hide_if_no_cb = no
+	set_defender_wargoal = wg_payback_msi
+
+	allowed_peace_offers = {
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -100
+
+	potential = {
+		is_playable = yes
+		is_payback_empire = yes
+		has_event_chain = payback_make_them_pay_swords_chain
+		is_pacifist = no
+		is_megacorp = no
+		is_homicidal = no
+		has_total_war_cb = no
+		from = {
+			OR = {
+				is_minamar = yes
+				has_country_flag = payback_stole_revenge
+			}
+		}
+	}
+	possible = {
+		is_subject = no
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+	}
+
+	war_exhaustion = 0.25
+
+	on_accept = {
+		hidden_effect = {
+			from = {
+				add_threat = {
+					who = root
+					amount = 0.25
+				}
+			}
+			set_truce = {
+				target = FROM
+				type = war
+			}
+			FROM = {
+				set_truce = {
+					target = ROOT
+					type = war
+				}
+			}
+		}
+		if = {
+			limit = { from = { has_been_declared_crisis = no } }
+			from = {
+				set_subject_of = {
+					who = root
+					preset = preset_tributary
+				}
+				add_modifier = {
+					modifier = newly_subjugated_loyalty
+					years = 5
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+wg_payback_megacorp_subjugate = {
+	casus_belli = cb_payback
+
+	hide_if_no_cb = no
+	set_defender_wargoal = wg_payback_msi
+
+	allowed_peace_offers = {
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -100
+
+	potential = {
+		is_playable = yes
+		is_payback_empire = yes
+		has_event_chain = payback_make_them_pay_swords_chain
+		is_pacifist = no
+		is_megacorp = yes
+		is_homicidal = no
+		has_total_war_cb = no
+		from = {
+			OR = {
+				is_minamar = yes
+				has_country_flag = payback_stole_revenge
+			}
+		}
+	}
+	possible = {
+		is_subject = no
+		custom_tooltip = {
+			fail_text = has_claimed_all_systems
+			from = {
+				is_playable = yes
+				any_owned_planet = {
+					is_colony = yes
+					root = {
+						NOT = { has_claim = prev.solar_system }
+					}
+				}
+			}
+		}
+	}
+
+	war_exhaustion = 0.25
+
+	on_accept = {
+		hidden_effect = {
+			from = {
+				add_threat = {
+					who = root
+					amount = 0.25
+				}
+			}
+			set_truce = {
+				target = FROM
+				type = war
+			}
+			FROM = {
+				set_truce = {
+					target = ROOT
+					type = war
+				}
+			}
+		}
+		FROM = {
+			if = {
+				limit = { has_been_declared_crisis = no }
+				ROOT = {
+					switch = {
+						trigger = has_policy_flag
+						oppressive_terms = {
+							FROM = {
+								set_subject_of = {
+									who = ROOT
+									preset = preset_subsidiary_oppressive
+								}
+							}
+						}
+						balanced_terms = {
+							FROM = {
+								set_subject_of = {
+									who = ROOT
+									preset = preset_subsidiary_balanced
+								}
+							}
+						}
+						benevolent_terms = {
+							FROM = {
+								set_subject_of = {
+									who = ROOT
+									preset = preset_subsidiary_benevolent
+								}
+							}
+						}
+					}
+				}
+				add_modifier = {
+					modifier = newly_subjugated_loyalty
+					years = 5
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+wg_payback_msi = {
+	casus_belli = cb_payback
+	hide_if_no_cb = yes
+
+	allowed_peace_offers = {
+		surrender
+		demand_surrender
+	}
+
+	surrender_acceptance = -100
+
+	potential = {
+		is_minamar = yes
+		from = {
+			is_payback_empire = yes
+		}
+	}
+
+	war_exhaustion = 0.25
+
+	possible = {
+		always = yes
+	}
+
+	on_accept = {
+		hidden_effect = {
+			from = {
+				add_threat = {
+					who = root
+					amount = 0.5
+				}
+			}
+			set_truce = {
+				target = FROM
+				type = war
+			}
+			FROM = {
+				set_truce = {
+					target = ROOT
+					type = war
+				}
+			}
+		}
+		FROM = {
+			set_subject_of = {
+				who = ROOT
+				preset = preset_payback_subsidiary_benevolent
+			}
+			add_modifier = {
+				modifier = newly_subjugated_loyalty
+				years = 5
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+wg_payback_msi_humiliation = {
+	casus_belli = cb_humiliation
+	hide_if_no_cb = no
+
+	allowed_peace_offers = {
+		status_quo
+		surrender
+		demand_surrender
+	}
+
+	set_defender_wargoal = wg_humiliation
+
+	surrender_acceptance = -50
+
+	potential = {
+		is_minamar = yes
+		from = {
+			is_payback_empire = yes
+		}
+	}
+
+	war_exhaustion = 0.25
+
+	possible = {
+		always = yes
+	}
+
+	on_accept = {
+		custom_tooltip = wg_humiliation_accept
+		hidden_effect = {
+			add_resource = { influence = 100 }
+			from = {
+				add_modifier = { modifier = humiliated days = 3600 }
+				if = {
+					limit = { has_policy_flag = diplo_stance_supremacist }
+					set_policy = {
+						policy = diplomatic_stance
+						option = diplo_stance_belligerent
+						cooldown = yes
+					}
+					prev = {
+						set_country_flag = humble_pie_achievement
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}

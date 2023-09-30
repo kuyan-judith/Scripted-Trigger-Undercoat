@@ -1,0 +1,541 @@
+#my_casus_belli = {
+#	potential = { ... }		# trigger to make some CBs invalid for certain types of countries; this = attacker (CB owner); default: { always = yes }
+#	is_valid = { ... }		# trigger, evaluated daily to check if CB should be created or destroyed automatically, does not affect CBs granted via script;
+#								# this = attacker (CB owner), from = defender (target country); default: { always = yes }
+#	destroy_if = { ... }	# trigger, evaluated daily to destroy CBs that have been granted via script ahead of expiration date;
+#								# this = attacker (CB owner), from = defender (target country); default: { always = no }
+#	show_notification = no/yes	# optional (default = yes), flag to control whether this CB will generate a notification (to avoid duplicate
+#								# notification when a claim CB is generated)
+#}
+
+
+cb_claim = {
+	show_in_diplomacy = yes
+	show_notification = no
+	potential = {
+		is_playable = yes
+		NOT = { is_in_federation_with = from }
+	}
+	is_valid = {
+		OR = {
+			has_claim = FROM
+			from = {
+				any_subject = {
+					root = { has_claim = prev }
+				}
+			}
+		}
+		has_total_war_cb = no
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_subjugation = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		OR = {
+			is_playable = yes
+			is_country_type = awakened_fallen_empire
+		}
+		NOT = { is_in_federation_with = from }
+		is_subject = no
+	}
+	is_valid = {
+		NOR = {
+			is_overlord_to = FROM
+			has_crisis_level = crisis_level_1
+		}
+		from = { is_subject = no }
+		OR = {
+			is_country_type = awakened_fallen_empire
+			relative_power = {
+				who = FROM
+				category = all
+				value > equivalent
+			}
+		}
+	}
+	destroy_if = {
+		NOT = { is_country_type = awakened_fallen_empire }
+		has_crisis_level = crisis_level_1
+		relative_power = {
+			who = FROM
+			category = all
+			value < superior
+		}
+	}
+}
+
+cb_humiliation = {
+	show_in_diplomacy = yes
+	show_notification = no
+	potential = {
+		OR = {
+			is_playable = yes
+			is_country_type = fallen_empire
+		}
+		NOT = { is_in_federation_with = from }
+	}
+	is_valid = {
+		if = {
+			limit = {
+				NOT = {
+					from = {
+						has_relation_flag = {
+							who = root
+							flag = vivisectors
+						}
+					}
+				}
+			}
+			OR = {
+				NOT = { has_policy_flag = liberation_wars }
+				from = { is_gestalt = yes }
+			}
+			OR = {
+				is_rival = FROM
+				AND = {
+					OR = {
+						is_active_resolution = "resolution_mutualdefense_castigation_proclamation"
+						is_active_resolution = "resolution_mutualdefense_renegade_containment"
+					}
+					FROM = {
+						OR = {
+							has_modifier = resolution_denounced
+							is_in_breach_of_any = yes
+						}
+					}
+				}
+			}
+		}
+
+		has_total_war_cb = no
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_ideology = {
+	show_in_diplomacy = yes
+	show_notification = no
+	potential = {
+		is_playable = yes
+		exists = from
+		NOR = {
+			is_gestalt = yes
+			is_in_federation_with = from
+		}
+	}
+	is_valid = {
+		has_policy_flag = liberation_wars
+		from = { is_playable = yes }
+		from = { is_gestalt = no }
+		has_total_war_cb = no
+		OR = {
+			AND = {
+				is_xenophile = yes
+				from = { is_xenophile = no }
+			}
+			AND = {
+				is_xenophobe = yes
+				from = { is_xenophobe = no }
+			}
+			AND = {
+				is_authoritarian = yes
+				from = { is_authoritarian = no }
+			}
+			AND = {
+				is_egalitarian = yes
+				from = { is_egalitarian = no }
+			}
+			AND = {
+				is_spiritualist = yes
+				from = { is_spiritualist = no }
+			}
+			AND = {
+				is_materialist = yes
+				from = { is_materialist = no }
+			}
+			AND = {
+				is_militarist = yes
+				from = { is_militarist = no }
+			}
+			AND = {
+				is_pacifist = yes
+				from = { is_pacifist = no }
+			}
+		}
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_sublimation = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_machine_assimilator = yes
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_purification = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		OR = {
+			is_berserk_fallen_machine_empire = yes
+			has_valid_civic = civic_fanatic_purifiers
+			has_valid_civic = civic_machine_terminator
+		}
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_hunger = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_playable = yes
+		has_valid_civic = civic_hive_devouring_swarm
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_despoliation = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_playable = yes
+		is_despoiler_empire = yes
+	}
+	is_valid = {
+		has_total_war_cb = no
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_pirate_raid = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_playable = yes
+		is_privateer_empire = yes
+	}
+	is_valid = {
+		has_total_war_cb = no
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_colossus = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		has_technology = "tech_colossus"
+		has_policy_flag = unrestricted_wars
+		is_playable = yes
+		NOT = { is_in_federation_with = from }
+	}
+	is_valid = {
+		has_total_war_cb = no
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+		any_controlled_fleet = {
+			is_ship_class = shipclass_military_special
+			any_controlled_ship = { is_ship_size = colossus }
+		}
+	}
+}
+
+cb_stop_colossus = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		from = { has_technology = "tech_colossus" }
+		is_playable = yes
+		NOT = { is_in_federation_with = from }
+	}
+	is_valid = {
+		has_total_war_cb = no
+		from = { is_playable = yes }
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+		from = {
+			any_controlled_fleet = {
+				is_ship_class = shipclass_military_special
+				any_controlled_ship = { is_ship_size = colossus }
+			}
+		}
+		NOT = {
+			any_controlled_fleet = {
+				is_ship_class = shipclass_military_special
+				any_controlled_ship = { is_ship_size = colossus }
+			}
+		}
+	}
+}
+
+cb_containment = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		from = {
+			OR = {
+				is_country_type = awakened_fallen_empire
+				is_homicidal = yes
+				is_machine_assimilator = yes
+			}
+		}
+		is_playable = yes
+		NOR = {
+			is_homicidal = yes
+			is_machine_assimilator = yes
+		}
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+		NOT = { is_overlord_to = FROM }
+		from = {
+			OR = {
+				is_country_type = awakened_fallen_empire
+				is_homicidal = yes
+				is_machine_assimilator = yes
+			}
+		}
+	}
+}
+
+cb_subject = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_playable = yes
+		is_subject = yes
+	}
+	is_valid = {
+		overlord = { is_same_value = from }
+	}
+}
+
+cb_counterattack = {
+	show_in_diplomacy = yes
+	show_notification = no
+	potential = {
+		is_playable = yes
+		NOT = { is_in_federation_with = from }
+	}
+	is_valid = {
+		is_galactic_community_member = yes
+		OR = {
+			is_active_resolution = "resolution_mutualdefense_enemy_of_my_enemy"
+			is_active_resolution = "resolution_mutualdefense_castigation_proclamation"
+			is_active_resolution = "resolution_mutualdefense_renegade_containment"
+		}
+		from = {
+			is_galactic_community_member = no
+			is_at_war = yes
+			any_war = {
+				is_war_participant = { who = prev side = attackers }
+				any_defender = { is_galactic_community_member = yes }
+			}
+		}
+
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_renegade_containment = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_playable = yes
+		is_galactic_community_member = yes
+		is_active_resolution = "resolution_mutualdefense_renegade_containment"
+		NOT = { is_in_federation_with = from }
+		from = { is_galactic_community_member = no }
+	}
+	is_valid = {
+		OR = {
+			has_policy_flag = unrestricted_wars
+			from = { is_gestalt = yes }
+		}
+
+		has_total_war_cb = no
+		from = {
+			is_galactic_community_member = no
+		}
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_end_threat_renegade_containment = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_playable = yes
+		from = {
+			is_playable = yes
+			any_war = {
+				using_war_goal = { type = wg_renegade_containment owner = attacker }
+			}
+		}
+		NOT = { is_in_federation_with = from }
+	}
+	is_valid = {
+		has_total_war_cb = no
+		from = {
+			is_playable = yes
+			any_war = {
+				using_war_goal = { type = wg_renegade_containment owner = attacker }
+			}
+		}
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_revenge_for_eaten_star = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_playable = yes
+		has_country_flag = knows_who_infested_star
+		from = {
+			has_country_flag = infested_star@root
+		}
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_end_threat_revenge_for_eaten_star = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		always = no
+	}
+}
+
+cb_allegiance = {
+	show_in_diplomacy = no
+	show_notification = no
+
+	potential = {
+		is_playable = yes
+	}
+	is_valid = {
+		has_secret_fealty_from_subject_of = from
+		is_subject = no
+		NOT = { is_in_federation_with = from }
+	}
+}
+
+cb_payback = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_playable = yes
+		is_payback_empire = yes
+		has_event_chain = payback_make_them_pay_swords_chain
+	}
+	is_valid = {
+		from = {
+			OR = {
+				is_minamar = yes
+				has_country_flag = payback_stole_revenge
+			}
+		}
+		NOT = { is_overlord_to = FROM }
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+	}
+}
+
+cb_payback_punishment = {
+	show_notification = yes
+	potential = {
+		has_country_flag = payback_punish_slavers
+		is_playable = yes
+		is_payback_empire = yes
+	}
+	is_valid = {
+		allows_slavery = no
+		from = {
+			OR = {
+				allows_preftl_exploitation = yes
+				allows_slavery = yes
+				allows_purge = yes
+			}
+		}
+	}
+}
