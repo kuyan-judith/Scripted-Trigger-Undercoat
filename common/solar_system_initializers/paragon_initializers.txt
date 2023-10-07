@@ -1,0 +1,847 @@
+@base_moon_distance = 6
+
+#Spawn Planet and System
+legendary_leader_start_site = {
+	name = "NAME_legendary_crash_site"
+	class = "rl_standard_stars"
+	usage = misc_system_init
+	spawn_chance = 25
+	usage_odds = {
+		base = 90000
+		modifier = {
+			factor = 0
+			has_paragon_dlc = no
+		}
+		modifier = {
+			factor = 0
+			is_fe_cluster = yes
+		}
+		modifier = {
+			factor = 0
+			has_star_flag = empire_cluster
+		}
+	}
+	max_instances = 1
+	flags = { legendary_leader_spawn_system }
+	init_effect = {
+		random_system = {
+			spawn_system = {
+				min_distance = 10
+				max_distance = 30
+				max_jumps = 0
+				initializer = "legendary_leader_1st_site"
+				hyperlane = yes
+				is_discovered = yes
+			}
+		}
+		reroll_random = yes
+		random_system = {
+			spawn_system = {
+				min_distance = 10
+				max_distance = 30
+				max_jumps = 0
+				initializer = "legendary_leader_2nd_site"
+				hyperlane = yes
+				is_discovered = yes
+			}
+		}
+		reroll_random = yes
+		random_system = {
+			spawn_system = {
+				min_distance = 10
+				max_distance = 30
+				max_jumps = 0
+				initializer = "legendary_leader_3rd_site"
+				hyperlane = yes
+				is_discovered = yes
+			}
+		}
+	}
+
+	planet = {
+		name = "NAME_legendary_crash_site"
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 35
+		has_ring = no
+	}
+
+	change_orbit = 60
+
+	planet = {
+		class = pc_molten
+		orbit_angle = 15
+		size = 16
+
+		change_orbit = @base_moon_distance
+	}
+
+	change_orbit = 15
+
+	planet = {
+		count = { min = 3 max = 6 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = 4 max = 10 }
+		orbit_angle = { min = 90 max = 270 }
+	}
+
+	change_orbit = 10
+
+	planet = {
+		count = 2
+		orbit_distance = { min = 30 max = 60 }
+		class = pc_barren_cold
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 18 max = 24 }
+
+		change_orbit = @base_moon_distance
+
+		moon = {
+			count = { min = 1 max = 2 }
+			size = { min = 8 max = 10 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 10 max = 12 }
+		}
+	}
+
+	change_orbit = 30
+
+	planet = {
+		class = pc_frozen
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 28 max = 36 }
+		flags = { legendary_leader_meet_point legendary_leader_planet }
+
+		init_effect = {
+			clear_deposits = yes
+			prevent_anomaly = yes
+			save_global_event_target_as = exakeides_planet
+		}
+	}
+	init_effect = {
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+#1st System - Volcanic Activity
+legendary_leader_1st_site = {
+	name = "NAME_Vapob"
+	class = "rl_standard_stars"
+	flags = { legendary_leader_1st_system }
+	max_instances = 1
+
+	planet = {
+		name = "NAME_Vapob"
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 25 max = 30 }
+		has_ring = no
+	}
+
+	change_orbit = { min = 60 max = 80 }
+
+	planet = {
+		class = pc_gas_giant
+		orbit_angle = { min = 25 max = 30 }
+		size = 30
+	}
+
+	change_orbit = 15
+
+	planet = {
+		count = { min = 2 max = 4 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = -1 max = 1 }
+		orbit_angle = { min = 90 max = 270 }
+		has_ring = no
+	}
+
+	change_orbit = { min = 5 max = 15 }
+
+	planet = {
+		class = pc_alpine
+		size = { min = 15 max = 18 }
+		orbit_angle = { min = 90 max = 270 }
+		flags = { legendary_leader_1st_planet legendary_leader_planet }
+
+		init_effect = {
+			clear_deposits = yes
+			prevent_anomaly = yes
+
+			add_deposit = d_volcanic_active_planet
+			add_deposit = d_volcanic_active_planet
+			add_deposit = d_volcanic_active_planet
+
+			add_deposit = random
+			add_deposit = random
+			add_deposit = d_active_volcano
+			add_deposit = d_active_volcano
+			add_deposit = d_active_volcano
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+
+			add_modifier = {
+				modifier = molten_mineral_rivers
+				days = -1
+			}
+		}
+
+		change_orbit = 4
+
+		moon = {
+			class = pc_barren
+			size = { min = 8 max = 10 }
+			orbit_angle = { min = 90 max = 270 }
+			change_orbit = 1
+		}
+	}
+
+	change_orbit = { min = 20 max = 30 }
+
+	planet = {
+		class = pc_barren
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 18 max = 24 }
+	}
+
+	change_orbit = 30
+
+	planet = {
+		class = pc_barren_cold
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 10 max = 12 }
+
+		change_orbit = 4
+
+		moon = {
+			class = pc_molten
+			size = { min = 6 max = 7 }
+			orbit_angle = { min = 90 max = 270 }
+		}
+	}
+	init_effect = {
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+#2nd System - Ship Graveyard
+legendary_leader_2nd_site = {
+	name = "NAME_Ivusheh"
+	class = "rl_standard_stars"
+	flags = { legendary_leader_2nd_system }
+	max_instances = 1
+
+	planet = {
+		name = "NAME_Ivusheh"
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 30
+		has_ring = no
+	}
+
+	change_orbit = 30
+
+	planet = {
+		class = pc_molten
+		orbit_angle = { min = 90 max = 270 }
+		size = 12
+
+		change_orbit = 2
+
+		moon = {
+			size = { min = 6 max = 9 }
+			class = pc_molten
+			orbit_angle = { min = 90 max = 270 }
+		}
+	}
+
+	change_orbit = { min = 10 max = 20 }
+
+	planet = {
+		count = { min = 2 max = 3 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = 4 max = 10 }
+		orbit_angle = { min = 90 max = 270 }
+	}
+
+	change_orbit = { min = 30 max = 40 }
+
+	planet = {
+		class = pc_desert
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 15 max = 18 }
+		flags = { legendary_leader_2nd_planet legendary_leader_planet }
+
+		init_effect = {
+			clear_deposits = yes
+			prevent_anomaly = yes
+
+			add_deposit = d_fallen_orbital_shipyard
+			add_deposit = d_space_ship_graveyard
+			add_deposit = d_space_ship_graveyard
+			add_deposit = d_space_ship_graveyard
+			add_deposit = d_space_ship_graveyard
+			add_deposit = d_space_ship_graveyard
+			add_deposit = d_space_ship_graveyard
+
+			add_deposit = random
+			add_deposit = random
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+
+			add_modifier = {
+				modifier = ship_junkyard
+				days = -1
+			}
+
+			create_ambient_object = {
+				type = "large_debris_object"
+				use_3d_location = yes
+				entity_offset = { min = -7 max = 7 }
+				location = this
+			}
+			create_ambient_object = {
+				type = "ancient_battlefield_02_object"
+				use_3d_location = yes
+				entity_offset = { min = -7 max = 7 }
+				location = this
+			}
+			create_ambient_object = {
+				type = "eventship_07_object"
+				use_3d_location = yes
+				entity_offset = -7
+				entity_offset_height = { min = -3 max = 3 }
+				entity_offset_angle = { min = 0 max = 360 }
+				location = this
+			}
+			create_ambient_object = {
+				type = "eventship_05_object"
+				use_3d_location = yes
+				entity_offset = 7
+				entity_offset_height = { min = -3 max = 3 }
+				entity_offset_angle = { min = 0 max = 360 }
+				location = this
+			}
+			create_ambient_object = {
+				type = "eventship_04_blue_object"
+				use_3d_location = yes
+				entity_offset = 5
+				entity_offset_height = { min = -3 max = 3 }
+				entity_offset_angle = { min = 0 max = 360 }
+				location = this
+			}
+			create_ambient_object = {
+				type = "eventship_01_object"
+				use_3d_location = yes
+				entity_offset = -6
+				entity_offset_height = { min = -3 max = 3 }
+				entity_offset_angle = { min = 0 max = 360 }
+				location = this
+			}
+		}
+	}
+
+	change_orbit = 17
+
+	planet = {
+		count = { min = 2 max = 3 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = -1 max = 1 }
+		orbit_angle = { min = 90 max = 270 }
+	}
+
+	change_orbit = 3
+
+	planet = {
+		class = pc_gas_giant
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 36 max = 48 }
+
+		change_orbit = @base_moon_distance
+
+		moon = {
+			size = { min = 10 max = 12 }
+			class = random_non_colonizable
+			orbit_angle = { min = 90 max = 270 }
+		}
+	}
+	init_effect = {
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+#3rd System - Hostile Planet
+legendary_leader_3rd_site = {
+	name = "NAME_Taprib"
+	class = "sc_m"
+	flags = { legendary_leader_3rd_system }
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 100
+	}
+	max_instances = 1
+
+	planet = {
+		name = "NAME_Taprib"
+		class = pc_m_star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 30
+		has_ring = no
+	}
+
+	change_orbit = 40
+
+	planet = {
+		class = pc_broken
+		orbit_angle = 15
+		size = 12
+
+		change_orbit = @base_moon_distance
+
+		moon = {
+			size = { min = 6 max = 8 }
+			class = pc_molten
+			orbit_angle = { min = 90 max = 270 }
+		}
+	}
+
+	change_orbit = 60
+
+	planet = {
+		count = { min = 2 max = 4 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = -1 max = 1 }
+		orbit_angle = { min = 90 max = 270 }
+	}
+
+	change_orbit = 15
+
+	planet = {
+		class = pc_tropical
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 15 max = 18 }
+		flags = { legendary_leader_3rd_planet legendary_leader_planet }
+
+		init_effect = {
+			clear_deposits = yes
+			prevent_anomaly = yes
+
+			add_deposit = d_hostile_fauna
+			add_deposit = d_lush_jungle
+			add_deposit = d_lush_jungle
+			add_deposit = d_hostile_flora
+			add_deposit = d_hostile_flora
+			add_deposit = d_hostile_flora
+
+			add_deposit = random
+			add_deposit = random
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+			add_deposit = random_blocker
+
+			add_modifier = {
+				modifier = hostile_planet
+				days = -1
+			}
+		}
+	}
+
+
+	change_orbit = 20
+
+	planet = {
+		count = 2
+		orbit_distance = { min = 20 max = 40 }
+		class = pc_frozen
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 18 max = 24 }
+
+		change_orbit = @base_moon_distance
+
+		moon = {
+			count = { min = 0 max = 1 }
+			class = pc_frozen
+			size = { min = 6 max = 10 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 10 max = 12 }
+		}
+	}
+	init_effect = {
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+#4th System - Final Reward - Defensive Matrix / Grid System
+legendary_leader_last_site = {
+	name = "NAME_Sursect"
+	class = "sc_pulsar"
+	flags = { legendary_leader_final_system }
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 124
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 65
+	}
+	max_instances = 1
+	init_effect = {
+		if = {
+			limit = {
+				is_inside_nebula = no
+			}
+			create_nebula = {
+				radius = 25
+			}
+		}
+	}
+
+	planet = {
+		name = "NAME_Sursect"
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 20
+		has_ring = no
+		init_effect = {
+			prevent_anomaly = yes
+			create_ambient_object = {
+				type = "abandoned_starbase_01_object"
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 20
+					angle = random
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 37
+					angle = 30
+				}
+			}
+			while = {
+				count = 2
+				create_ambient_object = {
+					type = "large_debris_object"
+					location = this
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 65
+						angle = random
+					}
+				}
+			}
+			create_ambient_object = {
+				type = "small_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 80
+					angle = random
+				}
+			}
+			while = {
+				count = 3
+				create_ambient_object = {
+					type = "medium_debris_01_object"
+					location = this
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 80
+						angle = random
+					}
+				}
+			}
+			while = {
+				count = 4
+				create_ambient_object = {
+					type = "small_debris_object"
+					location = this
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 90
+						angle = random
+					}
+				}
+			}
+			while = {
+				count = 3
+				create_ambient_object = {
+					type = "large_debris_object"
+					location = this
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 100
+						angle = random
+					}
+				}
+			}
+			while = {
+				count = 2
+				create_ambient_object = {
+					type = "large_debris_object"
+					location = this
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 100
+						angle = random
+					}
+				}
+			}
+			create_ambient_object = {
+				type = "medium_debris_01_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 110
+					angle = random
+				}
+			}
+			while = {
+				count = 4
+				create_ambient_object = {
+					type = "medium_debris_01_object"
+					location = solar_system
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 110
+						angle = random
+					}
+				}
+			}
+			while = {
+				count = 4
+				create_ambient_object = {
+					type = "large_debris_object"
+					location = this
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 120
+						angle = random
+					}
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 120
+					angle = 180
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 120
+					angle = 185
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 123
+					angle = 180
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 115
+					angle = 0
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 117
+					angle = 350
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 117
+					angle = 0
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 117
+					angle = 10
+				}
+			}
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 120
+					angle = 0
+				}
+			}
+		}
+	}
+
+	change_orbit = 65
+
+	planet = {
+		count = { min = 4 max = 6 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = -1 max = 1 }
+		orbit_angle = { min = 90 max = 270 }
+	}
+
+	change_orbit = 15
+
+	planet = {
+		class = pc_relic
+		orbit_angle = 15
+		size = 16
+		flags = { legendary_leader_final_planet legendary_leader_planet }
+
+		change_orbit = @base_moon_distance
+
+		init_effect = {
+			clear_deposits = yes
+			prevent_anomaly = yes
+
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+
+			add_deposit = d_pulsar_scarred
+			add_deposit = d_ancient_facilities
+			add_deposit = d_ancient_facilities
+
+			add_deposit = d_relic_metal_boneyard
+
+			create_archaeological_site = paragon_legendary_leader_homeworld
+
+			add_modifier = {
+				modifier = pulsar_frying_pan
+				days = -1
+			}
+
+			create_country = {
+				name = "NAME_Overlord_Empire"
+				type = faction
+			}
+			last_created_country = {
+				create_fleet = {
+					name = "NAME_Overlord_Enforcers"
+					settings = { spawn_debris = no }
+					effect = {
+						set_owner = PREV
+						while = {
+							count = 72
+							create_ship = {
+								name = "NAME_Autonomous_Drone"
+								design = "NAME_Guardian"
+							}
+						}
+						set_location = prevprev
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = self
+						set_aggro_range = 500
+						save_global_event_target_as = overlord_enforcers_automated_fleet
+						set_fleet_flag = overlord_enforcers_automated_fleet
+					}
+				}
+			}
+		}
+
+		moon = {
+			size = 8
+			class = pc_barren
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 10 max = 12 }
+		}
+	}
+
+	change_orbit = 44
+
+	planet = {
+		count = { min = 4 max = 6 }
+		class = pc_asteroid
+		size = { min = 2 max = 3 }
+		orbit_distance = { min = -1 max = 1 }
+		orbit_angle = { min = 90 max = 270 }
+	}
+	init_effect = {
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
