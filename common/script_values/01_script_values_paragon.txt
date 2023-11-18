@@ -85,7 +85,7 @@ ethic_leader_randomizer = {
 # At  50% progress, returns 0.10
 # At  70% progress, returns 0.03, tweaked affordable target point
 # At 100% progress, returns 0.02
-# 0.008 + 1 / (POW(progress * 3, 5) + 1.008) 
+# 0.008 + 1 / (POW(progress * 3, 5) + 1.008)
 council_agenda_early_activation_cost_curve = {
 	base = 0
 	add = trigger:council_agenda_progress_percent
@@ -119,8 +119,8 @@ leader_class_government_match_bonus_mult = {
 		# Check Leader Class vs PROMOTING Governments.
 		mult = 1.2
 		OR = {
-			AND = { # ADMIRAL good.
-				leader_class = admiral
+			AND = { # COMMANDER good.
+				leader_class = commander
 				owner = {
 					OR = {
 						has_government = gov_star_empire
@@ -136,26 +136,7 @@ leader_class_government_match_bonus_mult = {
 						has_government = gov_bandit_kingdom
 						has_government = gov_bandit_commune
 						has_government = gov_band_blood
-					}
-				}
-			}
-			AND = { # GENERAL good.
-				leader_class = general
-				owner = {
-					OR = {
-						has_government = gov_star_empire
-						has_government = gov_military_dictatorship
-						has_government = gov_military_junta
-						has_government = gov_military_commissariat
-						has_government = gov_martial_empire
-						has_government = gov_martial_dictatorship
-						has_government = gov_war_council
-						has_government = gov_assembly_of_clans
-						has_government = gov_citizen_stratocracy
-						has_government = gov_citizen_republic
-						has_government = gov_bandit_kingdom
-						has_government = gov_bandit_commune
-						has_government = gov_band_blood
+						has_government = gov_defensive_union
 					}
 				}
 			}
@@ -171,17 +152,18 @@ leader_class_government_match_bonus_mult = {
 						has_government = gov_technocratic_dictatorship
 						has_government = gov_science_directorate
 						has_government = gov_rational_consensus
+						has_government = gov_dimensional_covenant
 					}
 				}
 			}
-			AND = { # GOVERNOR good.
-				leader_class = governor
+			AND = { # OFFICIAL good.
+				leader_class = official
 				owner = {
 					OR = {
 						has_government = gov_theocratic_monarchy
 						has_government = gov_theocratic_dictatorship
 						has_government = gov_theocratic_oligarchy
-						has_government = gov_theocratic_republic						
+						has_government = gov_theocratic_republic
 						has_government = gov_divine_empire
 						has_government = gov_holy_tribunal
 						has_government = gov_megachurch
@@ -230,7 +212,7 @@ leader_traits_election_bonus_mult = {
 		}
 		mode = subtract
 	}
-	
+
 	# Scale to 5% per Trait, then normalize.
 	mult = 0.05
 	add = 1
@@ -344,8 +326,8 @@ leader_pending_negative_traits_modified = {
 
 country_salvage_ships_from_debris_chance = {
 	add = modifier:salvage_chance_add
-	mult = 100	# Since "salvage_chance_add" is a Percentage 0-1, but we want 0-100. 
-	add = 10	# This is the Base 
+	mult = 100	# Since "salvage_chance_add" is a Percentage 0-1, but we want 0-100.
+	add = 10	# This is the Base
 	add = $BONUS|0$
 	modifier = {
 		root = {
@@ -385,29 +367,6 @@ country_salvage_ships_from_debris_chance = {
 	}
 }
 
-country_num_unlockable_council_slots = {
-	# How many Civics do we have.
-	add = trigger:has_total_civic_points
-	subtract = trigger:has_unused_civic_points
-
-	# Exclude Galactic Sovereign which doesn't add a Councilor position.
-	modifier = {
-		OR = {
-			has_civic = civic_galactic_sovereign
-			has_civic = civic_galactic_sovereign_megacorp
-			has_civic = civic_psionic_sovereign
-		}
-		subtract = 1
-	}
-
-	# We only support unlocking 3 positions, even if we have more normal civics for some reason.
-	max = @max_unlocked_council_positions
-
-	# Subtract how many we've already unlocked.
-	subtract = trigger:has_unlocked_council_positions
-	min = 0
-}
-
 agenda_gestalt_purge_traits_exp_change_total = {
 	base = @agenda_gestalt_purge_traits_exp_change
 	complex_trigger_modifier = {
@@ -433,17 +392,9 @@ leader_num_negative_leader_trait_tiers = {
 }
 
 leader_age_percentage_of_lifespan = {
-    base = 85	# Starts dying at 80, but can live for longer.
-    complex_trigger_modifier = {
-        trigger = check_modifier_value
-        parameters = {
-            modifier = leader_age
-        }
-        mode = add
-    }
-	divide = trigger:leader_age
-	# Change: [Lifespan / LeaderAge] into: [LeaderAge / Lifespan] to get a percentage.
-	pow = -1
+    base = 0
+	add = trigger:leader_age
+	divide = trigger:leader_lifespan
 }
 
 country_assigned_priests = {
@@ -492,32 +443,19 @@ country_assigned_priests = {
 	}
 }
 
-tenth_of_leader_lifespan = {
-	base = 100
-	complex_trigger_modifier = {
-		trigger = check_modifier_value
-		parameters = {
-			modifier = leader_age
-		}
-		mode = add
-	}
-	divide = 10
+percent_of_leader_lifespan = {
+    base = 0
+	add = trigger:leader_lifespan
+	divide = 100
+	mult = $PERCENT$
 }
 
-perc_of_planet_pop = {
-	add = trigger:num_pops
-	modifier = {
-		event_target:attacking_general = { has_trait = leader_trait_kidnapper }
-		factor = 0.1
-	}
-	modifier = {
-		event_target:attacking_general = { has_trait = leader_trait_kidnapper_2 }
-		factor = 0.2
-	}
-	modifier = {
-		event_target:attacking_general = { has_trait = leader_trait_kidnapper_3 }
-		factor = 0.3
-	}
+skill_scaled_age_increase = {
+    base = 0
+	add = trigger:leader_lifespan
+	divide = 100
+	mult = 5 # Leader age is increased by 5% of leader lifespan per bonus skill.
+	mult = $SKILL$
 }
 
 industrial_espionage_chance = {
@@ -737,19 +675,6 @@ sacrifice_edict_power_councilor_death_cult = {
 	add = 1
 }
 
-naval_cap_vassals_councilor_feudal_realm = {
-	base = 0
-	complex_trigger_modifier = {
-		trigger = count_subject
-		trigger_scope = owner
-		parameters = {
-		}
-		mode = add
-	}
-	mult = value:councilor_level|TYPE|councilor_feudal_realm|
-	mult = 2
-}
-
 # Monthly energy income x3, rounded to the nearest 100
 # Capped between 400 and 8000
 funeral_cost_high = {
@@ -947,44 +872,7 @@ prev_has_skill = {
 
 # Weights for Imperial Heir classes
 
-heir_class_weight_admiral = {
-	base = 10
-	modifier = {
-		add = 20
-		owner = {
-			has_valid_civic = civic_distinguished_admiralty
-		}
-	}
-	modifier = {
-		add = 20
-		owner = {
-			has_crusader_spirit = yes			
-		}
-	}
-	modifier = {
-		add = 40
-		owner = {
-			is_privateer_empire = yes			
-		}
-	}
-	modifier = {
-		add = 20
-		owner = {
-			has_tradition = tr_supremacy_war_games		
-		}
-	}
-	modifier = {
-		add = 20
-		owner = {
-			has_philosopher_king = yes
-			ruler = {
-				leader_class = admiral
-			}		
-		}
-	}
-}
-
-heir_class_weight_general = {
+heir_class_weight_commander = {
 	base = 10
 	modifier = {
 		add = 20
@@ -999,34 +887,35 @@ heir_class_weight_general = {
 		}
 	}
 	modifier = {
-		add = 20
+		add = 40
 		owner = {
-			has_philosopher_king = yes
-			ruler = {
-				leader_class = general
-			}
+			is_privateer_empire = yes
 		}
 	}
 	modifier = {
 		add = 20
 		owner = {
-			has_tradition = tr_unyielding_resistance_is_frugal
+			has_tradition = tr_supremacy_war_games
+		}
+	}
+	modifier = {
+		add = 20
+		owner = {
+			has_philosopher_king = yes
+			ruler = {
+				leader_class = commander
+			}
 		}
 	}
 }
 
-heir_class_weight_governor = {
+
+heir_class_weight_official = {
 	base = 10
 	modifier = {
 		add = 40
 		owner = {
 			is_aristocratic_empire = yes
-		}
-	}
-	modifier = {
-		add = 40
-		owner = {
-			is_feudal_empire = yes
 		}
 	}
 	modifier = {
@@ -1040,7 +929,7 @@ heir_class_weight_governor = {
 		owner = {
 			has_philosopher_king = yes
 			ruler = {
-				leader_class = governor
+				leader_class = official
 			}
 		}
 	}
@@ -1072,14 +961,10 @@ heir_class_weight_scientist = {
 }
 
 luminary_age_lifespan = {
-    base = 60 #Standard is 80, but but we want to be sure that luminary won't die before this event
-    complex_trigger_modifier = {
-        trigger = check_modifier_value
-        parameters = {
-            modifier = leader_age
-        }
-        mode = add
-    }
+	base = 0
+	add = trigger:leader_lifespan
+	# We want to be sure that luminary won't die before this event
+	subtract = 20
 }
 
 restored_node_additional_skills = {
@@ -1119,24 +1004,24 @@ leader_skill_modifier = {
 		add = owner.modifier:restored_node_bonus_skill
 	}
 	modifier = {
-		leader_class = admiral
+		is_councilor_type = councilor_gestalt_legion
 		exists = owner
-		add = owner.modifier:restored_admiral_node_bonus_skill
+		add = owner.modifier:restored_legion_node_bonus_skill
 	}
 	modifier = {
-		leader_class = general
+		is_councilor_type = councilor_gestalt_regulatory
 		exists = owner
-		add = owner.modifier:restored_general_node_bonus_skill
+		add = owner.modifier:restored_regulatory_node_bonus_skill
 	}
 	modifier = {
-		leader_class = governor
+		is_councilor_type = councilor_gestalt_growth
 		exists = owner
-		add = owner.modifier:restored_governor_node_bonus_skill
+		add = owner.modifier:restored_growth_node_bonus_skill
 	}
 	modifier = {
-		leader_class = scientist
+		is_councilor_type = councilor_gestalt_cognitive
 		exists = owner
-		add = owner.modifier:restored_scientist_node_bonus_skill
+		add = owner.modifier:restored_cognitive_node_bonus_skill
 	}
 }
 
@@ -1154,44 +1039,73 @@ restored_node_skill = {
 		add = owner.modifier:restored_node_bonus_skill
 	}
 	modifier = {
-		leader_class = admiral
+		is_councilor_type = councilor_gestalt_legion
 		exists = owner
-		add = owner.modifier:restored_admiral_node_bonus_skill
+		add = owner.modifier:restored_legion_node_bonus_skill
 	}
 	modifier = {
-		leader_class = general
+		is_councilor_type = councilor_gestalt_regulatory
 		exists = owner
-		add = owner.modifier:restored_general_node_bonus_skill
+		add = owner.modifier:restored_regulatory_node_bonus_skill
 	}
 	modifier = {
-		leader_class = governor
+		is_councilor_type = councilor_gestalt_growth
 		exists = owner
-		add = owner.modifier:restored_governor_node_bonus_skill
+		add = owner.modifier:restored_growth_node_bonus_skill
+	}
+	modifier = {
+		is_councilor_type = councilor_gestalt_cognitive
+		exists = owner
+		add = owner.modifier:restored_cognitive_node_bonus_skill
+	}
+	modifier = {
+		exists = owner
+		add = owner.modifier:leader_initial_skill
+	}
+	modifier = {
+		leader_class = commander
+		exists = owner
+		add = owner.modifier:commander_initial_skill
+	}
+
+	modifier = {
+		leader_class = official
+		exists = owner
+		add = owner.modifier:official_initial_skill
 	}
 	modifier = {
 		leader_class = scientist
 		exists = owner
-		add = owner.modifier:restored_scientist_node_bonus_skill
-	}
-	modifier = {
-		OR = {
-			leader_class = admiral
-			leader_class = general
-		}
-		owner = {
-			OR = {
-				has_valid_civic = civic_distinguished_admiralty
-				has_valid_civic = civic_machine_warbots
-				has_valid_civic = civic_hive_strength_of_legions
-			}
-		}
-		add = 2
-	}
-	modifier = {
-		owner = {
-			is_memory_vault_empire = yes
-		}
-		add = 1
+		add = owner.modifier:scientist_initial_skill
 	}
 	max = trigger:has_skill
+}
+
+agenda_leadership_conditioning_num_leaders = {
+	base = 0
+	complex_trigger_modifier = {
+		trigger = count_owned_leader
+		parameters = {
+			limit = {
+				has_skill < 10
+			}
+		}
+		mode = add
+	}
+}
+
+agenda_leadership_conditioning_reward = {
+	base = @agenda_leadership_conditioning_exp_reward
+	divide = value:agenda_leadership_conditioning_num_leaders
+	floor = yes
+}
+
+tr_statecraft_amongst_peers_reward = {
+	base = @statecraft_amongst_peers_exp_reward
+	mult = trigger:has_skill
+}
+
+perc_of_planet_pop = {
+	add = trigger:num_pops
+	multiply = 0.3
 }

@@ -102,82 +102,35 @@ district_hab_industrial = {
 	}
 
 	inline_script = {
-		script = jobs/artisans_add
+		script = jobs/triggered/industrial_add
+		FOUNDRY_AMOUNT_VAL = value:stu_habitat_industrial_district_foundry_jobs
+		FACTORY_AMOUNT_VAL = value:stu_habitat_industrial_district_factory_jobs
+		desc = 1
 		trigger = " "
-		AMOUNT = 1
-		DRONE_AMOUNT = 0
-		desc = "
-			OR = {
-				is_gestalt = no
-				has_factory_designation = yes
-			}
-		"
 	}
-	inline_script = {
-		script = jobs/metallurgists_add
-		trigger = " "
-		AMOUNT = 1
-		DRONE_AMOUNT = 2
-		desc = "
-			OR = {
-				is_gestalt = yes
-				has_factory_designation = no
-			}
-		"
-	}
-	# Designation Job Changes
-	inline_script = {
-		script = jobs/no_desc/artisans_add
-		trigger = "
-			has_factory_designation = yes
-		"
-		AMOUNT = 1
-		DRONE_AMOUNT = 1
-	}
-	inline_script = {
-		script = jobs/no_desc/artisans_add
-		trigger = "
-			has_foundry_designation = yes
-		"
-		AMOUNT = -1
-		DRONE_AMOUNT = 0
-	}
-	inline_script = {
-		script = jobs/no_desc/metallurgists_add
-		trigger = "
-			has_factory_designation = yes
-		"
-		AMOUNT = -1
-		DRONE_AMOUNT = -1
-	}
-	inline_script = {
-		script = jobs/no_desc/metallurgists_add
-		trigger = "
-			has_foundry_designation = yes
-		"
-		AMOUNT = 1
-		DRONE_AMOUNT = 0
-	}
-	# Void Dweller Extra Jobs
-	inline_script = {
-		script = jobs/no_desc/artisans_add
-		trigger = "
-			has_factory_designation = yes
+
+	triggered_planet_modifier = {
+		potential = {
 			exists = owner
-			owner = { is_void_dweller_empire = yes }
-		"
-		AMOUNT = 1
-		DRONE_AMOUNT = 1
+			owner = {
+				is_machine_empire = yes
+				has_edict = industrial_maintenance
+			}
+		}
+		modifier = {
+			job_maintenance_drone_add = 1
+		}
 	}
-	inline_script = {
-		script = jobs/no_desc/metallurgists_add
-		trigger = "
-			has_foundry_designation = yes
+
+	triggered_desc = {
+		trigger = {
 			exists = owner
-			owner = { is_void_dweller_empire = yes }
-		"
-		AMOUNT = 1
-		DRONE_AMOUNT = 1
+			owner = {
+				is_machine_empire = yes
+				has_edict = industrial_maintenance
+			}
+		}
+		text = job_maintenance_drone_effect_desc
 	}
 }
 
@@ -227,55 +180,12 @@ district_hab_science = {
 		script = districts/habitat_districts_triggered_mods
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		job_researcher_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		job_brain_drone_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		job_calculator_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_researcher_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		text = job_brain_drone_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_calculator_effect_desc
+	inline_script = {
+		script = jobs/triggered/researchers_add
+		AMOUNT = 1
+		desc = 1
+		trigger = " "
+		mult_line = " mult = owner.value:hab_void_dweller_jobs "
 	}
 
 	triggered_desc = {
@@ -320,69 +230,13 @@ district_hab_energy = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-				is_fallen_empire_spiritualist = no
-			}
-		}
-		job_technician_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_fallen_empire_spiritualist = yes }
-		}
-		job_fe_acolyte_generator_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		job_technician_drone_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		job_technician_drone_add = 1
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		text = job_technician_drone_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-				is_fallen_empire_spiritualist = no
-			}
-		}
-		text = job_technician_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_fallen_empire_spiritualist = yes }
-		}
-		text = job_fe_acolyte_generator_effect_desc
+	inline_script = {
+		script = jobs/triggered/technicians_add
+		AMOUNT = 1
+		HIVE_BONUS = 1
+		desc = 1
+		trigger = " "
+		mult_line = " mult = owner.value:hab_void_dweller_jobs "
 	}
 
 	triggered_desc = {
@@ -424,69 +278,13 @@ district_hab_mining = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		job_mining_drone_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		job_mining_drone_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-				is_fallen_empire_spiritualist = no
-			}
-		}
-		job_miner_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_fallen_empire_spiritualist = yes }
-		}
-		job_fe_acolyte_mine_add = 1
-		mult = owner.value:hab_void_dweller_jobs
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		text = job_mining_drone_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-				is_fallen_empire_spiritualist = no
-			}
-		}
-		text = job_miner_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_fallen_empire_spiritualist = yes }
-		}
-		text = job_fe_acolyte_mine_effect_desc
+	inline_script = {
+		script = jobs/triggered/miners_add
+		AMOUNT = 1
+		HIVE_BONUS = 1
+		desc = 1
+		trigger = " "
+		mult_line = " mult = owner.value:hab_void_dweller_jobs "
 	}
 
 	triggered_desc = {

@@ -1,0 +1,4655 @@
+##############################
+# Astral Rift General Events #
+##############################
+
+namespace = astral_planes
+
+# Astral Rift game start spawn
+event = {
+	id = astral_planes.1
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+	}
+
+	immediate = {
+		get_galaxy_setup_value = {
+			setting = num_stars
+			which = local_astral_rifts_num
+			scale_by = 0.1
+		}
+
+		while = {
+			count = local_astral_rifts_num
+
+			reroll_random = yes
+
+			random_system = {
+				limit = {
+					NOR = {
+						exists = owner
+						any_neighbor_system = {
+							exists = owner
+						}
+					}
+					can_spawn_astral_rift_natural_generation = yes
+				}
+
+				weights = {
+					inline_script = "astral_rift/spawn_weights"
+				}
+
+				spawn_astral_scar = yes
+			}
+		}
+	}
+}
+
+# Progressive Astral Rifts spawn
+event = {
+	id = astral_planes.2
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		mid_game_years_passed >= 0
+	}
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				NOT = { has_country_flag = astral_rift_spawn_moratorium }
+				is_astral_rift_pool_empty = no
+			}
+
+			export_trigger_value_to_variable = {
+				trigger = count_system_within_border
+				parameters = {
+					limit = {
+						can_spawn_astral_rift_or_split_astral_scar = yes
+					}
+				}
+				variable = progressive_rift_valid_systems
+			}
+
+			if = {
+				limit = {
+					check_variable = {
+						which = progressive_rift_valid_systems
+						value > 0
+					}
+				}
+
+				change_variable = {
+					which = years_passed_since_last_rift_spawn
+					value = 1
+				}
+
+				set_variable_to_random_value = {
+					which = astral_rift_spawn_roll
+					min = 0
+					max = 100
+				}
+
+				if = {
+					limit = {
+						astral_rifts_completed >= @progressive_rift_additional_difficulty_threshold
+					}
+					change_variable = {
+						which = astral_rift_spawn_roll
+						value = @progressive_rift_additional_difficulty_past_threshold
+					}
+				}
+			}
+			else = {
+				clear_variable = progressive_rift_valid_systems
+			}
+		}
+
+		every_playable_country = {
+			limit = {
+				is_variable_set = progressive_rift_valid_systems
+			}
+
+			if = {
+				limit = {
+					check_variable_arithmetic  = {
+						which = years_passed_since_last_rift_spawn
+						multiply = @progressive_rift_spawn_chance_per_year
+						multiply = value:progressive_rifts_additional_weight
+						multiply = @progressive_rift_system_count_weight_inverted
+						add = progressive_rift_valid_systems
+						divide = @progressive_rift_system_count_weight_inverted
+						value > astral_rift_spawn_roll
+					}
+				}
+
+				random_planet_within_border = {
+					limit = {
+						is_astral_scar = yes
+						has_anomaly = no
+					}
+
+					log = "Splitting Astral Scar to an Astral Rift in system [This.System.GetName] for country [Prev.GetName]."
+					split_astral_scar = yes
+					prev = {
+						set_timed_country_flag = {
+							flag = astral_rift_spawn_moratorium
+							years = @astral_rift_spawn_moratorium_years
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						NOT = { has_country_flag = astral_rift_spawn_moratorium }
+					}
+					random_system_within_border = {
+						limit = {
+							can_spawn_astral_rift_natural_generation = yes
+						}
+						log = "Spawning Astral Scar in system [This.GetName] for country [Prev.GetName]."
+						spawn_astral_scar = yes
+					}
+					set_timed_country_flag = {
+						flag = astral_rift_spawn_moratorium
+						years = @astral_rift_spawn_moratorium_years
+					}
+				}
+
+				clear_variable = years_passed_since_last_rift_spawn
+			}
+			clear_variable = progressive_rift_valid_systems
+			clear_variable = astral_rift_spawn_roll
+		}
+	}
+}
+
+# Lock astral rift from pool if it may reward a relic
+# THIS = Country: Explorer country
+# FROM = AstralRift: Explored astral rift
+country_event = {
+	id = astral_planes.3
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			has_astral_rift_flag = can_reward_relic
+		}
+	}
+
+	immediate = {
+		from = {
+			switch = {
+				trigger = has_astral_rift_flag
+				r_daedalus_seal = {
+					set_global_flag = astral_rift_with_relic_r_daedalus_seal_being_explored
+				}
+				r_celestial_tear = {
+					set_global_flag = astral_rift_with_relic_r_celestial_tear_being_explored
+				}
+				r_ever_spinning_top = {
+					set_global_flag = astral_rift_with_relic_r_ever_spinning_top_being_explored
+				}
+				r_plasmic_core = {
+					set_global_flag = astral_rift_with_relic_r_plasmic_core_being_explored
+				}
+				r_infinity_root = {
+					set_global_flag = astral_rift_with_relic_r_infinity_root_being_explored
+				}
+				r_time_crystal = {
+					set_global_flag = astral_rift_with_relic_r_time_crystal_being_explored
+				}
+				r_continuum = {
+					set_global_flag = astral_rift_with_relic_r_continuum_being_explored
+				}
+			}
+		}
+	}
+}
+
+# Unlock astral rift from pool if the relic has not been acquired
+# THIS = Country: Explorer country
+# FROM = AstralRift: Explored astral rift
+country_event = {
+	id = astral_planes.4
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			has_astral_rift_flag = can_reward_relic
+		}
+	}
+
+	immediate = {
+		from = {
+			switch = {
+				trigger = has_astral_rift_flag
+				r_daedalus_seal = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_daedalus_seal
+					}
+				}
+				r_celestial_tear = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_celestial_tear
+					}
+				}
+				r_ever_spinning_top = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_ever_spinning_top
+					}
+				}
+				r_plasmic_core = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_plasmic_core
+					}
+				}
+				r_infinity_root = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_infinity_root
+					}
+				}
+				r_time_crystal = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_time_crystal
+					}
+				}
+				r_continuum = {
+					inline_script = {
+						script = astral_rift/unlock_from_pool_if_relic_not_owned
+						RELIC = r_continuum
+					}
+				}
+			}
+		}
+	}
+}
+
+# Fill Astral Rift pool on country start / created
+# Scope = Country
+country_event = {
+	id = astral_planes.5
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		is_playable = yes
+	}
+
+	immediate = {
+		fill_astral_rift_event_pool = yes
+	}
+}
+
+# Event to setup the localization flags on Astral Rifts
+# Directly using the exploring leader causes problem in the persistence of the texts
+# once the leader has finished the exploration or is dead
+# From = Astral Rift being explored
+# FromFrom = Exploring fleet
+country_event = {
+	id = astral_planes.6
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+	}
+
+	immediate = {
+		from = {
+			# Gestalt Empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_gestalt }
+					explorer = {
+						is_gestalt = yes
+					}
+				}
+				set_astral_rift_flag = description_gestalt
+
+				# Machine Consciousness
+				if = {
+					limit = {
+						NOT = { has_astral_rift_flag = description_machine_consciousness }
+						explorer = { is_machine_empire = yes }
+					}
+					set_astral_rift_flag = description_machine_consciousness
+				}
+
+				# Hive Mind
+				if = {
+					limit = {
+						NOT = { has_astral_rift_flag = description_hive_mind }
+						explorer = { is_hive_empire = yes }
+					}
+					set_astral_rift_flag = description_hive_mind
+				}
+			}
+			# Exterminator empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_exterminator }
+					explorer = {
+						OR = {
+							is_homicidal = yes
+							is_unfriendly = yes
+						}
+					}
+				}
+				set_astral_rift_flag = description_exterminator
+			}
+			# Pacifist empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_pacifist }
+					explorer = {
+						is_pacifist = yes
+					}
+				}
+				set_astral_rift_flag = description_pacifist
+			}
+			# Militarist empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_militarist }
+					explorer = {
+						is_militarist = yes
+					}
+				}
+				set_astral_rift_flag = description_militarist
+			}
+			# Xenophile empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_xenophile }
+					explorer = {
+						is_xenophile = yes
+					}
+				}
+				set_astral_rift_flag = description_xenophile
+			}
+			# Materialist empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_materialist }
+					explorer = {
+						is_materialist = yes
+					}
+				}
+				set_astral_rift_flag = description_materialist
+			}
+			# Spiritualist empire
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_spiritualist }
+					explorer = {
+						is_spiritualist = yes
+					}
+				}
+				set_astral_rift_flag = description_spiritualist
+			}
+			# Empire has exotic gases
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_has_exotic_gases }
+					explorer = {
+						OR = {
+							has_technology = tech_exotic_gases
+							has_resource = { type = exotic_gases amount > 0 }
+						}
+					}
+				}
+				set_astral_rift_flag = description_has_exotic_gases
+			}
+			# Psionic leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_psionic }
+					leader = {
+						has_trait = leader_trait_psionic
+					}
+				}
+				set_astral_rift_flag = description_psionic
+			}
+			# Latent Psionic leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_latent_psionic }
+					leader.species = {
+						has_trait = trait_latent_psionic
+					}
+				}
+				set_astral_rift_flag = description_latent_psionic
+			}
+			# Aquatic leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_aquatic }
+					leader.species = {
+						has_trait = trait_aquatic
+					}
+				}
+				set_astral_rift_flag = description_aquatic
+			}
+			# Toxoid leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_toxoid }
+					leader.species = {
+						is_species_class = TOX
+					}
+				}
+				set_astral_rift_flag = description_toxoid
+			}
+			# Human leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_human }
+					leader.species = {
+						is_human_species = yes
+					}
+				}
+				set_astral_rift_flag = description_human
+			}
+			# Organic leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_organic }
+					leader.species = {
+						is_organic_species = yes
+					}
+				}
+				set_astral_rift_flag = description_organic
+			}
+			# Robotic leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_robotic }
+					leader.species = {
+						is_robotic = yes
+					}
+				}
+				set_astral_rift_flag = description_robotic
+			}
+			# Plantoid leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_plantoid }
+					leader.species = {
+						is_species_class = PLANT
+					}
+				}
+				set_astral_rift_flag = description_plantoid
+			}
+			# Lithoid leader
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_lithoid }
+					leader.species = {
+						is_species_class = LITHOID
+					}
+				}
+				set_astral_rift_flag = description_lithoid
+			}
+			# Riftworld Origin - Arc Site completed
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_riftworld_digsite_completed }
+					explorer = {
+						has_country_flag = riftworld_digsite_completed
+					}
+				}
+				set_astral_rift_flag = description_riftworld_digsite_completed
+			}
+			# Empire is completing the Baol event chain
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_baol_chain }
+					explorer = {
+						has_event_chain = baol_chain
+					}
+				}
+				set_astral_rift_flag = description_baol_chain
+			}
+		}
+	}
+}
+
+# Event to trigger A Rift In Space situation if an astral rift spawns
+# Scope = Astral Rift
+event = {
+	id = astral_planes.7
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		NOT = {
+			has_astral_rift_flag = riftworld_rift
+		}
+		solar_system = {
+			exists = owner
+			owner = {
+				NOR = {
+					has_country_flag = has_completed_a_rift_in_space_situation
+					has_technology = tech_rift_sphere
+					has_tech_option = tech_rift_sphere
+				}
+			}
+		}
+	}
+
+	immediate = {
+		solar_system.owner = {
+			if = {
+				limit = {
+					any_situation = { is_situation_type = situation_a_rift_in_space }
+					has_country_flag = situation_a_rift_in_space_locked
+				}
+				every_situation = {
+					limit = { is_situation_type = situation_a_rift_in_space }
+					change_situation_target = root
+					set_situation_locked = no
+					prev = { remove_country_flag = situation_a_rift_in_space_locked }
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = {
+						any_situation = {
+							is_situation_type = situation_a_rift_in_space
+						}
+					}
+				}
+				if = {
+					limit = {
+						is_riftworld_empire = yes
+					}
+					country_event = {
+						id = astral_planes.101
+						scopes = {
+							from = root
+						}
+					}
+				}
+				else = {
+					country_event = {
+						id = astral_planes.100
+						scopes = {
+							from = root
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Event to add deposit to astral rifts once they spawn
+# Scope = Astral Rift
+event = {
+	id = astral_planes.8
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		NOT = { has_astral_rift_flag = crystal_rift }
+	}
+
+	immediate = {
+		add_deposit = d_astral_threads_deposit_2
+	}
+}
+
+# Event to indicate this player started exploring Rifts
+# Scope = Country
+country_event = {
+	id = astral_planes.9
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		NOT = { has_country_flag = has_started_exploring_rifts }
+	}
+
+	immediate = {
+		set_country_flag = has_started_exploring_rifts
+	}
+}
+
+#######################################
+# Astral Planes Crystal Sphere Events #
+#######################################
+
+# Crystal Sphere Spawn Event
+event = {
+	id = astral_planes.10
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		NOT = { has_global_flag = crystal_sphere_sent }
+		mid_game_years_passed > 0
+		any_playable_country = {
+			astral_rifts_completed >= @crystal_sphere_trigger_minimum_rift_requirement
+		}
+	}
+
+	immediate = {
+		every_playable_country = {
+			set_variable_to_random_value = {
+				which = crystal_sphere_spawn_roll
+				min = 0
+				max = 100
+			}
+			if = {
+				limit = {
+					is_riftworld_empire = yes
+				}
+				divide_variable = {
+					which = crystal_sphere_spawn_roll
+					value = 2
+				}
+			}
+
+			# Prioritize player-controlled empires
+			if = {
+				limit = {
+					is_ai = yes
+				}
+				multiply_variable = {
+					which = crystal_sphere_spawn_roll
+					value = 2
+				}
+			}
+		}
+		ordered_playable_country = {
+			limit = {
+				has_technology = tech_rift_sphere
+				astral_rifts_completed >= @crystal_sphere_eligibility_minimum_rift_requirement
+				check_variable_arithmetic = {
+					which = trigger:astral_rifts_completed
+					multiply = -1
+					add = crystal_sphere_spawn_roll
+					subtract = trigger:mid_game_years_passed
+					value < trigger:astral_rifts_completed
+				}
+				any_system_within_border = {
+					has_natural_wormhole = no
+					NOR = {
+						has_star_flag = shroud_tunnel_nexus
+						has_star_flag = shroud_tunnel_node
+						has_star_flag = sol_system
+					}
+				}
+			}
+			position = 0
+			order_by = trigger:astral_rifts_completed
+			# Send Crystal Sphere to found country
+			set_global_flag = crystal_sphere_sent
+
+			# Spawn it in the owned system the closest to the capital, included
+			ordered_system_within_border = {
+				limit = {
+					has_natural_wormhole = no
+					NOR = {
+						has_star_flag = shroud_tunnel_nexus
+						has_star_flag = shroud_tunnel_node
+						has_star_flag = sol_system
+					}
+				}
+				position = 0
+				order_by = trigger:distance_to_capital
+				inverse = yes
+
+				set_star_flag = crystal_sphere_system
+				save_global_event_target_as = crystal_sphere_system
+			}
+
+			country_event = {
+				id = astral_planes.15
+				days = 10
+				random = 350
+			}
+		}
+	}
+}
+
+# Crystal Sphere Starter Event
+country_event = {
+	id = astral_planes.15
+	title = astral_planes.15.name
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = has_acquired_crystal_sphere
+				NOT = { has_country_flag = crystal_sphere_event_delayed }
+			}
+		}
+		text = astral_planes.15.desc.win
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = has_acquired_crystal_sphere
+				has_country_flag = crystal_sphere_event_delayed
+			}
+		}
+		text = astral_planes.15.desc.win_delayed
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOT = { has_country_flag = has_acquired_crystal_sphere }
+			}
+		}
+		text = astral_planes.15.desc.default
+	}
+	picture = GFX_evt_crystal_sphere
+	show_sound = event_alien_nature
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			remove_country_flag = has_acquired_crystal_sphere
+			remove_country_flag = crystal_sphere_event_delayed
+		}
+	}
+
+	option = {
+		name = astral_planes.15.a
+		hidden_effect = {
+			start_situation = {
+				type = situation_study_crystal_sphere
+				target = event_target:crystal_sphere_system
+			}
+		}
+
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = 100
+				owner = {
+					OR = {
+						is_spiritualist = yes
+						is_riftworld_empire = yes
+					}
+				}
+			}
+			modifier = {
+				add = -10
+				owner = {
+					OR = {
+						is_xenophobe = yes
+						is_homicidal = yes
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = astral_planes.15.b
+		hidden_effect = {
+			start_situation = {
+				type = situation_destroy_crystal_sphere
+				target = event_target:crystal_sphere_system
+			}
+		}
+
+		ai_chance = {
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						is_spiritualist = yes
+						is_riftworld_empire = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# Crystal Sphere Lost
+country_event = {
+	id = astral_planes.20
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		exists = event_target:crystal_sphere_system
+		FROM = {
+			is_same_value = event_target:crystal_sphere_system
+		}
+	}
+
+	immediate = {
+		set_country_flag = has_lost_crystal_sphere
+		remove_country_flag = has_acquired_crystal_sphere
+		remove_country_flag = crystal_sphere_event_delayed
+	}
+}
+
+# Crystal Sphere Gained from another player
+country_event = {
+	id = astral_planes.25
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		exists = event_target:crystal_sphere_system
+		FROM = {
+			is_same_value = event_target:crystal_sphere_system
+		}
+	}
+
+	immediate = {
+		set_country_flag = has_acquired_crystal_sphere
+		if = {
+			limit = { has_technology = tech_rift_sphere }
+			country_event = { id = astral_planes.15 }
+		}
+		else = {
+			country_event = { id = astral_planes.30 }
+		}
+	}
+}
+
+# Crystal Sphere Gained from another player without Rift Sphere tech
+country_event = {
+	id = astral_planes.30
+	title = astral_planes.30.name
+	desc = astral_planes.30.desc
+	picture = GFX_evt_alien_planet
+	show_sound = event_alien_nature
+
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.30.a
+		hidden_effect = {
+			owner = { set_country_flag = crystal_sphere_event_delayed }
+		}
+	}
+}
+
+# Rift Sphere obtained after acquiring The Crystal Sphere
+country_event = {
+	id = astral_planes.35
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		last_increased_tech = tech_rift_sphere
+		owner = { has_country_flag = crystal_sphere_event_delayed }
+	}
+
+	immediate = {
+		country_event = { id = astral_planes.15 }
+	}
+}
+
+#First encounter with the strange wormhole
+fleet_event = {
+	id = astral_planes.45
+	title = astral_planes.45.name
+
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = opened_wormhole_to_formless_system
+			}
+		}
+		text = astral_planes.45.desc.event_chain_owner
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOT = { has_country_flag = opened_wormhole_to_formless_system }
+				has_global_flag = strange_wormholes_locked
+			}
+		}
+		text = astral_planes.45.desc.locked
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOT = { has_country_flag = opened_wormhole_to_formless_system }
+				NOT = { has_global_flag = strange_wormholes_locked }
+			}
+
+		}
+		text = astral_planes.45.desc.unlocked
+	}
+
+	picture = GFX_evt_wormhole
+	show_sound = event_radio_chatter
+	location = from
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			exists = event_target:crystal_sphere_system
+			is_same_value = event_target:crystal_sphere_system
+			has_natural_wormhole = yes
+		}
+		owner = {
+			NOT = {
+				has_country_flag = encountered_strange_wormhole
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = encountered_strange_wormhole
+			add_seen_bypass_type = strange_wormhole
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+}
+
+# Strange wormhole has become unlocked
+country_event = {
+	id = astral_planes.50
+	title = astral_planes.50.name
+	desc = astral_planes.50.desc
+	picture = GFX_evt_wormhole
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			has_country_flag = encountered_strange_wormhole
+			NOT = { has_country_flag = opened_wormhole_to_formless_system }
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+}
+
+########################
+# Astral Planes Events #
+########################
+
+# Astral Rift first encounter
+country_event = {
+	id = astral_planes.100
+	title = astral_planes.100.name
+	desc = {
+		trigger = {
+				from = {
+					has_astral_rift_flag = split_opened_rift
+					exists = owner
+					owner = {
+						is_same_empire = prevprev
+					}
+				}
+		}
+		text = astral_planes.100.desc.split
+	}
+	desc = {
+		trigger = {
+				from = {
+					NAND = {
+						has_astral_rift_flag = split_opened_rift
+						exists = owner
+						owner = {
+							is_same_empire = prevprev
+						}
+					}
+				}
+		}
+		text = astral_planes.100.desc.default
+	}
+	picture = GFX_evt_astral_rift
+	show_sound = event_space_cloud
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			any_situation = { is_situation_type = situation_a_rift_in_space }
+			has_country_flag = has_completed_a_rift_in_space_situation
+			has_technology = tech_rift_sphere
+			has_tech_option = tech_rift_sphere
+		}
+	}
+
+	option = {
+		name = astral_planes.100.a
+		start_situation = {
+			type = situation_a_rift_in_space
+			target = from
+		}
+	}
+}
+
+# Astral Rift first encounter for Riftworld
+# THIS = Country
+# From = AstralRift
+country_event = {
+	id = astral_planes.101
+	title = astral_planes.101.name
+	desc = astral_planes.101.desc
+	picture = GFX_evt_astral_rift
+	show_sound = event_space_cloud
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			any_situation = { is_situation_type = situation_a_rift_in_space }
+			has_country_flag = has_completed_a_rift_in_space_situation
+			has_technology = tech_rift_sphere
+			has_tech_option = tech_rift_sphere
+		}
+	}
+
+	option = {
+		name = astral_planes.101.a
+		start_situation = {
+			type = situation_a_rift_in_space
+			target = from
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.110
+	title = astral_planes.110.name
+	desc = astral_planes.110.desc
+	picture = GFX_evt_astral_rift
+	show_sound = event_space_cloud
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		last_increased_tech = "tech_astral_harvesting"
+		is_riftworld_empire = no
+	}
+
+	option = {
+		name = FASCINATING
+	}
+}
+
+ship_event = {
+	id = astral_planes.115
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			is_scope_type = planet
+			is_astral_scar = yes
+		}
+		controller = {
+			NOT = { has_country_flag = started_harvest_astral_threads }
+		}
+	}
+
+	immediate = {
+		name = FASCINATING
+		owner = {
+			set_country_flag = started_harvest_astral_threads
+			if = {
+				limit = { is_riftworld_empire = yes }
+				country_event = { id = astral_planes.116 days = 10080 random = 1440 }
+			}
+			else = {
+				country_event = { id = astral_planes.116 days = 1440 random = 720 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.116
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			any_situation = { is_situation_type = situation_a_rift_in_space }
+			has_country_flag = has_completed_a_rift_in_space_situation
+			has_technology = tech_rift_sphere
+			has_tech_option = tech_rift_sphere
+		}
+	}
+
+	immediate = {
+		random_system_within_border = {
+			limit = {
+				any_system_planet = {
+					is_astral_scar = yes
+				}
+			}
+			random_system_planet = {
+				limit = { is_astral_scar = yes }
+				split_astral_scar = yes
+			}
+			astral_rift = {
+				save_event_target_as = first_spawned_rift
+			}
+		}
+		if = {
+			limit = {
+				NOT = { exists = event_target:first_spawned_rift }
+			}
+			set_country_flag = waiting_for_rift_in_space_trigger
+		}
+	}
+}
+
+# From = system
+# This = country (new owner)
+# A Rift in Space situation trigger backup
+country_event = {
+	id = astral_planes.117
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_country_flag = waiting_for_rift_in_space_trigger
+		from = { any_system_planet = { is_astral_scar = yes } }
+	}
+
+	immediate = {
+		remove_country_flag = waiting_for_rift_in_space_trigger
+		country_event = { id = astral_planes.116 days = 180 }
+	}
+}
+
+# From = system
+# This = country (new owner)
+# A Rift in Space situation trigger speedup
+country_event = {
+	id = astral_planes.118
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		NOR = {
+			has_country_flag = has_completed_a_rift_in_space_situation
+			has_technology = tech_rift_sphere
+			has_tech_option = tech_rift_sphere
+		}
+		from = { has_astral_rift = yes }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				from.astral_rift = {
+					NOT = { exists = explorer }
+				}
+			}
+			if = {
+				limit = {
+					any_situation = { is_situation_type = situation_a_rift_in_space }
+					root = { has_country_flag = situation_a_rift_in_space_locked }
+				}
+				every_situation = {
+					limit = { is_situation_type = situation_a_rift_in_space }
+					change_situation_target = from.astral_rift
+					set_situation_locked = no
+					root = { remove_country_flag = situation_a_rift_in_space_locked }
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = {
+						any_situation = { is_situation_type = situation_a_rift_in_space }
+					}
+				}
+				if = {
+					limit = { is_riftworld_empire = yes }
+					country_event = {
+						id = astral_planes.101
+						scopes = {
+							from = from.astral_rift
+						}
+					}
+				}
+				else = {
+					country_event = {
+						id = astral_planes.100
+						scopes = {
+							from = from.astral_rift
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# From = system
+# This = country (new owner)
+country_event = {
+	id = astral_planes.119
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		any_situation = { is_situation_type = situation_a_rift_in_space }
+		NOT = { has_country_flag = situation_a_rift_in_space_locked }
+		from = { has_astral_rift = yes }
+	}
+
+	immediate = {
+		every_situation = {
+			limit = { is_situation_type = situation_a_rift_in_space }
+			if = {
+				limit = {
+					exists = target
+					target = { is_same_value = from.astral_rift }
+				}
+				change_situation_target = none
+				random_astral_rift = {
+					limit = {
+						solar_system = {
+							exists = owner
+							owner = { is_same_value = root.owner }
+						}
+					}
+					prev = {
+						change_situation_target = this
+					}
+				}
+				if = {
+					limit = {
+						NOT = { exists = target }
+					}
+					root = {
+						country_event = {
+							id = astral_planes.120
+							scopes = { from = prev }
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.120
+	title = astral_planes.120.name
+	desc = astral_planes.120.desc
+	picture = GFX_evt_astral_rift
+	show_sound = event_space_cloud
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_situation_locked = yes }
+		set_country_flag = situation_a_rift_in_space_locked
+	}
+
+	option = {
+		name = UNFORTUNATE
+	}
+}
+
+# Event to prevent exploring leaders' death from specific events
+# Scope = country
+# FROMFROM = exploring fleet
+country_event = {
+	id = astral_planes.200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+	}
+
+	immediate = {
+		fromfrom = {
+			leader = {
+				if = {
+					limit = { has_leader_flag = leader_death_events_blocked }
+					set_leader_flag = leader_rift_blocks_death_events
+				}
+				else = {
+					set_leader_flag = leader_death_events_blocked
+				}
+			}
+		}
+	}
+}
+
+# Event to remove exploring leaders' death prevention
+# Scope = country
+# FROMFROM = exploring fleet
+country_event = {
+	id = astral_planes.205
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		fromfrom = {
+			exists = leader
+		}
+	}
+
+	immediate = {
+		fromfrom = {
+			leader = {
+				if = {
+					limit = { has_leader_flag = leader_rift_blocks_death_events }
+					remove_leader_flag = leader_rift_blocks_death_events
+				}
+				else = {
+					remove_leader_flag = leader_death_events_blocked
+				}
+			}
+		}
+	}
+}
+
+##########################
+# Astral Thread Actions #
+##########################
+
+# Destroy Dimensional Fleet
+fleet_event = {
+	id = astral_planes.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		delete_dimensional_fleet = this
+	}
+}
+
+# Flash Forge Astral Thread Action Build Started
+fleet_event = {
+	id = "astral_planes.1010"
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		controller = {
+			has_country_flag = flash_forge_hyper_relay_activated
+		}
+	}
+
+	immediate = {
+		set_fleet_flag = flash_forging_hyper_relay
+		controller = {
+			remove_country_flag = flash_forge_hyper_relay_activated
+		}
+	}
+}
+
+# Flash Forge Astral Thread Action Build Canceled
+fleet_event = {
+	id = "astral_planes.1015"
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_fleet_flag = flash_forging_hyper_relay
+	}
+
+	immediate = {
+		remove_fleet_flag = flash_forging_hyper_relay
+		controller = {
+			set_country_flag = flash_forge_hyper_relay_activated
+		}
+	}
+}
+
+# Flash Forge Astral Thread Action Build Completed
+fleet_event = {
+	id = "astral_planes.1020"
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_fleet_flag = flash_forging_hyper_relay
+	}
+
+	immediate = {
+		remove_fleet_flag = flash_forging_hyper_relay
+		controller = {
+			start_astral_action_cooldown = action_flash_forge_hyper_relay
+		}
+	}
+}
+
+# Bypass lock expiring
+bypass_event = {
+	id = astral_planes.1030
+	title = "astral_planes.1030.name"
+	desc = "astral_planes.1030.desc"
+	picture = GFX_evt_astral_rift
+	show_sound = event_space_cloud
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+	}
+
+	option = {
+		name = astral_planes.1030.a
+		custom_tooltip = astral_planes.1030.a.tooltip
+		allow = {
+			can_lock_be_renewed = yes
+			owner = {
+				has_resource = { type = astral_threads amount >= @dimensional_lock_cost }
+			}
+		}
+		owner = {
+			add_resource = {
+				astral_threads = @dimensional_lock_cost
+				mult = -1
+			}
+		}
+		renew_bypass_lock = yes
+	}
+	option = {
+		name = astral_planes.1030.b
+		custom_tooltip = astral_planes.1030.b.tooltip
+	}
+}
+
+# Lateral Artifacting relic used (pre activation)
+country_event = {
+	id = astral_planes.1040
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_country_flag = lateral_artifacting_available
+	}
+
+	immediate = {
+		remove_country_flag = lateral_artifacting_available
+	}
+}
+
+##########################
+# Civics Handling Events #
+##########################
+
+# Dimensional Worship astral thread reward modifier computing
+country_event = {
+	id = astral_planes.2000
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		is_playable = yes
+	}
+
+	immediate = {
+		set_variable = {
+			which = astral_threads_scripted_rewards_mult
+			value = 1
+		}
+		if = {
+			limit = {
+				is_dimensional_worship_empire = yes
+			}
+			change_variable = {
+				which = astral_threads_scripted_rewards_mult
+				value = modifier:country_astral_threads_produces_mult
+			}
+		}
+	}
+}
+
+# Hyperspace Specialty
+country_event = {
+	id = astral_planes.2200
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_hyperspace_specialty_empire = yes
+		NOT = { has_technology = tech_hyper_drive_2 }
+	}
+
+	immediate = {
+		add_research_option = tech_hyper_drive_2
+	}
+}
+
+# Dark Consortium
+country_event = {
+	id = astral_planes.2205
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_dark_consortium_empire = yes
+		NOT = { has_technology = tech_mine_dark_matter }
+	}
+
+	immediate = {
+		give_technology = {
+			tech = tech_mine_dark_matter
+			message = no
+		}
+		set_country_flag = dark_matter_found
+		random_planet_within_border = {
+			limit = {
+				is_capital = no
+				has_deposit_for = shipclass_research_station
+			}
+			add_deposit = d_dark_matter_deposit_1
+		}
+	}
+}
+
+##############################
+# Astral Rift Discovery Flow #
+##############################
+
+country_event = {
+	id = astral_planes.2005
+	title = astral_planes.2005.name
+	desc = astral_planes.2005.desc
+	picture = GFX_evt_rift_sphere
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		last_increased_tech = "tech_rift_sphere"
+	}
+
+	option = {
+		name = astral_planes.2005.a
+	}
+}
+
+country_event = {
+	id = astral_planes.2006
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+	}
+
+	immediate = {
+		perform_astral_action_unlock_check = yes
+	}
+}
+
+#######################################
+# Formless System Event Chain #
+#######################################
+
+# Entering Formless System for the first time, from on_entering_strange_wormhole
+fleet_event = {
+	id = astral_planes.3000
+	title = astral_planes.3000
+	desc = astral_planes.3000.desc
+	picture = GFX_evt_formless_system
+	show_sound = formless_system_event
+	location = from
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			has_star_flag = formless_system
+		}
+		fromfrom = {
+			has_star_flag = crystal_sphere_system
+		}
+	}
+
+	option = {
+		name = ONSCREEN
+		owner = {
+			country_event = {
+				id = astral_planes.3005
+				scopes = { from = from }
+			}
+		}
+	}
+}
+
+# Initial Aberrant transmission
+country_event = {
+	id = astral_planes.3005
+	title = "TRANSMISSION"
+	desc = "astral_planes.3005.desc"
+	location = from
+
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = exd2
+		room = "extradimensional_orange_room"
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = astral_planes.3005.a
+	}
+}
+
+# Aberrant Scout fleet destroyed
+country_event = {
+	id = astral_planes.3010
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		exists = event_target:aberrant_country
+		is_same_value = event_target:aberrant_country
+		fromfrom = {
+			has_fleet_flag = invader_scout
+		}
+	}
+
+	immediate = {
+		change_variable = {
+			which = alive_scout_fleet_count
+			value = -1
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = alive_scout_fleet_count
+					value = 0
+				}
+			}
+
+			from = {
+				country_event = { id = astral_planes.3015 days = 2 }
+			}
+		}
+	}
+}
+
+# All Aberrant scout fleets destroyed
+country_event = {
+	id = astral_planes.3015
+	title = astral_planes.3015
+	desc = astral_planes.3015.desc
+	show_sound = formless_system_event
+
+	picture = GFX_evt_wormhole
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = ONSCREEN
+		country_event = { id = astral_planes.3020 }
+	}
+}
+
+# Initial formless transmission
+country_event = {
+	id = astral_planes.3020
+	title = "TRANSMISSION"
+	desc = "astral_planes.3020.desc"
+
+	diplomatic = yes
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = astral_planes.3020.a
+
+		establish_communications_no_message = event_target:formless_country
+		start_situation = {
+			type = situation_the_seal
+			target = event_target:formless_system
+		}
+	}
+}
+
+# Aberrant Invader fleet destroyed
+country_event = {
+	id = astral_planes.3025
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		exists = event_target:the_seal_situation
+		is_same_value = event_target:aberrant_country
+		fromfrom = {
+			has_fleet_flag = formless_invader
+		}
+		OR = {
+			event_target:the_seal_situation = {
+				check_variable_arithmetic = {
+					which = @formless_the_seal_situation_final_step_progress
+					subtract = @formless_event_situation_progress_on_destroy_invader_fleet
+					value >= trigger:situation_progress
+				}
+			}
+			NOT = {
+				event_target:aberrant_country = {
+					count_controlled_fleet = {
+						count = 2
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		event_target:the_seal_situation = {
+			add_situation_progress = @formless_event_situation_progress_on_destroy_invader_fleet
+		}
+
+		if = {
+			limit = {
+				event_target:aberrant_country = {
+					count_controlled_fleet = {
+						# As this event is fired from on_action on_fleet_destroyed_victim, the destroyed fleet was not deleted yet
+						# Therefore, we check for 1 instead of 0 as the fleet still exists
+						count <= 1
+						limit = { has_fleet_flag = formless_invader }
+					}
+				}
+			}
+
+			event_target:formless_country = {
+				every_controlled_fleet = {
+					limit = {
+						has_fleet_flag = formless_defense_fleet
+					}
+
+					destroy_fleet = {
+						target = this
+					}
+				}
+			}
+		}
+	}
+}
+
+# Entering or leaving Formless System, enable/disable The Seal situation effects
+fleet_event = {
+	id = astral_planes.3030
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		exists = event_target:the_seal_situation
+		owner = {
+			is_same_value = event_target:the_seal_situation.owner
+		}
+	}
+
+	immediate = {
+		if = {
+			# Entering Formless System
+			limit = {
+				from = {
+					has_star_flag = formless_system
+				}
+				fromfrom = {
+					has_star_flag = crystal_sphere_system
+				}
+			}
+			if = {
+				limit = {
+					event_target:the_seal_situation = {
+						current_situation_approach = situation_the_seal_weave_astral_fabric
+					}
+				}
+				add_modifier = {
+					modifier = the_seal_weave_astral_fabric_modifiers
+				}
+			}
+			if = {
+				limit = {
+					event_target:the_seal_situation = {
+						current_situation_approach = situation_the_seal_pump_exotic_gases
+					}
+				}
+				add_modifier = {
+					modifier = the_seal_pump_exotic_gases_modifier
+				}
+			}
+		}
+		else = {
+			# Leaving Formless System
+			limit = {
+				from = {
+					has_star_flag = crystal_sphere_system
+				}
+				fromfrom = {
+					has_star_flag = formless_system
+				}
+			}
+			if = {
+				limit = { has_modifier = the_seal_pump_exotic_gases_modifier }
+				remove_modifier = the_seal_pump_exotic_gases_modifier
+			}
+			if = {
+				limit = { has_modifier = the_seal_weave_astral_fabric_modifiers }
+				remove_modifier = the_seal_weave_astral_fabric_modifiers
+			}
+		}
+	}
+}
+
+# Formless Diplomacy
+country_event = {
+	id = astral_planes.3050
+	title = NAME_Formless
+	desc = astral_planes.3050.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		FROM = {
+			is_country_type = formless
+		}
+		any_situation = {
+			is_situation_type = situation_the_seal
+		}
+	}
+
+	immediate = {
+		from = {
+			if = {
+				limit = {
+					check_variable = { which = number_fleets_spawned value < 1 }
+				}
+				set_variable = {
+					which = number_fleets_spawned
+					value = 0
+				}
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.3050.a
+		custom_tooltip = astral_planes.3050.a.tt
+		allow = {
+			has_resource = { type = astral_threads amount >= 100 }
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = "number_formless_fleet_max_reached"
+				check_variable = {
+					which = from.number_fleets_spawned
+					value < 2
+				}
+			}
+		}
+		add_resource = { astral_threads = -100 }
+		hidden_effect = {
+			from = {
+				spawn_formless_defense_fleet = {
+					FLEET_FLAG = formless_diplomacy_defense_fleet
+				}
+			}
+			change_variable = {
+				which = from.number_fleets_spawned
+				value = 1
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.3050.b
+		default_hide_option = yes
+	}
+}
+
+# Formless Anchor destroyed
+country_event = {
+	id = astral_planes.3065
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		is_country_type = formless
+		exists = event_target:formless_anchor
+		fromfrom = { is_same_value = event_target:formless_anchor }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_country = {
+					AND = {
+						has_country_flag = opened_wormhole_to_formless_system
+						any_situation = {
+							is_situation_type = situation_the_seal
+						}
+					}
+				}
+			}
+			random_country = {
+				limit = {
+					has_country_flag = opened_wormhole_to_formless_system
+				}
+				random_situation = {
+					limit = {
+						is_situation_type = situation_the_seal
+					}
+					abort_situation = this
+				}
+				country_event = { id = astral_planes.3070 }
+			}
+			event_target:aberrant_country = {
+				destroy_country = yes
+			}
+		}
+		if = {
+			limit = {
+				has_country_flag = formless_war_state_initiated
+			}
+			from = {
+				country_event = { id = astral_planes.3165 }
+			}
+		}
+		every_playable_country = {
+			remove_country_flag = formless_reward_available
+		}
+		destroy_country = yes
+	}
+}
+
+# Formless Anchor destroyed by aberants consequences
+country_event = {
+	id = astral_planes.3070
+	title = "TRANSMISSION"
+	desc = astral_planes.3070.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = exd2
+		room = "extradimensional_orange_room"
+	}
+
+	option = {
+		name = astral_planes.3070.a
+		custom_tooltip = astral_planes.3070.a.tt
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		hidden_effect = {
+			event_target:formless_system = {
+				every_fleet_in_system = {
+					limit = { is_owned_by = root }
+					if = {
+						limit = { can_go_mia = yes }
+						set_mia = mia_emergency_ftl
+					}
+					else = {
+						destroy_fleet = this
+					}
+				}
+				destroy_star_system = yes
+			}
+			set_global_flag = strange_wormhole_closed
+		}
+	}
+}
+
+# Formless Haven setup
+planet_event = {
+	id = astral_planes.3080
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_planet_flag = formless_gaia_planet
+		has_modifier = pm_formless_haven
+	}
+
+	immediate = {
+		owner = {
+			create_species = {
+				name = random
+				class = random_non_machine
+				portrait = random
+				traits = random
+				homeworld = this
+				effect = {
+					save_event_target_as = formless_gaia_planet_species
+				}
+			}
+		}
+		while = {
+			count = 5
+			create_pop = {
+				species = event_target:formless_gaia_planet_species
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.3100
+	title = NAME_Formless
+	desc = astral_planes.3100.desc
+	show_sound = ap_rift_event_0_astral_wonder
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+	notification_event_icon = "GFX_message_leader_recruitment_lysator"
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		FROM = {
+			is_country_type = formless
+		}
+		has_country_flag = saved_formless
+		NOT = { has_country_flag = picked_formless_reward_path }
+	}
+
+	immediate = {
+		ethic_leader_creator = {
+			SPECIES_CLASS = EXD
+			LEADER_PORTRAIT = exd4_leader
+			NAME_LIST = Extradimensional
+			CLASS = commander
+			NAME = NAME_Formless_leader
+			LEVEL = 10
+			GENDER = indeterminable
+			IMMORTAL_SPECIES = yes
+			IMMORTAL = no
+			HIDEAGE = yes
+			ETHIC = xenophile
+			DESC = formless_leader_desc
+			CATCH_PHRASE = formless_leader_catch_phrase
+		}
+		last_created_leader = {
+			add_trait = leader_trait_spacebender
+			add_trait = subclass_commander_admiral
+			add_trait = leader_trait_psionic
+			add_trait = leader_trait_venerated_2
+			add_trait = leader_trait_scout_2
+			add_trait = leader_trait_commanding_presence_2
+			add_trait = leader_trait_energy_weapon_specialist
+			remove_leader_flag = renowned_leader
+			set_leader_flag = legendary_leader
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:ethic_leader
+		room = "extradimensional_formless_room"
+	}
+
+	option = {
+		name = astral_planes.3100.a
+		response_text = astral_planes.3100.a.desc
+		is_dialog_only = yes
+		set_country_flag = formless_lore_dialog_step_1
+	}
+	option = {
+		name = astral_planes.3100.b
+		allow = {
+			has_country_flag = formless_lore_dialog_step_1
+		}
+		hide_option_if_not_allowed = yes
+		response_text = astral_planes.3100.b.desc
+		is_dialog_only = yes
+		set_country_flag = formless_lore_dialog_step_2
+	}
+	option = {
+		name = astral_planes.3100.c
+		allow = {
+			has_country_flag = formless_lore_dialog_step_2
+		}
+		hide_option_if_not_allowed = yes
+		response_text = astral_planes.3100.c.desc
+		is_dialog_only = yes
+		set_country_flag = formless_lore_dialog_step_3
+	}
+	option = {
+		name = astral_planes.3100.d
+		allow = {
+			has_country_flag = formless_lore_dialog_step_3
+			is_homicidal = no
+			has_any_overlord = no
+		}
+		hide_option_if_not_allowed = yes
+		set_country_flag = picked_formless_reward_path
+		random_list = {
+			75 = {
+				modifier = {
+					add = trigger:astral_rifts_completed
+					always = yes
+				}
+				hidden_effect = {
+					custom_tooltip = formless_subjugation_path_success_tt
+					set_country_flag = picked_formless_subjugation_path
+					country_event = { id = astral_planes.3101 }
+				}
+			}
+			25 = {
+				set_faction_hostility = {
+					target = event_target:formless_country
+					set_hostile = yes
+				}
+				hidden_effect = {
+					set_country_flag = failed_formless_subjugation
+					country_event = { id = astral_planes.3102 }
+				}
+			}
+		}
+		hidden_effect = {
+			ethic_leader_kill_effect = yes
+		}
+	}
+	option = {
+		name = astral_planes.3100.e
+		allow = {
+			has_country_flag = formless_lore_dialog_step_3
+		}
+		hide_option_if_not_allowed = yes
+		set_country_flag = picked_formless_reward_path
+		country_event = { id = astral_planes.3102 }
+		hidden_effect = {
+			ethic_leader_kill_effect = yes
+		}
+	}
+	option = {
+		name = astral_planes.3100.f
+		tag = hire_leader
+		allow = {
+			is_homicidal = no
+		}
+		hire_event_leader_effect = {
+			LEADER = ethic_leader
+		}
+		last_created_leader = {
+			remove_leader_flag = renowned_leader
+			set_leader_flag = legendary_leader
+			set_leader_flag = immune_to_negative_traits
+			save_global_event_target_as = formless_leader
+		}
+		set_country_flag = allied_with_formless
+		set_country_flag = picked_formless_reward_path
+		set_country_flag = returned_to_form_achievement
+		schedule_next_formless_reward = yes
+		set_faction_hostility = {
+			target = event_target:formless_country
+			set_friendly = yes
+		}
+	}
+	option = {
+		name = GOODBYE
+		tag = dismiss_leader
+		hidden_effect = {
+			ethic_leader_kill_effect = yes
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.3101
+	title = NAME_Formless
+	desc = astral_planes.3101.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	trigger = {
+		has_country_flag = picked_formless_reward_path
+	}
+
+	immediate = {
+		event_target:formless_country = {
+			save_event_target_as = prev_formless_country
+		}
+		clear_global_event_target = formless_country
+		create_country = {
+			name = "NAME_Formless"
+			type = default
+			species = event_target:formless_species
+			ignore_initial_colony_error = yes
+			origin = origin_riftworld
+			authority = auth_democratic
+			civics = random
+			flag = {
+				icon = {
+					category = "special"
+					file = "extradimensional_03.dds"
+				}
+				background = {
+					category = "backgrounds"
+					file = "triangle_split.dds"
+				}
+				colors = {
+					"purple"
+					"pink"
+					"null"
+					"null"
+				}
+			}
+			ethos = {
+				ethic = ethic_fanatic_spiritualist
+				ethic = ethic_xenophile
+			}
+			effect = {
+				add_resource = {
+					minerals = 10000
+					energy = 10000
+					food = 1000
+					influence = 500
+				}
+				create_ship_design = { design = "NAME_Void_Shaper" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_Unbidden_Anchor" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_Unbidden_Starbase" }
+				add_ship_design = last_created_design
+				establish_communications_no_message = root
+				set_faction_hostility = {
+					target = root
+					set_hostile = no
+				}
+				event_target:formless_anchor = {
+					set_owner = prev
+				}
+				set_graphical_culture = extra_dimensional_01
+				save_global_event_target_as = formless_country
+			}
+		}
+		event_target:formless_gaia_planet = {
+			set_owner = event_target:formless_country
+			set_capital = yes
+			while = {
+				count = 10
+				create_pop = {
+					species = owner_main_species
+				}
+			}
+		}
+		event_target:prev_formless_country = {
+			destroy_country = yes
+		}
+	}
+	option = {
+		name = EXCELLENT
+		default_hide_option = yes
+		add_relic = r_eternal_throne
+		set_faction_hostility = {
+			target = event_target:formless_country
+			set_friendly = yes
+		}
+		event_target:formless_country = {
+			set_subject_of = {
+				who = root
+				preset = preset_luminarium
+			}
+			add_modifier = {
+				modifier = pledged_allegiance
+			}
+		}
+		set_country_flag = allied_with_formless
+		hidden_effect = {
+			event_target:formless_system = {
+				set_surveyed = {
+					surveyed = yes
+					surveyor = root
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.3102
+	title = NAME_Formless
+	desc = {
+		trigger = {
+			switch = {
+				trigger = has_country_flag
+				failed_formless_subjugation = { text = astral_planes.3102.desc.fail }
+				default = { text = astral_planes.3102.desc }
+			}
+		}
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	trigger = {
+		has_country_flag = picked_formless_reward_path
+	}
+
+	option = {
+		name = astral_planes.3102.a
+		default_hide_option = yes
+		set_faction_hostility = {
+			target = event_target:formless_country
+			set_hostile = yes
+		}
+		hidden_effect = {
+			event_target:formless_country = {
+				country_event = {
+					id = astral_planes.3150
+					scopes = { from = prev }
+				}
+			}
+		}
+	}
+}
+
+# Formless Rewards
+country_event = {
+	id = astral_planes.3110
+	title = NAME_Formless
+	desc = astral_planes.3110.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		FROM = {
+			is_country_type = formless
+		}
+		has_country_flag = allied_with_formless
+	}
+
+	option = {
+		name = astral_planes.3110.d
+
+		trigger = {
+			exists = event_target:formless_leader
+			any_owned_leader = {
+				is_same_value = event_target:formless_leader
+			}
+		}
+
+		response_text = astral_planes.3110.d.desc
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = astral_planes.3110.h
+
+		trigger = {
+			has_country_flag = formless_leader_died
+		}
+
+		response_text = astral_planes.3110.h.desc
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = astral_planes.3110.a
+		trigger = {
+			has_country_flag = formless_reward_available
+		}
+		custom_tooltip = astral_planes.3110.a.tt
+		hidden_effect = {
+			create_fleet = {
+				name = "NAME_Extradimensional_Defenders"
+				effect = {
+					set_owner = from
+					while = {
+						count = 16
+						create_ship = {
+							name = "NAME_Extradimensional_Defender"
+							design = "NAME_Formless_Cruiser"
+						}
+					}
+					set_owner = prev
+					set_location = {
+						target = event_target:formless_anchor
+						distance = 0
+						angle = random
+					}
+				}
+			}
+			schedule_next_formless_reward = yes
+		}
+
+		ai_chance = {
+			modifier = {
+				add = 10
+				is_militarist = yes
+			}
+			modifier = {
+				add = 100
+				is_at_war = yes
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.3110.b
+		trigger = {
+			has_country_flag = formless_reward_available
+		}
+		custom_tooltip = astral_planes.3110.b.tt
+		hidden_effect = {
+			add_random_research_option = {
+				add_progress = 1
+				area = physics
+				fail_effects = {
+					add_monthly_resource_mult = {
+						resource = physics_research
+						value = @tier5researchreward
+						min = @tier5researchmin
+						max = @tier5researchmax
+					}
+				}
+			}
+			schedule_next_formless_reward = yes
+		}
+	}
+
+	option = {
+		name = astral_planes.3110.c
+		trigger = {
+			has_country_flag = formless_reward_available
+		}
+		add_resource = { astral_threads = 100 }
+		schedule_next_formless_reward = yes
+
+		ai_chance = {
+			modifier = {
+				add = 10
+				has_resource = { type = astral_threads amount < 100 }
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.3110.e
+		trigger = {
+			#Has met the Unbidden
+			exists = event_target:extradimensionals
+			has_communications = event_target:extradimensionals
+		}
+		hidden_effect = {
+			set_country_flag = formless_unbidden_reward
+			country_event = {
+				id = astral_planes.3114
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.3110.f
+		trigger = {
+			#Has met the Aberrant
+			exists = event_target:extradimensionals2
+			has_communications = event_target:extradimensionals2
+		}
+		hidden_effect = {
+			set_country_flag = formless_aberrant_reward
+			country_event = {
+				id = astral_planes.3114
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.3110.g
+		trigger = {
+			#Has met the Vehement
+			exists = event_target:extradimensionals3
+			has_communications = event_target:extradimensionals3
+		}
+		hidden_effect = {
+			set_country_flag = formless_vehement_reward
+			country_event = {
+				id = astral_planes.3114
+				scopes = { from = from }
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.3100.e
+
+		trigger = {
+			event_target:formless_country = {
+				is_forced_friendly = prev
+				is_country_type = formless
+			}
+		}
+
+		remove_country_flag = formless_reward_available
+		set_faction_hostility = {
+			target = event_target:formless_country
+			set_hostile = yes
+		}
+		hidden_effect = {
+			event_target:formless_country = {
+				country_event = {
+					id = astral_planes.3150
+					scopes = { from = prev }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = GOODBYE
+		default_hide_option = yes
+	}
+}
+
+country_event = {
+	id = astral_planes.3111
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:formless_country
+		NOT = {
+			is_hostile = event_target:formless_country
+		}
+	}
+
+	immediate = {
+		set_country_flag = formless_reward_available
+	}
+}
+
+country_event = {
+	id = astral_planes.3114
+	title = NAME_Formless
+	desc = {
+		trigger = {
+			switch = {
+				trigger = has_country_flag
+				formless_unbidden_reward = { text = astral_planes.3114.desc.unbidden }
+				formless_aberrant_reward = { text = astral_planes.3114.desc.aberrant }
+				formless_vehement_reward = { text = astral_planes.3114.desc.vehement }
+			}
+		}
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	option = {
+		name = astral_planes.3114.a
+		trigger = {
+			OR = {
+				AND = {
+					has_country_flag = formless_unbidden_reward
+					NOT = { has_modifier = secret_of_the_unbidden_modifier }
+				}
+				AND = {
+					has_country_flag = formless_aberrant_reward
+					NOT = { has_modifier = pacification_of_the_aberrant_modifier }
+				}
+				AND = {
+					has_country_flag = formless_vehement_reward
+					NOT = { has_modifier = folly_of_the_vehement_modifier }
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = astral_planes.3115
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.3114.b
+		hidden_effect = {
+			reset_formless_crisis_reward = yes
+			country_event = {
+				id = astral_planes.3110
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = GOODBYE
+		default_hide_option = yes
+		hidden_effect = { reset_formless_crisis_reward = yes }
+	}
+}
+
+country_event = {
+	id = astral_planes.3115
+	title = NAME_Formless
+	desc = {
+		trigger = {
+			switch = {
+				trigger = has_country_flag
+				formless_unbidden_reward = { text = astral_planes.3115.desc.unbidden }
+				formless_aberrant_reward = { text = astral_planes.3115.desc.aberrant }
+				formless_vehement_reward = { text = astral_planes.3115.desc.vehement }
+			}
+		}
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	option = {
+		name = astral_planes.3115.a
+		allow = {
+			has_resource = { type = astral_threads amount >= 2000 }
+		}
+		add_resource = { astral_threads = -2000 }
+		if = {
+			limit = { has_country_flag = formless_unbidden_reward }
+			add_modifier = { modifier = secret_of_the_unbidden_modifier }
+		}
+		else_if = {
+			limit = { has_country_flag = formless_aberrant_reward }
+			add_modifier = { modifier = pacification_of_the_aberrant_modifier }
+		}
+		else_if = {
+			limit = { has_country_flag = formless_vehement_reward }
+			add_modifier = { modifier = folly_of_the_vehement_modifier }
+		}
+		hidden_effect = {
+			country_event = {
+				id = astral_planes.3116
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.3114.b
+		hidden_effect = {
+			reset_formless_crisis_reward = yes
+			country_event = {
+				id = astral_planes.3110
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = GOODBYE
+		default_hide_option = yes
+		hidden_effect = { reset_formless_crisis_reward = yes }
+	}
+}
+
+country_event = {
+	id = astral_planes.3116
+	title = NAME_Formless
+	desc = astral_planes.3116.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	option = {
+		name = astral_planes.3114.b
+		hidden_effect = {
+			reset_formless_crisis_reward = yes
+			country_event = {
+				id = astral_planes.3110
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = GOODBYE
+		default_hide_option = yes
+		hidden_effect = { reset_formless_crisis_reward = yes }
+	}
+}
+
+# Formless leader death
+country_event = {
+	id = astral_planes.3119
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			exists = event_target:formless_leader
+			is_same_value = event_target:formless_leader
+		}
+	}
+
+	immediate = {
+		set_country_flag = formless_leader_died
+	}
+}
+
+# Formless leader fights Extradimensionals
+# This = owner of fleet 1
+# From = owner of fleet 2
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = astral_planes.3120
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_country_flag = allied_with_formless
+		NOT = { has_country_flag = formless_leader_died }
+		from = {
+			OR = {
+				is_country_type = extradimensional
+				is_country_type = extradimensional_2
+				is_country_type = extradimensional_3
+			}
+		}
+		fromfrom.leader = {
+			exists = event_target:formless_leader
+			is_same_value = event_target:formless_leader
+		}
+	}
+
+	immediate = {
+		from = {
+			switch = {
+				trigger = is_country_type
+				extradimensional = { prev = { country_event = { id = astral_planes.3121 } } }
+				extradimensional_2 = { prev = { country_event = { id = astral_planes.3122 } } }
+				extradimensional_3 = { prev = { country_event = { id = astral_planes.3123 } } }
+			}
+		}
+	}
+}
+
+# Unbidden encountered
+country_event = {
+	id = astral_planes.3121
+	title = NAME_Formless
+	desc = astral_planes.3121.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = fromfromfrom
+
+	picture_event_data = {
+		portrait = exd1
+		room = "extradimensional_blue_room"
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+# Aberrant encountered
+country_event = {
+	id = astral_planes.3122
+	title = NAME_Formless
+	desc = astral_planes.3122.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = fromfromfrom
+
+	picture_event_data = {
+		portrait = exd2
+		room = "extradimensional_orange_room"
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+# Vehement encountered
+country_event = {
+	id = astral_planes.3123
+	title = NAME_Formless
+	desc = astral_planes.3123.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = fromfromfrom
+
+	picture_event_data = {
+		portrait = exd3
+		room = "extradimensional_green_room"
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+# War with the formless
+country_event = {
+	id = astral_planes.3150
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		is_country_type = formless
+		NOT = { exists = event_target:aberrant_country }
+	}
+
+	immediate = {
+		set_faction_hostility = {
+			target = from
+			set_hostile = yes
+		}
+		if = {
+			limit = {
+				# prevprev.from: country attacking the formless
+				exists = event_target:formless_leader
+				event_target:formless_leader = {
+					owner = {
+						is_same_value = prevprev.from
+					}
+				}
+			}
+			from = {
+				every_owned_leader = {
+					limit = {
+						is_same_value = event_target:formless_leader
+					}
+					# formless leader leaves if its owner is the formless' attacker
+					leader_event = { id = astral_planes.3155 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				NOT = { has_country_flag = formless_war_state_initiated }
+			}
+			set_country_flag = formless_war_state_initiated
+			while = {
+				count = 2
+				spawn_formless_defense_fleet = {
+					FLEET_FLAG = formless_defense_fleet
+					FLEET_SIZE = 32
+				}
+			}
+			country_event = {
+				id = astral_planes.3151
+				days = 360
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.3151
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_country_type = formless
+		has_country_flag = formless_war_state_initiated
+	}
+
+	immediate = {
+		spawn_formless_defense_fleet = {
+			FLEET_FLAG = formless_defense_fleet
+			FLEET_SIZE = 24
+		}
+		country_event = {
+			id = astral_planes.3151
+			days = 360
+		}
+	}
+}
+
+# Formless leader leaves
+leader_event = {
+	id = astral_planes.3155
+	title = astral_planes.3155.name
+	desc = astral_planes.3155.desc
+	picture = GFX_evt_formless_system
+	show_sound = event_celebration
+	event_window_type = leader_story
+
+	picture_event_data = {
+		portrait = this
+		room = root.owner
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.3155.a
+		kill_leader = {
+			fire = yes
+			show_notification = no
+		}
+	}
+}
+
+# Formless defeated their enemies
+country_event = {
+	id = astral_planes.3160
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		exists = event_target:formless_country
+		event_target:formless_country = {
+			has_country_flag = formless_war_state_initiated
+			NOT = {
+				any_playable_country = {
+					is_hostile = prev
+				}
+			}
+		}
+	}
+
+	immediate = {
+		event_target:formless_country = {
+			if = {
+				limit = {
+					NOT = {
+						any_playable_country = {
+							is_forced_friendly = prev
+						}
+					}
+				}
+				destroy_country = yes
+			}
+			else = {
+				remove_country_flag = formless_war_state_initiated
+				every_owned_fleet = {
+					limit = {
+						has_fleet_flag = formless_defense_fleet
+					}
+					delete_fleet = this
+				}
+			}
+		}
+	}
+}
+
+# Formless defeated by a player after the seal completed
+country_event = {
+	id = astral_planes.3165
+	title = astral_planes.3165.name
+	desc = astral_planes.3165.desc
+	picture = GFX_evt_formless_system
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		add_relic = r_eternal_throne
+		add_resource_astral_threads = { VALUE = 1000 }
+	}
+}
+
+country_event = {
+	id = astral_planes.3170
+	title = NAME_Formless
+	desc = astral_planes.3170.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "formless_diplomacy_window"
+	location = event_target:formless_capital
+
+	picture_event_data = {
+		portrait = exd4
+		room = "extradimensional_formless_room"
+	}
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		NOT = {
+			has_country_flag = opened_wormhole_to_formless_system
+		}
+		FROM = {
+			is_country_type = formless
+		}
+	}
+
+	option = {
+		name = GOODBYE
+		default_hide_option = yes
+	}
+}
+
+
+#########################
+# Astral Planes Actions #
+#   - Celestial Tear -  #
+#########################
+
+# Celestial Tear Relic acquired
+event = {
+	id = astral_planes.5000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		last_received_relic = r_celestial_tear
+	}
+
+	immediate = {
+		owner = {
+			every_controlled_planet = {
+				limit = {
+					star = {
+						is_star_affected_by_celestial_tear = yes
+					}
+					habitable_planet = yes
+					NOT = { has_modifier = celestial_tear_modifier }
+				}
+				add_modifier = { modifier = celestial_tear_modifier }
+			}
+		}
+	}
+}
+
+# Celestial Tear Relic lost
+event = {
+	id = astral_planes.5005
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		last_lost_relic = r_celestial_tear
+	}
+
+	immediate = {
+		owner = {
+			every_controlled_planet = {
+				limit = {
+					has_modifier = celestial_tear_modifier
+				}
+				remove_modifier = celestial_tear_modifier
+			}
+		}
+	}
+}
+
+# Celestial Tear Relic lost - on_country_destroyed (Owner destroyed)
+event = {
+	id = astral_planes.5006
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_relic = r_celestial_tear
+	}
+
+	immediate = {
+		every_controlled_planet = {
+			limit = {
+				has_modifier = celestial_tear_modifier
+			}
+			remove_modifier = celestial_tear_modifier
+		}
+	}
+}
+
+# Celestial Tear Relic Effect - on_terraforming_complete/on_planet_returned (A new habitable planet is acquired)
+event = {
+	id = astral_planes.5010
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		FROM = { has_relic = r_celestial_tear }
+		NOT = { has_modifier = celestial_tear_modifier }
+		star = {
+			is_star_affected_by_celestial_tear = yes
+		}
+		habitable_planet = yes
+	}
+
+	immediate = {
+		add_modifier = { modifier = celestial_tear_modifier }
+	}
+}
+
+# Celestial Tear Relic Effect Removal - on_planet_occupied (An affected planet was lost)
+event = {
+	id = astral_planes.5020
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		FROM = { has_relic = r_celestial_tear }
+		has_modifier = celestial_tear_modifier
+	}
+
+	immediate = {
+		remove_modifier = celestial_tear_modifier
+	}
+}
+
+# Celestial Tear Relic Effect Toggle - on_planet_class_changed (A star changed class)
+event = {
+	id = astral_planes.5030
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		is_star = yes
+		exists = owner
+		owner = { has_relic = r_celestial_tear }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				is_star_affected_by_celestial_tear = yes
+			}
+			solar_system = {
+				every_system_planet = {
+					limit = {
+						is_owned_by = root.owner
+						habitable_planet = yes
+						NOT = { has_modifier = celestial_tear_modifier }
+					}
+					add_modifier = { modifier = celestial_tear_modifier }
+				}
+			}
+		}
+		else = {
+			solar_system = {
+				every_system_planet = {
+					limit = {
+						is_owned_by = root.owner
+						has_modifier = celestial_tear_modifier
+					}
+					remove_modifier = celestial_tear_modifier
+				}
+			}
+		}
+	}
+}
+
+# Celestial Tear Relic Effect Toggle - on_system_controller_changed (A system changed controller)
+event = {
+	id = astral_planes.5035
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		OR = {
+			from = { has_relic = r_celestial_tear }
+			fromfrom = { has_relic = r_celestial_tear }
+		}
+		star = {
+			is_star_affected_by_celestial_tear = yes
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				from = { has_relic = r_celestial_tear }
+			}
+			every_system_planet = {
+				limit = {
+					is_owned_by = root.from
+					habitable_planet = yes
+					NOT = { has_modifier = celestial_tear_modifier }
+				}
+				add_modifier = { modifier = celestial_tear_modifier }
+			}
+		}
+		if = {
+			limit = {
+				fromfrom = { has_relic = r_celestial_tear }
+			}
+			every_system_planet = {
+				limit = {
+					is_owned_by = root.from
+					has_modifier = celestial_tear_modifier
+				}
+				remove_modifier = celestial_tear_modifier
+			}
+		}
+	}
+}
+
+# Celestial Tear Relic Effect - on_system_gained (System acquired)
+event = {
+	id = astral_planes.5040
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_relic = r_celestial_tear
+		FROM = {
+			star = {
+				is_star_affected_by_celestial_tear = yes
+			}
+		}
+	}
+
+	immediate = {
+		FROM = {
+			every_system_planet = {
+				limit = {
+					is_owned_by = root
+					habitable_planet = yes
+					NOT = { has_modifier = celestial_tear_modifier }
+				}
+				add_modifier = { modifier = celestial_tear_modifier }
+			}
+		}
+	}
+}
+
+# Celestial Tear Relic Effect Removal - on_system_lost (System lost)
+event = {
+	id = astral_planes.5050
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_relic = r_celestial_tear
+		FROM = {
+			star = {
+				is_star_affected_by_celestial_tear = yes
+			}
+		}
+	}
+
+	immediate = {
+		FROM = {
+			every_system_planet = {
+				limit = {
+					is_owned_by = root
+					has_modifier = celestial_tear_modifier
+				}
+				remove_modifier = celestial_tear_modifier
+			}
+		}
+	}
+}
+
+# Eternal Throne obtained
+event = {
+	id = astral_planes.5100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		last_received_relic = r_eternal_throne
+	}
+
+	immediate = {
+		every_owned_leader = {
+			limit = { is_immortal = no }
+			set_immortal = yes
+		}
+	}
+}
+
+# Eternal Throne Effect - leader acquired
+event = {
+	id = astral_planes.5110
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		owner = { has_relic = r_eternal_throne }
+		is_immortal = no
+	}
+
+	immediate = {
+		set_immortal = yes
+	}
+}
+
+####################
+# Anomalies - 6000 #
+####################
+
+# ASTRAL_SCAR_CAT
+ship_event = {
+	id = astral_planes.6000
+	title = astral_planes.6000.name
+	desc = astral_planes.6000.desc
+	picture = GFX_evt_astral_scar
+	show_sound = rift_open
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = INTRIGUING
+		enable_special_project = {
+			name = ASTRAL_SCAR_PROJECT
+			location = from
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.6001
+	title = astral_planes.6001.name
+	desc = astral_planes.6001.desc
+	picture = GFX_evt_astral_scar
+	show_sound = rift_open
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.6001.a
+		fromfromfrom = {
+			add_deposit = d_physics_10
+		}
+	}
+}
+
+# ASTRAL_SCAR_INSTABILITY Spawn probability
+ship_event = {
+	id = astral_planes.6005
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		from = {
+			is_astral_scar = yes
+		}
+		owner = {
+			NOT = { has_country_flag = astral_scar_instability_found }
+			has_technology = tech_astral_harvesting
+			has_technology = tech_rift_sphere
+			any_planet_within_border = {
+				is_astral_scar = yes
+			}
+			NOT = { is_astral_rift_explored = microverse }
+		}
+	}
+
+	immediate = {
+		random_list = {
+			80 = {
+				owner = {
+					set_country_flag = astral_scar_instability_found
+				}
+				from = {
+					prevent_anomaly = yes
+					solar_system = {
+						add_modifier = { modifier = instable_astral_scar_modifier }
+					}
+				}
+				enable_special_project = {
+					name = ASTRAL_SCAR_INSTABILITY
+					location = from
+				}
+			}
+			20 = {}
+		}
+	}
+}
+
+# ASTRAL_SCAR_INSTABILITY Success
+ship_event = {
+	id = astral_planes.6006
+	title = astral_planes.6006.name
+	desc = astral_planes.6006.desc
+	picture = GFX_evt_astral_scar
+	show_sound = ap_rift_event_0_astral_wonder
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.6006.a
+		ship_event = {
+			id = astral_planes.6007
+			scopes = { from = from }
+		}
+	}
+	option = {
+		name = astral_planes.6006.b
+		ship_event = {
+			id = astral_planes.6008
+			scopes = { from = from }
+		}
+	}
+}
+
+# ASTRAL_SCAR_INSTABILITY Ending I
+ship_event = {
+	id = astral_planes.6007
+	title = astral_planes.6007.name
+	desc = astral_planes.6007.desc
+	picture = GFX_evt_astral_scar
+	show_sound = ap_rift_event_0_astral_wonder
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		owner = {
+			astral_thread_large_reward = yes
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			solar_system = {
+				remove_modifier = instable_astral_scar_modifier
+			}
+		}
+		hidden_effect = {
+			from = { remove_planet = yes }
+		}
+	}
+}
+
+# ASTRAL_SCAR_INSTABILITY Ending II
+ship_event = {
+	id = astral_planes.6008
+	title = astral_planes.6008.name
+	desc = astral_planes.6008.desc
+	picture = GFX_evt_astral_rift
+	show_sound = rift_open
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			split_astral_scar = { ID = microverse }
+			solar_system = {
+				remove_modifier = instable_astral_scar_modifier
+			}
+		}
+	}
+}
+
+# ASTRAL_SCAR_INSTABILITY Ending III
+country_event = {
+	id = astral_planes.6009
+	title = astral_planes.6009.name
+	desc = astral_planes.6009.desc
+	picture = GFX_evt_astral_scar
+	show_sound = rift_open
+	location = fromfromfromfrom
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		owner = {
+			astral_thread_small_reward = yes
+		}
+		fromfromfromfrom = {
+			solar_system = {
+				remove_modifier = instable_astral_scar_modifier
+			}
+			hidden_effect = {
+				remove_planet = yes
+			}
+		}
+	}
+}
+
+# GREATEST_SHOW_CAT on success
+ship_event = {
+	id = astral_planes.6010
+	title = astral_planes.6010.name
+	desc = astral_planes.6010.desc
+	picture = GFX_evt_asteroid_field
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.6010.a
+		allow = {
+			owner = {
+				has_resource = { type = energy amount >= 1000 }
+			}
+		}
+		owner = {
+			add_resource = { energy = -1000 }
+		}
+		hidden_effect = {
+			ship_event = {
+				id = astral_planes.6011
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6010.b
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		solar_system = {
+			find_closest_player_planet_local = {
+				OWNER_SCOPE = owner
+				EVENT_TARGET = closest_planet_found_local
+			}
+		}
+		ship_event = {
+			id = astral_planes.6012
+			scopes = {
+				from = from
+				fromfrom = event_target:closest_planet_found_local
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6010.c
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		ship_event = {
+			id = astral_planes.6013
+			scopes = { from = from }
+		}
+	}
+}
+
+# GREATEST_SHOW_CAT Ending I
+ship_event = {
+	id = astral_planes.6011
+	title = astral_planes.6011.name
+	desc = astral_planes.6011.desc
+	picture = GFX_evt_asteroid_field
+	show_sound = rift_open
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.6011.a
+		owner = {
+			astral_thread_small_reward = yes
+		}
+		from = {
+			solar_system = {
+				spawn_astral_rift = {
+					id = interdimensional_circus
+					in_place_of = prev
+					spawn_sound = no
+				}
+			}
+		}
+		hidden_effect = {
+			from = { remove_planet = yes }
+		}
+	}
+}
+
+# GREATEST_SHOW_CAT Ending IIa
+ship_event = {
+	id = astral_planes.6012
+	title = astral_planes.6012.name
+	desc = astral_planes.6012.desc
+	picture = GFX_evt_asteroid_field
+	show_sound = event_administrative_work
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.6012.a
+		owner = {
+			add_resource = { energy = 500 }
+		}
+		from = {
+			add_deposit = d_trade_value_10
+		}
+	}
+}
+
+# GREATEST_SHOW_CAT Ending IIb
+ship_event = {
+	id = astral_planes.6013
+	title = astral_planes.6013.name
+	desc = astral_planes.6013.desc
+	picture = GFX_evt_asteroid_field
+	show_sound = ap_rift_event_0_astral_wonder
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.6013.a
+		owner = {
+			astral_thread_large_reward = yes
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+		hidden_effect = {
+			from = { remove_planet = yes }
+		}
+	}
+}
+
+# BLACK_HOLE_INSTABLE_CAT on success
+ship_event = {
+	id = astral_planes.6020
+	title = astral_planes.6020.name
+	desc = astral_planes.6020.desc
+	picture = GFX_evt_black_hole
+	show_sound = ap_rift_event_0_astral_wonder
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			astral_thread_small_reward = yes
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	option = {
+		name = astral_planes.6020.a
+		owner = {
+			astral_thread_small_reward = yes
+		}
+		hidden_effect = {
+			ship_event = {
+				id = astral_planes.6021
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6020.b
+		from = {
+			add_deposit = d_astral_threads_deposit_3
+		}
+		hidden_effect = {
+			ship_event = {
+				id = astral_planes.6022
+				days = 1080
+				random = 2520
+				scopes = {
+					from = from
+				}
+			}
+		}
+	}
+}
+
+# BLACK_HOLE_INSTABLE_CAT Ending I
+ship_event = {
+	id = astral_planes.6021
+	title = astral_planes.6021.name
+	desc = astral_planes.6021.desc
+	picture = GFX_evt_black_hole
+	show_sound = ap_rift_event_0_astral_wonder
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			solar_system = {
+				spawn_astral_rift = {
+					random_pos = yes
+					orbit_angle = 360
+				}
+			}
+		}
+	}
+}
+
+# BLACK_HOLE_INSTABLE_CAT Follow up event
+ship_event = {
+	id = astral_planes.6022
+	title = astral_planes.6022.name
+	desc = astral_planes.6022.desc
+	picture = GFX_evt_astral_scar
+	show_sound = ap_rift_event_0_astral_wonder
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			solar_system = {
+				exists = owner
+				owner = {
+					is_same_value = root.owner
+				}
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			astral_thread_large_reward = yes
+		}
+		from = {
+			remove_deposit = d_astral_threads_deposit_3
+			solar_system = {
+				spawn_astral_scar = yes
+			}
+		}
+	}
+}
+
+# Astralnomical Marvel Setup
+planet_event = {
+	id = astral_planes.6029
+	hide_window = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		habitable_planet = yes
+		solar_system = {
+			OR = {
+				has_astral_rift = yes
+				any_system_planet = {
+					is_astral_scar = yes
+				}
+			}
+		}
+		owner = {
+			is_gestalt = no
+			is_hive_empire = no
+			is_robot_empire = no
+			is_materialist = no
+			NOR = {
+				has_country_flag = has_started_exploring_rifts
+				has_country_flag = has_found_astral_rift_marvel
+				has_country_flag = has_found_astral_scar_marvel
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				solar_system = { has_astral_rift = yes }
+			}
+			owner = { set_country_flag = has_found_astral_rift_marvel }
+		}
+		else = {
+			solar_system = {
+				every_system_planet = {
+					limit = { is_astral_scar = yes }
+					prevent_anomaly = yes
+				}
+			}
+			owner = { set_country_flag = has_found_astral_scar_marvel }
+		}
+		planet_event = { id = astral_planes.6030 }
+	}
+}
+
+# Astralnomical Marvel Chapter 1
+planet_event = {
+	id = astral_planes.6030
+	title = astral_planes.6030.name
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		text = astral_planes.6030.desc.rift
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		text = astral_planes.6030.desc.scar
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		picture = GFX_evt_astral_rift
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		picture = GFX_evt_astral_scar
+	}
+	show_sound = ap_rift_event_0_astral_wonder
+	location = ROOT
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	option = {
+		name = FASCINATING
+		add_modifier = { modifier = astralnomical_interest_modifier }
+		hidden_effect = {
+			planet_event = {
+				id = astral_planes.6035
+				days = 180
+				random = 120
+			}
+		}
+	}
+}
+
+# Astralnomical Marvel Chapter 2
+planet_event = {
+	id = astral_planes.6035
+	title = astral_planes.6035.name
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		text = astral_planes.6035.desc.rift
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		text = astral_planes.6035.desc.scar
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		picture = GFX_evt_astral_rift
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		picture = GFX_evt_astral_scar
+	}
+	show_sound = ap_rift_event_0_astral_wonder
+	location = ROOT
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	option = {
+		name = INTERESTING
+		custom_tooltip = astral_planes.6035.tt
+		hidden_effect = {
+			add_modifier = { modifier = conflicting_visions }
+			planet_event = {
+				id = astral_planes.6040
+				days = 180
+				random = 120
+			}
+		}
+	}
+}
+
+# Astralnomical Marvel Chapter 3
+planet_event = {
+	id = astral_planes.6040
+	title = astral_planes.6040.name
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		text = astral_planes.6040.desc.rift
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		text = astral_planes.6040.desc.scar
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		picture = GFX_evt_astral_rift
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		picture = GFX_evt_astral_scar
+	}
+	show_sound = ap_rift_event_0_astral_wonder
+	location = ROOT
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	option = {
+		name = astral_planes.6040.a
+		set_planet_flag = accepted_mechanical_god_visions
+		hidden_effect = {
+			planet_event = {
+				id = astral_planes.6050
+				days = 180
+				random = 120
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6040.b
+		set_planet_flag = accepted_black_star_visions
+		hidden_effect = {
+			planet_event = {
+				id = astral_planes.6050
+				days = 180
+				random = 120
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6040.c
+		hidden_effect = {
+			planet_event = {
+				id = astral_planes.6045
+				days = 180
+				random = 120
+			}
+		}
+	}
+
+	after = {
+		custom_tooltip = astral_planes.6040.tt
+		hidden_effect = {
+			random_list = {
+				1 = { add_modifier = { modifier = widening_divide_1 } }
+				1 = { add_modifier = { modifier = widening_divide_2 } }
+				1 = { add_modifier = { modifier = widening_divide_3 } }
+				1 = { add_modifier = { modifier = widening_divide_4 } }
+				1 = { add_modifier = { modifier = widening_divide_5 } }
+				1 = { add_modifier = { modifier = widening_divide_6 } }
+			}
+		}
+	}
+}
+
+# Astralnomical Marvel Chapter 4
+planet_event = {
+	id = astral_planes.6045
+	title = astral_planes.6045.name
+	desc = astral_planes.6045.desc
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		picture = GFX_evt_astral_rift
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		picture = GFX_evt_astral_scar
+	}
+	show_sound = ap_rift_event_0_astral_wonder
+	location = ROOT
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	option = {
+		name = astral_planes.6045.a
+		random_owned_pop = {
+			kill_pop = yes
+		}
+		hidden_effect = {
+			planet_event = {
+				id = astral_planes.6055
+				days = 180
+				random = 120
+			}
+		}
+	}
+}
+
+# Astralnomical Marvel Ending I
+planet_event = {
+	id = astral_planes.6050
+	title = astral_planes.6050.name
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+			has_planet_flag = accepted_mechanical_god_visions
+		}
+		text = astral_planes.6050.desc.rift_mechgod
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+			has_planet_flag = accepted_black_star_visions
+		}
+		text = astral_planes.6050.desc.rift_blackstar
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+			has_planet_flag = accepted_mechanical_god_visions
+		}
+		text = astral_planes.6050.desc.scar_mechgod
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+			has_planet_flag = accepted_black_star_visions
+		}
+		text = astral_planes.6050.desc.scar_blackstar
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		picture = GFX_evt_astral_rift
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		picture = GFX_evt_astral_scar
+	}
+	show_sound = ap_rift_event_0_astral_wonder
+	location = ROOT
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = astralnomical_interest_modifier
+		remove_modifier = conflicting_visions
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_modifier = { modifier = astral_zeal_modifier }
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					owner = { has_country_flag = has_found_astral_scar_marvel }
+				}
+				solar_system = {
+					every_system_planet = {
+						limit = { is_astral_scar = yes }
+						prevent_anomaly = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# Astralnomical Marvel Ending II
+planet_event = {
+	id = astral_planes.6055
+	title = astral_planes.6055.name
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		text = astral_planes.6055.desc.rift
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		text = astral_planes.6055.desc.scar
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_rift_marvel }
+		}
+		picture = GFX_evt_astral_rift
+	}
+	picture = {
+		trigger = {
+			owner = { has_country_flag = has_found_astral_scar_marvel }
+		}
+		picture = GFX_evt_astral_scar
+	}
+	show_sound = ap_rift_event_0_astral_wonder
+	location = ROOT
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	option = {
+		name = astral_planes.6055.a
+		remove_modifier = astralnomical_interest_modifier
+		add_modifier = { modifier = astral_aficionados_modifier }
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					owner = { has_country_flag = has_found_astral_scar_marvel }
+				}
+				solar_system = {
+					every_system_planet = {
+						limit = { is_astral_scar = yes }
+						prevent_anomaly = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# Astral Zeal effect
+country_event = {
+	id = astral_planes.6059
+	hide_window = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_modifier = astral_zeal_modifier
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+
+# Spontaneous Explosions Anomaly on_success
+ship_event = {
+	id = astral_planes.6060
+	title = astral_planes.6060.name
+	desc = astral_planes.6060.desc
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_ground_battle
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		from = {
+			set_planet_flag = planet_under_investigation
+		}
+	}
+
+	option = {
+		name = astral_planes.6060.a
+		enable_special_project = {
+			name = SPONTANEOUS_EXPLOSIONS
+			location = from
+		}
+	}
+}
+
+# Spontaneous Explosions Special Project on_success
+ship_event = {
+	id = astral_planes.6065
+	title = astral_planes.6065.name
+	desc = astral_planes.6065.desc
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_ground_battle
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = astral_planes.6065.a
+		hidden_effect = {
+			ship_event = {
+				id = astral_planes.6070
+				scopes = { from = from }
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6065.b
+		hidden_effect = {
+			random_list = {
+				40 = {
+					complex_trigger_modifier = {
+						trigger = has_skill
+						trigger_scope = leader
+						mode = add
+						mult = 10
+					}
+					ship_event = {
+						id = astral_planes.6075
+						days = 75
+						random = 50
+						scopes = { from = from }
+					}
+				}
+				60 = {
+					complex_trigger_modifier = {
+						trigger = has_skill
+						trigger_scope = leader
+						mode = subtract
+						mult = 10
+					}
+					ship_event = {
+						id = astral_planes.6080
+						scopes = { from = from }
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = astral_planes.6065.c
+		hidden_effect = {
+			ship_event = {
+				id = astral_planes.6085
+				days = 300
+				random = 120
+				scopes = { from = from }
+			}
+		}
+	}
+
+	after = {
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# Spontaneous Explosions Special Project Ending I
+ship_event = {
+	id = astral_planes.6070
+	title = astral_planes.6070.name
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					any_situation = { is_situation_type = situation_a_rift_in_space }
+					has_country_flag = has_completed_a_rift_in_space_situation
+				}
+			}
+		}
+		text = astral_planes.6070.desc.rift
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOR = {
+					any_situation = { is_situation_type = situation_a_rift_in_space }
+					has_country_flag = has_completed_a_rift_in_space_situation
+				}
+			}
+		}
+		text = astral_planes.6070.desc.no_rift
+	}
+	picture = GFX_evt_astral_rift
+	show_sound = event_super_explosion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			solar_system = {
+				spawn_astral_rift = {
+					in_place_of = prev
+				}
+			}
+		}
+		hidden_effect = {
+			from = { remove_planet = yes }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+}
+
+# Spontaneous Explosions Special Project Ending IIA
+ship_event = {
+	id = astral_planes.6075
+	title = astral_planes.6075.name
+	desc = astral_planes.6075.desc
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		from = {
+			hidden_effect = {
+				remove_planet_flag = planet_under_investigation
+			}
+			add_deposit = d_weapon_extraction_facility
+		}
+	}
+}
+
+# Spontaneous Explosions Special Project Ending IIB
+ship_event = {
+	id = astral_planes.6080
+	title = astral_planes.6080.name
+	desc = {
+		trigger = {
+			owner = {
+				OR = {
+					any_situation = { is_situation_type = situation_a_rift_in_space }
+					has_country_flag = has_completed_a_rift_in_space_situation
+				}
+			}
+		}
+		text = astral_planes.6080.desc.rift
+	}
+	desc = {
+		trigger = {
+			owner = {
+				NOR = {
+					any_situation = { is_situation_type = situation_a_rift_in_space }
+					has_country_flag = has_completed_a_rift_in_space_situation
+				}
+			}
+		}
+		text = astral_planes.6080.desc.no_rift
+	}
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_ship_explosion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			solar_system = {
+				spawn_astral_rift = {
+					in_place_of = prev
+				}
+			}
+		}
+		destroy_ship = this
+		hidden_effect = {
+			from = { remove_planet = yes }
+		}
+	}
+}
+
+# Spontaneous Explosions Special Project Ending III
+ship_event = {
+	id = astral_planes.6085
+	title = astral_planes.6085.name
+	desc = astral_planes.6085.desc
+	picture = GFX_evt_nuclear_explosion
+	show_sound = event_super_explosion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = UNFORTUNATE
+		hidden_effect = {
+			from = { remove_planet = yes }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = volatile_motes
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+	}
+}

@@ -1,0 +1,755 @@
+#########################
+# ASTRAL PLANES EFFECTS #
+#########################
+
+add_resource_astral_threads = {
+	if = {
+		limit = { check_variable = { which = astral_threads_scripted_rewards_mult value < 1 } }
+		set_variable = {
+			which = astral_threads_scripted_rewards_mult
+			value = 1
+		}
+	}
+	add_resource = {
+		astral_threads =  @\[( $VALUE$ * $MULT|1$ + $ADD|0$ )]
+		mult = astral_threads_scripted_rewards_mult
+	}
+	hidden_effect = {
+		country_event = { id = tutorial.1340 days = 5 }
+	}
+}
+
+spawn_astral_scar = {
+	spawn_planet = {
+		class = pc_astral_scar
+		spawn_beyond_gravity_well = yes
+		orbit_angle_offset = 360
+		size = 20
+		init_effect = {
+			set_name = "NAME_Astral_Scar"
+			add_deposit = d_astral_threads_deposit_1
+			if = {
+				limit = {
+					solar_system = {
+						has_owner = yes
+					}
+				}
+				create_message = {
+					type = MESSAGE_ASTRAL_SCAR_DISCOVERED
+					localization = MESSAGE_ASTRAL_SCAR_DISCOVERED_DESC
+					days = 30
+					target = this
+					recipient = solar_system.owner
+				}
+			}
+			fire_on_action = { on_action = on_planet_spawned }
+		}
+	}
+}
+
+split_astral_scar = {
+	solar_system = {
+		spawn_astral_rift = {
+			id = $ID|none$
+			in_place_of = prev
+			init_effect = {
+				every_playable_country = {
+					limit = {
+						prevprevprev = {
+							is_surveyed = { who = prev status = yes }
+						}
+					}
+					prev = {
+						set_surveyed = { surveyed = yes surveyor = prev }
+					}
+				}
+				set_astral_rift_flag = split_opened_rift
+				if = {
+					limit = {
+						prevprev = {
+							has_research_station = yes
+						}
+					}
+					create_research_station = {
+						owner = prev.owner
+					}
+				}
+			}
+		}
+	}
+	hidden_effect = {
+		remove_planet = yes
+	}
+}
+
+find_closest_player_planet = {
+	closest_system = {
+		limit = {
+			AND = {
+				has_owner = yes
+				owner = { is_same_value = $OWNER_SCOPE$ }
+			}
+			any_system_planet = {
+				habitable_planet = yes
+				OR = {
+					is_colony = yes
+					is_capital = yes
+				}
+			}
+		}
+		random_system_planet = {
+			limit = { 
+				habitable_planet = yes
+				OR = {
+					is_colony = yes
+					is_capital = yes
+				}
+			}
+			save_global_event_target_as = $GLOBAL_TARGET$
+		}
+	}
+}
+
+find_closest_player_planet_local = {
+	find_closest_player_planet = {
+		OWNER_SCOPE = $OWNER_SCOPE$
+		GLOBAL_TARGET = $EVENT_TARGET$
+	}
+	event_target:$EVENT_TARGET$ = {
+		save_event_target_as = $EVENT_TARGET$
+	}
+	clear_global_event_target = $EVENT_TARGET$
+}
+
+# Does not check "has_modifier = zroni_insight_modifier", should be done before calling
+update_fleet_space_storm_reduction_zroni_rift = {
+	if = {
+		limit = {
+			NOT = {	has_modifier = zroni_insight_space_storm_reduction_modifier }
+			solar_system = {
+				has_modifier = space_storm
+			}
+		}
+		add_modifier = { modifier = zroni_insight_space_storm_reduction_modifier }
+	}
+	else_if = {
+		limit = {
+			has_modifier = zroni_insight_space_storm_reduction_modifier
+			solar_system = {
+				NOT = { has_modifier = space_storm }
+			}
+		}
+		remove_modifier = zroni_insight_space_storm_reduction_modifier
+	}
+}
+
+####################
+# FORMLESS EFFECTS #
+####################
+
+spawn_formless_defense_fleet = {
+	create_fleet = {
+		name = "NAME_Formless_Defense"
+		settings = {
+			can_upgrade = no
+			can_change_composition = no
+			can_change_leader = no
+			uses_naval_capacity = no
+			spawn_debris = no
+		}
+		effect = {
+			set_owner = prev
+			while = {
+				count = $FLEET_SIZE|10$
+				create_ship = {
+					name = "NAME_Formless_Cruiser"
+					design = "NAME_Formless_Cruiser"
+					upgradable = no
+				}
+			}
+			set_location = {
+				target = event_target:formless_anchor
+			}
+			set_fleet_flag = $FLEET_FLAG$
+		}
+	}
+}
+
+spawn_extradimensional_scouts_fleet = {
+	create_fleet = {
+		name = "NAME_Extradimensional_Scouts"
+		settings = {
+			can_upgrade = no
+			can_change_composition = no
+			can_change_leader = no
+			uses_naval_capacity = no
+			spawn_debris = no
+		}
+		effect = {
+			set_owner = prev
+			while = {
+				count = 8
+				create_ship = {
+					name = "NAME_Extradimensional_Scout"
+					design = "NAME_Extradimensional_Scout"
+					upgradable = no
+				}
+			}
+			set_location = {
+				target = prevprev
+				distance = 35
+				angle = @\[ 45 * $INDEX$ ]
+			}
+			set_fleet_flag = invader_scout
+			owner = {
+				change_variable = {
+					which = alive_scout_fleet_count
+					value = 1
+				}
+			}
+		}
+	}
+}
+
+spawn_formless_invader_fleet = {
+	create_fleet = {
+		name = "NAME_Formless_Aberrant_Invaders"
+		settings = {
+			can_upgrade = no
+			can_change_composition = no
+			can_change_leader = no
+			uses_naval_capacity = no
+			spawn_debris = no
+		}
+		effect = {
+			set_owner = prev
+			set_variable = {
+				which = battleships_to_spawn
+				value = $FLEET_STRENGTH$
+			}
+			set_variable = {
+				which = cruisers_to_spawn
+				value = battleships_to_spawn
+			}
+			multiply_variable = {
+				which = cruisers_to_spawn
+				value = 2.9
+			}
+			while = {
+				count = cruisers_to_spawn
+				create_ship = {
+					name = "NAME_Formless_Aberrant_Invader_Cruiser"
+					design = "NAME_Formless_Aberrant_Invader_Cruiser"
+					upgradable = no
+				}
+			}
+			while = {
+				count = battleships_to_spawn
+				create_ship = {
+					name = "NAME_Formless_Aberrant_Invader_Battleship"
+					design = "NAME_Formless_Aberrant_Invader_Battleship"
+					upgradable = no
+				}
+			}
+			set_location = {
+				target = prevprev
+			}
+			set_fleet_flag = formless_invader
+			auto_follow_fleet = {
+				target = event_target:formless_anchor
+				attack_fleet = yes
+			}
+		}
+	}
+}
+
+enable_the_seal_weave_astral_fabric = {
+	disable_the_seal_modifiers = yes
+	event_target:formless_system = {
+		every_fleet_in_system = {
+			limit = {
+				owner = {
+					is_same_value = event_target:the_seal_situation.owner
+				}
+			}
+			add_modifier = {
+				modifier = the_seal_weave_astral_fabric_modifiers
+			}
+		}
+	}
+}
+
+enable_the_seal_pump_exotic_gases = {
+	disable_the_seal_modifiers = yes
+	event_target:formless_system = {
+		every_fleet_in_system = {
+			limit = {
+				owner = {
+					is_same_value = event_target:the_seal_situation.owner
+				}
+			}
+			add_modifier = {
+				modifier = the_seal_pump_exotic_gases_modifier
+			}
+		}
+	}
+}
+
+disable_the_seal_modifiers = {
+	event_target:formless_system = {
+		every_fleet_in_system = {
+			limit = { has_modifier = the_seal_pump_exotic_gases_modifier }
+			remove_modifier = the_seal_pump_exotic_gases_modifier
+		}
+		every_fleet_in_system = {
+			limit = { has_modifier = the_seal_weave_astral_fabric_modifiers }
+			remove_modifier = the_seal_weave_astral_fabric_modifiers
+		}
+	}
+}
+
+schedule_next_formless_reward = {
+	hidden_effect = {
+		remove_country_flag = formless_reward_available
+		country_event = {
+			id = astral_planes.3111
+			days = @formless_reward_delay_days
+		}
+	}
+}
+
+##########
+# Relics #
+##########
+
+add_monthly_resource_mult_if_produced = {
+	if = {
+		limit = {
+			has_monthly_income = { type = $RESOURCE$ value > 0 }
+		}
+		add_monthly_resource_mult = {
+			resource = $RESOURCE$
+			value = $VALUE$
+		}
+	}
+}
+
+#############
+# Resources #
+#############
+
+copy_basic_resources_effect = {
+	#Clear previous values
+	export_resource_stockpile_to_variable = {
+		resource = energy
+		variable = energy_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = minerals
+		variable = minerals_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = food
+		variable = food_stockpile_to_clear
+	}
+	add_resource = {
+		energy = -1
+		mult = energy_stockpile_to_clear
+	}
+	add_resource = {
+		minerals = -1
+		mult = minerals_stockpile_to_clear
+	}
+	add_resource = {
+		food = -1
+		mult = food_stockpile_to_clear
+	}
+	clear_variable = energy_stockpile_to_clear
+	clear_variable = minerals_stockpile_to_clear
+	clear_variable = food_stockpile_to_clear
+
+	#Assign new values
+	$FROM$ = {
+		export_resource_stockpile_to_variable = {
+			resource = energy
+			variable = energy_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = minerals
+			variable = minerals_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = food
+			variable = food_stockpile_to_give
+		}
+	}
+	add_resource = {
+		energy = 1
+		mult = $FROM$.energy_stockpile_to_give
+	}
+	add_resource = {
+		minerals = 1
+		mult = $FROM$.minerals_stockpile_to_give
+	}
+	add_resource = {
+		food = 1
+		mult = $FROM$.food_stockpile_to_give
+	}
+	$FROM$ = {
+		clear_variable = energy_stockpile_to_give
+		clear_variable = minerals_stockpile_to_give
+		clear_variable = food_stockpile_to_give
+	}
+}
+
+copy_manufactured_resources_effect = {
+	#Clear previous values
+	export_resource_stockpile_to_variable = {
+		resource = consumer_goods
+		variable = consumer_goods_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = alloys
+		variable = alloys_stockpile_to_clear
+	}
+	add_resource = {
+		consumer_goods = -1
+		mult = consumer_goods_stockpile_to_clear
+	}
+	add_resource = {
+		alloys = -1
+		mult = alloys_stockpile_to_clear
+	}
+	clear_variable = consumer_goods_stockpile_to_clear
+	clear_variable = alloys_stockpile_to_clear
+	
+	#Assign new values
+	$FROM$ = {
+		export_resource_stockpile_to_variable = {
+			resource = consumer_goods
+			variable = consumer_goods_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = alloys
+			variable = alloys_stockpile_to_give
+		}
+	}
+	add_resource = {
+		consumer_goods = 1
+		mult = $FROM$.consumer_goods_stockpile_to_give
+	}
+	add_resource = {
+		alloys = 1
+		mult = $FROM$.alloys_stockpile_to_give
+	}
+	$FROM$ = {
+		clear_variable = consumer_goods_stockpile_to_give
+		clear_variable = alloys_stockpile_to_give
+	}
+}
+
+copy_advanced_resources_effect = {
+	#Clear previous values
+	export_resource_stockpile_to_variable = {
+		resource = volatile_motes
+		variable = volatile_motes_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = exotic_gases
+		variable = exotic_gases_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = rare_crystals
+		variable = rare_crystals_stockpile_to_clear
+	}
+	add_resource = {
+		volatile_motes = -1
+		mult = volatile_motes_stockpile_to_clear
+	}
+	add_resource = {
+		exotic_gases = -1
+		mult = exotic_gases_stockpile_to_clear
+	}
+	add_resource = {
+		rare_crystals = -1
+		mult = rare_crystals_stockpile_to_clear
+	}
+	clear_variable = volatile_motes_stockpile_to_clear
+	clear_variable = exotic_gases_stockpile_to_clear
+	clear_variable = rare_crystals_stockpile_to_clear
+	
+	#Assign new values
+	$FROM$ = {
+		export_resource_stockpile_to_variable = {
+			resource = volatile_motes
+			variable = volatile_motes_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = exotic_gases
+			variable = exotic_gases_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = rare_crystals
+			variable = rare_crystals_stockpile_to_give
+		}
+	}
+	add_resource = {
+		volatile_motes = 1
+		mult = $FROM$.volatile_motes_stockpile_to_give
+	}
+	add_resource = {
+		exotic_gases = 1
+		mult = $FROM$.exotic_gases_stockpile_to_give
+	}
+	add_resource = {
+		rare_crystals = 1
+		mult = $FROM$.rare_crystals_stockpile_to_give
+	}
+	$FROM$ = {
+		clear_variable = volatile_motes_stockpile_to_give
+		clear_variable = exotic_gases_stockpile_to_give
+		clear_variable = rare_crystals_stockpile_to_give
+	}
+}
+
+copy_rare_resources_effect = {
+	#Clear previous values
+	export_resource_stockpile_to_variable = {
+		resource = sr_living_metal
+		variable = sr_living_metal_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = sr_zro
+		variable = sr_zro_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = sr_dark_matter
+		variable = sr_dark_matter_stockpile_to_clear
+	}
+	export_resource_stockpile_to_variable = {
+		resource = nanites
+		variable = nanites_stockpile_to_clear
+	}
+	add_resource = {
+		sr_living_metal = -1
+		mult = sr_living_metal_stockpile_to_clear
+	}
+	add_resource = {
+		sr_zro = -1
+		mult = sr_zro_stockpile_to_clear
+	}
+	add_resource = {
+		sr_dark_matter = -1
+		mult = sr_dark_matter_stockpile_to_clear
+	}
+	add_resource = {
+		nanites = -1
+		mult = nanites_stockpile_to_clear
+	}
+	clear_variable = sr_living_metal_stockpile_to_clear
+	clear_variable = sr_zro_stockpile_to_clear
+	clear_variable = sr_dark_matter_stockpile_to_clear
+	clear_variable = nanites_stockpile_to_clear
+	
+	#Assign new values
+	$FROM$ = {
+		export_resource_stockpile_to_variable = {
+			resource = sr_living_metal
+			variable = sr_living_metal_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = sr_zro
+			variable = sr_zro_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = sr_dark_matter
+			variable = sr_dark_matter_stockpile_to_give
+		}
+		export_resource_stockpile_to_variable = {
+			resource = nanites
+			variable = nanites_stockpile_to_give
+		}
+	}
+	add_resource = {
+		sr_living_metal = 1
+		mult = $FROM$.sr_living_metal_stockpile_to_give
+	}
+	add_resource = {
+		sr_zro = 1
+		mult = $FROM$.sr_zro_stockpile_to_give
+	}
+	add_resource = {
+		sr_dark_matter = 1
+		mult = $FROM$.sr_dark_matter_stockpile_to_give
+	}
+	add_resource = {
+		nanites = 1
+		mult = $FROM$.nanites_stockpile_to_give
+	}
+	$FROM$ = {
+		clear_variable = sr_living_metal_stockpile_to_give
+		clear_variable = sr_zro_stockpile_to_give
+		clear_variable = sr_dark_matter_stockpile_to_give
+		clear_variable = nanites_stockpile_to_give
+	}
+}
+
+copy_basic_resources_incomes_effect = {
+	#Clear previous values
+	remove_modifier = copy_energy_income_modifier
+	remove_modifier = copy_minerals_income_modifier
+	remove_modifier = copy_food_income_modifier
+
+	#Assign new values
+	$FROM$ = {
+		export_resource_income_to_variable = {
+			resource = energy
+			variable = energy_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = minerals
+			variable = minerals_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = food
+			variable = food_income_to_give
+		}
+	}
+	add_modifier = {
+		modifier = copy_energy_income_modifier
+		mult = $FROM$.energy_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_minerals_income_modifier
+		mult = $FROM$.minerals_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_food_income_modifier
+		mult = $FROM$.food_income_to_give
+	}
+	$FROM$ = {
+		clear_variable = energy_income_to_give
+		clear_variable = minerals_income_to_give
+		clear_variable = food_income_to_give
+	}
+}
+
+copy_manufactured_resources_incomes_effect = {
+	#Clear previous values
+	remove_modifier = copy_consumer_goods_income_modifier
+	remove_modifier = copy_alloys_income_modifier
+	
+	#Assign new values
+	$FROM$ = {
+		export_resource_income_to_variable = {
+			resource = consumer_goods
+			variable = consumer_goods_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = alloys
+			variable = alloys_income_to_give
+		}
+	}
+	add_modifier = {
+		modifier = copy_consumer_goods_income_modifier
+		mult = $FROM$.consumer_goods_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_alloys_income_modifier
+		mult = $FROM$.alloys_income_to_give
+	}
+	$FROM$ = {
+		clear_variable = consumer_goods_income_to_give
+		clear_variable = alloys_income_to_give
+	}
+}
+
+copy_advanced_resources_incomes_effect = {
+	#Clear previous values
+	remove_modifier = copy_volatile_motes_income_modifier
+	remove_modifier = copy_exotic_gases_income_modifier
+	remove_modifier = copy_rare_crystals_income_modifier
+	
+	#Assign new values
+	$FROM$ = {
+		export_resource_income_to_variable = {
+			resource = volatile_motes
+			variable = volatile_motes_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = exotic_gases
+			variable = exotic_gases_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = rare_crystals
+			variable = rare_crystals_income_to_give
+		}
+	}
+	add_modifier = {
+		modifier = copy_volatile_motes_income_modifier
+		mult = $FROM$.volatile_motes_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_exotic_gases_income_modifier
+		mult = $FROM$.exotic_gases_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_rare_crystals_income_modifier
+		mult = $FROM$.rare_crystals_income_to_give
+	}
+	$FROM$ = {
+		clear_variable = volatile_motes_income_to_give
+		clear_variable = exotic_gases_income_to_give
+		clear_variable = rare_crystals_income_to_give
+	}
+}
+
+copy_rare_resources_incomes_effect = {
+	#Clear previous values
+	remove_modifier = copy_sr_living_metal_income_modifier
+	remove_modifier = copy_sr_zro_income_modifier
+	remove_modifier = copy_sr_dark_matter_income_modifier
+	remove_modifier = copy_nanites_income_modifier
+	
+	#Assign new values
+	$FROM$ = {
+		export_resource_income_to_variable = {
+			resource = sr_living_metal
+			variable = sr_living_metal_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = sr_zro
+			variable = sr_zro_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = sr_dark_matter
+			variable = sr_dark_matter_income_to_give
+		}
+		export_resource_income_to_variable = {
+			resource = nanites
+			variable = nanites_income_to_give
+		}
+	}
+	add_modifier = {
+		modifier = copy_sr_living_metal_income_modifier
+		mult = $FROM$.sr_living_metal_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_sr_zro_income_modifier
+		mult = $FROM$.sr_zro_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_sr_dark_matter_income_modifier
+		mult = $FROM$.sr_dark_matter_income_to_give
+	}
+	add_modifier = {
+		modifier = copy_nanites_income_modifier
+		mult = $FROM$.nanites_income_to_give
+	}
+	$FROM$ = {
+		clear_variable = sr_living_metal_income_to_give
+		clear_variable = sr_zro_income_to_give
+		clear_variable = sr_dark_matter_income_to_give
+		clear_variable = nanites_income_to_give
+	}
+}

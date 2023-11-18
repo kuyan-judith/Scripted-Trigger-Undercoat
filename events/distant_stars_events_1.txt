@@ -1607,7 +1607,10 @@ country_event = { #Adopted Amoeba Evolves
 		name = "distar.51.f"
 		trigger = {
 			owner_main_species = {
-				is_flora_species = no # undercoat: moved to scripted trigger
+				NOR = {
+					is_species_class = PLANT
+					is_species_class = FUN
+				}
 			}
 		}
 		event_target:lost_amoeba_adult_fleet = {
@@ -1630,7 +1633,10 @@ country_event = { #Adopted Amoeba Evolves
 		name = "distar.51.fb"
 		trigger = {
 			owner_main_species = {
-				is_flora_species = yes # undercoat: moved to scripted trigger
+				OR = {
+					is_species_class = PLANT
+					is_species_class = FUN
+				}
 			}
 		}
 		event_target:lost_amoeba_adult_fleet = {
@@ -2451,7 +2457,7 @@ country_event = {
 				}
 			}
 			create_leader = {
-				class = admiral
+				class = commander
 				species = event_target:kohtalo_species
 				name = "NAME_The_Captain"
 				skill = 2
@@ -4513,7 +4519,7 @@ ship_event = {
 				}
 			}
 			create_leader = {
-				class = admiral
+				class = commander
 				species = event_target:warform_species
 				name = NAME_S8751
 				skill = 5
@@ -4533,7 +4539,7 @@ ship_event = {
 					set_leader_flag = is_in_recruit_window
 					save_event_target_as = warform_leader
 					add_trait = leader_trait_admiral_warform
-					add_trait = subclass_admiral_tactician
+					add_trait = subclass_commander_admiral
 					add_trait = leader_trait_skirmisher_2
 					add_trait = leader_trait_scout
 					save_global_event_target_as = warform_leader
@@ -4883,7 +4889,7 @@ country_event = {
 			}
 			random_owned_leader = {
 				limit = {
-					is_councilor_type = councilor_gestalt_admiral
+					is_councilor_type = councilor_gestalt_legion
 				}
 				add_trait = leader_trait_admiral_warform_node
 			}
@@ -4903,7 +4909,7 @@ country_event = {
 			}
 			random_owned_leader = {
 				limit = {
-					is_councilor_type = councilor_gestalt_admiral
+					is_councilor_type = councilor_gestalt_legion
 				}
 				add_trait = leader_trait_admiral_warform_node
 			}
@@ -4960,7 +4966,7 @@ country_event = {
 			}
 			random_owned_leader = {
 				limit = {
-					is_councilor_type = councilor_gestalt_admiral
+					is_councilor_type = councilor_gestalt_legion
 				}
 				add_trait = leader_trait_admiral_warform_node
 			}
@@ -5300,7 +5306,7 @@ ship_event = {
 				}
 				random_owned_leader = {
 					LIMIT = {
-						leader_class = governor
+						leader_class = official
 						species = {
 							NOR = {
 								has_trait = trait_cybernetic
@@ -5599,6 +5605,7 @@ ship_event = {
 	picture = GFX_evt_ocean
 	show_sound = event_scanner
 	location = from
+	event_chain = living_planet_chain
 
 	is_triggered_only = yes
 
@@ -5608,6 +5615,17 @@ ship_event = {
 		}
 		from = {
 			save_global_event_target_as = living_planet_tar
+		}
+		if = {
+			limit = {
+				owner = { is_regular_empire = yes }
+			}
+			owner = {
+				begin_event_chain = {
+					event_chain = "living_planet_chain"
+					target = root.owner
+				}
+			}
 		}
 	}
 
@@ -5643,9 +5661,11 @@ ship_event = {
 			}
 		}
 		owner = {
-			begin_event_chain = {
-				event_chain = "living_planet_chain"
-				target = root.owner
+			tooltip = {
+				begin_event_chain = {
+					event_chain = "living_planet_chain"
+					target = root.owner
+				}
 			}
 			add_monthly_resource_mult = {
 				resource = society_research
@@ -5670,6 +5690,9 @@ ship_event = {
 				value = @tier2researchreward
 				min = @tier2researchmin
 				max = @tier2researchmax
+			}
+			hidden_effect = {
+				end_event_chain = living_planet_chain
 			}
 		}
 	}
@@ -5701,6 +5724,7 @@ country_event = { #On enacting Study The Sea Special Project
 	show_sound = event_scanner
 	location = event_target:living_planet_tar
 	is_triggered_only = yes
+	event_chain = living_planet_chain
 
 	trigger = {
 		has_country_flag = living_planet_started
@@ -5763,6 +5787,7 @@ country_event = { #Scientist is alive
 	show_sound = event_radio_chatter
 	location = event_target:living_planet_tar
 	is_triggered_only = yes
+	event_chain = living_planet_chain
 
 	trigger = {
 		exists = event_target:living_planet_scientist
@@ -5801,7 +5826,7 @@ country_event = { #Scientist is alive
 		custom_tooltip = "distar.192.c.tooltip"
 		hidden_effect = {
 			event_target:living_planet_scientist = {
-				kill_leader = { type = scientist show_notification = no }
+				kill_leader = { class = scientist show_notification = no }
 			}
 			remove_country_flag = strange_calling_fired
 		}
@@ -5819,6 +5844,7 @@ country_event = { #Scientist dies
 	show_sound = event_radio_chatter
 	location = event_target:living_planet_tar
 	is_triggered_only = yes
+	event_chain = living_planet_chain
 
 	trigger = {
 		exists = event_target:living_planet_tar
@@ -5881,6 +5907,7 @@ country_event = {
 	show_sound = event_mystic_reveal
 	location = event_target:living_planet_tar
 	is_triggered_only = yes
+	event_chain = living_planet_chain
 
 	trigger = {
 		exists = event_target:living_planet_tar
@@ -5969,6 +5996,7 @@ country_event = {
 	show_sound = event_ship_explosion
 	location = event_target:living_planet_tar
 	is_triggered_only = yes
+	event_chain = living_planet_chain
 
 	trigger = {
 		exists = event_target:living_planet_tar
@@ -5978,7 +6006,7 @@ country_event = {
 	option = {
 		name = CURSES
 		event_target:living_planet_scientist = {
-			kill_leader = { type = scientist show_notification = yes }
+			kill_leader = { class = scientist show_notification = yes }
 		}
 		hidden_effect = {
 			remove_country_flag = strange_calling_fired
@@ -6496,7 +6524,7 @@ country_event = {
 				}
 			}
 			create_leader = {
-				class = admiral
+				class = commander
 				species = event_target:captain_species
 				name = NAME_Reth_Unddol
 				skill = 5
@@ -6514,7 +6542,7 @@ country_event = {
 					set_leader_flag = is_in_recruit_window
 					save_event_target_as = captain_reth
 					add_trait = leader_trait_admiral_hells_heart
-					add_trait = subclass_admiral_aggressor
+					add_trait = subclass_commander_admiral
 					add_trait = leader_trait_corsair_2
 					add_trait = leader_trait_shipbreaker_2
 					set_age = 58 #Ahab's age!
@@ -6679,7 +6707,7 @@ country_event = {
 		event_target:ahab_fleet = {
 			set_owner = root
 			kill_leader = {
-				type = admiral show_notification = no
+				class = commander show_notification = no
 			}
 		}
 		add_monthly_resource_mult = {
@@ -6698,7 +6726,7 @@ country_event = {
 		event_target:ahab_fleet = {
 			set_owner = root
 			kill_leader = {
-				type = admiral show_notification = no
+				class = commander show_notification = no
 			}
 		}
 		add_monthly_resource_mult = {
@@ -6717,7 +6745,7 @@ country_event = {
 		event_target:ahab_fleet = {
 			set_owner = root
 			kill_leader = {
-				type = admiral show_notification = no
+				class = commander show_notification = no
 			}
 		}
 		add_monthly_resource_mult = {
@@ -6749,7 +6777,7 @@ country_event = {
 		event_target:ahab_fleet = {
 			set_owner = root
 			hidden_effect = {
-				kill_leader = { type = admiral show_notification = no }
+				kill_leader = { class = commander show_notification = no }
 			}
 		}
 	}
@@ -8185,14 +8213,14 @@ country_event = { #Create Full Ratling Empire #Root = Global Event Country
 			while = {
 				count = 1
 				create_leader = {
-					class = admiral
+					class = commander
 					species = event_target:ratling_species
 					name = random
 					skill = 3
 				}
 			}
 			create_leader = {
-				class = governor
+				class = official
 				species = event_target:ratling_species
 				name = random
 				skill = 3
@@ -8623,7 +8651,7 @@ ship_event = {
 		ethic_leader_creator = {
 			SPECIES_CLASS = AI
 			LEADER_PORTRAIT = cpl_04
-			CLASS = governor
+			CLASS = official
 			NAME = NAME_Caretaker
 			LEVEL = 4
 			GENDER = indeterminable
@@ -8633,7 +8661,7 @@ ship_event = {
 			CATCH_PHRASE = caretaker_leader_catch_phrase
 		}
 		last_created_leader = {
-			add_trait = subclass_governor_pioneer
+			add_trait = subclass_official_governor
 			add_trait = leader_trait_govenor_caretaker
 			add_trait = leader_trait_intellectual
 			add_trait = leader_trait_settler
@@ -8714,7 +8742,7 @@ country_event = {
 			}
 			random_owned_leader = {
 				limit = {
-					is_councilor_type = councilor_gestalt_governor
+					is_councilor_type = councilor_gestalt_growth
 				}
 				add_trait = leader_trait_govenor_caretaker_node
 			}

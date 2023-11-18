@@ -443,6 +443,11 @@ has_first_contact_dlc = {
 	host_has_dlc = "First Contact Story Pack"
 }
 
+has_astral_planes_dlc = {
+	optimize_memory
+	host_has_dlc = "Astral Planes"
+}
+
 uninhabitable_regular_planet = {
 	OR = {
 		is_planet_class = pc_molten
@@ -704,6 +709,7 @@ has_spiritualist_government = {
 		has_government = gov_grim_council
 		has_government = gov_megachurch
 		has_government = gov_sacrificial_megachurch
+		has_government = gov_dimensional_covenant
 	}
 }
 
@@ -720,6 +726,7 @@ has_militarist_government = {
 		has_government = gov_citizen_stratocracy
 		has_government = gov_citizen_republic
 		has_government = gov_band_blood
+		has_government = gov_defensive_union
 	}
 }
 
@@ -759,6 +766,18 @@ has_primitive_government = {
 	OR = {
 		has_government = gov_feudal_realms
 		has_government = gov_fragmented_nation_states
+	}
+}
+
+prefers_scientist_governors = {
+	OR = {
+		is_technocracy = yes
+	}
+}
+
+prefers_commander_governors = {
+	OR = {
+		is_despoiler_empire = yes
 	}
 }
 
@@ -922,6 +941,7 @@ is_crisis_faction = {
 		is_endgame_crisis = yes # Undercoat trigger
 		is_country_type = gray_goo
 		is_country_type = awakened_marauders
+		is_country_type = formless
 	}
 }
 
@@ -1343,7 +1363,7 @@ is_regular_empire = {
 
 is_default_or_fallen = {
 	OR = {
-		is_country_type = default
+		is_playable = yes
 		is_country_type = fallen_empire
 		is_country_type = awakened_fallen_empire #for checks in buildings
 		has_country_flag = is_playable
@@ -1744,7 +1764,7 @@ can_have_mineral_deposits = {
 		is_barren_dry_world = yes
 		is_barren_cold_world = yes
 		is_broken_world = yes
-		is_planet_class = pc_shattered
+		is_shattered_world = yes
 	}
 }
 
@@ -2453,18 +2473,19 @@ has_precursor_intro = {
 	}
 }
 
+# undercoat: added parameter
 baol_colony_1_trigger = {
-	has_access_fleet = root.owner
+	has_access_fleet = $who|root$.owner
 	is_capital_system = no
 	NOR = {
-		is_same_value = root.solar_system
-		has_star_flag = first_grunur_site@root.owner
-		has_star_flag = grunur_site@root.owner
+		is_same_value = $who|root$.solar_system
+		has_star_flag = first_grunur_site@$who|root$.owner
+		has_star_flag = grunur_site@$who|root$.owner
 		has_star_flag = sol_system
 	}
 	OR = {
 		has_owner = no
-		owner = { is_same_value = root.owner }
+		owner = { is_same_value = $who|root$.owner }
 	}
 	any_system_planet = {
 		is_barren_dry_world = yes
@@ -2474,18 +2495,19 @@ baol_colony_1_trigger = {
 	}
 }
 
+# undercoat: added parameter
 baol_colony_2_trigger = {
-	has_access_fleet = root.owner
+	has_access_fleet = $who|root$.owner
 	is_capital_system = no
 	NOR = {
-		is_same_value = root.solar_system
-		has_star_flag = first_grunur_site@root.owner
-		has_star_flag = grunur_site@root.owner
+		is_same_value = $who|root$.solar_system
+		has_star_flag = first_grunur_site@$who|root$.owner
+		has_star_flag = grunur_site@$who|root$.owner
 		has_star_flag = sol_system
 	}
 	OR = {
 		has_owner = no
-		owner = { is_same_value = root.owner }
+		owner = { is_same_value = $who|root$.owner }
 	}
 	any_system_planet = {
 		is_rocky_asteroid = yes
@@ -2495,17 +2517,18 @@ baol_colony_2_trigger = {
 	}
 }
 
+# undercoat: added parameter
 baol_colony_3_trigger = {
-	has_access_fleet = root.owner
+	has_access_fleet = $who|root$.owner
 	is_capital_system = no
 	NOR = {
-		is_same_value = root.solar_system
-		has_star_flag = first_grunur_site@root.owner
+		is_same_value = $who|root$.solar_system
+		has_star_flag = first_grunur_site@$who|root$.owner
 		has_star_flag = sol_system
 	}
 	OR = {
 		has_owner = no
-		owner = { is_same_value = root.owner }
+		owner = { is_same_value = $who|root$.owner }
 	}
 	any_system_planet = {
 		habitable_planet = yes
@@ -2520,16 +2543,16 @@ baol_colony_3_trigger = {
 			is_colony = no
 			num_sapient_pops < 10
 		}
-		NOT = { has_modifier = holy_planet } # Ariphaos
 	}
 }
 
+# undercoat: added parameter
 baol_colony_3_fallback_trigger = {
 	is_capital_system = no
 	NOR = {
-		is_same_value = root.solar_system
-		has_star_flag = first_grunur_site@root.owner
-		has_star_flag = grunur_site@root.owner
+		is_same_value = $who|root$.solar_system
+		has_star_flag = first_grunur_site@$who|root$.owner
+		has_star_flag = grunur_site@$who|root$.owner
 		has_star_flag = sol_system
 	}
 	any_system_planet = {
@@ -2545,7 +2568,6 @@ baol_colony_3_fallback_trigger = {
 			is_colony = no
 			num_sapient_pops < 10
 		}
-		NOT = { has_modifier = holy_planet } # Ariphaos
 	}
 }
 
@@ -2730,7 +2752,7 @@ is_pacified_space_critter_country_type = {
 	OR = {
 		is_country_type = tiyanki
 		AND = {
-			OR = { 
+			OR = {
 				is_country_type = amoeba
 				is_country_type = amoeba_borderless
 			}
@@ -3059,6 +3081,7 @@ has_energy_upkeep = {
 	OR = {
 		is_robotic_or_voidspawn_species = yes
 		has_trait = trait_cyborg_power_intensive
+		has_trait = trait_exd
 	}
 }
 
@@ -3707,10 +3730,10 @@ is_enclave_councilor_type = {
 
 is_gestalt_node = {
 	OR = {
-		is_councilor_type = councilor_gestalt_governor
-		is_councilor_type = councilor_gestalt_scientist
-		is_councilor_type = councilor_gestalt_admiral
-		is_councilor_type = councilor_gestalt_general
+		is_councilor_type = councilor_gestalt_growth
+		is_councilor_type = councilor_gestalt_cognitive
+		is_councilor_type = councilor_gestalt_legion
+		is_councilor_type = councilor_gestalt_regulatory
 	}
 }
 
@@ -4067,8 +4090,8 @@ is_rival_technologically_superior = {
 is_rival_economically_superior = {
 	any_rival_country = {
 		 relative_power = {
-		 	who = prev
-		 	category = economy
+			who = prev
+			category = economy
 		 	value >= superior
 		 }
 	}
@@ -4078,8 +4101,8 @@ is_rival_economically_superior = {
 is_rival_militarily_superior = {
 	any_rival_country = {
 		 relative_power = {
-		 	who = prev
-		 	category = fleet
+			who = prev
+			category = fleet
 		 	value >= superior
 		 }
 	}
@@ -4093,5 +4116,23 @@ is_void_dweller_empire = {
 	OR = {
 		has_ascension_perk = ap_voidborn
 		has_void_dweller_origin = yes
+	}
+}
+
+blocks_minister_of_state = {
+	OR = {
+		is_gestalt = yes
+		is_inwards_perfection_empire = yes
+		has_valid_civic = civic_fanatic_purifiers
+	}
+}
+
+is_terraforming_candidate = {
+	OR = {
+		has_modifier = terraforming_candidate
+		has_modifier = frozen_terraforming_candidate
+		has_modifier = toxic_terraforming_candidate
+		# Undercoat
+		has_planet_flag = stu_terraforming_candidate
 	}
 }

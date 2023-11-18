@@ -19,24 +19,6 @@ country_event = {
 				limit = { exists = fleet.leader }
 				fleet.leader = {
 
-					# Scholar of War / Scholar of War II
-					if = {
-						limit = {
-							OR = {
-								has_trait = leader_trait_scholar_of_war
-								has_trait = leader_trait_scholar_of_war_2
-								has_trait = leader_trait_scholar_of_war_3
-							}
-						}
-						if = {
-							limit = { has_trait = leader_trait_scholar_of_war }
-							add_experience = @trait_scholar_of_war_amt
-						}
-						else = {
-							add_experience = @trait_scholar_of_war_2_amt
-						}
-					}
-
 					# Corsair / Corsair II
 					if = {
 						limit = {
@@ -68,34 +50,29 @@ country_event = {
 						}
 					}
 
-					# Zealot / Zealot II
+					# Crusader / Crusader II
 					if = {
 						limit = {
-							OR = {
-								has_trait = leader_trait_par_zealot
-								has_trait = leader_trait_par_zealot_2
-								has_trait = leader_trait_par_zealot_3
+							has_trait_tier1or2or3 = {
+								TRAIT = leader_trait_crusader
 							}
 							ROOT.FROM = { # Owner of losing ship.
 								is_default_or_fallen = yes
 							}
 						}
-						
+
 						ROOT = {
 							if = {
-								limit = { PREV = { has_trait = leader_trait_par_zealot } }
+								limit = { PREV = { has_trait = leader_trait_crusader } }
 								add_resource = {
-									unity = @trait_zealot_amt
-									mult = value:calculate_ethics_divergence
+									unity = @trait_crusader_fleet_amt
 								}
 							}
 							else = {
 								add_resource = {
-									unity = @trait_zealot_2_amt
-									mult = value:calculate_ethics_divergence
+									unity = @trait_crusader_2_fleet_amt
 								}
 							}
-							clear_variable = ethics_divergence_mult
 						}
 					}
 
@@ -114,7 +91,7 @@ country_event = {
 						if = {
 							limit = { has_trait = leader_trait_shipbreaker }
 							ROOT = {
-								add_resource = { 
+								add_resource = {
 									alloys = @trait_shipbreaker_amt
 									mult = value:hells_heart_effect
 								}
@@ -122,7 +99,7 @@ country_event = {
 						}
 						else = {
 							ROOT = {
-								add_resource = { 
+								add_resource = {
 									alloys = @trait_shipbreaker_2_amt
 									mult = value:hells_heart_effect
 								}
@@ -146,57 +123,6 @@ country_event = {
 							}
 							else = {
 								repair_percentage = @trait_juryrigger_2_amt
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-# On winning a space battle.
-country_event = {
-	id = paragon_2.1010
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		FROMFROM = { # Winning fleet.
-			if = {
-				limit = { exists = leader }
-				leader = {
-
-					# Reverse Engineer.
-					if = {
-						limit = {
-							has_trait = leader_trait_reverse_engineer
-						}
-						ROOT = {
-							random_list = {
-								66 = {} # 33% chance to happen.
-								33 = {
-									if = {
-										limit = {
-											can_copy_random_tech_from = {
-												who = FROM
-												category = particles
-											}
-										}
-										copy_random_tech_from = {
-											who = FROM
-											category = particles
-											progress = 0.5
-										}
-									}
-									else = {
-										copy_random_tech_from = {
-											who = FROM
-											category = propulsion
-											progress = 0.5
-										}
-									}
-								}
 							}
 						}
 					}
@@ -257,165 +183,6 @@ country_event = {
 								add_intel = {
 									who = root.from
 									amount = 30
-								}
-							}
-						}
-
-						# Industrial Espionage.
-						if = {
-							limit = {
-								OR = {
-									has_trait = leader_trait_industrial_espionage
-									has_trait = leader_trait_industrial_espionage_2
-									has_trait = leader_trait_industrial_espionage_3
-								}
-							}
-
-							ROOT = {
-								if  = {
-									limit = { can_copy_random_tech_from = { who = FROM } }
-									random = {
-										chance = value:industrial_espionage_chance
-										if = {
-											limit = {
-												event_target:attacking_general = {
-													has_trait = leader_trait_industrial_espionage
-												}
-											}
-											copy_random_tech_from = {
-												who = FROM
-												progress = 50
-											}
-										}
-										else_if = {
-											limit = {
-												event_target:attacking_general = {
-													OR = {
-														has_trait = leader_trait_industrial_espionage_2
-														has_trait = leader_trait_industrial_espionage_3
-													}
-												}
-											}
-											copy_random_tech_from = {
-												who = FROM
-												progress = value:industrial_espionage_chance
-											}
-										}
-									}
-								}
-							}
-						}
-
-						# Pilferer.
-						if = {
-							limit = {
-								has_trait = leader_trait_pilferer
-								FROMFROM = {
-									NOT = {
-										has_planet_flag = recent_looted_by@root
-									}
-								}
-							}
-							FROMFROM = {
-								set_timed_planet_flag = {
-									flag = recent_looted_by@root
-									years = 10
-								}
-							}
-							ROOT = {
-								# Basic Resources - Regular Districts
-								add_resource = {
-									energy = 100
-									mult = FROMFROM.value:count_districts|TYPE|generator|
-								}
-								add_resource = {
-									minerals = 100
-									mult = FROMFROM.value:count_districts|TYPE|mining|
-								}
-								add_resource = {
-									food = 100
-									mult = FROMFROM.value:count_districts|TYPE|farming|
-								}
-								# Basic Resources - Uncapped Districts
-								add_resource = {
-									energy = 100
-									mult = FROMFROM.value:count_districts|TYPE|generator_uncapped|
-								}
-								add_resource = {
-									minerals = 100
-									mult = FROMFROM.value:count_districts|TYPE|mining_uncapped|
-								}
-								add_resource = {
-									food = 100
-									mult = FROMFROM.value:count_districts|TYPE|farming_uncapped|
-								}
-								# Advanced Resources - Regular Districts
-								add_resource = {
-									alloys = 50
-									mult = FROMFROM.value:count_districts|TYPE|industrial|
-								}
-								add_resource = {
-									consumer_goods = 50
-									mult = FROMFROM.value:count_districts|TYPE|industrial|
-								}
-								# Basic Resources - Habitat Districts
-								add_resource = {
-									energy = 100
-										mult = FROMFROM.value:count_districts|TYPE|hab_energy|
-									}
-								add_resource = {
-									minerals = 100
-									mult = FROMFROM.value:count_districts|TYPE|hab_mining|
-								}
-								# Advanced Resources - Habitat Districts
-								add_resource = {
-									alloys = 50
-									mult = FROMFROM.value:count_districts|TYPE|hab_industrial|
-								}
-								add_resource = {
-									consumer_goods = 50
-									mult = FROMFROM.value:count_districts|TYPE|hab_industrial|
-								}
-								# Research - Habitat Districts
-								add_resource = {
-									physics_research = 25
-									society_research = 25
-									engineering_research = 25
-									mult = FROMFROM.value:count_districts|TYPE|hab_science|
-								}
-								# Advanced Resources - Ecu Districts
-								add_resource = {
-									alloys = 50
-									mult = FROMFROM.value:count_ecu_districts_equiv|TYPE|arcology_arms_industry|
-								}
-								add_resource = {
-									consumer_goods = 50
-									mult = FROMFROM.value:count_ecu_districts_equiv|TYPE|arcology_civilian_industry|
-								}
-								# Basic Resources - Ringworld Districts
-								add_resource = {
-									energy = 100
-									mult = FROMFROM.value:count_ringworld_districts_equiv|TYPE|rw_generator|
-								}
-								add_resource = {
-									food = 100
-									mult = FROMFROM.value:count_ringworld_districts_equiv|TYPE|rw_farming|
-								}
-								# Advanced Resources - Ringworld Districts
-								add_resource = {
-									alloys = 50
-									mult = FROMFROM.value:count_ringworld_districts_equiv|TYPE|rw_industrial|
-								}
-								add_resource = {
-									consumer_goods = 50
-									mult = FROMFROM.value:count_ringworld_districts_equiv|TYPE|rw_industrial|
-								}
-								# Research - Ringworld Districts
-								add_resource = {
-									physics_research = 25
-									society_research = 25
-									engineering_research = 25
-									mult = FROMFROM.value:count_ringworld_districts_equiv|TYPE|rw_science|
 								}
 							}
 						}
@@ -560,55 +327,6 @@ country_event = {
 	}
 }
 
-# Supreme Warrior traits
-# Inital event started by on_ground_combat_started
-# to kick of the recursive check in X days
-# This = planet
-# From = country attacking
-planet_event = {
-	id = paragon_2.1105
-	hide_window = yes
-	is_triggered_only = yes
-
-	# Prevent duplicate events
-	trigger = {
-		not = { has_planet_flag = checking_supreme_warrior }
-	}
-
-	immediate = {
-		set_planet_flag = checking_supreme_warrior # Prevent duplicate events
-		planet_event = {
-			id = paragon_2.1106
-			days = 10
-		}
-	}
-}
-
-# Supreme Warrior traits
-# Recursive check every X days
-# This = planet
-# From = country attacking
-planet_event = {
-	id = paragon_2.1106
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { has_ground_combat = no }
-			remove_planet_flag = checking_supreme_warrior
-		}
-		else = {
-			# Handle both sides of the ground combat
-			random_kill_army_if_supreme_warrior = { SIDE_A = attacker SIDE_B = defender }
-			random_kill_army_if_supreme_warrior = { SIDE_A = defender SIDE_B = attacker }
-	
-			# Do the same check again in X days
-			planet_event = { id = paragon_2.1106 days = 10 } # NOTE: Update custom loc for effect when changing days
-		}
-	}
-}
-
 # Salvager trait
 # Fired when a science ship succesfully analyzed or scavenged debris (bot not both)
 # this = country
@@ -642,53 +360,6 @@ country_event = {
 	}
 }
 
-# Repair Crew traits, on_monthly_pulse
-event = {
-	id = paragon_2.1115
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		every_playable_country = {
-			save_event_target_as = leader_country
-			every_owned_leader = {
-				limit = {
-					has_trait = leader_trait_repair_crew
-					exists = solar_system
-				}
-				solar_system = {
-					every_fleet_in_system = {
-						limit = {
-							exists = owner
-							owner = {
-								is_same_value = event_target:leader_country
-							}
-						}
-						repair_percentage = 0.1
-					}
-				}
-			}
-			every_owned_leader = {
-				limit = {
-					has_trait = leader_trait_master_salvager
-					exists = solar_system
-				}
-				solar_system = {
-					every_fleet_in_system = {
-						limit = {
-							exists = owner
-							owner = {
-								is_same_value = event_target:leader_country
-							}
-						}
-						repair_percentage = 0.02
-					}
-				}
-			}
-		}
-	}
-}
-
 # Science Communicator.
 country_event = {
 	id = paragon_2.1120
@@ -716,151 +387,6 @@ country_event = {
 		}
 		else = {
 			from = { add_skill = 1 }
-		}
-	}
-}
-
-# On finishing a special project.
-# this = country
-# fromfromfrom = ship
-country_event = {
-	id = paragon_2.1125
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = FROMFROMFROM
-	}
-
-	immediate = {
-		FROMFROMFROM = {
-			if = {
-				limit = { exists = leader }
-				leader = {
-					if = {
-						limit = { has_trait = leader_trait_collective_wisdom }
-						ROOT = {
-							add_resource = {
-								unity = 150
-							}
-						}
-					}
-					else_if = {
-						limit = {
-							OR = {
-								has_trait = leader_trait_collective_wisdom_2
-								has_trait = leader_trait_collective_wisdom_3
-							}
-						}
-						ROOT = {
-							add_resource = {
-								unity = 300
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-# On finishing an anomaly.
-# this = ship
-# from = planet
-ship_event = {
-	id = paragon_2.1130
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = {
-				exists = leader
-				exists = owner
-			}
-			leader = {
-				if = {
-					limit = { has_trait = leader_trait_insightful }
-					ROOT.owner = {
-						add_resource = {
-							physics_research = 1
-							mult = value:income_mult|RESOURCE|physics_research|MULT|1|
-						}
-						add_resource = {
-							society_research = 1
-							mult = value:income_mult|RESOURCE|society_research|MULT|1|
-						}
-						add_resource = {
-							engineering_research = 1
-							mult = value:income_mult|RESOURCE|engineering_research|MULT|1|
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							has_trait = leader_trait_insightful_2
-							has_trait = leader_trait_insightful_3
-						}
-					}
-					ROOT.owner = {
-						add_resource = {
-							physics_research = 1
-							mult = value:income_mult|RESOURCE|physics_research|MULT|3|
-						}
-						add_resource = {
-							society_research = 1
-							mult = value:income_mult|RESOURCE|society_research|MULT|3|
-						}
-						add_resource = {
-							engineering_research = 1
-							mult = value:income_mult|RESOURCE|engineering_research|MULT|3|
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-# Knowledge for the Masses traits, on_monthly_pulse
-event = {
-	id = paragon_2.1135
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		every_playable_country = {
-			# Reset counters
-			set_variable = { which = knowledge_masses_amount value = 0 }
-			create_variable_if_not_exists = {
-				VARIABLE = prev_knowledge_masses_amount
-				VALUE_IF_CREATED = 0
-			}
-			
-			# Count how councilors have the trait
-			every_owned_leader = {
-				limit = {
-					is_councilor = yes
-					has_trait = leader_trait_knowledge_for_the_masses
-				}
-				prev = {
-					change_variable = { which = knowledge_masses_amount value = 1 }
-				}
-			}
-
-			# Scale value with number of pops
-			multiply_variable = {
-				which = knowledge_masses_amount
-				value = trigger:num_pops
-			}
-
-			# Update/remove modifier as needed
-			update_modifier_amount_if_needed = {
-				MODIFIER = knowledge_for_the_masses_per_pop_effect
-				MULT_VAR = knowledge_masses_amount
-				PREV_MULT_VAR = prev_knowledge_masses_amount
-			}
 		}
 	}
 }
@@ -901,60 +427,60 @@ event = {
 
 # Aptitude - Champions of the Empire Tradition
 # on_monthly_pulse
-event = {
-	id = paragon_2.1145
-	hide_window = yes
-	is_triggered_only = yes
+# event = {
+# 	id = paragon_2.1145
+# 	hide_window = yes
+# 	is_triggered_only = yes
 
-	immediate = {
-		every_playable_country = {
-			limit = { has_tradition = tr_aptitude_champions_of_the_empire }
+# 	immediate = {
+# 		every_playable_country = {
+# 			limit = { has_tradition = tr_aptitude_champions_of_the_empire }
 
-			# Reset counters
-			set_variable = { which = champs_of_empire_mil_amount value = 0 }
-			set_variable = { which = champs_of_empire_gov_amount value = 0 }
-			set_variable = { which = champs_of_empire_sci_amount value = 0 }
-			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_mil_amount VALUE_IF_CREATED = 0 }
-			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_gov_amount VALUE_IF_CREATED = 0 }
-			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_sci_amount VALUE_IF_CREATED = 0 }
-			
-			# Count how many leaders and skill levels there are of each class.
-			if = {
-				every_owned_leader = {
-					if = {
-						limit = { OR = { leader_class = admiral leader_class = general } }
-						PREV = { change_variable = { which = champs_of_empire_mil_amount value = value:prev_has_skill } }
-					}
-					else_if = {
-						limit = { leader_class = governor }
-						PREV = { change_variable = { which = champs_of_empire_gov_amount value = value:prev_has_skill } }
-					}
-					else_if = {
-						limit = { leader_class = scientist }
-						PREV = { change_variable = { which = champs_of_empire_sci_amount value = value:prev_has_skill } }
-					}
-				}
-			}
+# 			# Reset counters
+# 			set_variable = { which = champs_of_empire_mil_amount value = 0 }
+# 			set_variable = { which = champs_of_empire_gov_amount value = 0 }
+# 			set_variable = { which = champs_of_empire_sci_amount value = 0 }
+# 			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_mil_amount VALUE_IF_CREATED = 0 }
+# 			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_gov_amount VALUE_IF_CREATED = 0 }
+# 			create_variable_if_not_exists = { VARIABLE = prev_champs_of_empire_sci_amount VALUE_IF_CREATED = 0 }
 
-			# Update/remove modifier as needed
-			update_modifier_amount_if_needed = {
-				MODIFIER = champs_of_empire_mil_effect
-				MULT_VAR = champs_of_empire_mil_amount
-				PREV_MULT_VAR = prev_champs_of_empire_mil_amount
-			}
-			update_modifier_amount_if_needed = {
-				MODIFIER = champs_of_empire_gov_effect
-				MULT_VAR = champs_of_empire_gov_amount
-				PREV_MULT_VAR = prev_champs_of_empire_gov_amount
-			}
-			update_modifier_amount_if_needed = {
-				MODIFIER = champs_of_empire_sci_effect
-				MULT_VAR = champs_of_empire_sci_amount
-				PREV_MULT_VAR = prev_champs_of_empire_sci_amount
-			}
-		}
-	}
-}
+# 			# Count how many leaders and skill levels there are of each class.
+# 			if = {
+# 				every_owned_leader = {
+# 					if = {
+# 						limit = { leader_class = commander }
+# 						PREV = { change_variable = { which = champs_of_empire_mil_amount value = value:prev_has_skill } }
+# 					}
+# 					else_if = {
+# 						limit = { leader_class = official }
+# 						PREV = { change_variable = { which = champs_of_empire_gov_amount value = value:prev_has_skill } }
+# 					}
+# 					else_if = {
+# 						limit = { leader_class = scientist }
+# 						PREV = { change_variable = { which = champs_of_empire_sci_amount value = value:prev_has_skill } }
+# 					}
+# 				}
+# 			}
+
+# 			# Update/remove modifier as needed
+# 			update_modifier_amount_if_needed = {
+# 				MODIFIER = champs_of_empire_mil_effect
+# 				MULT_VAR = champs_of_empire_mil_amount
+# 				PREV_MULT_VAR = prev_champs_of_empire_mil_amount
+# 			}
+# 			update_modifier_amount_if_needed = {
+# 				MODIFIER = champs_of_empire_gov_effect
+# 				MULT_VAR = champs_of_empire_gov_amount
+# 				PREV_MULT_VAR = prev_champs_of_empire_gov_amount
+# 			}
+# 			update_modifier_amount_if_needed = {
+# 				MODIFIER = champs_of_empire_sci_effect
+# 				MULT_VAR = champs_of_empire_sci_amount
+# 				PREV_MULT_VAR = prev_champs_of_empire_sci_amount
+# 			}
+# 		}
+# 	}
+# }
 
 #############################
 # SCIENTIST TRAIT ANOMALIES #
@@ -968,22 +494,6 @@ ship_event = {
 
 	immediate = {
 		# We wait a day in order to check if any anomalies or dig sites have spawned.
-		# Midas Touch trait
-		ship_event = {
-			id = paragon_2.2003
-			scopes = {
-				from = from
-			}
-			days = 1
-		}
-		# Observant traits
-		ship_event = {
-			id = paragon_2.2002
-			scopes = {
-				from = from
-			}
-			days = 1
-		}
 		# Prospector traits
 		ship_event = {
 			id = paragon_2.2001
@@ -1007,21 +517,15 @@ ship_event = {
 		leader = {
 			has_trait_tier1or2or3 = {
 				TRAIT = leader_trait_prospector
-			} 
+			}
 		}
 		FROM = {
-			has_anomaly = no
-			is_colonizable = no
-			OR = {
-				can_have_mineral_deposits = yes
-				can_have_energy_deposits = yes
+			NOT = {
+				has_planet_flag = prospected_by@root.owner
 			}
 			OR = {
 				has_deposit_for = shipclass_mining_station
-				num_deposits = 0
-			}
-			NOT = {
-				has_planet_flag = prospected_by@root.owner
+				has_deposit_for = shipclass_research_station
 			}
 		}
 	}
@@ -1035,54 +539,16 @@ ship_event = {
 			}
 			scientist_prospector_effect = { CHANCE = 5 }
 		}
-		else = {
-			scientist_prospector_effect = { CHANCE = 10 }
-		}
-	}
-}
-
-# Observant traits
-ship_event = {
-	id = paragon_2.2002
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = leader
-		leader = {
-			has_trait_tier1or2or3 = {
-				TRAIT = leader_trait_observant
-			} 
-		}
-		FROM = {
-			has_anomaly = no
-			is_colonizable = no
-			OR = {
-				can_have_society_deposits = yes
-				can_have_physics_deposits = yes
-				can_have_engineering_deposits = yes
-			}
-			OR = {
-				has_deposit_for = shipclass_research_station
-				num_deposits = 0
-			}
-			NOT = {
-				has_planet_flag = prospected_by@root.owner
-			}
-		}
-	}
-
-	immediate = {
-		if = {
+		else_if = {
 			limit = {
 				leader = {
-					has_trait = leader_trait_observant
+					has_trait = leader_trait_prospector_2
 				}
 			}
-			scientist_observant_effect = { CHANCE = 5 }
+			scientist_prospector_effect = { CHANCE = 10 }
 		}
 		else = {
-			scientist_observant_effect = { CHANCE = 10 }
+			scientist_prospector_effect = { CHANCE = 15 }
 		}
 	}
 }
@@ -1098,216 +564,15 @@ ship_event = {
 		leader = {
 			has_trait = leader_trait_midas_touch
 		}
-		FROM = {
-			has_anomaly = no
-			is_colonizable = no
-			OR = {
-				can_have_volatile_motes_deposit = yes
-				can_have_rare_crystals_deposits = yes
-				can_have_exotic_gases_deposits = yes
-			}
-			OR = {
-				has_deposit_for = shipclass_mining_station
-				num_deposits = 0
-			}
-			NOT = {
-				has_planet_flag = prospected_by@root.owner
-			}
-		}
 	}
 
 	immediate = {
-		scientist_midas_touch_effect = { CHANCE = 10 }
-	}
-}
-
-# Mineral Deposit
-ship_event = {
-	id = paragon_2.2005
-	title = paragon_2.2005.name
-	desc = paragon_2.2005.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_minerals_2 }
-				2 = { add_deposit = d_minerals_3 }
-				1 = { add_deposit = d_minerals_4 }
-			}
-		}
-	}
-}
-
-# Energy Deposit
-ship_event = {
-	id = paragon_2.2010
-	title = paragon_2.2010.name
-	desc = paragon_2.2010.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_energy_2 }
-				2 = { add_deposit = d_energy_3 }
-				1 = { add_deposit = d_energy_4 }
-			}
-		}
-	}
-}
-
-# Volatile Motes Deposit
-ship_event = {
-	id = paragon_2.2015
-	title = paragon_2.2015.name
-	desc = paragon_2.2015.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_volatile_motes_1 }
-				2 = { add_deposit = d_volatile_motes_2 }
-				1 = { add_deposit = d_volatile_motes_3 }
-			}
-		}
-	}
-}
-
-# Exotic Gases Deposit
-ship_event = {
-	id = paragon_2.2020
-	title = paragon_2.2020.name
-	desc = paragon_2.2020.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_exotic_gases_1 }
-				2 = { add_deposit = d_exotic_gases_2 }
-				1 = { add_deposit = d_exotic_gases_3 }
-			}
-		}
-	}
-}
-
-# Rare Crystals Deposit
-ship_event = {
-	id = paragon_2.2025
-	title = paragon_2.2025.name
-	desc = paragon_2.2025.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_rare_crystals_1 }
-				2 = { add_deposit = d_rare_crystals_2 }
-				1 = { add_deposit = d_rare_crystals_3 }
-			}
-		}
-	}
-}
-
-# Physics Research Deposit
-ship_event = {
-	id = paragon_2.2030
-	title = paragon_2.2030.name
-	desc = paragon_2.2030.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_physics_1 }
-				2 = { add_deposit = d_physics_2 }
-				1 = { add_deposit = d_physics_3 }
-			}
-		}
-	}
-}
-
-# Society Research Deposit
-ship_event = {
-	id = paragon_2.2035
-	title = paragon_2.2035.name
-	desc = paragon_2.2035.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_society_1 }
-				2 = { add_deposit = d_society_2 }
-				1 = { add_deposit = d_society_3 }
-			}
-		}
-	}
-}
-
-# Engineering Research
-ship_event = {
-	id = paragon_2.2040
-	title = paragon_2.2040.name
-	desc = paragon_2.2040.desc
-	picture = GFX_evt_star_neutron
-	show_sound = event_ship_bridge
-	location = FROM
-	trackable = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = EXCELLENT
-		FROM = {
-			locked_random_list = {
-				1 = { add_deposit = d_engineering_1 }
-				2 = { add_deposit = d_engineering_2 }
-				1 = { add_deposit = d_engineering_3 }
+		owner = {
+			every_owned_leader = {
+				limit = {
+					leader_class = scientist
+				}
+				add_experience = 300
 			}
 		}
 	}
@@ -1343,97 +608,7 @@ country_event = { # Memorial Valuts Civic Paragon Level Tick / FROM = Leader
 	}
 }
 
-# This = country
-# From = leader
-country_event = { # Memorial Valuts Civic Give 1 Starting Level To Leaders / FROM = Leader
-	id = paragon_2.2050
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		exists = owner
-		is_memory_vault_empire = yes
-		is_playable = yes
-	}
-
-	immediate = {
-		FROM = {
-			if = {
-				limit = {
-					is_pool_leader = yes
-				}
-				add_skill = 1
-			}
-			else = {
-				add_skill_without_trait_selection = 1
-			}
-		}
-	}
-}
-
-# This = country
-# From = leader
-country_event = { # Crusader Spirit Civic Giving Traits / FROM = Leader
-	id = paragon_2.2055
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		exists = owner
-		has_crusader_spirit = { allow_invalid = yes }
-		is_playable = yes
-		FROM = {
-			OR = {
-				leader_class = general
-				leader_class = admiral
-			}
-		}
-	}
-
-	immediate = {
-		FROM = {
-			if = {
-				limit = {
-					leader_class = admiral
-				}
-				add_trait_no_notify = leader_trait_par_zealot
-			}
-			else_if = {
-				limit = {
-					leader_class = general
-				}
-				add_trait_no_notify = leader_trait_crusader
-			}
-		}
-	}
-}
-
-# Aptitude tradition tree adoption effect
-# on_added_to_leader_pool
-# scope: country, from: leader
-country_event = {
-	id = paragon_2.2060
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		has_tradition = tr_aptitude_adopt
-	}
-
-	immediate = {
-		FROM = {
-			add_trait_no_notify = "random_common"
-		}
-	}
-}
-
-# Change general/admiral background class.
+# Change general/commander background class.
 # scope: country, from: leader
 country_event = {
 	id = paragon_2.2065
@@ -1443,8 +618,8 @@ country_event = {
 	trigger = {
 		FROM = {
 			OR = {
-				leader_class = admiral
-				leader_class = general
+				leader_class = commander
+				leader_class = commander
 			}
 			has_miltary_background_job = no
 		}
@@ -1453,90 +628,12 @@ country_event = {
 	immediate = {
 		FROM = {
 			if = {
-				limit = { leader_class = admiral }
-				set_random_admiral_background_effect = yes
+				limit = { leader_class = commander }
+				set_random_commander_background_effect = yes
 			}
 			else = {
-				set_random_general_background_effect = yes
+				set_random_commander_background_effect = yes
 			}
-		}
-	}
-}
-
-ship_event = { #Scientist with Frontier Adventurer trait
-	id = paragon_2.2070
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = owner
-		leader = { has_trait = leader_trait_frontier_adventurer }
-	}
-
-	immediate = {
-		owner = {
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = 3
-			}
-		}
-	}
-}
-
-country_event = { # Technocracy Civic Giving Traits / FROM = Leader
-	id = paragon_2.2071
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		exists = owner
-		is_playable = yes
-		is_technocracy = { allow_invalid = yes }
-		FROM = { leader_class = scientist }
-	}
-
-	immediate = {
-		FROM = {
-			add_random_expertise_trait_effect = yes
-		}
-	}
-}
-
-ship_event = { #Scientist with Xeno Cataloger trait
-	id = paragon_2.2075
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = owner
-		leader = { has_trait = leader_trait_xeno_cataloger }
-	}
-
-	immediate = {
-		owner = {
-			add_monthly_resource_mult = {
-				resource = unity
-				value = 3
-			}
-		}
-	}
-}
-
-ship_event = { #Scientist Explorer doing the surveying
-	id = paragon_2.2080
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		exists = owner
-		leader = { has_trait = subclass_scientist_explorer }
-	}
-
-	immediate = {
-		owner = {
-			add_resource = { unity = 5 }
 		}
 	}
 }
@@ -1581,61 +678,6 @@ planet_event = { #General with Chainbreaker trait
 	}
 }
 
-# This = country
-# From = leader
-country_event = {
-	id = paragon_2.2090
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		has_heroic_tales = { allow_invalid = yes }
-	}
-
-	immediate = {
-		FROM = {
-			add_trait_no_notify = "random_common"
-		}
-	}
-}
-
-country_event = { #Gestalt Ruler Handler - giving them veteran class on level 3
-	id = paragon_2.2095
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_paragon_dlc = yes
-		is_gestalt = yes
-		FROM = {
-			is_ruler = yes
-			has_skill = 4
-		}
-	}
-
-	immediate = {
-		FROM = {
-			switch = {
-				trigger = leader_class
-				admiral = {
-					add_trait = subclass_admiral_strategist
-				}
-				scientist = {
-					add_trait = subclass_scientist_researcher
-				}
-				general = {
-					add_trait = subclass_general_marshall
-				}
-				governor = {
-					add_trait = subclass_governor_visionary
-				}
-			}	
-		}	
-	}
-}
-
 country_event = { # Gestalt Council Nodes: Update portraits at level 4 and 8.
 	id = paragon_2.2096
 	hide_window = yes
@@ -1653,7 +695,7 @@ country_event = { # Gestalt Council Nodes: Update portraits at level 4 and 8.
 	immediate = {
 		FROM = {
 			set_gestalt_node_protrait_effect = yes
-		}	
+		}
 	}
 }
 
@@ -1759,126 +801,6 @@ country_event = { #Xeno-Linguistic researched
 	}
 }
 
-country_event = { # Letters of Marque Civic Giving Traits / FROM = Leader
-	id = paragon_2.2110
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		exists = owner
-		is_privateer_empire = { allow_invalid = yes }
-		is_playable = yes
-		FROM = {
-			leader_class = admiral
-		}
-	}
-
-	immediate = {
-		FROM = {
-			if = {
-				limit = {
-					leader_class = admiral
-				}
-				add_trait_no_notify = leader_trait_corsair
-			}
-		}
-	}
-}
-
-country_event = { # All trait Giving Civics for game start
-	id = paragon_2.2115
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-	}
-
-	immediate = {
-		if = {
-			limit = { is_privateer_empire = { allow_invalid = yes } }
-			every_owned_leader = {
-				limit = {
-					leader_class = admiral
-				}
-				add_trait_no_notify = leader_trait_corsair
-			}
-		}
-		if = {
-			limit = { has_crusader_spirit = { allow_invalid = yes } }
-			every_owned_leader = {
-				limit = {
-					leader_class = admiral
-				}
-				add_trait_no_notify = leader_trait_par_zealot
-			}
-			every_owned_leader = {
-				limit = {
-					leader_class = general
-				}
-				add_trait_no_notify = leader_trait_crusader
-			}
-		}
-		if = {
-			limit = { has_heroic_tales = { allow_invalid = yes } }
-			every_owned_leader = {
-				add_trait_no_notify = "random_common"
-			}
-		}
-		if = {
-			limit = { is_technocracy = { allow_invalid = yes } }
-			every_owned_leader = {
-				limit = {
-					leader_class = scientist
-				}
-				add_random_expertise_trait_effect = yes
-			}
-		}
-		if = {
-			limit = { is_memory_vault_empire = yes }
-			every_owned_leader = {
-				if = {
-					limit = {
-						is_pool_leader = yes
-					}
-					add_skill = 1
-				}
-				else = {
-					add_skill_without_trait_selection = 1
-				}
-			}
-		}
-		if = {
-			limit = {
-				OR = {
-					has_valid_civic = civic_distinguished_admiralty
-					has_valid_civic = civic_machine_warbots
-					has_valid_civic = civic_hive_strength_of_legions
-				}
-			}
-			every_owned_leader = {
-				if = {
-					limit = {
-						OR = {
-							leader_class = admiral
-							leader_class = general
-						}
-					}
-					if = {
-						limit = { is_pool_leader = yes }
-						add_skill = 2
-					}
-					else = {
-						add_skill_without_trait_selection = 2
-					}
-				}
-			}
-		}
-	}
-}
-
 country_event = { # Set "Pending Negative Traits" for Leaders when created.
 	id = paragon_2.2200
 	hide_window = yes
@@ -1924,58 +846,6 @@ country_event = { # Set "Pending Negative Traits" for Leaders when created.
 	}
 }
 
-planet_event = { #Geologist Trait Unity Reward
-	id = paragon_2.2120
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_paragon_dlc = yes
-		exists = leader
-		leader = {
-			OR = {
-				has_trait = leader_trait_geologist
-				has_trait = leader_trait_geologist_2
-				has_trait = leader_trait_geologist_3
-			}
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				leader = { has_trait = leader_trait_geologist }
-			}
-			owner = {
-				add_monthly_resource_mult = {
-					resource = unity
-					value = 3
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				leader = { has_trait = leader_trait_geologist_2 }
-			}
-			owner = {
-				add_monthly_resource_mult = {
-					resource = unity
-					value = 6
-				}
-			}
-		}
-		else = {
-			owner = {
-				add_monthly_resource_mult = {
-					resource = unity
-					value = 9
-				}
-			}
-		}
-	}
-}
-
 #this = country
 country_event = { #UTILITY - give starting ruler a proper previous job
 	id = paragon_2.2125
@@ -1990,17 +860,14 @@ country_event = { #UTILITY - give starting ruler a proper previous job
 		ruler = {
 			switch = {
 				trigger = leader_class
-				admiral = {
-					set_random_admiral_background_effect = yes
-				}
-				general = {
-					set_random_general_background_effect = yes
+				commander = {
+					set_random_commander_background_effect = yes
 				}
 				scientist = {
 					set_random_scientist_background_effect = yes
 				}
-				governor = {
-					set_random_governor_background_effect = yes
+				official = {
+					set_random_official_background_effect = yes
 				}
 			}
 		}
@@ -2022,7 +889,7 @@ country_event = {
 			any_ground_combat_attacker = {
 				exists = leader
 				leader = {
-					has_trait_tier1or2or3 = { TRAIT = leader_trait_kidnapper }
+					has_trait = leader_trait_tzrynn_tithe
 				}
 			}
 		}
@@ -2035,7 +902,7 @@ country_event = {
 					limit = {
 						exists = leader
 						leader = {
-							has_trait_tier1or2or3 = { TRAIT = leader_trait_kidnapper }
+							has_trait = leader_trait_tzrynn_tithe
 						}
 					}
 					leader = { save_event_target_as = attacking_general }
@@ -2081,6 +948,6 @@ country_event = {
 	}
 
 	immediate = {
-		set_government_cooldown = no		
+		set_government_cooldown = no
 	}
 }

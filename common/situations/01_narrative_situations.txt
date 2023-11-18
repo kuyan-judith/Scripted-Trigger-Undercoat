@@ -505,26 +505,11 @@ leviathan_celebration_opportunity = {
 	}
 	on_monthly = {
 	}
-	approach = {#Do Nothing
-		name = approach_default
-		icon = GFX_situation_approach_balance_sheet
-		icon_background = GFX_situation_approach_bg_yellow
-		default = yes
-		on_select = {
-			custom_tooltip = leviathan_celebration_do_nothing_effect
-		}
-		ai_weight = {
-			base = 0
-		}
-		resources = {
-			category = situations
-			upkeep = {
-				unity = 5
-			}
-		}
-	}
 	approach = {#Encourage
 		name = approach_encourage
+		allow = {
+			NOT = { current_situation_approach = approach_reorganize }
+		}
 		on_select = {
 			custom_tooltip = leviathan_celebration_encourage_effect
 		}
@@ -533,14 +518,12 @@ leviathan_celebration_opportunity = {
 		ai_weight = {
 			base = 10
 		}
-		resources = {
-			category = situations
-			upkeep = {
-				energy = 25
-			}
-		}
+		default = yes
 	}
 	approach = {#Discourage
+		allow = {
+			NOT = { current_situation_approach = approach_reorganize }
+		}
 		name = approach_discourage
 		on_select = {
 			custom_tooltip = leviathan_celebration_discourage_effect
@@ -551,6 +534,41 @@ leviathan_celebration_opportunity = {
 			base = 0
 		}
 	}
+	approach = {#Reorganize
+		name = approach_reorganize
+		icon = GFX_situation_approach_influence 
+		icon_background = GFX_situation_approach_bg_yellow
+		allow = {
+			owner = {
+				NOT = { has_country_flag = reorganizing_leviathan_parade } #To ensure that the player is not reorganizing multiple parades at once
+				resource_stockpile_compare = {
+					resource = unity
+					value > 1000
+				}
+			}
+			NOR = {
+				situation_progress > 49
+				situation_monthly_progress <= 0
+			}
+		}
+		on_select = {
+			target = {
+				set_planet_flag = no_reorganize
+			}
+			custom_tooltip = approach_reorganize_effect
+			owner = {
+				add_resource = { unity = -1000 }
+			}
+			owner = {
+				set_country_flag = reorganizing_leviathan_parade
+			}
+			set_situation_locked = yes
+		}
+		ai_weight = {
+			base = 0
+		}
+	}
+
 	monthly_progress = {
 		base = 4
 		modifier = {
@@ -574,6 +592,11 @@ leviathan_celebration_opportunity = {
 					}
 				}
 			}
+		}
+		modifier = {
+			factor = 0
+			desc = string_current_approach
+			current_situation_approach = approach_reorganize
 		}
 	}
 

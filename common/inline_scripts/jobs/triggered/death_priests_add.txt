@@ -1,0 +1,90 @@
+triggered_planet_modifier = {
+	$mult_line$
+	potential = {
+		exists = owner
+		$trigger$
+	}
+	modifier = {
+		# Megacorp NO, Death Cult YES.
+		job_death_priest_add = $DEATH_PRIEST_AMOUNT$
+		job_mortal_initiate_add = $MORTAL_INITIATE_AMOUNT$
+	}
+}
+
+triggered_planet_modifier = {
+	$mult_line$
+	potential = {
+		exists = owner
+		$trigger$
+		owner = {
+			is_megacorp = yes
+			is_worker_coop_empire = no
+		}
+	}
+	modifier = {
+		# Megacorp YES, Death Cult YES.
+		job_death_priest_add = -$MANAGERS_REPLACE_DEATH_PRIESTS$
+		job_mortal_initiate_add = -$MANAGERS_REPLACE_MORTAL_INITIATES$
+		job_manager_add = $MANAGERS_REPLACE_DEATH_PRIESTS$
+		job_manager_add = $MANAGERS_REPLACE_MORTAL_INITIATES$
+	}
+}
+
+triggered_planet_modifier = {
+	$mult_line$
+	potential = {
+		exists = owner
+		$trigger$
+		owner = {
+			is_megacorp = yes
+			is_worker_coop_empire = yes
+		}
+	}
+	modifier = {
+		job_death_priest_add = -$MANAGERS_REPLACE_DEATH_PRIESTS$
+		job_mortal_initiate_add = -$MANAGERS_REPLACE_MORTAL_INITIATES$
+		job_steward_add = $MANAGERS_REPLACE_DEATH_PRIESTS$
+		job_steward_add = $MANAGERS_REPLACE_MORTAL_INITIATES$
+	}
+}
+
+inline_script = {
+	script = stu/conditional_script
+	CASE = $desc$
+	CONTENTS = "
+		triggered_desc = {
+			trigger = {
+				exists = owner
+				$trigger$
+			}
+			text = jobs_death_priest_and_mortal_initiate_effect_desc
+		}
+	"
+}
+inline_script = {
+	script = stu/include_if_nonzero
+	AMOUNT = @[ $desc$ * ( $MANAGERS_REPLACE_DEATH_PRIESTS$ + $MANAGERS_REPLACE_MORTAL_INITIATES$ ) ]
+	CONTENTS = "
+		triggered_desc = {
+			trigger = {
+				exists = owner
+				$trigger$
+				owner = { 
+					is_megacorp = yes
+					is_worker_coop_empire = no
+				}
+			}
+			text = job_manager_effect_desc
+		}
+		triggered_desc = {
+			trigger = {
+				exists = owner
+				$trigger$
+				owner = {
+					is_worker_coop_empire = yes
+				}
+			}
+			text = job_steward_effect_desc
+		}
+	"
+}

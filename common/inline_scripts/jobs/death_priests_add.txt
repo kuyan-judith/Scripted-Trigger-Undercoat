@@ -1,7 +1,6 @@
 triggered_planet_modifier = {
 	potential = {
 		exists = owner
-		$trigger$
 	}
 	modifier = {
 		# Megacorp NO, Death Cult YES.
@@ -17,7 +16,6 @@ triggered_planet_modifier = {
 			is_megacorp = yes
 			is_worker_coop_empire = no
 		}
-		$trigger$
 	}
 	modifier = {
 		# Megacorp YES, Death Cult YES.
@@ -35,7 +33,6 @@ triggered_planet_modifier = {
 			is_megacorp = yes
 			is_worker_coop_empire = yes
 		}
-		$trigger$
 	}
 	modifier = {
 		job_death_priest_add = -$MANAGERS_REPLACE_DEATH_PRIESTS$
@@ -48,36 +45,33 @@ triggered_planet_modifier = {
 # Death Priests and Mortal Initiates desc?
 triggered_desc = {
 	trigger = {
-		$desc$
 		exists = owner
-		$trigger$
 	}
 	text = jobs_death_priest_and_mortal_initiate_effect_desc
 }
 
-# Managers desc?
-triggered_desc = {
-	trigger = {
-		$desc$
-		exists = owner
-		owner = {
-			is_megacorp = yes
-			is_worker_coop_empire = no
+inline_script = {
+	script = stu/include_if_nonzero
+	AMOUNT = @[ $MANAGERS_REPLACE_DEATH_PRIESTS$ + $MANAGERS_REPLACE_MORTAL_INITIATES$ ]
+	CONTENTS = "
+		triggered_desc = {
+			trigger = {
+				exists = owner
+				owner = { 
+					is_megacorp = yes
+					is_worker_coop_empire = no
+				}
+			}
+			text = job_manager_effect_desc
 		}
-		$trigger$
-	}
-	text = job_manager_effect_desc
-}
-# Union Stewards desc?
-triggered_desc = {
-	trigger = {
-		$desc$
-		exists = owner
-		owner = {
-			is_megacorp = yes
-			is_worker_coop_empire = yes
+		triggered_desc = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_worker_coop_empire = yes
+				}
+			}
+			text = job_steward_effect_desc
 		}
-		$trigger$
-	}
-	text = job_steward_effect_desc
+	"
 }

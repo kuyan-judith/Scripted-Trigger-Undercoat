@@ -404,6 +404,9 @@ action_make_rival = {
 					from = { has_policy_flag = "diplo_stance_animosity" }
 				}
 				from = { is_rival = prev }
+
+				# We can be rivals with the Mirror Empire no matter relations' level
+				from = { is_country_type = mirrored_country }
 			}
 		}
 	}
@@ -651,6 +654,8 @@ action_form_commercial_pact = {
 						value >= 20
 					}
 				}
+				# We don't take into consideration relations' status when dealing with the Mirror Empire
+				from = { is_country_type = mirrored_country }
 			}
 		}
 		if = {
@@ -1302,7 +1307,6 @@ action_invite_to_federation = {
 				has_tradition = tr_diplomacy_the_federation
 			}
 		}
-
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
 		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes }
 		pompous_diplomacy_restrictions = yes
@@ -1681,8 +1685,9 @@ action_demand_subjugation = {
 		}
 		if = {
 			limit = {
-				NOT = {
+				NOR = {
 					has_menace_perk = menp_intimidation
+					is_feudal_empire = yes
 				}
 			}
 			# Requirements:
@@ -1929,6 +1934,14 @@ action_insult = {
 	auto_accepted = yes
 	should_show_auto_accept_message_recipient = yes
 	action_type = aggressive
+
+	potential = {
+		hidden_trigger = {
+			from = {
+				NOT = { is_country_type = mirrored_country }
+			}
+		}
+	}
 
 	possible = {
 		custom_tooltip = {
@@ -2218,7 +2231,6 @@ action_propose_to_break_secret_fealty = {
 	requires_recipient_independence = no
 	action_type = negative
 }
-
 
 ## Pre-FTL diplo actions
 

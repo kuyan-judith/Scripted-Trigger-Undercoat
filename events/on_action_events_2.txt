@@ -2315,42 +2315,6 @@ country_event = {
 	}
 }
 
-country_event = {
-	id = action.405
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { has_country_flag = spawning_renowned_leader }
-		OR = {
-			has_valid_civic = civic_distinguished_admiralty
-			has_valid_civic = civic_machine_warbots
-			has_valid_civic = civic_hive_strength_of_legions
-		}
-		from = {
-			OR = {
-				leader_class = admiral
-				leader_class = general
-			}
-		}
-	}
-
-	immediate = {
-		from = {
-			if = {
-				limit = {
-					is_pool_leader = yes
-				}
-				add_skill = 2
-			}
-			else = {
-				add_skill_without_trait_selection = 2
-			}
-		}
-	}
-}
-
 country_event = { # Random leader pool variations
 	id = action.406
 	hide_window = yes
@@ -2359,66 +2323,29 @@ country_event = { # Random leader pool variations
 
 	immediate = {
 		from = {
-			if = {
-				limit = { is_pool_leader = yes }
-				random_list = {
-					90 = { }
-					10 = {
-						add_trait_no_notify = "random_common"
-						add_trait_no_notify = "random_negative"
-						# Variable "leader_pending_negative_traits_unmodified" doesn't exist yet, can't reduce it yet. Checked now made in paragon_2.2200.
-					}
+			random_list = {
+				90 = { }
+				10 = {
+					add_trait_no_notify = "random_common"
+					add_trait_no_notify = "random_negative"
+					# Variable "leader_pending_negative_traits_unmodified" doesn't exist yet, can't reduce it yet. Checked now made in paragon_2.2200.
 				}
-				random_list = {
-					94 = { }
-					5 = {
-						add_skill = 1
-						add_age = 5
-					}
-					1 = {
-						add_skill = 2
-						add_age = 10
-					}
+			}
+			random_list = {
+				900 = { }
+				75 = {
+					add_skill_without_trait_selection = 1
+					add_age = value:skill_scaled_age_increase|SKILL|1|
+				}
+				25 = {
+					add_skill_without_trait_selection = 2
+					add_age = value:skill_scaled_age_increase|SKILL|2|
 				}
 			}
 		}
 	}
 }
 
-country_event = {
-	id = action.410
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			has_valid_civic = civic_distinguished_admiralty
-			has_valid_civic = civic_machine_warbots
-			has_valid_civic = civic_hive_strength_of_legions
-		}
-		any_pool_leader = {
-			OR = {
-				leader_class = admiral
-				leader_class = general
-			}
-			has_skill = 1
-		}
-	}
-
-	immediate = {
-		every_pool_leader = {
-			limit = {
-				OR = {
-					leader_class = admiral
-					leader_class = general
-				}
-				has_skill = 1
-			}
-			add_skill = 2
-		}
-	}
-}
 # Random pulse (set up the delay) - on_five_year_pulse_country - for overlords
 country_event = {
 	id = action.420
@@ -2739,7 +2666,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		is_memorialist_empire = yes
+		has_civic = civic_hive_memorialist
 		NOT = {
 			has_technology = tech_cultural_heritage
 		}
@@ -2875,15 +2802,13 @@ leader_event = {
 			limit = {
 				owner = {
 					OR = {
-						# Admiral
+						# Commander
 						is_privateer_empire = yes
 						has_tradition = tr_supremacy_war_games
-						# Admiral and General
 						has_valid_civic = civic_distinguished_admiralty
 						has_crusader_spirit = yes
-						# Governor
+						# Official
 						is_aristocratic_empire = yes
-						is_feudal_empire = yes
 						has_tradition = tr_domination_colonial_viceroys
 						# Scientist
 						is_technocracy = yes
@@ -2900,26 +2825,19 @@ leader_event = {
 			# Traditions that boost a class add 20.
 
 			random_list = {
-				# Admiral
+				# Commander
 				0 = {
 					modifier = {
-						add = value:heir_class_weight_admiral
+						add = value:heir_class_weight_commander
 					}
-					change_leader_class = admiral
+					change_leader_class = commander
 				}
-				# General
+				# Official
 				0 = {
 					modifier = {
-						add = value:heir_class_weight_general
+						add = value:heir_class_weight_official
 					}
-					change_leader_class = general
-				}
-				# Governor
-				0 = {
-					modifier = {
-						add = value:heir_class_weight_governor
-					}
-					change_leader_class = governor
+					change_leader_class = official
 				}
 				# Scientist
 				0 = {
@@ -2947,34 +2865,6 @@ leader_event = {
 					owner = { has_philosopher_king = yes }
 				}
 			}
-		}
-
-		################
-		# BONUS LEVELS #
-		################
-
-		# Vaults of Memory
-		if = {
-			limit = {
-				owner = {
-					is_memory_vault_empire = yes
-				}
-			}
-			add_skill_without_trait_selection = 1
-		}
-
-		# Distinguished Admiralty
-		if = {
-			limit = {
-				owner = {
-					has_valid_civic = civic_distinguished_admiralty
-				}
-				OR = {
-					leader_class = admiral
-					leader_class = general
-				}
-			}
-			add_skill_without_trait_selection = 2
 		}
 
 		##########
@@ -3005,34 +2895,13 @@ leader_event = {
 			add_random_expertise_trait_effect = yes
 		}
 
-		# Heroic Tales
-		if = {
-			limit = {
-				owner = {
-					has_heroic_tales = yes
-				}
-			}
-			add_trait_no_notify = "random_common"
-		}
-
-		# Crusader Spirit - Admiral
+		# Crusader Spirit
 		if = {
 			limit = {
 				owner = {
 					has_crusader_spirit = yes
 				}
-				leader_class = admiral
-			}
-			add_trait_no_notify = leader_trait_par_zealot
-		}
-
-		# Crusader Spirit - General
-		if = {
-			limit = {
-				owner = {
-					has_crusader_spirit = yes
-				}
-				leader_class = general
+				leader_class = commander
 			}
 			add_trait_no_notify = leader_trait_crusader
 		}
@@ -3043,19 +2912,9 @@ leader_event = {
 				owner = {
 					is_privateer_empire = yes
 				}
-				leader_class = admiral
+				leader_class = commander
 			}
 			add_trait_no_notify = leader_trait_corsair
-		}
-
-		# Aptitude Traditions
-		if = {
-			limit = {
-				owner = {
-					has_tradition = tr_aptitude_adopt
-				}
-			}
-			add_trait_no_notify = "random_common"
 		}
 	}
 }
@@ -3290,6 +3149,7 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = owner
 		owner = {
 			is_homicidal = no
 			is_gestalt = no
@@ -3942,6 +3802,42 @@ country_event = {
 				}
 			}
 			remove_modifier = reduce_living_metal_output
+		}
+	}
+}
+
+# Fired when a truce is over
+# This = owner of the truce
+# From = target of the truce
+country_event = {
+	id = action.740
+	hide_window = yes
+
+	is_triggered_only = yes
+	immediate = {
+		create_message = {
+			type = TOAST_TRUCE_IS_OVER
+			localization = TOAST_TRUCE_IS_OVER_DESC
+			days = @toast_important_message_days
+			target = from
+			variable = {
+				type = name
+				localization = ENEMY
+				scope = from
+			}
+		}
+		from = {
+			create_message = {
+				type = TOAST_TRUCE_IS_OVER
+				localization = TOAST_TRUCE_IS_OVER_DESC
+				days = @toast_important_message_days
+				target = root
+				variable = {
+					type = name
+					localization = ENEMY
+					scope = root
+				}
+			}
 		}
 	}
 }

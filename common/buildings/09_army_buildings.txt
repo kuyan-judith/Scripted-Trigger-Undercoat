@@ -3,69 +3,49 @@
 #############
 building_military_academy = {
 	base_buildtime = @b2_time
-	base_cap_amount = 1
+	empire_limit = {
+		base = 1
+	}
 	can_be_ruined = no
 	category = army
 
-	potential = {
-		exists = owner
-		owner = { has_reanimated_armies = no }
-	}
-
 	allow = {
-		has_upgraded_capital = yes
-		if = {
-			limit = {
-				exists = owner
-				owner = { is_ai = yes }
-			}
-			OR = {
-				has_building = building_stronghold
-				has_building = building_fortress
-			}
+		has_major_upgraded_capital = yes
+	}
+
+	country_modifier = {
+		country_commander_cap_add = 1
+		country_naval_cap_mult = 0.05
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		modifier = {
+			job_politician_add = 1
 		}
 	}
-
-	destroy_trigger = {
-		exists = owner
-		owner = {
-			OR = {
-				has_reanimated_armies = yes
-				AND = {
-					is_ai = yes
-					prev = {
-						NOR = {
-							has_building = building_stronghold
-							has_building = building_fortress
-						}
-					}
-				}
-			}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
 		}
-	}
-
-	convert_to = {
-		building_dread_encampment
-	}
-
-	army_modifier = {
-		army_starting_experience_add = 100
-	}
-
-	inline_script = {
-		script = jobs/soldiers_add
-		trigger = " "
-		AMOUNT = @b1_jobs
-		desc = " "
+		modifier = {
+			job_evaluator_add = 2
+		}
 	}
 
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = @b1_minerals
+			minerals = @b2_minerals
+			volatile_motes = @b2_rare_cost
 		}
 		upkeep = {
-			energy = @b1_upkeep
+			energy = @b2_upkeep
+			volatile_motes = @b2_rare_upkeep
 		}
 	}
 
@@ -73,8 +53,20 @@ building_military_academy = {
 		"tech_centralized_command"
 	}
 
-	show_tech_unlock_if = {
-		has_reanimated_armies = no
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_politician_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_evaluator_effect_desc
 	}
 }
 
@@ -89,16 +81,8 @@ building_dread_encampment = {
 		owner = { has_reanimated_armies = yes }
 	}
 
-	convert_to = {
-		building_military_academy
-	}
-
 	allow = {
 		has_upgraded_capital = yes
-	}
-
-	army_modifier = {
-		army_starting_experience_add = 100
 	}
 
 	planet_modifier = {
@@ -135,9 +119,7 @@ building_stronghold = {
 
 	inline_script = {
 		script = jobs/soldiers_add
-		trigger = " "
 		AMOUNT = @b1_jobs
-		desc = " "
 	}
 
 	resources = {
@@ -173,9 +155,7 @@ building_fortress = {
 
 	inline_script = {
 		script = jobs/soldiers_add
-		trigger = " "
 		AMOUNT = @b2_jobs
-		desc = " "
 	}
 
 	resources = {

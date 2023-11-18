@@ -6,34 +6,6 @@ refresh_class_cost_mod = {
 	}
 }
 
-random_kill_army_if_supreme_warrior = {
-	if = {
-		limit = {
-			# Check if the general on side A has the supreme warrior trait
-			any_ground_combat_$SIDE_A$ = {
-				exists = leader
-				leader = {
-					has_trait = leader_trait_supreme_warrior
-				}
-			}
-		}
-
-		# 15% of the time: kill a random frontline unit
-		random_list = {
-			# NOTE: Update custom loc for effect when changing probablity
-			85 = {}
-			15 = {
-				random_ground_combat_$SIDE_B$ = {
-					limit = {
-						is_in_frontline = yes
-					}
-					remove_army = yes
-				}
-			}
-		}
-	}
-}
-
 add_ship_type_from_debris = {
 	while = {
 		count = value:ships_of_size_in_fromscoped_debris|SIZE|$USES$|
@@ -224,6 +196,8 @@ ethic_leader_creator = {
 			name = UNKNOWN
 			class = $SPECIES_CLASS$
 			portrait = $LEADER_PORTRAIT$
+			name_list = $NAME_LIST|random_class$
+			immortal = $IMMORTAL_SPECIES|no$
 			traits = {
 				trait = "trait_enduring"
 			}
@@ -244,7 +218,7 @@ ethic_leader_creator = {
 			custom_description = $DESC$
 			custom_catch_phrase = $CATCH_PHRASE$
 			immortal = $IMMORTAL$
-			hide_age = $IMMORTAL$ # Right now it will always match immortal
+			hide_age = $HIDEAGE|IMMORTAL$ # Matches HIDEAGE, Fallbacks on IMMORTAL
 
 			randomize_traits = no
 			effect = {
@@ -281,6 +255,7 @@ ethic_leader_hire_effect = {
 
 	clone_leader = {
 		target = event_target:ethic_leader
+		skip_background_generation = yes
 	}
 	last_created_leader = {
 		save_global_event_target_as = $GLOBAL_EVENT_TARGET$
@@ -329,6 +304,7 @@ hire_event_leader_effect = {
 
 	clone_leader = {
 		target = event_target:$LEADER$
+		skip_background_generation = yes
 	}
 	last_created_leader = {
 		set_leader_flag = renowned_leader
@@ -377,7 +353,7 @@ country_create_gestalt_councilor = {
 	}
 	event_target:gestalt_councilor = {
 		set_owner = prev
-		change_leader_portrait = councilor_hive_$CLASS$_1
+		change_leader_portrait = $COUNCIL_POS$_1
 		set_council_position = $COUNCIL_POS$
 		set_immortal = yes
 		set_leader_flag = leader_death_events_blocked
@@ -385,82 +361,102 @@ country_create_gestalt_councilor = {
 			limit = {
 				has_paragon_dlc = yes
 			}
-			switch = {
-				trigger = leader_class
-				admiral = {
-					add_trait_no_notify = subclass_admiral_strategist
-				}
-				scientist = {
-					add_trait_no_notify = subclass_scientist_researcher
-				}
-				general = {
-					add_trait_no_notify = subclass_general_marshall
-				}
-				governor = {
-					add_trait_no_notify = subclass_governor_visionary
-				}
-			}
+			assign_node_subclass_traits = yes
+		}
+		add_trait_no_notify = random_common
+	}
+}
+
+assign_node_subclass_traits = {
+	switch = {
+		trigger = is_councilor_type
+		councilor_gestalt_legion = {
+			add_trait_no_notify = subclass_commander_councilor
+		}
+		councilor_gestalt_cognitive = {
+			add_trait_no_notify = subclass_scientist_councilor
+		}
+		councilor_gestalt_regulatory = {
+			add_trait_no_notify = subclass_official_diplomacy_councilor
+		}
+		councilor_gestalt_growth = {
+			add_trait_no_notify = subclass_official_economy_councilor
+		}
+	}
+}
+
+assign_gestalt_ruler_subclass_trait = {
+	switch = {
+		trigger = leader_class
+		commander = {
+			add_trait_no_notify = subclass_commander_councilor
+		}
+		scientist = {
+			add_trait_no_notify = subclass_scientist_councilor
+		}
+		official = {
+			add_trait_no_notify = subclass_official_economy_councilor
 		}
 	}
 }
 
 set_gestalt_node_protrait_effect = {
 	switch = {
-		trigger = leader_class
-		admiral = {
+		trigger = is_councilor_type
+		councilor_gestalt_legion = {
 			if = {
 				limit = { has_skill >= 8 }
-				change_leader_portrait = councilor_hive_admiral_3
+				change_leader_portrait = councilor_gestalt_legion_3
 			}
 			else_if = {
 				limit = { has_skill >= 4 }
-				change_leader_portrait = councilor_hive_admiral_2
+				change_leader_portrait = councilor_gestalt_legion_2
 			}
 			else_if = {
 				limit = { has_skill >= 1 }
-				change_leader_portrait = councilor_hive_admiral_1
+				change_leader_portrait = councilor_gestalt_legion_1
 			}
 		}
-		scientist = {
+		councilor_gestalt_cognitive = {
 			if = {
 				limit = { has_skill >= 8 }
-				change_leader_portrait = councilor_hive_scientist_3
+				change_leader_portrait = councilor_gestalt_cognitive_3
 			}
 			else_if = {
 				limit = { has_skill >= 4 }
-				change_leader_portrait = councilor_hive_scientist_2
+				change_leader_portrait = councilor_gestalt_cognitive_2
 			}
 			else_if = {
 				limit = { has_skill >= 1 }
-				change_leader_portrait = councilor_hive_scientist_1
+				change_leader_portrait = councilor_gestalt_cognitive_1
 			}
 		}
-		general = {
+		councilor_gestalt_regulatory = {
 			if = {
 				limit = { has_skill >= 8 }
-				change_leader_portrait = councilor_hive_general_3
+				change_leader_portrait = councilor_gestalt_regulatory_3
 			}
 			else_if = {
 				limit = { has_skill >= 4 }
-				change_leader_portrait = councilor_hive_general_2
+				change_leader_portrait = councilor_gestalt_regulatory_2
 			}
 			else_if = {
 				limit = { has_skill >= 1 }
-				change_leader_portrait = councilor_hive_general_1
+				change_leader_portrait = councilor_gestalt_regulatory_1
 			}
 		}
-		governor = {
+		councilor_gestalt_growth = {
 			if = {
 				limit = { has_skill >= 8 }
-				change_leader_portrait = councilor_hive_governor_3
+				change_leader_portrait = councilor_gestalt_growth_3
 			}
 			else_if = {
 				limit = { has_skill >= 4 }
-				change_leader_portrait = councilor_hive_governor_2
+				change_leader_portrait = councilor_gestalt_growth_2
 			}
 			else_if = {
 				limit = { has_skill >= 1 }
-				change_leader_portrait = councilor_hive_governor_1
+				change_leader_portrait = councilor_gestalt_growth_1
 			}
 		}
 	}
@@ -487,59 +483,15 @@ restore_gestalt_councilor_effect = {
 					}
 				}
 				assign_restored_node = {
-					CLASS = $CLASS$
 					COUNCIL_POS = $COUNCIL_POS$
 				}
 				last_created_leader = {
-					add_bonus_skills_effect = yes
 					add_skill_without_trait_selection = value:restored_node_additional_skills
 				}
 			}
 		}
 	}
 }
-
-add_bonus_skills_effect = {
-	# Aptitude Tradition bonus trait
-	if = {
-		limit = {
-			owner = {
-				has_tradition = tr_aptitude_adopt
-			}
-		}
-		add_trait_no_notify = "random_common"
-	}
-
-	# Memory Vaults
-	if = {
-		limit = {
-			owner = {
-				is_memory_vault_empire = yes
-			}
-		}
-		add_skill_without_trait_selection = 1
-	}
-
-	# Warbots/Strength of Legions/Distinguisted Admiralty
-	# Admirals and Generals
-	if = {
-		limit = {
-			owner = {
-				OR = {
-					has_valid_civic = civic_distinguished_admiralty
-					has_valid_civic = civic_machine_warbots
-					has_valid_civic = civic_hive_strength_of_legions
-				}
-			}
-			OR = {
-				leader_class = admiral
-				leader_class = general
-			}
-		}
-		add_skill_without_trait_selection = 2
-	}
-}
-
 
 create_restored_node = {
 	create_leader = {
@@ -565,7 +517,7 @@ create_restored_node = {
 assign_restored_node = {
 	event_target:restored_node = {
 		set_owner = prev
-		change_leader_portrait = councilor_hive_$CLASS$_1
+		change_leader_portrait = $COUNCIL_POS$_1
 		set_council_position = $COUNCIL_POS$
 		set_immortal = yes
 		set_leader_flag = leader_death_events_blocked
@@ -573,21 +525,7 @@ assign_restored_node = {
 			limit = {
 				has_paragon_dlc = yes
 			}
-			switch = {
-				trigger = leader_class
-				admiral = {
-					add_trait_no_notify = subclass_admiral_strategist
-				}
-				scientist = {
-					add_trait_no_notify = subclass_scientist_researcher
-				}
-				general = {
-					add_trait_no_notify = subclass_general_marshall
-				}
-				governor = {
-					add_trait_no_notify = subclass_governor_visionary
-				}
-			}
+			assign_node_subclass_traits = yes
 		}
 	}
 }
@@ -606,18 +544,20 @@ lower_leader_chance = { #increase the wait time between getting new ethic leader
 remove_subclass = {
 	switch = {
 		trigger = has_trait
-		subclass_admiral_aggressor = { remove_trait = subclass_admiral_aggressor }
-		subclass_admiral_tactician = { remove_trait = subclass_admiral_tactician }
-		subclass_admiral_strategist = { remove_trait = subclass_admiral_strategist }
-		subclass_general_invader = { remove_trait = subclass_general_invader }
-		subclass_general_protector = { remove_trait = subclass_general_protector }
-		subclass_general_marshall = { remove_trait = subclass_general_marshall }
+		subclass_commander_admiral = { remove_trait = subclass_commander_admiral }
+		subclass_commander_general = { remove_trait = subclass_commander_general }
+		subclass_commander_governor = { remove_trait = subclass_commander_governor }
+		subclass_commander_councilor = { remove_trait = subclass_commander_councilor }
+
+		subclass_official_delegate = { remove_trait = subclass_official_delegate }
+		subclass_official_governor = { remove_trait = subclass_official_governor }
+		subclass_official_diplomacy_councilor = { remove_trait = subclass_official_diplomacy_councilor }
+		subclass_official_economy_councilor = { remove_trait = subclass_official_economy_councilor }
+
 		subclass_scientist_explorer = { remove_trait = subclass_scientist_explorer }
-		subclass_scientist_analyst = { remove_trait = subclass_scientist_analyst }
-		subclass_scientist_researcher = { remove_trait = subclass_scientist_researcher }
-		subclass_governor_visionary = { remove_trait = subclass_governor_visionary }
-		subclass_governor_pioneer = { remove_trait = subclass_governor_pioneer }
-		subclass_governor_economist = { remove_trait = subclass_governor_economist }
+		subclass_scientist_scholar = { remove_trait = subclass_scientist_scholar }
+		subclass_scientist_governor = { remove_trait = subclass_scientist_governor }
+		subclass_scientist_councilor = { remove_trait = subclass_scientist_councilor }
 	}
 }
 
@@ -1187,7 +1127,7 @@ paragon_origin_civil_war = {
 		}
 		event_target:rebel_empire = {
 			create_leader = {
-				class = admiral
+				class = commander
 				species = owner_main_species
 				name = random
 				skill = 5
@@ -1196,7 +1136,7 @@ paragon_origin_civil_war = {
 				}
 			}
 			create_leader = {
-				class = governor
+				class = official
 				species = owner_main_species
 				name = random
 				skill = 5
@@ -1205,7 +1145,7 @@ paragon_origin_civil_war = {
 				}
 			}
 			create_leader = {
-				class = general
+				class = commander
 				species = owner_main_species
 				name = random
 				skill = 5
@@ -1476,147 +1416,131 @@ scientist_prospector_effect = {
 	}
 	random = {
 		chance = $CHANCE$
-		random_list = {
-			# Mineral Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2005
-					scopes = {
-						from = from
+		from = {
+			# Minerals
+			if = {
+				limit = {
+					has_resource = {
+						type = minerals
+						amount > 0
 					}
 				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_mineral_deposits = no
-					}
-				}
-			}
-			# Energy Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2010
-					scopes = {
-						from = from
-					}
-				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_energy_deposits = no
-					}
+				locked_random_list = {
+					1 = { add_deposit = d_minerals_2 }
+					2 = { add_deposit = d_minerals_3 }
+					1 = { add_deposit = d_minerals_4 }
 				}
 			}
-		}
-	}
-}
-
-scientist_observant_effect = {
-	FROM = {
-		set_planet_flag = prospected_by@root.owner
-	}
-	random = {
-		chance = $CHANCE$
-		random_list = {
-			# Physics Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2030
-					scopes = {
-						from = from
+			# Energy
+			if = {
+				limit = {
+					has_resource = {
+						type = energy
+						amount > 0
 					}
 				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_physics_deposits = no
-					}
+				locked_random_list = {
+					1 = { add_deposit = d_energy_2 }
+					2 = { add_deposit = d_energy_3 }
+					1 = { add_deposit = d_energy_4 }
 				}
 			}
-			# Society Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2035
-					scopes = {
-						from = from
+			# Volatile Motes
+			if = {
+				limit = {
+					has_resource = {
+						type = volatile_motes
+						amount > 0
 					}
 				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_society_deposits = no
-					}
-				}
-			}
-			# Engineering Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2040
-					scopes = {
-						from = from
-					}
-				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_engineering_deposits = no
-					}
+				locked_random_list = {
+					1 = { add_deposit = d_volatile_motes_1 }
+					2 = { add_deposit = d_volatile_motes_2 }
+					1 = { add_deposit = d_volatile_motes_3 }
 				}
 			}
-		}
-	}
-}
-
-scientist_midas_touch_effect = {
-	FROM = {
-		set_planet_flag = prospected_by@root.owner
-	}
-	random = {
-		chance = $CHANCE$
-		random_list = {
-			# Volatile Motes Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2015
-					scopes = {
-						from = from
+			# Volatile Motes
+			if = {
+				limit = {
+					has_resource = {
+						type = volatile_motes
+						amount > 0
 					}
 				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_volatile_motes_deposit = no
-					}
+				locked_random_list = {
+					1 = { add_deposit = d_volatile_motes_1 }
+					2 = { add_deposit = d_volatile_motes_2 }
+					1 = { add_deposit = d_volatile_motes_3 }
 				}
 			}
-			# Exotic Gases Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2020
-					scopes = {
-						from = from
+			# Exotic Gases
+			if = {
+				limit = {
+					has_resource = {
+						type = exotic_gases
+						amount > 0
 					}
 				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_exotic_gases_deposits = no
-					}
+				locked_random_list = {
+					1 = { add_deposit = d_exotic_gases_1 }
+					2 = { add_deposit = d_exotic_gases_2 }
+					1 = { add_deposit = d_exotic_gases_3 }
 				}
 			}
-			# Rare Crystals Deposit
-			1 = {
-				ship_event = {
-					id = paragon_2.2025
-					scopes = {
-						from = from
+			# Rare Crystals
+			if = {
+				limit = {
+					has_resource = {
+						type = rare_crystals
+						amount > 0
 					}
 				}
-				modifier = {
-					factor = 0
-					from = {
-						can_have_rare_crystals_deposits = no
+				locked_random_list = {
+					1 = { add_deposit = d_rare_crystals_1 }
+					2 = { add_deposit = d_rare_crystals_2 }
+					1 = { add_deposit = d_rare_crystals_3 }
+				}
+			}
+			# Physics Research
+			if = {
+				limit = {
+					has_resource = {
+						type = physics_research
+						amount > 0
 					}
+				}
+				locked_random_list = {
+					1 = { add_deposit = d_physics_1 }
+					2 = { add_deposit = d_physics_2 }
+					1 = { add_deposit = d_physics_3 }
+				}
+			}
+			# Society Research
+			if = {
+				limit = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+				locked_random_list = {
+					1 = { add_deposit = d_society_1 }
+					2 = { add_deposit = d_society_2 }
+					1 = { add_deposit = d_society_3 }
+				}
+			}
+			# Engineering Research
+			if = {
+				limit = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				locked_random_list = {
+					1 = { add_deposit = d_engineering_1 }
+					2 = { add_deposit = d_engineering_2 }
+					1 = { add_deposit = d_engineering_3 }
 				}
 			}
 		}
@@ -1890,7 +1814,7 @@ paragon_origin_launch_rebelion = {
 	}
 	event_target:rebel_empire_1 = {
 		create_leader = {
-			class = admiral
+			class = commander
 			species = owner_main_species
 			name = random
 			skill = 5
@@ -1899,7 +1823,7 @@ paragon_origin_launch_rebelion = {
 			}
 		}
 		create_leader = {
-			class = governor
+			class = official
 			species = owner_main_species
 			name = random
 			skill = 5
@@ -1908,7 +1832,7 @@ paragon_origin_launch_rebelion = {
 			}
 		}
 		create_leader = {
-			class = general
+			class = commander
 			species = owner_main_species
 			name = random
 			skill = 5
@@ -2387,7 +2311,7 @@ add_expertise_trait_to_leader_or_research_node_effect  = {
 		owner = {
 			random_owned_leader = {
 				limit = {
-					is_councilor_type = councilor_gestalt_scientist
+					is_councilor_type = councilor_gestalt_cognitive
 				}
 				add_expertise_trait_effect = {
 					TRAIT = $TRAIT$
@@ -2405,18 +2329,13 @@ add_expertise_trait_to_leader_or_research_node_effect  = {
 }
 
 
-set_random_admiral_background_effect = {
+set_random_commander_background_effect = {
 	random_list = {
 		1 = { change_background_job = captain }
 		1 = { change_background_job = chief_navigator }
 		1 = { change_background_job = principal_pilot }
 		1 = { change_background_job = ship_weapons_officer }
 		1 = { change_background_job = ship_logistics_officer }
-	}
-}
-
-set_random_general_background_effect = {
-	random_list = {
 		1 = { change_background_job = special_operations_commander }
 		1 = { change_background_job = commanding_officer }
 		1 = { change_background_job = chief_supply_officer }
@@ -2425,7 +2344,7 @@ set_random_general_background_effect = {
 	}
 }
 
-set_random_governor_background_effect = {
+set_random_official_background_effect = {
 	random_list = {
 		1 = { change_background_job = bureaucrat }
 		1 = { change_background_job = politician }
@@ -2441,5 +2360,96 @@ set_random_scientist_background_effect = {
 		1 = { change_background_job = researcher }
 		1 = { change_background_job = government_employee }
 		1 = { change_background_job = clerk }
+	}
+}
+
+assign_governor_effect = {
+	if = {
+		limit = {
+			prefers_scientist_governors = yes
+		}
+		set_starting_governor_effect = {
+			GOVERNOR = scientist
+		}
+	}
+	else_if = {
+		limit = {
+			prefers_commander_governors = yes
+		}
+		set_starting_governor_effect = {
+			GOVERNOR = commander
+		}
+	}
+	else = {
+		set_starting_governor_effect = {
+			GOVERNOR = official
+		}
+	}
+
+}
+
+set_starting_governor_effect = {
+	capital_scope = {
+		if = {
+			limit = {
+				exists = leader
+				leader = {
+					leader_class = $GOVERNOR$
+					is_councilor = yes
+				}
+			}
+			# Do nothing, leader matches chosen class.
+		}
+		else = {
+			if = {
+				limit = {
+					exists = leader
+				}
+				kill_leader = {
+					show_notification = no
+				}
+			}
+			root = {
+				if = {
+					limit = {
+						is_gestalt = no
+						any_owned_leader = {
+							leader_class =  $GOVERNOR$
+							is_councilor = yes
+							is_idle = yes
+							is_ruler = no
+						}
+					}
+					random_owned_leader = {
+						limit = {
+							leader_class =  $GOVERNOR$
+							is_councilor = yes
+							is_idle = yes
+							is_ruler = no
+						}
+						save_event_target_as = governor_leader
+					}
+				}
+				else = {
+					create_leader = {
+						class = $GOVERNOR$
+						name = random
+						species = owner_main_species
+					}
+					last_created_leader = {
+						save_event_target_as = governor_leader
+						if = {
+							limit = {
+								has_skill > 1
+								num_traits = 0
+							}
+							add_trait_no_notify = random_common
+						}
+					}
+				}
+
+			}
+			assign_leader = event_target:governor_leader
+		}
 	}
 }

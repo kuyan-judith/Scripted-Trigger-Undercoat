@@ -251,6 +251,7 @@ ship_event = {
 	}
 	location = FROM
 	show_sound = evn_fc_broken_shackles_origin
+	event_chain = homeworlds_chain
 
 	is_triggered_only = yes
 
@@ -883,10 +884,14 @@ country_event = {
 		random_owned_leader = {
 			limit = {
 				leader_class = scientist
+				NOT = { has_leader_flag = leader_death_events_blocked }
 			}
 			kill_leader = { show_notification = no }
 		}
 		random_owned_leader = {
+			limit = {
+				NOT = { has_leader_flag = leader_death_events_blocked }
+			}
 			kill_leader = { show_notification = no }
 		}
 		event_target:broken_shackles_homeworld = {
@@ -1967,6 +1972,7 @@ country_event = {
 	desc = "origin.5040.desc"
 	picture = GFX_evt_city_planet
 	show_sound = event_celebration
+	event_chain = homeworlds_chain
 	
 	is_triggered_only = yes
 
@@ -2009,15 +2015,23 @@ country_event = {
 				set_visited = event_target:abductee_system_3
 			}
 		}
+		owner = {
+			begin_event_chain = {
+				event_chain = homeworlds_chain
+				target = this
+			}
+		}
 	}
 
 	option = {
 		name = origin.5040.a
 		custom_tooltip = origin.5040.a.tooltip
 		owner = {
-			begin_event_chain = {
-				event_chain = homeworlds_chain
-				target = this
+			tooltip = {
+				begin_event_chain = {
+					event_chain = homeworlds_chain
+					target = this
+				}
 			}
 			create_point_of_interest = {
 				id = broken_shackles_find_home_01
@@ -4013,15 +4027,13 @@ country_event = {
 	desc = "origin.5270.desc"
 	picture = GFX_evt_hyper_relay_conjunction
 	show_sound = event_celebration
+	event_chain = homeworlds_chain
 
 	is_triggered_only = yes
 
-	immediate = {
-		end_event_chain = homeworlds_chain
-	}
-
 	option = {
 		name = EXCELLENT
+		end_event_chain = homeworlds_chain
 		if = {
 			limit = {
 				has_modifier = broken_shackles_homeworld_found_01
