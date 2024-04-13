@@ -23,9 +23,23 @@ fallen_empire_humiliate_effect = {
 		event_target:fallen_empire_humiliator = {
 			every_system_within_border = {
 				limit = {
-					event_target:fallen_empire_humiliated = { has_claim = prev }
+					event_target:fallen_empire_humiliated = {
+						OR = {
+							has_claim = prev
+							any_subject = { has_claim = prevprev }
+						}
+					}
 				}
-				remove_claims = { who = event_target:fallen_empire_humiliated }
+				event_target:fallen_empire_humiliated = {
+					if = {
+						limit = { has_claim = prev }
+						prev = { remove_claims = { who = event_target:fallen_empire_humiliated } }
+					}
+					every_subject = {
+						limit = { has_claim = prevprev }
+						prevprev = { remove_claims = { who = this } }
+					}
+				}
 			}
 		}
 	}
@@ -487,7 +501,7 @@ awaken_fallen_machine_empire = {
 	every_country = {
 		limit = {
 			is_country_type = fallen_empire
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 
 		country_event = { id = fallen_machine_empire.1 days = 30 random = 30 }
@@ -533,7 +547,7 @@ awaken_guardians_of_the_galaxy = {
 create_fallen_empire_platform = {
 	if = {
 		limit = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		create_ship = {
 			name = random
@@ -586,7 +600,7 @@ create_fallen_empire_platform = {
 create_fallen_empire_colossus = {
 	if = {
 		limit = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		create_ship = {
 			name = random
@@ -639,7 +653,7 @@ create_fallen_empire_colossus = {
 create_fallen_empire_titan = {
 	if = {
 		limit = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		create_ship = {
 			name = random
@@ -692,7 +706,7 @@ create_fallen_empire_titan = {
 create_fallen_empire_large_ship = {
 	if = {
 		limit = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		create_ship = {
 			name = random
@@ -745,7 +759,7 @@ create_fallen_empire_large_ship = {
 create_fallen_empire_small_ship = {
 	if = {
 		limit = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		create_ship = {
 			name = random
@@ -798,7 +812,7 @@ create_fallen_empire_small_ship = {
 create_fallen_empire_construction_ship = {
 	if = {
 		limit = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		create_ship = {
 			name = random
@@ -1031,7 +1045,7 @@ add_awakened_fallen_empire_fleet = {
 	if = {
 		limit = {
 			any_country = {
-				is_playable = yes
+				is_playable = yes # undercoat: moved to scripted trigger
 				OR = {
 					fleet_power > 120000
 					AND = {
@@ -1055,7 +1069,7 @@ add_awakened_fallen_empire_fleet = {
 	if = {
 		limit = {
 			any_country = {
-				is_playable = yes
+				is_playable = yes # undercoat: moved to scripted trigger
 				OR = {
 					fleet_power > 200000
 					AND = {

@@ -56,18 +56,18 @@ select_pre_ftl_origin = {
 	# Void Dwellers
 	if = {
 		limit = {
-			is_habitat = yes
+			is_habitat = yes # undercoat: moved to scripted trigger
 		}
 		set_planet_flag = pre_ftl_void_dwellers
 	}
 	else_if = {
 		limit = {
-			is_unshattered_ring_habitable_segment = yes
+			is_unshattered_ring_habitable_segment = yes # undercoat: moved to scripted trigger
 		}
 		# Do nothing!
 	}
 	else_if = {
-		limit = { is_shattered_ring_habitable = yes }
+		limit = { is_shattered_ring_habitable = yes } # undercoat: moved to scripted trigger
 		set_planet_flag = pre_ftl_shattered_ring
 	}
 	else = {
@@ -108,7 +108,7 @@ select_pre_ftl_origin = {
 							has_planet_flag = pre_ftl_life_seeded
 						}
 						any_country = {
-							is_life_seeded_empire = yes
+							is_life_seeded_empire = yes # undercoat: moved to scripted trigger
 						}
 					}
 				}
@@ -133,7 +133,7 @@ select_pre_ftl_origin = {
 							has_planet_flag = pre_ftl_ocean_paradise
 						}
 						any_country = {
-							is_ocean_paradise_empire = yes
+							is_ocean_paradise_empire = yes # undercoat: moved to scripted trigger
 						}
 					}
 				}
@@ -219,7 +219,7 @@ pre_ftl_clean_up_effect = {
 	owner = {
 		if = {
 			limit = {
-				is_subterranean_empire = yes
+				is_subterranean_empire = yes # undercoat: moved to scripted trigger
 			}
 			# If you're not in the industrial age, we'll accelerate your progress.
 			if = {
@@ -314,7 +314,7 @@ pre_ftl_clean_up_effect = {
 		}
 		if = {
 			limit = {
-				is_mechanist_empire = yes
+				is_mechanist_empire = yes # undercoat: moved to scripted trigger
 			}
 			# If you're not in the industrial age, we'll accelerate your progress.
 			if = {
@@ -1021,7 +1021,7 @@ setup_pre_ftl_planet = {
 				}
 				if = {
 					limit = {
-						is_mechanist_empire = yes
+						is_mechanist_empire = yes # undercoat: moved to scripted trigger
 					}
 					create_built_robot_species = yes
 					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
@@ -1060,7 +1060,7 @@ setup_pre_ftl_planet = {
 				}
 				if = {
 					limit = {
-						is_mechanist_empire = yes
+						is_mechanist_empire = yes # undercoat: moved to scripted trigger
 					}
 					create_built_robot_species = yes
 					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
@@ -1099,7 +1099,7 @@ setup_pre_ftl_planet = {
 				}
 				if = {
 					limit = {
-						is_mechanist_empire = yes
+						is_mechanist_empire = yes # undercoat: moved to scripted trigger
 					}
 					create_built_robot_species = yes
 					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
@@ -1138,7 +1138,7 @@ setup_pre_ftl_planet = {
 				}
 				if = {
 					limit = {
-						is_mechanist_empire = yes
+						is_mechanist_empire = yes # undercoat: moved to scripted trigger
 					}
 					create_built_robot_species = yes
 					last_created_species = { save_global_event_target_as = pre_ftl_mechanist_robot }
@@ -2136,7 +2136,7 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					if = {
 						limit = {
-							owner = { is_mechanist_empire = yes }
+							owner = { is_mechanist_empire = yes } # undercoat: moved to scripted trigger
 						}
 						owner = {
 							if = {
@@ -2198,7 +2198,7 @@ increase_pre_ftl_pops_by_age_effect = {
 					}
 					if = {
 						limit = {
-							owner = { is_mechanist_empire = yes }
+							owner = { is_mechanist_empire = yes } # undercoat: moved to scripted trigger
 						}
 						owner = {
 							if = {
@@ -2255,7 +2255,7 @@ increase_pre_ftl_pops_by_age_effect = {
 					}
 					if = {
 						limit = {
-							owner = { is_mechanist_empire = yes }
+							owner = { is_mechanist_empire = yes } # undercoat: moved to scripted trigger
 						}
 						owner = {
 							if = {
@@ -2312,7 +2312,7 @@ increase_pre_ftl_pops_by_age_effect = {
 					}
 					if = {
 						limit = {
-							owner = { is_mechanist_empire = yes }
+							owner = { is_mechanist_empire = yes } # undercoat: moved to scripted trigger
 						}
 						owner = {
 							if = {
@@ -3034,14 +3034,14 @@ achieve_ftl_effect = {
 	if = {
 		limit = {
 			has_country_flag = was_enlightened
-			has_default_pre_ftl_origin = yes
+			has_default_pre_ftl_origin = yes # undercoat: moved to scripted trigger
 		}
 		set_origin = origin_enlightened
 	}
 
 	if = {
 		limit = {
-			has_default_pre_ftl_origin = yes
+			has_default_pre_ftl_origin = yes # undercoat: moved to scripted trigger
 		}
 		set_origin = origin_default
 		if = {
@@ -3127,6 +3127,17 @@ achieve_ftl_effect = {
 		}
 	}
 
+	if = {
+		limit = {
+			is_gestalt = yes
+		}
+		country_event = { id = game_start.70 } #Sets up gestalt council
+	}
+	else = {
+		country_event = { id = game_start.72 } #Sets up regular council
+	}
+	country_event = { id = game_start.71 } #Sets up planet governor
+
 	create_fleet = {
 		effect = {
 			set_owner = prev
@@ -3141,35 +3152,18 @@ achieve_ftl_effect = {
 		}
 	}
 
-	while = {
-		count = 3
-		create_leader = {
-			class = scientist
-			name = random
-			species = owner_main_species
-		}
-	}
-
-	create_leader = {
-		class = official
-		name = random
-		species = owner_main_species
-	}
-
 	capital_scope = {
 		clear_blockers = yes
 		remove_all_buildings = yes
 		if = {
 			limit = {
-				NOT = {
-					is_habitat = yes
-				}
+				is_habitat = no # undercoat: moved to scripted trigger
 			}
 			generate_start_buildings_and_districts = yes
 		}
 		else_if = {
 			limit = {
-				is_habitat = yes
+				is_habitat = yes # undercoat: moved to scripted trigger
 			}
 			owner = {
 				give_technology = {
@@ -3226,7 +3220,7 @@ achieve_ftl_effect = {
 				limit = {
 					owner = {
 						is_spiritualist = yes
-						is_death_cult_empire = yes
+						is_death_cult_empire = yes # undercoat: moved to scripted trigger
 					}
 				}
 				add_building = building_sacrificial_temple_1
@@ -3254,7 +3248,7 @@ achieve_ftl_effect = {
 		}
 		if = {
 			limit = {
-				is_desert_world = yes
+				is_desert_world = yes # undercoat: moved to scripted trigger
 			}
 			set_planet_flag = tasty_desert
 		}

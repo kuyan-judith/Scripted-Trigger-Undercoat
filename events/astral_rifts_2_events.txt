@@ -733,7 +733,7 @@ astral_rift_event = {
 				portrait = random
 				traits = random
 				allow_negative_traits = no
-				namelist = random
+				namelist = random_class
 				effect = {
 					save_event_target_as = astral_rift_dimensional_dump_species
 				}
@@ -1925,10 +1925,23 @@ astral_rift_event = {
 		name = astral_rift.2430.a
 		leader = {
 			remove_all_traits = yes
-			add_trait = leader_trait_psionic
-			add_trait = leader_trait_resilient
-			add_trait = leader_trait_spark_of_genius
-			add_trait = leader_trait_foreign_consciousness
+			set_skill = 5
+			hidden_effect = {
+				add_trait = subclass_scientist_scholar
+				add_trait = leader_trait_resilient_2
+				add_trait = leader_trait_planar_theorist
+				add_trait = leader_trait_psionic
+				add_trait = leader_trait_academic_astral_rift_expert
+				add_trait = leader_trait_foreign_consciousness
+				if = {
+					limit = {
+						owner = {
+							has_tradition = tr_aptitude_champions_of_the_empire
+						}
+					}
+					add_trait = "random_common"
+				}
+			}
 		}
 		explorer = {
 			astral_thread_large_reward = yes
@@ -1967,15 +1980,15 @@ astral_rift_event = {
 			}
 			if = {
 				limit = {
-					NOT = { has_trait_tier1or2 = { TRAIT = leader_trait_spark_of_genius } }
+					NOT = { has_trait_tier1or2 = { TRAIT = leader_trait_planar_theorist } }
 				}
-				add_trait = leader_trait_spark_of_genius
+				add_trait = leader_trait_planar_theorist
 			}
 			else_if = {
 				limit = {
-					NOT = { has_trait = leader_trait_spark_of_genius_2 }
+					NOT = { has_trait = leader_trait_planar_theorist_2 }
 				}
-				add_trait = leader_trait_spark_of_genius_2
+				add_trait = leader_trait_planar_theorist_2
 			}
 			add_trait = leader_trait_foreign_consciousness
 		}
@@ -2156,7 +2169,12 @@ astral_rift_event = {
 
 	after = {
 		explorer = {
-			give_next_tech_society_option_effect = yes
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
 		}
 	}
 }
@@ -3067,6 +3085,7 @@ planet_event = {
 		owner = {
 			has_modifier = colonization_drones_modifier
 		}
+		habitable_planet_not_urban = yes
 	}
 
 	immediate = {
@@ -3076,12 +3095,27 @@ planet_event = {
 			}
 			25 = {
 				add_deposit = d_dense_jungle
+				modifier = {
+					factor = 2
+					OR = {
+						is_continental_world = yes # undercoat: moved to scripted trigger
+						is_tropical_world = yes # undercoat: moved to scripted trigger
+					}
+				}
 			}
 			25 = {
 				add_deposit = d_noxious_swamp
+				modifier = {
+					factor = 2
+					is_tundra_world = yes # undercoat: moved to scripted trigger
+				}
 			}
 			25 = {
 				add_deposit = d_toxic_kelp
+				modifier = {
+					factor = 2
+					is_ocean_world = yes # undercoat: moved to scripted trigger
+				}
 			}
 			10 = {}
 		}
@@ -3806,7 +3840,7 @@ astral_rift_event = {
 	}
 	desc = {
 		trigger = {
-			explorer = { is_despoiler_empire = yes }
+			explorer = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = astral_rift.2810.desc.barbaric_despoilers
 	}
@@ -3857,7 +3891,7 @@ astral_rift_event = {
 	}
 	option = {
 		trigger = {
-			explorer = { is_despoiler_empire = yes }
+			explorer = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 		}
 		name = astral_rift.2810.c
 		set_next_astral_rift_event = { id = astral_rift.2815 }
@@ -3919,7 +3953,7 @@ astral_rift_event = {
 					}
 					else_if = {
 						limit = {
-							explorer = { is_despoiler_empire = yes }
+							explorer = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 						}
 						text = astral_rift.2815.desc.barbaric_despoilers
 					}

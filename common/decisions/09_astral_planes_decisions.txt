@@ -1,0 +1,172 @@
+decision_fractal_seed = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_fractal_seed
+
+	resources = {
+		category = decisions
+		cost = {
+			astral_threads = 100
+		}
+	}
+
+	potential = {
+		owner = {
+			check_variable = {
+				which = num_authorized_fractal_seeds
+				value > 0
+			}
+		}
+		NOT = { has_deposit = d_fractal_seed }
+	}
+
+	effect = {
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = num_authorized_fractal_seeds
+					value = -1
+				}
+			}
+		}
+		add_deposit = d_fractal_seed
+	}
+
+	ai_weight = {
+		weight = 5
+	}
+}
+
+decision_breed_rockworm_hive = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_rockworm_hive_dig
+
+	potential = {
+		owner = {
+			has_country_flag = can_breed_rockworm_hives
+		}
+		NOT = { has_deposit = d_rockworm_hive }
+	}
+
+	effect = {
+		hidden_effect = {
+			owner = {
+				remove_country_flag = can_breed_rockworm_hives
+			}
+		}
+		add_deposit = d_rockworm_hive
+	}
+
+	ai_weight = {
+		weight = 5
+	}
+}
+
+decision_incubate_wind_creatures = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_incubate_wind_creatures
+
+	resources = {
+		category = decisions
+	}
+
+	potential = {
+		owner = {
+			check_variable = {
+				which = num_authorized_wind_creatures
+				value > 0
+			}
+		}
+		NOT = { has_deposit = d_forceful_winds }
+	}
+
+	effect = {
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = num_authorized_wind_creatures
+					value = -1
+				}
+			}
+		}
+		add_deposit = d_forceful_winds
+
+		# Must be removed after to updade planet modifiers graphics
+		if = {
+			limit = { has_modifier = hazardous_weather }
+			remove_modifier = hazardous_weather
+		}
+	}
+
+	ai_weight = {
+		weight = 5
+	}
+}
+
+decision_tidal_lock_planet = {
+	owned_planets_only = yes
+	sound = event_energy_field
+	icon = decision_tidal_lock_planet
+
+	potential = {
+		owner = {
+			has_country_flag = tidal_lock_knowledge
+		}
+		OR = {
+			is_moon = yes
+			has_moon = yes
+		}
+		NOR = {
+			has_modifier = intentionally_tidally_locked
+			has_planet_flag = tidally_locked_world
+			is_artificial = yes
+			is_city_world = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_tidal_lock_planet_tt
+		add_modifier = { modifier = intentionally_tidally_locked }
+		set_planet_flag = tidally_locked_world
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+decision_display_microplanet_husk = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_display_microplanet_husk
+
+	enactment_time = 180
+	resources = {
+		category = decisions
+		cost = {
+			astral_threads = 100
+			energy = 500
+		}
+	}
+
+	potential = {
+		owner = {
+			has_country_flag = can_build_microplanet_memorial
+		}
+	}
+
+	effect = {
+		hidden_effect = {
+			owner = {
+				remove_country_flag = can_build_microplanet_memorial
+			}
+		}
+		add_deposit = d_microplanet_memorial
+	}
+
+	ai_weight = {
+		weight = 5
+	}
+}

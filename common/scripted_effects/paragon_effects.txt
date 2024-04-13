@@ -276,8 +276,8 @@ ethic_leader_hire_effect = {
 			scope = event_target:ethic_leader
 		}
 		variable = {
-				key = "border"
-				value = "GFX_border_veteran" #TODO Add real rarity frame gfx
+			key = "border"
+			value = "GFX_border_veteran"
 		}
 	}
 }
@@ -302,12 +302,21 @@ ethic_leader_kill_effect = {
 
 hire_event_leader_effect = {
 
-	clone_leader = {
-		target = event_target:$LEADER$
-		skip_background_generation = yes
+	event_target:$LEADER$ = {
+		set_owner = root
 	}
-	last_created_leader = {
-		set_leader_flag = renowned_leader
+
+	if = {
+		limit = {
+			has_astral_planes_dlc = yes
+			has_relic = r_eternal_throne
+			event_target:$LEADER$ = {
+				is_immortal = no
+			}
+		}
+		event_target:$LEADER$ = {
+			set_immortal = yes
+		}
 	}
 
 	hire_event_leader_message = {
@@ -327,8 +336,8 @@ hire_event_leader_message = {
 			scope = event_target:$LEADER$
 		}
 		variable = {
-				key = "border"
-				value = "GFX_border_veteran" #TODO Add real rarity frame gfx
+			key = "border"
+			value = "GFX_border_veteran"
 		}
 	}
 }
@@ -364,6 +373,19 @@ country_create_gestalt_councilor = {
 			assign_node_subclass_traits = yes
 		}
 		add_trait_no_notify = random_common
+		add_skill_without_trait_selection = owner.modifier:leader_initial_skill
+		switch = {
+			trigger = leader_class
+			commander = {
+				add_skill_without_trait_selection = owner.modifier:commander_initial_skill
+			}
+			official = {
+				add_skill_without_trait_selection = owner.modifier:official_initial_skill
+			}
+			scientist = {
+				add_skill_without_trait_selection = owner.modifier:scientist_initial_skill
+			}
+		}
 	}
 }
 
@@ -486,6 +508,7 @@ restore_gestalt_councilor_effect = {
 					COUNCIL_POS = $COUNCIL_POS$
 				}
 				last_created_leader = {
+					add_trait_no_notify = random_common
 					add_skill_without_trait_selection = value:restored_node_additional_skills
 				}
 			}
@@ -694,7 +717,7 @@ paragon_origin_reformists_negotiations_effect = {
 				}
 				if = { #Down with the aristocracy and their oppression
 					limit = {
-						is_aristocratic_empire = yes
+						has_civic = civic_aristocratic_elite # undercoat: not changed
 					}
 					force_remove_civic = civic_aristocratic_elite
 					force_add_civic = civic_shadow_council
@@ -723,11 +746,11 @@ paragon_origin_reformists_negotiations_effect = {
 			}
 			if = {
 				limit = {
-					has_efficient_bureaucracy = no
+					has_efficient_bureaucracy = no # undercoat: moved to scripted trigger
 				}
 				if = { #Down with the aristocracy and their oppression
 					limit = {
-						is_aristocratic_empire = yes
+						has_civic = civic_aristocratic_elite # undercoat: not changed
 					}
 					force_remove_civic = civic_aristocratic_elite
 					force_add_civic = civic_efficient_bureaucracy
@@ -762,7 +785,7 @@ paragon_origin_reformists_negotiations_effect = {
 			force_remove_civic = civic_slaver_guilds
 			if = {
 				limit = {
-					has_philosopher_king = no
+					has_philosopher_king = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_philosopher_king
 			}
@@ -774,19 +797,19 @@ paragon_origin_reformists_negotiations_effect = {
 			}
 			else_if = {
 				limit = {
-					has_efficient_bureaucracy = no
+					has_efficient_bureaucracy = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_efficient_bureaucracy
 			}
 		}
 		if = { #People want some amenities
 			limit = {
-				has_dystopian_society = yes
+				has_civic = civic_dystopian_society # undercoat: not changed
 			}
 			force_remove_civic = civic_dystopian_society
 			if = {
 				limit = {
-					has_efficient_bureaucracy = no
+					has_efficient_bureaucracy = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_efficient_bureaucracy
 			}
@@ -798,7 +821,7 @@ paragon_origin_reformists_negotiations_effect = {
 			}
 			else_if = {
 				limit = {
-					has_philosopher_king = no
+					has_philosopher_king = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_philosopher_king
 			}
@@ -870,7 +893,7 @@ paragon_origin_reformists_negotiations_effect = {
 			force_remove_civic = civic_slaver_guilds
 			if = {
 				limit = {
-					has_philosopher_king = no
+					has_philosopher_king = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_philosopher_king
 			}
@@ -882,19 +905,19 @@ paragon_origin_reformists_negotiations_effect = {
 			}
 			else_if = {
 				limit = {
-					has_efficient_bureaucracy = no
+					has_efficient_bureaucracy = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_efficient_bureaucracy
 			}
 		}
 		if = { #People want some amenities
 			limit = {
-				has_dystopian_society = yes
+				has_civic = civic_dystopian_society # undercoat: not changed
 			}
 			force_remove_civic = civic_dystopian_society
 			if = {
 				limit = {
-					has_efficient_bureaucracy = no
+					has_efficient_bureaucracy = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_efficient_bureaucracy
 			}
@@ -906,7 +929,7 @@ paragon_origin_reformists_negotiations_effect = {
 			}
 			else_if = {
 				limit = {
-					has_philosopher_king = no
+					has_philosopher_king = no # undercoat: moved to scripted trigger
 				}
 				force_add_civic = civic_philosopher_king
 			}
@@ -1443,20 +1466,6 @@ scientist_prospector_effect = {
 					1 = { add_deposit = d_energy_2 }
 					2 = { add_deposit = d_energy_3 }
 					1 = { add_deposit = d_energy_4 }
-				}
-			}
-			# Volatile Motes
-			if = {
-				limit = {
-					has_resource = {
-						type = volatile_motes
-						amount > 0
-					}
-				}
-				locked_random_list = {
-					1 = { add_deposit = d_volatile_motes_1 }
-					2 = { add_deposit = d_volatile_motes_2 }
-					1 = { add_deposit = d_volatile_motes_3 }
 				}
 			}
 			# Volatile Motes
@@ -2248,7 +2257,7 @@ add_random_expertise_trait_effect = {
 				add = 4
 				owner = {
 					OR = {
-						is_remnants_empire = yes
+						is_remnants_empire = yes # undercoat: moved to scripted trigger
 						has_ascension_perk = ap_archaeoengineers
 						any_system_within_border = {
 							any_archaeological_site = {
@@ -2268,7 +2277,7 @@ add_random_expertise_trait_effect = {
 				add = 4
 				owner = {
 					OR = {
-						is_shroudwalker_apprentice_empire = yes # This might be possible, somehow.
+						is_shroudwalker_apprentice_empire = yes # This might be possible, somehow. # undercoat: moved to scripted trigger
 						has_technology = tech_psionic_theory
 					}
 				}
@@ -2298,6 +2307,28 @@ add_expertise_trait_effect = {
 	}
 	else = {
 		add_experience = 200
+	}
+}
+
+add_or_level_up_veteran_trait_effect = {
+	if = {
+		limit = {
+			NOT = {
+				has_trait_tier1or2or3 = {
+					TRAIT = $TRAIT$
+				}
+			}
+		}
+		add_trait = $TRAIT$
+	}
+	else_if = {
+		limit = {
+			has_trait = $TRAIT$
+		}
+		add_trait = $TRAIT$_2
+	}
+	else = {
+		add_trait = $TRAIT$_3
 	}
 }
 
@@ -2389,67 +2420,72 @@ assign_governor_effect = {
 }
 
 set_starting_governor_effect = {
-	capital_scope = {
-		if = {
-			limit = {
-				exists = leader
-				leader = {
-					leader_class = $GOVERNOR$
-					is_councilor = yes
-				}
-			}
-			# Do nothing, leader matches chosen class.
+	if = {
+		limit = {
+			exists = capital_scope
 		}
-		else = {
+		capital_scope = {
 			if = {
 				limit = {
 					exists = leader
+					leader = {
+						leader_class = $GOVERNOR$
+						is_councilor = yes
+					}
 				}
-				kill_leader = {
-					show_notification = no
-				}
+				# Do nothing, leader matches chosen class.
 			}
-			root = {
+			else = {
 				if = {
 					limit = {
-						is_gestalt = no
-						any_owned_leader = {
-							leader_class =  $GOVERNOR$
-							is_councilor = yes
-							is_idle = yes
-							is_ruler = no
-						}
+						exists = leader
 					}
-					random_owned_leader = {
+					kill_leader = {
+						show_notification = no
+					}
+				}
+				root = {
+					if = {
 						limit = {
-							leader_class =  $GOVERNOR$
-							is_councilor = yes
-							is_idle = yes
-							is_ruler = no
-						}
-						save_event_target_as = governor_leader
-					}
-				}
-				else = {
-					create_leader = {
-						class = $GOVERNOR$
-						name = random
-						species = owner_main_species
-					}
-					last_created_leader = {
-						save_event_target_as = governor_leader
-						if = {
-							limit = {
-								has_skill > 1
-								num_traits = 0
+							is_gestalt = no
+							any_owned_leader = {
+								leader_class =  $GOVERNOR$
+								is_councilor = yes
+								is_idle = yes
+								is_ruler = no
 							}
-							add_trait_no_notify = random_common
+						}
+						random_owned_leader = {
+							limit = {
+								leader_class =  $GOVERNOR$
+								is_councilor = yes
+								is_idle = yes
+								is_ruler = no
+							}
+							save_event_target_as = governor_leader
 						}
 					}
-				}
+					else = {
+						create_leader = {
+							class = $GOVERNOR$
+							name = random
+							species = owner_main_species
+						}
+						last_created_leader = {
+							save_event_target_as = governor_leader
+							if = {
+								limit = {
+									has_skill > 1
+									num_traits = 0
+								}
+								add_trait_no_notify = random_common
+							}
+						}
+					}
 
+				}
+				assign_leader = event_target:governor_leader
 			}
-			assign_leader = event_target:governor_leader
 		}
 	}
 }

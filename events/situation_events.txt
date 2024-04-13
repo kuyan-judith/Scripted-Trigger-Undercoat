@@ -31,9 +31,9 @@ planet_event = {
 	trigger = {
 		NOT = { has_planet_flag = colony_event }
 		is_artificial = no
-		is_nuked_world = no
+		is_nuked_world = no # undercoat: moved to scripted trigger
 		owner = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -417,9 +417,9 @@ planet_event = {
 
 	trigger = {
 		NOT = { has_planet_flag = colony_event }
-		is_desert_world = yes
+		is_desert_world = yes # undercoat: moved to scripted trigger
 		owner = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			is_gestalt = no #for now
 		}
 	}
@@ -958,7 +958,7 @@ situation_event = {
 		modifier = {
 			factor = 2
 			owner = {
-				is_technocracy = { allow_invalid = yes }
+				is_technocracy = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1346,8 +1346,8 @@ situation_event = {
 		trigger = {
 			owner = {
 				OR = {
-					is_hive_empire = yes
-					is_machine_empire = yes
+					is_hive_empire = yes # undercoat: moved to scripted trigger
+					is_machine_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -2770,6 +2770,26 @@ planet_event = {
 ### The Kaleidoscope
 ## By Giada Zavarise
 
+# Randomize Kaleidoscope existence on_game_start
+event = {
+	id = situation.1999
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_nemesis = yes
+	}
+
+	immediate = {
+		random_list = {
+			70 = {}
+			30 = {
+				set_global_flag = kaleidoscope_will_spawn
+			}
+		}
+	}
+}
+
 # Creates the Kaleidoscope and the variables used to track its state as it gets passed around
 event = {
 	id = situation.2000
@@ -2777,7 +2797,9 @@ event = {
 	hide_window = yes
 
 	trigger = {
+		mid_game_years_passed > 0
 		has_nemesis = yes
+		has_global_flag = kaleidoscope_will_spawn
 		NOT = { has_global_flag = kaleidoscope_started }
 	}
 
@@ -2840,7 +2862,7 @@ situation_event = {
 			limit = {
 				event_target:global_event_country = {
 					NOT = { has_country_flag = kaleidoscope_global_lifetime }
-				}		
+				}
 			}
 			# Notify owner
 			situation_event = { id = situation.2040 days = 15 }
@@ -2878,7 +2900,7 @@ situation_event = {
 				# No food = angry Kaleidoscope
 				event_target:global_event_country = {
 					if = {
-						limit = { 
+						limit = {
 							check_variable = {
 								which = kaleidoscope_global_mood
 								value > 1
@@ -2895,7 +2917,7 @@ situation_event = {
 				# Little food = no mood changes
 				event_target:global_event_country = {
 					if = {
-						limit = { 
+						limit = {
 							check_variable = {
 								which = kaleidoscope_global_mood
 								value < 20
@@ -2912,7 +2934,7 @@ situation_event = {
 				# A lot of food = happy Kaleidoscope
 				event_target:global_event_country = {
 					if = {
-						limit = { 
+						limit = {
 							check_variable = {
 								which = kaleidoscope_global_mood
 								value < 20
@@ -2946,7 +2968,6 @@ country_event = {
 	}
 
 	immediate = {
-		set_global_flag = kaleidoscope_started
 		# If we're firing this event from the console, initialize the Kaleidoscope
 		initialize_kaleidoscope = yes
 		if = {
@@ -3096,7 +3117,6 @@ planet_event = {
 			limit = {
 				NOT = { has_global_flag = kaleidoscope_started }
 			}
-			set_global_flag = kaleidoscope_started
 			initialize_kaleidoscope = yes
 			solar_system = {
 				spawn_kaleidoscope_effect = yes
@@ -3325,7 +3345,7 @@ situation_event = {
 			factor = value:kaleidoscope_negative_events_value
 		}
 	}
-	
+
 	immediate = {
 		set_timed_situation_flag = {
 			flag = kaleidoscope_invasion
@@ -3412,7 +3432,7 @@ situation_event = {
 			factor = value:kaleidoscope_negative_events_value
 		}
 	}
-	
+
 	immediate = {
 		set_timed_situation_flag = {
 			flag = kaleidoscope_random_events
@@ -3810,7 +3830,7 @@ situation_event = {
 		}
 	}
 
-	after = { 
+	after = {
 		set_global_flag = kaleidoscope_finished # just in case we need it in the future
 		destroy_situation = this
 		hidden_effect = {
@@ -3872,7 +3892,7 @@ situation_event = {
 		name = UNFORTUNATE
 	}
 
-	after = { 
+	after = {
 		set_global_flag = kaleidoscope_finished # just in case we need it in the future
 		destroy_situation = this
 		every_playable_country = {
@@ -3921,7 +3941,7 @@ situation_event = {
 			NOT = { has_country_flag = can_build_disco_sphere }
 			any_owned_megastructure = {
 				OR = {
-					is_megastructure_type = dyson_sphere_5 
+					is_megastructure_type = dyson_sphere_5
 					is_megastructure_type = dyson_sphere_restored
 				}
 			}
@@ -3993,7 +4013,7 @@ planet_event = {
 					OR = {
 						has_ambient_object_flag = kaleidoscope_small
 						has_ambient_object_flag = kaleidoscope_ambient_object
-					}	
+					}
 				}
 				destroy_ambient_object = this
 			}
@@ -4020,13 +4040,13 @@ country_event = {
 		}
 		exists = from
 		from = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 	}
-	
-	immediate = {		
+
+	immediate = {
 		from = {
-			# If the capital doesn't have a shield, give the Kaleidoscope to them 
+			# If the capital doesn't have a shield, give the Kaleidoscope to them
 			if = {
 				limit = {
 					capital_scope = {

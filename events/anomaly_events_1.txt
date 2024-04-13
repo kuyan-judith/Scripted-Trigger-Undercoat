@@ -594,10 +594,7 @@ country_event = {
 	immediate = {
 		random_country = {
 			limit = {
-				OR = {
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
 				OR = {
 					is_lithoid_empire = yes
 					has_ethic = ethic_fanatic_xenophile
@@ -843,14 +840,10 @@ ship_event = {
 
 	option = {
 		name = FASCINATING
-		custom_tooltip = anomaly.91.a.tooltip
-		hidden_effect = {
-			fromfrom = {
-				add_modifier = {
-					modifier = "cunning_flora"
-					days = -1
-				}
-				add_deposit = d_savage_wildlands
+		fromfrom = {
+			add_modifier = {
+				modifier = "cunning_flora"
+				days = -1
 			}
 		}
 	}
@@ -1307,6 +1300,7 @@ fleet_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = owner
 		owner = { has_country_flag = sol_search }
 		from = { has_star_flag = sol_target }
 	}
@@ -1469,7 +1463,7 @@ ship_event = {
 					has_ethic = "ethic_fanatic_xenophobe"
 					has_ethic = "ethic_xenophile"
 					has_ethic = "ethic_fanatic_xenophile"
-					is_gestalt = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -1683,7 +1677,7 @@ ship_event = {
 	auto_opens = yes
 
 	trigger = {
-		FROM = { is_rocky_asteroid = yes }
+		FROM = { is_rocky_asteroid = yes } # undercoat: moved to scripted trigger
 	}
 
 	option = {
@@ -1716,8 +1710,8 @@ ship_event = {
 	trigger = {
 		FROM = {
 			NOR = {
-				is_rocky_asteroid = yes
-				is_gas_giant = yes
+				is_rocky_asteroid = yes # undercoat: moved to scripted trigger
+				is_gas_giant = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1929,7 +1923,6 @@ fleet_event = {
 	id = anomaly.142
 	title = "anomaly.142.name"
 	desc = anomaly.142.desc
-	desc = anomaly.143.desc
 	picture = GFX_evt_ship_travel
 	show_sound = event_mystic_reveal
 	location = event_target:shrine
@@ -1972,7 +1965,6 @@ fleet_event = {
 fleet_event = {
 	id = anomaly.143
 	title = "anomaly.143.name"
-	desc = anomaly.142.desc
 	desc = anomaly.143.desc
 	picture = GFX_evt_ship_travel
 	show_sound = event_mystic_reveal
@@ -2016,8 +2008,7 @@ fleet_event = {
 fleet_event = {
 	id = anomaly.144
 	title = "anomaly.144.name"
-	desc = anomaly.142.desc
-	desc = anomaly.143.desc
+	desc = anomaly.144.desc
 	picture = GFX_evt_ship_travel
 	show_sound = event_mystic_reveal
 	location = event_target:shrine
@@ -2283,21 +2274,11 @@ ship_event = {
 	option = {
 		name = FASCINATING
 		owner = {
-			if = {
-				limit = {
-					has_tech_option = tech_society_2
-				}
-				add_tech_progress = {
-					tech = tech_society_2
-					progress = 0.80
-				}
-			}
-			else = {
-				add_research_option = tech_society_2
-				add_tech_progress = {
-					tech = tech_society_2
-					progress = 0.5
-				}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
 			}
 		}
 		hidden_effect = {
@@ -2553,6 +2534,7 @@ ship_event = {
 					has_ethic = ethic_militarist
 					has_civic = civic_machine_terminator
 					has_civic = civic_fanatic_purifiers
+					is_homicidal = yes # undercoat (addition rather than replacement to not mess with tooltips)
 				}
 				NOR = {
 					has_ethic = ethic_fanatic_xenophile
@@ -2835,7 +2817,7 @@ ship_event = {
 	option = {
 		name = anomaly.211.b
 		trigger = {
-			owner = { is_machine_empire = no }
+			owner = { is_machine_empire = no } # undercoat: moved to scripted trigger
 		}
 		custom_tooltip = anomaly.211.b.tooltip
 		hidden_effect = {
@@ -2845,7 +2827,7 @@ ship_event = {
 	option = {
 		name = anomaly.211.c
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		custom_tooltip = anomaly.211.b.tooltip
 		hidden_effect = {
@@ -2895,7 +2877,7 @@ ship_event = {
 		text = anomaly.215.desc
 		trigger = {
 			hidden:owner = {
-				NOT = { is_servitor_empire = yes }
+				is_servitor_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2903,7 +2885,7 @@ ship_event = {
 		text = anomaly.215.desc.serv
 		trigger = {
 			hidden:owner = {
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2911,15 +2893,6 @@ ship_event = {
 	picture = GFX_evt_big_landing_ship
 	show_sound = event_alien_nature
 	location = FROM
-
-	trigger = {
-		owner = {
-			OR = {
-				is_machine_empire = no
-				is_servitor_empire = yes
-			}
-		}
-	}
 
 	is_triggered_only = yes
 	auto_opens = yes
@@ -3205,7 +3178,7 @@ ship_event = {
 
 	is_triggered_only = yes
 
-	trigger = { from = { is_gaia_world = yes } }
+	trigger = { from = { is_gaia_world = yes } } # undercoat: moved to scripted trigger
 
 	immediate = {
 		from = {
@@ -3697,8 +3670,8 @@ ship_event = {
 
 	option = {
 		name = anomaly.290.b
-		trigger = { owner = { resource_stockpile_compare = { resource = energy value >= 100 } } }
-		owner = { add_resource = { energy = -100 } }
+		trigger = { owner = { resource_stockpile_compare = { resource = energy value >= 1000 } } }
+		owner = { add_resource = { energy = -1000 } }
 		from = {
 			enable_special_project = {
 				name = "REFINE_ROCK_PROJECT"
@@ -4339,7 +4312,7 @@ ship_event = {
 		}
 	}
 	option = {
-		trigger = { owner = { is_calamitous_birth_empire = yes } }
+		trigger = { owner = { is_calamitous_birth_empire = yes } } # undercoat: moved to scripted trigger
 		name = anomaly.660.b
 		owner = { add_modifier = { modifier = asteroid_thrusters days = -1 } } 
 	}
@@ -4424,7 +4397,7 @@ ship_event = {
 
 	immediate = {
 		from = { clear_deposits = yes }
-		owner = { country_event = { id = story.5 days = 2 } }
+		owner = { country_event = { id = story.1 days = 2 } }
 	}
 
 	option = {
@@ -4475,26 +4448,26 @@ ship_event = {
 	}
 }
 
-### Wildcat Miners
-ship_event = {
-	id = anomaly.700
-	title = "anomaly.700.name"
-	desc = "anomaly.700.desc"
-	picture = GFX_evt_outpost
-	show_sound = event_ship_bridge
-	location = FROM
-
-	is_triggered_only = yes
-
-	option = {
-		name = INTERESTING
-		FROM = {
-			create_mining_station = {
-				owner = ROOT
-			}
-		}
-	}
-}
+#### Wildcat Miners
+#ship_event = {
+#	id = anomaly.700
+#	title = "anomaly.700.name"
+#	desc = "anomaly.700.desc"
+#	picture = GFX_evt_outpost
+#	show_sound = event_ship_bridge
+#	location = FROM
+#
+#	is_triggered_only = yes
+#
+#	option = {
+#		name = INTERESTING
+#		FROM = {
+#			create_mining_station = {
+#				owner = ROOT
+#			}
+#		}
+#	}
+#}
 
 ### Ancient Survey Marker
 ship_event = {

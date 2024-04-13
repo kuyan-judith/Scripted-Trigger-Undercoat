@@ -34,10 +34,7 @@ country_event = {
 			limit = {
 				NOT = {
 					any_country = {
-						OR = {
-							is_country_type = fallen_empire
-							is_country_type = awakened_fallen_empire
-						}
+						is_fallen_empire = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
@@ -261,7 +258,7 @@ ship_event = {
 				is_ai = yes
 				has_country_flag = encountered_holy_world
 			}
-			is_scion_empire = yes
+			is_scion_empire = yes # undercoat: moved to scripted trigger
 			exists = overlord
 			overlord = {
 				is_country_type = fallen_empire # excludes 'awakened_fallen_empire'
@@ -399,7 +396,7 @@ country_event = {
 	immediate = {
 		every_playable_country = {
 			limit = {
-				is_scion_empire = yes
+				is_scion_empire = yes # undercoat: moved to scripted trigger
 				root = { is_overlord_to = prev }
 				any_agreement = {
 					agreement_preset = preset_scion
@@ -515,10 +512,6 @@ country_event = {
 					OR = {
 						has_technology = tech_eco_simulation
 						NOT = { can_research_technology = tech_eco_simulation }
-					}
-					OR = {
-						has_technology = tech_society_2
-						NOT = { can_research_technology = tech_society_2 }
 					}
 					OR = {
 						has_technology = tech_colonization_4
@@ -1308,19 +1301,13 @@ country_event = {
 			# Fire only for the attacker, i.e. a subject or Scion
 			any_attacker = { is_same_value = root }
 			any_defender = {
-				OR = {
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		# Fire only if root controls a fleet gifted by the FE via the "Scion" Origin
 		any_country = {
 			is_at_war_with = root
-			OR = {
-				is_country_type = fallen_empire
-				is_country_type = awakened_fallen_empire
-			}
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 			root = {
 				has_country_flag = borrowed_fleet_from@prev
 				any_controlled_fleet = { has_fleet_flag = scion_borrowed_fleet }
@@ -1332,10 +1319,7 @@ country_event = {
 		random_country = {
 			limit = {
 				is_at_war_with = root
-				OR = {
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
 				root = {
 					has_country_flag = borrowed_fleet_from@prev
 					any_controlled_fleet = { has_fleet_flag = scion_borrowed_fleet }
@@ -1535,9 +1519,7 @@ country_event = {
 			if = {
 				limit = {
 					root = {
-						NOT = {
-							is_selective_kinship_empire = yes
-						}
+						is_selective_kinship_empire = no # undercoat: moved to scripted trigger
 					}
 				}
 				create_fed_planet_1_species = { CLASS = random }
@@ -1565,7 +1547,7 @@ country_event = {
 			# Common Ground
 			if = {
 				limit = {
-					root = { is_common_ground_empire = yes }
+					root = { is_common_ground_empire = yes } # undercoat: moved to scripted trigger
 				}
 				create_common_ground_member = { NUM = 1 }
 			}
@@ -1573,7 +1555,7 @@ country_event = {
 			if = {
 				limit = {
 					root = {
-						is_hegemon_origin_empire = yes
+						is_hegemon_origin_empire = yes # undercoat: moved to scripted trigger
 						NOT = { has_ethic = ethic_xenophobe }
 					}
 				}
@@ -1642,9 +1624,7 @@ country_event = {
 			if = {
 				limit = {
 					root = {
-						NOT = {
-							is_selective_kinship_empire = yes
-						}
+						is_selective_kinship_empire = no # undercoat: moved to scripted trigger
 					}
 				}
 				create_fed_planet_2_species = { CLASS = random }
@@ -1672,7 +1652,7 @@ country_event = {
 			# Common Ground
 			if = {
 				limit = {
-					root = { is_common_ground_empire = yes }
+					root = { is_common_ground_empire = yes } # undercoat: moved to scripted trigger
 				}
 				create_common_ground_member = { NUM = 2 }
 			}
@@ -1680,7 +1660,7 @@ country_event = {
 			if = {
 				limit = {
 					root = {
-						is_hegemon_origin_empire = yes
+						is_hegemon_origin_empire = yes # undercoat: moved to scripted trigger
 						NOT = { has_ethic = ethic_xenophobe }
 					}
 				}
@@ -1748,6 +1728,7 @@ country_event = {
 			create_starting_leaders = yes
 			country_event = { id = game_start.9 } # create starter set of ships
 			country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
+			country_event = { id = origin.58 days = 1 } # delayed for federation assignment to settle
 			join_alliance = {
 				who = root
 				override_requirements = yes
@@ -1758,6 +1739,7 @@ country_event = {
 			create_starting_leaders = yes
 			country_event = { id = game_start.9 }
 			country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
+			country_event = { id = origin.58 days = 1 } # delayed for federation assignment to settle
 			join_alliance = {
 				who = root
 				override_requirements = yes
@@ -1767,7 +1749,7 @@ country_event = {
 
 		# Set Intel levels, Opinion, and Federation laws
 		if = {
-			limit = { is_common_ground_empire = yes }
+			limit = { is_common_ground_empire = yes } # undercoat: moved to scripted trigger
 			event_target:fed_member_1 = {
 				add_opinion_modifier = {
 					who = root
@@ -1840,7 +1822,7 @@ country_event = {
 			country_event = { id = origin.57 days = 2 }
 		}
 		if = {
-			limit = { is_hegemon_origin_empire = yes }
+			limit = { is_hegemon_origin_empire = yes } # undercoat: moved to scripted trigger
 			federation = {
 				set_federation_type = hegemony_federation
 				set_federation_leader = root
@@ -1960,7 +1942,7 @@ country_event = {
 					is_materialist = yes
 				}
 				is_machine_empire = yes
-				has_natural_neural_network = yes
+				has_natural_neural_network = yes # undercoat: moved to scripted trigger
 			}
 		}
 		federation = {
@@ -2017,6 +1999,19 @@ country_event = {
 		federation = {
 			add_federation_experience = 600
 			add_cohesion = 100
+		}
+	}
+}
+
+country_event = {
+	id = origin.58
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		create_leader = {
+			class = official
+			species = owner_main_species
 		}
 	}
 }
@@ -2082,14 +2077,14 @@ planet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.65.desc"
 	}
 	desc = {
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 		}
 		text = "origin.65.2.desc"
 	}
@@ -2126,14 +2121,14 @@ planet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.70.desc"
 	}
 	desc = {
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 		}
 		text = "origin.70.2.desc"
 	}
@@ -2156,7 +2151,7 @@ planet_event = {
 		name = origin_70.a
 		trigger = {
 			owner = {
-				is_machine_empire = no
+				is_machine_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		tooltip = {
@@ -2170,7 +2165,7 @@ planet_event = {
 	option = {
 		name = origin_70.b
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		tooltip = {
 			add_planet_devastation = 20
@@ -2188,14 +2183,14 @@ planet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.75.desc"
 	}
 	desc = {
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 		}
 		text = "origin.75.2.desc"
 	}
@@ -2232,14 +2227,14 @@ planet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.76.desc"
 	}
 	desc = {
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 		}
 		text = "origin.76.2.desc"
 	}
@@ -2267,7 +2262,7 @@ planet_event = {
 			has_planet_flag = doomsday_lost_some_pops
 			has_planet_flag = doomsday_still_original_owner
 			event_target:doomsday_owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.80.1.desc"
@@ -2277,7 +2272,7 @@ planet_event = {
 			has_planet_flag = doomsday_lost_some_pops
 			has_planet_flag = doomsday_still_original_owner
 			event_target:doomsday_owner = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.80.1.gestalt.desc"
@@ -2287,7 +2282,7 @@ planet_event = {
 			has_planet_flag = doomsday_lost_many_pops
 			has_planet_flag = doomsday_still_original_owner
 			event_target:doomsday_owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.80.2.desc"
@@ -2297,7 +2292,7 @@ planet_event = {
 			has_planet_flag = doomsday_lost_many_pops
 			has_planet_flag = doomsday_still_original_owner
 			event_target:doomsday_owner = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.80.2.gestalt.desc"
@@ -2307,7 +2302,7 @@ planet_event = {
 			has_planet_flag = doomsday_lost_everything
 			has_planet_flag = doomsday_still_original_owner
 			event_target:doomsday_owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.80.4.desc"
@@ -2317,7 +2312,7 @@ planet_event = {
 			has_planet_flag = doomsday_lost_everything
 			has_planet_flag = doomsday_still_original_owner
 			event_target:doomsday_owner = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.80.4.gestalt.desc"
@@ -2488,7 +2483,7 @@ planet_event = {
 
 	trigger = {
 		owner = {
-			is_doomsday_empire = yes
+			is_doomsday_empire = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = colonized_first_planet }
 		}
 	}
@@ -2563,7 +2558,7 @@ country_event = {
 		trigger = {
 			from = { has_planet_flag = doomsday_lost_some_pops }
 			event_target:doomsday_owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.90.1.desc"
@@ -2571,7 +2566,7 @@ country_event = {
 	desc = {
 		trigger = {
 			from = { has_planet_flag = doomsday_lost_some_pops }
-			event_target:doomsday_owner = { is_gestalt = yes }
+			event_target:doomsday_owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 		}
 		text = "origin.90.1.gestalt.desc"
 	}
@@ -2579,7 +2574,7 @@ country_event = {
 		trigger = {
 			from = { has_planet_flag = doomsday_lost_many_pops }
 			event_target:doomsday_owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "origin.90.2.desc"
@@ -2587,7 +2582,7 @@ country_event = {
 	desc = {
 		trigger = {
 			from = { has_planet_flag = doomsday_lost_many_pops }
-			event_target:doomsday_owner = { is_gestalt = yes }
+			event_target:doomsday_owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 		}
 		text = "origin.90.2.gestalt.desc"
 	}
@@ -2902,7 +2897,7 @@ country_event = {
 		# Parliamentary System interaction
 		if = {
 			limit = {
-				has_parliamentary_system = yes
+				has_parliamentary_system = yes # undercoat: moved to scripted trigger
 			}
 			country_event = {
 				id = origin.5041
@@ -3021,7 +3016,7 @@ country_event = {
 		if = {
 			limit = {
 				any_playable_country = {
-					is_broken_shackles_empire = yes
+					is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -3047,7 +3042,7 @@ country_event = {
 		if = {
 			limit = {
 				any_playable_country = {
-					is_payback_empire = yes
+					is_payback_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}

@@ -2,12 +2,16 @@
 # ASCENSION PATHS
 #################
 
+@ascension_path_base_weight = 100
+@ascension_path_synergy_weight = 2
+@ascension_path_anti_synergy_weight = 0.5
+
 ap_engineered_evolution = {
 	on_enabled = {
 		custom_tooltip = "engineered_evolution_tooltip"
 		if = {
 			limit = {
-				is_clone_army_empire = yes
+				is_clone_army_empire = yes # undercoat: moved to scripted trigger
 				OR = {
 					has_trait = trait_clone_soldier_infertile
 					has_trait = trait_clone_soldier_infertile_full_potential
@@ -51,22 +55,18 @@ ap_engineered_evolution = {
 		has_utopia = yes
 		NOR = {
 			has_ascension_perk = ap_engineered_evolution
-			is_machine_empire = yes
-			is_shroudwalker_apprentice_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 		}
 		is_mechanical_empire = no
 		is_cyborg_empire = no
 	}
 
 	ai_weight = {
-		factor = 15
+		factor = @ascension_path_base_weight
 		modifier = {
-			factor = 0
-			num_owned_planets < 6
-		}
-		modifier = {
-			factor = 3
-			is_hive_empire = yes
+			factor = @ascension_path_synergy_weight
+			has_engineered_evolution_synergy = yes
 		}
 	}
 }
@@ -106,23 +106,16 @@ ap_the_flesh_is_weak = {
 		has_utopia = yes
 		NOR = {
 			has_ascension_perk = ap_the_flesh_is_weak
-			is_shroudwalker_apprentice_empire = yes
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 		}
 		is_gestalt = no
 	}
 
 	ai_weight = {
-		factor = 20
+		factor = @ascension_path_base_weight
 		modifier = {
-			factor = 0.5
-			NOR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
-		}
-		modifier = {
-			factor = 0
-			num_owned_planets < 6
+			factor = @ascension_path_anti_synergy_weight
+			has_flesh_is_weak_anti_synergy = yes
 		}
 	}
 }
@@ -151,15 +144,11 @@ ap_organo_machine_interfacing = {
 		NOR = {
 			has_ascension_perk = ap_organo_machine_interfacing
 		}
-		is_hive_empire = yes
+		is_hive_empire = yes # undercoat: moved to scripted trigger
 	}
 
 	ai_weight = {
-		factor = 20
-		modifier = {
-			factor = 0
-			num_owned_planets < 10
-		}
+		factor = @ascension_path_base_weight
 	}
 }
 
@@ -194,14 +183,14 @@ ap_organo_machine_interfacing_assimilator = {
 		NOT = {
 			has_ascension_perk = ap_organo_machine_interfacing_assimilator
 		}
-		is_machine_assimilator = yes
+		is_machine_assimilator = yes # undercoat: moved to scripted trigger
 	}
 
 	ai_weight = {
-		factor = 20
+		factor = @ascension_path_base_weight
 		modifier = {
-			factor = 0
-			num_owned_planets < 10
+			factor = @ascension_path_synergy_weight
+			has_organo_machine_interfacing_assimilator_synergy = yes
 		}
 	}
 }
@@ -211,13 +200,13 @@ ap_synthetic_evolution = {
 		custom_tooltip = "synthetic_evolution_tooltip"
 		if = {
 			limit = {
-				is_necrophage_empire = yes
+				is_necrophage_empire = yes # undercoat: moved to scripted trigger
 			}
 			custom_tooltip = disables_necrophage_features
 		}
 		if = {
 			limit = {
-				is_clone_army_empire = yes
+				is_clone_army_empire = yes # undercoat: moved to scripted trigger
 				OR = {
 					has_trait = trait_clone_soldier_infertile
 					has_trait = trait_clone_soldier_infertile_full_potential
@@ -228,13 +217,13 @@ ap_synthetic_evolution = {
 		}
 		if = {
 			limit = {
-				is_overtuned_empire = yes
+				is_overtuned_empire = yes # undercoat: moved to scripted trigger
 			}
 			custom_tooltip = disables_overtuned_features
 		}
 		if = {
 			limit = {
-				is_idyllic_bloom_empire = yes
+				is_idyllic_bloom_empire = yes # undercoat: moved to scripted trigger
 			}
 			custom_tooltip = disables_idyllic_bloom
 		}
@@ -270,32 +259,26 @@ ap_synthetic_evolution = {
 		has_utopia = yes
 		NOR = {
 			has_ascension_perk = ap_synthetic_evolution
-			is_machine_empire = yes
-			is_shroudwalker_apprentice_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 		}
 		is_gestalt = no
 		is_mechanical_empire = no
 	}
 
 	ai_weight = {
-		factor = 20
+		factor = @ascension_path_base_weight
 		modifier = {
-			factor = 0.1
-			NOR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			factor = @ascension_path_synergy_weight
+			has_synthetic_evolution_synergy = yes
+		}
+		modifier = {
+			factor = @ascension_path_anti_synergy_weight
+			has_synthetic_evolution_anti_synergy = yes
 		}
 		modifier = {
 			factor = 0
-			num_owned_planets < 6
-		}
-		modifier = {
-			factor = 0
-			OR = {
-				is_necrophage_empire = yes
-				is_minamar = yes
-			}
+			blocks_ai_synthetic_evolution = yes
 		}
 	}
 }
@@ -335,7 +318,7 @@ ap_mind_over_matter = {
 		has_utopia = yes
 		NOR = {
 			has_ascension_perk = ap_mind_over_matter
-			is_shroudwalker_apprentice_empire = yes
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 		}
 		is_gestalt = no
 		is_mechanical_empire = no
@@ -343,21 +326,14 @@ ap_mind_over_matter = {
 	}
 
 	ai_weight = {
-		factor = 100
+		factor = @ascension_path_base_weight
 		modifier = {
-			factor = 0.1
-			NOR = {
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_spiritualist
-			}
+			factor = @ascension_path_synergy_weight
+			has_mind_over_matter_synergy = yes
 		}
 		modifier = {
-			factor = 0
-			num_owned_planets < 6
-		}
-		modifier = {
-			factor = 10
-			has_ascension_perk = ap_become_the_crisis
+			factor = @ascension_path_anti_synergy_weight
+			has_mind_over_matter_anti_synergy = yes
 		}
 	}
 }
@@ -369,7 +345,7 @@ ap_synthetic_age = {
 
 	potential = {
 		has_synthethic_dawn = yes
-		is_machine_empire = yes
+		is_machine_empire = yes # undercoat: moved to scripted trigger
 		NOT = {
 			has_ascension_perk = ap_synthetic_age
 		}
@@ -391,10 +367,10 @@ ap_synthetic_age = {
 	}
 
 	ai_weight = {
-		factor = 20
+		factor = @ascension_path_base_weight
 		modifier = {
-			factor = 0
-			num_owned_planets < 10
+			factor = @ascension_path_anti_synergy_weight
+			has_synthetic_age_anti_synergy = yes
 		}
 	}
 }
@@ -428,7 +404,7 @@ ap_transcendence = {
 		}
 		custom_tooltip = {
 			fail_text = "hive_mind_biological_ascension_only1"
-			is_hive_empire = no
+			is_hive_empire = no # undercoat: moved to scripted trigger
 		}
 		custom_tooltip = {
 			fail_text = "requires_ascension_perks_2"
@@ -442,7 +418,7 @@ ap_transcendence = {
 			fail_text = "requires_ap_mind_over_matter"
 			OR = {
 				has_ascension_perk = ap_mind_over_matter
-				is_shroudwalker_apprentice_empire = yes
+				is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -452,7 +428,7 @@ ap_transcendence = {
 #		has_utopia = yes
 #		NOT = {
 #			has_ascension_perk = ap_transcendence
-#			is_machine_empire = yes
+#			is_machine_empire = yes # undercoat: moved to scripted trigger
 #		}
 #		is_mechanical_empire = no
 #		is_cyborg_empire = no
@@ -470,7 +446,7 @@ ap_evolutionary_mastery = {
 #		add_research_option = tech_genetic_resequencing
 		if = {
 			limit = {
-				is_clone_army_empire = yes
+				is_clone_army_empire = yes # undercoat: moved to scripted trigger
 				OR = {
 					has_trait = trait_clone_soldier_infertile
 					has_trait = trait_clone_soldier_infertile_full_potential
@@ -517,7 +493,7 @@ ap_evolutionary_mastery = {
 #		has_utopia = yes
 #		NOT = {
 #			has_ascension_perk = ap_evolutionary_mastery
-#			is_machine_empire = yes
+#			is_machine_empire = yes # undercoat: moved to scripted trigger
 #		}
 #		is_mechanical_empire = no
 #		is_cyborg_empire = no

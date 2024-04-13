@@ -12,7 +12,7 @@ DISTAR_WRECK_CAT = {
 				is_homicidal = no
 				any_neighbor_country = {
 					is_ai = yes
-					is_playable = yes
+					is_playable = yes # undercoat: moved to scripted trigger
 					is_homicidal = no
 					has_communications = from.owner
 					NOR = {
@@ -52,6 +52,7 @@ DISTAR_RAINBOW_CAT = {
 			has_distar = yes
 			is_star = yes
 			is_star_class = sc_black_hole
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -104,8 +105,8 @@ DISTAR_NANO_CAT = {
 			add = 1
 			has_distar = yes
 			OR = {
-				is_barren_cold_world = yes
-				is_frozen_world = yes
+				is_barren_cold_world = yes # undercoat: moved to scripted trigger
+				is_frozen_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -152,7 +153,7 @@ DISTAR_LOST_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 1
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 0
@@ -244,6 +245,7 @@ DISTAR_DEAD_GOD_CAT = {
 			add = 1000
 			has_distar = yes
 			is_moon = yes
+			habitable_planet = no
 			solar_system = {
 				any_system_colony = {
 					exists = owner
@@ -253,7 +255,6 @@ DISTAR_DEAD_GOD_CAT = {
 					has_moon = yes
 					any_moon = {
 						is_same_value = root
-						habitable_planet = no
 					}
 				}
 			}
@@ -269,7 +270,6 @@ DISTAR_DEAD_GOD_CAT = {
 					has_moon = yes
 					any_moon = {
 						is_same_value = root
-						habitable_planet = no
 					}
 				}
 				add_modifier = { modifier = dead_god_planet_hidden days = -1 }
@@ -289,13 +289,10 @@ DISTAR_ELECTRO_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
+			has_any_strategic_resource = no
 			OR = {
 				is_asteroid = yes
-				is_molten_world = yes
-				is_barren_dry_world = yes
-				is_barren_cold_world = yes
-				is_toxic_world = yes
-				is_frozen_world = yes
+				uninhabitable_regular_planet = yes
 			}
 		}
 	}
@@ -312,28 +309,25 @@ DISTAR_RUM_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
 			is_inside_nebula = yes
-			OR = {
-				from.owner = {
-					NOT = {
-						is_gestalt = yes
-					}
-				}
-				from.owner = {
-					is_machine_empire = yes
-					NOR = {
-						has_civic = civic_machine_terminator
-						is_machine_assimilator = yes
-					}
-					any_neighbor_country = {
-						is_ai = yes
-						is_playable = yes
-						has_communications = from.owner
+			from.owner = {
+				OR = {
+					is_gestalt = no
+					AND = {
+						is_machine_empire = yes # undercoat: moved to scripted trigger
 						NOR = {
-							is_gestalt = yes
-							is_at_war_with = from.owner
-							is_same_value = from.owner
+							has_civic = civic_machine_terminator
+							is_machine_assimilator = yes # undercoat: moved to scripted trigger
+						}
+						any_neighbor_country = {
+							is_ai = yes
+							is_playable = yes # undercoat: moved to scripted trigger
+							has_communications = from.owner
+							NOR = {
+								is_gestalt = yes
+								is_at_war_with = from.owner
+							}
 						}
 					}
 				}
@@ -345,15 +339,15 @@ DISTAR_RUM_CAT = {
 		1 = {
 			modifier = {
 				factor = 0
-				owner = { is_machine_empire = yes }
+				owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 			}
 			anomaly_event = distar.90
 		}
-		0 = {
+		1 = {
 			modifier = {
-				add = 1
+				factor = 0
 				owner = {
-					is_machine_empire = yes
+					is_machine_empire = no # undercoat: moved to scripted trigger
 				}
 			}
 			anomaly_event = distar.91
@@ -420,11 +414,6 @@ DISTAR_EXO_CAT = {
 	}
 
 	on_spawn = {
-		#TODO [CD] [BLOCKERS]
-		#every_deposit = {
-		#	limit = { has_blocker = yes	}
-		#	set_blocker = "exofungus_blocker"
-		#}
 		add_modifier = { modifier = exofungus days = -1 }
 	}
 
@@ -440,7 +429,7 @@ DISTAR_ICE_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_frozen_world = yes
+			is_frozen_world = yes # undercoat: moved to scripted trigger
 			NOT = { has_deposit_for = shipclass_mining_station }
 		}
 	}
@@ -457,7 +446,7 @@ DISTAR_METAL_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_toxic_world = yes
+			is_toxic_world = yes # undercoat: moved to scripted trigger
 			NOT = { has_deposit_for = shipclass_research_station }
 		}
 	}
@@ -478,7 +467,7 @@ DISTAR_OCEAN_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_ocean_world = yes
+			is_ocean_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -537,7 +526,8 @@ DISTAR_DIAMOND_CAT = {
 			add = 1
 			has_distar = yes
 			is_star = yes #Necessary b/c is_star_class actually means is_system_class
-			is_star_class = sc_f
+			is_planet_class = pc_f_star
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -559,7 +549,8 @@ DISTAR_MOLTEN_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_molten_world = yes
+			is_molten_world = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -577,17 +568,14 @@ DISTAR_MERCURY_CAT = {
 	picture = "GFX_evt_ship_in_orbit"
 	level = 7
 
+	should_ai_and_humans_use = yes #So that the AI can also find living metal
+
 	spawn_chance = {
 		modifier = {
 			add = 0.1
 			has_distar = yes
-			OR = {
-				is_molten_world = yes
-				is_barren_dry_world = yes
-				is_barren_cold_world = yes
-				is_frozen_world = yes
-				is_toxic_world = yes
-			}
+			uninhabitable_regular_planet = yes
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -607,7 +595,7 @@ DISTAR_WARFORM_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_toxic_world = yes
+			is_toxic_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -659,7 +647,7 @@ DISTAR_THIRSTY_CAT = {
 		modifier = {
 			add = 1
 			has_distar = yes
-			is_barren_dry_world = yes
+			is_barren_dry_world = yes # undercoat: moved to scripted trigger
 			NOT = { has_deposit_for = shipclass_research_station }
 		}
 	}
@@ -680,14 +668,17 @@ DISTAR_FLYTRAP_CAT = {
 		modifier = {
 			add = 10
 			habitable_planet = yes
-			NOR = { is_desert_world = yes is_arctic_world = yes }
+			NOR = { 
+				is_desert_world = yes # undercoat: moved to scripted trigger
+				is_arctic_world = yes # undercoat: moved to scripted trigger
+			}
 		}
 		modifier = {
 			factor = 0
 			OR = {
 				has_distar = no
 				from.owner = {
-					is_machine_empire = yes
+					is_machine_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -873,12 +864,12 @@ DISTAR_SOY_CAT = {
 		modifier = {
 			add = 1
 			OR = {
-				is_tropical_world = yes
-				is_continental_world = yes
-				is_savannah_world = yes
-				is_alpine_world = yes
-				is_ocean_world = yes
-				is_gaia_world = yes
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_savannah_world = yes # undercoat: moved to scripted trigger
+				is_alpine_world = yes # undercoat: moved to scripted trigger
+				is_ocean_world = yes # undercoat: moved to scripted trigger
+				is_gaia_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		modifier = {
@@ -954,8 +945,8 @@ DISTAR_NANOCITY_CAT = {
 			add = 1
 			has_distar = yes
 			OR = {
-				is_barren_cold_world = yes
-				is_frozen_world = yes
+				is_barren_cold_world = yes # undercoat: moved to scripted trigger
+				is_frozen_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -980,9 +971,12 @@ DISTAR_NANOSAND_CAT = {
 			add = 1
 			has_distar = yes
 			OR = {
-				is_desert_world = yes
-				is_gaia_world = yes
-				is_barren_dry_world = yes
+				is_desert_world = yes # undercoat: moved to scripted trigger
+				is_gaia_world = yes # undercoat: moved to scripted trigger
+				AND = {
+					is_barren_dry_world = yes # undercoat: moved to scripted trigger
+					has_any_strategic_resource = no
+				}
 			}
 		}
 	}
@@ -1005,7 +999,8 @@ DISTAR_MEDGAS_CAT = {
 	spawn_chance = {
 		modifier = { #Normal chance to spawn if player has completed chain
 			add = 1
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 			from.owner = {
 				has_completed_event_chain_counter = {
 					event_chain = l_cluster_chain
@@ -1015,7 +1010,8 @@ DISTAR_MEDGAS_CAT = {
 		}
 		modifier = { #Higher chance to spawn if player has ongoing chain
 			add = 5
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 			from.owner = {
 				has_event_chain = "l_cluster_chain"
 			}
@@ -1064,7 +1060,7 @@ debris_gasgiant_category_temp = {
 		modifier = {
 			add = 0.35
 			has_distar = yes
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 0
@@ -1102,20 +1098,7 @@ abandoned_outpost_category = {
 
 	spawn_chance = {
 		modifier = {
-			add = 4 # added in system initializer
-			has_distar = yes
-			solar_system = { has_star_flag = big_rip_system }
-
-			from.owner = {
-				NOT = {
-					has_global_flag = l_cluster_opened
-					has_completed_event_chain_counter = {
-						event_chain = l_cluster_chain
-						counter = clues
-					}
-				}
-				has_event_chain = l_cluster_chain
-			}
+			add = 0 # added in system initializer
 		}
 	}
 
@@ -1205,7 +1188,7 @@ atomic_clock_cat = {
 						AND = {
 							exists = owner
 							owner = { is_primitive = yes }
-							is_unshattered_ring_habitable_segment = no
+							is_unshattered_ring_habitable_segment = no # undercoat: moved to scripted trigger
 						}
 						AND = {
 							habitable_planet = yes
@@ -1237,7 +1220,7 @@ gaia_planet_cat = {
 		modifier = {
 			add = 3
 			has_distar = yes
-			is_gaia_world = yes
+			is_gaia_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -1261,7 +1244,7 @@ corrupt_data_cat = {
 				has_moon = yes
 				is_under_colonization = yes
 				solar_system = { has_star_flag = empire_cluster }
-				is_gaia_world = yes
+				is_gaia_world = yes # undercoat: moved to scripted trigger
 				has_deposit = d_betharian_deposit
 				has_deposit = d_alien_pets_deposit
 				exists = archaeological_site
@@ -1309,11 +1292,11 @@ peculiar_patterns_cat = {
 			add = 0.1
 			has_distar = yes
 			OR = {
-				is_gaia_world = yes
-				is_continental_world = yes
-				is_savannah_world = yes
-				is_tropical_world = yes
-				is_ocean_world = yes
+				is_gaia_world = yes # undercoat: moved to scripted trigger
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_savannah_world = yes # undercoat: moved to scripted trigger
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+				is_ocean_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1323,10 +1306,10 @@ peculiar_patterns_cat = {
 				add = 1
 				From = {
 					OR = {
-						is_gaia_world = yes
-						is_continental_world = yes
-						is_savannah_world = yes
-						is_tropical_world = yes
+						is_gaia_world = yes # undercoat: moved to scripted trigger
+						is_continental_world = yes # undercoat: moved to scripted trigger
+						is_savannah_world = yes # undercoat: moved to scripted trigger
+						is_tropical_world = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
@@ -1338,10 +1321,10 @@ peculiar_patterns_cat = {
 				add = 1
 				From = {
 					OR = {
-						is_gaia_world = yes
-						is_continental_world = yes
-						is_savannah_world = yes
-						is_tropical_world = yes
+						is_gaia_world = yes # undercoat: moved to scripted trigger
+						is_continental_world = yes # undercoat: moved to scripted trigger
+						is_savannah_world = yes # undercoat: moved to scripted trigger
+						is_tropical_world = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
@@ -1352,7 +1335,7 @@ peculiar_patterns_cat = {
 			modifier = {
 				add = 1
 				From = {
-					is_ocean_world = yes
+					is_ocean_world = yes # undercoat: moved to scripted trigger
 				}
 			}
 			anomaly_event = distar.2010
@@ -1363,16 +1346,15 @@ peculiar_patterns_cat = {
 tomb_world_cat = {
 	picture = "GFX_evt_ship_in_orbit_2"
 	level = 4
-	max_once_global = yes
 	spawn_chance = {
 		modifier = {
 			add = 3
 			has_distar = yes
 			OR = {
-				is_toxic_world = yes
-				is_nuked_world = yes
-				is_barren_dry_world = yes
-				is_barren_cold_world = yes
+				is_toxic_world = yes # undercoat: moved to scripted trigger
+				is_nuked_world = yes # undercoat: moved to scripted trigger
+				is_barren_dry_world = yes # undercoat: moved to scripted trigger
+				is_barren_cold_world = yes # undercoat: moved to scripted trigger
 			}
 			NOT = { has_planet_flag = nuked_planet_anomalies_disabled }
 		}
@@ -1383,8 +1365,8 @@ tomb_world_cat = {
 				add = 1
 				From = {
 					OR = {
-						is_toxic_world = yes
-						is_nuked_world = yes
+						is_toxic_world = yes # undercoat: moved to scripted trigger
+						is_nuked_world = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
@@ -1395,8 +1377,8 @@ tomb_world_cat = {
 				add = 1
 				From = {
 					OR = {
-						is_barren_dry_world = yes
-						is_barren_cold_world = yes
+						is_barren_dry_world = yes # undercoat: moved to scripted trigger
+						is_barren_cold_world = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
@@ -1417,7 +1399,6 @@ tomb_world_cat = {
 alien_life_cat = {
 	picture = GFX_evt_alien_nature
 	level = 3
-	max_once_global = yes
 
 	spawn_chance = {
 		modifier = {
@@ -1556,7 +1537,7 @@ disco_trojan_asteroid_cat = {
 		# fiction doesn't work for hive minds/robots, so they're blocked
 		modifier = {
 			factor = 0
-			from.owner = { is_machine_empire = yes }
+			from.owner = { is_gestalt = yes }
 		}
 	}
 
@@ -1575,7 +1556,8 @@ disco_impossible_organism_cat = {
 	spawn_chance = {
 		modifier = {
 			add = 2
-			is_toxic_world = yes
+			is_toxic_world = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 		}
 		modifier = {
 			factor = 0
@@ -1583,8 +1565,7 @@ disco_impossible_organism_cat = {
 				OR = {
 					has_ethic = ethic_xenophobe
 					has_ethic = ethic_fanatic_xenophobe
-					has_civic = civic_machine_terminator
-					is_hive_empire = yes
+					is_gestalt = yes #mentions inviduals
 				}
 			}
 		}
@@ -1631,9 +1612,9 @@ disco_molluscoid_miners_cat = {
 		modifier = {
 			add = 2
 			OR = {
-				is_desert_world = yes
-				is_arid_world = yes
-				is_savannah_world = yes
+				is_desert_world = yes # undercoat: moved to scripted trigger
+				is_arid_world = yes # undercoat: moved to scripted trigger
+				is_savannah_world = yes # undercoat: moved to scripted trigger
 			}
 			has_any_strategic_resource = no
 		}
@@ -1643,6 +1624,7 @@ disco_molluscoid_miners_cat = {
 				NOR = {
 					is_gestalt = yes
 					has_ethic = ethic_fanatic_xenophobe
+					species_portrait = mol6
 				}
 			}
 		}
@@ -1685,7 +1667,7 @@ disco_speed_demon_cat = {
 		modifier = {
 			factor = 0
 			from.owner = {
-				is_machine_empire = yes
+				is_synthetic_empire = yes
 			}
 		}
 	}
@@ -1723,7 +1705,7 @@ disco_gray_cat = {
 	spawn_chance = {
 		modifier = {
 			add = 6
-			is_gray_goo_world = yes
+			is_gray_goo_world = yes # undercoat: moved to scripted trigger
 			solar_system = { has_star_flag = lcluster }
 		}
 		modifier = {

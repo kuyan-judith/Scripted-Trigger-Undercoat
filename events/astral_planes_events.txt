@@ -293,7 +293,7 @@ country_event = {
 
 	trigger = {
 		has_astral_planes_dlc = yes
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -332,7 +332,7 @@ country_event = {
 				if = {
 					limit = {
 						NOT = { has_astral_rift_flag = description_machine_consciousness }
-						explorer = { is_machine_empire = yes }
+						explorer = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 					}
 					set_astral_rift_flag = description_machine_consciousness
 				}
@@ -341,7 +341,7 @@ country_event = {
 				if = {
 					limit = {
 						NOT = { has_astral_rift_flag = description_hive_mind }
-						explorer = { is_hive_empire = yes }
+						explorer = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 					}
 					set_astral_rift_flag = description_hive_mind
 				}
@@ -427,7 +427,7 @@ country_event = {
 				limit = {
 					NOT = { has_astral_rift_flag = description_psionic }
 					leader = {
-						has_trait = leader_trait_psionic
+						has_psionic_leader_trait = yes
 					}
 				}
 				set_astral_rift_flag = description_psionic
@@ -516,6 +516,7 @@ country_event = {
 			if = {
 				limit = {
 					NOT = { has_astral_rift_flag = description_riftworld_digsite_completed }
+					has_astral_rift_flag = riftworld_rift
 					explorer = {
 						has_country_flag = riftworld_digsite_completed
 					}
@@ -531,6 +532,24 @@ country_event = {
 					}
 				}
 				set_astral_rift_flag = description_baol_chain
+			}
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_lithoid_empire }
+					explorer = {
+						is_lithoid_empire = yes
+					}
+				}
+				set_astral_rift_flag = description_lithoid_empire
+			}
+			if = {
+				limit = {
+					NOT = { has_astral_rift_flag = description_lithoid_empire }
+					explorer = {
+						is_synthetic_empire = yes
+					}
+				}
+				set_astral_rift_flag = description_synthetic_empire
 			}
 		}
 	}
@@ -585,7 +604,7 @@ event = {
 				}
 				if = {
 					limit = {
-						is_riftworld_empire = yes
+						is_riftworld_empire = yes # undercoat: moved to scripted trigger
 					}
 					country_event = {
 						id = astral_planes.101
@@ -672,7 +691,7 @@ event = {
 			}
 			if = {
 				limit = {
-					is_riftworld_empire = yes
+					is_riftworld_empire = yes # undercoat: moved to scripted trigger
 				}
 				divide_variable = {
 					which = crystal_sphere_spawn_roll
@@ -778,13 +797,6 @@ country_event = {
 
 	is_triggered_only = yes
 
-	immediate = {
-		owner = {
-			remove_country_flag = has_acquired_crystal_sphere
-			remove_country_flag = crystal_sphere_event_delayed
-		}
-	}
-
 	option = {
 		name = astral_planes.15.a
 		hidden_effect = {
@@ -801,7 +813,7 @@ country_event = {
 				owner = {
 					OR = {
 						is_spiritualist = yes
-						is_riftworld_empire = yes
+						is_riftworld_empire = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
@@ -831,11 +843,16 @@ country_event = {
 				owner = {
 					OR = {
 						is_spiritualist = yes
-						is_riftworld_empire = yes
+						is_riftworld_empire = yes # undercoat: moved to scripted trigger
 					}
 				}
 			}
 		}
+	}
+
+	after = {
+		remove_country_flag = has_acquired_crystal_sphere
+		remove_country_flag = crystal_sphere_event_delayed
 	}
 }
 
@@ -852,6 +869,7 @@ country_event = {
 		FROM = {
 			is_same_value = event_target:crystal_sphere_system
 		}
+		has_crystal_sphere_situation_ongoing = yes
 	}
 
 	immediate = {
@@ -874,6 +892,9 @@ country_event = {
 		FROM = {
 			is_same_value = event_target:crystal_sphere_system
 		}
+		FROMFROM = {
+			has_crystal_sphere_situation_ongoing = yes
+		}
 	}
 
 	immediate = {
@@ -893,16 +914,14 @@ country_event = {
 	id = astral_planes.30
 	title = astral_planes.30.name
 	desc = astral_planes.30.desc
-	picture = GFX_evt_alien_planet
+	picture = GFX_evt_crystal_sphere
 	show_sound = event_alien_nature
 
 	is_triggered_only = yes
 
 	option = {
 		name = astral_planes.30.a
-		hidden_effect = {
-			owner = { set_country_flag = crystal_sphere_event_delayed }
-		}
+		set_country_flag = crystal_sphere_event_delayed
 	}
 }
 
@@ -916,7 +935,7 @@ country_event = {
 	trigger = {
 		has_astral_planes_dlc = yes
 		last_increased_tech = tech_rift_sphere
-		owner = { has_country_flag = crystal_sphere_event_delayed }
+		has_country_flag = crystal_sphere_event_delayed
 	}
 
 	immediate = {
@@ -1110,7 +1129,7 @@ country_event = {
 	trigger = {
 		has_astral_planes_dlc = yes
 		last_increased_tech = "tech_astral_harvesting"
-		is_riftworld_empire = no
+		is_riftworld_empire = no # undercoat: moved to scripted trigger
 	}
 
 	option = {
@@ -1140,7 +1159,7 @@ ship_event = {
 		owner = {
 			set_country_flag = started_harvest_astral_threads
 			if = {
-				limit = { is_riftworld_empire = yes }
+				limit = { is_riftworld_empire = yes } # undercoat: moved to scripted trigger
 				country_event = { id = astral_planes.116 days = 10080 random = 1440 }
 			}
 			else = {
@@ -1255,7 +1274,7 @@ country_event = {
 					}
 				}
 				if = {
-					limit = { is_riftworld_empire = yes }
+					limit = { is_riftworld_empire = yes } # undercoat: moved to scripted trigger
 					country_event = {
 						id = astral_planes.101
 						scopes = {
@@ -1544,7 +1563,7 @@ country_event = {
 
 	trigger = {
 		has_astral_planes_dlc = yes
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -1554,7 +1573,7 @@ country_event = {
 		}
 		if = {
 			limit = {
-				is_dimensional_worship_empire = yes
+				is_dimensional_worship_empire = yes # undercoat: moved to scripted trigger
 			}
 			change_variable = {
 				which = astral_threads_scripted_rewards_mult
@@ -1590,7 +1609,6 @@ country_event = {
 
 	trigger = {
 		is_dark_consortium_empire = yes
-		NOT = { has_technology = tech_mine_dark_matter }
 	}
 
 	immediate = {
@@ -1603,9 +1621,15 @@ country_event = {
 			limit = {
 				is_capital = no
 				has_deposit_for = shipclass_research_station
+				NOT = {
+					any_fleet_in_orbit = {
+						is_ship_class = shipclass_habitat_station
+					}
+				}
 			}
 			add_deposit = d_dark_matter_deposit_1
 		}
+		set_country_flag = civic_dark_consortium_locked
 	}
 }
 
@@ -1627,20 +1651,6 @@ country_event = {
 
 	option = {
 		name = astral_planes.2005.a
-	}
-}
-
-country_event = {
-	id = astral_planes.2006
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_astral_planes_dlc = yes
-	}
-
-	immediate = {
-		perform_astral_action_unlock_check = yes
 	}
 }
 
@@ -1920,7 +1930,18 @@ fleet_event = {
 country_event = {
 	id = astral_planes.3050
 	title = NAME_Formless
-	desc = astral_planes.3050.desc
+	desc = {
+		trigger = {
+			NOT = { is_hostile = FROM }
+		}
+		text = astral_planes.3050.desc
+	}
+	desc = {
+		trigger = {
+			is_hostile = FROM
+		}
+		text = astral_planes.3102.desc.fail
+	}
 
 	diplomatic = yes
 	is_triggered_only = yes
@@ -1937,9 +1958,7 @@ country_event = {
 		FROM = {
 			is_country_type = formless
 		}
-		any_situation = {
-			is_situation_type = situation_the_seal
-		}
+		NOT = { has_country_flag = the_formless_seal_is_set }
 	}
 
 	immediate = {
@@ -1959,6 +1978,12 @@ country_event = {
 	option = {
 		name = astral_planes.3050.a
 		custom_tooltip = astral_planes.3050.a.tt
+		trigger = {
+			any_situation = {
+				is_situation_type = situation_the_seal
+			}
+			NOT = { is_hostile = FROM }
+		}
 		allow = {
 			has_resource = { type = astral_threads amount >= 100 }
 		}
@@ -2120,6 +2145,32 @@ planet_event = {
 			create_pop = {
 				species = event_target:formless_gaia_planet_species
 			}
+		}
+		create_message = {
+			type = MESSAGE_RANDOM_POP_SETTLED
+			localization = MESSAGE_RANDOM_POP_SETTLED
+			days = @toast_message_days
+			target = this
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.3099
+
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+	}
+
+	immediate = {
+		set_country_flag = saved_formless
+		country_event = {
+			id = astral_planes.3100
+			scopes = { from = event_target:formless_country }
 		}
 	}
 }
@@ -2383,6 +2434,53 @@ country_event = {
 		set_faction_hostility = {
 			target = event_target:formless_country
 			set_friendly = yes
+		}
+		event_target:formless_system = {
+			if = {
+				limit = {
+					exists = space_owner
+					space_owner = { NOT = { is_same_value = event_target:formless_country } }
+				}
+				if = {
+					limit = { exists = starbase }
+					starbase = {
+						set_owner = event_target:formless_country
+						if = {
+							limit = { has_starbase_size = starbase_outpost }
+							set_starbase_size = starbase_starport
+							set_starbase_module = {
+								slot = 1
+								module = shipyard
+							}
+							set_starbase_module = {
+								slot = 2
+								module = shipyard
+							}
+						}
+						else_if = {
+							limit = {
+								NOT = { has_starbase_module = shipyard }
+							}
+							set_starbase_module = {
+								slot = 1
+								module = shipyard
+							}
+							set_starbase_module = {
+								slot = 2
+								module = shipyard
+							}
+						}
+					}
+				}
+				else = {
+					create_starbase = {
+						size = starbase_starport
+						module = shipyard
+						module = shipyard
+						owner = event_target:formless_country
+					}
+				}
+			}
 		}
 		event_target:formless_country = {
 			set_subject_of = {
@@ -3805,8 +3903,13 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		allow = {
+			owner = {
+				has_resource = { type = astral_threads amount >= 50 }
+			}
+		}
 		owner = {
-			astral_thread_small_reward = yes
+			add_resource = { astral_threads = -50 }
 			add_monthly_resource_mult = {
 				resource = physics_research
 				value = @tier1researchreward

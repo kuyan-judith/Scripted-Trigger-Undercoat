@@ -23,7 +23,7 @@ country_event = {
 
 	trigger = {
 		is_spiritualist = yes
-		is_death_cult_empire = yes
+		is_death_cult_empire = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -74,7 +74,7 @@ country_event = {
 
 	trigger = {
 		is_spiritualist = yes
-		is_death_cult_empire = yes
+		is_death_cult_empire = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -125,7 +125,7 @@ country_event = {
 
 	trigger = {
 		is_spiritualist = yes
-		is_death_cult_empire = yes
+		is_death_cult_empire = yes # undercoat: moved to scripted trigger
 	}
 
 
@@ -175,7 +175,7 @@ planet_event = { #Braiiiins
 			is_organic_species = yes
 			NOT = { has_trait = trait_zombie }
 		}
-		owner = { has_permanent_employment = yes }
+		owner = { has_permanent_employment = yes } # undercoat: moved to scripted trigger
 		has_building = building_posthumous_employment_center
 	}
 
@@ -197,7 +197,7 @@ country_event = {
 	hide_window = yes
 
 	trigger = {
-		has_permanent_employment = yes
+		has_permanent_employment = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -214,7 +214,7 @@ country_event = {
 	show_sound = event_yellow_alert
 
 	trigger = {
-		has_permanent_employment = yes
+		has_permanent_employment = yes # undercoat: moved to scripted trigger
 		any_owned_pop = {
 			has_trait = trait_zombie
 		}
@@ -324,10 +324,10 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		is_playable = yes
-		is_cordyceptic_empire = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_cordyceptic_empire = yes # undercoat: moved to scripted trigger
 		from = {
-			is_playable = no
+			is_playable = no # undercoat: moved to scripted trigger
 		}
 		fromfromfrom = {
 			OR = {
@@ -343,11 +343,59 @@ country_event = {
 	}
 
 	immediate = {
+		fromfrom = {
+			if = {
+				limit = {
+					has_component = "SUBSPACE_DRIVE"
+				}
+				solar_system = {
+					if = {
+						limit = {
+							any_ship_in_system = {
+								exists = owner
+								owner = {
+									is_same_value = root
+								}
+								is_ship_class = shipclass_military
+								NOT = { has_component = "SUBSPACE_DRIVE" }
+							}
+						}
+						random_ship_in_system = {
+							limit = {
+								exists = owner
+								owner = {
+									is_same_value = root
+								}
+								is_ship_class = shipclass_military
+								NOT = { has_component = "SUBSPACE_DRIVE" }
+							}
+							fleet = {
+								save_event_target_as = reanimating_fleet
+							}
+						}
+					}
+					else = {
+						create_fleet = {
+							effect = {
+								set_owner = root
+								save_event_target_as = reanimating_fleet
+								set_location = prev
+							}
+						}
+					}
+				}
+			}
+			else = {
+				fleet = {
+					save_event_target_as = reanimating_fleet
+				}
+			}
+		}
 		fromfromfrom = {
 			switch = {
 				trigger = is_ship_size
 				space_whale_1 = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Tiyanki_Cow
 							design = NAME_Reanimated_Tiyanki_Cow
@@ -356,7 +404,7 @@ country_event = {
 					}
 				}
 				space_whale_2 = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Tiyanki_Bull
 							design = NAME_Reanimated_Tiyanki_Bull
@@ -365,7 +413,7 @@ country_event = {
 					}
 				}
 				space_whale_3 = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Tiyanki_Hatchling
 							design = NAME_Reanimated_Tiyanki_Hatchling
@@ -374,7 +422,7 @@ country_event = {
 					}
 				}
 				space_whale_4 = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Tiyanki_Calf
 							design = NAME_Reanimated_Tiyanki_Calf
@@ -383,7 +431,7 @@ country_event = {
 					}
 				}
 				space_whale_5 = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Tiyanki_Bull
 							design = NAME_Reanimated_Tiyanki_Bull
@@ -392,7 +440,7 @@ country_event = {
 					}
 				}
 				space_amoeba_mother = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Great_Space_Organism
 							design = NAME_Reanimated_Great_Space_Organism
@@ -401,7 +449,7 @@ country_event = {
 					}
 				}
 				space_amoeba = {
-					root.fromfrom.fleet = {
+					event_target:reanimating_fleet = {
 						create_ship = {
 							name = NAME_Reanimated_Small_Space_Organism
 							design = NAME_Reanimated_Small_Space_Organism
@@ -421,7 +469,7 @@ starbase_event = {
 	trigger = {
 		has_starbase_building = cordyceptic_reanimation_facility
 		owner = {
-			is_cordyceptic_empire = yes
+			is_cordyceptic_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	immediate = {
@@ -542,8 +590,8 @@ country_event = {
 	fire_only_once = yes
 
 	trigger = {
-		is_playable = yes
-		is_cordyceptic_empire = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_cordyceptic_empire = yes # undercoat: moved to scripted trigger
 		from = {
 			is_country_type = swarm
 		}

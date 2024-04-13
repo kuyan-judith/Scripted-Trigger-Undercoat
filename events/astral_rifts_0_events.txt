@@ -39,7 +39,8 @@ astral_rift_event = {
 		trigger = {
 			switch = {
 				trigger = has_astral_rift_flag
-				description_gestalt = { text = astral_rift.3.desc.gestalt }
+				description_hive_mind = { text = astral_rift.3.desc.hive }
+				description_machine_consciousness = { text = astral_rift.3.desc.machine }
 				default = { text = astral_rift.3.desc.default }
 			}
 		}
@@ -100,11 +101,18 @@ astral_rift_event = {
 				militants_first_choice = {
 					switch = {
 						trigger = has_astral_rift_flag
-						description_gestalt = {
+						description_hive_mind = {
 							switch = {
 								trigger = has_astral_rift_flag
 								description_riftworld_digsite_completed = { text = astral_rift.5.desc.militarist.gestalt.arcsite }
 								default = { text = astral_rift.5.desc.militarist.gestalt.no_arcsite }
+							}
+						}
+						description_machine_consciousness = {
+							switch = {
+								trigger = has_astral_rift_flag
+								description_riftworld_digsite_completed = { text = astral_rift.5.desc.militarist.machine.arcsite }
+								default = { text = astral_rift.5.desc.militarist.machine.no_arcsite }
 							}
 						}
 						default = {
@@ -124,6 +132,13 @@ astral_rift_event = {
 								trigger = has_astral_rift_flag
 								description_riftworld_digsite_completed = { text = astral_rift.5.desc.spiritualist.gestalt.arcsite }
 								default = { text = astral_rift.5.desc.spiritualist.gestalt.no_arcsite }
+							}
+						}
+						description_machine_consciousness = {
+							switch = {
+								trigger = has_astral_rift_flag
+								description_riftworld_digsite_completed = { text = astral_rift.5.desc.spiritualist.machine.arcsite }
+								default = { text = astral_rift.5.desc.spiritualist.machine.no_arcsite }
 							}
 						}
 						default = {
@@ -299,8 +314,22 @@ astral_rift_event = {
 		trigger = {
 			switch = {
 				trigger = has_astral_rift_flag
-				militants_first_choice = { text = astral_rift.15.desc.militarist }
-				preservationists_first_choice = { text = astral_rift.15.desc.spiritualist }
+				militants_first_choice = { 
+					switch = {
+						trigger = has_astral_rift_flag
+						description_lithoid_empire = { text = astral_rift.15.desc.militarist.lithoid }
+						description_synthetic_empire = { text = astral_rift.15.desc.militarist.synthetic }
+						default = { text = astral_rift.15.desc.militarist }
+					}
+				}
+				preservationists_first_choice = {
+					switch = {
+						trigger = has_astral_rift_flag
+						description_lithoid_empire = { text = astral_rift.15.desc.spiritualist.lithoid }
+						description_synthetic_empire = { text = astral_rift.15.desc.spiritualist.synthetic }
+						default = { text = astral_rift.15.desc.spiritualist }
+					}
+				}
 				default = { text = astral_rift.15.desc.common }
 			}
 		}
@@ -312,14 +341,76 @@ astral_rift_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = astral_rift.15.a
+		name = {
+			trigger = {
+				explorer = {
+					is_lithoid_empire = no
+					is_synthetic_empire = no
+				}
+			}
+			text = astral_rift.15.a
+		}
+		name = {
+			trigger = {
+				explorer = {
+					is_lithoid_empire = yes
+					is_synthetic_empire = no
+				}
+			}
+			text = astral_rift.15.a.lithoid
+		}
+		name = {
+			trigger = {
+				explorer = {
+					is_lithoid_empire = no
+					is_synthetic_empire = yes
+				}
+			}
+			text = astral_rift.15.a.synthetic
+		}
 		allow = {
 			explorer = {
-				has_resource = { type = food amount >= 1000 }
+				OR = {
+					AND = {
+						is_lithoid_empire = no
+						is_synthetic_empire = no
+						has_resource = { type = food amount >= 1000 }
+					}
+					AND = {
+						is_lithoid_empire = yes
+						is_synthetic_empire = no
+						has_resource = { type = minerals amount >= 1000 }	
+					}
+					AND = {
+						is_lithoid_empire = no
+						is_synthetic_empire = yes
+						has_resource = { type = energy amount >= 1000 }
+					}
+				}
 			}
 		}
 		explorer = {
-			add_resource = { food = -1000 }
+			if = {
+				limit = {
+					is_lithoid_empire = no
+					is_synthetic_empire = no
+				}
+				add_resource = { food = -1000 }
+			}
+			else_if = {
+				limit = {
+					is_lithoid_empire = yes
+					is_synthetic_empire = no
+				}
+				add_resource = { minerals = -1000 }
+			}
+			else_if = {
+				limit = {
+					is_lithoid_empire = no
+					is_synthetic_empire = yes
+				}
+				add_resource = { energy = -1000 }
+			}
 		}
 		set_astral_rift_flag = offered_food_to_preservationists
 		set_next_astral_rift_event = { id = astral_rift.20 }

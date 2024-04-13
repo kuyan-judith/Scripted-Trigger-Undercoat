@@ -10,7 +10,7 @@ is_valid_rival = {
 		fail_text = INVALID_RIVAL_DESC
 		root = {
 			OR = {
-				prev = { is_playable = no }
+				prev = { is_playable = no } # undercoat: moved to scripted trigger
 				AND = {
 					relative_power = { who = prev value >= inferior }
 					OR = {
@@ -30,7 +30,7 @@ can_add_claim = {
 	hidden_trigger = {
 		if = {
 			limit = {
-				root = { is_playable = no }
+				root = { is_playable = no } # undercoat: moved to scripted trigger
 			}
 			always = yes
 		}
@@ -59,7 +59,7 @@ can_add_claim = {
 		NAND = {
 			exists = owner
 			owner = {
-				is_empire = no
+				is_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -79,7 +79,7 @@ can_add_claim = {
 	}
 	custom_tooltip = {
 		fail_text = CANNOT_ADD_CLAIM_ASSIMILATOR
-		NOT = { root = { is_machine_assimilator = yes } }
+		NOT = { root = { is_machine_assimilator = yes } } # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = CANNOT_ADD_CLAIM_PURIFIERS
@@ -98,7 +98,7 @@ can_add_claim = {
 				NOR = {
 					is_same_species = root
 					has_country_flag = synthetic_empire
-					is_machine_empire = yes
+					is_machine_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -109,14 +109,14 @@ can_add_claim = {
 			exists = owner
 			owner = {
 				OR = {
-					is_homicidal = yes
-					is_machine_assimilator = yes
+					is_homicidal = yes # undercoat: moved to scripted trigger
+					is_machine_assimilator = yes # undercoat: moved to scripted trigger
 				}
 			}
 			root = {
 				NOR = {
-					is_homicidal = yes
-					is_machine_assimilator = yes
+					is_homicidal = yes # undercoat: moved to scripted trigger
+					is_machine_assimilator = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -128,9 +128,9 @@ can_add_claim = {
 can_get_claim_from_lost_system = {
 	custom_tooltip = {
 		fail_text = CANNOT_ADD_CLAIM_NOT_VALID_EMPIRE
-		is_empire = yes
+		is_empire = yes # undercoat: moved to scripted trigger
 		root = {
-			is_empire = yes
+			is_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	custom_tooltip = {
@@ -139,7 +139,7 @@ can_get_claim_from_lost_system = {
 	}
 	custom_tooltip = {
 		fail_text = CANNOT_ADD_CLAIM_ASSIMILATOR
-		is_machine_assimilator = no
+		is_machine_assimilator = no # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = CANNOT_ADD_CLAIM_PURIFIERS
@@ -155,7 +155,7 @@ can_get_claim_from_lost_system = {
 			NOR = {
 				is_same_species = root
 				has_country_flag = synthetic_empire
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -164,7 +164,7 @@ can_get_claim_from_lost_system = {
 # Root = Bombarding country
 # This = Receiving country
 should_surrender_planets_to = {
-	is_playable = yes
+	is_playable = yes # undercoat: moved to scripted trigger
 	is_gestalt = no
 	is_homicidal = no
 	is_crisis_faction = no
@@ -173,7 +173,7 @@ should_surrender_planets_to = {
 		is_homicidal = no
 		is_crisis_faction = no
 		is_primitive = no
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -206,7 +206,7 @@ should_abduct_pop = {
 species_can_live_on_planet = {
 	exists = root #somehow this appeared in the error log. No idea how!
 	NAND = {
-		root = { is_machine_world = yes }
+		root = { is_machine_world = yes } # undercoat: moved to scripted trigger
 		NOR = {
 			has_trait = trait_machine_unit
 			has_trait = trait_mechanical
@@ -214,9 +214,9 @@ species_can_live_on_planet = {
 				has_trait = trait_cybernetic
 				exists = root.owner
 				root.owner = {
-					is_machine_empire = yes
+					is_machine_empire = yes # undercoat: moved to scripted trigger
 					OR = {
-						is_machine_assimilator = yes # Assimilator empire
+						is_machine_assimilator = yes # Assimilator empire # undercoat: moved to scripted trigger
 						has_ascension_perk = ap_mechromancy
 					}
 				}
@@ -225,7 +225,7 @@ species_can_live_on_planet = {
 	}
 	if = {
 		limit = {
-			root = { is_hive_world = yes }
+			root = { is_hive_world = yes } # undercoat: moved to scripted trigger
 		}
 		OR = {
 			has_trait = trait_hive_mind
@@ -233,7 +233,7 @@ species_can_live_on_planet = {
 				exists = root.owner
 				root.owner = {
 					is_hive_empire = yes
-					is_necrophage_empire = yes
+					is_necrophage_empire = yes # undercoat: moved to scripted trigger
 					prev = { species_can_be_necrophaged = yes }
 				}
 			}
@@ -274,25 +274,7 @@ should_pay_for_leader_upkeep = {
 #Root = country
 #This = pop
 can_generate_leader_from_pop = {
-	has_citizenship_rights = yes
-	NOT = { has_trait = trait_syncretic_proles }
-	can_think = yes
-	OR = {
-		is_robot_pop = no
-		root = {
-			OR = {
-				has_technology = tech_synthetic_leaders
-				is_machine_empire = yes
-				is_mechanical_empire = yes
-			}
-		}
-	}
-	OR = {
-		is_same_species = root
-		root = {
-			is_necrophage_empire = no
-		}
-	}
+	can_be_leader = yes
 }
 
 #Checks whether this species is eligible to become rulers through elections
@@ -322,23 +304,8 @@ can_create_espionage_asset_from_species = {
 #Root = country
 #This = pop
 can_generate_military_leader_from_pop = {
+	can_be_leader = yes
 	can_be_military_leader = yes
-	OR = {
-		is_robot_pop = no
-		root = {
-			OR = {
-				has_technology = tech_synthetic_leaders
-				is_machine_empire = yes
-				is_mechanical_empire = yes
-			}
-		}
-	}
-	OR = {
-		is_same_species = root
-		root = {
-			is_necrophage_empire = no
-		}
-	}
 }
 
 #Root = species
@@ -363,7 +330,7 @@ can_release_vassal = {
 	}
 	custom_tooltip = {
 		fail_text = default
-		is_machine_assimilator = no
+		is_machine_assimilator = no # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = default
@@ -380,11 +347,11 @@ can_release_vassal_from_species = {
 			has_trait = trait_machine_unit
 			AND = {
 				has_trait = trait_hive_mind
-				NOT = { prev.this = { is_progenitor_hive_empire = yes } }
+				NOT = { prev.this = { is_progenitor_hive_empire = yes } } # undercoat: moved to scripted trigger
 			}
 			AND = {
 				NOT = { has_trait = trait_hive_mind }
-				prev.this = { is_hive_empire = yes }
+				prev.this = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 			}
 			has_trait = trait_mechanical
 			can_think = no
@@ -425,12 +392,12 @@ can_modify_species = {
 #From = target solar system
 #This rule is a condition for when subjects that normally cannot colonize outside their borders are allowed to
 subject_can_expand = {
-	root = { is_feudal_empire = yes }
+	root = { is_feudal_empire = yes } # undercoat: moved to scripted trigger
 	NAND = {
 		is_ai = yes
 		AND = {
 			exists = overlord
-			overlord = { is_vassal_origin_overlord = yes }
+			overlord = { is_vassal_origin_overlord = yes } # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -458,7 +425,7 @@ can_take_hostile_actions = {
 		limit = {
 			has_country_flag = fotd_seperatist_country@ROOT
 			ROOT = {
-				is_fear_of_the_dark_empire = yes
+				is_fear_of_the_dark_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		custom_tooltip = {
@@ -485,7 +452,7 @@ can_take_hostile_actions = {
 		#attacking primitives with non-interference
 		limit = {
 			ROOT = {
-				is_playable = yes
+				is_playable = yes # undercoat: moved to scripted trigger
 				NOT = {
 					has_policy_flag = interference_aggressive
 				}
@@ -500,7 +467,7 @@ can_take_hostile_actions = {
 	else_if = {
 		limit = {
 			is_primitive = yes
-			ROOT = { is_playable = yes }
+			ROOT = { is_playable = yes } # undercoat: moved to scripted trigger
 			capital_scope = {
 				root = {
 					NOT = {
@@ -740,7 +707,7 @@ species_has_happiness = {
 			has_trait = trait_mechanical
 			OR = {
 				NOT = { exists = from }
-				from = { is_machine_empire = yes }
+				from = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 				from = { NOT = { has_technology = tech_synthetic_workers } }
 				from = { has_policy_flag = ai_outlawed }
 			}
@@ -749,8 +716,8 @@ species_has_happiness = {
 			has_trait = trait_cybernetic
 			exists = from
 			from = {
-				is_machine_empire = yes
-				is_machine_assimilator = yes # Assimilator empire
+				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_assimilator = yes # Assimilator empire # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -884,7 +851,7 @@ can_species_be_assembled = {
 						owner = { has_modifier = syamelles_curse }
 						AND = {
 							has_building = building_posthumous_employment_center
-							owner = { has_permanent_employment = yes }
+							owner = { has_permanent_employment = yes } # undercoat: moved to scripted trigger
 						}
 						has_planet_flag = can_organic_assemble_flag #for mod compatibility
 					}
@@ -929,7 +896,7 @@ can_orbital_bombard = {
 		# Risa fix.
 		ROOT.CONTROLLER = { is_hostile = FROM.CONTROLLER }
 		ROOT.CONTROLLER = { is_at_war_with = FROM.CONTROLLER }
-		FROM = { is_infested_world = yes }
+		FROM = { is_infested_world = yes } # undercoat: moved to scripted trigger
 		FROM.CONTROLLER = {
 			OR = {
 				is_country_type = swarm
@@ -943,7 +910,7 @@ can_orbital_bombard = {
 		}
 		ROOT.CONTROLLER = {
 			OR = {
-				is_endgame_crisis = yes
+				is_endgame_crisis = yes # undercoat: moved to scripted trigger
 				#is_country_type = cybrex_empire		# should be governed by hostile rule - Ariphaos
 				is_country_type = dormant_marauders
 				is_country_type = marauder_raiders
@@ -1018,7 +985,7 @@ are_rebels_hostile = {
 
 #Root: planet
 should_colony_be_destroyed_on_pc_change = {
-	is_infested_world = yes
+	is_infested_world = yes # undercoat: moved to scripted trigger
 }
 
 # Is the given fleet the portal for given extradimensional country
@@ -1084,7 +1051,7 @@ will_anger_fallen_empire = {
 # root: country
 can_have_robot_pops = {
 	exists = this
-	is_hive_empire = no
+	is_hive_empire = no # undercoat: moved to scripted trigger
 	NOT = { has_policy_flag = robots_outlawed }
 }
 
@@ -1110,7 +1077,7 @@ can_purge_pop_manually = {
 		OR = {
 			is_robot_pop = yes
 			is_sapient = no
-			owner = { is_hive_empire = yes }
+			owner = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 			has_citizenship_type = { type = citizenship_slavery country = owner }
 			has_citizenship_type = { type = citizenship_full_machine country = owner }
 		}
@@ -1124,7 +1091,7 @@ can_purge_pop_manually = {
 				is_sapient = no
 				owner = { NOT = { has_policy_flag = pre_sapients_protect } }
 			}
-			owner = { is_gestalt = yes }
+			owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 			owner = { has_policy_flag = purge_allowed }
 		}
 	}
@@ -1133,7 +1100,7 @@ can_purge_pop_manually = {
 		exists = owner
 		OR = {
 			is_robot_pop = no
-			owner = { is_hive_empire = yes }
+			owner = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 			NAND = {
 				has_trait = trait_mechanical
 				owner = { has_policy_flag = ai_full_rights }
@@ -1177,7 +1144,7 @@ can_orbitable_repair_ships = {
 # this = ship
 # root = country that kills ship
 can_spawn_debris = {
-	root = { is_playable = yes }
+	root = { is_playable = yes } # undercoat: moved to scripted trigger
 	exists = owner
 	owner = { NOT = { has_ascension_perk = ap_enigmatic_engineering } }
 }
@@ -1240,14 +1207,8 @@ can_subjugate_empires = {
 
 # this = leader
 can_leader_get_council_trait = {
-	OR = {
-		NAND = {
-			exists = owner
-			owner = { is_gestalt = yes }
-			is_councilor = no
-		}
-		has_leader_flag = restored_node
-	}
+	# See 03_scripted_triggers_paragon.txt
+	can_leader_get_council_trait_trigger = yes
 }
 
 # this = leader
@@ -1261,7 +1222,13 @@ can_leader_get_normal_trait = {
 				has_leader_flag = restored_node
 			}
 		}
-		is_ruler = yes
+		AND = {
+			is_ruler = yes
+			exists = owner
+			owner = {
+				is_autocracy = yes
+			}
+		}
 		is_heir = yes
 	}
 }
@@ -1285,6 +1252,10 @@ can_leader_get_destiny_trait = {
 		exists = owner
 		owner = { is_gestalt = yes }
 	}
+	exists = owner
+	owner = {
+		is_crisis_faction = no
+	}
 }
 
 # this = country
@@ -1299,7 +1270,7 @@ can_jump_drive = {
 
 # this = country
 can_spawn_occupation_armies = {
-	is_empire = yes
+	is_empire = yes # undercoat: moved to scripted trigger
 }
 
 # this = system
@@ -1564,7 +1535,7 @@ should_force_decline_species = {
 					exists = owner
 					owner = {
 						OR = {
-							is_clone_army_empire = no					# Can't have Vats.
+							is_clone_army_empire = no					# Can't have Vats. # undercoat: moved to scripted trigger
 							has_country_flag = clone_army_fertility_unlocked			# Can't have Vats anymore.
 							NOT = { owner_main_species = { is_same_species = root } }	# Our Vats can't build this species.
 						}
@@ -1582,7 +1553,7 @@ can_build_branch_offices = {
 	custom_tooltip = {
 		fail_text = BRANCH_OFFICE_NOT_MEGACORP
 		OR = {
-			is_megacorp = yes
+			is_megacorp = yes # undercoat: moved to scripted trigger
 			has_civic = civic_galactic_sovereign_megacorp
 		}
 	}
@@ -1592,15 +1563,12 @@ can_build_branch_offices = {
 can_support_branch_offices = {
 	custom_tooltip = {
 		fail_text = BRANCH_OFFICE_NOT_FALLEN_EMPIRES
-		NOR = {
-			is_country_type = fallen_empire
-			is_country_type = awakened_fallen_empire
-		}
+		is_fallen_empire = no # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = BRANCH_OFFICE_NOT_ON_MEGACORP_PLANET
 		NOR = {
-			is_megacorp = yes
+			is_megacorp = yes # undercoat: moved to scripted trigger
 			has_civic = civic_galactic_sovereign_megacorp
 		}
 	}
@@ -1667,7 +1635,7 @@ can_build_branch_office_on_planet = {
 			root = {
 				is_subject = yes
 				OR = {
-					is_megacorp = yes
+					is_megacorp = yes # undercoat: moved to scripted trigger
 					has_civic = civic_galactic_sovereign_megacorp
 				}
 				overlord = {
@@ -1685,7 +1653,7 @@ can_build_branch_office_on_planet = {
 						is_same_value = root.overlord
 					}
 					OR = {
-						is_megacorp = yes
+						is_megacorp = yes # undercoat: moved to scripted trigger
 						has_civic = civic_galactic_sovereign_megacorp
 					}
 				}
@@ -1717,7 +1685,7 @@ can_build_branch_office_on_planet = {
 						is_subject = yes
 						overlord = {
 							NOR = {
-								is_megacorp = yes
+								is_megacorp = yes # undercoat: moved to scripted trigger
 								has_civic = civic_galactic_sovereign_megacorp
 							}
 						}
@@ -1732,7 +1700,7 @@ can_build_branch_office_on_planet = {
 					is_subject = yes
 					overlord = {
 						OR = {
-							is_megacorp = yes
+							is_megacorp = yes # undercoat: moved to scripted trigger
 							has_civic = civic_galactic_sovereign_megacorp
 						}
 					}
@@ -1779,7 +1747,7 @@ can_build_branch_office_on_planet = {
 # Checked by is_criminal_syndicate trigger
 is_criminal_syndicate_rule = {
 	OR = {
-		is_megacorp = yes
+		is_megacorp = yes # undercoat: moved to scripted trigger
 		has_valid_civic = civic_galactic_sovereign_megacorp
 	}
 	has_valid_civic = civic_criminal_heritage
@@ -1827,8 +1795,8 @@ can_win_timed_victory = {
 
 # This = country
 can_use_galactic_market = {
-	is_playable = yes
-	is_homicidal = no # Undercoat: moved to scripted trigger
+	is_playable = yes # undercoat: moved to scripted trigger
+	is_homicidal = no # undercoat: moved to scripted trigger
 }
 
 # ROOT = country
@@ -1873,11 +1841,11 @@ can_be_sold_on_slave_market = {
 can_be_part_of_galactic_community = {
 	custom_tooltip = {
 		fail_text = "community_default_failtext"
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = "community_homicidal_failtext"
-		is_homicidal = no # Undercoat: moved to scripted trigger
+		is_homicidal = no # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = "community_declared_crisis_failtext"
@@ -1897,11 +1865,11 @@ can_be_part_of_galactic_community = {
 can_be_part_of_galactic_empire = {
 	custom_tooltip = {
 		fail_text = "community_default_failtext"
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = "community_homicidal_failtext"
-		is_homicidal = no # Undercoat: moved to scripted trigger
+		is_homicidal = no # undercoat: moved to scripted trigger
 	}
 	custom_tooltip = {
 		fail_text = "community_declared_crisis_failtext"
@@ -1928,8 +1896,8 @@ can_see_galactic_community = {
 
 # This = country
 can_be_part_of_galactic_council = {
-	is_playable = yes
-	is_homicidal = no # Undercoat: moved to scripted trigger
+	is_playable = yes # undercoat: moved to scripted trigger
+	is_homicidal = no # undercoat: moved to scripted trigger
 }
 
 # If, 'yes', forces an empire to be advanced at game start (overrides game settings)
@@ -1952,7 +1920,7 @@ is_allowed_to_be_advanced_empire = {
 
 # This = planet
 has_enough_pops_for_necrophage_on_planet = {
-	owner = { is_necrophage_empire = yes }
+	owner = { is_necrophage_empire = yes } # undercoat: moved to scripted trigger
 	has_available_jobs = necro_apprentice
 	if = {
 		limit = {
@@ -2035,7 +2003,7 @@ can_planet_auto_migrate = {
 		exists = owner
 		owner = {
 			OR = {
-				is_playable = yes
+				is_playable = yes # undercoat: moved to scripted trigger
 				is_country_type = awakened_fallen_empire
 			}
 		}
@@ -2093,7 +2061,7 @@ can_remove_positive_traits_organic = {
 		}
 		AND = {
 			has_toxoids = yes
-			is_overtuned_empire = yes
+			is_overtuned_empire = yes # undercoat: moved to scripted trigger
 		}
 		has_technology = tech_epigenetic_triggers
 		# Undercoat
@@ -2185,7 +2153,7 @@ can_have_first_contact = {
 				is_country_type = dragon_dummy
 			}
 		}
-		is_here_be_dragons_empire = yes
+		is_here_be_dragons_empire = yes # undercoat: moved to scripted trigger
 		from = { has_country_flag = dragon_of@prev }
 	}
 	else_if = {
@@ -2274,7 +2242,7 @@ can_fill_ruler_job = {
 		limit = {
 			exists = owner
 			owner = {
-				is_necrophage_empire = yes
+				is_necrophage_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		custom_tooltip = {
@@ -2418,7 +2386,7 @@ can_country_connect_to_relay_network = {
 	AND = {
 		is_primitive = no
 		OR = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			is_subject = yes
 			is_overlord = yes
 		}
@@ -2477,7 +2445,7 @@ will_leader_retire = {
 	exists = owner
 	not = { has_leader_flag = use_unspecific_death_reason }
 	owner = {
-		is_gestalt = no
+		is_gestalt = no # undercoat: moved to scripted trigger
 	}
 	has_leader_flag = retirement_is_default # Randomized retirement instead of death in paragon.590
 }
@@ -2485,6 +2453,7 @@ will_leader_retire = {
 # This = country, Country that wants to get an external leader
 # From = country, country that we are trying to get from
 can_get_external_leader_pool_candidate = {
+	exists = from
 	OR = {
 		has_diplo_migration_treaty = from
 		is_in_federation_with = from
@@ -2502,18 +2471,18 @@ can_get_external_leader_pool_candidate = {
 		}
 		AND = {
 			ROOT = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 			FROM = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		AND = {
 			ROOT = {
-				is_hive_empire = yes
+				is_hive_empire = yes # undercoat: moved to scripted trigger
 			}
 			FROM = {
-				is_hive_empire = yes
+				is_hive_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2540,29 +2509,28 @@ can_trade_leader = {
 		}
 		AND = {
 			ROOT = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 			FROM = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		AND = {
 			ROOT = {
-				is_hive_empire = yes
+				is_hive_empire = yes # undercoat: moved to scripted trigger
 			}
 			FROM = {
-				is_hive_empire = yes
+				is_hive_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
+	# Can't trade gestalt nodes
+	is_gestalt_node = no
 	# The overlord can't be a fallen or awakened empire.
 	ROOT = {
 		NAND = {
 			is_overlord = yes
-			OR = {
-				is_country_type = fallen_empire
-				is_country_type = awakened_fallen_empire
-			}
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	NOR = {
@@ -2579,10 +2547,7 @@ can_trade_fleet = {
 		ROOT = {
 			NAND = {
 				is_overlord = yes
-				OR = {
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		NOT = { has_fleet_flag = dimensional_fleet }
@@ -2955,14 +2920,12 @@ can_trade_favor = {
 	NOR = {
 		OR = {
 			is_country_type = mirrored_country
-			is_country_type = fallen_empire
-			is_country_type = awakened_fallen_empire
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 		}
 		from = {
 			OR = {
 				is_country_type = mirrored_country
-				is_country_type = fallen_empire
-				is_country_type = awakened_fallen_empire
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2993,7 +2956,15 @@ can_interact_with_astral_rift = {
 can_explore_astral_rift = {
 	has_technology = tech_rift_sphere
 	hidden_trigger = {
-		is_astral_rift_pool_empty = no
+		OR = {
+			is_astral_rift_pool_empty = no
+			AND = {
+				exists = from.explorer
+				from.explorer = {
+					is_same_value = prevprev
+				}
+			}
+		}
 	}
 }
 
@@ -3010,3 +2981,112 @@ can_leader_explore_astral_rift = {
 		is_heir = no
 	}
 }
+
+# FROM = country of the ai (in case it's relevant)
+# THIS = planet
+# this determines if the planet is allowed to receive a governor at all, and isn't called for a specific candidate
+can_ai_assign_governor = {
+	OR = {
+		is_sector_capital = yes
+		is_capital = yes
+	}
+	num_pops >= 1	# replaces the MINIMUM_POPS_TO_CONSIDER_GOVERNOR define
+	NOT = {
+		exists = leader
+	}
+}
+
+# if the galactic community exists, is a galactic empire, and the country is part of it
+# the ai will call this to see if it should set its delegate to strengthn it
+# It is guaranteed that the galactic community exists, is an empire, and the country is part of it
+# when this rule is called
+# THIS = Country
+# FROM = Galactic Emperor (Country)
+should_ai_support_galactic_empire = {
+	OR = {
+		is_galactic_emperor = yes
+		AND = {
+			NOT = {
+				FROM = {
+					is_overlord_to = prev
+				}
+			}
+			imperial_authority <= 0.75
+			is_part_of_galactic_council = yes
+			opinion = {
+				who = FROM
+				value >= 300	# value defined as "GOOD" in for opinion 00_defines.txt
+			}
+		}
+		AND = {
+			NOT = {
+				FROM = {
+					is_overlord_to = prev
+				}
+			}
+			imperial_authority <= 0.75
+			opinion = {
+				who = FROM
+				value >= 750	# value define as "EXCELLENT" for opinion in 00_defines.txt
+			}
+		}
+		AND = {
+			# Subjects of the Galactic Emperor that are loyal or cannot vote
+			# should support the Imperium
+			FROM = {
+				is_overlord_to = prev
+			}
+			OR = {
+				has_loyalty >= 0
+				NOT = {
+					any_agreement = {
+						has_term_value = {
+							term = subject_diplomacy
+							value = subject_can_do_diplomacy
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# if the galactic community exists, is a galactic empire, and the country is part of it
+# and if it didn't decided to strengthen the empire,
+# the ai will call this to see if it should set its delegate to undermine it
+# if the ai neither wants to support nor undermine the galactic empire, it will just keep
+# its emissary as a standard delegate
+# It is guaranteed that the galactic community exists, is an empire, and the country is part of it
+# when this rule is called
+# THIS = Country
+# FROM = Galactic Emperor (Country)
+should_ai_undermine_galactic_empire = {
+	is_galactic_emperor = no
+	imperial_authority >= 0.25
+	OR = {
+		AND = {
+			NOT = {
+				FROM = {
+					is_overlord_to = prev
+				}
+			}
+			opinion = {
+				who = FROM
+				value <= -300	# value defined as "POOR" for opinion in 00_defines.txt
+			}
+		}
+		AND = {
+			FROM = {
+				is_overlord_to = prev
+			}
+			has_loyalty < 0
+			any_agreement = {
+				has_term_value = {
+					term = subject_diplomacy
+					value = subject_can_do_diplomacy
+				}
+			}
+		}
+	}
+}
+

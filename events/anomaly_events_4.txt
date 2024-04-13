@@ -126,11 +126,11 @@ country_event = {
 					has_owner = no
 					owner = { is_same_value = root }
 				}
-				any_system_planet = { is_gas_giant = yes }
+				any_system_planet = { is_gas_giant = yes } # undercoat: moved to scripted trigger
 			}
 			min_steps = 1
 			random_system_planet = {
-				limit = { is_gas_giant = yes }
+				limit = { is_gas_giant = yes } # undercoat: moved to scripted trigger
 				hidden_effect = {
 					set_planet_flag = baldarak
 					save_event_target_as = baldarak_planet
@@ -288,7 +288,7 @@ country_event = {
 						owner = { is_same_value = root }
 					}
 					any_system_planet = {
-						is_gas_giant = yes
+						is_gas_giant = yes # undercoat: moved to scripted trigger
 						NOR = {
 							has_planet_flag = baldarak
 							has_planet_flag = tollok_rong
@@ -298,7 +298,7 @@ country_event = {
 				min_steps = 1
 				random_system_planet = {
 					limit = {
-						is_gas_giant = yes
+						is_gas_giant = yes # undercoat: moved to scripted trigger
 						NOR = {
 							has_planet_flag = baldarak
 							has_planet_flag = tollok_rong
@@ -1083,7 +1083,7 @@ ship_event = {
 			NOR = {
 				is_tutorial_level = 0
 				has_country_flag = discovered_modifier_planet
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		from = {
@@ -1153,7 +1153,7 @@ ship_event = {
 				is_tutorial_level = 0
 				has_country_flag = discovered_modifier_planet
 			}
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		from = {
 			num_modifiers > 0
@@ -1322,6 +1322,7 @@ ship_event = {
 				default = { give_technology = { tech = tech_administrative_ai }}
 			}
 			set_country_flag = studied_nanite_swarm
+			end_event_chain = parvus_III_chain
 		}
 	}
 	option =  {
@@ -1330,13 +1331,12 @@ ship_event = {
 		enable_special_project = {
 			name = "DESTROY_SWARM"
 			location = event_target:nanite_swarm_planet
-			owner = root
+			owner = root.owner
 		}
 	}
 
 	after = {
 		owner = {
-			end_event_chain = parvus_III_chain
 			country_event = { id = anomaly.6710 days = 80 random = 1000 }
 		}
 	}
@@ -1456,6 +1456,9 @@ ship_event = {
 					clear_blocker = yes
 				}
 			}
+		}
+		owner = {
+			end_event_chain = parvus_III_chain
 		}
 	}
 }
@@ -2427,7 +2430,7 @@ ship_event = { #Giant Alien Spiders are no Joke
 		trigger = {
 			owner = {
 				OR = {
-					has_void_dweller_origin = yes
+					has_void_dweller_origin = yes # undercoat: moved to scripted trigger
 					has_technology = tech_habitat_1
 				}
 			}
@@ -2977,7 +2980,9 @@ ship_event = {
 	}
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = {
+			clear_deposits = yes
+		}
 	}
 
 	option = {
@@ -2985,12 +2990,10 @@ ship_event = {
 		owner = { add_resource = { minerals = 100 } }
 		from = {
 			set_deposit = d_rare_crystals_4
-			mining_station = {
-				dismantle = yes
-			}
-			hidden_effect = {
-				remove_planet_flag = sleeping_crystal
-				set_planet_flag = annoyed_crystal
+			tooltip = {
+				mining_station = {
+					dismantle = yes
+				}
 			}
 		}
 	}
@@ -3004,11 +3007,18 @@ ship_event = {
 			location = from
 		}
 		from = {
+			tooltip = {
+				mining_station = {
+					dismantle = yes
+				}
+			}
+		}
+	}
+
+	after = {
+		from = {
 			remove_planet_flag = sleeping_crystal
 			set_planet_flag = annoyed_crystal
-			mining_station = {
-				dismantle = yes
-			}
 		}
 	}
 }
@@ -3116,7 +3126,7 @@ ship_event = {
 		trigger = {
 			owner = {
 				OR = {
-					is_agrarian_empire = yes
+					is_agrarian_empire = yes # undercoat: moved to scripted trigger
 					is_spiritualist = yes
 					is_xenophobe = yes
 				}
@@ -3245,31 +3255,31 @@ ship_event = {
 	location = from
 	picture = {
 		trigger = {
-			From = { is_molten_world = yes }
+			From = { is_molten_world = yes } # undercoat: moved to scripted trigger
 		}
 		picture = GFX_evt_molten
 	}
 	picture = {
 		trigger = {
-			From = { is_toxic_world = yes }
+			From = { is_toxic_world = yes } # undercoat: moved to scripted trigger
 		}
 		picture = GFX_evt_toxic
 	}
 	picture = {
 		trigger = {
-			From = { is_barren_dry_world = yes }
+			From = { is_barren_dry_world = yes } # undercoat: moved to scripted trigger
 		}
 		picture = GFX_evt_warm_barren
 	}
 	picture = {
 		trigger = {
-			From = { is_barren_cold_world = yes }
+			From = { is_barren_cold_world = yes } # undercoat: moved to scripted trigger
 		}
 		picture = GFX_evt_cold_barren
 	}
 	picture = {
 		trigger = {
-			From = { is_frozen_world = yes }
+			From = { is_frozen_world = yes } # undercoat: moved to scripted trigger
 		}
 		picture = GFX_evt_frozen
 	}
@@ -3531,7 +3541,12 @@ country_event = {
 				}
 			}
 			vending_machine_contents_rot = {
-				give_next_tech_society_option_effect = yes
+				add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
 			}
 		}
 	}
@@ -3556,12 +3571,7 @@ ship_event = {
 
 	option = {
 		name = anomaly.7020.a
-		if = {
-			limit = {
-				owner = { is_regular_empire = yes }
-			}
-			from = { create_archaeological_site = site_space_shanty_dig }
-		}
+		from = { create_archaeological_site = site_space_shanty_dig }
 	}
 }
 
@@ -3585,13 +3595,7 @@ ship_event = {
 
 	option = {
 		name = anomaly.7030.desc.a
-		if = {
-			limit = {
-				has_ancrel = yes
-				owner = { is_regular_empire = yes }
-			}
-			from = { create_archaeological_site = site_rage_sage_dig }
-		}
+		from = { create_archaeological_site = site_rage_sage_dig }
 	}
 }
 
@@ -3646,13 +3650,13 @@ ship_event = {
 	}
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = anomaly.7101.machines.desc
 	}
 	desc = {
 		trigger = {
-			owner = { is_hive_empire = yes }
+			owner = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = anomaly.7101.hive.desc
 	}
@@ -3666,7 +3670,7 @@ ship_event = {
 	option = {
 		trigger = {
 			owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 		name = anomaly.7101.a
@@ -3677,7 +3681,7 @@ ship_event = {
 	option = {
 		trigger = {
 			owner = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		name = anomaly.7101.b
@@ -3688,7 +3692,7 @@ ship_event = {
 	option = {
 		trigger = {
 			owner = {
-				is_hive_empire = yes
+				is_hive_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		name = anomaly.7101.c
@@ -4556,6 +4560,92 @@ country_event = {
 		event_target:desertling_planet = {
 			remove_modifier = alien_infestation
 			add_deposit = d_red_desert
+		}
+	}
+}
+
+ship_event = {
+	id = anomaly.7200
+	title = anomaly.7200.name
+	desc = anomaly.7200.desc
+	picture = GFX_evt_shrouded_planet
+	show_sound = event_mystic_reveal
+	location = from
+
+	is_triggered_only = yes
+
+	option = {
+		name = anomaly.7200.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			from.solar_system = {
+				every_system_planet = {
+					switch = {
+						trigger = has_planet_flag
+						planet_Ariph = {
+							change_pc = pc_molten
+							add_deposit = d_alloys_2
+						}
+						planet_Hari_XXIV = {
+							change_pc = pc_molten
+							add_deposit = d_alloys_2
+						}
+						planet_Risasi = {
+							change_pc = pc_asteroid
+							add_deposit = d_rare_crystals_2
+						}
+						planet_Aridder = {
+							change_pc = pc_frozen
+							add_deposit = d_minerals_2
+						}
+						planet_Echo = {
+							change_pc = pc_barren
+							add_deposit = d_energy_2
+						}
+						planet_Rover = {
+							change_pc = pc_toxic
+							add_deposit = d_exotic_gases_1
+						}
+						planet_Jasepe = {
+							change_pc = pc_barren
+							add_deposit = d_minerals_3
+						}
+						planet_Blaxe = {
+							change_pc = pc_gas_giant
+							add_deposit = d_energy_3
+						}
+						planet_Glavi = {
+							change_pc = pc_gas_giant
+							add_deposit = d_exotic_gases_1
+						}
+						planet_Salvold = {
+							change_pc = pc_barren_cold
+							add_deposit = d_minerals_2
+						}
+						planet_Frince = {
+							change_pc = pc_frozen
+							add_deposit = d_minerals_2
+						}
+						star_seddom = {
+							set_planet_size = 33
+							add_deposit = d_energy_5
+						}
+					}
+				}
+				random_ambient_object = {
+					limit = {
+						has_ambient_object_flag = breachsealer_breach
+					}
+					destroy_ambient_object = this
+				}
+			}
 		}
 	}
 }

@@ -240,27 +240,27 @@ wears_clothes = { # The species uses the portrait that wears clothes
 }
 
 is_fallen_empire_machine = {
-	is_fallen_empire = yes
-	is_machine_empire = yes
+	is_fallen_empire = yes # undercoat: moved to scripted trigger
+	is_machine_empire = yes # undercoat: moved to scripted trigger
 }
 
 is_fallen_empire_materialist = {
-	is_fallen_empire = yes
+	is_fallen_empire = yes # undercoat: moved to scripted trigger
 	has_ethic = ethic_fanatic_materialist
 }
 
 is_fallen_empire_spiritualist = {
-	is_fallen_empire = yes
+	is_fallen_empire = yes # undercoat: moved to scripted trigger
 	has_ethic = ethic_fanatic_spiritualist
 }
 
 is_fallen_empire_xenophobe = {
-	is_fallen_empire = yes
+	is_fallen_empire = yes # undercoat: moved to scripted trigger
 	has_ethic = ethic_fanatic_xenophobe
 }
 
 is_fallen_empire_xenophile = {
-	is_fallen_empire = yes
+	is_fallen_empire = yes # undercoat: moved to scripted trigger
 	has_ethic = ethic_fanatic_xenophile
 }
 
@@ -272,7 +272,7 @@ is_valid_fallen_empire_for_task = {
 		has_ethic = ethic_fanatic_spiritualist
 		has_ethic = ethic_fanatic_xenophile
 		has_ethic = ethic_fanatic_materialist
-		is_machine_empire = yes
+		is_machine_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -360,42 +360,34 @@ has_apocalypse = {
 	optimize_memory
 	host_has_dlc = Apocalypse
 }
-
 has_megacorp_dlc = {
 	optimize_memory
 	host_has_dlc = Megacorp
 }
-
 has_arachnoids = {
 	optimize_memory
 	host_has_dlc = "Arachnoid Portrait Pack"
 }
-
 has_anniversary_portraits = {
 	optimize_memory
 	host_has_dlc = "Anniversary Portraits"
 }
-
 has_creatures_of_the_void = {
 	optimize_memory
 	host_has_dlc = "Creatures of the Void Portrait Pack"
 }
-
 has_symbols_of_domination = {
 	optimize_memory
 	host_has_dlc = "Symbols of Domination"
 }
-
 has_pdx_account_bonus = {
 	optimize_memory
 	host_has_dlc = "Paradox Account Sign-up Bonus"
 }
-
 has_original_soundtrack = {
 	optimize_memory
 	host_has_dlc = "Original Game Soundrack"
 }
-
 has_paragons_dlc = {
 	optimize_memory
 	host_has_dlc = "Galactic Paragons"
@@ -448,6 +440,11 @@ has_astral_planes_dlc = {
 	host_has_dlc = "Astral Planes"
 }
 
+has_rick_the_cube_dlc = {
+	optimize_memory
+	host_has_dlc = "Rick The Cube Species Portrait"
+}
+
 uninhabitable_regular_planet = {
 	OR = {
 		is_planet_class = pc_molten
@@ -468,17 +465,24 @@ colonizable_planet = {
 
 habitable_planet = {
 	OR = {
-		is_starting_planet_type = yes
-		is_gaia_world = yes
-		is_relic_world = yes
-		is_city_world = yes
+		is_starting_planet_type = yes # undercoat: moved to scripted trigger
+		is_gaia_world = yes # undercoat: moved to scripted trigger
+		is_relic_world = yes # undercoat: moved to scripted trigger
+		is_city_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
 habitable_planet_not_urban = {
 	OR = {
-		is_starting_planet_type = yes
-		is_gaia_world = yes
+		is_starting_planet_type = yes # undercoat: moved to scripted trigger
+		is_gaia_world = yes # undercoat: moved to scripted trigger
+	}
+}
+
+is_urban_planet = {
+	OR = {
+		is_city_world = yes # undercoat: moved to scripted trigger
+		is_relic_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -498,10 +502,10 @@ is_starting_planet_type = {
 
 can_have_habitable_deposits = {
 	OR = {
-		is_nuked_world = yes
-		is_starting_planet_type = yes
-		is_gaia_world = yes
-		is_relic_world = yes
+		is_nuked_world = yes # undercoat: moved to scripted trigger
+		is_starting_planet_type = yes # undercoat: moved to scripted trigger
+		is_gaia_world = yes # undercoat: moved to scripted trigger
+		is_relic_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -623,23 +627,44 @@ allows_alien_leaders = {
 	}
 }
 
+can_be_leader = {
+	has_citizenship_rights = yes
+	NOT = { has_trait = trait_syncretic_proles }
+	can_think = yes
+	OR = {
+		is_robot_pop = no
+		$country|root$ = {
+			OR = {
+				has_technology = tech_synthetic_leaders
+				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_mechanical_empire = yes
+			}
+		}
+	}
+	OR = {
+		is_same_species = $country|root$
+		$country|root$ = {
+			is_necrophage_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+}
+
 can_be_military_leader = {
 	is_enslaved = no
 	is_sapient = yes
-	can_think = yes # Ariphaos
 	OR = {
 		is_robot_pop = no
 		owner = { has_policy_flag = ai_full_rights }
-		owner = { is_machine_empire = yes }
+		owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 	}
 	OR = {
 		AND = { # MIs only accept Fully Integrated leaders
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 			has_citizenship_type = { type = citizenship_full_machine country = owner }
 			has_military_service_type = { type = military_service_full }
 		}
 		AND = { # non-MIs accept whatever
-			NOT = { owner = { is_machine_empire = yes } }
+			NOT = { owner = { is_machine_empire = yes } } # undercoat: moved to scripted trigger
 			has_military_service_type = { type = military_service_full }
 		}
 	}
@@ -657,15 +682,15 @@ can_be_soldier = {
 allows_slavery = {
 	OR = {
 		has_policy_flag = slavery_allowed
-		is_gestalt = yes
+		is_gestalt = yes # undercoat: moved to scripted trigger
 	}
 }
 
 allows_purge = {
 	OR = {
 		has_policy_flag = purge_allowed
-		is_gestalt = yes
-		is_homicidal = yes
+		is_gestalt = yes # undercoat: moved to scripted trigger
+		is_homicidal = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -770,35 +795,31 @@ has_primitive_government = {
 }
 
 prefers_scientist_governors = {
-	OR = {
-		is_technocracy = yes
-	}
+	is_technocracy = yes # undercoat: moved to scripted trigger
 }
 
 prefers_commander_governors = {
-	OR = {
-		is_despoiler_empire = yes
-	}
+	is_despoiler_empire = yes # undercoat: moved to scripted trigger
 }
 
-#Works in species scope, with a country in from
+#Works in species scope, with a country in $country|from$
 # undercoat: added parameter
 is_lonely_hive_mind_pop = {
 	has_trait = trait_hive_mind
-	NOT = { $country|from$ = { is_hive_empire = yes } }
+	NOT = { $country|from$ = { is_hive_empire = yes } } # undercoat: moved to scripted trigger
 	$country|from$ = {
-		is_fallen_empire = no
+		is_fallen_empire = no # undercoat: moved to scripted trigger
 	}
 }
 
-#Works in species scope, with a country in from
+#Works in species scope, with a country in $country|from$
 # undercoat: added parameter
 is_disconnected_machine_pop = {
 	has_trait = trait_machine_unit
 	$country|from$ = {
 		NOR = {
-			is_machine_empire = yes
-			is_fallen_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -893,8 +914,8 @@ has_any_megastructure_in_empire = {
 }
 
 is_fallen_machine_empire = {
-	is_fallen_empire = yes
-	is_machine_empire = yes
+	is_fallen_empire = yes # undercoat: moved to scripted trigger
+	is_machine_empire = yes # undercoat: moved to scripted trigger
 }
 
 is_berserk_fallen_machine_empire = {
@@ -1015,7 +1036,7 @@ is_livestock = {
 is_synthetic_empire = {
 	OR = {
 		has_country_flag = synthetic_empire
-		is_machine_empire = yes
+		is_machine_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -1031,9 +1052,9 @@ is_trinary_star = {
 planet_can_be_liberated_from_owner = {
 	owner = {
 		NOR = {
-			is_fallen_empire = yes
-			is_hive_empire = yes
-			is_machine_empire = yes
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
+			is_hive_empire = yes # undercoat: moved to scripted trigger
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -1053,7 +1074,7 @@ is_robot_empire = {
 	OR = {
 		owner_species = { has_trait = trait_mechanical }
 		has_country_flag = synthetic_empire
-		is_machine_empire = yes
+		is_machine_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -1100,7 +1121,7 @@ is_lithoid_devouring_swarm_consumption_world = { # planet scope
 
 is_country_type_with_subjects = {
 	OR = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		is_country_type = awakened_fallen_empire
 		is_country_type = awakened_marauders
 	}
@@ -1111,13 +1132,13 @@ is_valid_target_fe_stop_atrocities = {
 		allows_slavery = yes
 		allows_purge = yes
 	}
-	is_gestalt = no
+	is_gestalt = no # undercoat: moved to scripted trigger
 	is_homicidal = no # undercoat: moved to scripted trigger
 }
 
 is_valid_target_fe_stop_ai = {
 	NOT = { has_policy_flag = ai_outlawed }
-	is_gestalt = no
+	is_gestalt = no # undercoat: moved to scripted trigger
 	has_technology = tech_synthetic_workers
 	is_mechanical_empire = no
 }
@@ -1352,13 +1373,11 @@ is_xenophobe = {
 
 is_regular_empire = {
 	OR = {
-		is_playable = yes
+		is_empire = yes # undercoat: moved to scripted trigger
 		#for checks in buildings and districts
 		is_country_type = awakened_marauders
-		is_country_type = fallen_empire
-		is_country_type = awakened_fallen_empire
 	}
-	NOT = { is_gestalt = yes	}
+	is_gestalt = no # undercoat: moved to scripted trigger
 }
 
 is_default_or_fallen = {
@@ -1374,7 +1393,7 @@ is_default_or_fallen = {
 # Undercoat: changed for tooltip
 is_capitalist = {
 	OR = {
-		is_megacorp = yes
+		is_megacorp = yes # undercoat: moved to scripted trigger
 		has_civic = civic_corporate_dominion
 		has_civic = civic_merchant_guilds
 	}
@@ -1405,16 +1424,16 @@ is_machine_empire = {
 
 is_autocracy = { #Power of one
 	OR = {
-		is_gestalt = yes
-		has_authority_imperial = yes
-		has_authority_dictatorial = yes
+		is_gestalt = yes # undercoat: moved to scripted trigger
+		has_authority_imperial = yes # undercoat: moved to scripted trigger
+		has_authority_dictatorial = yes # undercoat: moved to scripted trigger
 	}
 }
 
 is_oligarchy = { #Power of few
 	OR = {
-		has_authority_oligarchic = yes
-		has_authority_corporate = yes
+		has_authority_oligarchic = yes # undercoat: moved to scripted trigger
+		has_authority_corporate = yes # undercoat: moved to scripted trigger
 	}
 	NOR = {
 		has_ethic = ethic_egalitarian
@@ -1424,9 +1443,9 @@ is_oligarchy = { #Power of few
 
 is_democracy = { #Power of many
 	OR = {
-		has_authority_democratic = yes
+		has_authority_democratic = yes # undercoat: moved to scripted trigger
 		AND = {
-			has_authority_corporate = yes
+			has_authority_corporate = yes # undercoat: moved to scripted trigger
 			is_egalitarian = yes
 		}
 	}
@@ -1442,10 +1461,10 @@ can_set_ai_policy = {
 			OR = {
 				has_technology = tech_synthetic_workers
 				has_technology = tech_sapient_ai
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 			OR = {
-				is_playable = yes
+				is_playable = yes # undercoat: moved to scripted trigger
 				has_ai_personality_behaviour = robot_exploiter
 				has_ai_personality_behaviour = robot_liberator
 			}
@@ -1470,7 +1489,7 @@ has_comms_with_alien_empire = {
 		fail_text = has_comms_with_alien_empire_tooltip
 		any_relation = {
 			has_communications = prev
-			is_empire = yes
+			is_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -1480,7 +1499,7 @@ has_comms_with_alien_civilization = {
 	any_relation = {
 		has_communications = prev
 		OR = {
-			is_empire = yes
+			is_empire = yes # undercoat: moved to scripted trigger
 			is_country_type = enclave
 			is_country_type = nomad
 			is_country_type = dormant_marauders
@@ -1496,17 +1515,17 @@ has_total_war_cb = {
 	OR = {
 		#attacker checks
 		AND = {
-			is_empire = yes
+			is_empire = yes # undercoat: moved to scripted trigger
 			OR = {
 				is_country_type = awakened_fallen_empire
 				has_valid_civic = civic_hive_devouring_swarm
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 				AND = {
 					has_valid_civic = civic_machine_terminator
 					$target|from$ = {
 						NOR = {
 							has_country_flag = synthetic_empire
-							is_machine_empire = yes
+							is_machine_empire = yes # undercoat: moved to scripted trigger
 						}
 					}
 				}
@@ -1518,17 +1537,17 @@ has_total_war_cb = {
 		}
 		#end threat checks
 		AND = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			NOR = {
 				is_country_type = awakened_fallen_empire
-				is_homicidal = yes
-				is_machine_assimilator = yes
+				is_homicidal = yes # undercoat: moved to scripted trigger
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 			$target|from$ = {
 				OR = {
 					is_country_type = awakened_fallen_empire
-					is_homicidal = yes
-					is_machine_assimilator = yes
+					is_homicidal = yes # undercoat: moved to scripted trigger
+					is_machine_assimilator = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -1653,14 +1672,14 @@ is_homicidal = {
 
 is_unfriendly = {
 	OR = {
-		is_homicidal = yes
-		is_despoiler_empire = yes
+		is_homicidal = yes # undercoat: moved to scripted trigger
+		is_despoiler_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 
 is_slaver = {
 	OR = {
-		is_despoiler_empire = yes
+		is_despoiler_empire = yes # undercoat: moved to scripted trigger
 		has_ascension_perk = ap_nihilistic_acquisition
 	}
 }
@@ -1740,14 +1759,14 @@ is_wet = {
 
 is_dry = {
 	has_climate = dry
-	is_city_world = no
+	is_city_world = no # undercoat: moved to scripted trigger
 }
 
 is_barren = {
 	OR = {
-		is_barren_dry_world = yes
-		is_barren_cold_world = yes
-		is_rocky_asteroid = yes
+		is_barren_dry_world = yes # undercoat: moved to scripted trigger
+		is_barren_cold_world = yes # undercoat: moved to scripted trigger
+		is_rocky_asteroid = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -1757,28 +1776,28 @@ is_cold = {
 
 can_have_mineral_deposits = {
 	OR = {
-		is_rocky_asteroid = yes
-		is_molten_world = yes
-		is_toxic_world = yes
-		is_frozen_world = yes
-		is_barren_dry_world = yes
-		is_barren_cold_world = yes
-		is_broken_world = yes
-		is_shattered_world = yes
+		is_rocky_asteroid = yes # undercoat: moved to scripted trigger
+		is_molten_world = yes # undercoat: moved to scripted trigger
+		is_toxic_world = yes # undercoat: moved to scripted trigger
+		is_frozen_world = yes # undercoat: moved to scripted trigger
+		is_barren_dry_world = yes # undercoat: moved to scripted trigger
+		is_barren_cold_world = yes # undercoat: moved to scripted trigger
+		is_broken_world = yes # undercoat: moved to scripted trigger
+		is_shattered_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_energy_deposits = {
 	OR = {
 		planet_is_standard_star = yes # undercoat: moved to scripted trigger
-		is_gas_giant = yes
-		is_molten_world = yes
-		is_ice_asteroid = yes
+		is_gas_giant = yes # undercoat: moved to scripted trigger
+		is_molten_world = yes # undercoat: moved to scripted trigger
+		is_ice_asteroid = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_society_deposits = {
-	is_toxic_world = yes
+	is_toxic_world = yes # undercoat: moved to scripted trigger
 }
 
 can_have_minor_physics_deposits = {
@@ -1791,47 +1810,47 @@ can_have_physics_deposits = {
 
 can_have_minor_engineering_deposits = {
 	OR = {
-		is_frozen_world = yes
-		is_gas_giant = yes
+		is_frozen_world = yes # undercoat: moved to scripted trigger
+		is_gas_giant = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_engineering_deposits = {
 	OR = {
-		is_frozen_world = yes
-		is_gas_giant = yes
-		planet_is_neutron_star_including_pulsar = yes
-		planet_is_black_hole = yes
+		is_frozen_world = yes # undercoat: moved to scripted trigger
+		is_gas_giant = yes # undercoat: moved to scripted trigger
+		planet_is_neutron_star_including_pulsar = yes # undercoat: moved to scripted trigger
+		planet_is_black_hole = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_trade_deposits = {
 	OR = {
-		is_gas_giant = yes
-		is_molten_world = yes
-		is_toxic_world = yes
+		is_gas_giant = yes # undercoat: moved to scripted trigger
+		is_molten_world = yes # undercoat: moved to scripted trigger
+		is_toxic_world = yes # undercoat: moved to scripted trigger
 		is_asteroid = yes
 	}
 }
 
 can_have_volatile_motes_deposit = {
 	OR = {
-		is_molten_world = yes
-		is_rocky_asteroid = yes
+		is_molten_world = yes # undercoat: moved to scripted trigger
+		is_rocky_asteroid = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_rare_crystals_deposits = {
 	OR = {
-		is_gas_giant = yes
-		is_toxic_world = yes
+		is_gas_giant = yes # undercoat: moved to scripted trigger
+		is_toxic_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_exotic_gases_deposits = {
 	OR = {
-		is_frozen_world = yes
-		is_ice_asteroid = yes
+		is_frozen_world = yes # undercoat: moved to scripted trigger
+		is_ice_asteroid = yes # undercoat: moved to scripted trigger
 		is_inside_nebula = yes
 	}
 }
@@ -1928,7 +1947,7 @@ has_gw_interstellar_assembly = {
 
 can_generate_trade_value = {
 	exists = owner
-	owner = { is_playable = yes }
+	owner = { is_playable = yes } # undercoat: moved to scripted trigger
 }
 
 is_crossbreeding_possible = {
@@ -2023,14 +2042,14 @@ holo_theatres_upkeep_affordable = {
 	}
 	OR = {
 		AND = {
-			has_warrior_culture = yes
+			has_warrior_culture = yes # undercoat: moved to scripted trigger
 			has_monthly_income = {
 				resource = alloys
 				value > 2
 			}
 		}
 		AND = {
-			has_warrior_culture = no
+			has_warrior_culture = no # undercoat: moved to scripted trigger
 			has_monthly_income = {
 				resource = consumer_goods
 				value > 2
@@ -2436,10 +2455,6 @@ scion_has_techs = {
 		NOT = { can_research_technology = tech_eco_simulation }
 	}
 	OR = {
-		has_technology = tech_society_2
-		NOT = { can_research_technology = tech_society_2 }
-	}
-	OR = {
 		has_technology = tech_colonization_4
 		NOT = { can_research_technology = tech_colonization_4 }
 	}
@@ -2467,7 +2482,7 @@ has_precursor_intro = {
 		has_country_flag = stu_precursor_intro
 		# Still in the early stages of 'On the Shoulders of Giants'
 		AND = {
-			is_shoulders_of_giants_empire = yes
+			is_shoulders_of_giants_empire = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = origin_shoulders_closure }
 		}
 	}
@@ -2488,7 +2503,7 @@ baol_colony_1_trigger = {
 		owner = { is_same_value = $who|root$.owner }
 	}
 	any_system_planet = {
-		is_barren_dry_world = yes
+		is_barren_dry_world = yes # undercoat: moved to scripted trigger
 		has_anomaly = no
 		NOT = { exists = archaeological_site }
 		NOT = { has_planet_flag = suppress_archaeological_sites }
@@ -2510,7 +2525,7 @@ baol_colony_2_trigger = {
 		owner = { is_same_value = $who|root$.owner }
 	}
 	any_system_planet = {
-		is_rocky_asteroid = yes
+		is_rocky_asteroid = yes # undercoat: moved to scripted trigger
 		has_anomaly = no
 		NOT = { exists = archaeological_site }
 		NOT = { has_planet_flag = suppress_archaeological_sites }
@@ -2532,7 +2547,7 @@ baol_colony_3_trigger = {
 	}
 	any_system_planet = {
 		habitable_planet = yes
-		is_city_world = no
+		is_urban_planet = no
 		has_anomaly = no
 		NOR = {
 			exists = archaeological_site
@@ -2557,7 +2572,7 @@ baol_colony_3_fallback_trigger = {
 	}
 	any_system_planet = {
 		habitable_planet = yes
-		is_city_world = no
+		is_urban_planet = no
 		has_anomaly = no
 		NOR = {
 			exists = archaeological_site
@@ -2736,14 +2751,10 @@ is_drone_country_type = {
 
 is_space_critter_country_type = {
 	OR = {
-		is_country_type = tiyanki
-		is_country_type = tiyanki_garrison
-		is_country_type = amoeba
-		is_country_type = amoeba_borderless
-		is_country_type = amoeba_garrison
-		is_country_type = amoeba_faction
-		is_country_type = crystal
-		is_country_type = crystal_faction
+		is_tiyanki_country_type = yes
+		is_amoeba_country_type = yes
+		is_crystal_country_type = yes
+		has_country_flag = stu_space_critter_country
 	}
 }
 
@@ -2837,14 +2848,14 @@ basic_eligibility_for_separatism_joining_trigger = {
 		has_non_aggression_pact = event_target:revolt_situation.owner
 	}
 	has_communications = event_target:revolt_situation.owner
-	is_playable = yes
+	is_playable = yes # undercoat: moved to scripted trigger
 }
 
 default_endgame_early_start_triggers = {
 	OR = {
 		NOT = {
 			any_country = {
-				is_fallen_empire = yes
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		has_global_flag = no_war_in_heaven
@@ -2875,7 +2886,7 @@ should_ai_focus_on_trade = {
 
 # undercoat: added parameter
 valid_curators_intel_trade_target = {
-	is_playable = yes
+	is_playable = yes # undercoat: moved to scripted trigger
 	NOR = {
 		is_same_value = $who|root$
 		AND = {
@@ -2936,7 +2947,7 @@ crisis_shroud_message = {
 }
 
 no_resource_for_component = {
-	is_playable = yes
+	is_playable = yes # undercoat: moved to scripted trigger
 	OR = {
 		NOT = {
 			can_buy_on_market = $RESOURCE$ #i.e. has galactic market or positive income
@@ -3013,8 +3024,8 @@ is_crisis_sphere = {
 is_low_tech_start = {
 	OR = {
 		is_primitive = yes
-		is_broken_shackles_empire = yes
-		is_payback_empire = yes
+		is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
+		is_payback_empire = yes # undercoat: moved to scripted trigger
 		is_eager_explorer_empire = yes
 	}
 }
@@ -3050,7 +3061,7 @@ has_phototrophic_energy_upkeep = {
 				has_trait = trait_harvested_radiotrophic
 				has_trait = trait_lithoid_radiotrophic
 			}
-			NOT = { planet = { is_nuked_world = yes } }
+			NOT = { planet = { is_nuked_world = yes } } # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -3378,14 +3389,14 @@ is_faction_allowed = {
 		}
 		AND = {
 			days_passed > 30
-			has_parliamentary_system = yes
+			has_parliamentary_system = yes # undercoat: moved to scripted trigger
 		}
 		AND = {
 			days_passed > 350
-			is_broken_shackles_empire = yes
+			is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
-	is_gestalt = no
+	is_gestalt = no # undercoat: moved to scripted trigger
 	NOT = { has_country_flag = suppress_vanilla_factions }
 }
 
@@ -3427,9 +3438,9 @@ values_others = {
 	OR = {
 		is_xenophile = yes
 		has_valid_civic = civic_hive_empath
-		is_servitor_empire = yes
+		is_servitor_empire = yes # undercoat: moved to scripted trigger
 		has_valid_civic = civic_machine_exploration_protocol
-		is_fruitful_empire = yes
+		is_fruitful_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -3497,34 +3508,25 @@ is_fanatical = {
 	}
 }
 
-has_leader_upkeep = {
-	exists = owner
-	OR = {
-		is_idle = yes
-		owner = {
-			is_feudal_empire = no
-		}
-	}
-}
 can_have_sensory_readings = {
 	OR = {
-		is_rocky_asteroid = yes
-		is_frozen_world = yes
-		is_barren_dry_world = yes
-		is_barren_cold_world = yes
-		is_starting_planet_type = yes
-		is_gaia_world = yes
-		is_relic_world = yes
-		is_city_world = yes
+		is_rocky_asteroid = yes # undercoat: moved to scripted trigger
+		is_frozen_world = yes # undercoat: moved to scripted trigger
+		is_barren_dry_world = yes # undercoat: moved to scripted trigger
+		is_barren_cold_world = yes # undercoat: moved to scripted trigger
+		is_starting_planet_type = yes # undercoat: moved to scripted trigger
+		is_gaia_world = yes # undercoat: moved to scripted trigger
+		is_relic_world = yes # undercoat: moved to scripted trigger
+		is_city_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
 can_have_resource_discovery = {
 	OR = {
 		is_asteroid = yes # undercoat - changed from planet class check
-		is_frozen_world = yes
-		is_barren_dry_world = yes
-		is_barren_cold_world = yes
+		is_frozen_world = yes # undercoat: moved to scripted trigger
+		is_barren_dry_world = yes # undercoat: moved to scripted trigger
+		is_barren_cold_world = yes # undercoat: moved to scripted trigger
 	}
 }
 
@@ -3554,7 +3556,7 @@ is_relentless_industrialist_empire = {
 
 uses_standard_ship_sizes = {
 	OR = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		is_country_type = gdf
 		is_country_type = enclave_mercenary
 		has_country_flag = use_default_ships #for modders: apply this in on_country_created for new country types that you want to use corvettes etc
@@ -3590,7 +3592,7 @@ is_organic_controllable_ship = {
 }
 
 ai_should_build_habitats = {
-	is_playable = yes
+	is_playable = yes # undercoat: moved to scripted trigger
 	OR = {
 		is_at_war = no
 		mid_game_years_passed > 0
@@ -3598,7 +3600,7 @@ ai_should_build_habitats = {
 	has_technology = tech_habitat_1
 	if = {
 		limit = {
-			has_void_dweller_origin = no #VDs should build habitats even if there are other planets available
+			has_void_dweller_origin = no #VDs should build habitats even if there are other planets available # undercoat: moved to scripted trigger
 		}
 		ai_colonize_plans <= 0
 		OR = {
@@ -3608,7 +3610,7 @@ ai_should_build_habitats = {
 	}
 	NOT = {
 		any_planet_within_border = {
-			is_habitat = yes
+			is_habitat = yes # undercoat: moved to scripted trigger
 			is_colony = no
 		}
 	}
@@ -3813,16 +3815,16 @@ can_think = {
 
 has_slave_origin = {
 	OR = {
-		is_broken_shackles_empire = yes
-		is_payback_empire = yes
+		is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
+		is_payback_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 
 has_reduced_pop_origin = {
 	OR = {
-		is_broken_shackles_empire = yes
-		is_payback_empire = yes
-		is_fear_of_the_dark_empire = yes
+		is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
+		is_payback_empire = yes # undercoat: moved to scripted trigger
+		is_fear_of_the_dark_empire = yes # undercoat: moved to scripted trigger
 	}
 }
 has_specialist_subject_leader_trait = {
@@ -3949,7 +3951,7 @@ can_remove_overtuned_traits = {
 	$country|from$ = {
 		OR = {
 			has_tradition = tr_genetics_resequencing
-			is_overtuned_empire = yes
+			is_overtuned_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -4020,12 +4022,16 @@ has_chosen_covenant_trait_non_ruler = {
 		has_trait = leader_trait_eater_chosen
 		has_trait = leader_trait_instrument_chosen
 		has_trait = leader_trait_whisperers_chosen
+		# Undercoat
+		check_modifier_value = {
+			modifier = stu_chosen_covenant_non_ruler_flag
+			value > 0
+		}
 	}
 }
 
 has_presapient_trait = {
 	OR = {
-		has_trait = trait_presapient_forcefully_devolved # Ariphaos
 		has_trait = trait_presapient_starborn
 		has_trait = trait_presapient_earthbound
 		has_trait = trait_presapient_natural_intellectuals
@@ -4086,7 +4092,6 @@ is_rival_technologically_superior = {
 	}
 }
 
-# undercoat: made usable outside root scope
 is_rival_economically_superior = {
 	any_rival_country = {
 		 relative_power = {
@@ -4115,14 +4120,14 @@ blocks_disruptive_gameplay = { #In case we ever want to extend the effect to oth
 is_void_dweller_empire = {
 	OR = {
 		has_ascension_perk = ap_voidborn
-		has_void_dweller_origin = yes
+		has_void_dweller_origin = yes # undercoat: moved to scripted trigger
 	}
 }
 
 blocks_minister_of_state = {
 	OR = {
 		is_gestalt = yes
-		is_inwards_perfection_empire = yes
+		is_inwards_perfection_empire = yes # undercoat: moved to scripted trigger
 		has_valid_civic = civic_fanatic_purifiers
 	}
 }
@@ -4135,4 +4140,57 @@ is_terraforming_candidate = {
 		# Undercoat
 		has_planet_flag = stu_terraforming_candidate
 	}
+}
+
+has_engineered_evolution_synergy = {
+	OR = {
+		is_syncretic_evolution_empire = yes # undercoat: moved to scripted trigger
+		is_life_seeded_empire = yes # undercoat: moved to scripted trigger
+		is_necrophage_empire = yes # undercoat: moved to scripted trigger
+		is_clone_army_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+has_flesh_is_weak_anti_synergy = {
+	is_materialist = no
+}
+
+has_organo_machine_interfacing_assimilator_synergy = {
+	is_machine_assimilator = yes # undercoat: moved to scripted trigger
+}
+
+has_synthetic_evolution_synergy = {
+	is_mechanist_empire = yes # undercoat: moved to scripted trigger
+}
+
+has_synthetic_evolution_anti_synergy = {
+	is_materialist = no
+}
+
+blocks_ai_synthetic_evolution = {
+	OR = {
+		has_policy_flag = ai_outlawed
+		has_policy_flag = robots_outlawed
+		is_necrophage_empire = yes # undercoat: moved to scripted trigger
+		is_clone_army_empire = yes # undercoat: moved to scripted trigger
+		is_overtuned_empire = yes # undercoat: moved to scripted trigger
+		is_minamar = yes # undercoat: moved to scripted trigger
+		is_idyllic_bloom_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+has_mind_over_matter_synergy = {
+	OR = {
+		has_ascension_perk = ap_become_the_crisis
+		has_origin = origin_demonic_incursion
+		has_country_flag = knights_met_end_of_cycle
+	}
+}
+
+has_mind_over_matter_anti_synergy = {
+	is_spiritualist = no
+}
+
+has_synthetic_age_anti_synergy = {
+	is_machine_assimilator = yes # undercoat: moved to scripted trigger
 }

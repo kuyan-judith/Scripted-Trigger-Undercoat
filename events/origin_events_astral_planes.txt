@@ -16,7 +16,7 @@ country_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		is_riftworld_empire = yes
+		is_riftworld_empire = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -52,7 +52,7 @@ country_event = {
 
 		if = {
 			limit = {
-				is_dimensional_worship_empire = yes
+				is_dimensional_worship_empire = yes # undercoat: moved to scripted trigger
 			}
 			random_owned_starbase = {
 				set_starbase_building = {
@@ -76,9 +76,7 @@ country_event = {
 	
 	trigger = {
 		has_astral_planes_dlc = yes
-		NOT = {
-			is_riftworld_empire = yes
-		}
+		is_riftworld_empire = no # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -224,19 +222,49 @@ fleet_event = {
 		trigger = {
 			controller = {
 				has_technology = tech_rift_sphere
+				NOT = {
+					species = {
+						is_archetype = MACHINE
+					}
+				}
 			}
 		}
 		text = astral_planes.2140.desc.has_rift_sphere
 	}
 	desc = {
 		trigger = {
-			NOT = {
-				controller = {
+			controller = {
+				NOR = { 
 					has_technology = tech_rift_sphere
+					species = {
+						is_archetype = MACHINE
+					}
 				}
 			}
 		}
 		text = astral_planes.2140.desc.default
+	}
+	desc = {
+		trigger = {
+			controller = {
+				has_technology = tech_rift_sphere
+				species = {
+					is_archetype = MACHINE
+				}
+			}
+		}
+		text = astral_planes.2140.desc.machine.has_rift_sphere
+	}
+	desc = {
+		trigger = {
+			controller = {
+				NOT = { has_technology = tech_rift_sphere }
+				species = {
+					is_archetype = MACHINE
+				}
+			}
+		}
+		text = astral_planes.2140.desc.machine
 	}
 	picture = GFX_evt_riftworld_archsite_ancestors
 	show_sound = ap_rift_event_0_astral_wonder
@@ -254,7 +282,22 @@ fleet_event = {
 	}
 
 	option = {
-		name = astral_planes.2140.a
+		name = {
+			trigger = {
+				controller = {
+					is_machine_empire = no
+				}
+			}
+			text = astral_planes.2140.a
+		}
+		name = {
+			trigger = {
+				controller = {
+					is_synthetic_empire = yes
+				}
+			}
+			text = astral_planes.2140.a.synthetic
+		}
 		small_artifact_reward = yes
 		controller = {
 			if = {

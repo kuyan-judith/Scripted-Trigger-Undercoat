@@ -12,11 +12,18 @@ artifact_arcane_deciphering = {
 
 	ai_weight = {
 		weight = 100
+		modifier = {
+			factor = 1.5
+			has_ethic = ethic_materialist
+		}
+		modifier = {
+			factor = 2
+			has_ethic = ethic_fanatic_materialist
+		}
 	}
 
 	potential = {
 		has_technology = tech_arcane_deciphering
-		has_ancrel = yes
 	}
 
 	allow = {
@@ -60,7 +67,6 @@ artifact_lgate_clue = {
 		NOT = { has_country_flag = completed_lcluster_chain }
 		NOT = { has_global_flag = l_cluster_opened }
 		has_distar = yes
-		has_ancrel = yes
 	}
 
 	allow = {
@@ -103,7 +109,6 @@ artifact_proclaim_religious_finding = {
 
 	potential = {
 		is_spiritualist = yes
-		has_ancrel = yes
 	}
 
 	effect = {
@@ -138,12 +143,23 @@ artifact_proclaim_superiority = {
 			factor = 0
 			has_resource = { type = minor_artifacts amount < @minor_artifact_ai_threshold }
 		}
+		modifier = {
+			factor = 0.1
+			resource_stockpile_compare = {
+				resource = influence
+				value > 500
+			}
+		}
+		modifier = {
+			factor = 0
+			resource_stockpile_compare = {
+				resource = influence
+				value > 800
+			}
+		}
 	}
 
-	potential = {
-		is_xenophobe = yes
-		has_ancrel = yes
-	}
+	potential = { is_xenophobe = yes }
 
 	effect = {
 		add_monthly_resource_mult = {
@@ -178,6 +194,11 @@ artifact_celebrate_diversity = {
 			is_xenophile = yes
 		}
 		modifier = {
+			factor = 0.25
+			is_spiritualist = yes
+			is_xenophile = no
+		}
+		modifier = {
 			factor = 0
 			has_resource = { type = minor_artifacts amount < @minor_artifact_ai_threshold }
 		}
@@ -186,7 +207,6 @@ artifact_celebrate_diversity = {
 	potential = {
 		is_gestalt = no
 		is_xenophobe = no
-		has_ancrel = yes
 	}
 
 	effect = {
@@ -225,7 +245,6 @@ artifact_cultural_study = {
 			is_megacorp = no
 			is_worker_coop_empire = yes
 		}
-		has_ancrel = yes
 	}
 
 	allow = {
@@ -251,7 +270,6 @@ artifact_manager_awards = {
 	potential = {
 		is_megacorp = yes
 		is_worker_coop_empire = no
-		has_ancrel = yes
 	}
 
 	allow = {
@@ -274,10 +292,7 @@ artifact_artifact_relays_hivemind = {
 		weight = 0
 	}
 
-	potential = {
-		is_hive_empire = yes
-		has_ancrel = yes
-	}
+	potential = { is_hive_empire = yes }
 
 	allow = {
 		custom_tooltip = {
@@ -299,10 +314,7 @@ artifact_artifact_relays_machine = {
 		weight = 0
 	}
 
-	potential = {
-		is_machine_empire = yes
-		has_ancrel = yes
-	}
+	potential = { is_machine_empire = yes }
 
 	allow = {
 		custom_tooltip = {
@@ -324,10 +336,7 @@ artifact_sanctuary_exhibits = {
 		weight = 0
 	}
 
-	potential = {
-		is_servitor_empire = yes
-		has_ancrel = yes
-	}
+	potential = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
 
 	allow = {
 		custom_tooltip = {
@@ -352,7 +361,7 @@ artifact_find_military_applications = {
 			is_militarist = yes
 		}
 		modifier = {
-			factor = 1.25
+			factor = 2
 			is_at_war = yes
 		}
 		modifier = {
@@ -360,6 +369,7 @@ artifact_find_military_applications = {
 			AND = {
 				is_pacifist = yes
 				is_at_war = no
+				has_crisis = no
 			}
 		}
 		modifier = {
@@ -375,10 +385,7 @@ artifact_find_military_applications = {
 		}
 	}
 
-	potential = {
-		has_technology = tech_arcane_deciphering
-		has_ancrel = yes
-	}
+	potential = { has_technology = tech_arcane_deciphering }
 
 	effect = {
 		custom_tooltip = artifact_find_military_applications_effect
@@ -433,7 +440,6 @@ artifact_find_peaceful_applications = {
 	potential = {
 		has_technology = tech_arcane_deciphering
 		is_homicidal = no
-		has_ancrel = yes
 	}
 
 	effect = {
@@ -472,8 +478,10 @@ artifact_sell_collector = {
 	}
 
 	potential = {
-		is_gestalt = no
-		has_ancrel = yes
+		NAND = {
+			is_gestalt = yes
+			is_homicidal = yes
+		}
 	}
 
 	effect = {
@@ -485,14 +493,28 @@ artifact_sell_collector = {
 			}
 		}
 	}
-	allow = { NOT = { has_modifier = artifact_sell_cooldown } }
+	allow = {
+		NOT = { has_modifier = artifact_sell_cooldown }
+		if = {
+			limit = { is_gestalt = yes }
+			custom_tooltip = {
+				fail_text = "GALACTIC_MARKET_NOT_FOUNDED"
+				has_global_flag = galactic_market_founded
+			}
+		}
+		if = {
+			limit = { is_gestalt = yes }
+			custom_tooltip = {
+				fail_text = "GALACTIC_MARKET_ACCESS"
+				is_galactic_community_member = yes
+			}
+		}
+	}
+
 }
 
 artifact_arcane_deciphering_locked = {
-	potential = {
-		NOT = { has_technology = tech_arcane_deciphering }
-		has_ancrel = yes
-	}
+	potential = { NOT = { has_technology = tech_arcane_deciphering } }
 
 	allow = {
 		custom_tooltip = {
@@ -503,10 +525,7 @@ artifact_arcane_deciphering_locked = {
 }
 
 artifact_find_military_applications_locked = {
-	potential = {
-		NOT = { has_technology = tech_arcane_deciphering }
-		has_ancrel = yes
-	}
+	potential = { NOT = { has_technology = tech_arcane_deciphering } }
 
 	allow = {
 		custom_tooltip = {
@@ -520,7 +539,6 @@ artifact_find_peaceful_applications_locked = {
 	potential = {
 		NOT = { has_technology = tech_arcane_deciphering }
 		is_homicidal = no
-		has_ancrel = yes
 	}
 
 	allow = {
@@ -546,7 +564,6 @@ artifact_irassian_research = {
 	potential = {
 		 has_country_flag = irassian_world_found
 		 NOT = { has_country_flag = irassian_research_started }
-		 has_ancrel = yes
 	}
 
 	effect = {
@@ -578,7 +595,6 @@ artifact_yuht_research = {
 	potential = {
 		 has_country_flag = yuht_world_found
 		 NOT = { has_country_flag = yuht_research_started }
-		 has_ancrel = yes
 	}
 
 	effect = {
@@ -610,7 +626,6 @@ artifact_vultaum_research = {
 	potential = {
 		 has_country_flag = vultaum_world_found
 		 NOT = { has_country_flag = vultaum_research_started }
-		 has_ancrel = yes
 	}
 
 	effect = {
@@ -642,7 +657,6 @@ artifact_cybrex_research = {
 	potential = {
 		 has_country_flag = cybrex_world_found
 		 NOT = { has_country_flag = cybrex_research_started }
-		 has_ancrel = yes
 	}
 
 	effect = {
@@ -680,7 +694,6 @@ artifact_league_research = {
 		}
 
 		NOT = { has_country_flag = league_research_started }
-		has_ancrel = yes
 	}
 
 	effect = {
@@ -712,7 +725,6 @@ artifact_baol_research = {
 	potential = {
 		 has_country_flag = last_baol_system
 		 NOT = { has_country_flag = baol_research_started }
-		 has_ancrel = yes
 	}
 
 	effect = {
@@ -744,7 +756,6 @@ artifact_zroni_research = {
 	potential = {
 		 has_country_flag = last_zroni_system
 		 NOT = { has_country_flag = zroni_research_started }
-		 has_ancrel = yes
 	}
 
 	effect = {
@@ -834,7 +845,6 @@ artifact_precursor_clue = {
 				}
 			}
 		}
-		has_ancrel = yes
 	}
 
 	allow = {

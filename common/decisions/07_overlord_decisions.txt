@@ -26,6 +26,8 @@ decision_strip_mining = {
 		any_deposit = {
 			has_deposit_category = deposit_cat_food
 		}
+
+		NOT = { has_district = district_mining_uncapped }
 	}
 
 	effect = {
@@ -41,6 +43,32 @@ decision_strip_mining = {
 
 	ai_weight = {
 		weight = 1
+		modifier = {
+			factor = 0
+			OR = {
+				has_designation = col_farming
+				AND = {
+					has_district = district_farming
+					num_free_districts = { type = district_farming value < 3 }
+				}
+				AND = {
+					has_district = district_farming_uncapped
+					num_free_districts = { type = district_farming_uncapped value < 3 }
+				}
+			}
+		}
+		modifier = {
+			factor = 100
+			owner = {
+				country_uses_food = no
+			}
+		}
+		modifier = {
+			factor = 0.1
+			owner = {
+				is_environmentalist_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
 	}
 }
 
@@ -70,7 +98,7 @@ decision_grow_progenitor = {
 	potential = {
 		has_deposit = d_progenitor_empty
 		exists = owner
-		owner = { is_progenitor_hive_empire = yes }
+		owner = { is_progenitor_hive_empire = yes } # undercoat: moved to scripted trigger
 	}
 
 	effect = {

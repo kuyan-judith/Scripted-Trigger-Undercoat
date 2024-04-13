@@ -270,12 +270,19 @@ leader_yearly_chance_for_negative_trait = {
 	max = @negative_trait_yearly_chance_when_eligible_max
 }
 
-# Eligibility increases for every full 20 years of AGE, every LEVEL, and every PENDING Negative trait.
+# Eligibility increases:
+# - full 20 years of AGE assuming an unmodified LIFESPAN of 80 years
+# - every LEVEL
+# - every PENDING Negative trait
 # Eligibility decreases for every CURRENT negative trait.
 leader_eligible_for_negative_trait = {
-	# Eligibility = floor(AGE / 20) + LEVEL + PENDINGNegativeTraits - 8 - CURRENTNegativeTraitTiers * 2
+	# Eligibility = floor(AGE × 4 / LIFESPAN) + LEVEL + PENDINGNegativeTraits - 8 - CURRENTNegativeTraitTiers * 2
 	add = trigger:leader_age
-	divide = 20		# 1 for every full 20 years
+	complex_trigger_modifier = {
+		trigger = leader_lifespan
+		mode = divide
+	}
+	mult = 4
 	floor = yes
 	add = trigger:has_skill
 	add = value:leader_pending_negative_traits_modified
@@ -883,13 +890,13 @@ heir_class_weight_commander = {
 	modifier = {
 		add = 20
 		owner = {
-			has_crusader_spirit = yes
+			has_crusader_spirit = yes # undercoat: moved to scripted trigger
 		}
 	}
 	modifier = {
 		add = 40
 		owner = {
-			is_privateer_empire = yes
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	modifier = {
@@ -901,7 +908,7 @@ heir_class_weight_commander = {
 	modifier = {
 		add = 20
 		owner = {
-			has_philosopher_king = yes
+			has_philosopher_king = yes # undercoat: moved to scripted trigger
 			ruler = {
 				leader_class = commander
 			}
@@ -915,7 +922,7 @@ heir_class_weight_official = {
 	modifier = {
 		add = 40
 		owner = {
-			is_aristocratic_empire = yes
+			is_aristocratic_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	modifier = {
@@ -927,7 +934,7 @@ heir_class_weight_official = {
 	modifier = {
 		add = 20
 		owner = {
-			has_philosopher_king = yes
+			has_philosopher_king = yes # undercoat: moved to scripted trigger
 			ruler = {
 				leader_class = official
 			}
@@ -940,7 +947,7 @@ heir_class_weight_scientist = {
 	modifier = {
 		add = 40
 		owner = {
-			is_technocracy = yes
+			is_technocracy = yes # undercoat: moved to scripted trigger
 		}
 	}
 	modifier = {
@@ -952,7 +959,7 @@ heir_class_weight_scientist = {
 	modifier = {
 		add = 20
 		owner = {
-			has_philosopher_king = yes
+			has_philosopher_king = yes # undercoat: moved to scripted trigger
 			ruler = {
 				leader_class = scientist
 			}

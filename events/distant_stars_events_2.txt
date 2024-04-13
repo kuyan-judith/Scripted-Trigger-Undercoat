@@ -180,7 +180,7 @@ planet_event = { #Changing Ratling planetview image back to nuked on colonizatio
 
 	trigger = {
 		has_planet_flag = ratling_planet
-		is_nuked_world = yes
+		is_nuked_world = yes # undercoat: moved to scripted trigger
 		NOT = { has_planet_flag = changed_planetview_image }
 	}
 
@@ -228,31 +228,31 @@ ship_event = { #Duplicated action.94 for SRs that are created by events, not on 
 	desc = {
 		trigger = {
 			success_text = {
-				text =							 distar.305.volatile_motes
+				text = distar.305.volatile_motes
 				hidden:fromfrom = { has_resource = { type = volatile_motes amount > 0 } }
 			}
 			success_text = {
-				text =							 distar.305.exotic_gases
+				text = distar.305.exotic_gases
 				hidden:fromfrom = { has_resource = { type = exotic_gases amount > 0 } }
 			}
 			success_text = {
-				text =							 distar.305.rare_crystals
+				text = distar.305.rare_crystals
 				hidden:fromfrom = { has_resource = { type = rare_crystals amount > 0 } }
 			}
 			success_text = {
-				text =							 distar.305.living_metal
+				text = distar.305.living_metal
 				hidden:fromfrom = { has_resource = { type = sr_living_metal amount > 0 } }
 			}
 			success_text = {
-				text =							 distar.305.zro
+				text = distar.305.zro
 				hidden:fromfrom = { has_resource = { type = sr_zro amount > 0 } }
 			}
 			success_text = {
-				text =							 distar.305.dark_matter
+				text = distar.305.dark_matter
 				hidden:fromfrom = { has_resource = { type = sr_dark_matter amount > 0 } }
 			}
 			success_text = {
-				text =							 distar.305.astral_threads
+				text = distar.305.astral_threads
 				hidden:fromfrom = { has_resource = { type = astral_threads amount > 0 } }
 			}
 			success_text = {
@@ -511,7 +511,10 @@ country_event = { #Atomic Clock follow-up: Selection
 							has_anomaly = no
 							planet_size > 8
 							planet_size < 25
-							is_broken_world = no
+							NOR = {
+								is_broken_world = yes # undercoat: moved to scripted trigger
+								is_planet_class = "pc_astral_scar"
+							}
 							is_star = no
 						}
 					}
@@ -550,7 +553,7 @@ country_event = { #Atomic Clock follow-up: Selection
 							owner = {
 								is_primitive = yes
 							}
-							is_unshattered_ring_habitable_segment = no
+							is_unshattered_ring_habitable_segment = no # undercoat: moved to scripted trigger
 						}
 					}
 				}
@@ -592,7 +595,7 @@ country_event = { #Atomic Clock follow-up: A system planet is terraformed
 					has_anomaly = no
 					planet_size > 8
 					planet_size < 25
-					is_broken_world = no
+					is_broken_world = no # undercoat: moved to scripted trigger
 					is_star = no
 				}
 				save_event_target_as = atomic_clock_planet
@@ -711,7 +714,7 @@ country_event = { #A useable Gray Goo Ship is built
 	immediate = {
 		create_country = {
 			name = "NAME_Nanite_Ship"
-			type = faction
+			type = nice_faction
 			auto_delete = yes
 			flag = {
 				icon = {
@@ -1006,21 +1009,25 @@ country_event = {
 		#		has_owner = no
 		#		#is_colony = no
 		#		#uninhabitable_regular_planet = yes
-		#		is_nuked_world = yes
+		#		is_nuked_world = yes # undercoat: moved to scripted trigger
 		#		has_anomaly = no
 		#	}
 		#	save_global_event_target_as = utopian_planet
 		#}
 		save_global_event_target_as = country_that_discovered_mardak_vol
 		event_target:vechtar_zavonia_leader_name = {
-			add_trait = leader_trait_maniacal
+			add_or_level_up_veteran_trait_effect = {
+				TRAIT = leader_trait_maniacal
+			}
 		}
 	}
 
 	option = {
 		tooltip = {
 			event_target:vechtar_zavonia_leader_name = {
-				add_trait = leader_trait_maniacal
+				add_or_level_up_veteran_trait_effect = {
+					TRAIT = leader_trait_maniacal
+				}
 			}
 		}
 		name = distar.1001.a
@@ -1043,7 +1050,7 @@ country_event = {
 		}
 		hidden_effect = {
 			create_point_of_interest = {
-				id = hidden_planet
+				id = mardak_hidden_planet #The Rubricator was also using the hidden_planet id
 				name = "hidden_planet_poi"
 				desc = hidden_planet_desc
 				event_chain = generation_ship_chain
@@ -1055,7 +1062,9 @@ country_event = {
 	option = {
 		tooltip = {
 			event_target:vechtar_zavonia_leader_name = {
-				add_trait = leader_trait_maniacal
+				add_or_level_up_veteran_trait_effect = {
+					TRAIT = leader_trait_maniacal
+				}
 			}
 		}
 		add_resource = { influence = 50 }
@@ -2030,12 +2039,12 @@ ship_event = {
 		name = distar.1020.c
 		trigger = {
 			owner = {
-				OR = {
-					NOT = { has_technology = tech_lasers_1 }
-					NOT = { has_technology = tech_lasers_2 }
-					NOT = { has_technology = tech_lasers_3 }
-					NOT = { has_technology = tech_lasers_4 }
-					NOT = { has_technology = tech_lasers_5 }
+				NAND = {
+					has_technology = tech_lasers_1
+					has_technology = tech_lasers_2
+					has_technology = tech_lasers_3
+					has_technology = tech_lasers_4
+					has_technology = tech_lasers_5
 				}
 			}
 		}
@@ -2108,25 +2117,23 @@ country_event = {
 	desc = {
 		text = "distar.1022.desc.a"
 		trigger = {
-			OR = {
-				NOT = { has_technology = tech_lasers_1 }
-				NOT = { has_technology = tech_lasers_2 }
-				NOT = { has_technology = tech_lasers_3 }
-				NOT = { has_technology = tech_lasers_4 }
-				NOT = { has_technology = tech_lasers_5 }
-			}
-		}
-	}
-	desc = {
-		text = "distar.1022.desc.b"
-		trigger = {
-			AND = {
+			NAND = {
 				has_technology = tech_lasers_1
 				has_technology = tech_lasers_2
 				has_technology = tech_lasers_3
 				has_technology = tech_lasers_4
 				has_technology = tech_lasers_5
 			}
+		}
+	}
+	desc = {
+		text = "distar.1022.desc.b"
+		trigger = {
+			has_technology = tech_lasers_1
+			has_technology = tech_lasers_2
+			has_technology = tech_lasers_3
+			has_technology = tech_lasers_4
+			has_technology = tech_lasers_5
 		}
 	}
 	picture = GFX_evt_engineering_research
@@ -2138,13 +2145,11 @@ country_event = {
 	immediate = {
 		if = {
 			limit = {
-				AND = {
-					has_technology = tech_lasers_1
-					has_technology = tech_lasers_2
-					has_technology = tech_lasers_3
-					has_technology = tech_lasers_4
-					has_technology = tech_lasers_5
-				}
+				has_technology = tech_lasers_1
+				has_technology = tech_lasers_2
+				has_technology = tech_lasers_3
+				has_technology = tech_lasers_4
+				has_technology = tech_lasers_5
 			}
 			event_target:broken_star_lifting_platform = {
 				destroy_ambient_object = this
@@ -2155,69 +2160,54 @@ country_event = {
 	option = {
 		name = distar.1022.a
 		trigger = {
-			OR = {
-				NOT = { has_technology = tech_lasers_1 }
-				NOT = { has_technology = tech_lasers_2 }
-				NOT = { has_technology = tech_lasers_3 }
-				NOT = { has_technology = tech_lasers_4 }
-				NOT = { has_technology = tech_lasers_5 }
+			NAND = {
+				has_technology = tech_lasers_1
+				has_technology = tech_lasers_2
+				has_technology = tech_lasers_3
+				has_technology = tech_lasers_4
+				has_technology = tech_lasers_5
 			}
 		}
-		if = {
-			limit = {
-				NOT = {
-					has_technology = tech_lasers_1
+		inverted_switch = {
+			trigger = has_technology
+			tech_lasers_1 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_1
+					PROGRESS = 0.2
+					CATEGORY = physics_research
 				}
 			}
-			add_research_option = tech_lasers_1
-			add_tech_progress = {
-				tech = tech_lasers_1
-				progress = 0.2
+			tech_lasers_2 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_2
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
+			}
+			tech_lasers_3 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_3
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
+			}
+			tech_lasers_4 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_4
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
+			}
+			tech_lasers_5 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_5
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
 			}
 		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_1
-				NOT = { has_technology = tech_lasers_2 }
-			}
-			add_research_option = tech_lasers_2
-			add_tech_progress = {
-				tech = tech_lasers_2
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_2
-				NOT = { has_technology = tech_lasers_3 }
-			}
-			add_research_option = tech_lasers_3
-			add_tech_progress = {
-				tech = tech_lasers_3
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_3
-				NOT = { has_technology = tech_lasers_4 }
-			}
-			add_research_option = tech_lasers_4
-			add_tech_progress = {
-				tech = tech_lasers_4
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_4
-				NOT = { has_technology = tech_lasers_5 }
-			}
-			add_research_option = tech_lasers_5
-			add_tech_progress = {
-				tech = tech_lasers_5
-				progress = 0.2
-			}
+		event_target:star_lifting_star = {
+			add_deposit = d_physics_1
 		}
 	}
 
@@ -2233,7 +2223,7 @@ country_event = {
 			}
 		}
 		event_target:star_lifting_star = {
-			add_deposit = d_physics_2
+			add_deposit = d_physics_3
 		}
 	}
 	option = {
@@ -2253,7 +2243,7 @@ country_event = {
 			}
 		}
 		event_target:star_lifting_star = {
-			add_deposit = d_physics_2
+			add_deposit = d_physics_3
 		}
 	}
 }
@@ -2427,7 +2417,7 @@ ship_event = {
 				max = @tier2researchmax
 			}
 			hidden_effect = {
-				country_event = { id = distar.310 days = 15333 }
+				country_event = { id = distar.310 days = 15323 }
 			}
 		}
 	}
@@ -2465,8 +2455,8 @@ ship_event = {
 	}
 
 	trigger = {
-		any_country = {
-			is_playable = yes
+		any_playable_country = {
+			is_playable = yes # undercoat: moved to scripted trigger
 			NOT = {
 				is_same_value = root.owner
 			}
@@ -2482,7 +2472,7 @@ ship_event = {
 				NOR = {
 					is_same_value = root.owner
 					has_country_flag = lost_colony_parent
-					is_machine_empire = yes
+					is_machine_empire = yes # undercoat: moved to scripted trigger
 					is_synthetic_empire = yes
 					owner_species = {
 						has_trait = trait_mechanical
@@ -2574,7 +2564,9 @@ country_event = {
 	immediate = {
 		from.leader = {
 			save_event_target_as = cube_science_officer
-			add_trait = leader_trait_maniacal
+			add_or_level_up_veteran_trait_effect = {
+				TRAIT = leader_trait_maniacal
+			}
 		}
 	}
 	option = {
@@ -2582,7 +2574,9 @@ country_event = {
 		custom_tooltip = distar.1056.a.tooltip
 		tooltip = {
 			from.leader = {
-			add_trait = leader_trait_maniacal
+				add_or_level_up_veteran_trait_effect = {
+					TRAIT = leader_trait_maniacal
+				}
 		}
 		}
 	}
@@ -2726,7 +2720,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_desert_world = yes
+				is_desert_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_desert
@@ -2734,7 +2728,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_tropical_world = yes
+				is_tropical_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_tropical
@@ -2742,7 +2736,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_arid_world = yes
+				is_arid_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_arid
@@ -2751,10 +2745,10 @@ ship_event = {
 		trigger = {
 			from = {
 				OR = {
-					is_continental_world = yes
-					is_gaia_world = yes
-					is_alpine_world = yes
-					is_savannah_world = yes
+					is_continental_world = yes # undercoat: moved to scripted trigger
+					is_gaia_world = yes # undercoat: moved to scripted trigger
+					is_alpine_world = yes # undercoat: moved to scripted trigger
+					is_savannah_world = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -2763,7 +2757,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_ocean_world = yes
+				is_ocean_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_ocean
@@ -2771,7 +2765,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_tundra_world = yes
+				is_tundra_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_tundra
@@ -2779,7 +2773,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_arctic_world = yes
+				is_arctic_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_arctic
@@ -2787,7 +2781,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_gas_giant = yes
+				is_gas_giant = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_gas_giant
@@ -2796,17 +2790,17 @@ ship_event = {
 		trigger = {
 			from = {
 				NOR = {
-					is_arctic_world = yes
-					is_desert_world = yes
-					is_tropical_world = yes
-					is_arid_world = yes
-					is_continental_world = yes
-					is_gaia_world = yes
-					is_alpine_world = yes
-					is_savannah_world = yes
-					is_ocean_world = yes
-					is_tundra_world = yes
-					is_arctic_world = yes
+					is_arctic_world = yes # undercoat: moved to scripted trigger
+					is_desert_world = yes # undercoat: moved to scripted trigger
+					is_tropical_world = yes # undercoat: moved to scripted trigger
+					is_arid_world = yes # undercoat: moved to scripted trigger
+					is_continental_world = yes # undercoat: moved to scripted trigger
+					is_gaia_world = yes # undercoat: moved to scripted trigger
+					is_alpine_world = yes # undercoat: moved to scripted trigger
+					is_savannah_world = yes # undercoat: moved to scripted trigger
+					is_ocean_world = yes # undercoat: moved to scripted trigger
+					is_tundra_world = yes # undercoat: moved to scripted trigger
+					is_arctic_world = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -2857,14 +2851,6 @@ ship_event = {
 	location = From
 
 	is_triggered_only = yes
-
-	trigger = {
-		owner = {
-			NOT = {
-				is_gestalt = yes
-			}
-		}
-	}
 
 	immediate = {
 		leader = {
@@ -3170,20 +3156,12 @@ country_event = {
 	location = FROM
 
 	is_triggered_only = yes
-# spawns pops
-	option = {
-		name = distar.1081.a
-		#trigger = {
-		#	any_owned_planet = {
-		#		free_housing > 0
-		#	}
-		#}
+
+	immediate = {
 		random_owned_planet = {
 			limit = {
-				num_buildings = {
-					type = any
-					value > 0
-				}
+				is_colony = yes
+				num_sapient_pops > 1
 			}
 			weights = {
 				base = 1
@@ -3196,6 +3174,14 @@ country_event = {
 					free_housing > 3
 				}
 			}
+			save_event_target_as = target_planet
+		}
+	}
+
+# spawns pops
+	option = {
+		name = distar.1081.a
+		event_target:target_planet = {
 			hidden_effect = {
 				create_species = {
 					name = "NAME_Azizians"
@@ -3227,7 +3213,7 @@ country_event = {
 # Gives pets
 	option = {
 		name = distar.1081.b
-		random_owned_planet = {
+		event_target:target_planet = {
 			add_deposit = d_alien_pets_deposit
 			add_deposit = d_alien_pets_deposit
 			hidden_effect = { set_planet_flag = azizian_pet_planet }
@@ -3237,7 +3223,7 @@ country_event = {
 	option = {
 		name = distar.1081.c
 		custom_tooltip = distar.1080.c.tooltip
-		random_owned_planet = {
+		event_target:target_planet = {
 			set_planet_flag = titanic_azizian_can_build
 		}
 		set_country_flag = titanic_azizian_soldiers
@@ -3450,7 +3436,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_tropical_world = yes
+				is_tropical_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_tropical
@@ -3458,7 +3444,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_continental_world = yes
+				is_continental_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_continental
@@ -3468,8 +3454,8 @@ ship_event = {
 		trigger = {
 			from = {
 				NOR = {
-					is_continental_world = yes
-					is_tropical_world = yes
+					is_continental_world = yes # undercoat: moved to scripted trigger
+					is_tropical_world = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -3513,6 +3499,10 @@ ship_event = {
 		owner = { country_event = { id = story.1 days = 30 } }
 		From = {
 			change_pc = pc_barren
+			add_modifier = {
+				modifier = "terraforming_candidate"
+				days = -1
+			}
 		}
 	}
 
@@ -3583,24 +3573,7 @@ country_event = {
 	desc = {
 		text = "distar.2006.desc.a"
 		trigger = {
-			OR = {
-				NOT = { has_technology = tech_ship_armor_1 }
-				NOT = { has_technology = tech_ship_armor_2 }
-				NOT = { has_technology = tech_ship_armor_3 }
-				NOT = { has_technology = tech_ship_armor_4 }
-				NOT = { has_technology = tech_ship_armor_5 }
-				NOT = { has_technology = tech_lasers_1 }
-				NOT = { has_technology = tech_lasers_2 }
-				NOT = { has_technology = tech_lasers_3 }
-				NOT = { has_technology = tech_lasers_4 }
-				NOT = { has_technology = tech_lasers_5 }
-			}
-		}
-	}
-	desc = {
-		text = "distar.2006.desc.b"
-		trigger = {
-			AND = {
+			NAND = {
 				has_technology = tech_ship_armor_1
 				has_technology = tech_ship_armor_2
 				has_technology = tech_ship_armor_3
@@ -3614,6 +3587,21 @@ country_event = {
 			}
 		}
 	}
+	desc = {
+		text = "distar.2006.desc.b"
+		trigger = {
+			has_technology = tech_ship_armor_1
+			has_technology = tech_ship_armor_2
+			has_technology = tech_ship_armor_3
+			has_technology = tech_ship_armor_4
+			has_technology = tech_ship_armor_5
+			has_technology = tech_lasers_1
+			has_technology = tech_lasers_2
+			has_technology = tech_lasers_3
+			has_technology = tech_lasers_4
+			has_technology = tech_lasers_5
+		}
+	}
 	picture = GFX_evt_engineering_research
 	show_sound = event_mystic_reveal
 	location = fromfromfrom
@@ -3623,68 +3611,50 @@ country_event = {
 	option = {
 		name = distar.2006.a
 		trigger = {
-			OR = {
-				NOT = { has_technology = tech_lasers_1 }
-				NOT = { has_technology = tech_lasers_2 }
-				NOT = { has_technology = tech_lasers_3 }
-				NOT = { has_technology = tech_lasers_4 }
-				NOT = { has_technology = tech_lasers_5 }
+			NAND = {
+				has_technology = tech_lasers_1
+				has_technology = tech_lasers_2
+				has_technology = tech_lasers_3
+				has_technology = tech_lasers_4
+				has_technology = tech_lasers_5
 			}
 		}
-		if = {
-			limit = {
-				NOT = {
-					has_technology = tech_lasers_1
+		inverted_switch = {
+			trigger = has_technology
+			tech_lasers_1 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_1
+					PROGRESS = 0.2
+					CATEGORY = physics_research
 				}
 			}
-			add_research_option = tech_lasers_1
-			add_tech_progress = {
-				tech = tech_lasers_1
-				progress = 0.2
+			tech_lasers_2 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_2
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
 			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_1
-				NOT = { has_technology = tech_lasers_2 }
+			tech_lasers_3 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_3
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
 			}
-			add_research_option = tech_lasers_2
-			add_tech_progress = {
-				tech = tech_lasers_2
-				progress = 0.2
+			tech_lasers_4 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_4
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
 			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_2
-				NOT = { has_technology = tech_lasers_3 }
-			}
-			add_research_option = tech_lasers_3
-			add_tech_progress = {
-				tech = tech_lasers_3
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_3
-				NOT = { has_technology = tech_lasers_4 }
-			}
-			add_research_option = tech_lasers_4
-			add_tech_progress = {
-				tech = tech_lasers_4
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_lasers_4
-				NOT = { has_technology = tech_lasers_5 }
-			}
-			add_research_option = tech_lasers_5
-			add_tech_progress = {
-				tech = tech_lasers_5
-				progress = 0.2
+			tech_lasers_5 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_lasers_5
+					PROGRESS = 0.2
+					CATEGORY = physics_research
+				}
 			}
 		}
 	}
@@ -3692,68 +3662,50 @@ country_event = {
 	option = {
 		name = distar.2006.b
 		trigger = {
-			OR = {
-				NOT = { has_technology = tech_ship_armor_1 }
-				NOT = { has_technology = tech_ship_armor_2 }
-				NOT = { has_technology = tech_ship_armor_3 }
-				NOT = { has_technology = tech_ship_armor_4 }
-				NOT = { has_technology = tech_ship_armor_5 }
+			NAND = {
+				has_technology = tech_ship_armor_1
+				has_technology = tech_ship_armor_2
+				has_technology = tech_ship_armor_3
+				has_technology = tech_ship_armor_4
+				has_technology = tech_ship_armor_5
 			}
 		}
-		if = {
-			limit = {
-				NOT = {
-					has_technology = tech_ship_armor_1
+		inverted_switch = {
+			trigger = has_technology
+			tech_ship_armor_1 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_ship_armor_1
+					PROGRESS = 0.2
+					CATEGORY = engineering_research
 				}
 			}
-			add_research_option = tech_ship_armor_1
-			add_tech_progress = {
-				tech = tech_ship_armor_1
-				progress = 0.2
+			tech_ship_armor_2 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_ship_armor_2
+					PROGRESS = 0.2
+					CATEGORY = engineering_research
+				}
 			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_ship_armor_1
-				NOT = { has_technology = tech_ship_armor_2 }
+			tech_ship_armor_3 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_ship_armor_3
+					PROGRESS = 0.2
+					CATEGORY = engineering_research
+				}
 			}
-			add_research_option = tech_ship_armor_2
-			add_tech_progress = {
-				tech = tech_ship_armor_2
-				progress = 0.2
+			tech_ship_armor_4 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_ship_armor_4
+					PROGRESS = 0.2
+					CATEGORY = engineering_research
+				}
 			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_ship_armor_2
-				NOT = { has_technology = tech_ship_armor_3 }
-			}
-			add_research_option = tech_ship_armor_3
-			add_tech_progress = {
-				tech = tech_ship_armor_3
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_ship_armor_3
-				NOT = { has_technology = tech_ship_armor_4 }
-			}
-			add_research_option = tech_ship_armor_4
-			add_tech_progress = {
-				tech = tech_ship_armor_4
-				progress = 0.2
-			}
-		}
-		else_if = {
-			limit = {
-				has_technology = tech_ship_armor_4
-				NOT = { has_technology = tech_ship_armor_5 }
-			}
-			add_research_option = tech_ship_armor_5
-			add_tech_progress = {
-				tech = tech_ship_armor_5
-				progress = 0.2
+			tech_ship_armor_5 = {
+				add_tech_option_or_research_effect = {
+					TECH = tech_ship_armor_5
+					PROGRESS = 0.2
+					CATEGORY = engineering_research
+				}
 			}
 		}
 	}
@@ -3761,18 +3713,16 @@ country_event = {
 	option = {
 		name = distar.2006.c
 		trigger = {
-			AND = {
-				has_technology = tech_lasers_1
-				has_technology = tech_lasers_2
-				has_technology = tech_lasers_3
-				has_technology = tech_lasers_4
-				has_technology = tech_lasers_5
-				has_technology = tech_shields_1
-				has_technology = tech_shields_2
-				has_technology = tech_shields_3
-				has_technology = tech_shields_4
-				has_technology = tech_shields_5
-			}
+			has_technology = tech_lasers_1
+			has_technology = tech_lasers_2
+			has_technology = tech_lasers_3
+			has_technology = tech_lasers_4
+			has_technology = tech_lasers_5
+			has_technology = tech_shields_1
+			has_technology = tech_shields_2
+			has_technology = tech_shields_3
+			has_technology = tech_shields_4
+			has_technology = tech_shields_5
 		}
 		add_resource = {
 			influence = 50
@@ -3851,8 +3801,8 @@ ship_event = {
 		name = distar.2015.A.machine
 		trigger = {
 			owner = {
-				is_machine_empire = yes
-				NOT = { is_servitor_empire = yes }
+				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_servitor_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		owner = {
@@ -4273,11 +4223,11 @@ country_event = {
 						LIMIT = {
 							any_neighbor_country = {
 								exists = this
-								is_playable = yes
+								is_playable = yes # undercoat: moved to scripted trigger
 							}
 						}
 						random_neighbor_country = {
-							limit = { is_playable = yes }
+							limit = { is_playable = yes } # undercoat: moved to scripted trigger
 							save_event_target_as = tech_country
 						}
 						copy_techs_from = {
@@ -4312,7 +4262,7 @@ country_event = {
 					}
 					ELSE = {
 						random_country = {
-							limit = { is_playable = yes	}
+							limit = { is_playable = yes	} # undercoat: moved to scripted trigger
 							save_event_target_as = tech_country
 						}
 						copy_techs_from = {
@@ -4487,11 +4437,62 @@ country_event = {
 					type = defense_army
 				}
 			}
+
 			solar_system = {
-				create_starbase = {
-					size = starbase_citadel
-					module = shipyard
-					owner = event_target:time_loop_country
+				event_target:time_loop_country = {
+					inverted_switch = { # If you don't have the technology for it build the simpler starbase.
+						trigger = has_technology
+						tech_starbase_3 = {
+							prev = {
+								create_starbase = {
+									size = starbase_starport
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+						tech_starbase_4 = {
+							prev = {
+								create_starbase = {
+									size = starbase_starhold
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+						tech_starbase_5 = {
+							prev = {
+								create_starbase = {
+									size = starbase_starfortress
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+						default = {
+							prev = {
+								create_starbase = {
+									size = starbase_citadel
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -4605,11 +4606,11 @@ country_event = {
 						LIMIT = {
 							any_neighbor_country = {
 								exists = this
-								is_playable = yes
+								is_playable = yes # undercoat: moved to scripted trigger
 							}
 						}
 						random_neighbor_country = {
-							limit = { is_playable = yes }
+							limit = { is_playable = yes } # undercoat: moved to scripted trigger
 							save_event_target_as = tech_country
 						}
 						copy_techs_from = {
@@ -4644,7 +4645,7 @@ country_event = {
 					}
 					ELSE = {
 						random_country = {
-							limit = { is_playable = yes	}
+							limit = { is_playable = yes	} # undercoat: moved to scripted trigger
 							save_event_target_as = tech_country
 						}
 						copy_techs_from = {
@@ -4852,7 +4853,6 @@ event = {
 		}
 		any_playable_country = {
 			is_ai = no
-			is_at_war = no
 		}
 	}
 	immediate = {
@@ -4887,11 +4887,12 @@ planet_event = {
 				any_system = {
 					exists = owner
 					owner = {
-						is_playable = yes
+						is_playable = yes # undercoat: moved to scripted trigger
 						is_at_war = no
 					}
 					any_system_planet = {
 						exists = owner
+						owner = { is_playable = yes } # undercoat: moved to scripted trigger
 						NOT = { has_planet_flag = has_been_scanned }
 					}
 				}
@@ -4902,11 +4903,12 @@ planet_event = {
 						exists = owner
 						owner = {
 							is_ai = no
-							is_playable = yes
+							is_playable = yes # undercoat: moved to scripted trigger
 							is_at_war = no
 						}
 						any_system_planet = {
 							exists = owner
+							owner = { is_playable = yes } # undercoat: moved to scripted trigger
 							NOT = { has_planet_flag = has_been_scanned }
 						}
 					}
@@ -4915,18 +4917,20 @@ planet_event = {
 					limit = {
 						exists = owner
 						owner = {
-							is_playable = yes
+							is_playable = yes # undercoat: moved to scripted trigger
 							is_at_war = no
 							is_ai = no
 						}
 						any_system_planet = {
 							exists = owner
+							owner = { is_playable = yes } # undercoat: moved to scripted trigger
 							NOT = { has_planet_flag = has_been_scanned }
 						}
 					}
 					random_system_planet = {
 						limit = {
 							exists = owner
+							owner = { is_playable = yes } # undercoat: moved to scripted trigger
 							NOT = { has_planet_flag = has_been_scanned }
 						}
 						#set_planet_flag = has_been_scanned
@@ -4940,17 +4944,19 @@ planet_event = {
 					limit = {
 						exists = owner
 						owner = {
-							is_playable = yes
+							is_playable = yes # undercoat: moved to scripted trigger
 							is_at_war = no
 						}
 						any_system_planet = {
 							exists = owner
+							owner = { is_playable = yes } # undercoat: moved to scripted trigger
 							NOT = { has_planet_flag = has_been_scanned }
 						}
 					}
 					random_system_planet = {
 						limit = {
 							exists = owner
+							owner = { is_playable = yes } # undercoat: moved to scripted trigger
 							NOT = { has_planet_flag = has_been_scanned }
 						}
 						#set_planet_flag = has_been_scanned
@@ -4965,7 +4971,7 @@ planet_event = {
 				limit = {
 					exists = owner
 					owner = {
-						is_playable = yes
+						is_playable = yes # undercoat: moved to scripted trigger
 					}
 					any_system_planet = {
 						exists = owner
@@ -5217,7 +5223,7 @@ country_event = {
 							exists = owner
 							owner = {
 								is_ai = no
-								is_playable = yes
+								is_playable = yes # undercoat: moved to scripted trigger
 								is_at_war = no
 								NOR = {
 									is_hostile = root
@@ -5274,7 +5280,7 @@ country_event = {
 						limit = {
 							exists = owner
 							owner = {
-								is_playable = yes
+								is_playable = yes # undercoat: moved to scripted trigger
 								is_at_war = no
 								NOR = {
 									is_hostile = root
@@ -5312,11 +5318,7 @@ country_event = {
 			limit = {
 				exists = event_target:new_location
 				exists = event_target:enigmatic_cache_present_host
-				event_target:new_location = {
-					owner = {
-						is_same_value = event_target:enigmatic_cache_present_host
-					}
-				}
+				event_target:new_location = { is_owned_by = event_target:enigmatic_cache_present_host }
 				NOT = {
 					has_country_flag = enigmatic_cache_host_country
 				}
@@ -5623,9 +5625,6 @@ ship_event = {
 						has_star_flag = hostile_system
 						is_same_value = event_target:cache_current_location
 					}
-					NOT = {
-						is_same_value = event_target:cache_current_location
-					}
 				}
 			}
 			closest_system = {
@@ -5634,9 +5633,6 @@ ship_event = {
 					NOR = {
 						has_star_flag = guardian
 						has_star_flag = hostile_system
-						is_same_value = event_target:cache_current_location
-					}
-					NOT = {
 						is_same_value = event_target:cache_current_location
 					}
 				}
@@ -5852,8 +5848,8 @@ event = {
 						NOT = { has_trait = trait_machine_unit }
 					}
 					NOT = {
-						any_country = {
-							is_playable = yes
+						any_playable_country = {
+							is_playable = yes # undercoat: moved to scripted trigger
 							relative_power = {
 								who = prev
 								category = technology
@@ -5882,8 +5878,8 @@ event = {
 						NOT = { has_trait = trait_machine_unit }
 					}
 					NOT = {
-						any_country = {
-							is_playable = yes
+						any_playable_country = {
+							is_playable = yes # undercoat: moved to scripted trigger
 							relative_power = {
 								who = prev
 								category = technology
@@ -6102,6 +6098,8 @@ country_event = {
 					owner_species = {
 						OR = {
 							has_trait = trait_intelligent
+							has_trait = trait_erudite
+							has_trait = trait_artificial_intelligence
 							has_trait = trait_quick_learners
 						}
 					}
@@ -6532,6 +6530,10 @@ country_event = {
 				}
 			}
 		}
+		change_dominant_species = {
+			species = last_created_species
+			change_all = yes
+		}
 		every_owned_pop = {
 			limit = {
 				has_modifier = enigmatic_fatigue
@@ -6627,6 +6629,10 @@ country_event = {
 			}
 		}
 
+		change_dominant_species = {
+			species = last_created_species
+			change_all = yes
+		}
 		#every_owned_pop = {
 		#	limit = {
 		#		has_trait = trait_machine_unit
@@ -6872,6 +6878,9 @@ ship_event = {
 					min_steps = 2
 					limit = {
 						has_access_fleet = root.owner
+						NOT = {
+							has_star_flag = guardian
+						}
 						any_system_planet = {
 							is_asteroid = yes
 						}
@@ -6921,40 +6930,11 @@ ship_event = {
 			}
 		}
 		owner = {
-			inverted_switch = {
-				trigger = has_technology
-				tech_engineering_1 = {
-					add_research_option = tech_engineering_1
-					add_tech_progress = {
-						tech = tech_engineering_1
-						progress = 0.3
-					}
-				}
-				tech_engineering_2 = {
-					add_research_option = tech_engineering_2
-					add_tech_progress = {
-						tech = tech_engineering_2
-						progress = 0.3
-					}
-				}
-				tech_engineering_3 = {
-					add_research_option = tech_engineering_3
-					add_tech_progress = {
-						tech = tech_engineering_3
-						progress = 0.3
-					}
-				}
-			}
-			if = {
-				limit = {
-					has_technology = tech_engineering_3
-				}
-				add_monthly_resource_mult = {
-					resource = engineering_research
-					value = @tier2researchreward
-					min = @tier2researchmin
-					max = @tier2researchmax
-				}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
 			}
 		}
 	}
@@ -7241,7 +7221,10 @@ ship_event = {
 		fromfrom = {
 			save_event_target_as = impossible_organism_planet
 			# clear deposits so as not to conflict with resources added later
-			clear_deposits = yes
+			if = {
+				limit = { has_deposit_for = shipclass_mining_station }
+				clear_deposits = yes
+			}
 		}
 
 		save_event_target_as = impossible_organism_science_ship
@@ -7447,7 +7430,7 @@ country_event = { # First words
 			NOR = {
 				has_ethic = ethic_xenophile
 				has_ethic = ethic_fanatic_xenophile
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
 
@@ -7476,7 +7459,7 @@ country_event = { # First words
 
 	option = { # Servitor
 		trigger = {
-			is_servitor_empire = yes
+			is_servitor_empire = yes # undercoat: moved to scripted trigger
 		}
 
 		allow = {
@@ -7504,7 +7487,7 @@ country_event = { # First words
 
 	option = { # Assimilator
 		trigger = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 		}
 
 		allow = {
@@ -7538,7 +7521,7 @@ country_event = { # First words
 		custom_tooltip = "distar.3013.b.no_room.kill.tooltip"
 
 		trigger = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 		}
 		add_monthly_resource_mult = {
 			resource = influence
@@ -7552,7 +7535,7 @@ country_event = { # First words
 		name = "distar.3013.b"
 		custom_tooltip = distar.3013.b.tooltip
 		trigger = {
-			NOT = { is_machine_assimilator = yes }
+			is_machine_assimilator = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = {
 			country_event = { id = distar.3016 days = 720 random = 100 }
@@ -7901,15 +7884,15 @@ country_event = { # Releasing fungoids into society as pops was successful
 	desc = {
 		trigger = {
 			NOR = {
-				is_machine_assimilator = yes
-				is_servitor_empire = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.3017.desc"
 	}
 	desc = {
 		trigger = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 		}
 		text = "distar.3017.desc.assim"
 	}
@@ -7925,14 +7908,14 @@ country_event = { # Releasing fungoids into society as pops was successful
 	}
 	option = {
 		exclusive_trigger = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 		}
 		name = EXCELLENT
 		custom_tooltip = distar.3017.a.assi.tooltip
 	}
 	option = {
 		exclusive_trigger = {
-			is_servitor_empire = yes
+			is_servitor_empire = yes # undercoat: moved to scripted trigger
 		}
 		name = EXCELLENT
 		custom_tooltip = distar.3017.a.serv.tooltip
@@ -8535,7 +8518,7 @@ country_event = {
 
 	trigger = {
 		NOT = {
-			is_shroudwalker_apprentice_empire = yes
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 			has_country_flag = encountered_first_wormhole
 		}
 	}

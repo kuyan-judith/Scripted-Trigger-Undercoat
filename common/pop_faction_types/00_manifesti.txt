@@ -29,7 +29,7 @@ manifesti = {
 		NOR = {
 			is_homicidal = yes
 			is_fanatic = yes
-			has_warrior_culture = yes
+			has_warrior_culture = yes # undercoat: moved to scripted trigger
 			has_country_flag = manifesti_decline #Applied if/when the faction is suppressed
 		}
 	}
@@ -104,8 +104,8 @@ manifesti = {
 			is_ruler = yes
 			owner = {
 				OR = {
-					has_authority_imperial = yes
-					has_authority_dictatorial = yes
+					has_authority_imperial = yes # undercoat: moved to scripted trigger
+					has_authority_dictatorial = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -128,7 +128,7 @@ manifesti = {
 			exists = owner
 			owner = {
 				has_technology = tech_colonization_2
-				has_void_dweller_origin = no
+				has_void_dweller_origin = no # undercoat: moved to scripted trigger
 			}
 		}
 
@@ -204,12 +204,19 @@ manifesti = {
 
 		trigger = {
 			owner = {
-				research_leader = {
-					OR = {
-						has_trait = leader_trait_roamer
-						has_trait = leader_trait_carefree
-						has_trait = leader_trait_roamer_2
-						has_trait = leader_trait_carefree_2
+				count_owned_leader = {
+					count = 0
+					limit = {
+						leader_class = scientist
+						is_councilor = yes
+						NOR = {
+							has_trait_tier1or2 = {
+								TRAIT = leader_trait_roamer
+							}
+							has_trait_tier1or2 = {
+								TRAIT = leader_trait_carefree
+							}
+						}
 					}
 				}
 			}
@@ -262,8 +269,8 @@ manifesti = {
 						is_federation_leader = yes
 					}
 					NOT = {
-						any_envoy = {
-							has_envoy_task = { task = federation }
+						any_owned_leader = {
+							is_assigned_to_federation = yes
 						}
 					}
 				}
@@ -272,8 +279,8 @@ manifesti = {
 						is_galactic_community_member = yes
 					}
 					NOT = {
-						any_envoy = {
-							has_envoy_task = { task = galactic_community }
+						any_owned_leader = {
+							is_assigned_to_galcom = yes
 						}
 						is_proposing_resolution = any
 					}
@@ -288,7 +295,7 @@ manifesti = {
 		ETHIC = ethic_egalitarian
 		ETHIC_FANATIC = ethic_fanatic_egalitarian
 		ETHIC_OPPOSED = ethic_authoritarian
-	} 
+	}
 
 	on_create = {
 		pop_faction_event = { id = factions.1 }
@@ -361,7 +368,7 @@ manifesti = {
 						every_relation = {
 							limit = {
 								is_ai = no
-								is_playable = yes
+								is_playable = yes # undercoat: moved to scripted trigger
 								has_communications = prev
 								has_intel_level = {
 									who = prev

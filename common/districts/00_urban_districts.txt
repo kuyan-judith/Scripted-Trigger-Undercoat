@@ -56,7 +56,7 @@ district_crashed_slaver_ship = {
 		potential = {
 			exists = owner
 			owner = {
-				is_agrarian_empire = yes
+				is_agrarian_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		modifier = {
@@ -91,7 +91,7 @@ district_crashed_slaver_ship = {
 			exists = owner
 			owner = {
 				has_technology = tech_housing_2
-				is_agrarian_empire = no
+				is_agrarian_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		modifier = {
@@ -130,6 +130,141 @@ district_crashed_slaver_ship = {
 	}
 }
 
+district_resort = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = resort_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = resort_colony
+	}
+
+	allow = {
+		NOT = { has_modifier = slave_colony }
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_city
+		district_arcology_housing
+		district_rw_city
+		district_nexus
+		district_hive
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_housing_add = 2
+		planet_max_buildings_add = 0.5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_agrarian_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			planet_housing_add = -1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+			}
+		}
+		modifier = {
+			job_resort_worker_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_pleasure_seeker = yes
+			}
+		}
+		modifier = {
+			job_entertainer_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_active_tradition = tr_prosperity_public_works }
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_housing_1
+			}
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_housing_2
+				is_agrarian_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		text = job_resort_worker_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_pleasure_seeker = yes
+			}
+		}
+		text = job_entertainer_effect_desc
+	}
+}
+
 district_city = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
@@ -144,6 +279,7 @@ district_city = {
 			uses_district_set = machine_world
 			uses_district_set = shattered_ring_world
 		}
+		NOT = { has_modifier = resort_colony }
 	}
 
 	potential = {
@@ -164,15 +300,16 @@ district_city = {
 		}
 		NOT = { has_deposit = d_crashed_slaver_ship }
 		OR = {
+			uses_district_set = district_resort
 			uses_district_set = standard
 			uses_district_set = hive_world
 			uses_district_set = machine_world
 			uses_district_set = shattered_ring_world
 		}
+		NOT = { has_modifier = resort_colony }
 	}
 
 	allow = {
-		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
 	}
 
@@ -203,7 +340,7 @@ district_city = {
 		potential = {
 			exists = owner
 			owner = {
-				is_agrarian_empire = yes
+				is_agrarian_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		modifier = {
@@ -217,7 +354,7 @@ district_city = {
 			owner = {
 				OR = {
 					is_regular_empire = yes
-					is_fear_of_the_dark_empire = yes
+					is_fear_of_the_dark_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -253,7 +390,7 @@ district_city = {
 			exists = owner
 			owner = {
 				has_technology = tech_housing_2
-				is_agrarian_empire = no
+				is_agrarian_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		modifier = {
@@ -326,7 +463,7 @@ district_hive = {
 
 	triggered_planet_modifier = {
 		potential = {
-			is_hive_world = yes
+			is_hive_world = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			planet_housing_add = 6
@@ -515,6 +652,7 @@ district_industrial = {
 		}
 	}
 
+	# Undercoat inline script
 	inline_script = {
 		script = jobs/triggered/industrial_add
 		FOUNDRY_AMOUNT_VAL = value:stu_industrial_district_foundry_jobs
@@ -601,6 +739,7 @@ district_srw_commercial = {
 		}
 	}
 
+	# Undercoat: moved to inline script
 	inline_script = {
 		script = jobs/factory_add
 		AMOUNT = 1

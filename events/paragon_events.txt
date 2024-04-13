@@ -2727,7 +2727,7 @@ country_event = {
 	immediate = {
 		if = {
 			limit = {
-				has_authority_democratic = yes
+				has_authority_democratic = yes # undercoat: moved to scripted trigger
 				exists = ruler
 				ruler = {
 					NOT = {
@@ -2759,7 +2759,7 @@ country_event = {
 
 	trigger = {
 		has_paragon_dlc = yes
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		exists = from
 		from = {
 			is_pool_leader = no
@@ -3123,8 +3123,7 @@ country_event = {
 							factor = 0
 							species = {
 								NOR = {
-									is_species_class = PLANT
-									is_species_class = FUN
+									is_flora_species = yes # undercoat: moved to scripted trigger
 									is_species_class = PRE_PLANT
 									is_species_class = PRE_FUN
 								}
@@ -3346,7 +3345,7 @@ country_event = {
 	option = {
 		name = paragon.550.l
 		trigger = {
-			is_megacorp = yes
+			is_megacorp = yes # undercoat: moved to scripted trigger
 		}
 
 		inline_script = {
@@ -3719,7 +3718,7 @@ country_event = {
 	show_sound = event_power_down
 	is_triggered_only = yes
 
-	trigger = { is_machine_empire = yes }
+	trigger = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 
 	after = {
 		# Clean up the clone since we aren't using it anymore
@@ -3746,7 +3745,7 @@ country_event = {
 	show_sound = event_life_support_fail
 	is_triggered_only = yes
 
-	trigger = { is_hive_empire = yes }
+	trigger = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 
 	after = {
 		# Clean up the clone since we aren't using it anymore
@@ -3841,6 +3840,96 @@ country_event = {
 	}
 }
 
+# on_monthly_pulse_country
+# this = country
+country_event = {
+	id = paragon.605
+	hide_window = yes
+	trigger = {
+		is_gestalt = yes
+		is_empire = yes # undercoat: moved to scripted trigger
+		NOR = {
+			has_councilor = {
+				COUNCILOR = councilor_gestalt_growth
+			}
+			has_councilor = {
+				COUNCILOR = councilor_gestalt_cognitive
+			}
+			has_councilor = {
+				COUNCILOR = councilor_gestalt_legion
+			}
+			has_councilor = {
+				COUNCILOR = councilor_gestalt_regulatory
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		# Growth Node
+		if = {
+			limit = {
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_gestalt_growth
+					}
+				}
+			}
+			country_create_gestalt_councilor = {
+				CLASS = official
+				COUNCIL_POS = councilor_gestalt_growth
+				DESC = councilor_gestalt_growth_desc
+			}
+		}
+		# Cognitive Node
+		if = {
+			limit = {
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_gestalt_cognitive
+					}
+				}
+			}
+			country_create_gestalt_councilor = {
+				CLASS = scientist
+				COUNCIL_POS = councilor_gestalt_cognitive
+				DESC = councilor_gestalt_cognitive_desc
+			}
+		}
+		# Legion Node
+		if = {
+			limit = {
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_gestalt_legion
+					}
+				}
+			}
+			country_create_gestalt_councilor = {
+				CLASS = commander
+				COUNCIL_POS = councilor_gestalt_legion
+				DESC = councilor_gestalt_legion_desc
+			}
+		}
+		# Regulatory Node
+		if = {
+			limit = {
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_gestalt_regulatory
+					}
+				}
+			}
+			country_create_gestalt_councilor = {
+				CLASS = official
+				COUNCIL_POS = councilor_gestalt_regulatory
+				DESC = councilor_gestalt_regulatory_desc
+			}
+		}
+	}
+}
+
 ########################
 
 
@@ -3856,7 +3945,7 @@ country_event = {
 
 	trigger = {
 		has_paragon_dlc = yes
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {

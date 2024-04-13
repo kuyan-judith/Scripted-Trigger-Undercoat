@@ -11,8 +11,20 @@ AST_WAVELENGTHS_1_CAT = {
 	}
 
 	on_success = {
-		1 = anomaly.75
-		1 = anomaly.115
+		1 = {
+			modifier = {
+				factor = 0
+				from = { has_any_strategic_resource = yes }
+			}
+			anomaly_event = anomaly.75
+		}
+		1 = {
+			modifier = {
+				factor = 0
+				from = { has_any_strategic_resource = yes }
+			}
+			anomaly_event = anomaly.115
+		}
 		1 = anomaly.130
 		0 = {
 			modifier = {
@@ -43,6 +55,10 @@ AST_WAVELENGTHS_1_CAT = {
 					has_country_flag = birth_of_piracy
 				}
 			}
+			modifier = {
+				factor = 0
+				from = { has_any_strategic_resource = yes }
+			}
 			anomaly_event = anomaly.3065
 		}
 	}
@@ -63,6 +79,7 @@ AST_DEBRIS_FIELD_1_CAT = {
 					OR = {
 						has_star_flag = com_sol
 						has_star_flag = nuked_sol
+						has_star_flag = lost_colony_sol
 					}
 				}
 				any_country = {
@@ -87,15 +104,18 @@ AST_DEBRIS_FIELD_1_CAT = {
 		0 = {
 			modifier = {
 				add = 10
-				any_system = {
-					OR = {
-						has_star_flag = com_sol
-						has_star_flag = nuked_sol
+				OR = {
+					any_system = {
+						OR = {
+							has_star_flag = com_sol
+							has_star_flag = nuked_sol
+							has_star_flag = lost_colony_sol
+						}
 					}
-				}
-				any_country = {
-					is_country_type = primitive
-					has_country_flag = humans_early_space_age
+					any_country = {
+						is_country_type = primitive
+						has_country_flag = humans_early_space_age
+					}
 				}
 				owner = {
 					NOR = {
@@ -128,10 +148,17 @@ AST_DEBRIS_FIELD_1_CAT = {
 		0 = {
 			modifier = {
 				add = 10
-				any_system = {
-					OR = {
-						has_star_flag = com_sol
-						has_star_flag = nuked_sol
+				OR = {
+					any_system = {
+						OR = {
+							has_star_flag = com_sol
+							has_star_flag = nuked_sol
+							has_star_flag = lost_colony_sol
+						}
+					}
+					any_country = {
+						is_country_type = primitive
+						has_country_flag = humans_early_space_age
 					}
 				}
 				owner = {
@@ -169,30 +196,8 @@ HBL_LUSH_PLANET_1_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_continental_world = yes
-				is_tropical_world = yes
-			}
-			OR = {
-				any_system = {
-					OR = {
-						has_star_flag = com_sol
-						has_star_flag = nuked_sol
-					}
-				}
-				any_country = {
-					OR = {
-						has_country_flag = human_1
-						has_country_flag = humans_early_space_age
-					}
-				}
-			}
-			FROM = {
-				owner = {
-					NOT = {
-						has_country_flag = found_voyager
-						has_country_flag = found_pioneer
-					}
-				}
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_tropical_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -219,9 +224,7 @@ HBL_LUSH_PLANET_1_CAT = {
 		0 = {
 			modifier = {
 				add = 1
-				owner.capital_scope = {
-					colony_age > 240
-				}
+				years_passed > 240
 				owner = {
 					NOT = {
 						has_country_flag = SA
@@ -246,7 +249,7 @@ UHB_ANCIENT_RUINS_1_CAT = {
 			is_ringworld = no
 			NOT = {
 				habitable_planet = yes
-				is_gas_giant = yes
+				is_gas_giant = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -262,7 +265,7 @@ UHB_ANCIENT_RUINS_1_CAT = {
 #	spawn_chance = {
 #		modifier = {
 #			add = 3
-#			is_molten_world = yes
+#			is_molten_world = yes # undercoat: moved to scripted trigger
 #		}
 #	}
 #
@@ -280,14 +283,12 @@ GEN_PLAYGROUND_CAT = {
 			is_asteroid = no
 			is_star = no
 			is_ringworld = no
-			NOT = {
-				is_gas_giant = yes
-			}
+			is_gas_giant = no # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 0
 			from.owner = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -320,8 +321,8 @@ AST_SHRINE_1_CAT = {
 			factor = 0
 			from.owner = {
 				OR = {
-					is_gestalt = yes
-					is_shoulders_of_giants_empire = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
+					is_shoulders_of_giants_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -347,10 +348,8 @@ HBL_MUSIC_1_CAT = {
 			modifier = {
 				add = 1
 				owner = {
-					has_technology = tech_society_1
 					NOT = {
 						has_country_flag = HBL_MUSIC_1_FLAG
-						has_technology = tech_society_2
 					}
 				}
 			}
@@ -368,12 +367,16 @@ GAS_ZRO_ICE_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
 			FROM = {
 				owner = {
-					has_technology = tech_mine_zro
+					OR = {
+						has_technology = tech_mine_zro
+						has_country_flag = zroni_intro
+					}
 				}
 			}
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -389,6 +392,7 @@ AST_ILLICIT_DARK_CAT = {
 		modifier = {
 			add = 3
 			is_asteroid = yes
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -403,12 +407,12 @@ TOX_PURPLE_RAIN_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_toxic_world = yes
+			is_toxic_world = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 0
 			from.owner = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -425,9 +429,9 @@ FROZ_BASE_CAT = {
 		base = 0
 		modifier = {
 			add = 3
-			is_frozen_world = yes
+			is_frozen_world = yes # undercoat: moved to scripted trigger
 			from.owner = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -456,7 +460,7 @@ TROP_PETS_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_tropical_world = yes
+			is_tropical_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -472,12 +476,12 @@ BARR_BASE_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_barren_dry_world = yes
+			is_barren_dry_world = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 0
 			from.owner = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -493,25 +497,13 @@ PROJ_MOON_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			NOT = {
-				is_star = no
-				is_gas_giant = yes
-			}
-			OR = {
-				is_toxic_world = yes
-				is_barren_dry_world = yes
-				is_frozen_world = yes
-				is_molten_world = yes
-			}
+			uninhabitable_regular_planet = yes
+			has_any_strategic_resource = no
 			has_moon = yes
 			num_moons < 2
 			any_moon = {
-				OR = {
-					is_toxic_world = yes
-					is_barren_dry_world = yes
-					is_frozen_world = yes
-					is_molten_world = yes
-				}
+				uninhabitable_regular_planet = yes
+				has_any_strategic_resource = no
 			}
 		}
 	}
@@ -527,7 +519,7 @@ SEA_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_ocean_world = yes
+			is_ocean_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -542,7 +534,8 @@ MOLTEN_BASE_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_molten_world = yes
+			is_molten_world = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -591,15 +584,28 @@ HAB_CORN_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_tropical_world = yes
-				is_continental_world = yes
-				is_ocean_world = yes
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_ocean_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
 
 	on_success = {
-		1 = anomaly.215
+		1 = {
+			modifier = {
+				factor = 0
+				NOT = {	
+					owner = {
+						OR = {
+							is_machine_empire = no
+							is_servitor_empire = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+			}
+			anomaly_event = anomaly.215
+		}
 		1 = anomaly.3025
 	}
 }
@@ -613,9 +619,9 @@ HAB_MAT_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_tropical_world = yes
-				is_continental_world = yes
-				is_arid_world = yes
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_arid_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -631,14 +637,8 @@ ATM_ANOMALY_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_asteroid = no
-			is_star = no
-			is_ringworld = no
-			habitable_planet = no
-			NOR = {
-				is_gas_giant = yes
-				is_nuked_world = yes
-			}
+			uninhabitable_regular_planet = yes
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -653,7 +653,8 @@ FRBR_GRIMACING_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_barren_dry_world = yes
+			is_barren_dry_world = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 			planet_size < 26
 			planet_size > 9
 		}
@@ -670,7 +671,7 @@ FROZ_ILLUMINATED_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_frozen_world = yes
+			is_frozen_world = yes # undercoat: moved to scripted trigger
 			from = {
 				owner = {
 					has_technology = tech_lasers_1
@@ -695,7 +696,7 @@ GAS_CLOUDY_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_gas_giant = yes
+			is_gas_giant = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -710,7 +711,7 @@ GAIA_MOVE_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_gaia_world = yes
+			is_gaia_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -725,7 +726,7 @@ FROZ_BOX_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_frozen_world = yes
+			is_frozen_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -741,9 +742,9 @@ CONT_SIGNS_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_continental_world = yes
-				is_tropical_world = yes
-				is_tundra_world = yes
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+				is_tundra_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -759,7 +760,7 @@ FROZ_BASE2_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_arctic_world = yes
+			is_arctic_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -775,6 +776,7 @@ AST_CRATER_CAT = {
 		modifier = {
 			add = 3
 			is_asteroid = yes
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -803,12 +805,18 @@ BAR_COLONY_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_barren_dry_world = yes
+			is_barren_dry_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
 	on_success = {
-		1 = anomaly.285
+		1 = {
+			modifier = {
+				factor = 0
+				from = { has_any_strategic_resource = yes }
+			}
+			anomaly_event = anomaly.285
+		}
 		1 = anomaly.3015
 	}
 }
@@ -821,7 +829,8 @@ TOX_MAT_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_toxic_world = yes
+			is_toxic_world = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -907,11 +916,11 @@ AST_CLUSTER_CAT = {
 				add = 1
 				owner = {
 					any_relation = {
-						is_playable = yes
+						is_playable = yes # undercoat: moved to scripted trigger
 						has_communications = prev
 						is_ai = yes
 						NOR = {
-							is_gestalt = yes
+							is_gestalt = yes # undercoat: moved to scripted trigger
 							is_xenophobe = yes
 						}
 					}
@@ -930,7 +939,7 @@ GAEA_CHECKERED_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_gaia_world = yes
+			is_gaia_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -946,8 +955,8 @@ GEN_ABANDONED_SHIP_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_continental_world = yes
-				is_arid_world = yes
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_arid_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -963,7 +972,7 @@ GEN_DESERT_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_desert_world = yes
+			is_desert_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -998,7 +1007,8 @@ TOX_STRUCTURES_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_toxic_world = yes
+			is_toxic_world = yes # undercoat: moved to scripted trigger
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -1013,15 +1023,13 @@ TROP_WOODS_CAT = {
 	spawn_chance = {
 		modifier = {
 			add = 3
-			is_tropical_world = yes
+			is_tropical_world = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 0
 			from.owner = {
-				is_machine_empire = yes
-				NOT = {
-					is_servitor_empire = yes
-				}
+				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_servitor_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1038,6 +1046,7 @@ HOLE_RADIATION_CAT = {
 		modifier = {
 			add = 3
 			is_star_class = sc_black_hole
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -1046,12 +1055,10 @@ HOLE_RADIATION_CAT = {
 			modifier = {
 				add = 1
 				leader = {
-					NOR = {
-						has_trait = leader_trait_paranoid
-						species = {
-							has_trait = trait_hive_mind
-						}
-					}
+					NOT = { has_trait = leader_trait_paranoid }
+				}
+				owner = {
+					is_hive_empire = no
 				}
 			}
 			anomaly_event = anomaly.3070
@@ -1069,18 +1076,16 @@ UHB_BUOY_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_toxic_world = yes
-				is_barren_cold_world = yes
-				is_barren_dry_world = yes
-				is_frozen_world = yes
-				is_nuked_world = yes
+				is_toxic_world = yes # undercoat: moved to scripted trigger
+				is_barren_cold_world = yes # undercoat: moved to scripted trigger
+				is_barren_dry_world = yes # undercoat: moved to scripted trigger
+				is_frozen_world = yes # undercoat: moved to scripted trigger
+				is_nuked_world = yes # undercoat: moved to scripted trigger
 			}
 			NOT = { has_planet_flag = nuked_planet_anomalies_disabled }
 			from.owner = {
 				has_country_flag = birth_of_piracy
-				NOT = {
-					is_gestalt = yes
-				}
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1097,8 +1102,8 @@ GAIA_RECORD_CAT = {
 		modifier = {
 			add = 3
 			OR = {
-				is_gaia_world = yes
-				is_continental_world = yes
+				is_gaia_world = yes # undercoat: moved to scripted trigger
+				is_continental_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}

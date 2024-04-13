@@ -1523,7 +1523,7 @@ event = {
 				has_special_project = LCLUSTER_PROJECT
 			}
 			any_relation = {
-				is_playable = yes
+				is_playable = yes # undercoat: moved to scripted trigger
 				has_communications = prev
 				has_event_chain = l_cluster_chain
 				NOT = { has_country_flag = lgate_warned@prev }
@@ -1545,7 +1545,7 @@ event = {
 					has_special_project = LCLUSTER_PROJECT
 				}
 				any_relation = {
-					is_playable = yes
+					is_playable = yes # undercoat: moved to scripted trigger
 					has_communications = prev
 					has_event_chain = l_cluster_chain
 					NOT = { has_country_flag = lgate_warned@prev }
@@ -1558,7 +1558,7 @@ event = {
 			}
 			random_relation = {
 				limit = {
-					is_playable = yes
+					is_playable = yes # undercoat: moved to scripted trigger
 					has_communications = prev
 					has_event_chain = l_cluster_chain
 					NOT = { has_country_flag = lgate_warned@prev }
@@ -2037,7 +2037,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		from = { is_country_type = ldragon_country }
 	}
 
@@ -2128,11 +2128,21 @@ fleet_event = {
 				}
 			}
 		}
-		solar_system.star = {
-			enable_special_project = {
-				name = TAME_LDRAGON_PROJECT
-				location = this
-				owner = root.owner
+		solar_system = {
+			star = {
+				enable_special_project = {
+					name = TAME_LDRAGON_PROJECT
+					location = this
+					owner = root.owner
+				}
+			}
+			random_fleet_in_system = {
+				limit = {
+					exists = owner
+					owner = { is_country_type = ldragon_country }
+					is_ship_size = nanite_space_dragon_baby
+				}
+				save_global_event_target_as = ldrake@prev
 			}
 		}
 	}
@@ -2153,16 +2163,10 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		from.solar_system = {
-			random_fleet_in_system = {
-				limit = {
-					exists = owner
-					owner = { is_country_type = ldragon_country }
-				}
-				save_event_target_as = new_dragon
-				set_owner = root
-			}
+		event_target:ldrake@fromfrom.solar_system = {
+			set_owner = root
 		}
+		clear_global_event_target = ldrake@fromfrom.solar_system
 	}
 
 	option = {
@@ -2306,7 +2310,7 @@ country_event = {
 
 	trigger = {
 		NOT = {
-			is_shroudwalker_apprentice_empire = yes
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
 			has_country_flag = encountered_first_wormhole
 		}
 		FROM = {

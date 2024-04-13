@@ -69,7 +69,7 @@ set_lessenger_damage = {
 }
 
 remove_lessenger_damage = {
-	every_controlled_fleet = {
+	every_controlled_ship = {
 		remove_modifier = lessenger_75
 		remove_modifier = lessenger_50
 		remove_modifier = lessenger_25
@@ -159,13 +159,6 @@ scion_society_tech = {
 			can_research_technology = tech_eco_simulation
 		}
 		give_technology = { tech = tech_eco_simulation }
-	}
-	else_if = {
-		limit = {
-			NOT = { has_technology = tech_society_2 }
-			can_research_technology = tech_society_2
-		}
-		give_technology = { tech = tech_society_2 }
 	}
 	else_if = {
 		limit = {
@@ -671,9 +664,9 @@ machine_federation_member_civic_fix = {
 	if = {
 		limit = {
 			OR = {
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 		force_remove_civic = civic_machine_servitor
@@ -1254,7 +1247,7 @@ generate_lost_colony_parent_bonus = {
 	add_building = building_precinct_house
 
 	while = {
-		limit = { num_pops < 57 }
+		limit = { num_pops < 45 }
 		create_pop = {
 			species = owner_main_species
 			ethos = random
@@ -1283,6 +1276,195 @@ generate_lost_colony_parent_bonus = {
 			}
 		}
 	}
+}
+
+generate_lost_colony_parent_colony_1 = { # Industry	
+	while = { 
+		count = 2
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_industrial
+		}
+	}
+	if = {
+		limit = { owner = { is_gestalt = no } }
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_city
+		}
+	}
+	else_if = {
+		limit = {
+			owner = { is_hive_empire = yes }
+		}
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_hive
+		}
+	}
+	else_if = {
+		limit = {
+			owner = { is_machine_empire = yes }
+		}
+		add_district_and_planet_size_if_needed_effect = {
+			district = district_nexus
+		}
+	}
+	while = {
+		limit = { num_pops < 7 }
+		create_pop = {
+			species = owner_main_species
+			ethos = random
+		}
+	}
+	if = {
+		limit = {
+			owner = { is_hive_empire = yes }
+		}
+		if = {
+			limit = {
+				owner = { is_progenitor_hive_empire = yes } # undercoat: moved to scripted trigger
+			}
+			add_building = building_offspring_nest
+		}
+		else = {
+			add_building = building_spawning_pool
+		}
+	}
+	if = {
+		limit = {
+			owner = { is_machine_empire = yes }
+		}
+		add_building = building_machine_assembly_plant
+	}
+	if = {
+		limit = {
+			owner = {
+				has_permanent_employment = yes # undercoat: moved to scripted trigger
+			}
+			free_building_slots > 0
+		}
+		add_building = building_posthumous_employment_center
+	}
+	if = {
+		limit = {
+			owner = {
+				is_environmentalist_empire = yes # undercoat: moved to scripted trigger
+			}
+			free_building_slots > 0
+		}
+		add_building = building_ranger_lodge
+		add_blocker = { type = d_big_nature_preserve_blocker }
+	}
+	if = {
+		limit = {
+			owner = {
+				is_relentless_industrialist_empire = yes
+			}
+			free_building_slots > 0
+		}
+		add_building = building_coordinated_fulfillment_center_1
+	}
+	if = {
+		limit = {
+			owner = {
+				has_permanent_employment = yes # undercoat: moved to scripted trigger
+			}
+			free_building_slots > 0
+		}
+		add_building = building_posthumous_employment_center
+	}
+}
+
+generate_lost_colony_parent_colony_2 = { # Research
+	while = {
+		count = 2
+		if = {
+			limit = { owner = { is_gestalt = no } }
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_city
+			}
+		}
+		else_if = {
+			limit = {
+				owner = { is_hive_empire = yes }
+			}
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_hive
+			}
+		}
+		else_if = {
+			limit = {
+				owner = { is_machine_empire = yes }
+			}
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_nexus
+			}
+		}
+		add_building = building_research_lab_1
+	}
+	while = {
+		limit = { num_pops < 7 }
+		create_pop = {
+			species = owner_main_species
+			ethos = random
+		}
+	}
+	if = {
+		limit = {
+			owner = { is_hive_empire = yes }
+		}
+		if = {
+			limit = {
+				owner = { is_progenitor_hive_empire = yes } # undercoat: moved to scripted trigger
+			}
+			add_building = building_offspring_nest
+		}
+		else = {
+			add_building = building_spawning_pool
+		}
+	}
+	if = {
+		limit = {
+			owner = { is_machine_empire = yes }
+		}
+		add_building = building_machine_assembly_plant
+	}
+	if = {
+		limit = {
+			owner = {
+				has_permanent_employment = yes # undercoat: moved to scripted trigger
+			}
+			free_building_slots > 0
+		}
+		add_building = building_posthumous_employment_center
+	}
+	if = {
+		limit = {
+			owner = {
+				is_environmentalist_empire = yes # undercoat: moved to scripted trigger
+			}
+			free_building_slots > 0
+		}
+		add_building = building_ranger_lodge
+		add_blocker = { type = d_big_nature_preserve_blocker }
+	}
+	if = {
+		limit = {
+			owner = {
+				is_relentless_industrialist_empire = yes
+			}
+			free_building_slots > 0
+		}
+		add_building = building_coordinated_fulfillment_center_1
+	}
+	if = {
+		limit = {
+			owner = {
+				has_permanent_employment = yes # undercoat: moved to scripted trigger
+			}
+			free_building_slots > 0
+		}
+		add_building = building_posthumous_employment_center
+	}
+	set_colony_type = col_research
 }
 
 thesis_disband = {
@@ -1507,6 +1689,7 @@ spawn_shattered_ring_guaranteed_1_effect = {
 		name = "NAME_Ring_Section"
 		orbit_angle = -30
 		orbit_distance = 45
+		# Undercoat
 		init_effect = {
 			fire_on_action = { on_action = on_planet_spawned }
 		}
@@ -1516,6 +1699,7 @@ spawn_shattered_ring_guaranteed_1_effect = {
 		name = "NAME_Ring_Section"
 		orbit_angle = 0
 		orbit_distance = 45
+		# Undercoat
 		init_effect = {
 			fire_on_action = { on_action = on_planet_spawned }
 		}
@@ -1532,6 +1716,7 @@ spawn_shattered_ring_guaranteed_1_effect = {
 		init_effect = {
 			prevent_anomaly = yes
 			shattered_ring_blocker_effect = yes
+			# Undercoat
 			fire_on_action = { on_action = on_planet_spawned }
 		}
 	}
@@ -1543,6 +1728,7 @@ spawn_shattered_ring_guaranteed_2_effect = {
 		name = "NAME_Ring_Section"
 		orbit_angle = 150
 		orbit_distance = 45
+		# Undercoat
 		init_effect = {
 			fire_on_action = { on_action = on_planet_spawned }
 		}
@@ -1553,6 +1739,7 @@ spawn_shattered_ring_guaranteed_2_effect = {
 		name = "NAME_Ring_Section"
 		orbit_angle = 180
 		orbit_distance = 45
+		# Undercoat
 		init_effect = {
 			fire_on_action = { on_action = on_planet_spawned }
 		}
@@ -1569,6 +1756,7 @@ spawn_shattered_ring_guaranteed_2_effect = {
 		init_effect = {
 			prevent_anomaly = yes
 			shattered_ring_blocker_effect = yes
+			# Undercoat
 			fire_on_action = { on_action = on_planet_spawned }
 		}
 	}
@@ -1663,6 +1851,7 @@ spawn_habitat_effect = {
 			event_target:target_planet = {
 				set_planet_flag = habitat@PREV
 			}
+			# Undercoat
 			fire_on_action = { on_action = on_planet_spawned }
 		}
 	}
@@ -1838,7 +2027,14 @@ on_orbital_complete_effect = {
 			}
 		}
 	}
-	remove_megastructure = fromfrom
+	if = {
+		limit = {
+			fromfrom = {
+				is_scope_type = megastructure
+			}
+		}
+		remove_megastructure = fromfrom
+	}
 }
 
 set_habitat_planetary_features_effect = {
@@ -2310,6 +2506,7 @@ surveyor_update_orbital_effect = {
 					}
 				}
 			}
+
 			random_fleet_in_orbit = {
 				limit = {
 					OR = {
@@ -2319,6 +2516,7 @@ surveyor_update_orbital_effect = {
 				}
 				save_event_target_as = target_orbital
 			}
+
 			solar_system = {
 				random_system_planet = {
 					limit = {
@@ -2327,197 +2525,197 @@ surveyor_update_orbital_effect = {
 					save_event_target_as = target_habitat
 				}
 			}
-		}
 
-		last_added_deposit = {
-			switch = {
-				trigger = is_deposit_type
-				# Energy
-				d_energy_5 = {
-					event_target:target_orbital = {
-						set_fleet_flag = energy_orbital
-					}
-				}
-				d_energy_7 = {
-					event_target:target_orbital = {
-						set_fleet_flag = energy_orbital
-					}
-				}
-				d_energy_9 = {
-					event_target:target_orbital = {
-						set_fleet_flag = energy_orbital
-					}
-				}
-				# Minerals
-				d_minerals_5 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-				}
-				d_minerals_7 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-				}
-				d_minerals_9 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-				}
-				# Physics Research
-				d_physics_5 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				d_physics_7 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				d_physics_9 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				# Society Research
-				d_society_5 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				d_society_7 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				d_society_9 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				# Engineering Research
-				d_engineering_5 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				d_engineering_7 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				d_engineering_9 = {
-					event_target:target_orbital = {
-						set_fleet_flag = science_orbital
-					}
-				}
-				# Alloys
-				d_alloys_3 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-					event_target:target_habitat = {
-						add_deposit = d_hab_alloy_3
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+			last_added_deposit = {
+				switch = {
+					trigger = is_deposit_type
+					# Energy
+					d_energy_5 = {
+						event_target:target_orbital = {
+							set_fleet_flag = energy_orbital
 						}
 					}
-				}
-				d_alloys_4 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-					event_target:target_habitat = {
-						add_deposit = d_hab_alloy_4
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_energy_7 = {
+						event_target:target_orbital = {
+							set_fleet_flag = energy_orbital
 						}
 					}
-				}
-				d_alloys_5 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-					event_target:target_habitat = {
-						add_deposit = d_hab_alloy_5
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_energy_9 = {
+						event_target:target_orbital = {
+							set_fleet_flag = energy_orbital
 						}
 					}
-				}
-				# Exotic Gases
-				d_exotic_gases_1 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_gas_1
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					# Minerals
+					d_minerals_5 = {
+						event_target:target_orbital = {
+							set_fleet_flag = mining_orbital
 						}
 					}
-				}
-				d_exotic_gases_2 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_gas_2
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_minerals_7 = {
+						event_target:target_orbital = {
+							set_fleet_flag = mining_orbital
 						}
 					}
-				}
-				d_exotic_gases_3 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_gas_3
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_minerals_9 = {
+						event_target:target_orbital = {
+							set_fleet_flag = mining_orbital
 						}
 					}
-				}
-				# Rare Crystals
-				d_rare_crystals_1 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_crystal_1
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					# Physics Research
+					d_physics_5 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
 						}
 					}
-				}
-				d_rare_crystals_2 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_crystal_2
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_physics_7 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
 						}
 					}
-				}
-				d_rare_crystals_3 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_crystal_3
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_physics_9 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
 						}
 					}
-				}
-				# Volatile Motes
-				d_volatile_motes_1 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_mote_1
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					# Society Research
+					d_society_5 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
 						}
 					}
-				}
-				d_volatile_motes_2 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_mote_2
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_society_7 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
 						}
 					}
-				}
-				d_volatile_motes_3 = {
-					event_target:target_habitat = {
-						add_deposit = d_hab_mote_3
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:chosen_planet
+					d_society_9 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
+						}
+					}
+					# Engineering Research
+					d_engineering_5 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
+						}
+					}
+					d_engineering_7 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
+						}
+					}
+					d_engineering_9 = {
+						event_target:target_orbital = {
+							set_fleet_flag = science_orbital
+						}
+					}
+					# Alloys
+					d_alloys_3 = {
+						event_target:target_orbital = {
+							set_fleet_flag = mining_orbital
+						}
+						event_target:target_habitat = {
+							add_deposit = d_hab_alloy_3
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_alloys_4 = {
+						event_target:target_orbital = {
+							set_fleet_flag = mining_orbital
+						}
+						event_target:target_habitat = {
+							add_deposit = d_hab_alloy_4
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_alloys_5 = {
+						event_target:target_orbital = {
+							set_fleet_flag = mining_orbital
+						}
+						event_target:target_habitat = {
+							add_deposit = d_hab_alloy_5
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					# Exotic Gases
+					d_exotic_gases_1 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_gas_1
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_exotic_gases_2 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_gas_2
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_exotic_gases_3 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_gas_3
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					# Rare Crystals
+					d_rare_crystals_1 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_crystal_1
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_rare_crystals_2 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_crystal_2
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_rare_crystals_3 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_crystal_3
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					# Volatile Motes
+					d_volatile_motes_1 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_mote_1
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_volatile_motes_2 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_mote_2
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
+						}
+					}
+					d_volatile_motes_3 = {
+						event_target:target_habitat = {
+							add_deposit = d_hab_mote_3
+							last_added_deposit = {
+								set_deposit_flag = planet@event_target:chosen_planet
+							}
 						}
 					}
 				}

@@ -22,11 +22,23 @@ country_event = {
 	}
 
 	immediate = {
+
+		# Champions of the Empire
+		# Adds a random common trait
+		if = {
+			limit = {
+				has_tradition = tr_aptitude_champions_of_the_empire
+			}
+			from = {
+				add_trait_no_notify = "random_common"
+			}
+		}
+
 		# Aristocratic Elite
 		# 20% Chance for a random positive trait and a random negative trait
 		if = {
 			limit = {
-				is_aristocratic_empire = yes
+				is_aristocratic_empire = yes # undercoat: moved to scripted trigger
 			}
 			from = {
 				random_list = {
@@ -45,7 +57,7 @@ country_event = {
 		# Adds a random expertise trait
 		if = {
 			limit = {
-				is_technocracy = yes
+				is_technocracy = yes # undercoat: moved to scripted trigger
 				from = { leader_class = scientist }
 			}
 			from = {
@@ -57,7 +69,7 @@ country_event = {
 		# Adds the Crusader trait
 		if = {
 			limit = {
-				has_crusader_spirit = yes
+				has_crusader_spirit = yes # undercoat: moved to scripted trigger
 				from = { leader_class = commander }
 			}
 			from = {
@@ -69,7 +81,7 @@ country_event = {
 		# Adds the Corsair trait
 		if = {
 			limit = {
-				is_privateer_empire = { allow_invalid = yes }
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
 				from = { leader_class = commander }
 			}
 			from = {
@@ -93,7 +105,7 @@ country_event = {
 		# 20% Chance for a random positive trait and a random negative trait
 		if = {
 			limit = {
-				is_aristocratic_empire = yes
+				is_aristocratic_empire = yes # undercoat: moved to scripted trigger
 			}
 			every_owned_leader = {
 				random_list = {
@@ -113,7 +125,7 @@ country_event = {
 		if = {
 			limit = {
 				has_ancrel = yes
-				is_remnants_empire = yes
+				is_remnants_empire = yes # undercoat: moved to scripted trigger
 			}
 			every_owned_leader = {
 				limit = {
@@ -132,7 +144,7 @@ country_event = {
 		# Adds a random Expertise trait
 		if = {
 			limit = {
-				is_technocracy = yes
+				is_technocracy = yes # undercoat: moved to scripted trigger
 			}
 			every_owned_leader = {
 				limit = {
@@ -146,7 +158,7 @@ country_event = {
 		# Adds the Crusader trait
 		if = {
 			limit = {
-				has_crusader_spirit = yes
+				has_crusader_spirit = yes # undercoat: moved to scripted trigger
 			}
 			every_owned_leader = {
 				limit = {
@@ -159,12 +171,190 @@ country_event = {
 		# Letters of Marque
 		# Adds the Corsair trait
 		if = {
-			limit = { is_privateer_empire = { allow_invalid = yes } }
+			limit = { is_privateer_empire = yes } # undercoat: moved to scripted trigger
 			every_owned_leader = {
 				limit = {
 					leader_class = commander
 				}
 				add_trait_no_notify = leader_trait_corsair
+			}
+		}
+	}
+}
+
+# New heir appointed
+leader_event = {
+	id = leader.200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+	}
+
+	immediate = {
+		# Set age to be younger than normal.
+		set_variable_to_random_value = {
+			which = heir_age_mod
+			min = -10
+			max = 0
+			rounded = yes
+		}
+		add_age = heir_age_mod
+
+		####################
+		# CLASS RANDOMISER #
+		####################
+
+		# Set skill level to 1
+		set_skill = 1
+		# Add generic level modifiers
+		add_skill_without_trait_selection = owner.modifier:leader_initial_skill
+
+		if = {
+			limit = {
+				owner = {
+					OR = {
+						# Commander
+						is_privateer_empire = yes # undercoat: moved to scripted trigger
+						has_tradition = tr_supremacy_war_games
+						has_valid_civic = civic_distinguished_admiralty
+						has_crusader_spirit = yes # undercoat: moved to scripted trigger
+						# Official
+						is_aristocratic_empire = yes # undercoat: moved to scripted trigger
+						has_tradition = tr_domination_colonial_viceroys
+						# Scientist
+						is_technocracy = yes # undercoat: moved to scripted trigger
+						has_tradition = tr_discovery_science_division
+						# Current Ruler's Class
+						has_philosopher_king = yes # undercoat: moved to scripted trigger
+					}
+				}
+			}
+
+			# All classes have a base weight of 10.
+			# Civics that boost only one class add 40.
+			# Civics that boost two classes add 20 to each class.
+			# Traditions that boost a class add 20.
+
+			random_list = {
+				# Commander
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_commander
+					}
+					change_leader_class = commander
+					add_skill_without_trait_selection = owner.modifier:commander_initial_skill
+				}
+				# Official
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_official
+					}
+					change_leader_class = official
+					add_skill_without_trait_selection = owner.modifier:official_initial_skill
+				}
+				# Scientist
+				0 = {
+					modifier = {
+						add = value:heir_class_weight_scientist
+					}
+					change_leader_class = scientist
+					add_skill_without_trait_selection = owner.modifier:scientist_initial_skill
+				}
+			}
+		}
+
+		##########
+		# TRAITS #
+		##########
+
+		# Initial Traits, set after determining class.
+		add_trait_no_notify = trait_imperial_heir
+		add_trait_no_notify = "random_common"
+
+		# Chance for a negative trait.
+		random_list = {
+			95 = { }
+			5 = {
+				add_trait_no_notify = "random_common"
+				add_trait_no_notify = "random_negative"
+				# Variable "leader_pending_negative_traits_unmodified" doesn't exist yet, can't reduce it yet. Checked now made in paragon_2.2200.
+				modifier = {
+					factor = 0
+					owner = { has_philosopher_king = yes } # undercoat: moved to scripted trigger
+				}
+			}
+		}
+
+		# Under One Rule
+		if = {
+			limit = {
+				owner = {
+					OR = {
+						has_origin = origin_legendary_leader_imperial
+						ruler = { has_trait = leader_trait_legendary_offspring }
+					}
+				}
+			}
+			add_trait_no_notify = leader_trait_legendary_offspring
+		}
+
+		# Technocracy
+		if = {
+			limit = {
+				owner = {
+					is_technocracy = yes # undercoat: moved to scripted trigger
+				}
+				leader_class = scientist
+			}
+			add_random_expertise_trait_effect = yes
+		}
+
+		# Crusader Spirit
+		if = {
+			limit = {
+				owner = {
+					has_crusader_spirit = yes # undercoat: moved to scripted trigger
+				}
+				leader_class = commander
+			}
+			add_trait_no_notify = leader_trait_crusader
+		}
+
+		# Letters of Marque
+		if = {
+			limit = {
+				owner = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+				}
+				leader_class = commander
+			}
+			add_trait_no_notify = leader_trait_corsair
+		}
+	}
+}
+
+# Add Imperial Ruler trait on changing to Imperial authority.
+country_event = {
+	id = leader.201
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_authority_imperial = yes # undercoat: moved to scripted trigger
+		exists = ruler
+	}
+
+	immediate = {
+		ruler = {
+			if = {
+				limit = {
+					NOT = { has_trait = trait_imperial_heir }
+				}
+				add_trait = trait_imperial_heir
 			}
 		}
 	}
@@ -319,7 +509,7 @@ country_event = { # Mutual Support
 	is_triggered_only = yes
 
 	immediate = {
-		every_country = {
+		every_galcom_member = {
 			limit = {
 				position_on_last_resolution = support
 				any_owned_leader = {
@@ -361,6 +551,55 @@ country_event = { # Mutual Support
 					type = name
 					localization = LEADER
 					scope = event_target:galcom_delegate
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Delegate Focus Traits
+	id = leader.320
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_galcom_member = {
+			limit = {
+				NOT = {
+					is_same_value = root
+				}
+				position_on_last_resolution = support
+				any_owned_leader = {
+					is_assigned_to_galcom = yes
+					has_matching_resolution_category_focus_trait_tier1or2or3 = yes
+				}
+			}
+			random_owned_leader = {
+				limit = {
+					is_assigned_to_galcom = yes
+					has_matching_resolution_category_focus_trait_tier1or2or3 = yes
+				}
+				if = {
+					limit = {
+						has_matching_resolution_category_focus_trait_tier_1 = yes
+					}
+					delegate_focus_effect = {
+						CHANCE = @resolution_focus_amt_1
+					}
+				}
+				else_if = {
+					limit = {
+						has_matching_resolution_category_focus_trait_tier_2 = yes
+					}
+					delegate_focus_effect = {
+						CHANCE = @resolution_focus_amt_2
+					}
+				}
+				else = {
+					delegate_focus_effect = {
+						CHANCE = @resolution_focus_amt_3
+					}
 				}
 			}
 		}

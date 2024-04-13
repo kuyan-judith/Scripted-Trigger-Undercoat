@@ -2,61 +2,61 @@
 # Decisions
 ##########################################################################
 
-decision_prospect = {
-	owned_planets_only = yes
-
-	enactment_time = 180
-	resources = {
-		category = decisions
-		cost = {
-			unity = 250
-			energy = 500
-		}
-	}
-
-	potential = {
-		is_artificial = no
-		is_machine_world = no
-		is_hive_world = no
-		is_city_world = no
-		owner = {
-			has_active_tradition = tr_adaptability_finish
-		}
-		NOT = { has_planet_flag = planet_prospected }
-	}
-
-	effect = {
-		custom_tooltip = decision_prospect_effects_short
-		hidden_effect = {
-			set_planet_flag = planet_prospected
-			add_random_non_blocker_deposit = yes
-			create_message = {
-				type = MESSAGE_TYPE_PLANET_PROSPECTED
-				localization = MESSAGE_PLANET_PROSPECTED
-				days = 30
-				target = this
-				variable = {
-					type = name
-					localization = PLANET
-					scope = this
-				}
-				variable = {
-					type = name
-					localization = DEPOSIT
-					scope = last_added_deposit
-				}
-			}
-		}
-	}
-
-	ai_weight = {
-		weight = 1
-		modifier = {
-			factor = 0
-			num_pops < 20
-		}
-	}
-}
+#decision_prospect = { # Cut as of tradition rebalance
+#	owned_planets_only = yes
+#
+#	enactment_time = 180
+#	resources = {
+#		category = decisions
+#		cost = {
+#			unity = 250
+#			energy = 500
+#		}
+#	}
+#
+#	potential = {
+#		is_artificial = no
+#		is_machine_world = no # undercoat: moved to scripted trigger
+#		is_hive_world = no # undercoat: moved to scripted trigger
+#		is_city_world = no # undercoat: moved to scripted trigger
+#		owner = {
+#			has_active_tradition = tr_adaptability_finish
+#		}
+#		NOT = { has_planet_flag = planet_prospected }
+#	}
+#
+#	effect = {
+#		custom_tooltip = decision_prospect_effects_short
+#		hidden_effect = {
+#			set_planet_flag = planet_prospected
+#			add_random_non_blocker_deposit = yes
+#			create_message = {
+#				type = MESSAGE_TYPE_PLANET_PROSPECTED
+#				localization = MESSAGE_PLANET_PROSPECTED
+#				days = 30
+#				target = this
+#				variable = {
+#					type = name
+#					localization = PLANET
+#					scope = this
+#				}
+#				variable = {
+#					type = name
+#					localization = DEPOSIT
+#					scope = last_added_deposit
+#				}
+#			}
+#		}
+#	}
+#
+#	ai_weight = {
+#		weight = 1
+#		modifier = {
+#			factor = 0
+#			num_pops < 20
+#		}
+#	}
+#}
 
 # decision_geologist_prospect = {
 # 	owned_planets_only = yes
@@ -71,9 +71,9 @@ decision_prospect = {
 
 # 	potential = {
 # 		is_artificial = no
-# 		is_machine_world = no
-# 		is_hive_world = no
-# 		is_city_world = no
+# 		is_machine_world = no # undercoat: moved to scripted trigger
+# 		is_hive_world = no # undercoat: moved to scripted trigger
+# 		is_city_world = no # undercoat: moved to scripted trigger
 # 		planet = {
 # 			exists = leader
 # 			leader = {
@@ -214,7 +214,7 @@ decision_slave_colony = {
 
 	potential = {
 		is_capital = no
-		is_city_world = no
+		is_city_world = no # undercoat: moved to scripted trigger
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = penal_colony }
 		NOT = { has_modifier = slave_colony }
@@ -294,9 +294,32 @@ decision_resort_colony = {
 
 	potential = {
 		is_capital = no
-		NOT = { has_modifier = penal_colony }
-		NOT = { has_modifier = slave_colony }
-		is_city_world = no
+		NOR = { 
+			has_modifier = penal_colony 
+			has_modifier = slave_colony
+			has_modifier = resort_colony
+			is_city_world = yes # undercoat: moved to scripted trigger
+			AND = {
+				is_nuked_world = yes # undercoat: moved to scripted trigger
+				NOR = {
+					owner = {
+						OR = {	
+							is_memorialist_empire = yes	
+							has_trait = trait_survivor
+							has_trait = trait_pc_nuked_preference
+							has_trait = trait_plantoid_radiotrophic
+							has_trait = trait_advanced_radiotrophic
+							has_trait = trait_harvested_radiotrophic
+							has_trait = trait_lithoid_radiotrophic
+						}
+					}
+				}
+			}
+			AND = {
+				is_relic_world = yes # undercoat: moved to scripted trigger
+				NOT = { owner = { is_memorialist_empire = yes } }
+			}
+		}
 		owner = {
 			is_regular_empire = yes
 		}
@@ -304,15 +327,10 @@ decision_resort_colony = {
 	}
 
 	allow = {
-		planet_size >= 15
 		custom_tooltip = {
 			fail_text = decision_resort_colony_no_districts
 			num_districts = { type = any value < 1 }
 			num_buildings = { type = any value < 2 }
-		}
-		custom_tooltip = {
-			fail_text = no_upgraded_capital_tooltip
-			has_upgraded_capital = no
 		}
 		custom_tooltip = {
 			fail_text = decision_resort_colony_only_one
@@ -321,6 +339,10 @@ decision_resort_colony = {
 					any_owned_planet = { has_modifier = resort_colony }
 				}
 			}
+		}
+		custom_tooltip = {
+			fail_text = decision_cant_be_building_anything
+			has_building_construction = no
 		}
 	}
 
@@ -331,9 +353,14 @@ decision_resort_colony = {
 		}
 		hidden_effect = {
 			remove_building = building_colony_shelter
+			remove_building = building_capital
+			remove_building = building_major_capital
+			remove_building = building_system_capital
 			add_building = building_resort_capital
 		}
-		hidden_effect = { validate_planet_buildings_and_districts = yes }
+		hidden_effect = {
+			validate_planet_buildings_and_districts = yes
+		}
 	}
 
 	ai_weight = {
@@ -388,8 +415,8 @@ decision_crucible_colony = {
 			has_tradition = tr_cybernetics_assimilator_crucible
 		}
 		NOR = {
-			is_machine_world = yes
-			is_city_world = yes
+			is_machine_world = yes # undercoat: moved to scripted trigger
+			is_city_world = yes # undercoat: moved to scripted trigger
 			has_modifier = crucible_colony
 		}
 	}
@@ -415,7 +442,7 @@ decision_crucible_colony = {
 	}
 
 	ai_weight = {
-		weight = 0 #TODO investigate later
+		weight = 0 #TODO AUG-37374
 	}
 }
 
@@ -578,15 +605,15 @@ decision_consecrated_worlds = {
 			if = {
 				limit = {
 					OR = {
-						is_rocky_asteroid = yes
-						is_nuked_world = yes
-						is_gas_giant = yes
+						is_rocky_asteroid = yes # undercoat: moved to scripted trigger
+						is_nuked_world = yes # undercoat: moved to scripted trigger
+						is_gas_giant = yes # undercoat: moved to scripted trigger
 						is_planet_class = pc_shielded
-						is_hive_world = yes
-						is_machine_world = yes
+						is_hive_world = yes # undercoat: moved to scripted trigger
+						is_machine_world = yes # undercoat: moved to scripted trigger
 						is_planet_class = pc_ai
-						is_city_world = yes
-						is_relic_world = yes
+						is_city_world = yes # undercoat: moved to scripted trigger
+						is_relic_world = yes # undercoat: moved to scripted trigger
 					}
 				}
 				custom_tooltip = consecrated_worlds_unsuitable
@@ -595,11 +622,11 @@ decision_consecrated_worlds = {
 						modifier = {
 							factor = 10
 							OR = {
-								is_hive_world = yes
-								is_machine_world = yes
+								is_hive_world = yes # undercoat: moved to scripted trigger
+								is_machine_world = yes # undercoat: moved to scripted trigger
 								is_planet_class = pc_ai
-								is_city_world = yes
-								is_relic_world = yes
+								is_city_world = yes # undercoat: moved to scripted trigger
+								is_relic_world = yes # undercoat: moved to scripted trigger
 							}
 						}
 						add_modifier = {
@@ -718,11 +745,11 @@ decision_consecrated_worlds = {
 						add = 20
 							AND = {
 								root.space_owner = {
-									is_toxic_knights_empire = yes
+									is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
 								}
-								is_toxic_world = yes
+								is_toxic_world = yes # undercoat: moved to scripted trigger
 							}
-							is_toxic_world = yes
+							is_toxic_world = yes # undercoat: moved to scripted trigger
 						}
 						add_modifier = {
 							modifier = consecrated_quality_3
@@ -748,9 +775,9 @@ decision_consecrated_worlds = {
 							add = 20
 							AND = {
 								root.space_owner = {
-									is_toxic_knights_empire = yes
+									is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
 								}
-								is_toxic_world = yes
+								is_toxic_world = yes # undercoat: moved to scripted trigger
 							}
 						}
 						add_modifier = {
@@ -777,7 +804,7 @@ decision_consecrated_worlds = {
 			else_if = {
 				limit = {
 					habitable_planet = yes
-					is_gaia_world = no
+					is_gaia_world = no # undercoat: moved to scripted trigger
 				}
 				custom_tooltip = consecrated_worlds_suitable
 				random_list = {
@@ -857,7 +884,7 @@ decision_consecrated_worlds = {
 				}
 			}
 			else_if = {
-				limit = { is_gaia_world = yes }
+				limit = { is_gaia_world = yes } # undercoat: moved to scripted trigger
 				custom_tooltip = consecrated_worlds_perfect
 				random_list = {
 					0 = {
@@ -1108,8 +1135,8 @@ decision_arcology_project = {
 
 	potential = {
 		NOR = {
-			is_city_world = yes
-			is_relic_world = yes
+			is_city_world = yes # undercoat: moved to scripted trigger
+			is_relic_world = yes # undercoat: moved to scripted trigger
 			has_modifier = resort_colony
 			has_modifier = penal_colony
 			has_modifier = slave_colony
@@ -1161,6 +1188,7 @@ decision_arcology_project = {
 				entity = "city_planet_entity"
 				graphical_culture = owner
 			}
+			planet_event = { id = action.68 }
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
@@ -1207,13 +1235,13 @@ decision_arcology_project_relic = {
 	}
 
 	potential = {
-		is_relic_world = yes
+		is_relic_world = yes # undercoat: moved to scripted trigger
 		is_artificial = no
 		exists = owner
 		owner = {
 			OR = {
 				is_regular_empire = yes
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1243,6 +1271,7 @@ decision_arcology_project_relic = {
 				entity = "city_planet_entity"
 				graphical_culture = owner
 			}
+			planet_event = { id = action.68 }
 			add_deposit = d_former_relic_world
 			planet_event = { id = mega.201 }
 			while = {
@@ -1293,7 +1322,15 @@ decision_market_nomination = {
 			has_global_flag = ongoing_market_relocation_nomination
 		}
 		#from = { has_communications = event_target:50percentcomms } # should include self
-		from = { has_country_flag = market_nomination_eligible }
+		exists = from
+		from = {
+			has_country_flag = market_nomination_eligible
+			is_inwards_perfection_empire = no # undercoat: moved to scripted trigger
+			OR = {
+				is_ai = no
+				NOT = { has_ethic = ethic_fanatic_xenophobe }
+			}
+		}
 	}
 
 	allow = {
@@ -1339,7 +1376,7 @@ decision_market_nomination = {
 					}
 					modifier = {
 						factor = 0.33
-						from = { is_megacorp = yes }
+						from = { is_megacorp = yes } # undercoat: moved to scripted trigger
 					}
 					modifier = {
 						factor = 0.5
@@ -1355,7 +1392,7 @@ decision_market_nomination = {
 					}
 					modifier = {
 						factor = 1.5
-						from = { is_gestalt = yes }
+						from = { is_gestalt = yes } # undercoat: moved to scripted trigger
 					}
 				}
 				6 = {
@@ -1373,11 +1410,11 @@ decision_market_nomination = {
 				1 = {
 					modifier = {
 						factor = 200
-						is_city_world = yes
+						is_city_world = yes # undercoat: moved to scripted trigger
 					}
 					modifier = {
 						factor = 9
-						from = { is_megacorp = yes }
+						from = { is_megacorp = yes } # undercoat: moved to scripted trigger
 					}
 					modifier = {
 						factor = 2
@@ -1393,7 +1430,7 @@ decision_market_nomination = {
 					}
 					modifier = {
 						factor = 0.5
-						from = { is_gestalt = yes }
+						from = { is_gestalt = yes } # undercoat: moved to scripted trigger
 					}
 					add_modifier = {
 						modifier = market_nominee_level_3
@@ -1435,7 +1472,7 @@ decision_market_nomination = {
 		}
 		modifier = {
 			factor = 2
-			from = { is_megacorp = yes }
+			from = { is_megacorp = yes } # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			factor = 1.5
@@ -1569,7 +1606,7 @@ decision_boost_market_nomination = {
 		}
 		modifier = {
 			factor = 2
-			from = { is_megacorp = yes }
+			from = { is_megacorp = yes } # undercoat: moved to scripted trigger
 		}
 	}
 }
@@ -1892,9 +1929,9 @@ decision_project_cornucopia = {
 
 	potential = {
 		is_artificial = no
-		is_machine_world = no
-		is_hive_world = no
-		is_city_world = no
+		is_machine_world = no # undercoat: moved to scripted trigger
+		is_hive_world = no # undercoat: moved to scripted trigger
+		is_city_world = no # undercoat: moved to scripted trigger
 		owner = {
 			is_galactic_community_member = yes
 			is_active_resolution = "resolution_industry_project_cornucopia"
@@ -1947,7 +1984,7 @@ decision_crystalline_refugees = {
 	}
 
 	potential = {
-		is_habitat = yes
+		is_habitat = yes # undercoat: moved to scripted trigger
 		exists = owner
 		exists = event_target:central_crystal_empire
 		owner = {
@@ -2002,7 +2039,7 @@ decision_crystalline_architecture = {
 	}
 
 	potential = {
-		is_habitat = yes
+		is_habitat = yes # undercoat: moved to scripted trigger
 		exists = owner
 		exists = event_target:central_crystal_empire
 		owner = {
@@ -2051,7 +2088,7 @@ decision_shattered_ring_project = {
 	}
 
 	potential = {
-		is_shattered_ring_habitable = yes
+		is_shattered_ring_habitable = yes # undercoat: moved to scripted trigger
 		exists = owner
 	}
 
@@ -2068,7 +2105,7 @@ decision_shattered_ring_project = {
 			change_pc = pc_ringworld_habitable
 
 			set_planet_entity = {
-				entity = "ringworld_seam_entity_01_entity"
+				entity = "ringworld_habitable_entity_01_entity"
 				graphical_culture = owner
 			}
 			solar_system = {
@@ -2172,7 +2209,7 @@ decision_expand_planetary_sea = {
 	enactment_time = @expand_planetary_sea_length
 
 	potential = {
-		is_ocean_world = yes
+		is_ocean_world = yes # undercoat: moved to scripted trigger
 		exists = owner
 		owner = {
 			has_ascension_perk = ap_hydrocentric
@@ -2387,7 +2424,7 @@ decision_flood_habitat = {
 	enactment_time = @expand_planetary_sea_length
 
 	potential = {
-		is_habitat = yes
+		is_habitat = yes # undercoat: moved to scripted trigger
 		exists = owner
 		owner = {
 			has_ascension_perk = ap_hydrocentric
@@ -2684,7 +2721,7 @@ decision_consecrate_habitat_knights = {
 
 	potential = {
 		owner = {
-			is_toxic_knights_empire = yes
+			is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
 			has_relic = r_toxic_god
 		}
 		uses_district_set = habitat
@@ -2752,7 +2789,7 @@ decision_expand_preserves = {
 	potential = {
 		exists = owner
 		owner = {
-			is_environmentalist_empire = yes
+			is_environmentalist_empire = yes # undercoat: moved to scripted trigger
 		}
 		has_deposit = d_big_nature_preserve_blocker
 		free_district_slots > 0
@@ -2794,7 +2831,7 @@ decision_reorganize_leviathan_parade = {
 				}
 				change_situation_target = root
 				set_situation_locked = no
-				set_situation_approach = approach_encourage	
+				set_situation_approach = approach_encourage
 			}
 		}
 	}

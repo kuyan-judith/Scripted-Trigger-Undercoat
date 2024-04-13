@@ -1,0 +1,455 @@
+namespace = astral_situation
+
+situation_event = {
+	id = astral_situation.1
+	title = astral_situation.1.name
+	desc = astral_situation.1.desc
+	picture = GFX_evt_crystal_sphere
+	show_sound = event_wind_ruins
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = target
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			add_resource_astral_threads = { VALUE = 100 }
+			add_resource = {
+				rare_crystals = 500
+				exotic_gases = 500
+			}
+			add_modifier = {
+				modifier = destroy_sphere_modifier
+				days = 3600
+			}
+			if = {
+				limit = {
+					OR = {
+						is_xenophobe = yes
+						is_homicidal = yes
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier4unityreward
+					min = @tier4unitymin
+					max = @tier4unitymax
+				}
+			}
+		}
+	}
+
+	after = {
+		destroy_situation = this
+	}
+}
+
+situation_event = {
+	id = astral_situation.5
+	title = astral_situation.5.name
+	desc = astral_situation.5.desc
+	picture = GFX_evt_crystal_sphere
+	show_sound = event_wind_ruins
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = target
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		event_target:crystal_sphere_system = {
+			spawn_astral_rift = {
+				random_pos = yes
+				orbit_angle = 360
+				id = crystal
+				graphics_entity_name = crystal_rift_entity
+			}
+		}
+	}
+
+	after = {
+		destroy_situation = this
+	}
+}
+
+situation_event = {
+	id = astral_situation.10
+	
+	hide_window = yes
+	is_triggered_only = yes
+
+	location = target
+	situation = this
+
+	immediate = {
+		change_variable = {
+			which = months_since_last_wave
+			value = 1
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = months_since_last_wave
+					value >= @formless_event_delay_between_waves_in_months
+				}
+			}
+
+			set_variable = {
+				which = months_since_last_wave
+				value = 0
+			}
+			set_saved_date = {
+				key = days_before_spawn
+				days_from_present = formless_event_delay_between_waves_in_days
+				expires = formless_event_delay_between_waves_in_days
+			}
+
+			target = {
+				event_target:aberrant_country = {
+					spawn_formless_invader_fleet = {
+						FLEET_STRENGTH = prev.invader_fleet_strength
+					}
+					change_variable = {
+						which = invader_fleet_strength
+						value = 1
+					}
+				}
+
+				event_target:formless_country = {
+					spawn_formless_defense_fleet = {
+						FLEET_FLAG = formless_defense_fleet
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_situation.15
+
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		event_target:aberrant_country = {
+			destroy_country = yes
+		}
+		event_target:formless_system = {
+			spawn_planet = {
+				class = "pc_gaia"
+				name = "NAME_FORMLESS_SYSTEM_GAIA"
+				orbit_angle = 180
+				orbit_distance = 110
+				size = 40
+				init_effect = {
+					set_planet_flag = formless_gaia_planet
+					save_global_event_target_as = formless_gaia_planet
+					add_modifier = {
+						modifier = pm_formless_haven
+					}
+				}
+			}
+		}
+		remove_global_flag = strange_wormholes_locked
+		every_playable_country = {
+			country_event = { id = astral_planes.50 days = 1 }
+		}
+		set_country_flag = the_formless_seal_is_set
+		country_event = {
+			id = astral_planes.3099
+			days = 1
+		}
+	}
+}
+
+situation_event = {
+	id = astral_situation.20
+	title = astral_situation.20.name
+	desc = astral_situation.20.desc
+	picture = GFX_evt_astral_rift
+	is_triggered_only = yes
+	
+	location = target
+	situation = this
+
+	trigger = {
+		owner = { NOT = { has_technology = tech_rift_sphere } }
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			add_resource_astral_threads = { VALUE = 100 }
+			add_tech_progress = {
+				tech = tech_rift_sphere
+				progress = 0.25
+			}
+		}
+		hidden_effect = {
+			destroy_situation = this
+		}
+	}
+}
+
+situation_event = {
+	id = astral_situation.25
+	is_triggered_only = yes
+	hide_window = yes
+
+	location = target
+	situation = this
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { current_situation_approach = situation_a_rift_in_space_standard }
+				NOT = { has_situation_flag = has_started_studying_rift_in_space }
+			}
+			set_situation_flag = has_started_studying_rift_in_space
+		}
+		else_if = { # Situation has been studied for a month
+			limit = {
+				NOT = { current_situation_approach = situation_a_rift_in_space_standard }
+				has_situation_flag = has_started_studying_rift_in_space
+				NOT = { has_situation_flag = has_studied }
+			}
+			set_situation_flag = has_studied
+		}
+		else_if = { # Went back to standard approach before studying for a month
+			limit = {
+				current_situation_approach = situation_a_rift_in_space_standard 
+				has_situation_flag = has_started_studying_rift_in_space
+				NOT = { has_situation_flag = has_studied }
+			}
+			remove_situation_flag = has_started_studying_rift_in_space
+		}
+
+		if = {
+			limit = {
+				has_situation_flag = has_studied
+				current_stage = stage_2
+				owner = {
+					NOT = { has_country_flag = has_fired_rift_in_space_special_event }
+				}
+			}
+			situation_event = { id = astral_situation.30 }
+			owner = {
+				set_country_flag = has_fired_rift_in_space_special_event
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = astral_situation.30
+	hide_window = yes
+	is_triggered_only = yes
+	
+	location = target
+	situation = this
+
+	trigger = {
+		NOT = {
+			owner = { has_country_flag = has_completed_a_rift_in_space_situation }
+		}
+	}
+
+	immediate = {
+		situation_event = { id = astral_situation.35 }
+		if = {
+			limit = {
+				NOT = {
+					owner = { has_country_flag = has_triggered_rift_in_space_unique_event }
+				}
+			}
+			situation_event = {
+				id = astral_situation.30
+				days = 360
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = astral_situation.35
+	hide_window = yes
+	is_triggered_only = yes
+	
+	location = target
+	situation = this
+
+	immediate = {
+		random_list = {
+			50 = {
+				situation_event = { id = astral_situation.55 }
+				owner = { set_country_flag = has_triggered_rift_in_space_unique_event }
+			}
+			50 = {
+				situation_event = { id = astral_situation.60 }
+				owner = { set_country_flag = has_triggered_rift_in_space_unique_event }
+			}
+			50 = {
+				situation_event = { id = astral_situation.65 }
+				owner = { set_country_flag = has_triggered_rift_in_space_unique_event }
+			}
+			0 = {
+				modifier = {
+					add = value:rift_in_space_event_probability
+					always = yes
+				}
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = astral_situation.55
+	title = astral_situation.55.name
+	desc = astral_situation.55.desc
+	picture = GFX_evt_astral_rift
+	is_triggered_only = yes
+	
+	location = target
+	situation = this
+
+	immediate = {
+		target.solar_system = {
+			spawn_planet = {
+				class = random_colonizable
+				name = NAME_Planet_Rift_In_Space
+				orbit_distance = 80
+				size = 17
+				init_effect = {
+					prevent_anomaly = yes
+					set_planet_flag = pre_ftl_default
+					generate_pre_ftls_on_planet = yes
+					set_surveyed = {
+						surveyed = yes
+						surveyor = root
+					}
+					set_all_comms_surveyed = yes
+					last_created_country = {
+						establish_communications_no_message = root
+					}
+					save_event_target_as = planet_rift_in_space
+				}
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+	}
+}
+
+situation_event = {
+	id = astral_situation.60
+	title = astral_situation.60.name
+	desc = astral_situation.60.desc
+	picture = GFX_evt_astral_rift
+	is_triggered_only = yes
+
+	location = target
+	situation = this
+
+	immediate = {
+		create_species = {
+			name = random
+			class = random_non_machine
+			portrait = random
+			traits = random
+			extra_trait_points = 5
+			allow_negative_traits = no
+			effect = {
+				save_event_target_as = rift_temporary_species
+			}
+		}
+		target.solar_system = {
+			closest_system = {
+				limit = {
+					AND = {
+						has_owner = yes
+						owner = { is_same_value = root.owner }
+					}
+					any_system_planet = {
+						habitable_planet = yes
+						OR = {
+							is_colony = yes
+							is_capital = yes
+						}
+					}
+				}
+				random_system_planet = {
+					limit = { 
+						habitable_planet = yes
+						OR = {
+							is_colony = yes
+							is_capital = yes
+						}
+					}
+					create_pop = {
+						species = event_target:rift_temporary_species
+					}
+					save_event_target_as = rift_temporary_species_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+	}
+}
+
+situation_event = {
+	id = astral_situation.65
+	title = astral_situation.65.name
+	desc = astral_situation.65.desc
+	picture = GFX_evt_astral_rift
+	is_triggered_only = yes
+	
+	location = target
+	situation = this
+
+	immediate = {
+		target.solar_system = {
+			closest_system = {
+				limit = {
+					AND = {
+						has_owner = yes
+						owner = { is_same_value = root.owner }
+					}
+					any_system_planet = {
+						habitable_planet = yes
+						OR = {
+							is_colony = yes
+							is_capital = yes
+						}
+					}
+				}
+				random_system_planet = {
+					limit = { 
+						habitable_planet = yes
+						OR = {
+							is_colony = yes
+							is_capital = yes
+						}
+					}
+					add_modifier = {
+						modifier = rift_in_space_time_acceleration_modifier
+						days = 360
+					}
+					save_event_target_as = rift_temporary_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+	}
+}

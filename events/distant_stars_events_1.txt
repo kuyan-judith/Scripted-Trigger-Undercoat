@@ -21,21 +21,6 @@ ship_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		owner = {
-			any_neighbor_country = {
-				is_ai = yes
-				is_playable = yes
-				is_homicidal = no
-				has_communications = prev
-				NOR = {
-					is_at_war_with = prev
-					is_same_value = prev
-				}
-			}
-		}
-	}
-
 	immediate = {
 		create_ambient_object = {
 			type = "abandoned_ship_object"
@@ -52,14 +37,15 @@ ship_event = {
 		owner = {
 			random_neighbor_country = {
 				limit = {
-					is_playable = yes
+					is_ai = yes
+					is_playable = yes # undercoat: moved to scripted trigger
 					is_homicidal = no
 					has_communications = prev
 					NOR = {
 						is_at_war_with = prev
 						is_country = prev
 					}
-					any_system = { has_access_fleet = prev }
+					event_target:supply_wreckage_tar.solar_system = { has_access_fleet = prev }
 				}
 				save_event_target_as = wreckage_owner
 			}
@@ -92,13 +78,13 @@ country_event = {
 	title = "distar.2.name"
 	desc = {
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		text = "distar.2.desc"
 	}
 	desc = {
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		text = "distar.2.desc.machi"
 	}
@@ -406,7 +392,7 @@ ship_event = {
 	option = {
 		name = FASCINATING
 		from = {
-			add_deposit = d_energy_3
+			add_deposit = d_energy_10
 			hidden_effect = { add_modifier = { modifier = black_hole_energy years = -1 } }
 		}
 	}
@@ -513,7 +499,7 @@ ship_event = {
 		if = {
 			limit = {
 				owner = {
-					is_playable = yes
+					is_playable = yes # undercoat: moved to scripted trigger
 					NOT = { has_country_flag = cured_rage_virus }
 				}
 			}
@@ -541,7 +527,7 @@ planet_event = {
 			}
 		}
 		owner = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = cured_rage_virus }
 		}
 	}
@@ -556,7 +542,7 @@ planet_event = {
 			owner = {
 				NOR = {
 					has_policy_flag = ai_outlawed
-					is_gestalt = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -596,7 +582,7 @@ planet_event = {
 	}
 	option = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		name = "distar.26.mach"
 		custom_tooltip = "distar.26.a.tooltip"
@@ -643,7 +629,7 @@ ship_event = { #MI version
 	is_triggered_only = yes
 
 	trigger = {
-		owner = { is_machine_empire = yes }
+		owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 	}
 
 	option = {
@@ -673,7 +659,7 @@ ship_event = { #Biological version
 	is_triggered_only = yes
 
 	trigger = {
-		owner = { is_machine_empire = no }
+		owner = { is_machine_empire = no } # undercoat: moved to scripted trigger
 	}
 
 	option = {
@@ -1052,9 +1038,9 @@ planet_event = { #Rage Virus cured
 				}
 			}
 			IF = {
-				limit = { any_owned_leader = { is_researching_area = society } }
+				limit = { any_owned_leader = { is_head_of_research = yes } }
 				random_owned_leader = {
-					limit = { is_researching_area = society }
+					limit = { is_head_of_research = yes }
 					add_skill = 1
 				}
 			}
@@ -1062,9 +1048,9 @@ planet_event = { #Rage Virus cured
 				limit = {
 					NOT = { has_technology = tech_genome_mapping }
 					OR = {
-						is_machine_empire = no
-						is_machine_assimilator = yes
-						is_servitor_empire = yes
+						is_machine_empire = no # undercoat: moved to scripted trigger
+						is_machine_assimilator = yes # undercoat: moved to scripted trigger
+						is_servitor_empire = yes # undercoat: moved to scripted trigger
 					}
 				}
 				give_technology = { tech = tech_genome_mapping }
@@ -1087,8 +1073,8 @@ planet_event = { #Rage Virus cured
 				limit = {
 					NOT = { has_technology = tech_vitality_boosters }
 					OR = {
-						is_machine_empire = no
-						is_machine_assimilator = yes
+						is_machine_empire = no # undercoat: moved to scripted trigger
+						is_machine_assimilator = yes # undercoat: moved to scripted trigger
 					}
 				}
 				give_technology = { tech = tech_vitality_boosters }
@@ -1162,10 +1148,6 @@ ship_event = {
 		name = EXCELLENT
 		owner = {
 			if = {
-				limit = { NOT = { has_technology = tech_engineering_1 } }
-				give_technology = { tech = tech_engineering_1 }
-			}
-			else_if = {
 				limit = { NOT = { has_technology = tech_assembly_pattern } }
 				give_technology = { tech = tech_assembly_pattern }
 			}
@@ -1607,10 +1589,7 @@ country_event = { #Adopted Amoeba Evolves
 		name = "distar.51.f"
 		trigger = {
 			owner_main_species = {
-				NOR = {
-					is_species_class = PLANT
-					is_species_class = FUN
-				}
+				is_flora_species = no # undercoat: moved to scripted trigger
 			}
 		}
 		event_target:lost_amoeba_adult_fleet = {
@@ -1633,10 +1612,7 @@ country_event = { #Adopted Amoeba Evolves
 		name = "distar.51.fb"
 		trigger = {
 			owner_main_species = {
-				OR = {
-					is_species_class = PLANT
-					is_species_class = FUN
-				}
+				is_flora_species = yes # undercoat: moved to scripted trigger
 			}
 		}
 		event_target:lost_amoeba_adult_fleet = {
@@ -2193,7 +2169,9 @@ ship_event = {
 		if = {
 			limit = { exists = event_target:amoeba_finding_scientist }
 			event_target:amoeba_finding_scientist = {
-				add_trait = leader_trait_maniacal
+				add_or_level_up_veteran_trait_effect = {
+					TRAIT = leader_trait_maniacal
+				}
 			}
 		}
 
@@ -2411,7 +2389,7 @@ country_event = {
 	immediate = {
 		create_country = {
 			name = "NAME_Kohtalo"
-			type = faction
+			type = nice_faction
 			flag = {
 				icon = {
 					category = "spherical"
@@ -2738,15 +2716,15 @@ ship_event = {
 				#any_owned_planet = { free_housing > 1	}
 				NOR = { #Disallow for non-DS Hiveminds and non-Civic'd MIs
 					AND = {
-						is_machine_empire = yes
+						is_machine_empire = yes # undercoat: moved to scripted trigger
 						NOR = {
 							has_civic = civic_machine_terminator
-							is_machine_assimilator = yes
-							is_servitor_empire = yes
+							is_machine_assimilator = yes # undercoat: moved to scripted trigger
+							is_servitor_empire = yes # undercoat: moved to scripted trigger
 						}
 					}
 					AND = {
-						is_hive_empire = yes
+						is_hive_empire = yes # undercoat: moved to scripted trigger
 						NOT = {
 							has_civic = civic_hive_devouring_swarm
 						}
@@ -2927,7 +2905,7 @@ ship_event = {
 				NOR = {
 					has_ethic = "ethic_xenophile"
 					has_ethic = "ethic_fanatic_xenophile"
-					is_gestalt = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
 					has_policy_flag = slavery_allowed
 				}
 				#any_owned_planet = {
@@ -3121,7 +3099,7 @@ ship_event = {
 		custom_tooltip = "distar.71.pop.tooltip"
 		trigger = {
 			owner = {
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 				#any_owned_planet = {
 				#	free_housing > 1
 				#}
@@ -3157,7 +3135,7 @@ ship_event = {
 		custom_tooltip = "distar.71.pop.tooltip"
 		trigger = {
 			owner = {
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 				#any_owned_planet = { free_housing > 1	}
 			}
 		}
@@ -3201,7 +3179,7 @@ planet_event = { #On colonizing the repaired Megastructure section
 		solar_system = { #If we did not thaw out the clones earlier
 			star = { has_modifier = clones_in_cryo }
 		}
-		is_unshattered_ring_habitable_segment = yes
+		is_unshattered_ring_habitable_segment = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -3279,7 +3257,7 @@ planet_event = { #On colonizing the repaired Megastructure section
 		trigger = {
 			owner = {
 				NOR = {
-					is_gestalt = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
 					has_civic = civic_fanatic_purifiers
 				}
 			}
@@ -3297,7 +3275,7 @@ planet_event = { #On colonizing the repaired Megastructure section
 	option = {
 		name = "distar.71.pop.assim"
 		trigger = {
-			owner = { is_machine_assimilator = yes }
+			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 		}
 		hidden_effect = {
 			while = {
@@ -3312,7 +3290,7 @@ planet_event = { #On colonizing the repaired Megastructure section
 	option = {
 		name = "distar.72.b.servi"
 		trigger = {
-			owner = { is_servitor_empire = yes }
+			owner = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
 		}
 		hidden_effect = {
 			while = {
@@ -3344,7 +3322,7 @@ planet_event = { #On colonizing the repaired Megastructure section
 		trigger = {
 			owner = {
 				NOR = {
-					is_servitor_empire = yes
+					is_servitor_empire = yes # undercoat: moved to scripted trigger
 					has_ethic = ethic_fanatic_xenophile
 					has_ethic = ethic_fanatic_egalitarian
 				}
@@ -3606,7 +3584,7 @@ ship_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		owner = { is_machine_empire = no }
+		owner = { is_machine_empire = no } # undercoat: moved to scripted trigger
 	}
 
 	option = {
@@ -3633,17 +3611,17 @@ ship_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		owner = { is_machine_empire = yes }
+		owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
 		owner = {
 			random_neighbor_country = {
 				limit = {
-					is_playable = yes
+					is_playable = yes # undercoat: moved to scripted trigger
 					has_communications = prev
 					NOR = {
-						is_gestalt = yes
+						is_gestalt = yes # undercoat: moved to scripted trigger
 						is_at_war_with = prev
 						is_country = prev
 					}
@@ -4006,7 +3984,7 @@ fleet_event = { #Scrap bot!
 	trigger = {
 		from = { has_star_flag = scavenger_bot_system }
 		owner = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = encountered_scavenger_bot }
 		}
 		exists = event_target:scavenger_bot_fleet
@@ -4102,7 +4080,7 @@ country_event = { #Death of Scavenger Bot
 	option = {
 		name = OK
 		exclusive_trigger = {
-			is_playable = no
+			is_playable = no # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -4403,7 +4381,7 @@ ship_event = { #The Big Friendly Warform
 
 	option = {
 		trigger = {
-			owner = { NOR = { has_policy_flag = ai_outlawed is_machine_empire = yes } }
+			owner = { NOR = { has_policy_flag = ai_outlawed is_machine_empire = yes } } # undercoat: moved to scripted trigger
 		}
 		name = "distar.155.a"
 		from = {
@@ -4416,7 +4394,7 @@ ship_event = { #The Big Friendly Warform
 	}
 	option = {
 		trigger = {
-			owner = { NOR = { has_policy_flag = ai_outlawed is_machine_empire = yes } }
+			owner = { NOR = { has_policy_flag = ai_outlawed is_machine_empire = yes } } # undercoat: moved to scripted trigger
 		}
 		name = "distar.155.b"
 		custom_tooltip = distar.155.machine.tt
@@ -4430,7 +4408,7 @@ ship_event = { #The Big Friendly Warform
 	}
 	option = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		name = "distar.155.machi"
 		from = {
@@ -4443,7 +4421,7 @@ ship_event = { #The Big Friendly Warform
 	}
 	option = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		name = "distar.155.machi_2"
 		custom_tooltip = distar.155.machine.tt
@@ -4455,13 +4433,13 @@ ship_event = {
 	title = "distar.156.name"
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = no }
+			owner = { is_machine_empire = no } # undercoat: moved to scripted trigger
 		}
 		text = "distar.156.desc"
 	}
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = "distar.156.desc.machi"
 	}
@@ -4639,7 +4617,7 @@ country_event = {
 	option = {
 		name = "distar.158.d"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.159 } }
 	}
@@ -4647,7 +4625,7 @@ country_event = {
 	option = {
 		name = "distar.158.d.machi"
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.159 } }
 	}
@@ -4672,14 +4650,14 @@ country_event = {
 	option = {
 		name = "distar.159.a"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.160 } }
 	}
 	option = {
 		name = "distar.159.a.machi"
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.160 } }
 	}
@@ -4703,14 +4681,14 @@ country_event = {
 	option = {
 		name = "distar.160.a"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.161 } }
 	}
 	option = {
 		name = "distar.160.a.machi"
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.161 } }
 	}
@@ -4734,21 +4712,21 @@ country_event = {
 	option = {
 		name = "distar.161.a"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.162 } }
 	}
 	option = {
 		name = "distar.161.a.machi"
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.162 } }
 	}
 	option = {
 		name = "distar.161.b"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.164 } }
 	}
@@ -4772,14 +4750,14 @@ country_event = {
 	option = {
 		name = "distar.162.a"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.163 } }
 	}
 	option = {
 		name = "distar.162.a.machi"
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.163 } }
 	}
@@ -4803,7 +4781,7 @@ country_event = {
 	option = {
 		name = "distar.163.a"
 		trigger = {
-			is_machine_empire = no
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.164 } }
 	}
@@ -4811,7 +4789,7 @@ country_event = {
 	option = {
 		name = "distar.163.a.machi"
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = { country_event = { id = distar.164 } }
 	}
@@ -4856,7 +4834,7 @@ country_event = {
 					has_ethic = ethic_fanatic_pacifist
 					has_ethic = ethic_egalitarian
 					has_ethic = ethic_fanatic_egalitarian
-					is_gestalt = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
 				}
 			}
 			text =  "distar.164.a"
@@ -4872,14 +4850,14 @@ country_event = {
 					has_ethic = ethic_fanatic_materialist
 					has_ethic = ethic_spiritualist
 					has_ethic = ethic_fanatic_spiritualist
-					is_gestalt = yes
+					is_gestalt = yes # undercoat: moved to scripted trigger
 				}
 			}
 			text = "distar.164.b"
 		}
 		name = {
 			trigger = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 			text = "distar.164.machi"
 		}
@@ -4900,8 +4878,15 @@ country_event = {
 			}
 		}
 		event_target:repaired_warform = {
+			hidden_effect = {
+				leader = {
+					unassign_leader = this
+				}
+			}
 			set_owner = root
-			hidden_effect = { set_leader = last_created_leader }
+			hidden_effect = {
+				set_leader = event_target:warform_leader
+			}
 		}
 		if = {
 			limit = {
@@ -4957,8 +4942,15 @@ country_event = {
 			}
 		}
 		event_target:repaired_warform = {
+			hidden_effect = {
+				leader = {
+					unassign_leader = this
+				}
+			}
 			set_owner = root
-			hidden_effect = { set_leader = last_created_leader }
+			hidden_effect = {
+				set_leader = event_target:warform_leader
+			}
 		}
 		if = {
 			limit = {
@@ -5031,7 +5023,7 @@ ship_event = {
 	option = {
 		name = "distar.167.a"
 		owner = {
-			add_resource = { minerals = 300 }
+			add_resource = { alloys = 75 }
 		}
 	}
 
@@ -5097,7 +5089,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_machine_empire = no
+				is_machine_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.170.desc"
@@ -5105,7 +5097,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.170.desc.machi"
@@ -5129,7 +5121,7 @@ ship_event = {
 	option = {
 		trigger = {
 			owner = {
-				is_machine_empire = no
+				is_machine_empire = no # undercoat: moved to scripted trigger
 				any_owned_pop = {
 					species = {
 						NOR = {
@@ -5154,7 +5146,7 @@ ship_event = {
 	option = {
 		trigger = {
 			owner = {
-				is_machine_empire = no
+				is_machine_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		name = NOTIME
@@ -5163,7 +5155,7 @@ ship_event = {
 	option = {
 		trigger = {
 			owner = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		name = "distar.170.machi"
@@ -5438,6 +5430,14 @@ country_event = { #New leaders get Brainslug Trait
 						#Nothing
 					}
 					20 = {
+						modifier = {
+							factor = 0.5
+							has_ethic = ethic_xenophobe
+						}
+						modifier = {
+							factor = 2
+							has_ethic = ethic_xenophile
+						}
 						add_trait = leader_trait_brainslug
 					}
 				}
@@ -5472,6 +5472,14 @@ country_event = { #Pool leaders get Brainslug Trait
 						#Nothing
 					}
 					20 = {
+						modifier = {
+							factor = 0.5
+							has_ethic = ethic_xenophobe
+						}
+						modifier = {
+							factor = 2
+							has_ethic = ethic_xenophile
+						}
 						add_trait = leader_trait_brainslug
 					}
 				}
@@ -5488,12 +5496,9 @@ country_event = { #Cohabitants of Brainslugged pops generate initial Unrest
 	is_triggered_only = yes
 
 	immediate = {
-		IF = {
-			LIMIT = {
-				NOR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-				}
+		if = {
+			limit = {
+				is_xenophobe = no
 			}
 			every_owned_planet = {
 				limit = {
@@ -5514,7 +5519,7 @@ country_event = { #Cohabitants of Brainslugged pops generate initial Unrest
 				}
 			}
 		}
-		ELSE = { #Xenophobes result in higher unrest
+		else = { #Xenophobes result in higher unrest
 			every_owned_planet = {
 				limit = {
 					OR = {
@@ -5592,13 +5597,13 @@ ship_event = {
 	}
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = "distar.190.desc.machi"
 	}
 	desc = {
 		trigger = {
-			owner = { is_hive_empire = yes }
+			owner = { is_hive_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = "distar.190.desc.hive"
 	}
@@ -6132,17 +6137,11 @@ planet_event = { #If you terraform the planet to a non-seabearing class before c
 			has_modifier = "pm_study_the_sea"
 		}
 		# should now remove modifiers even if terraformed after chain completion
-		OR = {
-			is_desert_world = yes
-			is_arid_world = yes
-			is_savannah_world = yes
-			is_tropical_world = yes
-			is_alpine_world = yes
-			is_tundra_world = yes
-			is_arctic_world = yes
-			is_city_world = yes
-			is_relic_world = yes
-			is_planet_class = pc_ai
+		NOR = {
+			is_gaia_world = yes # undercoat: moved to scripted trigger
+			is_ocean_world = yes # undercoat: moved to scripted trigger
+			is_continental_world = yes # undercoat: moved to scripted trigger
+			is_tropical_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -6244,7 +6243,7 @@ fleet_event = { #Tiyanki Matriarch
 	trigger = {
 		from = { has_star_flag = elderly_tiyanki_system }
 		owner = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = encountered_elderly_tiyanki }
 		}
 		exists = event_target:elderly_tiyanki_fleet
@@ -6331,7 +6330,7 @@ country_event = { #Death of the Matriarch
 		trigger = { NOT = { has_valid_civic = civic_memorialist } }
 		hidden_effect = {
 			if = {
-				limit = { is_playable = yes }
+				limit = { is_playable = yes } # undercoat: moved to scripted trigger
 				country_event = { id = distar.213 }
 				country_event = { id = galcom.110 days = 60 }
 			}
@@ -6343,7 +6342,7 @@ country_event = { #Death of the Matriarch
 		trigger = { has_valid_civic = civic_memorialist }
 		hidden_effect = {
 			if = {
-				limit = { is_playable = yes }
+				limit = { is_playable = yes } # undercoat: moved to scripted trigger
 				country_event = { id = distar.213 }
 				country_event = { id = galcom.110 days = 60 }
 			}
@@ -6380,7 +6379,7 @@ country_event = { #Death of the Matriarch
 		custom_tooltip = distar.212.b.tooltip
 		hidden_effect = {
 			if = {
-				limit = { is_playable = yes }
+				limit = { is_playable = yes } # undercoat: moved to scripted trigger
 				country_event = { id = distar.213 }
 				country_event = { id = galcom.110 days = 60 }
 			}
@@ -6436,7 +6435,7 @@ country_event = {
 	immediate = {
 		create_country = {
 			name = "NAME_Reth_Unddol"
-			type = faction
+			type = nice_faction
 			auto_delete = yes
 			flag = {
 				icon = {
@@ -6609,13 +6608,13 @@ country_event = {
 		tag = hire_leader
 		name = {
 			trigger = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 			}
 			text = distar.215.a
 		}
 		name = {
 			trigger = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 			text = distar.215.a.gesta
 		}
@@ -6874,7 +6873,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_machine_empire = no
+				is_machine_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.220.desc"
@@ -6882,7 +6881,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.220.desc.machi"
@@ -6971,7 +6970,7 @@ fleet_event = { #Junkheap Ratlings
 	trigger = {
 		from = { has_star_flag = ratling_system }
 		owner = {
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = discovered_ratlings }
 		}
 		NOR = {
@@ -7106,7 +7105,7 @@ country_event = { #Spawn Ratlings #Root = Global Event Country
 			has_star_flag = ratling_system
 			any_system_planet = {
 				has_planet_flag = ratling_planet
-				is_broken_world = no
+				is_broken_world = no # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -7179,8 +7178,8 @@ country_event = { #Spawn Ratlings #Root = Global Event Country
 					has_planet_flag = ratling_planet
 					is_colony = no
 					is_under_colonization = no
-					is_broken_world = no
-					is_shattered_world = no
+					is_broken_world = no # undercoat: moved to scripted trigger
+					is_shattered_world = no # undercoat: moved to scripted trigger
 				}
 				set_owner = event_target:ratling_pre_space_country
 				add_building = building_junkheap
@@ -7631,7 +7630,7 @@ country_event = { #Switch owner on ground invasion successful to prevent endless
 	}
 	desc = {
 		trigger = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			any_system = {
 				has_star_flag = ratling_system
 				any_system_planet = {
@@ -7645,7 +7644,7 @@ country_event = { #Switch owner on ground invasion successful to prevent endless
 	}
 	desc = {
 		trigger = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			NOT = {
 				any_system = {
 					has_star_flag = ratling_system
@@ -7739,7 +7738,7 @@ country_event = { #Switch owner on ground invasion successful to prevent endless
 				has_ethic = ethic_xenophobe
 				has_ethic = ethic_fanatic_xenophobe
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -7841,7 +7840,7 @@ country_event = { #Create Full Ratling Empire #Root = Global Event Country
 				NOR = {
 					has_orbital_bombardment = yes
 					has_ground_combat = yes
-					is_broken_world = yes
+					is_broken_world = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -7910,7 +7909,7 @@ country_event = { #Create Full Ratling Empire #Root = Global Event Country
 				}
 				else = {
 					random_country = {
-						limit = { is_playable = yes	}
+						limit = { is_playable = yes	} # undercoat: moved to scripted trigger
 						save_event_target_as = tech_country
 					}
 					copy_techs_from = {
@@ -7962,7 +7961,7 @@ country_event = { #Create Full Ratling Empire #Root = Global Event Country
 					NOR = {
 						has_orbital_bombardment = yes
 						has_ground_combat = yes
-						is_broken_world = yes
+						is_broken_world = yes # undercoat: moved to scripted trigger
 					}
 				}
 				set_owner = event_target:ratling_country
@@ -8104,7 +8103,7 @@ country_event = { #Create Full Ratling Empire #Root = Global Event Country
 							is_same_value = event_target:ratling_country
 						}
 						planet_size > 12
-						is_broken_world = no
+						is_broken_world = no # undercoat: moved to scripted trigger
 					}
 					save_global_event_target_as = ratling_capital
 					set_capital = yes
@@ -8339,7 +8338,7 @@ country_event = { #Alert that the Ketling default empire has been created
 			OR = {
 				has_ethic = ethic_xenophile
 				has_ethic = ethic_fanatic_xenophile
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		hidden_effect = {
@@ -8554,7 +8553,7 @@ fleet_event = { #Entering Sealed System
 			random_system_planet = {
 				limit = {
 					has_anomaly = yes
-					is_gaia_world = yes
+					is_gaia_world = yes # undercoat: moved to scripted trigger
 				}
 				save_event_target_as = tanker_planet
 			}
@@ -8581,7 +8580,7 @@ country_event = { #Death of the Sealed System Psionic Entity
 		FromFromFrom.fleet = {
 			is_same_value = event_target:sealed_psionic_entity
 		}
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 	}
 
 	option = {
@@ -8594,13 +8593,13 @@ ship_event = { #Sealed System Anomaly Reward
 	title = "distar.244.name"
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = no }
+			owner = { is_machine_empire = no } # undercoat: moved to scripted trigger
 		}
 		text = "distar.244.desc"
 	}
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		text = "distar.244.desc.machi"
 	}
@@ -8623,7 +8622,7 @@ ship_event = { #Sealed System Anomaly Reward
 
 	option = {
 		exclusive_trigger = {
-			owner = { is_machine_empire = yes }
+			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		}
 		name = CURIOUS
 		owner = {
@@ -8711,13 +8710,13 @@ country_event = {
 		tag = hire_leader
 		name = {
 			trigger = {
-				is_machine_empire = no
+				is_machine_empire = no # undercoat: moved to scripted trigger
 			}
 			text = "distar.246.a"
 		}
 		name = {
 			trigger = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 			}
 			text = "distar.246.machi"
 		}
@@ -8753,7 +8752,7 @@ country_event = {
 		name = "distar.246.b"
 		trigger = {
 			NOR = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 				has_policy_flag = ai_outlawed
 			}
 		}
@@ -8793,7 +8792,7 @@ country_event = {
 
 	option = {	#Repurpose the leader (MI)
 		trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		tag = dismiss_leader
 		name = "distar.246.machi.b"
@@ -8854,11 +8853,11 @@ country_event = { #Destroying the leader
 	id = distar.248
 	title = "distar.248.name"
 	desc = {
-		trigger = { is_machine_empire = yes }
+		trigger = { is_machine_empire = yes } # undercoat: moved to scripted trigger
 		text = "distar.248.desc.machi"
 	}
 	desc = {
-		trigger = { is_machine_empire = no }
+		trigger = { is_machine_empire = no } # undercoat: moved to scripted trigger
 		text = "distar.248.desc"
 	}
 	location = event_target:droppod_tar
@@ -8876,7 +8875,7 @@ country_event = { #Destroying the leader
 	option = {
 		name = "distar.248.machi"
 		exclusive_trigger = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		add_resource = { minerals = 100 }
 		add_monthly_resource_mult = {
@@ -8915,7 +8914,7 @@ ship_event = { #Phaseshifting Planet
 	picture = {
 		trigger = {
 			from = {
-				is_shrouded_world = yes
+				is_shrouded_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_shrouded_planet
@@ -8923,7 +8922,7 @@ ship_event = { #Phaseshifting Planet
 	picture = {
 		trigger = {
 			from = {
-				is_gaia_world = yes
+				is_gaia_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_gaia
@@ -8964,7 +8963,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			event_target:phaseshift_planet = {
-				is_gaia_world = yes #Inverted check bc pc_change in immediate actually runs after
+				is_gaia_world = yes #Inverted check bc pc_change in immediate actually runs after # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.251.desc.shroud"
@@ -8972,7 +8971,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			event_target:phaseshift_planet = {
-				is_shrouded_world = yes #Inverted check bc pc_change in immediate actually runs after
+				is_shrouded_world = yes #Inverted check bc pc_change in immediate actually runs after # undercoat: moved to scripted trigger
 			}
 		}
 		text = "distar.251.desc.gaia"
@@ -8990,7 +8989,7 @@ ship_event = {
 	immediate = {
 		event_target:phaseshift_planet = {
 			IF = {
-				limit = { is_shrouded_world = yes }
+				limit = { is_shrouded_world = yes } # undercoat: moved to scripted trigger
 				change_pc = pc_gaia
 				clear_deposits = yes
 				add_deposit = d_active_volcano
@@ -9007,7 +9006,7 @@ ship_event = {
 				add_deposit = d_teeming_reef
 			}
 			ELSE_IF = {
-				limit = { is_gaia_world = yes }
+				limit = { is_gaia_world = yes } # undercoat: moved to scripted trigger
 				change_pc = pc_shrouded
 				clear_deposits = yes
 			}
@@ -9049,7 +9048,7 @@ ship_event = { #If we own the system, and the planet is still shifting when rese
 	picture = {
 		trigger = {
 			from = {
-				is_shrouded_world = yes
+				is_shrouded_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_shrouded_planet
@@ -9057,7 +9056,7 @@ ship_event = { #If we own the system, and the planet is still shifting when rese
 	picture = {
 		trigger = {
 			from = {
-				is_gaia_world = yes
+				is_gaia_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_gaia
@@ -9161,7 +9160,7 @@ ship_event = { #A country completes the Special Project to Phase-Lock
 		hidden_effect = {
 			event_target:phaseshift_planet = {
 				IF = {
-					limit = { is_gaia_world = no }
+					limit = { is_gaia_world = no } # undercoat: moved to scripted trigger
 					change_pc = pc_gaia
 					clear_deposits = yes
 					add_deposit = d_active_volcano
@@ -9386,7 +9385,7 @@ planet_event = { #Recursive Phaseshift
 
 	immediate = {
 		IF = {
-			limit = { is_gaia_world = yes }
+			limit = { is_gaia_world = yes } # undercoat: moved to scripted trigger
 			change_pc = pc_shrouded
 			clear_deposits = yes
 			IF = {
@@ -9397,7 +9396,7 @@ planet_event = { #Recursive Phaseshift
 			}
 		}
 		ELSE_IF = {
-			limit = { is_shrouded_world = yes }
+			limit = { is_shrouded_world = yes } # undercoat: moved to scripted trigger
 			change_pc = pc_gaia
 			clear_deposits = yes
 			add_deposit = d_active_volcano
@@ -9421,7 +9420,7 @@ planet_event = { #Recursive Phaseshift
 			}
 		}
 		ELSE_IF = {
-			limit = { is_broken_world = yes }
+			limit = { is_broken_world = yes } # undercoat: moved to scripted trigger
 			remove_planet_flag = phaseshifting_active
 		}
 		ELSE = {
@@ -9535,7 +9534,7 @@ ship_event = {
 		name = "distar.261.a.servi"
 		exclusive_trigger = {
 			owner = {
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		owner = {
@@ -9552,7 +9551,7 @@ ship_event = {
 		name = "distar.261.a.assim"
 		exclusive_trigger = {
 			owner = {
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 		owner = {
@@ -9616,9 +9615,7 @@ planet_event = {
 			is_same_species = event_target:livestock_species
 		}
 		owner = {
-			NOT = {
-				is_machine_empire = yes
-			}
+			is_machine_empire = no # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -9852,7 +9849,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_desert_world = yes
+				is_desert_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_desert
@@ -9860,7 +9857,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_gaia_world = yes
+				is_gaia_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_gaia
@@ -9868,7 +9865,7 @@ ship_event = {
 	picture = {
 		trigger = {
 			from = {
-				is_barren_dry_world = yes
+				is_barren_dry_world = yes # undercoat: moved to scripted trigger
 			}
 		}
 		picture = GFX_evt_warm_barren
@@ -9881,7 +9878,7 @@ ship_event = {
 	immediate = {
 		from = {
 			if = {
-				limit = { is_barren_dry_world = yes }
+				limit = { is_barren_dry_world = yes } # undercoat: moved to scripted trigger
 				clear_deposits = yes
 			}
 		}

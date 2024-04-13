@@ -119,7 +119,7 @@ opinion_policy_slavery = {
 			allows_slavery = no
 
 			FROM = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 				allows_slavery = yes
 			}
 		}
@@ -130,7 +130,7 @@ opinion_policy_slavery = {
 			allows_slavery = no
 
 			FROM = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 				allows_slavery = yes
 			}
 		}
@@ -141,7 +141,7 @@ opinion_policy_slavery = {
 			allows_slavery = no
 
 			FROM = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 				allows_slavery = yes
 			}
 		}
@@ -152,7 +152,7 @@ opinion_policy_slavery = {
 			allows_slavery = no
 
 			FROM = {
-				is_gestalt = no
+				is_gestalt = no # undercoat: moved to scripted trigger
 				allows_slavery = yes
 			}
 		}
@@ -275,31 +275,34 @@ opinion_genocidal = {
 		base = 0
 		modifier = {
 			add = -5
-			is_fallen_empire = no
+			NOR = {
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
+				is_homicidal = yes
+			}
 		}
 		modifier = {
 			add = -5
 			has_ethic = "ethic_egalitarian"
 			allows_purge = no
-			is_fallen_empire = no
+			is_fallen_empire = no # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -10
 			has_ethic = "ethic_fanatic_egalitarian"
 			allows_purge = no
-			is_fallen_empire = no
+			is_fallen_empire = no # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -5
-			has_ethic = "ethic_xenophile"
+			values_others = yes
 			allows_purge = no
-			is_fallen_empire = no
+			is_fallen_empire = no # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -10
 			has_ethic = "ethic_fanatic_xenophile"
 			allows_purge = no
-			is_fallen_empire = no
+			is_fallen_empire = no # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -5
@@ -313,6 +316,14 @@ opinion_genocidal = {
 
 	decay = {
 		base = 1
+		modifier = {
+			add = 1
+			has_ethic = ethic_xenophobe
+		}
+		modifier = {
+			add = 3
+			has_ethic = ethic_fanatic_xenophobe
+		}
 	}
 }
 
@@ -337,11 +348,19 @@ opinion_necrophage = {
 		base = -1
 		modifier = {
 			add = -1
-			has_ethic = ethic_xenophile
+			OR = {
+				has_ethic = ethic_xenophile
+				has_valid_civic = civic_hive_empath
+				has_valid_civic = civic_machine_exploration_protocol
+			}
 		}
 		modifier = {
-			add = -2
-			has_ethic = ethic_fanatic_xenophile
+			add = -3
+			OR = {
+				has_ethic = ethic_fanatic_xenophile
+				is_fruitful_empire = yes # undercoat: moved to scripted trigger
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
+			}
 		}
 	}
 
@@ -398,7 +417,7 @@ opinion_nuker = {
 				is_xenophobe = yes
 				is_robot_empire = yes
 			}
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -3
@@ -407,7 +426,7 @@ opinion_nuker = {
 				is_xenophobe = yes
 				is_robot_empire = yes
 			}
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -3
@@ -416,16 +435,16 @@ opinion_nuker = {
 				has_ethic = ethic_xenophile
 				has_civic = civic_hive_empath
 			}
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -6
 			OR = {
 				has_ethic = ethic_fanatic_pacifist
 				has_ethic = ethic_fanatic_xenophile
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -6
@@ -434,7 +453,7 @@ opinion_nuker = {
 		modifier = {
 			add = -6
 			is_at_war_with = root.from
-			is_playable = yes
+			is_playable = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -670,18 +689,18 @@ opinion_cede_planet = {
 # We were forcibly subjectized by them
 opinion_forced_subjectized = {
 	opinion = {
-		base = -30
+		base = -100
 	}
 
 	decay = {
-		base = 5
+		base = 1
 	}
 }
 
 # They released us from subjectage
 opinion_subject_released = {
 	opinion = {
-		base = 30
+		base = 100
 	}
 
 	decay = {
@@ -834,7 +853,7 @@ opinion_rivalry = {
 		base = -100
 		modifier = {
 			add = -100
-			is_fallen_empire = yes
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 		}
 		modifier = {
 			add = -100
@@ -853,7 +872,7 @@ opinion_declared_rival = {
 		base = -100
 		modifier = {
 			add = -100
-			is_fallen_empire = yes
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -943,8 +962,10 @@ opinion_decline_war = {
 	}
 
 	decay = {
-		base = 1
+		base = 3
 	}
+
+	min = -100
 
 	accumulative = yes
 }
@@ -952,7 +973,7 @@ opinion_decline_war = {
 # An AI warns a player ally that they are not helping in the war
 opinion_inactive_in_war = {
 	opinion = {
-		base = -20
+		base = -50
 	}
 
 	months = 12
@@ -1015,7 +1036,7 @@ opinion_took_station = {
 		base = -5
 		modifier = {
 			factor = 4
-			is_fallen_empire = yes
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2489,7 +2510,7 @@ opinion_abducted_aliens = {
 
 triggered_opinion_tr_versatility_universal_compatibility = {
 	trigger = {
-		is_machine_empire = yes
+		is_machine_empire = yes # undercoat: moved to scripted trigger
 		FROM = {
 			has_tradition = tr_versatility_universal_compatibility
 		}
@@ -2506,7 +2527,7 @@ triggered_opinion_ap_defender_of_the_galaxy = {
 			has_ascension_perk = ap_defender_of_the_galaxy
 		}
 		# Is not a Fallen Empire, Awakened Empire or Pre-FTL Empire
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		OR = {
 			# Is independent
 			is_subject = no
@@ -2535,11 +2556,11 @@ triggered_opinion_ap_defender_of_the_galaxy = {
 
 triggered_opinion_democratic_authority = {
 	trigger = {
-		is_playable = yes
-		has_authority_democratic = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_authority_democratic = yes # undercoat: moved to scripted trigger
 		FROM = {
-			is_playable = yes
-			has_authority_democratic = yes
+			is_playable = yes # undercoat: moved to scripted trigger
+			has_authority_democratic = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2550,11 +2571,11 @@ triggered_opinion_democratic_authority = {
 
 triggered_opinion_oligarchic_authority = {
 	trigger = {
-		is_playable = yes
-		has_authority_oligarchic = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_authority_oligarchic = yes # undercoat: moved to scripted trigger
 		FROM = {
-			is_playable = yes
-			has_authority_oligarchic = yes
+			is_playable = yes # undercoat: moved to scripted trigger
+			has_authority_oligarchic = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2565,11 +2586,11 @@ triggered_opinion_oligarchic_authority = {
 
 triggered_opinion_dictatorial_authority = {
 	trigger = {
-		is_playable = yes
-		has_authority_dictatorial = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_authority_dictatorial = yes # undercoat: moved to scripted trigger
 		FROM = {
-			is_playable = yes
-			has_authority_dictatorial = yes
+			is_playable = yes # undercoat: moved to scripted trigger
+			has_authority_dictatorial = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2580,11 +2601,11 @@ triggered_opinion_dictatorial_authority = {
 
 triggered_opinion_imperial_authority = {
 	trigger = {
-		is_playable = yes
-		has_authority_imperial = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_authority_imperial = yes # undercoat: moved to scripted trigger
 		FROM = {
-			is_playable = yes
-			has_authority_imperial = yes
+			is_playable = yes # undercoat: moved to scripted trigger
+			has_authority_imperial = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2595,10 +2616,10 @@ triggered_opinion_imperial_authority = {
 
 triggered_opinion_both_hive_mind = {
 	trigger = {
-		is_hive_empire = yes
+		is_hive_empire = yes # undercoat: moved to scripted trigger
 		FROM = {
 			NOT = { has_valid_civic = "civic_hive_devouring_swarm" }
-			is_hive_empire = yes
+			is_hive_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2609,11 +2630,11 @@ triggered_opinion_both_hive_mind = {
 
 triggered_opinion_hive_mind = {
 	trigger = {
-		is_playable = yes
-		is_gestalt = no
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_gestalt = no # undercoat: moved to scripted trigger
 		FROM = {
 			NOT = { has_valid_civic = "civic_hive_devouring_swarm" }
-			is_hive_empire = yes
+			is_hive_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2624,11 +2645,11 @@ triggered_opinion_hive_mind = {
 
 triggered_opinion_hive_mind_empath = {
 	trigger = {
-		is_playable = yes
-		is_gestalt = no
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_gestalt = no # undercoat: moved to scripted trigger
 		FROM = {
 			has_valid_civic = "civic_hive_empath"
-			is_hive_empire = yes
+			is_hive_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2699,7 +2720,7 @@ triggered_opinion_synthetics_small = {
 		is_cyborg_empire = no
 		is_mechanical_empire = no
 		NOR = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			has_ethic = ethic_spiritualist
 			has_ethic = ethic_fanatic_spiritualist
 			has_ethic = ethic_materialist
@@ -2714,22 +2735,22 @@ triggered_opinion_synthetics_small = {
 
 triggered_opinion_both_machine_intelligence = {
 	trigger = {
-		is_machine_empire = yes
+		is_machine_empire = yes # undercoat: moved to scripted trigger
 		NOT = { has_valid_civic = civic_machine_terminator }
 		FROM = {
 			NOT = { has_valid_civic = civic_machine_terminator }
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 		NOT = {
 			AND = {
-				is_machine_assimilator = yes
-				FROM = { is_machine_assimilator = yes }
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
+				FROM = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 			}
 		}
 		NOT = {
 			AND = {
-				is_servitor_empire = yes
-				FROM = { is_servitor_empire = yes }
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
+				FROM = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2741,18 +2762,18 @@ triggered_opinion_both_machine_intelligence = {
 
 triggered_organic_opinion_of_machine_empires = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		FROM = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			NOR = {
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 		is_mechanical_empire = no
 		is_cyborg_empire = no
 		NOR = {
-			is_gestalt = yes
+			is_gestalt = yes # undercoat: moved to scripted trigger
 			has_ethic = ethic_materialist
 			has_ethic = ethic_fanatic_materialist
 			has_ethic = ethic_spiritualist
@@ -2760,14 +2781,14 @@ triggered_organic_opinion_of_machine_empires = {
 		}
 		AND = {
 			NOR = {
-				is_gestalt = yes
+				is_gestalt = yes # undercoat: moved to scripted trigger
 				owner_species = { has_trait = trait_decadent }
 				has_ai_personality = decadent_hierarchy
 				has_ai_personality = slaving_despots
 				has_ai_personality = democratic_crusaders
 			}
 			FROM = {
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2781,7 +2802,7 @@ triggered_dc_opinion_of_servitors = {
 	trigger = {
 		has_ai_personality = democratic_crusaders
 		FROM = {
-			is_servitor_empire = yes
+			is_servitor_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2794,7 +2815,7 @@ triggered_dc_opinion_of_assimilators = {
 	trigger = {
 		has_ai_personality = democratic_crusaders
 		FROM = {
-			is_machine_assimilator = yes
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -2811,8 +2832,8 @@ triggered_opinion_xenophobes = {
 		NAND = {
 			is_same_species_class = from
 			OR = {
-				from = { is_selective_kinship_empire = yes }
-				is_selective_kinship_empire = yes
+				from = { is_selective_kinship_empire = yes } # undercoat: moved to scripted trigger
+				is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -2993,8 +3014,8 @@ triggered_opinion_xenophobia = {
 		NAND = {
 			is_same_species_class = from
 			OR = {
-				from = { is_selective_kinship_empire = yes }
-				is_selective_kinship_empire = yes
+				from = { is_selective_kinship_empire = yes } # undercoat: moved to scripted trigger
+				is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -3425,10 +3446,10 @@ triggered_materialist_opinion_of_machine_empires = {
 	trigger = {
 		has_ethic = ethic_materialist
 		FROM = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			NOT = {
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -3441,10 +3462,10 @@ triggered_fanatic_materialist_opinion_of_machine_empires = {
 	trigger = {
 		has_ethic = ethic_fanatic_materialist
 		FROM = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			NOT = {
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -3455,15 +3476,15 @@ triggered_fanatic_materialist_opinion_of_machine_empires = {
 
 triggered_spiritualist_opinion_of_machine_empires = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		has_ethic = ethic_spiritualist
 		FROM = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			is_mechanical_empire = no
 			is_cyborg_empire = no
 			NOR = {
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -3474,15 +3495,15 @@ triggered_spiritualist_opinion_of_machine_empires = {
 
 triggered_fanatic_spiritualist_opinion_of_machine_empires = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		has_ethic = ethic_fanatic_spiritualist
 		is_mechanical_empire = no
 		is_cyborg_empire = no
 		FROM = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			NOR = {
 				has_civic = civic_machine_terminator
-				is_machine_assimilator = yes
+				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -3493,12 +3514,12 @@ triggered_fanatic_spiritualist_opinion_of_machine_empires = {
 
 triggered_spiritualist_fe_opinion_of_machine_empires = {
 	trigger = {
-		is_fallen_empire = yes
+		is_fallen_empire = yes # undercoat: moved to scripted trigger
 		has_ethic = ethic_fanatic_spiritualist
 		is_mechanical_empire = no
 		is_cyborg_empire = no
 		FROM = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	opinion = {
@@ -3508,9 +3529,9 @@ triggered_spiritualist_fe_opinion_of_machine_empires = {
 
 triggered_terminators_opinion_of_servitors = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		has_civic = civic_machine_terminator
-		FROM = { is_servitor_empire = yes }
+		FROM = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -200
@@ -3519,9 +3540,9 @@ triggered_terminators_opinion_of_servitors = {
 
 triggered_opinion_both_servitors = {
 	trigger = {
-		is_playable = yes
-		is_servitor_empire = yes
-		FROM = { is_servitor_empire = yes }
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_servitor_empire = yes # undercoat: moved to scripted trigger
+		FROM = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = 40
@@ -3530,14 +3551,14 @@ triggered_opinion_both_servitors = {
 
 triggered_decadent_opinion_of_servitors = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		OR = {
 			owner_species = { has_trait = trait_decadent }
 			has_ai_personality = decadent_hierarchy
 			has_ai_personality = slaving_despots
 		}
 		FROM = {
-			is_servitor_empire = yes
+			is_servitor_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	opinion = {
@@ -3547,12 +3568,12 @@ triggered_decadent_opinion_of_servitors = {
 
 triggered_spiritualist_negative_opinion_of_assimilators = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		OR = {
 			has_ethic = ethic_spiritualist
 			has_ethic = ethic_fanatic_spiritualist
 		}
-		FROM = { is_machine_assimilator = yes }
+		FROM = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -200
@@ -3561,14 +3582,14 @@ triggered_spiritualist_negative_opinion_of_assimilators = {
 
 triggered_negative_opinion_of_assimilators = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		NOR = {
 			has_ethic = ethic_spiritualist
 			has_ethic = ethic_fanatic_spiritualist
-			is_gestalt = yes
+			is_gestalt = yes # undercoat: moved to scripted trigger
 			has_ai_personality = democratic_crusaders
 		}
-		FROM = { is_machine_assimilator = yes }
+		FROM = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 	}
 
 	opinion = {
@@ -3578,9 +3599,9 @@ triggered_negative_opinion_of_assimilators = {
 
 triggered_opinion_both_assimilators = {
 	trigger = {
-		is_playable = yes
-		is_machine_assimilator = yes
-		FROM = { is_machine_assimilator = yes }
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_machine_assimilator = yes # undercoat: moved to scripted trigger
+		FROM = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = 40
@@ -3609,11 +3630,11 @@ triggered_negative_opinion_of_exterminators_fe = {
 
 triggered_negative_opinion_of_exterminators = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		FROM = { has_civic = civic_machine_terminator }
 		is_mechanical_empire = no
 		NOR = {
-			is_machine_empire = yes
+			is_machine_empire = yes # undercoat: moved to scripted trigger
 			has_valid_civic = civic_fanatic_purifiers
 			is_species_class = ROBOT
 			is_species_class = MACHINE
@@ -3631,8 +3652,8 @@ triggered_negative_opinion_of_exterminators = {
 
 triggered_servitors_negative_opinion_of_exterminators = {
 	trigger = {
-		is_playable = yes
-		is_servitor_empire = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		is_servitor_empire = yes # undercoat: moved to scripted trigger
 		FROM = { has_civic = civic_machine_terminator }
 	}
 	opinion = {
@@ -3642,7 +3663,7 @@ triggered_servitors_negative_opinion_of_exterminators = {
 
 triggered_opinion_both_terminators = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		has_civic = civic_machine_terminator
 		FROM = { has_civic = civic_machine_terminator }
 	}
@@ -3653,11 +3674,11 @@ triggered_opinion_both_terminators = {
 
 triggered_exterminators_opinion_of_organics = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		has_civic = civic_machine_terminator
 		FROM = {
 			NOR = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 				is_species_class = MACHINE
 				is_species_class = ROBOT
 				has_country_flag = synthetic_empire
@@ -3675,11 +3696,11 @@ triggered_exterminators_opinion_of_organics = {
 
 triggered_exterminators_opinion_of_machines = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		has_civic = civic_machine_terminator
 		FROM = {
 			OR = {
-				is_machine_empire = yes
+				is_machine_empire = yes # undercoat: moved to scripted trigger
 				is_species_class = ROBOT
 				is_species_class = MACHINE
 				has_country_flag = synthetic_empire
@@ -3690,7 +3711,7 @@ triggered_exterminators_opinion_of_machines = {
 			}
 			NOR = {
 				has_civic = civic_machine_terminator
-				is_servitor_empire = yes
+				is_servitor_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -3701,16 +3722,16 @@ triggered_exterminators_opinion_of_machines = {
 
 triggered_opinion_barbaric_despoilers = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		NOR = {
 			is_militarist = yes
 			is_pacifist = yes
 			is_authoritarian = yes
-			is_gestalt = yes
+			is_gestalt = yes # undercoat: moved to scripted trigger
 			has_valid_civic = civic_fanatic_purifiers
 		}
-		is_despoiler_empire = no
-		FROM = { is_despoiler_empire = yes }
+		is_despoiler_empire = no # undercoat: moved to scripted trigger
+		FROM = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -50
@@ -3719,8 +3740,8 @@ triggered_opinion_barbaric_despoilers = {
 
 triggered_opinion_crusader_spirit = {
 	trigger = {
-		is_playable = yes
-		has_crusader_spirit = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_crusader_spirit = yes # undercoat: moved to scripted trigger
 		FROM = {
 			NOT = { has_same_ethos = PREV }
 		}
@@ -3732,8 +3753,8 @@ triggered_opinion_crusader_spirit = {
 
 triggered_opinion_crusader_spirit_pos = {
 	trigger = {
-		is_playable = yes
-		has_crusader_spirit = yes
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_crusader_spirit = yes # undercoat: moved to scripted trigger
 		FROM = { has_same_ethos = PREV }
 	}
 	opinion = {
@@ -3743,12 +3764,12 @@ triggered_opinion_crusader_spirit_pos = {
 
 triggered_authoritarian_opinion_barbaric_despoilers = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		is_authoritarian = yes
 		is_militarist = no
 		is_pacifist = no
-		is_despoiler_empire = no
-		FROM = { is_despoiler_empire = yes }
+		is_despoiler_empire = no # undercoat: moved to scripted trigger
+		FROM = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -40
@@ -3757,10 +3778,10 @@ triggered_authoritarian_opinion_barbaric_despoilers = {
 
 triggered_militarist_opinion_barbaric_despoilers = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		is_militarist = yes
-		is_despoiler_empire = no
-		FROM = { is_despoiler_empire = yes }
+		is_despoiler_empire = no # undercoat: moved to scripted trigger
+		FROM = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -20
@@ -3769,10 +3790,10 @@ triggered_militarist_opinion_barbaric_despoilers = {
 
 triggered_pacifist_opinion_barbaric_despoilers = {
 	trigger = {
-		is_playable = yes
+		is_playable = yes # undercoat: moved to scripted trigger
 		is_pacifist = yes
-		is_despoiler_empire = no
-		FROM = { is_despoiler_empire = yes }
+		is_despoiler_empire = no # undercoat: moved to scripted trigger
+		FROM = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -80
@@ -3781,11 +3802,11 @@ triggered_pacifist_opinion_barbaric_despoilers = {
 
 triggered_fe_opinion_barbaric_despoilers = {
 	trigger = {
-		is_fallen_empire = yes
+		is_fallen_empire = yes # undercoat: moved to scripted trigger
 		has_ethic = ethic_fanatic_xenophile
 		is_mechanical_empire = no
 		is_cyborg_empire = no
-		FROM = { is_despoiler_empire = yes }
+		FROM = { is_despoiler_empire = yes } # undercoat: moved to scripted trigger
 	}
 	opinion = {
 		base = -40
@@ -4060,8 +4081,8 @@ opinion_cut_our_forests = {
 triggered_selective_kinship = {
 	trigger = {
 		OR = {
-			is_selective_kinship_empire = yes
-			from = { is_selective_kinship_empire = yes }
+			is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
+			from = { is_selective_kinship_empire = yes } # undercoat: moved to scripted trigger
 		}
 		exists = from.species
 		is_same_species_class = from
@@ -4074,7 +4095,7 @@ triggered_selective_kinship = {
 
 triggered_selective_kinship_hates = {
 	trigger = {
-		is_selective_kinship_empire = yes
+		is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
 		exists = from.species
 		NOT = { is_same_species_class = from }
 	}

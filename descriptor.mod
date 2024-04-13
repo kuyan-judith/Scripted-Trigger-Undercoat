@@ -4,5 +4,5 @@ tags={
 }
 picture="thumbnail.png"
 name="~~Scripted Trigger Undercoat"
-supported_version="3.10.0"
+supported_version="3.11.3"
 remote_file_id="2868680633"
