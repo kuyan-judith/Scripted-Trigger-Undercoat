@@ -595,7 +595,10 @@ country_event = { #Atomic Clock follow-up: A system planet is terraformed
 					has_anomaly = no
 					planet_size > 8
 					planet_size < 25
-					is_broken_world = no # undercoat: moved to scripted trigger
+					NOR = {
+						is_broken_world = yes # undercoat: moved to scripted trigger
+						is_planet_class = "pc_astral_scar"
+					}
 					is_star = no
 				}
 				save_event_target_as = atomic_clock_planet
@@ -681,7 +684,7 @@ country_event = { #A system planet is gray gooed
 		event_target:atomic_clock_planet = {
 			if = {
 				limit = { has_deposit_for = shipclass_mining_station }
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 			}
 			if = {
 				limit = { has_mining_station = yes }
@@ -824,7 +827,7 @@ country_event = { #An unmanned computer network is built
 				}
 				if = {
 					limit = { has_deposit_for = shipclass_mining_station }
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 				}
 				if = {
 					limit = { has_mining_station = yes }
@@ -915,7 +918,7 @@ country_event = { #A habitable planet is nuked
 					is_under_colonization = no
 				}
 				every_owned_pop = {
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 				save_event_target_as = nuked_planet
 				change_pc = pc_toxic
@@ -1185,7 +1188,6 @@ country_event = {
 				class = FUN
 				portrait = fun4
 				traits = {
-					#ideal_planet_class = "pc_continental"
 					trait = random_traits
 				}
 				homeworld = this
@@ -1403,7 +1405,7 @@ country_event = {
 	}
 
 	immediate = {
-		create_species = {
+		create_species = { # No homeworld set as they don't originate from a known planet
 			name = "Vol"
 			class = MAM
 			portrait = mam5
@@ -1568,7 +1570,7 @@ country_event = {
 				}
 				every_owned_pop = {
 					limit = { is_same_species = event_target:mardak_vol_species }
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 				add_deposit = d_fungoid_extermination
 			}
@@ -1849,6 +1851,7 @@ planet_event = {
 		add_deposit = d_fungoid_extermination
 		closest_system = {
 			min_steps = 1
+			use_bypasses = yes
 			random_system_planet = {
 				save_event_target_as = new_target
 			}
@@ -1888,7 +1891,7 @@ planet_event = {
 					}
 					every_owned_pop = {
 						limit = { is_same_species = event_target:mardak_vol_species }
-						kill_pop = yes
+						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 					}
 					add_deposit = d_fungoid_extermination
 				}
@@ -2086,7 +2089,7 @@ country_event = {
 					distance = 20
 				}
 			}
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 	}
 
@@ -2472,7 +2475,7 @@ ship_event = {
 				NOR = {
 					is_same_value = root.owner
 					has_country_flag = lost_colony_parent
-					is_machine_empire = yes # undercoat: moved to scripted trigger
+					is_machine_empire = yes
 					is_synthetic_empire = yes
 					owner_species = {
 						has_trait = trait_mechanical
@@ -3024,7 +3027,7 @@ country_event = {
 			hidden_effect = {
 				if = {
 					limit = { NOT = { has_deposit_for = shipclass_mining_station } }
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 				}
 			}
 			add_deposit = d_energy_8
@@ -3801,7 +3804,7 @@ ship_event = {
 		name = distar.2015.A.machine
 		trigger = {
 			owner = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 				is_servitor_empire = no # undercoat: moved to scripted trigger
 			}
 		}
@@ -3872,7 +3875,7 @@ ship_event = {
 	immediate = {
 		owner = { country_event = { id = story.5 days = 30 } }
 		from = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			solar_system = {
 				random_system_planet = {
 					limit = {
@@ -3988,7 +3991,7 @@ country_event = {
 
 	immediate = {
 		event_target:time_loop_world = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			set_planet_flag = repaired_time_loop_shield
 			planet_event = { id = distar.2034 days = 7200 random = 14400 }
 		}
@@ -4010,7 +4013,7 @@ planet_event = {
 
 	immediate = {
 		set_planet_flag = time_loop_lizards_dead
-		clear_deposits = yes
+		clear_deposits_stu = yes # undercoat: moved to scripted effect
 		if = {
 			limit = {
 				exists = orbital_station
@@ -5219,6 +5222,7 @@ country_event = {
 				}
 				solar_system = {
 					closest_system = {
+						use_bypasses = yes
 						limit = {
 							exists = owner
 							owner = {
@@ -5277,6 +5281,7 @@ country_event = {
 				}
 				solar_system = {
 					closest_system = {
+						use_bypasses = yes
 						limit = {
 							exists = owner
 							owner = {
@@ -7017,7 +7022,7 @@ ship_event = {
 		fromfrom = {
 			save_event_target_as = trojan_asteroid
 			# clear deposits so as not to conflict with energy added later
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 	}
 
@@ -7223,7 +7228,7 @@ ship_event = {
 			# clear deposits so as not to conflict with resources added later
 			if = {
 				limit = { has_deposit_for = shipclass_mining_station }
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 			}
 		}
 
@@ -8314,7 +8319,7 @@ ship_event = {
 	immediate = {
 		from = { save_event_target_as = asteroid_target }
 		event_target:asteroid_target = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 		save_event_target_as = unknown_machine_science_ship
 		solar_system = { save_event_target_as = sol_sys }
@@ -8875,7 +8880,7 @@ country_event = { # Alien Box opened
 					is_councilor = yes
 					is_ruler = no
 				}
-				set_gestalt_node_protrait_effect = yes
+				set_gestalt_node_portrait_effect = yes
 			}
 		}
 	}

@@ -20,7 +20,7 @@ trait_ruler_frontier_spirit = {
 	leader_potential_add = {
 		has_paragon_dlc = no
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -44,7 +44,7 @@ leader_trait_intellectual = {
 	leader_potential_add = {
 		has_paragon_dlc = no
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	initial = no
 	randomized = no
 }
@@ -73,10 +73,10 @@ leader_trait_bureaucrat = { # Unifier
 		potential = {
 			always = yes
 		}
-		planet_administrators_unity_produces_mult = 0.05
+		planet_jobs_unity_produces_mult = 0.05
 		mult = trigger:has_skill
 	}
-	leader_class = { official commander scientist }
+	inline_script = leaders/class_restrictions/generic
 	triggered_desc = {
 		exclusive_trigger = {
 			always = yes
@@ -107,14 +107,14 @@ leader_trait_bureaucrat_2 = { # Unifier
 		potential = {
 			always = yes
 		}
-		planet_administrators_unity_produces_mult = 0.05
+		planet_jobs_unity_produces_mult = 0.05
 		mult = trigger:has_skill
 	}
 	triggered_sector_modifier = {
 		potential = {
 			always = yes
 		}
-		planet_administrators_unity_produces_mult = 0.025
+		planet_jobs_unity_produces_mult = 0.025
 		mult = trigger:has_skill
 	}
 	triggered_desc = {
@@ -123,7 +123,7 @@ leader_trait_bureaucrat_2 = { # Unifier
 		}
 		text = leader_trait_bureaucrat_2_tt
 	}
-	leader_class = { official commander scientist }
+	inline_script = leaders/class_restrictions/generic
 }
 
 ###################
@@ -148,7 +148,7 @@ leader_trait_army_veteran = {
 		add_age = value:percent_of_leader_lifespan|PERCENT|10|
 		set_random_commander_background_effect = yes
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	opposites = { "leader_trait_retired_fleet_officer" }
 	selectable_weight = {
 		weight = @shared_trait_weight
@@ -174,7 +174,7 @@ leader_trait_army_veteran_2 = {
 		armies_cost_mult = -0.10
 		army_defense_damage_mult = 0.25
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	opposites = { "leader_trait_retired_fleet_officer" }
 }
 
@@ -199,7 +199,7 @@ leader_trait_retired_fleet_officer = {
 		add_age = value:percent_of_leader_lifespan|PERCENT|10|
 		set_random_commander_background_effect = yes
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	opposites = { "leader_trait_army_veteran" }
 	selectable_weight = {
 		weight = @shared_trait_weight
@@ -224,7 +224,7 @@ leader_trait_retired_fleet_officer_2 = {
 		starbase_shipyard_build_speed_mult = 0.20
 		ship_starting_experience_add = 200
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	opposites = { "leader_trait_army_veteran" }
 }
 
@@ -260,7 +260,7 @@ leader_trait_agrarian_upbringing = {
 	sector_modifier = {
 		planet_jobs_food_produces_mult = 0.05
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = {
 		weight = @shared_trait_weight
 		inline_script = {
@@ -286,7 +286,7 @@ leader_trait_agrarian_upbringing_2 = {
 	sector_modifier = {
 		planet_jobs_food_produces_mult = 0.10
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 }
 
 #########################
@@ -303,17 +303,31 @@ trait_ruler_fertility_preacher = {
 		COUNCIL = yes
 		TIER = 1
 	}
+	leader_potential_add = {
+		trait_is_crisis_faction_check = no
+		exists = owner
+		owner = {
+			OR = {
+				is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
+				AND = {
+					is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
+					has_technology = tech_synthetic_workers
+				}
+			}
+
+		}
+	}
 	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = no }
+			owner = { is_synthetic_empire = no }
 		}
 		pop_growth_speed = 0.03
 	}
 	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			owner = { is_synthetic_empire = yes }
 		}
 		planet_pop_assembly_mult = 0.03
 	}
@@ -324,7 +338,7 @@ trait_ruler_fertility_preacher = {
 		}
 		planet_jobs_food_produces_mult = 0.1
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @class_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -344,14 +358,14 @@ trait_ruler_fertility_preacher_2 = {
 	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = no }
+			owner = { is_synthetic_empire = no }
 		}
 		pop_growth_speed = 0.05
 	}
 	triggered_councilor_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			owner = { is_synthetic_empire = yes }
 		}
 		planet_pop_assembly_mult = 0.05
 	}
@@ -362,7 +376,7 @@ trait_ruler_fertility_preacher_2 = {
 		}
 		planet_jobs_food_produces_mult = 0.15
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -394,7 +408,7 @@ leader_trait_righteous = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = -10
 	}
-	leader_class = { commander official }
+	inline_script = leaders/class_restrictions/commander_or_official
 	opposites = {
 		leader_trait_corrupt
 		leader_trait_corrupt_2
@@ -431,7 +445,7 @@ leader_trait_righteous_2 = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = -25
 	}
-	leader_class = { commander official }
+	inline_script = leaders/class_restrictions/commander_or_official
 	opposites = {
 		leader_trait_corrupt
 		leader_trait_corrupt_2
@@ -460,7 +474,7 @@ leader_trait_iron_fist = {
 		exists = owner
 		owner = { allows_slavery = yes }
 	}
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	selectable_weight = {
 		weight = @shared_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -483,7 +497,7 @@ leader_trait_iron_fist_2 = {
 	sector_modifier = {
 		planet_jobs_slave_produces_mult = 0.1
 	}
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 }
 
 ###################
@@ -511,7 +525,7 @@ leader_trait_environmental_engineer = {
 		deposit_blockers_cost_mult = -0.10
 		planet_clear_blocker_speed_mult = 0.10
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = {
 		weight = @shared_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -542,7 +556,7 @@ leader_trait_environmental_engineer_2 = {
 		deposit_blockers_cost_mult = -0.15
 		planet_clear_blocker_speed_mult = 0.15
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 }
 
 ###################
@@ -565,8 +579,16 @@ leader_trait_enlister = {
 	triggered_planet_modifier = {
 		potential = {
 			trait_is_gestalt_check = no
+			planet = { NOT = { has_modifier = slave_colony } }
 		}
 		job_soldier_add = 1
+	}
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
+			planet = { has_modifier = slave_colony }
+		}
+		job_battle_thrall_add = 1
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -578,7 +600,7 @@ leader_trait_enlister = {
 		planet_army_build_speed_mult = 0.05
 		armies_cost_mult = -0.05
 	}
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	selectable_weight = {
 		weight = @shared_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -602,8 +624,16 @@ leader_trait_enlister_2 = {
 	triggered_planet_modifier = {
 		potential = {
 			trait_is_gestalt_check = no
+			planet = { NOT = { has_modifier = slave_colony } }
 		}
 		job_soldier_add = 2
+	}
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
+			planet = { has_modifier = slave_colony }
+		}
+		job_battle_thrall_add = 2
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -627,7 +657,7 @@ leader_trait_enlister_2 = {
 		}
 		job_warrior_drone_add = 1
 	}
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 }
 
 ###################
@@ -643,7 +673,7 @@ leader_trait_shipwright = {
 	councilor_modifier = {
 		starbase_shipyard_build_speed_mult = 0.05
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_irenic
 		leader_trait_irenic_2
@@ -667,7 +697,7 @@ leader_trait_shipwright_2 = {
 	councilor_modifier = {
 		starbase_shipyard_build_speed_mult = 0.10
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_irenic
 		leader_trait_irenic_2
@@ -695,7 +725,7 @@ leader_trait_architectural_interest = {
 		planet_structures_upkeep_mult = -0.05
 		planet_building_build_speed_mult = 0.05
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	opposites = {
 		leader_trait_procrastinator
 		leader_trait_procrastinator_2
@@ -724,7 +754,7 @@ leader_trait_architectural_interest_2 = {
 		planet_structures_upkeep_mult = -0.1
 		planet_building_build_speed_mult = 0.1
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	opposites = {
 		leader_trait_procrastinator
 		leader_trait_procrastinator_2
@@ -753,7 +783,7 @@ leader_trait_trade_focus = {
 	sector_modifier = {
 		trade_value_mult = 0.075
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @class_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -783,7 +813,7 @@ leader_trait_trade_focus_2 = {
 	sector_modifier = {
 		trade_value_mult = 0.125
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###############
@@ -808,7 +838,7 @@ leader_trait_frontier_spirit = {
 		has_paragon_dlc = yes
 		has_trait = subclass_official_economy_councilor
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -830,7 +860,7 @@ leader_trait_frontier_spirit_2 = {
 		ship_colonizer_cost_mult = -0.10
 		planet_colony_development_speed_mult = 0.33
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_frontier_spirit_3 = {
@@ -849,7 +879,7 @@ leader_trait_frontier_spirit_3 = {
 		planet_colony_development_speed_mult = 0.50
 		colony_start_num_pops_add = 1
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -870,7 +900,7 @@ leader_trait_cultural_focus = {
 		planet_jobs_unity_produces_mult = 0.1
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @class_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -891,7 +921,7 @@ leader_trait_cultural_focus_2 = {
 		planet_jobs_unity_produces_mult = 0.15
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_cultural_focus_3 = {
@@ -908,7 +938,7 @@ leader_trait_cultural_focus_3 = {
 		planet_jobs_unity_produces_mult = 0.25
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -936,7 +966,7 @@ trait_ruler_investor = {
 		}
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_insider_trading
 		leader_trait_insider_trading_2
@@ -965,7 +995,7 @@ trait_ruler_investor_2 = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = 0.05
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_insider_trading
 		leader_trait_insider_trading_2
@@ -995,7 +1025,7 @@ trait_ruler_investor_3 = {
 		has_paragon_dlc = yes
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_insider_trading
 		leader_trait_insider_trading_2
@@ -1024,7 +1054,7 @@ trait_ruler_architectural_sense = {
 		}
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -1047,7 +1077,7 @@ trait_ruler_architectural_sense_2 = {
 		planet_building_build_speed_mult = 0.15
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 trait_ruler_architectural_sense_3 = {
@@ -1071,7 +1101,7 @@ trait_ruler_architectural_sense_3 = {
 	leader_potential_add = {
 		has_paragon_dlc = yes
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -1094,7 +1124,7 @@ trait_ruler_deep_connections = {
 			has_trait = subclass_official_diplomacy_councilor
 		}
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -1115,7 +1145,7 @@ trait_ruler_deep_connections_2 = {
 		country_councilor_influence_produces_add = 0.75
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 trait_ruler_deep_connections_3 = {
@@ -1135,7 +1165,7 @@ trait_ruler_deep_connections_3 = {
 		has_paragon_dlc = yes
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -1160,7 +1190,7 @@ leader_trait_reformer = {
 		pop_government_ethic_attraction = 0.35
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -1182,7 +1212,7 @@ leader_trait_reformer_2 = {
 		pop_government_ethic_attraction = 0.5
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_reformer_3 = {
@@ -1203,7 +1233,7 @@ leader_trait_reformer_3 = {
 		pop_government_ethic_attraction = 0.75
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -1226,7 +1256,7 @@ leader_trait_courtroom_training = {
 		exists = owner
 		owner = { is_homicidal = no }
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_intolerant
 		leader_trait_intolerant_2
@@ -1251,7 +1281,7 @@ leader_trait_courtroom_training_2 = {
 	councilor_modifier = {
 		country_trust_cap_add = 50
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_intolerant
 		leader_trait_intolerant_2
@@ -1272,7 +1302,7 @@ leader_trait_courtroom_training_3 = {
 	councilor_modifier = {
 		country_trust_cap_add = 75
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_intolerant
 		leader_trait_intolerant_2
@@ -1305,7 +1335,7 @@ leader_trait_mining_focus = {
 		has_governor_subclass = yes
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
@@ -1337,7 +1367,7 @@ leader_trait_mining_focus_2 = {
 		planet_jobs_minerals_produces_mult = 0.125
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1358,7 +1388,7 @@ leader_trait_mining_focus_3 = {
 		planet_jobs_minerals_produces_mult = 0.225
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1384,7 +1414,7 @@ leader_trait_generator_focus = {
 		has_governor_subclass = yes
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
@@ -1416,7 +1446,7 @@ leader_trait_generator_focus_2 = {
 		planet_jobs_energy_produces_mult = 0.125
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1437,7 +1467,7 @@ leader_trait_generator_focus_3 = {
 		planet_jobs_energy_produces_mult = 0.225
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1465,7 +1495,7 @@ leader_trait_farming_focus = {
 		has_governor_subclass = yes
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
@@ -1497,7 +1527,7 @@ leader_trait_farming_focus_2 = {
 		planet_jobs_food_produces_mult = 0.125
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1518,7 +1548,7 @@ leader_trait_farming_focus_3 = {
 		planet_jobs_food_produces_mult = 0.225
 	}
 	leader_trait_type = veteran
-	leader_class = { commander }
+	inline_script = leaders/class_restrictions/commander
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1545,7 +1575,7 @@ leader_trait_settler = {
 		planet_housing_add = 2
 		planet_amenities_add = 5
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		inline_script = paragon/subclass_free_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -1571,7 +1601,7 @@ leader_trait_settler_2 = {
 		planet_amenities_add = 7
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_settler_3 = {
@@ -1593,7 +1623,7 @@ leader_trait_settler_3 = {
 		planet_amenities_add = 10
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -1617,7 +1647,7 @@ leader_trait_cartographer = {
 		terraform_speed_mult = 0.10
 	}
 	leader_trait_type = veteran
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -1638,7 +1668,7 @@ leader_trait_cartographer_2 = {
 		terraform_speed_mult = 0.25
 	}
 	leader_trait_type = veteran
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 }
 
 leader_trait_cartographer_3 = {
@@ -1655,7 +1685,7 @@ leader_trait_cartographer_3 = {
 		terraform_speed_mult = 0.33
 	}
 	leader_trait_type = veteran
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 }
 
 ###################
@@ -1676,7 +1706,7 @@ leader_trait_expeditionist = {
 		has_trait = subclass_official_economy_councilor
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -1697,7 +1727,7 @@ leader_trait_expeditionist_2 = {
 		planet_clear_blocker_speed_mult = 0.25
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_expeditionist_3 = {
@@ -1714,7 +1744,7 @@ leader_trait_expeditionist_3 = {
 		planet_clear_blocker_speed_mult = 0.33
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -1741,7 +1771,7 @@ leader_trait_naturalist = {
 		}
 	}
 	leader_trait_type = veteran
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -1765,7 +1795,7 @@ leader_trait_naturalist_2 = {
 		deposit_blockers_natural_unity_produces_add = 3
 	}
 	leader_trait_type = veteran
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 }
 
 leader_trait_naturalist_3 = {
@@ -1785,7 +1815,7 @@ leader_trait_naturalist_3 = {
 		deposit_blockers_natural_unity_produces_add = 6
 	}
 	leader_trait_type = veteran
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 }
 
 ###################
@@ -1813,7 +1843,7 @@ leader_trait_forge_focus = {
 		planet_jobs_alloys_produces_mult = 0.05
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
@@ -1845,7 +1875,7 @@ leader_trait_forge_focus_2 = {
 	sector_modifier = {
 		planet_jobs_alloys_produces_mult = 0.1
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1866,7 +1896,7 @@ leader_trait_forge_focus_3 = {
 	sector_modifier = {
 		planet_jobs_alloys_produces_mult = 0.175
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1896,7 +1926,7 @@ leader_trait_industrial_focus = {
 		planet_jobs_consumer_goods_produces_mult = 0.05
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
@@ -1928,7 +1958,7 @@ leader_trait_industrial_focus_2 = {
 		planet_jobs_consumer_goods_produces_mult = 0.1
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1949,7 +1979,7 @@ leader_trait_industrial_focus_3 = {
 		planet_jobs_consumer_goods_produces_mult = 0.175
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -1979,7 +2009,7 @@ leader_trait_refinement_focus = {
 		planet_chemists_produces_mult = 0.05
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 	selectable_weight = {
 		weight = @subclass_trait_weight
@@ -2015,7 +2045,7 @@ leader_trait_refinement_focus_2 = {
 		planet_chemists_produces_mult = 0.1
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -2040,7 +2070,7 @@ leader_trait_refinement_focus_3 = {
 		planet_chemists_produces_mult = 0.175
 	}
 	leader_trait_type = veteran
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	custom_tooltip_with_modifiers = only_one_governor_focus
 }
 
@@ -2069,7 +2099,7 @@ leader_trait_urbanist = {
 		planet_buildings_upkeep_mult = -0.25
 		planet_districts_upkeep_mult = -0.25
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2125,7 +2155,7 @@ leader_trait_assembler = {
 		}
 		planet_pop_assembly_organic_mult = 0.075
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2167,7 +2197,7 @@ leader_trait_assembler_2 = {
 		}
 		planet_pop_assembly_organic_mult = 0.125
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 }
 
 leader_trait_assembler_3 = {
@@ -2205,7 +2235,7 @@ leader_trait_assembler_3 = {
 		}
 		planet_pop_assembly_organic_mult = 0.2
 	}
-	leader_class = { official scientist }
+	inline_script = leaders/class_restrictions/scientist_or_official
 }
 
 ###################
@@ -2229,7 +2259,7 @@ leader_trait_pop_focused = {
 	sector_modifier = {
 		planet_jobs_worker_produces_mult = 0.025
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2255,7 +2285,7 @@ leader_trait_pop_focused_2 = {
 		planet_jobs_worker_produces_mult = 0.05
 		planet_jobs_specialist_produces_mult = 0.025
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_pop_focused_3 = {
@@ -2272,14 +2302,26 @@ leader_trait_pop_focused_3 = {
 	planet_modifier = {
 		planet_jobs_worker_produces_mult = 0.15
 		planet_jobs_specialist_produces_mult = 0.1
-		planet_jobs_ruler_produces_mult = 0.05
 	}
 	sector_modifier = {
 		planet_jobs_worker_produces_mult = 0.075
 		planet_jobs_specialist_produces_mult = 0.05
+	}
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
+		}
+		planet_jobs_ruler_produces_mult = 0.05
+	}
+
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_gestalt_check = no
+		}
 		planet_jobs_ruler_produces_mult = 0.025
 	}
-	leader_class = { official }
+
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -2319,7 +2361,7 @@ leader_trait_distribution_lines = {
 		}
 		planet_artisans_upkeep_mult = -0.025
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2359,7 +2401,7 @@ leader_trait_distribution_lines_2 = {
 		}
 		planet_artisans_upkeep_mult = -0.05
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 leader_trait_distribution_lines_3 = {
@@ -2395,7 +2437,7 @@ leader_trait_distribution_lines_3 = {
 		}
 		planet_artisans_upkeep_mult = -0.1
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 }
 
 ###################
@@ -2424,7 +2466,7 @@ leader_trait_efficient = {
 		planet_jobs_ruler_produces_mult = 0.25
 		pop_cat_ruler_political_power = 0.075
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2446,21 +2488,47 @@ leader_trait_arbiter = {
 		has_paragon_dlc = yes
 		has_trait = subclass_commander_governor
 	}
-	planet_modifier = {
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		planet_jobs_worker_produces_mult = 0.5
 		planet_jobs_slave_produces_mult = 0.5
 		planet_pops_upkeep_mult = -0.35
 		pop_happiness = -0.1
 		pop_growth_speed_reduction = 0.05
 	}
-	sector_modifier = {
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		planet_jobs_worker_produces_mult = 0.25
 		planet_jobs_slave_produces_mult = 0.25
 		planet_pops_upkeep_mult = -0.175
 		pop_happiness = -0.05
 		pop_growth_speed_reduction = 0.025
 	}
-	leader_class = { commander }
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		planet_jobs_worker_produces_mult = 0.5
+		planet_jobs_slave_produces_mult = 0.5
+		planet_pops_upkeep_mult = -0.35
+		pop_happiness = -0.1
+		planet_pop_assembly_mult = -0.05
+	}
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		planet_jobs_worker_produces_mult = 0.25
+		planet_jobs_slave_produces_mult = 0.25
+		planet_pops_upkeep_mult = -0.175
+		pop_happiness = -0.05
+		planet_pop_assembly_mult = -0.025
+	}
+	inline_script = leaders/class_restrictions/commander
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2482,17 +2550,39 @@ leader_trait_utopian_idealist = {
 		has_paragon_dlc = yes
 		has_trait = subclass_official_governor
 	}
-	planet_modifier = {
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		pop_happiness = 0.2
 		pop_growth_from_immigration = 0.25
 		planet_immigration_pull_mult = 0.1
 	}
-	sector_modifier = {
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		pop_happiness = 0.1
 		pop_growth_from_immigration = 0.125
 		planet_immigration_pull_mult = 0.05
 	}
-	leader_class = { official }
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		pop_happiness = 0.2
+		planet_pop_assembly_mult = 0.05
+		planet_immigration_pull_mult = 0.1
+	}
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		pop_happiness = 0.1
+		planet_pop_assembly_mult = 0.025
+		planet_immigration_pull_mult = 0.05
+	}
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2544,7 +2634,7 @@ leader_trait_mediator = {
 		mult = planet.value:species_on_planet
 	}
 	custom_tooltip = leader_trait_mediator_effect
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2570,7 +2660,6 @@ leader_trait_shroud_preacher = {
 	}
 	leader_potential_add = {
 		has_paragon_dlc = yes
-		has_ethic = ethic_spiritualist
 		OR = {
 			has_trait = subclass_scientist_governor
 			has_trait = subclass_official_governor
@@ -2578,10 +2667,30 @@ leader_trait_shroud_preacher = {
 		}
 	}
 	custom_tooltip_with_modifiers = leader_trait_shroud_preacher_effect
-	leader_class = { official scientist commander }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
+		modifier = {
+			exists = owner
+			owner = {
+				OR = {
+					has_cybernetic_ascension = yes
+					has_genetic_ascension = yes
+					has_synthetic_ascension = yes
+					is_natural_design_empire = yes
+					is_individual_machine = yes
+				}
+			}
+			factor = 0
+		}
+		modifier = {
+			exists = owner
+			owner = {
+				has_psionic_ascension = yes
+			}
+			factor = 2
+		}
 	}
 	background_icon = "GFX_leader_background_destiny_1"
 }
@@ -2610,7 +2719,7 @@ leader_trait_master_diplomat = {
 			is_homicidal = no
 		}
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_reclusive
 		leader_trait_reclusive_2
@@ -2641,7 +2750,7 @@ leader_trait_supreme_organizer = {
 		has_paragon_dlc = yes
 		has_trait = subclass_official_economy_councilor
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/council_weight_mult
@@ -2675,7 +2784,7 @@ leader_trait_galvanizer = {
 		pop_category_rulers_unity_produces_add = 0.25
 		pop_happiness = 0.05
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	selectable_weight = {
 		weight = @subclass_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2715,7 +2824,7 @@ leader_trait_corrupt = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = 5
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		leader_trait_righteous
 		leader_trait_righteous_2
@@ -2728,7 +2837,10 @@ leader_trait_corrupt = {
 		inline_script = paragon/governor_weight_mult
 		modifier = {
 			species = {
-				has_trait = trait_decadent
+				OR = {
+					has_trait = trait_decadent
+					has_trait = trait_robot_decadent
+				}
 			}
 			factor = @species_trait_weight_mult
 		}
@@ -2760,7 +2872,7 @@ leader_trait_corrupt_2 = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_crime_no_happiness_add = 15
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		leader_trait_righteous
 		leader_trait_righteous_2
@@ -2780,18 +2892,36 @@ leader_trait_polluter = {
 		COUNCIL = no
 		TIER = 1
 	}
-	planet_modifier = {
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		pop_growth_speed = -0.05
 	}
-	sector_modifier = {
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		pop_growth_speed = -0.025
+	}
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		planet_pop_assembly_mult = -0.05
+	}
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		planet_pop_assembly_mult = -0.025
 	}
 	leader_potential_add = {
 		trait_is_crisis_faction_check = no
 		exists = owner
 		owner = { is_machine_empire = no }
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = {
 		weight = @class_negative_trait_weight
 		inline_script = paragon/governor_weight_mult
@@ -2811,13 +2941,31 @@ leader_trait_polluter_2 = {
 		COUNCIL = no
 		TIER = 2
 	}
-	planet_modifier = {
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		pop_growth_speed = -0.15
 	}
-	sector_modifier = {
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = no
+		}
 		pop_growth_speed = -0.075
 	}
-	leader_class = { commander official scientist }
+	triggered_planet_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		planet_pop_assembly_mult = -0.15
+	}
+	triggered_sector_modifier = {
+		potential = {
+			trait_is_individual_machine_check = yes
+		}
+		planet_pop_assembly_mult = -0.075
+	}
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = @tier2_negative_trait_weight
 }
 
@@ -2840,7 +2988,7 @@ leader_trait_sadistic = {
 		trait_is_crisis_faction_check = no
 		NOT = { has_ethic = ethic_pacifist }
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		leader_trait_righteous
 		leader_trait_righteous_2
@@ -2870,7 +3018,7 @@ leader_trait_sadistic_2 = {
 	sector_modifier = {
 		planet_stability_add = -5
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		leader_trait_righteous
 		leader_trait_righteous_2
@@ -2906,13 +3054,16 @@ leader_trait_profligate = {
 		potential = { trait_is_gestalt_check = yes }
 		pop_amenities_usage_no_happiness_mult = 0.05
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = {
 		weight = @class_negative_trait_weight
 		inline_script = paragon/governor_weight_mult
 		modifier = {
 			species = {
-				has_trait = trait_wasteful
+				OR = {
+					has_trait = trait_wasteful
+					has_trait = trait_robot_wasteful
+				}
 			}
 			factor = @species_trait_weight_mult
 		}
@@ -2944,7 +3095,7 @@ leader_trait_profligate_2 = {
 		potential = { trait_is_gestalt_check = yes }
 		pop_amenities_usage_no_happiness_mult = 0.125
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	selectable_weight = @tier2_negative_trait_weight
 }
 
@@ -2966,7 +3117,7 @@ leader_trait_procrastinator = {
 	sector_modifier = {
 		planet_building_build_speed_mult = -0.05
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		leader_trait_architectural_interest
 		leader_trait_architectural_interest_2
@@ -2998,7 +3149,7 @@ leader_trait_procrastinator_2 = {
 	sector_modifier = {
 		planet_building_build_speed_mult = -0.15
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		leader_trait_architectural_interest
 		leader_trait_architectural_interest_2
@@ -3034,7 +3185,7 @@ leader_trait_insider_trading = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = -0.025
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		trait_ruler_investor
 		trait_ruler_investor_2
@@ -3071,7 +3222,7 @@ leader_trait_insider_trading_2 = {
 		potential = { trait_is_gestalt_check = yes }
 		planet_jobs_produces_mult = -0.05
 	}
-	leader_class = { commander official scientist }
+	inline_script = leaders/class_restrictions/generic
 	opposites = {
 		trait_ruler_investor
 		trait_ruler_investor_2
@@ -3093,7 +3244,7 @@ leader_trait_irenic = {
 		starbase_shipyard_build_speed_mult = -0.10
 		starbase_shipyard_build_cost_mult = 0.05
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_shipwright
 		leader_trait_shipwright_2
@@ -3117,7 +3268,7 @@ leader_trait_irenic_2 = {
 		starbase_shipyard_build_speed_mult = -0.25
 		starbase_shipyard_build_cost_mult = 0.10
 	}
-	leader_class = { official }
+	inline_script = leaders/class_restrictions/official
 	opposites = {
 		leader_trait_shipwright
 		leader_trait_shipwright_2

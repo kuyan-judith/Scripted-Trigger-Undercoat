@@ -134,7 +134,7 @@ country_event = {
 				hidden_effect = {
 					set_planet_flag = baldarak
 					save_event_target_as = baldarak_planet
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 				}
 				enable_special_project = {
 					name = "GAS_GIANT_RELOCATION"
@@ -178,7 +178,7 @@ ship_event = {
 					modifier = "gas_giant_civ"
 					days = -1
 				}
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 				if = {
 					limit = { has_mining_station = yes }
 					mining_station = { dismantle = yes }
@@ -306,7 +306,7 @@ country_event = {
 					}
 					hidden_effect = {
 						set_planet_flag = new_baldarak
-						clear_deposits = yes
+						clear_deposits_stu = yes # undercoat: moved to scripted effect
 						if = {
 							limit = { exists = orbital_station }
 							orbital_station = { delete_fleet = this }
@@ -362,7 +362,7 @@ ship_event = {
 					modifier = "gas_giant_colony"
 					days = -1
 				}
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 				if = {
 					limit = { has_mining_station = yes }
 					mining_station = { dismantle = yes }
@@ -1083,7 +1083,7 @@ ship_event = {
 			NOR = {
 				is_tutorial_level = 0
 				has_country_flag = discovered_modifier_planet
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 			}
 		}
 		from = {
@@ -1153,7 +1153,7 @@ ship_event = {
 				is_tutorial_level = 0
 				has_country_flag = discovered_modifier_planet
 			}
-			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_machine_empire = yes
 		}
 		from = {
 			num_modifiers > 0
@@ -1179,6 +1179,9 @@ ship_event = {
 
 	trigger = {
 		from = {
+			NOT = {
+				has_planet_flag = deposit_added
+			}
 			is_colonizable = no
 			OR = {
 				has_modifier = chthonian_planet
@@ -1203,8 +1206,18 @@ ship_event = {
 	immediate = {
 		from = {
 			prevent_anomaly = yes
-			clear_deposits = yes
-			add_deposit = d_minerals_6
+			hidden_effect = {
+				from = {
+					if = {
+						limit = {
+							NOT = { has_deposit_for = shipclass_mining_station }
+						}
+						clear_deposits_stu = yes # undercoat: moved to scripted effect
+					}
+					set_planet_flag = deposit_added
+					add_deposit = d_minerals_6
+				}
+			}
 		}
 	}
 }
@@ -1508,7 +1521,7 @@ planet_event = {
 
 	immediate = {
 		every_owned_pop = {
-			kill_pop = yes
+			kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 		}
 		destroy_colony = yes
 	}
@@ -1546,7 +1559,7 @@ ship_event = {
 			FROM = {
 				if = {
 					limit = { NOT = { has_deposit_for = shipclass_research_station } }
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 				}
 			}
 		}
@@ -1571,7 +1584,7 @@ ship_event = {
 			FROM = {
 				if = {
 					limit = { NOT = { has_deposit_for = shipclass_research_station } }
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 				}
 			}
 		}
@@ -1967,13 +1980,20 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = {
+			if = {
+				limit = {
+					NOT = { has_deposit_for = shipclass_mining_station }
+				}
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
+			}
+		}
 	}
 
 	option = {
 		name = anomaly.6786.a
 		FROM = {
-			set_deposit = d_minerals_3
+			add_deposit = d_minerals_3
 			custom_tooltip = anomaly.6786.a.tooltip
 		}
 		hidden_effect = {
@@ -2015,13 +2035,20 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = {
+			if = {
+				limit = {
+					NOT = { has_deposit_for = shipclass_research_station }
+				}
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
+			}
+		}
 	}
 
 	option = {
 		name = FASCINATING
 		FROM = {
-			set_deposit = d_physics_3
+			add_deposit = d_physics_3
 		}
 	}
 }
@@ -2272,7 +2299,12 @@ ship_event = {
 		name = anomaly.6800.b
 		hidden_effect = {
 			from = {
-				clear_deposits = yes
+				if = {
+					limit = {
+						NOT = { has_deposit_for = shipclass_mining_station }
+					}
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
+				}
 				add_modifier = {
 					modifier = "ship_graveyard"
 					days = -1
@@ -2430,7 +2462,7 @@ ship_event = { #Giant Alien Spiders are no Joke
 		trigger = {
 			owner = {
 				OR = {
-					has_void_dweller_origin = yes # undercoat: moved to scripted trigger
+					has_void_dweller_origin = yes
 					has_technology = tech_habitat_1
 				}
 			}
@@ -2555,7 +2587,7 @@ ship_event = {
 	immediate = {
 		owner = { country_event = { id = story.1 days = 30 } }
 		from = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 	}
 
@@ -2655,7 +2687,14 @@ ship_event = {
 	option = {
 		name = anomaly.6840.b
 		hidden_effect = {
-			from = { clear_deposits = yes }
+			from = {
+				if = {
+					limit = {
+						NOT = { has_deposit_for = shipclass_mining_station }
+					}
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
+				}
+			}
 		}
 		from = { add_deposit = d_minerals_5 }
 	}
@@ -2683,7 +2722,7 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = { clear_deposits_stu = yes }
 	}
 
 	option = {
@@ -2953,6 +2992,8 @@ ship_event = {
 						surveyed = yes
 						surveyor = root.owner
 					}
+					# Undercoat on_action
+					fire_on_action = { on_action = on_planet_spawned }
 				}
 			}
 		}
@@ -2981,7 +3022,7 @@ ship_event = {
 
 	immediate = {
 		from = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 	}
 
@@ -3072,7 +3113,7 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		fromfromfrom = { clear_deposits = yes }
+		fromfromfrom = { clear_deposits_stu = yes }
 	}
 
 	option = {
@@ -3105,7 +3146,7 @@ ship_event = {
 	location = from
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = { clear_deposits_stu = yes }
 	}
 
 	option = {
@@ -3147,7 +3188,7 @@ ship_event = {
 	location = from
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = { clear_deposits_stu = yes }
 	}
 	option = {
 		name = anomaly.6900.a
@@ -3287,7 +3328,7 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = { clear_deposits_stu = yes }
 	}
 	option = {
 		name = anomaly.6905.a
@@ -3566,7 +3607,7 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = { clear_deposits_stu = yes }
 	}
 
 	option = {
@@ -3590,7 +3631,7 @@ ship_event = {
 
 
 	immediate = {
-		from = { clear_deposits = yes }
+		from = { clear_deposits_stu = yes }
 	}
 
 	option = {
@@ -3650,13 +3691,13 @@ ship_event = {
 	}
 	desc = {
 		trigger = {
-			owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+			owner = { is_machine_empire = yes }
 		}
 		text = anomaly.7101.machines.desc
 	}
 	desc = {
 		trigger = {
-			owner = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+			owner = { is_hive_empire = yes }
 		}
 		text = anomaly.7101.hive.desc
 	}

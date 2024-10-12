@@ -1,0 +1,4283 @@
+##########################################
+# EVENTS - PRECURSORS - Cosmic Storms ####
+#### By Thari Schop & Bertine van Hövell #
+##########################################
+
+namespace = cstorms
+@precursor_easy = 6
+@precursor_medium = 8
+@precursor_hard = 10
+@storm_fused_chance = 1
+@storm_fused_supercharged_chance = 4
+
+###############################
+#### The Weather Manipulators #
+###############################
+
+### Precursor Weather Manipulators Intro
+ship_event = {
+	id = cstorms.100
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		solar_system = {
+			NOR = {
+				has_star_flag = precursor_system
+				is_same_value = root.owner.capital_scope.solar_system
+			}
+
+			has_star_flag = precursor_inetian
+		}
+		owner = {
+			is_ai = no
+			has_precursor_intro = no
+		}
+		FROM = {
+			has_anomaly = no
+
+			# Only on planets that don't have something else going on.
+			NOR = {
+				has_planet_flag = precursor_world
+				exists = archaeological_site
+			}
+
+			# needs to be a barren planet.
+			OR = {
+				is_barren_dry_world = yes # undercoat: moved to scripted trigger
+				is_barren_cold_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @origin_shoulders_multiplier
+			owner = {
+				is_shoulders_of_giants_empire = yes # undercoat: moved to scripted trigger
+				has_country_flag = origin_shoulders_closure
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = inetian_intro
+			country_event = { id = story.5 days = 30 }
+		}
+
+		from = {
+			add_anomaly = {
+				category = STORMS_PREC_WM_ONE
+				target = prev.owner
+			}
+		}
+	}
+}
+
+### Precursor - Weather Manipulators: 1 The Ancient Storm Shelters
+ship_event = {
+	id = cstorms.105
+	title = "cstorms.105.name"
+	desc = "cstorms.105.desc"
+	picture = GFX_evt_underground_civilization
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = cs_inetian_chain
+			target = owner
+		}
+	}
+
+	option = {
+		name = INTERESTING
+		tooltip = {
+			begin_event_chain = {
+				event_chain = cs_inetian_chain
+				target = owner
+			}
+		}
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			create_archaeological_site = site_weathermanipulators_the_ancient_storm_shelters
+			save_global_event_target_as = wm_storm_shelter_planet
+		}
+	}
+}
+
+### Precursor - Weather Manipulators: 2 Weathered Shelters
+fleet_event = { #1st step From Dust till Devastation
+	id = cstorms.110
+	title = "cstorms.110.name"
+	desc = "cstorms.110.desc"
+	picture = GFX_evt_poor_stormshelter
+	location = from
+	show_sound = event_dig_site
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.110.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd step Beneath the Edifice
+	id = cstorms.115
+	title = "cstorms.115.name"
+	desc = "cstorms.115.desc"
+	picture = GFX_evt_poor_stormshelter
+	location = from
+	show_sound = event_drilling
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd step Timeworn Transcriptions
+	id = cstorms.120
+	title = "cstorms.120.name"
+	desc = "cstorms.120.desc"
+	picture = GFX_evt_derelict_interior
+	location = from
+	show_sound = event_machinery
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.120.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			if = {
+				limit = {
+					has_paragon_dlc = yes
+				}
+				if = {
+					limit = {
+						is_gestalt = yes
+					}
+					add_tech_option_or_research_effect = {
+						TECH = tech_node_reformatting_1
+						PROGRESS = 0.2
+						CATEGORY = society_research
+					}
+				}
+				else = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_xeno_linguistics
+						PROGRESS = 0.2
+						CATEGORY = society_research
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						is_gestalt = yes
+					}
+					add_tech_option_or_research_effect = {
+						TECH = tech_node_culling_1
+						PROGRESS = 0.2
+						CATEGORY = society_research
+					}
+					else = {
+						add_tech_option_or_research_effect = {
+							TECH = tech_xeno_diplomacy
+							PROGRESS = 0.2
+							CATEGORY = society_research
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = { ##If the player has more than 500 energy, allow to  buy default reward plus clues.
+		name = cstorms.120.b
+		trigger = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 500 }
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 500 }
+			}
+		}
+
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			add_resource = { energy = -500 }
+			fromfrom = { add_stage_clues = 2 }
+		}
+	}
+
+	option = { ##If the player has less than 300 energy, allow to buy clues only.
+		name = cstorms.120.c
+		trigger = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value <= 300 }
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value <= 300 }
+			}
+		}
+		owner = {
+			add_resource = { energy = -300 }
+		}
+		fromfrom = { add_stage_clues = 2 }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #4th Insurance of Assets
+	id = cstorms.125
+	title = "cstorms.125.name"
+	desc = "cstorms.125.desc"
+	picture = GFX_evt_glitchy_matrix
+	location = from
+	show_sound = event_finding_loot
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.125.a
+		owner = {
+			add_resource = { minerals = 1000 }
+		}
+	}
+
+	option = { ##Spend energy to get more engineering research, less minerals.
+		name = cstorms.125.b
+
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 800 }
+			}
+		}
+
+		owner = {
+			add_resource = { energy = -800 }
+			add_resource = { minerals = 800 }
+			add_resource = { engineering_research = 600 }
+		}
+	}
+
+	option = { ##spend energy to get less rewards, more clues.
+		name = cstorms.125.c
+
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 800 }
+			}
+		}
+
+		owner = {
+			add_resource = { energy = -800 }
+			add_resource = { minerals = 400 }
+		}
+		fromfrom = { add_stage_clues = 3 }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #5th step Marketplace Machinations
+	id = cstorms.130
+	title = "cstorms.130.name"
+	desc = "cstorms.130.desc"
+	picture = GFX_evt_crusher_droid
+	location = from
+	show_sound = event_machinery
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.130.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				medium_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+
+		enable_special_project = {
+			name = INETIAN_PROJECTS_01
+			location = this
+			owner = root.owner
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Special Project 1
+
+fleet_event = {
+	id = cstorms.135
+	title = "cstorms.135.name"
+	desc = "cstorms.135.desc"
+	event_chain = cs_inetian_chain
+	picture = GFX_evt_poor_stormshelter
+	location = event_target:wm_digsite_A.solar_system
+	show_sound = event_machinery
+	is_triggered_only = yes
+
+	option = { ##no rewards because it transitions into next dig sites
+		name = INTERESTING
+	}
+}
+
+### Coordinates A: Colonized Planet
+fleet_event = { #1st stage
+	id = cstorms.140
+	event_chain = cs_inetian_chain
+	title = "cstorms.140.name"
+	desc = "cstorms.140.desc"
+	picture = GFX_evt_city_ruins
+	location = from
+	show_sound = event_dig_site
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd stage
+	id = cstorms.145
+	event_chain = cs_inetian_chain
+	title = "cstorms.145.name"
+	desc = "cstorms.145.desc"
+	picture = GFX_evt_timeworm_transcriptions
+	location = from
+	show_sound = event_galactic_market
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.145.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd stage
+	id = cstorms.150
+	event_chain = cs_inetian_chain
+	title = "cstorms.150.name"
+	desc = {
+		text = "cstorms.150.desc.a"
+		trigger = {
+			owner = {
+				NOR = {
+					has_country_flag = pc_arcsite_B_completed
+					has_country_flag = pc_arcsite_C_completed
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.150.desc.b"
+		trigger = {
+			owner = {
+				AND = {
+					has_country_flag = pc_arcsite_B_completed
+					NOT = { has_country_flag = pc_arcsite_C_completed }
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.150.desc.c"
+		trigger = {
+			owner = {
+				AND = {
+					NOT = { has_country_flag = pc_arcsite_B_completed }
+					has_country_flag = pc_arcsite_C_completed
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.150.desc.d"
+		trigger = {
+			owner = {
+				AND = {
+					has_country_flag = pc_arcsite_B_completed
+					has_country_flag = pc_arcsite_C_completed
+				}
+			}
+		}
+	}
+	picture = GFX_evt_timeworm_transcriptions
+	location = from
+	show_sound = event_collapsing_ruins
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = { set_country_flag = pc_arcsite_A_completed }
+	}
+
+	option = {
+		name = cstorms.150.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			fleet_event = {
+				id = cstorms.175
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Coordinates B: Industrial Planet
+fleet_event = { #1st stage
+	id = cstorms.155
+	event_chain = cs_inetian_chain
+	title = "cstorms.155.name"
+	desc = "cstorms.155.desc"
+	picture = GFX_evt_resource_cache
+	location = from
+	show_sound = event_dig_site
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = UNDERSTOOD
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd stage
+	id = cstorms.160
+	event_chain = cs_inetian_chain
+	title = "cstorms.160.name"
+	desc = "cstorms.160.desc"
+	picture = GFX_evt_resource_cache
+	location = from
+	show_sound = event_wind_ruins
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DISCONCERTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd stage
+	id = cstorms.165
+	event_chain = cs_inetian_chain
+	title = "cstorms.165.name"
+	desc = {
+		text = "cstorms.165.desc.a"
+		trigger = {
+			owner = {
+				NOR = {
+					has_country_flag = pc_arcsite_A_completed
+					has_country_flag = pc_arcsite_C_completed
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.165.desc.b"
+		trigger = {
+			owner = {
+				AND = {
+					has_country_flag = pc_arcsite_A_completed
+					NOT = { has_country_flag = pc_arcsite_C_completed }
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.165.desc.c"
+		trigger = {
+			owner = {
+				AND = {
+					NOT = {has_country_flag = pc_arcsite_A_completed }
+					has_country_flag = pc_arcsite_C_completed
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.165.desc.d"
+		trigger = {
+			owner = {
+				AND = {
+					has_country_flag = pc_arcsite_A_completed
+					has_country_flag = pc_arcsite_C_completed
+				}
+			}
+		}
+	}
+	picture = GFX_evt_ship_offloading_cargo
+	location = from
+	show_sound = event_machinery
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = { set_country_flag = pc_arcsite_B_completed }
+	}
+
+	option = {
+		name = cstorms.165.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			fleet_event = {
+				id = cstorms.175
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Coordinates C: Barren Planet
+fleet_event = { #1st stage
+	id = cstorms.170
+	event_chain = cs_inetian_chain
+	title = "cstorms.170.name"
+	desc = "cstorms.170.desc"
+	picture = GFX_evt_cold_barren
+	location = from
+	show_sound = event_wind_ruins
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.170.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd stage
+	id = cstorms.171
+	event_chain = cs_inetian_chain
+	title = "cstorms.171.name"
+	desc = "cstorms.171.desc"
+	picture = GFX_evt_cold_barren
+	location = from
+	show_sound = event_dig_site
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.171.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd stage
+	id = cstorms.172
+	event_chain = cs_inetian_chain
+	title = "cstorms.172.name"
+	desc = {
+		text = "cstorms.172.desc.a"
+		trigger = {
+			owner = {
+				NOR = {
+					has_country_flag = pc_arcsite_A_completed
+					has_country_flag = pc_arcsite_B_completed
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.172.desc.b"
+		trigger = {
+			owner = {
+				AND = {
+					has_country_flag = pc_arcsite_A_completed
+					NOT = { has_country_flag = pc_arcsite_B_completed }
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.172.desc.c"
+		trigger = {
+			owner = {
+				AND = {
+					NOT = { has_country_flag = pc_arcsite_A_completed }
+					has_country_flag = pc_arcsite_B_completed
+				}
+			}
+		}
+	}
+	desc = {
+		text = "cstorms.172.desc.d"
+		trigger = {
+			owner = {
+				AND = {
+					has_country_flag = pc_arcsite_A_completed
+					has_country_flag = pc_arcsite_B_completed
+				}
+			}
+		}
+	}
+	picture = GFX_evt_weather_manipulators
+	location = from
+	show_sound = event_wind_ruins
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		owner = { set_country_flag = pc_arcsite_C_completed }
+	}
+
+	option = {
+		name = {
+			trigger = {
+				owner = {
+					AND = {
+						has_country_flag = pc_arcsite_A_completed
+						has_country_flag = pc_arcsite_B_completed
+					}
+				}
+			}
+			text = cstorms.172.a
+		}
+		name = {
+			trigger = {
+				owner = {
+					NAND = {
+						has_country_flag = pc_arcsite_A_completed
+						has_country_flag = pc_arcsite_B_completed
+					}
+				}
+			}
+			text = cstorms.172.b
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			fleet_event = {
+				id = cstorms.175
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Trigger special project after all 3 digsites are excavated
+fleet_event = {
+	event_chain = cs_inetian_chain
+	id = cstorms.175
+	location = event_target:wm_digsite_A
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			AND = {
+				has_country_flag = pc_arcsite_A_completed
+				has_country_flag = pc_arcsite_B_completed
+				has_country_flag = pc_arcsite_C_completed
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			enable_special_project = {
+				name = INETIAN_PROJECTS_02
+				location = event_target:wm_digsite_A
+			}
+		}
+	}
+}
+
+country_event = {
+	id =  cstorms.176
+	event_chain = cs_inetian_chain
+	title = cstorms.176.name
+	desc = cstorms.176.desc
+	picture = GFX_evt_weather_manipulators
+	location = from
+	show_sound = event_activating_unknown_technology
+
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = {
+			id = cstorms.179
+			days = 360
+		}
+	}
+
+	option = {
+		name = cstorms.176.a
+
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+
+		capital_scope = {
+			add_modifier = {
+				modifier = storm_relic_repelling_field_modifier
+				months = 12
+
+			}
+
+			create_cosmic_storm_influence_field = {
+				center = this.solar_system
+				radius = {
+					base = 150
+					modifier = {
+						mult = value:storm_size_multiplier
+					}
+				}
+				is_timed_influence_field = yes
+			}
+		}
+
+		spawn_random_storm = {
+			type = celestial_storm
+			immediate = yes
+			cosmic_storm_start_position = from.solar_system
+		}
+	}
+
+	option = {
+		name = cstorms.176.b
+		add_resource = { alloys = 600 }
+		add_resource = { engineering_research = 1000 }
+
+		if = {
+			limit = {
+				has_technology = tech_storm_manipulation
+			}
+			add_resource = { physics_research = 500}
+		}
+		else = {
+			give_technology = { tech = tech_storm_manipulation }
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.179
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		event_target:wm_digsite_C = {
+			# Try to find nearest new inetian system without an owner.
+			closest_system = {
+				min_steps = 2
+				limit = {
+					has_owner = no
+					NOT = { has_star_flag = precursor_system }
+					has_star_flag = precursor_inetian
+
+					any_system_planet = {
+						NOT = { has_planet_flag = precursor_world }
+						OR = {
+							is_barren_dry_world = yes # undercoat: moved to scripted trigger
+							is_barren_cold_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+
+				save_event_target_as = system_storm_formation
+				prevprev = { set_country_flag = wm_digsite_storm_formation_found }
+			}
+			# Fallback to any inetian system owned by us.
+			if = {
+				limit = { NOT = { root = { has_country_flag = wm_digsite_storm_formation_found } } }
+
+				closest_system = {
+					min_steps = 1
+					limit = {
+						has_star_flag = precursor_inetian
+						owner = {
+							is_same_value = root
+						}
+						any_system_planet = {
+							NOT = { has_planet_flag = precursor_world }
+						OR = {
+								is_barren_dry_world = yes # undercoat: moved to scripted trigger
+								is_barren_cold_world = yes # undercoat: moved to scripted trigger
+							}
+						}
+					}
+
+					save_event_target_as = system_storm_formation
+					prevprev = { set_country_flag = wm_digsite_storm_formation_found } }
+			}
+		}
+
+		# Fallback to any system within out border with a barren planet.
+		if = {
+			limit = { NOT = { root = { has_country_flag = wm_digsite_storm_formation_found } } }
+
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						NOR = {
+							has_planet_flag = precursor_world
+							exists = archaeological_site
+						}
+
+						OR = {
+							is_barren_dry_world = yes # undercoat: moved to scripted trigger
+							is_barren_cold_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+
+				save_event_target_as = system_storm_formation
+			}
+		}
+
+		event_target:system_storm_formation = {
+			random_system_planet = {
+				limit = {
+					NOR = {
+						has_planet_flag = precursor_world
+						exists = archaeological_site
+					}
+					OR = {
+						is_barren_dry_world = yes # undercoat: moved to scripted trigger
+						is_barren_cold_world = yes # undercoat: moved to scripted trigger
+					}
+				}
+
+				save_event_target_as = wm_digsite_storm_formation
+				root = { set_visited = prevprev }
+				create_archaeological_site = site_weathermanipulators_storm_formation
+				mark_used_by_precursor = yes
+			}
+		}
+
+		remove_country_flag = wm_digsite_storm_formation_found
+
+		country_event = {
+			id = cstorms.180
+		}
+	}
+}
+
+# Delayed Event 1
+country_event = {
+	id =  cstorms.180
+	event_chain = cs_inetian_chain
+	title = cstorms.180.name
+	desc = cstorms.180.desc
+	picture = GFX_evt_poor_stormshelter
+	location = event_target:wm_digsite_storm_formation
+	show_sound = event_sensor_ping
+
+	is_triggered_only = yes
+
+	option = { ##no rewards this is a transition event
+		name = cstorms.180.a
+	}
+}
+
+
+# Digsite 5
+fleet_event = {# Stage 1
+	id =  cstorms.181
+	event_chain = cs_inetian_chain
+	title = cstorms.181.name
+	desc = cstorms.181.desc
+	picture = GFX_evt_alien_planet
+	show_sound = event_scanner
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DISCONCERTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {# Stage 2
+	id =  cstorms.182
+	event_chain = cs_inetian_chain
+	title = cstorms.182.name
+	desc = cstorms.182.desc
+	picture = GFX_evt_warm_barren
+	show_sound = event_scanner
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	option = {
+		name = INTERESTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				medium_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {# Stage 3
+	id =  cstorms.183
+	event_chain = cs_inetian_chain
+	title = cstorms.183.name
+	desc = cstorms.183.desc
+	picture = GFX_evt_warm_barren
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	option = {
+		name = INTRIGUING
+
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				medium_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+}
+
+# This: fleet
+# From: Digsite
+fleet_event = {# Stage 4
+	id = cstorms.184
+	event_chain = cs_inetian_chain
+	title = cstorms.184.name
+	desc = cstorms.184.desc
+	picture = GFX_evt_storm_formation
+	show_sound = event_administrative_work
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	option = {
+		name = cstorms.184.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+
+			add_tech_option_or_research_effect = {
+				TECH = tech_storm_prediction_2
+				PROGRESS = 0.5
+				CATEGORY = physics_research
+			}
+
+			enable_special_project = {
+				name = INETIAN_PROJECTS_03
+				owner = this
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.185
+
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		event_target:wm_storm_shelter_planet = {
+			random_system = {
+				limit = {
+					not = { has_star_flag = precursor_system }
+					has_star_flag = precursor_inetian
+					NOR = {
+						exists = space_owner
+						is_fe_cluster = no
+						has_star_flag = hostile_system
+					}
+					distance = {
+						source = prev
+						type = euclidean
+						min_distance >= 10
+						max_distance <= 60
+					}
+
+					any_system_planet = {
+						NOT = { has_planet_flag = precursor_world }
+						uninhabitable_regular_planet = yes
+						has_anomaly = no
+						is_moon = no
+						has_moon = no
+					}
+				}
+
+				save_event_target_as = system_last_storm_shelter
+				prevprev = {
+					set_country_flag = picked_storm_shelter_system
+				}
+			}
+		}
+
+		# Fallback for if we can't find a valid unclaimed system: pick an Inetian system owned by the country.
+		if = {
+			limit = { NOT = { has_country_flag = picked_storm_shelter_system } }
+
+			random_system_within_border = {
+				limit = {
+					has_star_flag = precursor_inetian
+					distance = {
+						source = event_target:wm_storm_shelter_planet
+						type = euclidean
+						min_distance >= 10
+						max_distance <= 60
+					}
+
+					any_system_planet = {
+						NOT = { has_planet_flag = precursor_world }
+						uninhabitable_regular_planet = yes
+						has_anomaly = no
+						is_moon = no
+						has_moon = no
+					}
+				}
+
+				save_event_target_as = system_last_storm_shelter
+				prevprev = {
+					set_country_flag = picked_storm_shelter_system
+				}
+			}
+		}
+		# Fallback to a random owned system.
+		if = {
+			limit = { NOT = { has_country_flag = picked_storm_shelter_system } }
+
+			random_system_within_border = {
+				limit = {
+					NOT = { is_same_value = event_target:wm_storm_shelter_planet.solar_system }
+
+					any_system_planet = {
+						NOT = { has_planet_flag = precursor_world }
+						uninhabitable_regular_planet = yes
+						has_anomaly = no
+						is_moon = no
+						has_moon = no
+					}
+				}
+
+				save_event_target_as = system_last_storm_shelter
+				prevprev = {
+					set_country_flag = picked_storm_shelter_system
+				}
+			}
+		}
+
+		# If no owned system can be found with a matching planet, find a matching planet as close to our capital as possible, disregarding any system constraints.
+		if = {
+			limit = { NOT = { has_country_flag = picked_storm_shelter_system } }
+
+			capital_scope = {
+				closest_system = {
+					limit = {
+						any_system_planet = {
+							NOR = {
+								has_planet_flag = precursor_world
+								exists = archaeological_site
+							}
+							uninhabitable_regular_planet = yes
+							has_anomaly = no
+							is_moon = no
+							has_moon = no
+						}
+					}
+
+					save_event_target_as = system_last_storm_shelter
+				}
+			}
+		}
+
+		event_target:system_last_storm_shelter = {
+			random_system_planet = {
+				limit = {
+					NOR = {
+						has_planet_flag = precursor_world
+						exists = archaeological_site
+					}
+					uninhabitable_regular_planet = yes
+					has_anomaly = no
+					is_moon = no # to avoid intersecting the habitat with the orbiting planet.
+					has_moon = no # to avoid intersecting the habitat with the moon.
+				}
+
+				set_planet_flag = precursor_world
+				save_global_event_target_as = wm_last_storm_shelter
+				create_ambient_object = {
+					type = "ambient_habitat_destroyed"
+					location = event_target:wm_last_storm_shelter
+
+					entity_offset = { min = 10 max = 10 }
+					use_3d_location = yes
+				}
+
+				set_surveyed = {
+					surveyed = yes
+					surveyor = root
+				}
+
+				root = {
+					country_event = {
+						id = cstorms.186
+					}
+				}
+			}
+		}
+	}
+}
+
+# Special project 3 complete
+country_event = {
+	id = cstorms.186
+	event_chain = cs_inetian_chain
+	title = cstorms.186.name
+	desc = cstorms.186.desc
+	picture = GFX_evt_storm_formation
+	show_sound = event_default
+	location = event_target:wm_last_storm_shelter
+
+	is_triggered_only = yes
+
+	option = { ##no rewards for transition event
+		name = cstorms.186.a
+
+		event_target:wm_last_storm_shelter = {
+			create_archaeological_site = site_weathermanipulators_last_shelter
+		}
+	}
+}
+
+
+# Digsite 6
+fleet_event = {# Stage 1
+	id =  cstorms.190
+	event_chain = cs_inetian_chain
+	title = cstorms.190.name
+	desc = cstorms.190.desc
+	picture = GFX_evt_ruined_system
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = UNDERSTOOD
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {# Stage 2
+	id =  cstorms.191
+	event_chain = cs_inetian_chain
+	title = cstorms.191.name
+	desc = cstorms.191.desc
+	picture = GFX_evt_ruined_system
+	show_sound = event_airlock
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = PROCEED
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {# Stage 3
+	id =  cstorms.192
+	event_chain = cs_inetian_chain
+	title = cstorms.192.name
+	desc = cstorms.192.desc
+	picture = GFX_evt_rare_tech_cache
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DISCONCERTING
+		owner = {
+			add_resource = { energy = 800 }
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {# Stage 4
+	id =  cstorms.193
+	event_chain = cs_inetian_chain
+	title = cstorms.193.name
+	desc = cstorms.193.desc
+	picture = GFX_evt_the_last_stormshelter
+	show_sound = event_faceoff_in_space
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.193.a
+		owner = {
+			end_event_chain = cs_inetian_chain
+			if = {
+				limit = { has_ancrel = yes }
+				large_artifact_reward = yes
+			}
+
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+
+			add_relic = r_weather_manipulator
+
+			add_tech_option_or_research_effect = {
+				TECH = tech_nutrient_replication
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+
+			set_country_flag = completed_inetian_traders_precursor
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+ship_event = {
+	id = cstorms.195
+	event_chain = cs_inetian_chain
+	title = cstorms.195.name
+	desc = cstorms.195.desc
+
+	picture = GFX_evt_ongoing_disaster
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = UNDERSTOOD
+
+		owner = {
+			# Tech or research.
+			if = {
+				limit = { NOT = {has_technology = tech_advanced_storm_manipulation } }
+
+				# Give previous tier if country didn't have it already,
+				if = {
+					limit = { NOT = { has_technology = tech_storm_manipulation } }
+
+					give_technology = {
+						tech = tech_storm_manipulation
+					}
+				}
+
+				give_technology = {
+					tech = tech_advanced_storm_manipulation
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier4researchreward
+					min = @tier4researchmin
+					max = @tier4researchmax
+				}
+			}
+
+			if = {
+				limit = {
+					OR= {
+						is_hive_empire = yes
+						is_machine_empire = yes
+					}
+				 }
+
+				 add_modifier = {
+					modifier = secrets_of_the_inetian_traders_hive_mach
+				 }
+			}
+			else = {
+				add_modifier = {
+					modifier = secrets_of_the_inetian_traders
+				 }
+			}
+		}
+
+		# Give statecraft trait.
+		leader = {
+			if = {
+				limit = {
+					NOR = {
+						has_trait = leader_trait_expertise_statecraft
+						has_trait = leader_trait_expertise_statecraft_2
+						has_trait = leader_trait_expertise_statecraft_3
+					}
+				}
+
+				add_trait = leader_trait_expertise_statecraft
+			}
+
+			else = {
+				add_experience = 200
+			}
+		}
+
+		owner = {
+			set_country_flag = unlocked_hyperlane_detailer
+		}
+	}
+}
+
+##############################################
+#### The adAkkaria Convention of Benevolence #
+##############################################
+
+ship_event = {
+	id = cstorms.200
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		solar_system = {
+			has_star_flag = precursor_adakkaria
+			NOT = { is_same_value = root.owner.capital_scope.solar_system }
+		}
+		owner = {
+			is_ai = no
+			has_precursor_intro = no
+		}
+		FROM = {
+			NOR = {
+				has_anomaly = yes
+				is_star = yes
+				can_have_habitable_deposits = yes
+
+				has_planet_flag = precursor_world
+				exists = archaeological_site
+				is_gas_giant = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @origin_shoulders_multiplier
+			owner = {
+				is_shoulders_of_giants_empire = yes # undercoat: moved to scripted trigger
+				has_country_flag = origin_shoulders_closure
+			}
+		}
+	}
+
+
+	immediate = {
+		owner = {
+			set_country_flag = adakkaria_intro
+			country_event = { id = story.5 days = 30 }
+		}
+
+		from = {
+			add_anomaly = {
+				category = STORMS_PREC_ONE
+				target = owner
+			}
+		}
+	}
+}
+
+### Precursor - adAkkaria: 1 A signal from Benevolence
+ship_event = {
+	id = cstorms.205
+	title = "cstorms.205.name"
+	desc = "cstorms.205.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_ruined_system
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = cs_adAkkaria_chain
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		tooltip = {
+			begin_event_chain = {
+				event_chain = cs_adAkkaria_chain
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		from = {
+			create_archaeological_site = site_adakkaria_the_propaganda_station
+		}
+	}
+}
+
+### Precursor - adAkkaria: 2 The Propaganda Station
+fleet_event = { #1st step Interfacing with the past
+	id = cstorms.215
+	title = "cstorms.215.name"
+	desc = "cstorms.215.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_broadcast_hacking
+	location = from
+	show_sound = event_radio_chatter
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #2nd step From the Exalted Leadership
+	id = cstorms.220
+	title = "cstorms.220.name"
+	desc = "cstorms.220.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_broadcast_hacking
+	location = from
+	show_sound = event_radio_chatter
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #3rd step UniCom’s Ultimatum
+	id = cstorms.225
+	title = "cstorms.225.name"
+	desc = "cstorms.225.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_broadcast_hacking
+	location = from
+	show_sound = event_radio_chatter_02
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier1unityreward
+					min = @tier1unitymin
+					max = @tier1unitymax
+				}
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				owner = { is_gestalt = no }
+			}
+			text = cstorms.225.a
+		}
+		name = {
+			trigger = {
+				owner = { is_hive_empire = yes }
+			}
+			text = cstorms.225.a.hive
+		}
+		name = {
+			trigger = {
+				owner = { is_machine_empire = yes }
+			}
+			text = cstorms.225.a.machine
+		}
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier1unityreward
+					min = @tier1unitymin
+					max = @tier1unitymax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #4th step Saints and Psionics
+	id = cstorms.230
+	title = "cstorms.230.name"
+	desc = "cstorms.230.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_broadcast_hacking
+	location = from
+	show_sound = event_radio_chatter_02
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.230.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			add_modifier = {
+				modifier = dramatic_enthusiasm
+				days = 360
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				owner = { is_gestalt = no }
+			}
+			text = cstorms.230.b
+		}
+		name = {
+			trigger = {
+				owner = { is_hive_empire = yes }
+			}
+			text = cstorms.230.b.hive
+		}
+		name = {
+			trigger = {
+				owner = { is_machine_empire = yes }
+			}
+			text = cstorms.230.b.machine
+		}
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			add_modifier = {
+				modifier = melodramatic_much
+				days = 360
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #5th step Oldcast
+	id = cstorms.235
+	title = "cstorms.235.name"
+	desc = "cstorms.235.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_broadcast_hacking
+	location = from
+	show_sound = event_radio_chatter
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.235.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = cstorms.240
+					days = 120
+					random = 30
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.240
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		# Try to find a barren world in an adAkkaria system within our borders.
+		random_system_within_border = {
+			limit = {
+				NOT = { has_star_flag = precursor_system }
+				has_star_flag = precursor_adakkaria
+
+				any_system_planet = {
+					OR = {
+						is_barren_dry_world = yes # undercoat: moved to scripted trigger
+						is_barren_cold_world = yes # undercoat: moved to scripted trigger
+					}
+					NOR = {
+						has_planet_flag = precursor_world
+						exists = archaeological_site
+					}
+				}
+			}
+
+			save_event_target_as = system_windswept_fates
+			prev = { set_country_flag = system_windswept_fates_found }
+		}
+		# Fallback to already used adakkaria system within borders
+		if = {
+			limit = { NOT = { has_country_flag = system_windswept_fates_found } }
+
+			random_system_within_border = {
+				limit = {
+					has_star_flag = precursor_adakkaria
+
+					any_system_planet = {
+						OR = {
+							is_barren_dry_world = yes # undercoat: moved to scripted trigger
+							is_barren_cold_world = yes # undercoat: moved to scripted trigger
+						}
+						NOR = {
+							has_planet_flag = precursor_world
+							exists = archaeological_site
+						}
+					}
+				}
+
+				save_event_target_as = system_windswept_fates
+				prev = { set_country_flag = system_windswept_fates_found }
+			}
+		}
+		# Fallback to random system within borders
+		if = {
+			limit = { NOT = { has_country_flag = system_windswept_fates_found } }
+
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						OR = {
+							is_barren_dry_world = yes # undercoat: moved to scripted trigger
+							is_barren_cold_world = yes # undercoat: moved to scripted trigger
+						}
+						NOR = {
+							has_planet_flag = precursor_world
+							exists = archaeological_site
+						}
+					}
+				}
+
+				save_event_target_as = system_windswept_fates
+			}
+		}
+
+		event_target:system_windswept_fates = {
+			# Spawn the storm.
+			spawn_random_storm = {
+				cosmic_storm_start_position = this
+				immediate = yes
+			}
+
+			last_created_cosmic_storm = {
+				set_storm_flag = storm_windswept_fates
+				save_event_target_as = storm_windswept_fates
+			}
+
+			# We ensured in the previous event that this system has a matching planet.
+			random_system_planet = {
+				limit = {
+					OR = {
+						is_barren_dry_world = yes # undercoat: moved to scripted trigger
+						is_barren_cold_world = yes # undercoat: moved to scripted trigger
+					}
+					NOR = {
+						has_planet_flag = precursor_world
+						exists = archaeological_site
+					}
+				}
+
+				save_global_event_target_as = planet_windswept_fates
+				mark_used_by_precursor = yes
+			}
+		}
+
+		country_event = {
+			id = cstorms.245
+			days = 70
+			random = 20
+		}
+
+		# Only needed during this event.
+		remove_country_flag = system_windswept_fates_found
+	}
+}
+
+country_event = {
+	id = cstorms.245
+	title = cstorms.245.name
+	desc = cstorms.245.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_warm_barren
+	show_sound = event_radio_chatter
+
+	location = event_target:planet_windswept_fates
+
+	is_triggered_only = yes
+
+	immediate = {
+		every_cosmic_storm = {
+			limit = {
+				has_storm_flag = storm_windswept_fates
+			}
+
+			destroy_cosmic_storm = yes
+		}
+	}
+
+	option = {
+		name = cstorms.245.a
+	}
+
+	after = {
+		event_target:planet_windswept_fates = {
+			create_archaeological_site = site_adakarria_windswept_fates
+		}
+	}
+}
+
+### Precursor - adAkkaria: 3 Windswept Fates
+fleet_event = { #Stage 1: Fierce Conditions
+	id = cstorms.2105
+	title = "cstorms.2105.name"
+	desc = "cstorms.2105.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_windswept_fates
+	location = from
+	show_sound = event_wind_ruins
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2105.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Stage 2: What has been lost
+	id = cstorms.2110
+	title = "cstorms.2110.name"
+	desc = "cstorms.2110.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_windswept_fates
+	location = from
+	show_sound = event_dig_site
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2110.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Stage 3: Violence from Above
+	id = cstorms.2115
+	title = "cstorms.2115.name"
+	desc = "cstorms.2115.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_windswept_fates
+	location = from
+	show_sound = event_wind_ruins
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Stage 4: The Forever Tempest
+	id = cstorms.2120
+	title = "cstorms.2120.name"
+	desc = "cstorms.2120.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_windswept_fates
+	location = from
+	show_sound = event_wind_ruins
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2120.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Stage 5: The Body
+	id = cstorms.2125
+	title = "cstorms.2125.name"
+	desc = "cstorms.2125.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_windswept_fates
+	location = from
+	show_sound = event_whispering
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Stage 6: And to Dust Once More
+	id = cstorms.2130
+	title = "cstorms.2130.name"
+	desc = "cstorms.2130.desc"
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_windswept_fates
+	location = from
+	show_sound = event_wind_ruins
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = UNFORTUNATE
+		owner = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_storm_prediction_1 = {
+					add_tech_progress = {
+						tech = tech_storm_prediction_1
+						progress = 0.25
+					}
+				}
+				tech_ship_hull_storm_breaker_1 = {
+					add_tech_progress = {
+						tech = tech_ship_hull_storm_breaker_1
+						progress = 0.25
+					}
+				}
+				tech_storm_prediction_2 = {
+					add_tech_progress = {
+						tech = tech_storm_prediction_2
+						progress = 0.25
+					}
+				}
+				tech_ship_hull_storm_breaker_2 = {
+					add_tech_progress = {
+						tech = tech_ship_hull_storm_breaker_2
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+		fleet_event = {
+			id = cstorms.2140
+			days = 15
+		}
+	}
+}
+
+fleet_event = {
+	id = cstorms.2140
+	title = cstorms.2140.name
+	desc = cstorms.2140.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_intelligence_report
+	show_sound = event_scanner
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						is_star = no
+						NOR = {
+							has_planet_flag = precursor_world
+							exists = archaeological_site
+						}
+					}
+				}
+
+				weights = {
+					base = 1
+
+					# Prefer not to use a system already usedfor a precursor event/
+					modifier = {
+						has_star_flag = precursor_system
+						factor = 0.001
+					}
+
+					# heavily prefer adakkaria systems.
+					modifier = {
+						has_star_flag = precursor_adakkaria
+						factor = 100
+					}
+
+					# Really want systems with asteroid belts
+					modifier = {
+						num_asteroid_belts > 0
+						factor = 100
+					}
+				}
+
+				random_system_planet = {
+					limit = {
+						is_star = no
+						NOR = {
+							has_planet_flag = precursor_world
+							exists = archaeological_site
+						}
+					}
+
+					weights = {
+						base = 1
+
+						# prefer asteroids
+						modifier = {
+							is_asteroid = yes
+							factor = 100
+						}
+					}
+
+					save_event_target_as = planet_storm_to_signal
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+
+		event_target:planet_storm_to_signal = {
+			hidden_effect = { mark_used_by_precursor = yes }
+			create_archaeological_site = site_adakkaria_fleets_of_the_thrice_damned
+		}
+	}
+
+	after = {
+		# Remove flag, was only necessary locally to track if a system with asteroids was found.
+		owner = {
+			remove_country_flag = planet_storm_to_signal_found
+		}
+	}
+}
+
+### Precursor - adAkkaria: 4 Fleets of the Thrice Damned
+fleet_event = { #Stage 1: Shredded Remains
+	id = cstorms.2150
+	title = cstorms.2150.name
+	desc = cstorms.2150.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_fleets_of_the_thrice_damned
+	show_sound = event_finding_loot
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DISCONCERTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 2: The limits of Duty
+	id = cstorms.2155
+	title = cstorms.2155.name
+	desc = cstorms.2155.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_fleets_of_the_thrice_damned
+	show_sound = event_encrypted_comms
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2155.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 3: Remains to be seen
+	id = cstorms.2160
+	title = cstorms.2160.name
+	desc = cstorms.2160.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_fleets_of_the_thrice_damned
+	show_sound = event_finding_loot
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = PECULIAR
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 4: Dead men tell tales
+	id = cstorms.2165
+	title = cstorms.2165.name
+
+	desc = {
+		trigger = { owner = { is_gestalt = yes } }
+		text = cstorms.2165.desc.gestalt
+	}
+	desc = {
+		trigger = {
+			leader = { has_psionic_leader_trait = yes }
+		}
+		text = cstorms.2165.desc.psio
+	}
+	desc = {
+		trigger = {
+			NOR = {
+				owner = { is_gestalt = yes }
+				leader = { has_psionic_leader_trait = yes }
+			}
+		}
+		text = cstorms.2165.desc.def
+	}
+
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_fleets_of_the_thrice_damned
+	show_sound = event_whispering
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2165.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 5: Landeer's Legacy
+	id = cstorms.2170
+	title = cstorms.2170.name
+
+	desc = {
+		trigger = { owner = { is_gestalt = yes } }
+		text = cstorms.2170.desc.gestalt
+	}
+	desc = {
+		trigger = { owner = { is_gestalt = no } }
+		text = cstorms.2170.desc.def
+	}
+
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_fleets_of_the_thrice_damned
+	show_sound = event_comms_cutoff
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = UNDERSTOOD
+
+		owner = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_ship_storm_weapons_1 = {
+					add_tech_progress = {
+						tech = tech_ship_storm_weapons_1
+						progress = 0.25
+					}
+				}
+				tech_ship_hull_storm_breaker_1 = {
+					add_tech_progress = {
+						tech = tech_ship_hull_storm_breaker_1
+						progress = 0.25
+					}
+				}
+				tech_ship_storm_weapons_2 = {
+					add_tech_progress = {
+						tech = tech_ship_storm_weapons_2
+						progress = 0.25
+					}
+				}
+				tech_ship_hull_storm_breaker_2 = {
+					add_tech_progress = {
+						tech = tech_ship_hull_storm_breaker_2
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+			solar_system = {
+				spawn_random_storm = {
+					type = "gravity"
+					cosmic_storm_start_position = this
+					immediate = yes
+				}
+			}
+		}
+
+		hidden_effect = {
+			from = {
+				planet = {
+					save_event_target_as = planet_storm_to_signal
+				}
+			}
+
+			owner = {
+				country_event = {
+					id = cstorms.2179
+					days = 15
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.2179
+
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		event_target:planet_storm_to_signal = {
+			spawn_system = {
+				min_distance >= 40
+				max_distance <= 60
+				initializer = "adSalivul_system"
+				hyperlane = yes
+				is_discovered = yes
+			}
+		}
+
+		set_visited = event_target:planet_assembling_the_past.solar_system
+
+		country_event = {
+			id = cstorms.2180
+		}
+	}
+}
+
+# Assembling the Past: Triggers special project in newly discovered system.
+country_event = {
+	id = cstorms.2180
+	title = cstorms.2180.name
+	desc = cstorms.2180.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_fleets_of_the_thrice_damned
+	show_sound = event_scanner
+	location = event_target:planet_assembling_the_past
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		owner = {
+			enable_special_project = {
+				name = project_adakkaria_tracing_history
+				location = event_target:planet_assembling_the_past
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.2185
+	title = cstorms.2185.name
+	desc = cstorms.2185.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_ship_in_orbit
+	show_sound = event_inhabited_solar_system
+	location = event_target:planet_assembling_the_past
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:planet_assembling_the_past = {
+			solar_system = {
+				spawn_megastructure = {
+					type = habitat_central_complex_ruined
+					name = NAME_Patriotic_Institute_of_Exalted_Benevolence
+					planet = prev
+				}
+			}
+
+			create_archaeological_site = site_adakkaria_the_patriotic_institute
+		}
+	}
+
+	option = {
+		name = cstorms.2185.a
+	}
+}
+
+### Precursor - adAkkaria 4: The Patriotic Institute of Exalted Benevolence
+fleet_event = { #Stage 1: Enter Benevolence
+	id = cstorms.2200
+	title = cstorms.2200.name
+	desc = cstorms.2200.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_habitat
+	show_sound = event_door_opening
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { #Stage 2: Glitched for Good
+	id = cstorms.2205
+	title = cstorms.2205.name
+
+	desc = {
+		trigger = { owner = { is_machine_empire = yes } }
+		text = cstorms.2205.desc.mach
+	}
+	desc = {
+		trigger = { NOT = { owner = { is_machine_empire = yes } } }
+		text = cstorms.2205.desc.def
+	}
+
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_habitat
+	show_sound = event_yellow_alert
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTRIGUING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {  # Stage 3: Exalted Inquiries
+	id = cstorms.2210
+	title = cstorms.2210.name
+	desc = cstorms.2210.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_habitat
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2210.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 4: A Word From Our Subjects
+	id = cstorms.2215
+	title = cstorms.2215.name
+	desc = cstorms.2215.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_habitat
+	show_sound = event_radio_chatter
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 5: A Raw Deal
+	id = cstorms.2220
+	title = cstorms.2220.name
+	desc = cstorms.2220.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_habitat
+	show_sound = event_encrypted_comms
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2220.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = { # Stage 6: A Forlorn Fate Incomplete
+	id = cstorms.2225
+	title = cstorms.2225.name
+	desc = cstorms.2225.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_habitat
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2225.a
+		owner = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_habitat_1 = {
+					add_tech_progress = {
+						tech = tech_habitat_1
+						progress = 0.25
+					}
+				}
+				tech_habitat_2 = {
+					add_tech_progress = {
+						tech = tech_habitat_2
+						progress = 0.25
+					}
+				}
+				tech_habitat_3 = {
+					add_tech_progress = {
+						tech = tech_habitat_3
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier3researchreward
+						min = @tier3researchmin
+						max = @tier3researchmax
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+
+		hidden_effect = {
+			leader = {
+				save_event_target_as = leader_patriotic_institute
+			}
+
+			owner = {
+				country_event = {
+					id = cstorms.2230
+					days = 15
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.2230
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+
+		# get reference to previous system.
+		every_system = {
+			limit = {
+				has_star_flag = adSalivul_system
+			}
+
+			save_event_target_as = adSalivul_system
+		}
+
+		# spawn near the previous system.
+		event_target:adSalivul_system = {
+			spawn_system = {
+				min_distance >= 10
+				max_distance <= 30
+				initializer = "adSul_system"
+				hyperlane = yes
+				is_discovered = yes
+			}
+		}
+		set_visited = last_created_system
+
+		# branch events for psionic leader.
+		if = {
+			limit = {
+				exists = event_target:leader_patriotic_institute
+				event_target:leader_patriotic_institute = {
+					has_psionic_leader_trait = yes
+				}
+			}
+
+			country_event = {
+				id = cstorms.2245
+			}
+		}
+		else = {
+			country_event = {
+				id = cstorms.2240
+			}
+		}
+	}
+}
+
+# Eye of the Convention
+country_event = {
+	id = cstorms.2240
+	title = cstorms.2240.name
+	desc = cstorms.2240.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_clocks
+	show_sound = event_space_cloud
+	location = event_target:adSul_star
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		enable_special_project = {
+			name = project_adakkaria_benevolent_grounds
+			location = event_target:adSul_star
+		}
+	}
+}
+
+# The Void Calls
+country_event = {
+	id = cstorms.2245
+	title = cstorms.2245.name
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_surreal_visions
+	show_sound = evn_ove_shroud_tunnel
+
+	is_triggered_only = yes
+
+	desc = {
+		trigger = { is_gestalt = no }
+		text = cstorms.2245.desc
+	}
+	desc = {
+		trigger = { is_gestalt = yes }
+		text = cstorms.2245.desc.gestalt
+	}
+
+
+	option = {
+		name = ON_SCREEN
+		country_event = { id = cstorms.2260 }
+	}
+}
+
+# Benevolent Grounds (Special Project) follow-up
+country_event = {
+	id = cstorms.2250
+	title = cstorms.2250.name
+	desc = cstorms.2250.desc
+	event_chain = cs_adAkkaria_chain
+	picture = GFX_evt_cosmic_storms_shroud_storm
+	show_sound = evn_ove_shroud_tunnel
+
+	is_triggered_only = yes
+
+	option = {
+		name = ON_SCREEN
+		country_event = { id = cstorms.2260 }
+	}
+}
+
+# Dialogue "Storm Speaks" Part 1/3
+country_event = {
+    id = cstorms.2260
+    title = cstorms.2260.name
+    desc = cstorms.2260.desc
+    show_sound = event_whispering
+    picture = GFX_evt_cosmic_storms_the_storm_speaks
+
+    picture_event_data = {
+        portrait = shroud1
+        room = cosmic_storm_room
+    }
+
+    diplomatic = yes
+
+    is_triggered_only = yes
+
+    option = {
+        name = cstorms.2260.a
+        response_text = cstorms.2260.a.resp
+        is_dialog_only = yes
+    }
+
+    option = {
+        name = cstorms.2260.b
+        response_text = cstorms.2260.b.resp
+        is_dialog_only = yes
+    }
+
+    option = {
+        name = cstorms.2260.c
+        hidden_effect = {
+            country_event = {
+                id = cstorms.2265
+            }
+        }
+    }
+}
+
+# Dialogue "Storm Speaks" Part 2/3
+country_event = {
+    id = cstorms.2265
+    title = cstorms.2265.name
+    desc = cstorms.2265.desc
+    show_sound = event_whispering
+
+    picture_event_data = {
+        portrait = shroud1
+        room = cosmic_storm_room
+    }
+    diplomatic = yes
+
+    is_triggered_only = yes
+
+    option = {
+        name = cstorms.2260.a # Same text as 2260, so re-using
+        response_text = cstorms.2260.a.resp
+        is_dialog_only = yes
+    }
+    option = {
+        name = cstorms.2260.b # Same text as 2260, so re-using
+        response_text = cstorms.2260.b.resp
+        is_dialog_only = yes
+    }
+    option = {
+        name = cstorms.2260.c # Same text as 2260, so re-using
+        response_text = cstorms.2265.c.resp # This is new, so 2265
+        is_dialog_only = yes
+    }
+    option = {
+        name = cstorms.2265.d
+        hidden_effect = {
+            country_event = {
+                id = cstorms.2270
+            }
+        }
+    }
+}
+
+# Dialogue "Storm Speaks" Part 3/3
+country_event = {
+    id = cstorms.2270
+    title = cstorms.2270.name
+    desc = cstorms.2270.desc
+    show_sound = event_whispering
+
+    picture_event_data = {
+        portrait = shroud1
+        room = cosmic_storm_room
+    }
+    diplomatic = yes
+
+    is_triggered_only = yes
+
+    option = {
+        name = cstorms.2260.a # Same text as 2260, so re-using
+        response_text = cstorms.2260.a.resp
+        is_dialog_only = yes
+    }
+    option = {
+        name = cstorms.2260.b # Same text as 2260, so re-using
+        response_text = cstorms.2260.b.resp
+        is_dialog_only = yes
+    }
+    option = {
+        name = cstorms.2260.c # Same text as 2260, so re-using
+        response_text = cstorms.2265.c.resp # This is new, so 2265
+        is_dialog_only = yes
+    }
+    option = {
+        name = cstorms.2265.e
+        event_target:adSul_capital = {
+            create_archaeological_site = site_adakkaria_celebration
+        }
+    }
+}
+
+### Digsite Celebration Stage 1/6: Enforced Nihility
+fleet_event = {
+	id = cstorms.2285
+	title = cstorms.2285.name
+	desc = cstorms.2285.desc
+	picture = GFX_evt_ancient_databank
+	show_sound = evn_ove_imperial_vassal
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Digsite Celebration Stage 2/6: Descent to the Damned
+fleet_event = {
+	id = cstorms.2290
+	title = cstorms.2290.name
+	desc = cstorms.2290.desc
+	picture = GFX_evt_ancient_databank
+	show_sound = evn_ove_ghost_ships
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = {
+			trigger = {
+				owner = { is_homicidal = no}
+			}
+			text = cstorms.2290.a
+		}
+		name = {
+			trigger = {
+				owner = { is_homicidal = yes}
+			}
+			text = cstorms.2290.a.gen
+		}
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Digsite Celebration Stage 3/6: A Celebration of Sorts
+fleet_event = {
+	id = cstorms.2295
+	title = cstorms.2295.name
+
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = yes
+				is_gestalt = no
+			}
+			has_psionic_leader = no
+		}
+		text = cstorms.desc.authgen.default
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = yes
+				is_gestalt = no
+			}
+
+			has_psionic_leader = yes
+		}
+		text = cstorms.desc.authgen.psionic
+	}
+	desc = {
+		trigger = {
+			owner = { is_authoritarian_or_homicidal = no }
+			has_psionic_leader = yes
+		}
+		text = cstorms.desc.default.psionic
+	}
+	desc = {
+		trigger = {
+			owner = { is_authoritarian_or_homicidal = no }
+			has_psionic_leader = no
+		}
+		text = cstorms.desc.default.default
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = no
+				is_gestalt = yes
+			}
+		}
+		text = cstorms.desc.default.gestalt
+	}
+
+
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = {
+			trigger = {
+				has_psionic_leader = no
+				owner = { is_gestalt = no }
+			}
+			text = cstorms.2295.a
+		}
+		name = {
+			trigger = {
+				has_psionic_leader = yes
+				owner = { is_gestalt = no }
+			}
+			text = cstorms.2295.a.psionic
+		}
+		name = {
+			trigger = {
+				owner = { is_gestalt = yes }
+				has_psionic_leader = no
+			}
+			text = cstorms.2295.a.gestalt
+		}
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+
+		if = {
+			limit = {
+				leader = {
+					has_psionic_leader_trait = no
+					species = {
+						is_robotic_species = no
+					}
+				}
+			}
+
+			leader = {
+				if = {
+					limit = { has_trait = leader_trait_erudite }
+					remove_trait = leader_trait_erudite
+				}
+				if = {
+					limit = { has_trait = leader_trait_cyborg }
+					remove_trait = leader_trait_cyborg
+				}
+				add_trait = leader_trait_psionic
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				has_psionic_leader = no
+				owner = { is_gestalt = no }
+			}
+			text = cstorms.2295.b
+		}
+		name = {
+			trigger = {
+				has_psionic_leader = yes
+				owner = { is_gestalt = no }
+			}
+			text = ACKNOWLEDGED
+		}
+		name = {
+			trigger = {
+				owner = { is_gestalt = yes }
+				has_psionic_leader = no
+			}
+			text = PROCEED
+		}
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Digsite Celebration Stage 4/6: And All Is Said
+fleet_event = {
+	id = cstorms.2300
+	title = cstorms.2300.name
+
+	desc = {
+		trigger = {
+			has_psionic_leader = no
+		}
+		text = cstorms.2300.desc
+	}
+	desc = {
+		trigger = {
+			has_psionic_leader = yes
+		}
+		text = cstorms.2300.desc.psionic
+	}
+
+
+	picture = GFX_evt_ancient_databank
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = {
+			trigger = { has_psionic_leader = no }
+			text = DISCONCERTING
+		}
+		name = {
+			trigger = { has_psionic_leader = yes }
+			text = cstorms.2300.a.psionic
+		}
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+	option = {
+		name = {
+			trigger = { has_psionic_leader = no }
+			text = cstorms.2300.b
+		}
+		name = {
+			trigger = { has_psionic_leader = yes }
+			text = cstorms.2300.b.psionic
+		}
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Digsite Celebration Stage 5/6: The Tempest Invocator
+fleet_event = {
+	id = cstorms.2305
+	title = cstorms.2305.name
+
+	desc = {
+		trigger = {
+			has_psionic_leader = no
+			owner = { is_gestalt = no }
+		}
+		text = cstorms.2305.desc.default
+	}
+	desc = {
+		trigger = { has_psionic_leader = yes }
+		text = cstorms.2305.desc.psionic
+	}
+	desc = {
+		trigger = { owner = { is_gestalt = yes } }
+		text = cstorms.2305.desc.gestalt
+	}
+
+	picture = GFX_evt_sapient_AI
+	show_sound = event_mind_over_matter
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DISCONCERTING
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+### Digsite Celebration Stage 6/6: The Final Phase
+fleet_event = {
+	id = cstorms.2310
+	title = cstorms.2310.name
+
+	desc = {
+		trigger = {
+			owner = { is_authoritarian_or_homicidal = no }
+			has_psionic_leader = no
+		}
+		text = cstorms.2310.desc.default
+	}
+	desc = {
+		trigger = {
+			owner = { is_authoritarian_or_homicidal = yes }
+			has_psionic_leader = no
+		}
+		text = cstorms.2310.desc.authgen
+	}
+
+	picture = GFX_evt_cosmic_storms_celebration
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.2310.a
+		owner = {
+			if = {
+				limit = { has_ancrel = yes }
+				large_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier5researchreward
+					min = @tier5researchmin
+					max = @tier5researchmax
+				}
+			}
+
+			hidden_effect = {
+				country_event = {
+					id = cstorms.2320
+					days = 15
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Dialogue "The Storm's Swansong" Part 1/6
+country_event = {
+	id = cstorms.2320
+	title = cstorms.2320.name
+	desc = cstorms.2320.desc
+	show_sound = event_whispering
+
+	picture_event_data = {
+		portrait = shroud1
+		room = cosmic_storm_room
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.2320.a
+		response_text = cstorms.2320.a.resp
+		is_dialog_only = yes
+	}
+	option = {
+		name = cstorms.2320.b
+		response_text = cstorms.2320.b.resp
+		is_dialog_only = yes
+	}
+	option = {
+		name = cstorms.2320.c
+		response_text = cstorms.2320.c.resp
+		is_dialog_only = yes
+	}
+	option = {
+		name = cstorms.2320.d
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2325
+			}
+		}
+	}
+}
+
+# Dialogue "The Storm's Swansong" Part 2/6
+country_event = {
+	id = cstorms.2325
+	title = cstorms.2320.name # Re-use from 2320
+	desc = cstorms.2325.desc
+	show_sound = event_whispering
+
+	picture_event_data = {
+		portrait = shroud1
+		room = cosmic_storm_room
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+
+	option = { # Re-use from 2320
+		name = cstorms.2320.a
+		response_text = cstorms.2320.a.resp
+		is_dialog_only = yes
+	}
+	option = { # Re-use from 2320
+		name = cstorms.2320.b
+		response_text = cstorms.2320.b.resp
+		is_dialog_only = yes
+	}
+	option = { # Re-use from 2320
+		name = cstorms.2320.c
+		response_text = cstorms.2320.c.resp
+		is_dialog_only = yes
+	}
+	option = {
+		name = cstorms.2325.d
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2330
+			}
+		}
+	}
+}
+
+# Dialogue "The Storm's Swansong" Part 3/6
+country_event = {
+	id = cstorms.2330
+	title = cstorms.2320.name # Re-use from 2320
+	desc = cstorms.2330.desc
+	show_sound = event_whispering
+
+	picture_event_data = {
+		portrait = shroud1
+		room = cosmic_storm_room
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+
+	option = {
+		name = cstorms.2330.a
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2335
+			}
+		}
+	}
+}
+
+# Dialogue "The Storm's Swansong" Part 4/6
+country_event = {
+	id = cstorms.2335
+	title = cstorms.2320.name # Re-use from 2320
+	desc = cstorms.2335.desc
+	show_sound = event_whispering
+
+	picture_event_data = {
+		portrait = shroud1
+		room = cosmic_storm_room
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+
+	option = { # Free The Storm
+		name = cstorms.2335.a
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2340
+			}
+		}
+	}
+	option = { # Claim the Tempest Invocator
+		name = cstorms.2335.b
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2345
+			}
+		}
+	}
+}
+
+# Dialogue "The Storm's Swansong" Part 5/6 (Free The Storm)
+country_event = {
+	id = cstorms.2340
+	title = cstorms.2320.name # Re-use from 2320
+	desc = cstorms.2340.desc
+	show_sound = evn_ove_shroudwalker_enclave
+
+	picture_event_data = {
+		portrait = shroud1
+		room = cosmic_storm_room
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.2340.a
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2350
+			}
+		}
+	}
+}
+
+# Dialogue "The Storm's Swansong" Part 6/6 (Claim the Tempest Invocator)
+country_event = {
+	id = cstorms.2345
+	title = cstorms.2320.name # Re-use from 2320
+	desc = cstorms.2345.desc
+	show_sound = event_screams
+
+	picture_event_data = {
+		portrait = shroud1
+		room = cosmic_storm_room
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.2345.a
+		hidden_effect = {
+			country_event = {
+				id = cstorms.2355
+			}
+		}
+	}
+}
+
+# A Storm Nevermore
+country_event = {
+	id = cstorms.2350
+	title = cstorms.2350.name
+	desc = cstorms.2350.desc
+	picture = GFX_evt_cosmic_storms_the_storm_speaks
+	show_sound = evn_ove_shroudwalker_enclave
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.2350.a
+
+		set_country_flag = adakkaria_world_found
+
+		# Change to previously_terraformed_planet
+		event_target:adSul_capital = {
+			change_pc = "pc_continental"
+			set_planet_entity = {
+				entity = "previously_terraformed_planet_entity"
+			}
+			add_modifier = {
+				modifier = previously_terraformed_planet
+				days = -1
+			}
+			if = {
+				limit = { is_colony = yes }
+
+				add_building = building_adakkaria_patriotic_institute
+				# This is duplicated from the patriotic institute's 'on_built', because that doesn't trigger when using 'add_building'.
+				start_patriotic_institute_spawn_storm_repeated = yes
+			}
+			else = {
+				add_modifier = {
+					modifier = has_patriotic_institute
+					days = -1
+				}
+			}
+		}
+	}
+}
+
+# Replace modifier with building after colonization
+planet_event = {
+	id = cstorms.2351
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = has_patriotic_institute
+	}
+
+	immediate = {
+		remove_modifier = has_patriotic_institute
+		add_building = building_adakkaria_patriotic_institute
+		# This is duplicated from the patriotic institute's 'on_built', because that doesn't trigger when using 'add_building'.
+		start_patriotic_institute_spawn_storm_repeated = yes
+	}
+}
+
+# Pain Rage Grief Fear
+country_event = {
+	id = cstorms.2355
+	title = cstorms.2355.name
+	desc = cstorms.2355.desc
+	picture = GFX_evt_cosmic_storms_the_storm_speaks
+	show_sound = event_screams
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.2355.a
+		add_relic = r_the_tempest_invocator
+		end_event_chain = cs_adAkkaria_chain
+	}
+}
+
+# Secrets of the adAkkaria Convention
+country_event = {
+	id = cstorms.2365
+	title = cstorms.2365.name
+
+	desc = {
+		trigger = {
+			is_gestalt = no
+		}
+		text = cstorms.2365.desc.default
+	}
+	desc = {
+		trigger = {
+			is_gestalt = yes
+		}
+		text = cstorms.2365.desc.gestalt
+	}
+
+	picture = GFX_evt_cosmic_storms_celebration
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.2365.a
+
+		add_modifier = {
+			modifier = patriotic_institute_true_potential_unleashed
+		}
+
+		custom_tooltip = cstorms.2365.a.tt
+		hidden_effect = {
+			set_country_flag = patriotic_institute_supercharged
+			event_target:adSul_capital = {
+				start_patriotic_institute_spawn_storm_repeated = yes
+
+				# If there's currently a storm, trigger the storm-fused effect immediately.
+				if = {
+					limit = {
+						solar_system = {
+							is_inside_storm = yes
+						}
+					}
+
+					make_pops_storm_fused_with_chance = {
+						CHANCE = @storm_fused_supercharged_chance
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = cstorms.2365.b
+
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+	}
+}
+
+# Changes a random pop to storm-fused.
+# Triggered from on_storm_entered_system
+# This: System
+# From: Storm
+system_event = {
+	id = cstorms.2370
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_star_flag = adSul_system
+		exists = owner
+
+		# A given storm can only trigger this once
+		exists = from
+		NOT = {
+			from = {
+				OR = {
+					has_storm_flag = passed_patriotic_institute
+					has_storm_flag = storm_stormfall
+				}
+			}
+		}
+
+		# Requires colonized patriotic institute.
+		any_system_planet = {
+			has_building = building_adakkaria_patriotic_institute
+			is_colony = yes
+		}
+	}
+
+	immediate = {
+		from = {
+			set_storm_flag = passed_patriotic_institute
+		}
+
+		random_system_planet = {
+			limit = {
+				has_building = building_adakkaria_patriotic_institute
+				is_colony = yes
+			}
+
+			if = {
+				limit = {
+					owner = {
+						has_country_flag = patriotic_institute_supercharged
+					}
+				}
+
+				make_pops_storm_fused_with_chance = {
+					CHANCE = @storm_fused_supercharged_chance
+				}
+			}
+			else = {
+				make_pops_storm_fused_with_chance = {
+					CHANCE = @storm_fused_chance
+				}
+			}
+		}
+	}
+}

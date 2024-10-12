@@ -13,12 +13,6 @@ tr_genetics_adopt = {
 	}
 	unlocks_agenda = agenda_genetic_pursuit
 	custom_tooltip = tr_genetics_adopt_modifier_desc
-	modifier = {
-		description_parameters = {
-			POINTS = @ap_genetic_opener_POINTS
-		}
-		BIOLOGICAL_species_trait_points_add = @ap_genetic_opener_POINTS
-	}
 	# Unlocks Clone Vats
 }
 
@@ -28,16 +22,7 @@ tr_genetics_finish = {
 			country_event = { id = utopia.2703 }
 			if = {
 				limit = {
-					OR = {
-						has_origin = origin_legendary_leader_dictatorial
-						AND = {
-							has_country_flag = paragon_origin_reformists_gone
-							has_origin = origin_legendary_leader_imperial
-						}
-					}
-					NOT = { has_country_flag = luminary_ascension_path }
-					exists = ruler
-					ruler = { has_leader_flag = paragon_origin_legendary_leader }
+					legendary_leader_ascension_trigger = yes # undercoat - moved to scripted trigger
 				}
 				country_event = {
 					id = paragon.5201 days = 3600 random = 7200
@@ -46,12 +31,8 @@ tr_genetics_finish = {
 		}
 	}
 	modifier = {
+		planet_buildings_clone_vats_upkeep_mult = -0.33
 		ascension_perks_add = 1
-		description = tr_genetics_finish_modifier_desc
-		description_parameters = {
-			POINTS = @ap_genetic_finisher_POINTS
-		}
-		BIOLOGICAL_species_trait_points_add = @ap_genetic_finisher_POINTS
 	}
 
 	tradition_swap = {
@@ -67,14 +48,10 @@ tr_genetics_finish = {
 				country_event = { id = utopia.2703 }
 			}
 		}
-
+		custom_tooltip = tr_genetics_finish_extra_traits_modifier_desc
 		modifier = {
+			planet_buildings_clone_vats_upkeep_mult = -0.33
 			ascension_perks_add = 1
-			description = tr_genetics_finish_extra_traits_modifier_desc
-			description_parameters = {
-				POINTS = @ap_genetic_finisher_POINTS
-			}
-			BIOLOGICAL_species_trait_points_add = @ap_genetic_finisher_POINTS
 		}
 	}
 }
@@ -89,35 +66,34 @@ tr_genetics_creation = {
 	possible = {
 		has_tradition = tr_genetics_resequencing
 	}
-	# Unlocks Advanced Traits
+	# Can alter organic pop appearance within the same archtype
 	# Unlocks Assimilation to add or remove the Hive-Minded trait.
 	custom_tooltip_with_modifiers = tr_genetics_creation_desc
-	modifier = {
-		BIOLOGICAL_species_trait_points_add = 2
-	}
 }
 
 tr_genetics_enhanced_expression = {
 	possible = {
 		has_tradition = tr_genetics_creation
 	}
+	# Unlocks Advanced Traits
 	modifier = {
-		BIOLOGICAL_species_trait_picks_add = 1
+		BIOLOGICAL_species_trait_points_add = 6
+		BIOLOGICAL_species_trait_picks_add = 2
+		modify_species_cost_mult = -0.50
 	}
-	# Can alter organic pop appearance within the same archtype
-	custom_tooltip = tr_genetics_enhanced_expression_desc
-}
-
-tr_genetics_efficient_cloning = {
-	# Double Organic Pop Assembly from Clone Vats
-	custom_tooltip = tr_genetics_efficient_cloning_desc
+	custom_tooltip_with_modifiers = tr_genetics_enhanced_expression_desc
 }
 
 tr_genetics_retrovirus = {
-	possible = {
-		has_tradition = tr_genetics_efficient_cloning
-	}
 	modifier = {
-		modify_species_cost_mult = -0.50
+		pop_environment_tolerance = 0.10
 	}
+}
+
+tr_genetics_efficient_cloning = {
+	possible = {
+		has_tradition = tr_genetics_retrovirus
+	}
+	# Improved Organic Pop Assembly from Clone Vats
+	custom_tooltip = tr_genetics_efficient_cloning_desc
 }

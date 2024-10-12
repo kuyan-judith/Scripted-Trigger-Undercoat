@@ -1,0 +1,4791 @@
+##########################################
+# EVENTS - Cosmic Storms - 0000 to 1500 ##
+####### By BHVR Rotterdam et al. #########
+##########################################
+
+namespace = cstorms
+
+country_event = {
+	id = cstorms.1
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		num_cosmic_storms_encountered < 1 # First time encountering a storm
+		from = { NOT = { has_storm_flag = first_storm_met_by_@root } }
+	}
+
+	immediate = {
+		from = { set_storm_flag = first_storm_met_by_@root }
+	}
+}
+
+#############################
+# Anomaly & Digsite Randomiser Event #
+#
+## This event allow for random anomalies to be deposited by cosmic storms
+## Triggered via 00_on_actions.txt - on_storm_left_system
+#
+#############################
+
+system_event = {
+	id = cstorms.5
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		any_system_planet = {
+			is_valid_planet_for_storm_uncovered_anomaly = yes
+		}
+	}
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				is_valid_planet_for_storm_uncovered_anomaly = yes
+			}
+			random_list = {
+				1 = {
+					add_anomaly_in_owned_space = { CATEGORY = STORMS_ANOM_ANTS }
+				}
+				0 = {
+					modifier = {
+						add = 1
+						prev = {
+							exists = owner
+							owner = { is_gestalt = no }
+						}
+					}
+					planet_event = { id = cstorms.1270 }
+				}
+				1 = {
+					add_anomaly_in_owned_space = { CATEGORY = STORMS_ANOM_STAT }
+				}
+				0 = {
+					modifier = {
+						add = 1
+						has_planet_flag = AFFECTED_BY_SHROUD_AFTERMATH
+					}
+					add_anomaly_in_owned_space = { CATEGORY = STORMS_ANOM_BRAIN }
+				}
+				1 = {
+					planet_event = {
+						id = cstorms.1600 # Terrestial telescope
+					}
+				}
+				1 = {
+					add_anomaly_in_owned_space = { CATEGORY = the_imitator_category }
+				}
+			}
+		}
+	}
+}
+
+system_event = {
+	id = cstorms.10
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		exists = owner
+		NOR = {
+			has_star_flag = extradimensional_origin_system
+			has_star_flag = formless_system
+		}
+	}
+
+	immediate = {
+		random_list = {
+			0 = {
+				modifier = {
+					add = 1
+					any_system_planet = {
+						is_star = yes
+						NOR = {
+							is_planet_class = pc_t_star
+							is_star_class = sc_pulsar
+							is_planet_class = pc_neutron_star
+							planet_is_black_hole = yes # undercoat: moved to scripted trigger
+							is_planet_class = pc_toxoid_star
+						}
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_ANOM_POLYCHROMATIC }
+				}
+				owner = { set_country_flag = spawned_STORMS_ANOM_POLYCHROMATIC }
+				random_system_planet = {
+					limit = {
+						is_star = yes
+						NOR = {
+							is_planet_class = pc_t_star
+							is_star_class = sc_pulsar
+							is_planet_class = pc_neutron_star
+							planet_is_black_hole = yes # undercoat: moved to scripted trigger
+							is_planet_class = pc_toxoid_star
+						}
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+					add_anomaly = {
+						category = STORMS_ANOM_POLYCHROMATIC
+						target = solar_system.owner
+					}
+				}
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_ANOM_TRIPLETS }
+				}
+				owner = { set_country_flag = spawned_STORMS_ANOM_TRIPLETS }
+				while = {
+					count = 2
+					spawn_planet = {
+						generate_random_name = yes
+						class = pc_ice_asteroid
+						orbit_distance = { min = 90 max = 210 }
+						orbit_angle = { min = 0 max = 360 }
+						flags = { asteroid_triplet }
+						init_effect = {
+							clear_deposits_stu = yes # undercoat: moved to scripted effect
+							# Undercoat on_action
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+				spawn_planet = {
+					generate_random_name = yes
+					class = pc_crystal_asteroid
+					orbit_distance = { min = 90 max = 210 }
+					orbit_angle = { min = 0 max = 360 }
+					flags = { asteroid_triplet }
+					init_effect = {
+						clear_deposits_stu = yes # undercoat: moved to scripted effect
+						# Undercoat on_action
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				random_system_planet = {
+					limit = { has_planet_flag = asteroid_triplet }
+					add_anomaly = {
+						category = STORMS_ANOM_TRIPLETS
+						target = solar_system.owner
+					}
+				}
+			}
+			0 = {
+				modifier = {
+					add = 1
+					any_system_planet = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_ANOM_TRAVELLERS }
+				}
+				owner = { set_country_flag = spawned_STORMS_ANOM_TRAVELLERS }
+				random_system_planet = {
+					limit = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+					add_anomaly = {
+						category = STORMS_ANOM_TRAVELLERS
+						target = solar_system.owner
+					}
+				}
+			}
+			0 = {
+				modifier = {
+					add = 1
+					any_system_planet = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_COSMIC_SLUDGE }
+				}
+				owner = { set_country_flag = spawned_STORMS_COSMIC_SLUDGE }
+				random_system_planet = {
+					limit = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+					add_anomaly = {
+						category = STORMS_COSMIC_SLUDGE
+						target = solar_system.owner
+					}
+				}
+			}
+			0 = {
+				modifier = {
+					add = 1
+					any_system_planet = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_SHATTERED_SATTELITE }
+				}
+				owner = { set_country_flag = spawned_STORMS_SHATTERED_SATTELITE }
+				random_system_planet = {
+					limit = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+					add_anomaly = {
+						category = STORMS_SHATTERED_SATTELITE
+						target = solar_system.owner
+					}
+				}
+			}
+			0 = {
+				modifier = {
+					add = 1
+					any_system_planet = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_EVISCERATED_FAUNA }
+				}
+				owner = { set_country_flag = spawned_STORMS_EVISCERATED_FAUNA }
+				random_system_planet = {
+					limit = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+					create_ambient_object = {
+						type = small_dead_tiyanki_object
+						location = this
+					}
+					last_created_ambient_object = {
+						set_ambient_object_flag = eviscerated_space_fauna_object
+						set_location = {
+							target = prev
+							distance = 10
+							angle = random
+						}
+					}
+					add_anomaly = {
+						category = STORMS_EVISCERATED_FAUNA
+						target = solar_system.owner
+					}
+				}
+			}
+			0 = {
+				modifier = {
+					add = 1
+					any_system_planet = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					owner = {
+						OR = {
+							has_communications = event_target:tiyanki_garrison_country
+							has_communications = event_target:tiyanki_country
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_country_flag = spawned_STORMS_DISPLACED_TIYANKI }
+				}
+				owner = { set_country_flag = spawned_STORMS_DISPLACED_TIYANKI }
+				random_system_planet = {
+					limit = {
+						is_star = yes
+						has_anomaly = no
+						is_preventing_anomaly = no
+					}
+					add_anomaly = {
+						category = STORMS_DISPLACED_TIYANKI
+						target = solar_system.owner
+					}
+				}
+			}
+		}
+	}
+}
+
+#############################
+# Civic Events
+#############################
+
+planet_event = {
+	id = cstorms.20
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_environmental_architects_empire = yes
+		}
+		OR = {
+			AND = {
+				has_deposit = d_mountain_range
+				owner = {
+					NOR = {
+						has_technology = tech_mountain_range
+						has_tech_option = tech_mountain_range
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_active_volcano
+				owner = {
+					NOR = {
+						has_technology = tech_volcano
+						has_tech_option = tech_volcano
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_dangerous_wildlife_blocker
+				owner = {
+					NOR = {
+						has_technology = tech_dangerous_wildlife
+						has_tech_option = tech_dangerous_wildlife
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_dense_jungle
+				owner = {
+					NOR = {
+						has_technology = tech_dense_jungle
+						has_tech_option = tech_dense_jungle
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_toxic_kelp
+				owner = {
+					NOR = {
+						has_technology = tech_toxic_kelp
+						has_tech_option = tech_toxic_kelp
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_deep_sinkhole
+				owner = {
+					NOR = {
+						has_technology = tech_deep_sinkhole
+						has_tech_option = tech_deep_sinkhole
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_quicksand_basin
+				owner = {
+					NOR = {
+						has_technology = tech_quicksand_basin
+						has_tech_option = tech_quicksand_basin
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_noxious_swamp
+				owner = {
+					NOR = {
+						has_technology = tech_noxious_swamp
+						has_tech_option = tech_noxious_swamp
+					}
+				}
+			}
+			AND = {
+				has_deposit = d_massive_glacier
+				owner = {
+					NOR = {
+						has_technology = tech_massive_glacier
+						has_tech_option = tech_massive_glacier
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		add_research_options_for_natural_blockers = yes
+	}
+}
+
+#############################
+# Cosmic Storms Events
+#############################
+
+# This: System
+# From: Storm
+system_event = {
+	id = cstorms.500
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			NOR = {
+				has_technology = tech_industrial_storm_protection
+				has_country_flag = triggered_storm_protection_boost
+			}
+		}
+		from = {
+			has_storm_flag = first_storm_met_by_@prev.owner
+			count_system_within_storm = {
+				limit = {
+					NOT = { is_same_value = prevprev }
+					exists = owner
+					owner = { is_same_value = prevprevprev.owner }
+				}
+				count = 0
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = triggered_storm_protection_boost
+			add_storm_type_flag = { SCOPE_TYPE = country STORM_SCOPE = from }
+			country_event = {
+				id = cstorms.505
+				scopes = { from = prev }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.505
+	title = cstorms.505.name
+	desc = cstorms.505.desc
+	picture = GFX_evt_star_chart
+	show_sound = event_default
+	is_triggered_only = yes
+	location = from
+
+	option = {
+		name = FASCINATING
+		add_tech_option_or_research_effect = {
+			TECH = tech_industrial_storm_protection
+			PROGRESS = 0.1
+			CATEGORY = engineering_research
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			clear_affected_storm_flag = { SCOPE_TYPE = country }
+		}
+	}
+}
+
+## Start spawning storms after a while.
+event = {
+	id = cstorms.900
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_cosmic_storms_dlc = yes
+	}
+
+	immediate = {
+		event_target:global_event_country = {
+			country_event = {
+				id = cstorms.905
+				days = @days_before_storms_start_spawning
+			}
+		}
+	}
+}
+
+### Spawn Cosmic Storm
+country_event = {
+	id = cstorms.905
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# Early game
+		if = {
+			limit = {
+				mid_game_years_passed < 1
+				end_game_years_passed < 1
+			}
+
+			try_spawn_natural_storm = {
+				MAX_STORM_COUNT = value:storm_early_game_spawn_max_cap_scaled
+				SPAWN_CHANCE = value:storm_early_game_spawn_chance_scaled
+				COOLDOWN = value:storm_early_game_cooldown_in_days_scaled
+				COOLDOWN_VARIANCE = value:storm_early_game_cooldown_variance_scaled
+			}
+		}
+		# Mid Game
+		else_if = {
+			limit = {
+				mid_game_years_passed > 0
+				end_game_years_passed < 1
+			}
+
+			try_spawn_natural_storm = {
+				MAX_STORM_COUNT = value:storm_mid_game_spawn_max_cap_scaled
+				SPAWN_CHANCE = value:storm_mid_game_spawn_chance_scaled
+				COOLDOWN = value:storm_mid_game_cooldown_in_days_scaled
+				COOLDOWN_VARIANCE = value:storm_mid_game_cooldown_variance_scaled
+			}
+		}
+
+		# Late Game
+		else_if = {
+			limit = {
+				end_game_years_passed > 0
+			}
+
+			# Will set 'nexus_storm_spawned' flag if successful.
+			try_spawn_natural_nexus_storm = {
+				MAX_STORM_COUNT = value:storm_late_game_spawn_max_cap_scaled
+				SPAWN_CHANCE = value:nexus_storm_spawn_chance_scaled
+				COOLDOWN = value:nexus_storm_cooldown_in_days_scaled
+			}
+
+			# If we didn't spawn a nexus storm, try to spawn a different type.
+			if = {
+				limit = { NOT = { has_country_flag =  nexus_storm_spawned }  }
+
+				try_spawn_natural_storm = {
+					MAX_STORM_COUNT = value:storm_late_game_spawn_max_cap_scaled
+					SPAWN_CHANCE = value:storm_late_game_spawn_chance_scaled
+					COOLDOWN = value:storm_late_game_cooldown_in_days_scaled
+					COOLDOWN_VARIANCE = value:storm_late_game_cooldown_variance_scaled
+				}
+			}
+			else = {
+				# Clear flag, only needed for this event.
+				remove_country_flag = nexus_storm_spawned
+
+				country_event = {
+					id = cstorms.905
+					days = value:storm_late_game_cooldown_in_days_scaled
+					random = value:storm_late_game_cooldown_variance_scaled
+				}
+			}
+		}
+	}
+}
+
+# Triggers after nexus storm cooldown is finished, removes flag.
+country_event = {
+	id = cstorms.910
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = nexus_storm_on_cooldown
+	}
+}
+
+# Monthly unity gain from systems/planets affected by storms (see on_monthly_pulse)
+event = {
+	id = cstorms.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_cosmic_storms_dlc = yes
+		has_global_flag = cosmic_storm_has_occurred
+	}
+
+	immediate = {
+		every_playable_country = {
+			# Unity per system
+			if = {
+				limit = {
+					is_galactic_community_member = yes
+					is_active_resolution = "resolution_cosmic_storms_shared_knowledge"
+				}
+
+				# Reset counters
+				set_variable = { which = storm_affected_system_count value = 0 }
+				create_variable_if_not_exists = { VARIABLE = prev_storm_affected_system_count VALUE_IF_CREATED = 0 }
+
+				# Count
+				if = {
+					every_system_within_border = {
+						limit = {
+							has_star_flag = storm_system
+						}
+
+						PREV = { change_variable = { which = storm_affected_system_count value = 1 } }
+					}
+				}
+
+				# Update/remove modifier as needed
+				update_modifier_amount_if_needed = {
+					MODIFIER = storm_unity_gain_modifier
+					MULT_VAR = storm_affected_system_count
+					PREV_MULT_VAR = prev_storm_affected_system_count
+				}
+			}
+			# Unity per planet
+			else_if = {
+				limit = {
+					is_galactic_community_member = yes
+					OR = {
+						is_active_resolution = "resolution_cosmic_storms_protection_initiative"
+						is_active_resolution = "resolution_cosmic_storms_galactic_management"
+						is_active_resolution = "resolution_cosmic_storms_utilization_protocols"
+						is_active_resolution = "resolution_cosmic_storms_manipulation_mandate"
+					}
+				}
+
+				# Reset counters
+				set_variable = { which = storm_affected_planet_count value = 0 }
+				create_variable_if_not_exists = { VARIABLE = prev_storm_affected_planet_count VALUE_IF_CREATED = 0 }
+
+				# Count
+				if = {
+					every_planet_within_border = {
+						limit = {
+							has_owner = yes
+							solar_system = {
+								has_star_flag = storm_system
+							}
+						}
+
+						PREV = { change_variable = { which = storm_affected_planet_count value = 1 } }
+					}
+				}
+
+				# Tier 3 and 4 of the resolutions gain 2 unity per planet and the final tier 3 per planet.
+				if = {
+					limit = {
+						OR = {
+							is_active_resolution = "resolution_cosmic_storms_galactic_management"
+							is_active_resolution = "resolution_cosmic_storms_utilization_protocols"
+						}
+					}
+					multiply_variable = { which = storm_affected_planet_count value = 2 }
+				}
+				else_if = {
+					limit = {
+						is_active_resolution = "resolution_cosmic_storms_manipulation_mandate"
+					}
+					multiply_variable = { which = storm_affected_planet_count value = 3 }
+				}
+
+				# Update/remove modifier as needed
+				update_modifier_amount_if_needed = {
+					MODIFIER = storm_unity_gain_modifier
+					MULT_VAR = storm_affected_planet_count
+					PREV_MULT_VAR = prev_storm_affected_planet_count
+				}
+			}
+			# Remove modifier or it might linger after repealing/switching resolutions.
+			else = {
+				remove_modifier = storm_unity_gain_modifier
+			}
+		}
+	}
+}
+
+# Monthly unity gain from low health ships affected by Particle Storm (see on_monthly_pulse)
+event = {
+	id = cstorms.1050
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_cosmic_storms_dlc = yes
+		has_global_flag = cosmic_storm_has_occurred
+	}
+
+	immediate = {
+		every_playable_country = {
+			# Reset counters
+			set_variable = { which = storm_affected_ship_count value = 0 }
+			create_variable_if_not_exists = { VARIABLE = prev_storm_affected_ship_count VALUE_IF_CREATED = 0 }
+
+			# Count
+			if = {
+				every_owned_ship = {
+					limit = {
+						has_hp_percentage <= @storm_hp_perc_limit
+						exists = solar_system
+						solar_system = { is_inside_storm = particle_storm }
+					}
+
+					PREV = { change_variable = { which = storm_affected_ship_count value = 1 } }
+				}
+			}
+
+			# Update/remove modifier as needed
+			update_modifier_amount_if_needed = {
+				MODIFIER = particle_storm_ship_unity_gain_modifier
+				MULT_VAR = storm_affected_ship_count
+				PREV_MULT_VAR = prev_storm_affected_ship_count
+			}
+		}
+	}
+}
+
+# Cosmic Storms monthly affects
+event = {
+	id = cstorms.1100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_cosmic_storms_dlc = yes
+		has_global_flag = cosmic_storm_has_occurred
+	}
+
+	immediate = {
+		every_cosmic_storm = {
+			if = {
+				limit = { is_storm_type = electric_storm }
+				every_system_within_storm = {
+					every_ship_in_system = {
+						limit = { has_shield_hp > 0 }
+						reduce_shield = value:storm_ship_damage_received|DMG|@storm_monthly_dmg_low|
+					}
+				}
+			}
+			else_if = {
+				limit = { is_storm_type = particle_storm }
+				every_system_within_storm = {
+					every_ship_in_system = {
+						limit = { has_hp_percentage > @storm_hp_perc_limit }
+						damage_ship = value:storm_ship_damage_received|DMG|@storm_monthly_dmg_low|
+					}
+				}
+			}
+			else_if = {
+				limit = { is_storm_type = nexus_storm }
+				every_system_within_storm = {
+					every_ship_in_system = {
+						limit = { has_hp_percentage > @storm_hp_perc_limit }
+						damage_ship = value:storm_ship_damage_received|DMG|@storm_monthly_dmg_high|
+					}
+				}
+			}
+		}
+	}
+}
+
+# Update Diplomatic Weight for Storm Devotion
+system_event = {
+	id = cstorms.1150
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_storm_callers_empire = yes
+			NOT = {
+				has_modifier = storm_devotion_diplo_weight_modifier
+				has_modifier = storm_devotion_corporate_diplo_weight_modifier
+			}
+		}
+		is_capital_system = yes
+	}
+
+	immediate = {
+		owner = {
+			if = {
+				limit = {
+					is_megacorp = no
+				}
+				add_modifier = {
+					modifier = storm_devotion_diplo_weight_modifier
+					days = -1
+					multiplier = modifier:capital_storm_diplo_weight_mult
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = storm_devotion_corporate_diplo_weight_modifier
+					days = -1
+					multiplier = modifier:capital_storm_diplo_weight_mult
+				}
+			}
+		}
+	}
+}
+
+system_event = {
+	id = cstorms.1155
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_storm_callers_empire = yes
+			OR = {
+				has_modifier = storm_devotion_diplo_weight_modifier
+				has_modifier = storm_devotion_corporate_diplo_weight_modifier
+			}
+		}
+		is_capital_system = yes
+	}
+
+	immediate = {
+		owner = {
+			remove_modifier = storm_devotion_diplo_weight_modifier
+			remove_modifier = storm_devotion_corporate_diplo_weight_modifier
+		}
+	}
+}
+
+####################
+### Event Chains ###
+####################
+
+### Collided Planets event chain
+
+# Event 1: A Tale of Two Planets
+planet_event = {
+	id = cstorms.1200
+	title = cstorms.1200.name
+	desc = cstorms.1200.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = collided_planet
+		exists = owner
+	}
+
+	immediate = {
+		hidden_effect = {
+			owner = {
+				begin_event_chain = {
+					event_chain = cs_collided_planet_chain
+				}
+			}
+
+			save_event_target_as = collided_planets
+		}
+	}
+
+	option = {
+		name = INTRIGUING
+
+		owner = {
+			tooltip = {
+				begin_event_chain = {
+					event_chain = cs_collided_planet_chain
+				}
+			}
+
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+
+		hidden_effect = {
+			planet_event = {
+				id = cstorms.1205
+				days = 150
+			}
+		}
+	}
+}
+
+# Collided Planets Event 2: Precarious Reality
+planet_event = {
+	id = cstorms.1205
+	title = cstorms.1205.name
+	desc = cstorms.1205.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+		owner = {
+			has_event_chain = cs_collided_planet_chain
+		}
+	}
+
+	option = {
+		name = WORRYING
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+
+		hidden_effect = {
+			planet_event = {
+				id = cstorms.1210
+				days = 150
+			}
+		}
+	}
+}
+
+# Collided Planets Event 3: Metamorphosis Unchained
+planet_event = {
+	id = cstorms.1210
+	title = cstorms.1210.name
+	desc = cstorms.1210.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+		owner = {
+			has_event_chain = cs_collided_planet_chain
+		}
+	}
+
+	immediate = {
+		save_event_target_as = collided_planets
+
+		add_modifier = {
+			modifier = collided_planet_collapsing
+			days = -1
+		}
+
+		planet_event = {
+			id = cstorms.1215
+			days = @collided_planet_days_before_collapse
+		}
+	}
+
+	option = {
+		name = cstorms.1210.a
+
+		tooltip = {
+			add_modifier = {
+				modifier = collided_planet_collapsing
+			}
+		}
+
+		hidden_effect = {
+			set_planet_flag = attempting_stabilization
+		}
+
+		owner = {
+			enable_special_project = {
+				name = project_cosmic_storms_collidedplanet_stabilize
+				location = prev
+				owner = this
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1210.b
+
+		tooltip = {
+			add_modifier = {
+				modifier = collided_planet_collapsing
+			}
+		}
+
+		set_planet_flag = attempting_harmonization
+
+		owner = {
+			enable_special_project = {
+				name = project_cosmic_storms_collidedplanet_harmonize
+				location = prev
+				owner = this
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1210.c
+
+		tooltip = {
+			add_modifier = {
+				modifier = collided_planet_collapsing
+			}
+		}
+	}
+}
+
+# Destroy planet, triggered after 200 years
+planet_event = {
+	id =  cstorms.1215
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = collided_planet_collapsing
+	}
+
+	immediate = {
+		if = { # If there's an owner, notify them, then destruct.
+			limit = { exists = owner }
+
+			save_event_target_as = collided_planets
+			planet_event = {
+				id = cstorms.1240
+			}
+		}
+		else = { # just detruct now.
+			destroy_collided_planets = yes
+		}
+	}
+}
+
+# Collided Planets Event 4A: Collision Maintained
+planet_event = {
+	id = cstorms.1220
+	title = cstorms.1220.name
+	desc = cstorms.1220.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+		owner = {
+			has_event_chain = cs_collided_planet_chain
+		}
+	}
+
+	# Stay continental
+	option = {
+		name = cstorms.1220.a
+		remove_modifier = collided_planet_collapsing
+	}
+
+	option = {
+		name = cstorms.1220.b
+
+		remove_modifier = collided_planet_collapsing
+		change_pc = pc_savannah
+	}
+
+	option = {
+		name = cstorms.1220.c
+
+		remove_modifier = collided_planet_collapsing
+		change_pc = pc_alpine
+	}
+}
+
+# Collided Planets Event 4B: A World For Everyone
+planet_event = {
+	id = cstorms.1225
+	title = cstorms.1225.name
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	desc = {
+		trigger = {
+			has_planet_flag = attempting_stabilization
+		}
+
+		text = cstorms.1225.desc.stabalize
+	}
+	desc = {
+		trigger = {
+			NOT = { has_planet_flag = attempting_stabilization }
+		}
+
+		text = cstorms.1225.desc.def
+	}
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+		owner = {
+			has_event_chain = cs_collided_planet_chain
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+
+		remove_modifier = collided_planet_collapsing
+		change_pc = {
+			class = pc_gaia
+			inherit_entity = no
+		}
+	}
+}
+
+# Collided Planets Event 4C: Fixer Upper
+planet_event = {
+	id = cstorms.1230
+	title = cstorms.1230.name
+	desc = cstorms.1230.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+		owner = {
+			has_event_chain = cs_collided_planet_chain
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+
+		remove_modifier = collided_planet_collapsing
+
+		add_blocker = { type = d_crater }
+		add_blocker = { type = d_crater }
+		add_blocker = { type = d_crater }
+		add_blocker = { type = d_crater }
+		add_blocker = { type = d_active_volcano }
+		add_blocker = { type = d_active_volcano }
+		add_blocker = { type = d_active_volcano }
+		add_blocker = { type = d_active_volcano }
+	}
+}
+
+# Collided Planets Event 4D: Home Assundered
+planet_event = {
+	id = cstorms.1235
+	title = cstorms.1235.name
+	desc = cstorms.1235.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+		owner = {
+			has_event_chain = cs_collided_planet_chain
+		}
+	}
+
+	option = {
+		name = UNFORTUNATE
+		destroy_collided_planets = yes
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier5researchreward
+				min = @tier5researchmin
+				max = @tier5researchmax
+			}
+		}
+	}
+}
+
+# Collided Planets Event 4E: Collided and Crashed
+planet_event = {
+	id = cstorms.1240
+	title = cstorms.1240.name
+	desc = cstorms.1240.desc
+	event_chain = cs_collided_planet_chain
+	picture = GFX_evt_cosmic_storms_collided_planets
+	location = this
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_colony = yes
+		exists = owner
+	}
+
+	option = {
+		name = UNFORTUNATE
+		destroy_collided_planets = yes
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier5researchreward
+				min = @tier5researchmin
+				max = @tier5researchmax
+			}
+		}
+	}
+}
+
+### Crimson crawlers
+
+# On Anomaly complete
+ship_event = {
+	id = cstorms.1255
+	title = cstorms.1255.name
+	desc = cstorms.1255.desc
+	picture = GFX_evt_crimson_crawlers
+	location = from
+
+	is_triggered_only = yes
+
+	option = {
+		name = INTRIGUING
+		enable_special_project = {
+			name = "project_cosmic_storms_crimson_crawlers"
+			location = from
+			owner = root.owner
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.1260
+	title = cstorms.1260.name
+	desc = cstorms.1260.desc
+	picture = GFX_evt_crimson_crawlers
+	location = from
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.1260.a
+
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+	}
+
+	option = {
+		name = cstorms.1260.b
+		from = {
+			remove_modifier = crimson_crawlers
+			add_modifier = { modifier = crimson_crawlers_sashimi_style }
+		}
+	}
+
+	option = {
+		name = cstorms.1260.c
+		from = {
+			remove_modifier = crimson_crawlers
+			add_modifier = { modifier = crimson_crawlers_bbq_them }
+		}
+	}
+}
+
+
+## Hold the line
+planet_event = {
+	id =  cstorms.1270
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		solar_system = {
+			exists = owner
+			owner = { is_ai = no }
+
+			NOT = {
+				any_system_planet = {
+					OR = {
+						has_planet_flag = hold_the_line_habitat
+						has_planet_flag = habitat
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					owner = { is_payback_empire = yes } # undercoat: moved to scripted trigger
+				}
+				NOT = {
+					any_system_planet = {
+						is_homeworld = yes
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		set_planet_flag = hold_the_line_habitat
+		create_archaeological_site = site_hold_the_line
+		create_ambient_object = {
+			type = unidentified_habitat
+			location = this
+		}
+		last_created_ambient_object = {
+			set_ambient_object_flag = unidentified_habitat
+		}
+	}
+}
+
+#Chapter 1 Brand new bemusement
+
+fleet_event = {
+	id =  cstorms.1275
+	title = cstorms.1275.name
+	desc = cstorms.1275.desc
+	picture = GFX_evt_space_station
+	show_sound = event_dig_site
+	is_triggered_only = yes
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 2 Manual overdrive
+fleet_event = {
+	id =  cstorms.1280
+	title = cstorms.1280.name
+	desc = cstorms.1280.desc
+	picture = GFX_evt_space_station
+	show_sound = event_dig_site
+	is_triggered_only = yes
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = INTRIGUING
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 3 Your Call is Important To Us
+fleet_event = {
+	id =  cstorms.1285
+	title = cstorms.1285.name
+	desc = cstorms.1285.desc
+	picture = GFX_evt_cosmic_storms_hold_the_line
+	show_sound = event_dig_site
+	is_triggered_only = yes
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 4 Maze of Options
+fleet_event = {
+	id =  cstorms.1290
+	title = cstorms.1290.name
+	picture = GFX_evt_cosmic_storms_hold_the_line
+	desc = cstorms.1290.desc
+	is_triggered_only = yes
+	show_sound = event_dig_site
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = cstorms.1290.a
+		owner = {
+			set_country_flag = holdtheline_swear
+
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1290.b
+		owner = {
+			set_country_flag = holdtheline_silence
+
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1290.c
+		owner = {
+			set_country_flag = holdtheline_buttonmash
+
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 5 Following Protocol
+fleet_event = {
+	id =  cstorms.1295
+	title = cstorms.1295.name
+	picture = GFX_evt_cosmic_storms_hold_the_line
+	is_triggered_only = yes
+	show_sound = event_dig_site
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	desc = {
+		trigger = {
+			owner = { has_country_flag = holdtheline_swear }
+		}
+		text = cstorms.1295.desc.a
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = holdtheline_silence }
+		}
+		text = cstorms.1295.desc.b
+	}
+
+	desc = {
+		trigger = {
+			owner = { has_country_flag = holdtheline_buttonmash }
+		}
+		text = cstorms.1295.desc.c
+	}
+
+	option = {
+		name = INCREDIBLE
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 6 Years to earn, seconds to lose
+fleet_event = {
+	id =  cstorms.1300
+	title = cstorms.1300.name
+	desc = cstorms.1300.desc
+	picture = GFX_evt_cosmic_storms_hold_the_line
+	is_triggered_only = yes
+	show_sound = event_dig_site
+
+	archaeology = yes
+
+	option = {
+		name = EXCELLENT
+		solar_system = {
+			random_ambient_object = {
+				limit = {
+					has_ambient_object_flag = unidentified_habitat
+				}
+				destroy_ambient_object = this
+			}
+		}
+
+		from.solar_system = {
+			spawn_megastructure = {
+				type = "habitat_central_complex"
+				name = NAME_Hold_the_line_habitat
+				planet = from
+				owner = owner
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+
+### Stormbound
+
+#Stormbound Event 1: Omen Rises
+system_event = {
+	id = cstorms.1310
+	title = cstorms.1310.name
+	desc = cstorms.1310.desc
+	picture = GFX_evt_cosmic_storms_stormbound
+	show_sound = event_mysterious_signal
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = this
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_ai = no
+		}
+
+		has_cosmic_storms_dlc = yes
+	}
+
+	option = {
+		name = INTRIGUING
+		owner = {
+			begin_event_chain = {
+				event_chain = cs_stormbound_chain
+				target = this
+			}
+
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+
+			hidden_effect = {
+				country_event = { id = cstorms.1311 days = 800 }
+			}
+		}
+	}
+}
+
+#Setting the flag needed for Omen Returns
+country_event = {
+	id = cstorms.1311
+	event_chain = cs_stormbound_chain
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_event_chain = cs_stormbound_chain
+	}
+
+	immediate = {
+		set_country_flag = omen_returns
+	}
+}
+
+#Stormbound Event 2: Omen Returns
+system_event = {
+	id = cstorms.1313
+	title = cstorms.1313.name
+	desc = cstorms.1313.desc
+	picture = GFX_evt_cosmic_storms_stormbound
+	event_chain = cs_stormbound_chain
+	show_sound = event_mysterious_signal
+	is_triggered_only = yes
+	fire_only_once = yes
+	location = this
+
+	trigger = {
+		exists = owner
+		owner = { has_country_flag = omen_returns }
+		any_system_planet = {
+			has_research_station = yes
+		}
+	}
+
+	option = {
+		name = INTRIGUING
+		owner = {
+			set_country_flag = whispers_in_the_tempest
+			remove_country_flag = omen_returns
+
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1313.a
+		owner = {
+			end_event_chain = cs_stormbound_chain
+
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+		}
+	}
+}
+
+#Stormbound Event 3: Whispers in the Tempest
+system_event = {
+	id = cstorms.1316
+	title = cstorms.1316.name
+	desc = cstorms.1316.desc
+	picture = GFX_evt_cosmic_storms_stormbound
+	event_chain = "cs_stormbound_chain"
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		exists = owner
+		owner = { has_country_flag = whispers_in_the_tempest }
+		any_fleet_in_system = {
+			owner = {
+				is_same_value = solar_system.owner
+			}
+			is_ship_class = shipclass_science_ship
+		}
+	}
+
+	immediate = {
+		random_fleet_in_system = {
+			limit = {
+				owner = {
+					is_same_value = solar_system.owner
+				}
+				is_ship_class = shipclass_science_ship
+			}
+			save_event_target_as = stormbound_science
+		}
+	}
+
+	option = {
+		name = DISCONCERTING
+		owner = {
+			set_country_flag = spirits_of_the_storm
+			remove_country_flag = whispers_in_the_tempest
+
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+system_event = {
+	id = cstorms.1317
+	title = cstorms.1317.name
+	desc = cstorms.1317.desc
+	picture = GFX_evt_cosmic_storms_stormbound
+	event_chain = "cs_stormbound_chain"
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_country_flag = spirits_of_the_storm
+			NOT = {
+				has_country_flag = has_discovered_spirits_of_the_storm
+			}
+		}
+		exists = from
+		from = {
+			NOT = { has_storm_flag = storm_stormfall }
+		}
+	}
+
+	immediate = {
+		create_ambient_object = {
+			type = "stormbound_event_ship_object"
+			location = this
+		}
+
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 80
+				angle = random
+			}
+			save_event_target_as = the_ship
+			set_ambient_object_flag = stormbound_ambient_object
+		}
+		event_target:the_ship = {
+			enable_special_project = {
+				name = "project_cosmic_storms_stormbound"
+				location = this
+				owner = prev.owner
+			}
+		}
+		owner = {
+			set_country_flag = has_discovered_spirits_of_the_storm
+		}
+	}
+
+	option = {
+		name = INTRIGUING
+	}
+
+}
+
+#Stormbound Event 4: Homebound - Part 1
+ship_event = {
+	id = cstorms.1320
+	title = cstorms.1320.name
+	desc = cstorms.1320.desc
+	picture = GFX_evt_cosmic_storms_stormbound
+	event_chain = "cs_stormbound_chain"
+	show_sound = event_mysterious_signal
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		owner = {
+			remove_country_flag = spirits_of_the_storm
+		}
+	}
+
+	option = {
+		name = cstorms.1320.a
+
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = cstorms.1321
+					days = 150
+					random = 60
+				}
+			}
+		}
+	}
+}
+
+#Stormbound Event 5: Homebound - Part 2
+country_event = {
+	id = cstorms.1321
+	title = cstorms.1321.name
+	desc = cstorms.1321.desc
+	picture = GFX_evt_cosmic_storms_stormbound
+	event_chain = "cs_stormbound_chain"
+	show_sound = event_mysterious_signal
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = cstorms.1321.a
+
+		owner = {
+			stormbound_final_reward = yes
+			add_modifier = {
+				modifier = letters_of_the_manifold
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1321.b
+		owner = {
+			stormbound_final_reward = yes
+		}
+	}
+
+	after = {
+		owner = {
+			end_event_chain = cs_stormbound_chain
+			remove_country_flag = has_discovered_spirits_of_the_storm
+		}
+		hidden_effect = {
+			solar_system = { system_event = { id = cstorms.1325 } }
+		}
+	}
+}
+
+system_event = {
+    id = cstorms.1325
+    is_triggered_only = yes
+    hide_window = yes
+
+    immediate = {
+        every_ambient_object = {
+            limit = { has_ambient_object_flag = stormbound_ambient_object }
+            destroy_ambient_object = this
+        }
+            every_ambient_object = {
+                limit = { has_ambient_object_flag = stormbound_ambient_object }
+                destroy_ambient_object = this
+            }
+
+        owner = {
+            remove_country_flag = has_discovered_spirits_of_the_storm
+            owner = {
+                remove_country_flag = has_discovered_spirits_of_the_storm
+            }
+        }
+    }
+}
+
+#But they are cute
+
+ship_event = {
+	id = cstorms.1500
+	title = cstorms.1500.name
+	desc = cstorms.1500.desc
+	picture = GFX_evt_but_they_are_cute
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.1500.a
+
+		enable_special_project = {
+			name = "project_cosmic_storms_but_they_are_cute"
+			location = from
+			owner = root.owner
+		}
+
+		begin_event_chain = {
+			event_chain = "cs_but_they_are_cute_chain"
+			target = this.owner
+		}
+	}
+
+	option = {
+		name = cstorms.1500.b
+
+		owner = {
+			add_resource = { food = 50 }
+			add_resource = { unity = 50 }
+
+			add_tech_option_or_research_effect = {
+				TECH = tech_dangerous_wildlife
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+		}
+	}
+}
+
+#Lets poke it
+ship_event = {
+	id = cstorms.1505
+	title = cstorms.1505.name
+	desc = cstorms.1505.desc
+	picture = GFX_evt_but_they_are_cute
+	event_chain = cs_but_they_are_cute_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.1505.a
+		hidden_effect = {
+			ship_event = { id = cstorms.1510 days = 30 }
+		}
+	}
+
+	option = {
+		name = cstorms.1505.b
+		hidden_effect = {
+			ship_event = { id = cstorms.1515 days = 30 }
+		}
+	}
+}
+
+#Emotional support Gurr
+ship_event = {
+	id = cstorms.1510
+	title = cstorms.1510.name
+	desc = cstorms.1510.desc
+	picture = GFX_evt_but_they_are_cute
+	event_chain = cs_but_they_are_cute_chain
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.1510.a
+
+		if = {
+			limit = {
+				has_paragon_dlc = yes
+			}
+
+			leader = {
+				add_trait = leader_trait_emotional_support_pet
+			}
+		}
+		else = {
+			leader = {
+				add_trait = leader_trait_eager
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+
+			end_event_chain = cs_but_they_are_cute_chain
+		}
+	}
+}
+
+#The end of Gurr
+ship_event = {
+	id = cstorms.1515
+	title = cstorms.1515.name
+	desc = cstorms.1515.desc
+	picture = GFX_evt_but_they_are_cute
+	event_chain = cs_but_they_are_cute_chain
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_country_flag = killed_the_gurr
+			add_resource = { food = 50 }
+			add_resource = { unity = 50 }
+
+			add_tech_option_or_research_effect = {
+				TECH = tech_dangerous_wildlife
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+		}
+
+		leader = {
+			add_trait = leader_trait_melancholic
+		}
+	}
+
+	option = {
+		name = cstorms.1515.a
+		hidden_effect = {
+			ship_event = { id = cstorms.1520 days = 100 }
+		}
+	}
+}
+
+#The end of Gurr?
+ship_event = {
+	id = cstorms.1520
+	title = cstorms.1520.name
+	desc = cstorms.1520.desc
+	picture = GFX_evt_but_they_are_cute
+	event_chain = cs_but_they_are_cute_chain
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1520.a
+		owner = {
+			end_event_chain = cs_but_they_are_cute_chain
+		}
+	}
+}
+
+# The Imitator
+ship_event = {
+	id = cstorms.1550
+	title = cstorms.1550.name
+	desc = cstorms.1550.desc
+	picture = GFX_evt_space_debris
+
+	is_triggered_only = yes
+
+	immediate = {
+
+		random_country = {
+			species = {
+				save_event_target_as = leader_species
+			}
+		}
+
+		create_country = {
+            name = "NAME_imitator"
+            type = global_event
+            flag = {
+                icon = {
+                    category = "special"
+                    file = "unknown.dds"
+                }
+                background = {
+                    category = "backgrounds"
+                    file = "00_solid.dds"
+                }
+                colors = {
+                    "red"
+                    "red"
+                    "null"
+                    "null"
+                }
+            }
+            effect = {
+                save_global_event_target_as = imitator_country
+            }
+        }
+        event_target:imitator_country = {
+			create_species = {
+				name = random
+				class = random_non_machine
+				portrait = random
+				traits = random
+				effect = {
+					save_event_target_as = imitator_species
+				}
+			}
+			create_leader = {
+				class = scientist
+				name = random
+				species = event_target:imitator_species
+				skill = 3
+				custom_catch_phrase = the_imitator_catch_phrase
+				custom_description = the_imitator_leader_desc
+				traits = {
+					trait = leader_trait_adaptable
+					trait = leader_trait_excessive
+				}
+				skip_background_generation = yes
+			}
+
+			last_created_leader = {
+				save_global_event_target_as = the_imitator
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1550.a
+
+		hidden_effect = {
+			event_target:the_imitator = {
+				kill_leader = { show_notification = no }
+				event_target:imitator_country = {
+					destroy_country = yes
+				}
+				clear_global_event_target = the_imitator
+				clear_global_event_target = imitator_country
+			}
+		}
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1550.b
+		hidden_effect = {
+			ship_event = { id = cstorms.1555 days = 30 }
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.1555
+	title = cstorms.1555.name
+	desc = cstorms.1555.desc
+	picture = GFX_evt_the_imitator
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.1555.a
+
+		owner = {
+			hire_event_leader_effect = {
+				LEADER = the_imitator
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1555.b
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+			hidden_effect = {
+				event_target:the_imitator = {
+					kill_leader = { show_notification = no }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1555.c
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			hidden_effect = {
+				event_target:the_imitator = {
+					kill_leader = { show_notification = no }
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			event_target:imitator_country = {
+				destroy_country = yes
+			}
+			clear_global_event_target = the_imitator
+			clear_global_event_target = imitator_country
+		}
+	}
+}
+
+
+### Green Skies
+# A Curious Collage
+fleet_event = {
+	id = cstorms.1400
+	title = cstorms.1400.name
+	desc = cstorms.1400.desc
+	picture = GFX_evt_archaeology_camp
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTRIGUING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Weathered Situation
+fleet_event = {
+	id = cstorms.1405
+	title = cstorms.1405.name
+	desc = cstorms.1405.desc
+	picture = GFX_evt_archaeology_camp
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+
+		from.star = {
+			solar_system = {
+				system_event = { id = cstorms.1406 }
+			}
+		}
+	}
+
+	option = {
+		name = WORRYING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+system_event = {
+	id = cstorms.1406
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_star_flag = storm_system
+		}
+	}
+
+	immediate = {
+		create_cosmic_storm = {
+			type = celestial_storm
+			immediate = yes
+			cosmic_storm_start_position = this
+		}
+	}
+}
+
+# Folly
+fleet_event = {
+	id = cstorms.1410
+	title = cstorms.1410.name
+	desc = cstorms.1410.desc
+	picture = GFX_evt_archaeology_camp
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = cstorms.1410.a
+		owner = {
+			add_resource = {
+				consumer_goods = 100
+				minerals = 500
+				alloys = 200
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Pirates!
+fleet_event = {
+	id = cstorms.1415
+	title = cstorms.1415.name
+	desc = cstorms.1415.desc
+	picture = GFX_evt_cosmic_storms_green_skies
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+			planet = {
+				save_event_target_as = planet_green_skies
+			}
+		}
+		hidden_effect = {
+			leader = {
+				exile_leader_as = green_skies_hostage
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1415.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 2000
+				}
+			}
+		}
+		owner = {
+			add_resource = { energy = -2000 }
+		}
+		hidden_effect = {
+			owner = {
+				country_event = { id = cstorms.1425 days = 15 }
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1415.b
+		owner = {
+			save_global_event_target_as = green_skies_hostage_owner
+		}
+		owner = { set_country_flag = green_skies_hostage_taken }
+		hidden_effect = {
+			owner = {
+				country_event = { id = cstorms.1416 days = 15 }
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Pushback
+country_event = {
+	id = cstorms.1416
+	title = cstorms.1416.name
+	desc = cstorms.1416.desc
+	picture = GFX_evt_cosmic_storms_green_skies
+	show_sound = event_ship_explosion
+
+	is_triggered_only = yes
+
+	option = {
+		name = BATTLESTATIONS
+		owner = {
+			create_green_skies_pirates_fleet = yes
+		}
+	}
+}
+
+# Fired from on_fleet_destroyed_victim
+# This = owner of fleet 1 (destroyed)
+# From = owner of fleet 2 (combatant)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+# If green skies fleet is destroyed, return hostage
+country_event = {
+	id = cstorms.1417
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		fromfrom = {
+			has_fleet_flag = green_skies_pirate_fleet
+		}
+	}
+
+	immediate = {
+		event_target:green_skies_hostage_owner = { country_event = { id = cstorms.1420 } }
+	}
+}
+
+# Return hostage
+# Won't Get Fooled Again
+country_event = {
+	id = cstorms.1420
+	title = cstorms.1420.name
+	desc = cstorms.1420.desc
+	picture = GFX_evt_cosmic_storms_green_skies
+	show_sound = event_ship_explosion
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = green_skies_outcome_modifier
+		}
+	}
+
+	option = {
+		name = cstorms.1420.a
+		return_leader_from_exile = green_skies_hostage
+	}
+
+	option = {
+		name = cstorms.1420.b
+		kill_exiled_leader = green_skies_hostage
+	}
+
+	after = {
+		clear_global_event_target = green_skies_hostage_owner
+	}
+}
+
+# The Pleasures of Doing Business
+country_event = {
+	id = cstorms.1425
+	title = cstorms.1425.name
+	desc = cstorms.1425.desc
+	picture = GFX_evt_cosmic_storms_green_skies
+	show_sound = event_ship_explosion
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = green_skies_outcome_modifier
+		}
+	}
+
+	option = {
+		name = cstorms.1425.a
+		return_leader_from_exile = green_skies_hostage
+	}
+
+	option = {
+		name = cstorms.1425.b
+		kill_exiled_leader = green_skies_hostage
+	}
+}
+
+##########################
+###Terrestial Telescope###
+##########################
+
+planet_event = {
+	id = cstorms.1600
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_cosmic_storms_dlc = yes
+	}
+
+	immediate = {
+		add_anomaly_in_owned_space = {
+			CATEGORY = terrestial_telescope_category
+		}
+
+		create_ambient_object = {
+			type = "abandoned_starbase_01_object"
+			location = this
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.1605
+	title = cstorms.1605.name
+	desc = cstorms.1605.desc
+	picture = GFX_evt_space_station
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = green_skies_outcome_modifier
+		}
+	}
+
+	option = {
+		name = AMAZING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+#############################
+# Magnetized Planetary Core #
+#############################
+
+system_event = {
+	id = cstorms.1700
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = magnetic_storm }
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_magnetized_planetary_core }
+		}
+		any_system_planet = {
+			is_colony = yes
+			is_artificial = no
+			NOT = { has_modifier = weak_magnetic_field }
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+		}
+	}
+
+	immediate = {
+		random_list = {
+			75 = {}
+			25 = {
+				modifier = {
+					factor = 2
+					has_modifier = strong_magnetic_field
+				}
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+						is_artificial = no
+						NOT = { has_modifier = weak_magnetic_field }
+						NOT = { has_planet_flag = afflicted_by_storm_event }
+					}
+					planet_event = {
+						id = cstorms.1705
+						days = 90
+						scopes = { from = owner }
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1705
+	title = cstorms.1705.name
+	desc = cstorms.1705.desc
+	picture = GFX_evt_cosmic_storms_magnetic_storm
+	show_sound = event_power_down
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		NOT = { has_planet_flag = afflicted_by_storm_event }
+		is_colony = yes
+		is_artificial = no
+		NOT = { has_modifier = weak_magnetic_field }
+		is_owned_by = from
+		owner = {
+			NOT = { has_country_flag = triggered_magnetized_planetary_core }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = afflicted_by_storm_event
+		owner = { set_country_flag = triggered_magnetized_planetary_core }
+		add_modifier = { modifier = pm_magnetized_planetary_core }
+	}
+
+	option = {
+		name = FASCINATING
+		tooltip = {
+			add_modifier = { modifier = pm_magnetized_planetary_core }
+		}
+	}
+}
+
+######################
+# Electrified Oceans #
+######################
+
+system_event = {
+	id = cstorms.1710
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = electric_storm }
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_electrified_oceans }
+		}
+		any_system_planet = {
+			is_colony = yes
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			OR = {
+				is_wet = yes
+				is_cold = yes
+			}
+		}
+	}
+
+	immediate = {
+		random_list = {
+			75 = {}
+			25 = {
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+						NOT = { has_planet_flag = afflicted_by_storm_event }
+						OR = {
+							is_wet = yes
+							is_cold = yes
+						}
+					}
+					planet_event = {
+						id = cstorms.1715
+						days = 90
+						scopes = { from = owner }
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1715
+	title = cstorms.1715.name
+	desc = {
+		trigger = {
+			text = cstorms.1715.desc.common
+			text = newline
+			success_text = {
+				text = cstorms.1715.desc.aquatic
+				hidden:owner.owner_main_species = {
+					OR = {
+						has_trait = trait_aquatic
+						has_trait = trait_robot_aquatic
+					}
+				}
+			}
+			success_text = {
+				text = cstorms.1715.desc.non_aquatic
+				hidden:owner.owner_main_species = {
+					NOR = {
+						has_trait = trait_aquatic
+						has_trait = trait_robot_aquatic
+					}
+				}
+			}
+		}
+	}
+	picture = GFX_evt_cosmic_storms_celestial_storm
+	show_sound = event_kaleidoscopic_lights
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		NOT = { has_planet_flag = afflicted_by_storm_event }
+		is_colony = yes
+		OR = {
+			is_wet = yes
+			is_cold = yes
+		}
+		is_owned_by = from
+		owner = {
+			NOT = { has_country_flag = triggered_electrified_oceans }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = afflicted_by_storm_event
+		owner = { set_country_flag = triggered_electrified_oceans }
+	}
+
+	option = {
+		name = cstorms.1715.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			if = {
+				limit = {
+					owner_main_species = {
+						OR = {
+							has_trait = trait_aquatic
+							has_trait = trait_robot_aquatic
+						}
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier1unityreward
+					min = @tier1unitymin
+					max = @tier1unitymax
+				}
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1715.b
+		add_deposit = d_electrified_oceans
+	}
+}
+
+#######################
+# Ghostly Apparitions #
+#######################
+
+system_event = {
+	id = cstorms.1720
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = shroud_storm }
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_machine_empire = no
+			is_individual_machine = no
+			NOT = { has_country_flag = triggered_ghostly_apparitions }
+		}
+		any_system_planet = {
+			is_colony = yes
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			is_artificial = no
+		}
+	}
+
+	immediate = {
+		random_list = {
+			25 = {}
+			75 = {
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+						NOT = { has_planet_flag = afflicted_by_storm_event }
+						is_artificial = no
+					}
+					planet_event = {
+						id = cstorms.1725
+						days = 90
+						scopes = { from = owner }
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1725
+	title = cstorms.1725.name
+	desc = {
+		trigger = {
+			text = cstorms.1725.desc.common
+			text = newline
+			if = {
+				limit = {
+					owner = {
+						OR = {
+							owner_species = { has_trait = trait_psionic }
+							has_psionic_ascension = yes
+						}
+					}
+				}
+				text = cstorms.1725.desc.psionic
+			}
+			else_if = {
+				limit = { owner = { is_spiritualist = yes } }
+				text = cstorms.1725.desc.spiritualist
+			}
+			else_if = {
+				limit = { owner = { is_gestalt = yes } }
+				text = cstorms.1725.desc.gestalt
+			}
+			else = {
+				text = cstorms.1725.desc.default
+			}
+		}
+	}
+	picture = GFX_evt_cosmic_storms_the_storm_speaks
+	show_sound = event_death_cult
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		NOT = { has_planet_flag = afflicted_by_storm_event }
+		is_colony = yes
+		is_artificial = no
+		is_owned_by = from
+		owner = {
+			NOT = { has_country_flag = triggered_ghostly_apparitions }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = afflicted_by_storm_event
+		owner = { set_country_flag = triggered_ghostly_apparitions }
+	}
+
+	option = {
+		name = cstorms.1725.a
+		allow = {
+			owner = {
+				is_spiritualist = yes
+				resource_stockpile_compare = {
+					resource = minerals
+					value >= 100
+				}
+			}
+		}
+		owner = {
+			add_resource = { minerals = -100 }
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		add_deposit = d_ghostly_canyon
+	}
+}
+
+#######################
+# Volcanic Inactivity #
+#######################
+
+system_event = {
+	id = cstorms.1730
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_volcanic_inactivity }
+		}
+		any_system_planet = {
+			is_colony = yes
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			has_deposit = d_active_volcano
+		}
+	}
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				is_colony = yes
+				NOT = { has_planet_flag = afflicted_by_storm_event }
+				has_deposit = d_active_volcano
+			}
+			add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+			planet_event = {
+				id = cstorms.1731
+				days = 360
+				scopes = { from = owner }
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1731
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				is_colony = yes
+				NOT = { has_planet_flag = afflicted_by_storm_event }
+				has_deposit = d_active_volcano
+				is_owned_by = from
+				owner = {
+					NOT = { has_country_flag = triggered_volcanic_inactivity }
+				}
+			}
+			set_planet_flag = afflicted_by_storm_event
+			owner = { set_country_flag = triggered_volcanic_inactivity }
+			planet_event = { id = cstorms.1735 }
+		}
+		else = {
+			clear_affected_storm_flag = { SCOPE_TYPE = planet }
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1735
+	title = cstorms.1735.name
+	desc = cstorms.1735.desc
+	picture = GFX_evt_molten
+	show_sound = event_collapsing_ruins
+	is_triggered_only = yes
+	location = this
+
+	option = {
+		name = FASCINATING
+		remove_deposit = d_active_volcano
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_tech_option_or_research_effect = {
+				TECH = tech_volcano
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			clear_affected_storm_flag = { SCOPE_TYPE = planet }
+		}
+	}
+}
+
+#######################
+# Mountain in the Sky #
+#######################
+
+system_event = {
+	id = cstorms.1740
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = gravity_storm }
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_sky_mountain }
+		}
+		any_system_planet = {
+			is_colony = yes
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			is_artificial = no
+		}
+	}
+
+	immediate = {
+		random_list = {
+			1 = {}
+			1 = {
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+						NOT = { has_planet_flag = afflicted_by_storm_event }
+						is_artificial = no
+					}
+					planet_event = {
+						id = cstorms.1745
+						days = 30
+						scopes = { from = owner }
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1745
+	title = cstorms.1745.name
+	desc = cstorms.1745.desc
+	picture = GFX_evt_cosmic_storms_gravity_storm
+	show_sound = event_big_door_opening
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		NOT = { has_planet_flag = afflicted_by_storm_event }
+		is_colony = yes
+		is_artificial = no
+		is_owned_by = from
+		owner = {
+			NOT = { has_country_flag = triggered_sky_mountain }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = afflicted_by_storm_event
+		owner = { set_country_flag = triggered_sky_mountain }
+	}
+
+	option = {
+		name = INTERESTING
+		add_deposit = d_sky_mountain
+	}
+}
+
+####################
+# Melting Glaciers #
+####################
+
+system_event = {
+	id = cstorms.1750
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			OR = {
+				is_storm_type = electric_storm
+				is_storm_type = particle_storm
+				is_storm_type = gravity_storm
+				is_storm_type = magnetic_storm
+				is_storm_type = solar_storm
+				is_storm_type = celestial_storm
+			}
+		}
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_melting_glaciers }
+		}
+		any_system_planet = {
+			is_colony = yes
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			is_artificial = no
+			is_cold = yes
+		}
+	}
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				is_colony = yes
+				NOT = { has_planet_flag = afflicted_by_storm_event }
+				is_artificial = no
+				is_cold = yes
+			}
+			add_storm_type_flag = { SCOPE_TYPE = planet STORM_SCOPE = from }
+			planet_event = {
+				id = cstorms.1751
+				days = 90
+				scopes = { from = owner }
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1751
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				is_colony = yes
+				NOT = { has_planet_flag = afflicted_by_storm_event }
+				is_artificial = no
+				is_cold = yes
+				is_owned_by = from
+				owner = {
+					NOT = { has_country_flag = triggered_melting_glaciers }
+				}
+			}
+			set_planet_flag = afflicted_by_storm_event
+			owner = { set_country_flag = triggered_melting_glaciers }
+			planet_event = { id = cstorms.1755 }
+		}
+		else = {
+			clear_affected_storm_flag = { SCOPE_TYPE = planet }
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1755
+	title = cstorms.1755.name
+	desc = {
+		trigger = {
+			text = cstorms.1755.desc.common
+			text = newline
+			success_text = {
+				text = cstorms.1755.desc.electric
+				has_planet_flag = affected_by_electric_storm
+			}
+			success_text = {
+				text = cstorms.1755.desc.particle
+				has_planet_flag = affected_by_particle_storm
+			}
+			success_text = {
+				text = cstorms.1755.desc.gravity
+				has_planet_flag = affected_by_gravity_storm
+			}
+			success_text = {
+				text = cstorms.1755.desc.magnetic
+				has_planet_flag = affected_by_magnetic_storm
+			}
+			success_text = {
+				text = cstorms.1755.desc.solar
+				has_planet_flag = affected_by_solar_storm
+			}
+			success_text = {
+				text = cstorms.1755.desc.celestial
+				has_planet_flag = affected_by_celestial_storm
+			}
+		}
+	}
+	picture = GFX_evt_arctic
+	show_sound = event_collapsing_ruins
+	is_triggered_only = yes
+	location = this
+
+	option = {
+		name = FASCINATING
+		if = {
+			limit = { has_deposit = d_massive_glacier }
+			remove_deposit = d_massive_glacier
+		}
+		add_deposit = d_forgiving_tundra
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_tech_option_or_research_effect = {
+				TECH = tech_massive_glacier
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			clear_affected_storm_flag = { SCOPE_TYPE = planet }
+		}
+	}
+}
+
+###############
+# Dusty Drink #
+###############
+
+system_event = {
+	id = cstorms.1760
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = celestial_storm }
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_robotic_species = no
+			NOT = { has_country_flag = triggered_dusty_drink }
+		}
+		any_system_planet = {
+			is_colony = yes
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			is_artificial = no
+		}
+	}
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				is_colony = yes
+				NOT = { has_planet_flag = afflicted_by_storm_event }
+				is_artificial = no
+			}
+			planet_event = {
+				id = cstorms.1761
+				days = 90
+				scopes = { from = owner }
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1761
+	title = cstorms.1761.name
+	desc = {
+		trigger = {
+			text = cstorms.1761.desc.common
+			text = newline
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				text = cstorms.1761.desc.lithoid
+			}
+			else = { text = cstorms.1761.desc.default }
+		}
+	}
+	picture = GFX_evt_cosmic_storms_celestial_storm
+	show_sound = event_metal_fatigue
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		NOT = { has_planet_flag = afflicted_by_storm_event }
+		is_colony = yes
+		is_artificial = no
+		solar_system = { is_inside_storm = celestial_storm }
+		is_owned_by = from
+		owner = {
+			NOT = { has_country_flag = triggered_dusty_drink }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = afflicted_by_storm_event
+		owner = { set_country_flag = triggered_dusty_drink }
+	}
+
+	option = {
+		name = cstorms.1761.a
+		trigger = {
+			owner = { is_lithoid_empire = no }
+		}
+		add_modifier = { modifier = pm_satured_filtration }
+		enable_special_project = {
+			name = "CLEAR_DUSTY_PIPES_PROJECT"
+			location = this
+			owner = this.owner
+		}
+	}
+
+	option = {
+		name = cstorms.1761.b
+		trigger = {
+			owner = { is_lithoid_empire = yes }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1765
+	title = cstorms.1765.name
+	desc = cstorms.1765.desc
+	picture = GFX_evt_colony_settlement
+	show_sound = event_default
+	is_triggered_only = yes
+	location = this
+
+	option = {
+		name = EXCELLENT
+		remove_modifier = pm_satured_filtration
+		owner = {
+			add_modifier = { modifier = filtration_insight_modifier }
+			inverted_switch = {
+				trigger = has_technology
+				tech_industrial_farming = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_industrial_farming
+						PROGRESS = 0.25
+						CATEGORY = society_research
+					}
+				}
+				tech_eco_simulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_eco_simulation
+						PROGRESS = 0.25
+						CATEGORY = society_research
+					}
+				}
+				tech_gene_crops = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_gene_crops
+						PROGRESS = 0.25
+						CATEGORY = society_research
+					}
+				}
+				tech_nano_vitality_crops = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_nano_vitality_crops
+						PROGRESS = 0.25
+						CATEGORY = society_research
+					}
+				}
+				default = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_repeatable_improved_tile_food_output
+						PROGRESS = 0.25
+						CATEGORY = society_research
+					}
+				}
+			}
+		}
+	}
+}
+
+####################
+# Flightless Fauna #
+####################
+
+system_event = {
+	id = cstorms.1770
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = gravity_storm }
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_flightless_fauna }
+		}
+		any_system_planet = {
+			is_colony = yes
+			exists = owner
+			NOT = { has_planet_flag = afflicted_by_storm_event }
+			is_artificial = no
+		}
+	}
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				is_colony = yes
+				exists = owner
+				NOT = { has_planet_flag = afflicted_by_storm_event }
+				is_artificial = no
+			}
+			planet_event = {
+				id = cstorms.1771
+				days = 90
+				scopes = { from = owner }
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1771
+	title = cstorms.1771.name
+	desc = {
+		trigger = {
+			text = cstorms.1771.desc.common
+			text = newline
+			if = {
+				limit = { owner = { has_civic = civic_hive_devouring_swarm } }
+				text = cstorms.1771.desc.swarm
+			}
+			else = { text = cstorms.1771.desc.default }
+		}
+	}
+	picture = GFX_evt_cosmic_storms_gravity_storm
+	show_sound = event_dangerous_animals
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		NOT = { has_planet_flag = afflicted_by_storm_event }
+		is_colony = yes
+		is_artificial = no
+		solar_system = { is_inside_storm = gravity_storm }
+		exists = owner
+		is_owned_by = from
+		owner = {
+			NOT = { has_country_flag = triggered_flightless_fauna }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = afflicted_by_storm_event
+		owner = { set_country_flag = triggered_flightless_fauna }
+	}
+
+	option = {
+		name = cstorms.1771.a
+		trigger = {
+			owner = { has_civic = civic_hive_devouring_swarm }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1771.b
+		trigger = {
+			owner = { NOT = { has_civic = civic_hive_devouring_swarm } }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1771.c
+		trigger = {
+			owner = { NOT = { has_civic = civic_hive_devouring_swarm } }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = minerals
+					value >= 350
+				}
+			}
+		}
+		hidden_effect = {
+			set_planet_flag = flightless_fauna_saved_by_@owner
+		}
+		owner = {
+			add_resource = { minerals = -350 }
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+system_event = {
+	id = cstorms.1775
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = gravity_storm }
+		any_system_planet = {
+			is_colony = yes
+			exists = owner
+			has_planet_flag = flightless_fauna_saved_by_@owner
+		}
+	}
+
+	immediate = {
+		random_system_planet = {
+			limit = {
+				exists = owner
+				has_planet_flag = flightless_fauna_saved_by_@owner
+			}
+			planet_event = {
+				id = cstorms.1776
+				days = 360
+				scopes = { from = owner }
+			}
+			remove_planet_flag = flightless_fauna_saved_by_@owner
+		}
+	}
+}
+
+planet_event = {
+	id = cstorms.1776
+	title = cstorms.1776.name
+	desc = cstorms.1776.desc
+	picture = GFX_evt_animal_wildlife
+	show_sound = event_alien_nature
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		solar_system = { is_inside_storm = no }
+		is_owned_by = from
+	}
+
+	option = {
+		name = cstorms.1776.a
+		add_deposit = d_avian_reserve
+	}
+}
+
+####################
+# Eye of the Storm #
+####################
+
+system_event = {
+	id = cstorms.1800
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_eye_of_the_storm }
+		}
+		exists = from
+		from = {
+			NOT = { has_storm_flag = storm_stormfall }
+		}
+	}
+
+	immediate = {
+		from = { lock_storm_in_place = yes }
+		owner = {
+			set_country_flag = triggered_eye_of_the_storm
+			country_event = {
+				id = cstorms.1801
+				scopes = {
+					from = prev
+					fromfrom = from
+				}
+			}
+		}
+	}
+}
+
+# from = system
+# fromfrom = storm
+country_event = {
+	id = cstorms.1801
+	title = cstorms.1801.name
+	desc = cstorms.1801.desc
+	inline_script = {
+		script = cosmic_storms/StormEventPicture
+		STORM_SCOPE = fromfrom
+	}
+	show_sound = event_default
+	is_triggered_only = yes
+	location = from
+
+	option = {
+		name = CURIOUS
+		from = {
+			inline_script = {
+				script = cosmic_storms/EnableEyeOfTheStormProject
+				STORM_SCOPE = root.fromfrom
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.1805
+	title = cstorms.1805.name
+	desc = {
+		trigger = {
+			text = cstorms.1805.desc
+			if = {
+				limit = { has_ship_flag = event_traumatized_leader }
+				text = newline
+				text = cstorms.1805.desc.traumatized
+			}
+		}
+	}
+	picture = GFX_evt_cosmic_storms_stormbound
+	show_sound = event_faceoff_in_space
+	is_triggered_only = yes
+	location = from
+
+	immediate = {
+		fromfrom = {
+			switch = {
+				trigger = is_storm_type
+				magnetic_storm = { prev.from.star = { set_planet_flag = collect_alloys } }
+				celestial_storm = { prev.from.star = { set_planet_flag = collect_minerals } }
+				shroud_storm = { prev.from.star = { set_planet_flag = collect_zro } }
+				nexus_storm = { prev.from.star = { set_planet_flag = collect_multiple_resources } }
+				default = { prev.from.star = { set_planet_flag = collect_energy } }
+			}
+		}
+		random_list = {
+			90 = {}
+			10 = {
+				set_ship_flag = event_traumatized_leader
+				leader = { add_trait = leader_trait_traumatized }
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		controller = {
+			if = {
+				limit = {
+					prev.from.star = {
+						OR = {
+							has_planet_flag = collect_energy
+							has_planet_flag = collect_multiple_resources
+						}
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = energy
+					value = @tier4materialreward
+					min = @tier4materialmin
+					max = @tier4materialmax
+				}
+			}
+			if = {
+				limit = {
+					prev.from.star = {
+						OR = {
+							has_planet_flag = collect_alloys
+							has_planet_flag = collect_multiple_resources
+						}
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = alloys
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+			if = {
+				limit = {
+					prev.from.star = {
+						OR = {
+							has_planet_flag = collect_minerals
+							has_planet_flag = collect_multiple_resources
+						}
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier4materialreward
+					min = @tier4materialmin
+					max = @tier4materialmax
+				}
+			}
+			if = {
+				limit = {
+					prev.from.star = {
+						has_planet_flag = collect_zro
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = sr_zro
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+			add_tech_option_or_research_effect = {
+				TECH = tech_ship_hull_storm_breaker_1
+				PROGRESS = 0.1
+				CATEGORY = engineering_research
+			}
+		}
+		if = {
+			limit = { has_ship_flag = event_traumatized_leader }
+			tooltip = {
+				leader = { add_trait = leader_trait_traumatized }
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = { has_ship_flag = event_traumatized_leader }
+				remove_ship_flag = event_traumatized_leader
+			}
+			from.star = {
+				remove_planet_flag = collect_energy
+				remove_planet_flag = collect_alloys
+				remove_planet_flag = collect_minerals
+				remove_planet_flag = collect_zro
+				remove_planet_flag = collect_multiple_resources
+			}
+		}
+	}
+}
+
+
+##################
+# Storm in a Box #
+##################
+
+country_event = {
+	id = cstorms.1810
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = triggered_storm_in_a_box }
+		from = { has_storm_flag = first_storm_met_by_@root }
+	}
+
+	immediate = {
+		set_country_flag = triggered_eye_of_the_storm
+		country_event = {
+			id = cstorms.1815
+			days = 1800
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.1815
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		random_system_within_border = {
+			system_event = { id = cstorms.1816 }
+		}
+	}
+}
+
+system_event = {
+	id = cstorms.1816
+	title = cstorms.1816.name
+	desc = cstorms.1816.desc
+	picture = GFX_evt_astral_rift_psionic_stranger_2
+	show_sound = event_default
+	is_triggered_only = yes
+	location = this
+
+	option = {
+		name = cstorms.1816.a
+		enable_special_project = {
+			name = "STORM_IN_A_BOX_INVESTIGATE_PROJECT"
+			location = this.star
+			owner = root.owner
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.1820
+	title = cstorms.1820.name
+	desc = cstorms.1820.desc
+	picture = GFX_evt_astral_rift_psionic_stranger_2
+	show_sound = event_ancient_drone
+	is_triggered_only = yes
+	location = this
+
+	option = {
+		name = cstorms.1820.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		solar_system.star = {
+			enable_special_project = {
+				name = "STORM_IN_A_BOX_TRAP_PROJECT"
+				location = this
+				owner = root.controller
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1820.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.1825
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		random_list = {
+			1 = {
+				spawn_random_storm = {
+					type = gravity_storm
+					immediate = yes
+					cosmic_storm_start_position = this.solar_system
+				}
+			}
+			1 = {
+				spawn_random_storm = {
+					type = celestial_storm
+					immediate = yes
+					cosmic_storm_start_position = this.solar_system
+				}
+			}
+			1 = {
+				spawn_random_storm = {
+					type = electric_storm
+					immediate = yes
+					cosmic_storm_start_position = this.solar_system
+				}
+			}
+			1 = {
+				spawn_random_storm = {
+					type = particle_storm
+					immediate = yes
+					cosmic_storm_start_position = this.solar_system
+				}
+			}
+			1 = {
+				spawn_random_storm = {
+					type = solar_storm
+					immediate = yes
+					cosmic_storm_start_position = this.solar_system
+				}
+			}
+			1 = {
+				spawn_random_storm = {
+					type = magnetic_storm
+					immediate = yes
+					cosmic_storm_start_position = this.solar_system
+				}
+			}
+		}
+		ship_event = {
+			id = cstorms.1826
+			scopes = { from = last_created_cosmic_storm }
+		}
+	}
+}
+
+# FROM = released storm
+ship_event = {
+	id = cstorms.1826
+	title = cstorms.1826.name
+	desc = cstorms.1826.desc
+	inline_script = {
+		script = cosmic_storms/StormEventPicture
+		STORM_SCOPE = from
+	}
+	show_sound = event_energy_field
+	is_triggered_only = yes
+	location = this
+
+	option = {
+		name = REMARKABLE
+		custom_tooltip = cstorms.1826.storm_tt
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_ship_hull_storm_breaker_1 } }
+				add_research_option = tech_ship_hull_storm_breaker_1
+				add_tech_progress = {
+					tech = tech_ship_hull_storm_breaker_1
+					progress = 0.1
+				}
+			}
+			else_if = {
+				limit = { NOT = { has_technology = tech_ship_hull_storm_breaker_2 } }
+				add_research_option = tech_ship_hull_storm_breaker_2
+				add_tech_progress = {
+					tech = tech_ship_hull_storm_breaker_2
+					progress = 0.1
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			add_modifier = { modifier = storm_trap_insight_modifier }
+		}
+	}
+}
+
+##########################
+# Aftermath Opportunists #
+##########################
+
+system_event = {
+	id = cstorms.1830
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_megacorp = yes
+		exists = owner
+		exists = event_target:caravaneer_fleet3_country
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_unfriendly = no
+			has_communications = event_target:caravaneer_fleet3_country
+			NOR = {
+				has_country_flag = triggered_aftermath_opportunists
+				has_technology = tech_storm_prediction_2
+				is_hostile_to = event_target:caravaneer_fleet3_country
+				is_unfriendly_to = event_target:caravaneer_fleet3_country
+				is_at_war_with = event_target:caravaneer_fleet3_country
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = triggered_aftermath_opportunists
+			country_event = { id = cstorms.1835 }
+		}
+	}
+}
+
+country_event = {
+	id = cstorms.1835
+	title = cara_fleet3_main.title
+	desc = cstorms.1835.desc
+	diplomatic = yes
+	is_triggered_only = yes
+	custom_gui = "enclave_caravaneer_window"
+
+	trigger = {
+		exists = event_target:caravaneer_fleet3_country
+	}
+
+	picture_event_data = {
+		portrait = event_target:caravaneer_fleet3_country
+		room = ethic_spaceship_room
+	}
+
+	option = {
+		name = cstorms.1835.a
+		trigger = { NOT = { has_technology = tech_storm_prediction_1 } }
+		inline_script = {
+			script = events/resource_cost_with_allow
+			RESOURCE = energy
+			AMOUNT = 1500
+		}
+		give_technology = { tech = tech_storm_prediction_1 }
+	}
+
+	option = {
+		name = cstorms.1835.a
+		trigger = {
+			has_technology = tech_storm_prediction_1
+			NOT = { has_technology = tech_storm_prediction_2 }
+		}
+		inline_script = {
+			script = events/resource_cost_with_allow
+			RESOURCE = energy
+			AMOUNT = 2000
+		}
+		give_technology = { tech = tech_storm_prediction_2 }
+	}
+
+	option = {
+		name = cstorms.1835.b
+	}
+}
+
+#####################
+### Shroud Events ###
+#####################
+
+#Gatekeeper
+
+planet_event = {
+	id = cstorms.8500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { #Normal habitable Planets but not colonies, no habitats etc
+			limit = {
+				exists = planet
+			}
+			if = {
+				limit = {
+					is_colony = no
+					is_star = no
+					NOT = { ##Lets not mess with Habitat deposits
+						any_fleet_in_orbit = {
+							is_ship_class = shipclass_habitat_station
+						}
+					}
+				}
+				if = { ### temperate worlds turn into something
+					limit = {
+						is_wet = yes
+					}
+					random_list = {
+						40 = {
+							random_list = {
+								30 = { change_pc = pc_arid }
+								30 = { change_pc = pc_desert }
+								30 = { change_pc = pc_savannah }
+							}
+						}
+						40 = {
+							random_list = {
+								30 = { change_pc = pc_tundra }
+								30 = { change_pc = pc_arctic }
+								30 = { change_pc = pc_alpine }
+							}
+						}
+						1 = { change_pc = pc_gaia }
+						1 = { change_pc = pc_nuked }
+					}
+					reroll_planet = yes
+				}
+				if = { ### dry worlds turn into something
+					limit = {
+						is_dry = yes
+					}
+					random_list = {
+						40 = {
+							random_list = {
+								30 = { change_pc = pc_continental }
+								30 = { change_pc = pc_tropical }
+								30 = { change_pc = pc_ocean }
+							}
+						}
+						40 = {
+							random_list = {
+								30 = { change_pc = pc_tundra }
+								30 = { change_pc = pc_arctic }
+								30 = { change_pc = pc_alpine }
+							}
+						}
+						1 = { change_pc = pc_gaia }
+						1 = { change_pc = pc_nuked }
+					}
+					reroll_planet = yes
+				}
+				if = { ### cold worlds turn into something
+					limit = {
+						is_cold = yes
+					}
+					random_list = {
+						40 = {
+							random_list = {
+								30 = { change_pc = pc_continental }
+								30 = { change_pc = pc_tropical }
+								30 = { change_pc = pc_ocean }
+							}
+						}
+						40 = {
+							random_list = {
+								30 = { change_pc = pc_arid }
+								30 = { change_pc = pc_desert }
+								30 = { change_pc = pc_savannah }
+							}
+						}
+						1 = { change_pc = pc_gaia }
+						1 = { change_pc = pc_nuked }
+					}
+					reroll_planet = yes
+				}
+				if = { ### dead worlds turn into something
+					limit = {
+						OR = {
+							is_gas_giant = yes # undercoat: moved to scripted trigger
+							is_barren_dry_world = yes # undercoat: moved to scripted trigger
+							is_barren_cold_world = yes # undercoat: moved to scripted trigger
+							is_toxic_world = yes # undercoat: moved to scripted trigger
+							is_frozen_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+					random_list = {
+						5 = {
+							change_pc = pc_shrouded
+							if = {
+								limit = {
+							 		has_deposit_for = shipclass_mining_station
+							 	}
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							}
+							random_list = {
+								20 = { add_deposit = d_zro_deposit_1 }
+								20 = { add_deposit = d_zro_deposit_2 }
+								20 = { add_deposit = d_zro_deposit_3 }
+								20 = { add_deposit = d_zro_deposit_4 }
+								20 = { add_deposit = d_zro_deposit_5 }
+							}
+						}
+						5 = {
+							change_pc = pc_broken
+							if = {
+								limit = {
+							 		has_deposit_for = shipclass_research_station
+							 	}
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							}
+							random_list = {
+								20 = { add_deposit = d_alloys_1 }
+								20 = { add_deposit = d_alloys_2 }
+								20 = { add_deposit = d_alloys_3 }
+								20 = { add_deposit = d_alloys_4 }
+								20 = { add_deposit = d_alloys_5 }
+							}
+						}
+						5 = {
+							change_pc = pc_shattered
+							if = {
+								limit = {
+							 		has_deposit_for = shipclass_research_station
+							 	}
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							}
+							random_list = {
+								20 = { add_deposit = d_minerals_1 }
+								20 = { add_deposit = d_minerals_2 }
+								20 = { add_deposit = d_minerals_3 }
+								20 = { add_deposit = d_minerals_4 }
+								20 = { add_deposit = d_minerals_5 }
+							}
+						}
+						5 = {
+							change_pc = pc_gray_goo
+							if = {
+								limit = {
+							 		has_deposit_for = shipclass_mining_station
+							 	}
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							}
+							add_deposit = d_nanites_deposit
+						}
+					}
+				}
+				if = { #Notify the owner of the system
+					limit = { exists = solar_system.owner }
+					solar_system.owner = { country_event = { id = cstorms.8510 } }
+				}
+			}
+			if = {
+				limit = {
+					is_colony = yes
+				}
+				random_owned_pop = {
+					change_species = last_created_species
+				}
+				owner = { country_event = { id = cstorms.8515 } }
+			}
+			if = { #Change star planet class and star entity
+				limit = {
+					is_star = yes
+					is_binary_star = no
+					is_trinary_star = no
+				}
+				random_list = {
+					20 = {
+						change_pc = pc_a_star
+						solar_system = {
+							set_star_class = sc_a
+						}
+					}
+					20 = {
+						change_pc = pc_f_star
+						solar_system = {
+							set_star_class = sc_f
+						}
+					}
+					20 = {
+						change_pc = pc_g_star
+						solar_system = {
+							set_star_class = sc_g
+						}
+					}
+					20 = {
+						change_pc = pc_k_star
+						solar_system = {
+							set_star_class = sc_k
+						}
+					}
+					20 = {
+						change_pc = pc_m_star
+						solar_system = {
+							set_star_class = sc_m
+						}
+					}
+					20 = {
+						change_pc = pc_m_giant_star
+						solar_system = {
+							set_star_class = sc_m_giant
+						}
+					}
+					20 = {
+						change_pc = pc_t_star
+						solar_system = {
+							set_star_class = sc_t
+						}
+					}
+					5 = {
+						change_pc = pc_black_hole
+						solar_system = {
+							set_star_class = sc_black_hole
+						}
+					}
+					5 = {
+						change_pc = pc_neutron_star
+						solar_system = {
+							set_star_class = sc_neutron_star
+						}
+					}
+					5 = {
+						change_pc = pc_pulsar
+						solar_system = {
+							set_star_class = sc_pulsar
+						}
+					}
+				}
+				if = { #Notify the owner of the system
+					limit = { exists = solar_system.owner }
+					solar_system.owner = { country_event = { id = cstorms.8520 } }
+				}
+			}
+			set_planet_flag = shroud_storm_changed #Only change a planet once
+			add_modifier = { modifier = shroud_switched } #Leave a planet modifier so people realize the planet was changed
+		}
+	}
+}
+
+#################################################
+# Shroud Storm - Exchange Notification          #
+#################################################
+
+country_event = {
+	id = cstorms.8510
+	title = cstorms.8510.title
+	desc = cstorms.8510.desc
+	is_triggered_only = yes
+	picture = GFX_evt_cosmic_storms_shroud_storm
+	location = from
+
+	option = {
+		name = cstorms.8510.a
+	}
+}
+
+country_event = {
+	id = cstorms.8515
+	title = cstorms.8515.title
+	desc = cstorms.8515.desc
+	is_triggered_only = yes
+	picture = GFX_evt_cosmic_storms_shroud_storm
+	location = from
+
+	option = {
+		name = cstorms.8515.a
+	}
+}
+
+country_event = {
+	id = cstorms.8520
+	title = cstorms.8520.title
+	desc = cstorms.8520.desc
+	is_triggered_only = yes
+	picture = GFX_evt_cosmic_storms_shroud_storm
+	location = from
+
+	option = {
+		name = cstorms.8520.a
+	}
+}
+
+#################################################
+# Repowered Complex - Spawn Archaeological Site #
+#################################################
+
+system_event = {
+	id = cstorms.1840
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = { is_storm_type = electric_storm }
+		any_system_planet = {
+			NOR = {
+				has_planet_flag = afflicted_by_storm_event
+				exists = archaeological_site
+				has_planet_flag = suppress_archaeological_sites
+			}
+			is_a_planet = yes
+			is_a_planet_megastructure = yes
+			is_artificial = no
+			is_astral_scar = no
+			has_anomaly = no
+		}
+	}
+
+	immediate = {
+		random_list = {
+			1 = {}
+			1 = {
+				random_system_planet = {
+					limit = {
+						NOR = {
+							has_planet_flag = afflicted_by_storm_event
+							exists = archaeological_site
+							has_planet_flag = suppress_archaeological_sites
+						}
+						is_a_planet = yes
+						is_a_planet_megastructure = yes
+						is_artificial = no
+						is_astral_scar = no
+						has_anomaly = no
+					}
+					set_planet_flag = afflicted_by_storm_event
+					prevent_anomaly = yes
+					create_archaeological_site = site_repowered_complex
+				}
+			}
+		}
+	}
+}
+
+#Chapter 1 Fortified Entrance
+fleet_event = {
+	id =  cstorms.1845
+	title = cstorms.1845.name
+	desc = cstorms.1845.desc
+	picture = GFX_evt_generator_powerup
+	show_sound = event_default
+	is_triggered_only = yes
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = CURIOUS
+		if = {
+			limit = { has_ancrel = yes }
+			small_artifact_reward = yes
+		}
+		else = {
+			controller = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier1unityreward
+					min = @tier1unitymin
+					max = @tier1unitymax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 2 Survival Shelter
+fleet_event = {
+	id =  cstorms.1850
+	title = cstorms.1850.name
+	desc = cstorms.1850.desc
+	picture = GFX_evt_derelict_interior
+	show_sound = event_airlock
+	is_triggered_only = yes
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = cstorms.1850.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			if = {
+				limit = { country_uses_consumer_goods = yes }
+				add_monthly_resource_mult = {
+					resource = consumer_goods
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+#Chapter 3 The Deluxe Shelter Package™️
+fleet_event = {
+	id =  cstorms.1855
+	title = cstorms.1855.name
+	desc = {
+		trigger = {
+			text = cstorms.1855.desc
+			if = {
+				limit = { controller = { is_megacorp = yes } }
+				text = newline
+				text = cstorms.1855.desc.megacorp
+			}
+		}
+	}
+	picture = GFX_evt_physics_research
+	show_sound = event_door_opening
+	is_triggered_only = yes
+
+	archaeology = yes
+
+	immediate = {
+		from = {
+			set_site_progress_locked = yes
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		if = {
+			limit = { has_ancrel = yes }
+			medium_artifact_reward = yes
+		}
+		else = {
+			controller = {
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier2unityreward
+					min = @tier2unitymin
+					max = @tier2unitymax
+				}
+			}
+		}
+		controller = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_industrial_storm_protection
+						PROGRESS = 0.5
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_manipulation
+						PROGRESS = 0.5
+						CATEGORY = physics_research
+					}
+				}
+				tech_storm_prediction_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_1
+						PROGRESS = 0.5
+						CATEGORY = physics_research
+					}
+				}
+				tech_advanced_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_industrial_storm_protection
+						PROGRESS = 0.5
+						CATEGORY = engineering_research
+					}
+				}
+				tech_advanced_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_storm_manipulation
+						PROGRESS = 0.5
+						CATEGORY = physics_research
+					}
+				}
+				tech_ship_hull_storm_breaker_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_hull_storm_breaker_1
+						PROGRESS = 0.5
+						CATEGORY = engineering_research
+					}
+				}
+				tech_ship_storm_weapons_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_storm_weapons_1
+						PROGRESS = 0.5
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_prediction_2 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_2
+						PROGRESS = 0.5
+						CATEGORY = physics_research
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		from = {
+			set_site_progress_locked = no
+		}
+	}
+}
+
+##################
+# Deposit Event #
+##################
+
+planet_event = {
+	id = cstorms.8000
+	title = cstorms.8000.title
+	desc = cstorms.8000.desc
+	picture = GFX_evt_vortex
+	show_sound = event_scanner
+	is_triggered_only = yes
+	location = this
+
+	trigger = {}
+
+	option = {
+		name = cstorms.8000.a
+	}
+}
+
+### Cleanup owner-switch Filtration
+
+planet_event = {
+	id = cstorms.8100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = pm_satured_filtration
+		from = {
+			NOT = {
+				has_special_project = CLEAR_DUSTY_PIPES_PROJECT
+			}
+		}
+	}
+
+	immediate = {
+		enable_special_project = {
+			name = "CLEAR_DUSTY_PIPES_PROJECT"
+			location = this
+			owner = this.owner
+		}
+	}
+}

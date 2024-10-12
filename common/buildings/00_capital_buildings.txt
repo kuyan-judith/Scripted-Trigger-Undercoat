@@ -31,6 +31,7 @@ building_colony_shelter = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
 			uses_habitat_capitals = yes
+			uses_district_set = cosmogenesis_world
 		}
 	}
 
@@ -41,6 +42,7 @@ building_colony_shelter = {
 		building_slave_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_colony_shelter_nanotech
 	}
 
 	planet_modifier = {
@@ -54,33 +56,68 @@ building_colony_shelter = {
 		script = buildings/on_all_capital_buildings
 	}
 
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/enforcers_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_dystopian_society = yes }
+		"
+	}
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
 			owner = { has_dystopian_society = yes } # undercoat: moved to scripted trigger
 		}
-		job_enforcer_add = 1
 		job_colonist_add = -1
 	}
 
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
+			owner = { is_regular_empire = yes }
+			has_modifier = penal_colony
 		}
-		job_roboticist_add = 1
+		job_warden_add = 1
 		job_colonist_add = -1
 	}
 
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_individual_machine = yes }
+		"
+	}
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
+			owner = { is_individual_machine = yes }
 		}
-		pop_growth_speed = 0.10
+		job_colonist_add = -1
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
+		"
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
+		}
+		job_colonist_add = -1
 	}
 
 	resources = {
@@ -100,27 +137,11 @@ building_colony_shelter = {
 			owner = {
 				NAND = {
 					has_dystopian_society = yes # undercoat: moved to scripted trigger
-					has_active_tradition = tr_synthetics_finish
+					has_active_tradition = tr_synthetics_prefabricated_components
 				}
 			}
 		}
 		text = job_colonist_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_dystopian_society = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_enforcer_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
 	}
 
 	triggered_desc = {
@@ -153,6 +174,7 @@ building_capital = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
 			uses_habitat_capitals = yes
+			is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -163,6 +185,7 @@ building_capital = {
 		building_slave_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_capital_nanotech
 	}
 
 	allow = {
@@ -181,8 +204,12 @@ building_capital = {
 		is_regular_empire = yes
 	}
 
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
+	}
 	planet_modifier = {
-		job_enforcer_add = 1
 		planet_housing_add = 5
 		planet_amenities_add = 5
 		planet_max_buildings_add = @buildings_t2
@@ -192,6 +219,25 @@ building_capital = {
 
 	inline_script = {
 		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 1
+		SECONDARY_JOB = 1
+		TERTIARY_JOB = 2
+	}
+
+	# Undercoat inline script
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/triggered/culture_workers_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			exists = owner.federation
+			owner.federation = { has_federation_perk = culture_workers_1 }
+		"
 	}
 
 	triggered_planet_modifier = {
@@ -209,50 +255,12 @@ building_capital = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		job_healthcare_add = 1
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/politicians_add
-		POLITICIAN_AMOUNT = 2
-		STEWARD_AMOUNT = 3
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/civic_capital_jobs
-		AMOUNT = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
 			owner = { has_technology = tech_capital_productivity_1 }
 		}
 		modifier = {
 			planet_jobs_productive_upkeep_mult = 0.1
 			planet_jobs_productive_produces_mult = 0.1
 		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
 	}
 
 	resources = {
@@ -263,27 +271,6 @@ building_capital = {
 		upkeep = {
 			energy = @b2_upkeep
 		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_enforcer_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_healthcare_effect_desc
 	}
 
 	triggered_desc = {
@@ -329,6 +316,7 @@ building_major_capital = {
 		building_slave_major_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_major_capital_nanotech
 	}
 
 	prerequisites = {
@@ -339,8 +327,12 @@ building_major_capital = {
 		is_regular_empire = yes
 	}
 
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 2
+	}
 	planet_modifier = {
-		job_enforcer_add = 2
 		planet_housing_add = 8
 		planet_amenities_add = 8
 		planet_max_buildings_add = @buildings_t3
@@ -350,6 +342,13 @@ building_major_capital = {
 
 	inline_script = {
 		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 2
+		SECONDARY_JOB = 1
+		TERTIARY_JOB = 2
 	}
 
 	triggered_planet_modifier = {
@@ -362,33 +361,6 @@ building_major_capital = {
 		modifier = {
 			planet_housing_add = 1
 		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		job_healthcare_add = 1
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/politicians_add
-		POLITICIAN_AMOUNT = 3
-		STEWARD_AMOUNT = 4
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/civic_capital_jobs
-		AMOUNT = 1
 	}
 
 	triggered_planet_modifier = {
@@ -413,7 +385,8 @@ building_major_capital = {
 		}
 	}
 
-	inline_script = { # undercoat: moved to inline script
+	# Undercoat inline script
+	inline_script = {
 		script = jobs/triggered/culture_workers_add
 		AMOUNT = 1
 		desc = 1
@@ -424,17 +397,6 @@ building_major_capital = {
 		mult_line = " "
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -443,18 +405,6 @@ building_major_capital = {
 		upkeep = {
 			energy = @b3_upkeep
 		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_enforcer_effect_desc
 	}
 
 	triggered_desc = {
@@ -508,6 +458,7 @@ building_system_capital = {
 		building_slave_major_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_system_capital_nanotech
 	}
 
 	allow = {
@@ -522,8 +473,12 @@ building_system_capital = {
 		is_regular_empire = yes
 	}
 
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 3
+	}
 	planet_modifier = {
-		job_enforcer_add = 3
 		planet_housing_add = 12
 		planet_amenities_add = 12
 		planet_max_buildings_add = @buildings_t4
@@ -533,6 +488,13 @@ building_system_capital = {
 
 	inline_script = {
 		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 2
+		SECONDARY_JOB = 2
+		TERTIARY_JOB = 2
 	}
 
 	triggered_planet_modifier = {
@@ -550,28 +512,13 @@ building_system_capital = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
+			owner = {
+				has_active_tradition = tr_domination_imperious_architecture
+			}
 		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
+		modifier = {
+			planet_housing_add = 1
 		}
-		job_healthcare_add = 1
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/politicians_add
-		POLITICIAN_AMOUNT = 4
-		STEWARD_AMOUNT = 6
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/civic_capital_jobs
-		AMOUNT = 2
 	}
 
 	triggered_planet_modifier = {
@@ -618,17 +565,6 @@ building_system_capital = {
 		mult_line = " "
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -637,26 +573,6 @@ building_system_capital = {
 		upkeep = {
 			energy = @b4_upkeep
 		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_enforcer_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_healthcare_effect_desc
 	}
 
 	triggered_desc = {
@@ -696,6 +612,7 @@ building_deployment_post = {
 			is_fallen_empire = no
 		}
 		uses_habitat_capitals = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 	}
 
 	convert_to = {
@@ -703,15 +620,39 @@ building_deployment_post = {
 		building_colony_shelter
 		building_ancient_control_center
 		building_ancient_palace
+		building_deployment_post_nanotech
 	}
 
 	planet_modifier = {
 		planet_housing_add = 3
 		planet_amenities_add = 8
-		job_replicator_add = 2
-		job_patrol_drone_add = 1
 		job_maintenance_drone_add = 2
 		planet_max_buildings_add = @buildings_t1
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = no }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			NOT = { has_modifier = gestation_colony }
+			owner = { is_machine_assimilator = yes }
+		"
 	}
 
 	inline_script = {
@@ -720,31 +661,10 @@ building_deployment_post = {
 
 	triggered_planet_modifier = {
 		potential = {
-			exists = owner
-			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
+			has_modifier = gestation_colony
 		}
 		modifier = {
-			job_replicator_add = -1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			has_designation = col_crucible
-		}
-		modifier = {
-			job_replicator_add = -1
-			job_crucible_drone_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish_machine }
-		}
-		modifier = {
-			job_replicator_add = 1
+			job_gestation_drone_add = 2
 		}
 	}
 
@@ -761,24 +681,13 @@ building_deployment_post = {
 
 	triggered_desc = {
 		trigger = {
-			NOT = { has_designation = col_crucible }
+			has_modifier = gestation_colony
 		}
-		text = job_replicator_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			has_designation = col_crucible
-		}
-		text = job_crucible_drone_effect_desc
+		text = job_gestation_drone_effect_desc
 	}
 
 	triggered_desc = {
 		text = job_maintenance_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
 	}
 }
 
@@ -808,6 +717,7 @@ building_machine_capital = {
 			is_fallen_empire = no
 		}
 		uses_habitat_capitals = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 	}
 
 	destroy_trigger = {
@@ -820,6 +730,7 @@ building_machine_capital = {
 		building_colony_shelter
 		building_ancient_control_center
 		building_ancient_palace
+		building_machine_capital_nanotech
 	}
 
 	allow = {
@@ -837,11 +748,34 @@ building_machine_capital = {
 	planet_modifier = {
 		planet_housing_add = 5
 		planet_amenities_add = 10
-		job_replicator_add = 2
-		job_patrol_drone_add = 1
 		job_maintenance_drone_add = 3
 		planet_max_buildings_add = @buildings_t2
 		defense_armies_add = @tier_2_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = no }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			NOT = { has_modifier = gestation_colony }
+			owner = { is_machine_assimilator = yes }
+		"
 	}
 
 	inline_script = {
@@ -854,28 +788,16 @@ building_machine_capital = {
 			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 		}
 		modifier = {
-			job_replicator_add = -1
 			job_maintenance_drone_add = 1
 		}
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_designation = col_crucible
+			has_modifier = gestation_colony
 		}
 		modifier = {
-			job_replicator_add = -1
-			job_crucible_drone_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish_machine }
-		}
-		modifier = {
-			job_replicator_add = 1
+			job_gestation_drone_add = 2
 		}
 	}
 
@@ -906,20 +828,9 @@ building_machine_capital = {
 
 	triggered_desc = {
 		trigger = {
-			NOT = { has_designation = col_crucible }
+			has_modifier = gestation_colony
 		}
-		text = job_replicator_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			has_designation = col_crucible
-		}
-		text = job_crucible_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
+		text = job_gestation_drone_effect_desc
 	}
 
 	triggered_desc = {
@@ -955,6 +866,7 @@ building_machine_major_capital = {
 		building_major_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_machine_major_capital_nanotech
 	}
 
 	allow = {
@@ -972,11 +884,34 @@ building_machine_major_capital = {
 	planet_modifier = {
 		planet_housing_add = 8
 		planet_amenities_add = 12
-		job_replicator_add = 2
-		job_patrol_drone_add = 2
 		job_maintenance_drone_add = 4
 		planet_max_buildings_add = @buildings_t3
 		defense_armies_add = @tier_3_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 2
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = no }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			NOT = { has_modifier = gestation_colony }
+			owner = { is_machine_assimilator = yes }
+		"
 	}
 
 	inline_script = {
@@ -989,28 +924,16 @@ building_machine_major_capital = {
 			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 		}
 		modifier = {
-			job_replicator_add = -1
 			job_maintenance_drone_add = 1
 		}
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_designation = col_crucible
+			has_modifier = gestation_colony
 		}
 		modifier = {
-			job_replicator_add = -1
-			job_crucible_drone_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish_machine }
-		}
-		modifier = {
-			job_replicator_add = 1
+			job_gestation_drone_add = 2
 		}
 	}
 
@@ -1048,20 +971,9 @@ building_machine_major_capital = {
 
 	triggered_desc = {
 		trigger = {
-			NOT = { has_designation = col_crucible }
+			has_modifier = gestation_colony
 		}
-		text = job_replicator_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			has_designation = col_crucible
-		}
-		text = job_crucible_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
+		text = job_gestation_drone_effect_desc
 	}
 
 	upgrades = {
@@ -1098,6 +1010,7 @@ building_machine_system_capital = {
 		building_machine_major_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_machine_system_capital_nanotech
 	}
 
 	allow = {
@@ -1115,11 +1028,46 @@ building_machine_system_capital = {
 	planet_modifier = {
 		planet_housing_add = 12
 		planet_amenities_add = 18
-		job_replicator_add = 2
-		job_patrol_drone_add = 3
 		job_maintenance_drone_add = 5
 		planet_max_buildings_add = @buildings_t4
 		defense_armies_add = @tier_4_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 3
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/roboticists_add
+		AMOUNT = 2
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = -1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = yes }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			num_sapient_pops >= 10
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			num_sapient_pops >= 40
+		"
 	}
 
 	inline_script = {
@@ -1128,48 +1076,20 @@ building_machine_system_capital = {
 
 	triggered_planet_modifier = {
 		potential = {
-			num_sapient_pops >= 10
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
-			num_sapient_pops >= 40
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
 			exists = owner
 			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 		}
 		modifier = {
-			job_replicator_add = -1
 			job_maintenance_drone_add = 1
 		}
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_designation = col_crucible
+			has_modifier = gestation_colony
 		}
 		modifier = {
-			job_replicator_add = -1
-			job_crucible_drone_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish_machine }
-		}
-		modifier = {
-			job_replicator_add = 1
+			job_gestation_drone_add = 2
 		}
 	}
 
@@ -1217,18 +1137,10 @@ building_machine_system_capital = {
 	}
 
 	triggered_desc = {
-		text = job_replicator_effect_desc
-	}
-
-	triggered_desc = {
 		trigger = {
-			has_designation = col_crucible
+			has_modifier = gestation_colony
 		}
-		text = job_crucible_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
+		text = job_gestation_drone_effect_desc
 	}
 
 	upgrades = {
@@ -1262,6 +1174,7 @@ building_hive_capital = {
 			is_fallen_empire = no
 		}
 		uses_habitat_capitals = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 	}
 
 	destroy_trigger = { # destroys and/or triggers conversion if true
@@ -1274,6 +1187,7 @@ building_hive_capital = {
 		building_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_capital_nanotech
 	}
 
 	upgrades = {
@@ -1293,9 +1207,13 @@ building_hive_capital = {
 		planet_amenities_add = 8
 		job_synapse_drone_add = 2
 		job_maintenance_drone_add = 2
-		job_patrol_drone_add = 1
 		planet_max_buildings_add = @buildings_t2
 		defense_armies_add = @tier_2_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
 	}
 
 	inline_script = {
@@ -1323,17 +1241,6 @@ building_hive_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -1350,10 +1257,6 @@ building_hive_capital = {
 
 	triggered_desc = {
 		text = job_maintenance_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
 	}
 }
 
@@ -1385,6 +1288,8 @@ building_hive_major_capital = {
 		building_major_capital
 		building_ancient_control_center
 		building_ancient_palace
+		building_machine_major_capital_nanotech
+		building_major_capital_nanotech
 	}
 
 	upgrades = {
@@ -1408,9 +1313,13 @@ building_hive_major_capital = {
 		planet_amenities_add = 12
 		job_synapse_drone_add = 3
 		job_maintenance_drone_add = 5
-		job_patrol_drone_add = 2
 		planet_max_buildings_add = @buildings_t4
 		defense_armies_add = @tier_3_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 2
 	}
 
 	inline_script = {
@@ -1460,17 +1369,6 @@ building_hive_major_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -1487,10 +1385,6 @@ building_hive_major_capital = {
 
 	triggered_desc = {
 		text = job_maintenance_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
 	}
 }
 
@@ -1569,36 +1463,26 @@ building_hab_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		job_healthcare_add = 1
-	}
-
 	inline_script = { # undercoat: moved to inline script
 		script = jobs/politicians_add
 		POLITICIAN_AMOUNT = 1
 		STEWARD_AMOUNT = 2
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_dystopian_society = yes } # undercoat: moved to scripted trigger
-		}
-		modifier = {
-			job_enforcer_add = 1
-		}
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/misc_re_capital_jobs
+		PRIMARY_JOB = 1
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/enforcers_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_dystopian_society = yes }
+		"
 	}
 
 	triggered_planet_modifier = {
@@ -1616,60 +1500,18 @@ building_hab_capital = {
 			owner = { is_machine_empire = yes }
 		}
 		job_evaluator_add = 1
-		job_replicator_add = 1
 		job_maintenance_drone_add = 2
 		planet_amenities_add = 3
 	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_active_tradition = tr_synthetics_finish_machine
-			}
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-				has_dystopian_society = yes # undercoat: moved to scripted trigger
-			}
-		}
-		text = job_enforcer_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_healthcare_effect_desc
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_empire = yes }
+		"
 	}
 
 	triggered_desc = {
@@ -1678,14 +1520,6 @@ building_hab_capital = {
 			owner = { is_machine_empire = yes }
 		}
 		text = job_evaluator_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_replicator_effect_desc
 	}
 
 	triggered_desc = {
@@ -1805,42 +1639,27 @@ building_hab_major_capital = {
 			owner = { is_machine_empire = yes }
 		}
 		job_evaluator_add = 2
-		job_replicator_add = 1
 		job_maintenance_drone_add = 3
 		planet_amenities_add = 3
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_empire = yes }
+		"
 	}
 
 	triggered_desc = {
 		text = building_hab_major_capital_tooltip
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_active_tradition = tr_synthetics_finish_machine
-			}
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		job_healthcare_add = 1
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/misc_re_capital_jobs
+		PRIMARY_JOB = 1
 	}
 
 	inline_script = { # undercoat: moved to inline script
@@ -1883,12 +1702,15 @@ building_hab_major_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/enforcers_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
 			owner = { is_regular_empire = yes }
-		}
-		job_enforcer_add = 1
+		"
 	}
 
 	triggered_planet_modifier = {
@@ -1914,17 +1736,6 @@ building_hab_major_capital = {
 			}
 		"
 		mult_line = " "
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
 	}
 
 	triggered_desc = {
@@ -1973,41 +1784,9 @@ building_hab_major_capital = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_enforcer_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_healthcare_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
 			owner = { is_machine_empire = yes }
 		}
 		text = job_evaluator_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_replicator_effect_desc
 	}
 
 	triggered_desc = {
@@ -2127,42 +1906,27 @@ building_hab_system_capital = {
 			owner = { is_machine_empire = yes }
 		}
 		job_evaluator_add = 3
-		job_replicator_add = 1
 		job_maintenance_drone_add = 3
 		planet_amenities_add = 3
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_empire = yes }
+		"
 	}
 
 	triggered_desc = {
 		text = building_hab_system_capital_tooltip
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_active_tradition = tr_synthetics_finish_machine
-			}
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		job_healthcare_add = 1
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/misc_re_capital_jobs
+		PRIMARY_JOB = 1
 	}
 
 	inline_script = { # undercoat: moved to inline script
@@ -2205,12 +1969,15 @@ building_hab_system_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		job_enforcer_add = 2
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/enforcers_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_dystopian_society = yes }
+		"
 	}
 
 	triggered_planet_modifier = {
@@ -2236,17 +2003,6 @@ building_hab_system_capital = {
 			}
 		"
 		mult_line = " "
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
 	}
 
 	triggered_desc = {
@@ -2295,17 +2051,9 @@ building_hab_system_capital = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
 		}
 		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_enforcer_effect_desc
 	}
 
 	triggered_desc = {
@@ -2322,14 +2070,6 @@ building_hab_system_capital = {
 			owner = { is_machine_empire = yes }
 		}
 		text = job_evaluator_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_replicator_effect_desc
 	}
 
 	triggered_desc = {
@@ -2401,12 +2141,15 @@ building_resort_capital = {
 		script = buildings/on_all_capital_buildings
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
+		"
 	}
 
 	triggered_planet_modifier = {
@@ -2421,33 +2164,6 @@ building_resort_capital = {
 		script = jobs/politicians_add
 		POLITICIAN_AMOUNT = 1
 		STEWARD_AMOUNT = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_healthcare_effect_desc
 	}
 
 	triggered_desc = {
@@ -2511,12 +2227,15 @@ building_resort_major_capital = {
 		script = buildings/on_all_capital_buildings
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
+		"
 	}
 
 	triggered_planet_modifier = {
@@ -2542,25 +2261,6 @@ building_resort_major_capital = {
 			planet_jobs_productive_upkeep_mult = 0.1
 			planet_jobs_productive_produces_mult = 0.1
 		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
 	}
 
 	triggered_desc = {
@@ -2625,17 +2325,6 @@ building_slave_capital = {
 		script = jobs/politicians_add
 		POLITICIAN_AMOUNT = 2
 		STEWARD_AMOUNT = 3
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
 	}
 
 	triggered_desc = {
@@ -2717,17 +2406,6 @@ building_slave_major_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	triggered_desc = {
 		text = job_slave_overseer_effect_desc
 	}
@@ -2772,8 +2450,12 @@ building_imperial_capital = {
 	prerequisites = {
 	}
 
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 5
+	}
 	planet_modifier = {
-		job_enforcer_add = 5
 		planet_housing_add = 18
 		planet_amenities_add = 18
 		planet_max_buildings_add = 11
@@ -2783,6 +2465,13 @@ building_imperial_capital = {
 
 	inline_script = {
 		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 3
+		SECONDARY_JOB = 3
+		TERTIARY_JOB = 0
 	}
 
 	triggered_desc = {
@@ -2802,33 +2491,6 @@ building_imperial_capital = {
 		modifier = {
 			planet_housing_add = 1
 		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		job_roboticist_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_private_healthcare_empire = yes } # undercoat: moved to scripted trigger
-		}
-		job_healthcare_add = 1
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/politicians_add
-		POLITICIAN_AMOUNT = 6
-		STEWARD_AMOUNT = 9
-	}
-
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/civic_capital_jobs
-		AMOUNT = 3
 	}
 
 	triggered_planet_modifier = {
@@ -2864,17 +2526,6 @@ building_imperial_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -2883,18 +2534,6 @@ building_imperial_capital = {
 		upkeep = {
 			energy = @b4_upkeep
 		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish }
-		}
-		text = job_roboticist_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_enforcer_effect_desc
 	}
 
 	triggered_desc = {
@@ -2949,12 +2588,56 @@ building_imperial_machine_capital = {
 	planet_modifier = {
 		planet_housing_add = 18
 		planet_amenities_add = 20
-		job_replicator_add = 4
-		job_patrol_drone_add = 5
 		job_maintenance_drone_add = 6
 		planet_max_buildings_add = 11
 		planet_max_branch_office_buildings_add = 3
 		defense_armies_add = @tier_4_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 5
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/roboticists_add
+		AMOUNT = 4
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = -1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = yes }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = -1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			has_modifier = gestation_colony
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			num_sapient_pops >= 10
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			num_sapient_pops >= 40
+		"
 	}
 
 	inline_script = {
@@ -2970,48 +2653,20 @@ building_imperial_machine_capital = {
 
 	triggered_planet_modifier = {
 		potential = {
-			num_sapient_pops >= 10
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
-			num_sapient_pops >= 40
-		}
-		modifier = {
-			job_replicator_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
 			exists = owner
 			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 		}
 		modifier = {
-			job_replicator_add = -1
 			job_maintenance_drone_add = 1
 		}
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			has_designation = col_crucible
+			has_modifier = gestation_colony
 		}
 		modifier = {
-			job_replicator_add = -1
-			job_crucible_drone_add = 2
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_synthetics_finish_machine }
-		}
-		modifier = {
-			job_replicator_add = 1
+			job_gestation_drone_add = 2
 		}
 	}
 
@@ -3059,18 +2714,10 @@ building_imperial_machine_capital = {
 	}
 
 	triggered_desc = {
-		text = job_replicator_effect_desc
-	}
-
-	triggered_desc = {
 		trigger = {
-			has_designation = col_crucible
+			has_modifier = gestation_colony
 		}
-		text = job_crucible_drone_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_patrol_drone_effect_desc
+		text = job_gestation_drone_effect_desc
 	}
 }
 
@@ -3119,10 +2766,14 @@ building_imperial_hive_capital = {
 		planet_amenities_add = 20
 		job_synapse_drone_add = 5
 		job_maintenance_drone_add = 7
-		job_patrol_drone_add = 4
 		planet_max_buildings_add = 11
 		planet_max_branch_office_buildings_add = 3
 		defense_armies_add = @tier_4_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 4
 	}
 
 	inline_script = {
@@ -3178,17 +2829,6 @@ building_imperial_hive_capital = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
-			has_current_purge = yes
-			exists = growing_species
-			growing_species = { has_trait = trait_cybernetic }
-		}
-		pop_growth_speed = 0.10
-	}
-
 	resources = {
 		category = planet_buildings
 		cost = {
@@ -3206,8 +2846,1123 @@ building_imperial_hive_capital = {
 	triggered_desc = {
 		text = job_maintenance_drone_effect_desc
 	}
+}
+
+#### Nanotech Capital
+# Colony
+building_colony_shelter_nanotech = {
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			is_fallen_empire = no
+		}
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+			uses_habitat_capitals = yes
+			uses_district_set = cosmogenesis_world
+		}
+	}
+
+	convert_to = {
+		building_hive_capital
+		building_deployment_post
+		building_resort_capital
+		building_slave_capital
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	planet_modifier = {
+		planet_housing_add = 3
+		planet_amenities_add = 7
+		planet_max_buildings_add = @buildings_t1
+		job_colonist_add = 2
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/enforcers_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_dystopian_society = yes }
+		"
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_dystopian_society = yes } # undercoat: moved to scripted trigger
+		}
+		job_colonist_add = -1
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_individual_machine = yes }
+		"
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_individual_machine = yes }
+		}
+		job_colonist_add = -1
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
+		"
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
+		}
+		job_colonist_add = -1
+	}
+
+	resources = {
+		category = planet_buildings
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	upgrades = {
+		building_capital
+	}
 
 	triggered_desc = {
-		text = job_patrol_drone_effect_desc
+		trigger = {
+			exists = owner
+			owner = {
+				NAND = {
+					has_dystopian_society = yes # undercoat: moved to scripted trigger
+					has_active_tradition = tr_synthetics_prefabricated_components
+				}
+			}
+		}
+		text = job_colonist_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = payback_unified_purpose
+		}
+		text = job_unifier_effect_desc
+	}
+}
+
+# Planetary Administration
+building_capital_nanotech = {
+	base_buildtime = @b2_time
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			is_fallen_empire = no
+		}
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+			uses_habitat_capitals = yes
+			is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	convert_to = {
+		building_hive_capital
+		building_machine_capital
+		building_resort_capital
+		building_slave_capital
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	allow = {
+		num_sapient_pops >= 10
+	}
+
+	upgrades = {
+		"building_major_capital"
+	}
+
+	prerequisites = {
+		"tech_planetary_government"
+	}
+
+	show_tech_unlock_if = {
+		always = no
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
+	}
+	planet_modifier = {
+		planet_housing_add = 5
+		planet_amenities_add = 5
+		planet_max_buildings_add = @buildings_t2
+		planet_max_branch_office_buildings_add = 1
+		defense_armies_add = @tier_2_capital_defense_armies
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 1
+		SECONDARY_JOB = 1
+		TERTIARY_JOB = 2
+	}
+
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/triggered/culture_workers_add
+		AMOUNT = 2
+		desc = 1
+		trigger = "
+			exists = owner.federation
+			owner.federation = { has_federation_perk = culture_workers_1 }
+		"
+		mult_line = " "
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_domination_imperious_architecture
+			}
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_1 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b2_minerals
+		}
+		upkeep = {
+			energy = @b2_upkeep
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = payback_unified_purpose
+		}
+		text = job_unifier_effect_desc
+	}
+}
+
+# Major Capital
+building_major_capital_nanotech = {
+	base_buildtime = @b3_time
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			is_fallen_empire = no
+		}
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+	}
+
+	allow = {
+		num_sapient_pops >= 25
+	}
+
+	convert_to = {
+		building_hive_major_capital
+		building_machine_major_capital
+		building_resort_major_capital
+		building_slave_major_capital
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	prerequisites = {
+		"tech_colonial_centralization"
+	}
+
+	show_tech_unlock_if = {
+		always = no
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 2
+	}
+	planet_modifier = {
+		planet_housing_add = 8
+		planet_amenities_add = 8
+		planet_max_buildings_add = @buildings_t3
+		planet_max_branch_office_buildings_add = 2
+		defense_armies_add = @tier_3_capital_defense_armies
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 2
+		SECONDARY_JOB = 1
+		TERTIARY_JOB = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_domination_imperious_architecture
+			}
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_1 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_2 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/triggered/culture_workers_add
+		AMOUNT = 2
+		desc = 1
+		trigger = "
+			exists = owner.federation
+			owner.federation = { has_federation_perk = culture_workers_1 }
+		"
+		mult_line = " "
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+		}
+		upkeep = {
+			energy = @b3_upkeep
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = payback_unified_purpose
+		}
+		text = job_unifier_effect_desc
+	}
+
+	upgrades = {
+		"building_system_capital"
+	}
+}
+
+building_system_capital_nanotech = {
+	base_buildtime = @b4_time
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			is_regular_empire = yes
+			is_fallen_empire = no
+		}
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+	}
+
+	convert_to = {
+		building_hive_major_capital
+		building_machine_major_capital
+		building_major_capital
+		building_resort_major_capital
+		building_slave_major_capital
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	allow = {
+		num_sapient_pops >= 50
+	}
+
+	prerequisites = {
+		"tech_galactic_administration"
+	}
+
+	show_tech_unlock_if = {
+		always = no
+	}
+
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 3
+	}
+	planet_modifier = {
+		planet_housing_add = 12
+		planet_amenities_add = 12
+		planet_max_buildings_add = @buildings_t4
+		planet_max_branch_office_buildings_add = 4
+		defense_armies_add = @tier_4_capital_defense_armies
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	inline_script = {
+		script = buildings/regular_empire_capital_jobs
+		PRIMARY_JOB = 2
+		SECONDARY_JOB = 2
+		TERTIARY_JOB = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_domination_imperious_architecture
+			}
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_domination_imperious_architecture
+			}
+		}
+		modifier = {
+			planet_housing_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_1 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_2 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_3 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	inline_script = { # undercoat: moved to inline script
+		script = jobs/triggered/culture_workers_add
+		AMOUNT = 2
+		desc = 1
+		trigger = "
+			exists = owner.federation
+			owner.federation = { has_federation_perk = culture_workers_1 }
+		"
+		mult_line = " "
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b4_minerals
+		}
+		upkeep = {
+			energy = @b4_upkeep
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = payback_unified_purpose
+		}
+		text = job_unifier_effect_desc
+	}
+
+	upgrades = {
+		building_imperial_capital
+	}
+}
+
+#############
+# Machine buildings
+#############
+
+# Colony
+building_deployment_post_nanotech = {
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			OR = {
+				is_machine_empire = yes
+				is_country_type = ai_empire
+			}
+			is_fallen_empire = no
+		}
+		uses_habitat_capitals = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+	}
+
+	convert_to = {
+		building_hive_capital
+		building_colony_shelter
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	planet_modifier = {
+		planet_housing_add = 3
+		planet_amenities_add = 8
+		job_maintenance_drone_add = 2
+		planet_max_buildings_add = @buildings_t1
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = no }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			NOT = { has_modifier = gestation_colony }
+			owner = { is_machine_assimilator = yes }
+		"
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = gestation_colony
+		}
+		modifier = {
+			job_gestation_drone_add = 2
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	upgrades = {
+		building_machine_capital
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = gestation_colony
+		}
+		text = job_gestation_drone_effect_desc
+	}
+
+	triggered_desc = {
+		text = job_maintenance_drone_effect_desc
+	}
+}
+
+# Administrative Array
+building_machine_capital_nanotech = {
+	base_buildtime = @b2_time
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			OR = {
+				is_machine_empire = yes
+				is_country_type = ai_empire
+				AND = {
+					exists = event_target:mechanocalibrator_country
+					is_same_value = event_target:mechanocalibrator_country
+				}
+			}
+			is_fallen_empire = no
+		}
+		uses_habitat_capitals = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+	}
+
+	destroy_trigger = {
+		exists = owner
+		owner = { is_machine_empire = no }
+	}
+
+	convert_to = {
+		building_hive_capital
+		building_colony_shelter
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	allow = {
+		num_sapient_pops >= 10
+	}
+
+	prerequisites = {
+		"tech_planetary_government"
+	}
+
+	show_tech_unlock_if = {
+		always = no
+	}
+
+	planet_modifier = {
+		planet_housing_add = 5
+		planet_amenities_add = 10
+		job_maintenance_drone_add = 3
+		planet_max_buildings_add = @buildings_t2
+		defense_armies_add = @tier_2_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 1
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = no }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			NOT = { has_modifier = gestation_colony }
+			owner = { is_machine_assimilator = yes }
+		"
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			job_maintenance_drone_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = gestation_colony
+		}
+		modifier = {
+			job_gestation_drone_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_1 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b2_minerals
+		}
+		upkeep = {
+			energy = @b2_upkeep
+		}
+	}
+
+	upgrades = {
+		building_machine_major_capital
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = gestation_colony
+		}
+		text = job_gestation_drone_effect_desc
+	}
+
+	triggered_desc = {
+		text = job_maintenance_drone_effect_desc
+	}
+}
+
+# Planetary Processor
+building_machine_major_capital_nanotech = {
+	base_buildtime = @b3_time
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			OR = {
+				is_machine_empire = yes
+				is_country_type = ai_empire
+			}
+			is_fallen_empire = no
+		}
+	}
+
+	convert_to = {
+		building_hive_major_capital
+		building_major_capital
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	allow = {
+		num_sapient_pops >= 25
+	}
+
+	prerequisites = {
+		"tech_colonial_centralization"
+	}
+
+	show_tech_unlock_if = {
+		always = no
+	}
+
+	planet_modifier = {
+		planet_housing_add = 8
+		planet_amenities_add = 12
+		job_maintenance_drone_add = 4
+		planet_max_buildings_add = @buildings_t3
+		defense_armies_add = @tier_3_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 2
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 2
+		desc = 1
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = no }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 1
+		mult_line = " "
+		trigger = "
+			NOT = { has_modifier = gestation_colony }
+			owner = { is_machine_assimilator = yes }
+		"
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			job_maintenance_drone_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = gestation_colony
+		}
+		modifier = {
+			job_gestation_drone_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_1 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_2 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+		}
+		upkeep = {
+			energy = @b3_upkeep
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = gestation_colony
+		}
+		text = job_gestation_drone_effect_desc
+	}
+
+	upgrades = {
+		"building_machine_system_capital"
+	}
+}
+
+# Primary Nexus
+building_machine_system_capital_nanotech = {
+	base_buildtime = @b4_time
+	capital = yes
+	can_build = no
+	can_demolish = no
+	can_be_ruined = no
+	can_be_disabled = no
+	position_priority = 0
+
+	category = government
+	building_sets = { nanotech_world }
+
+	potential = {
+		exists = owner
+		owner = {
+			OR = {
+				is_machine_empire = yes
+				is_country_type = ai_empire
+			}
+			is_fallen_empire = no
+		}
+	}
+
+	convert_to = {
+		building_hive_major_capital
+		building_major_capital
+		building_machine_major_capital
+		building_ancient_control_center
+		building_ancient_palace
+	}
+
+	allow = {
+		num_sapient_pops >= 50
+	}
+
+	prerequisites = {
+		"tech_galactic_administration"
+	}
+
+	show_tech_unlock_if = {
+		always = no
+	}
+
+	planet_modifier = {
+		planet_housing_add = 12
+		planet_amenities_add = 18
+		job_maintenance_drone_add = 5
+		planet_max_buildings_add = @buildings_t4
+		defense_armies_add = @tier_4_capital_defense_armies
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = 3
+	}
+	# Undercoat inline script
+	inline_script = {
+		script = jobs/roboticists_add
+		AMOUNT = 2
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = -1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			owner = { is_machine_assimilator = yes }
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			num_sapient_pops >= 10
+		"
+	}
+	inline_script = {
+		script = jobs/triggered/roboticists_add
+		AMOUNT = 1
+		desc = 0
+		mult_line = " "
+		trigger = "
+			num_sapient_pops >= 40
+		"
+	}
+
+	inline_script = {
+		script = buildings/on_all_capital_buildings
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			job_maintenance_drone_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = gestation_colony
+		}
+		modifier = {
+			job_gestation_drone_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_1 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_2 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_capital_productivity_3 }
+		}
+		modifier = {
+			planet_jobs_productive_upkeep_mult = 0.1
+			planet_jobs_productive_produces_mult = 0.1
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b4_minerals
+		}
+		upkeep = {
+			energy = @b4_upkeep
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = gestation_colony
+		}
+		text = job_gestation_drone_effect_desc
+	}
+
+	upgrades = {
+		"building_imperial_machine_capital"
 	}
 }

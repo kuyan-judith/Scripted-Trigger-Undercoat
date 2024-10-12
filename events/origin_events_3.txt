@@ -538,7 +538,8 @@ planet_event = {
 
 	trigger = {
 		owner = { is_progenitor_hive_empire = yes } # undercoat: moved to scripted trigger
-		NOT = {
+		NOR = {
+			is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
 			num_assigned_jobs = {
 				job = offspring_drone
 				value >= 1
@@ -575,6 +576,7 @@ country_event = {
 			limit = {
 				NOR = {
 					has_modifier = missing_offspring_modifier
+					is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
 					num_assigned_jobs = {
 						job = offspring_drone
 						value >= 1
@@ -1243,7 +1245,7 @@ country_event = {
 					}
 					change_pc = pc_shrouded
 					clear_planet_modifiers = yes
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 				}
 			}
 		}
@@ -1271,7 +1273,7 @@ country_event = {
 						}
 						change_pc = pc_shrouded
 						clear_planet_modifiers = yes
-						clear_deposits = yes
+						clear_deposits_stu = yes # undercoat: moved to scripted effect
 					}
 				}
 			}
@@ -1559,7 +1561,7 @@ country_event = {
 				}
 			}
 		}
-		set_subject_of = {
+		set_subject_of_stu = {
 			who = event_target:origin_imperial_homeland_country
 		}
 		overlord = {
@@ -2078,7 +2080,7 @@ country_event = { # Overlord Version
 				limit = {
 					is_ai = yes
 				}
-				set_subject_of = { who = none }
+				set_subject_of_stu = { who = none }
 			}
 			country_event = { id = origin.5735 }
 		}
@@ -2196,7 +2198,7 @@ country_event = { # Vassal Version
 		}
 		custom_tooltip = SET_SUBJECT_OF_EFFECT_NONE_WE_VERBOSE
 		hidden_effect = {
-			set_subject_of = { who = none }
+			set_subject_of_stu = { who = none }
 		}
 	}
 	# Take leadership
@@ -2213,7 +2215,7 @@ country_event = { # Vassal Version
 		custom_tooltip = SET_SUBJECT_OF_EFFECT_NONE_WE_VERBOSE
 		custom_tooltip = origin.5735.b.tt
 		hidden_effect = {
-			set_subject_of = { who = none }
+			set_subject_of_stu = { who = none }
 			every_playable_country = {
 				limit = {
 					OR = {
@@ -3149,7 +3151,7 @@ country_event = { # Requests aid
 			while = {
 				count = 1
 				random_owned_pop = {
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 			}
 		}
@@ -3827,7 +3829,7 @@ country_event = { # Encounter Leviathan
 							is_same_value = root.species
 						}
 					}
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 				random_owned_pop = {
 					limit = {
@@ -3835,7 +3837,7 @@ country_event = { # Encounter Leviathan
 							is_same_value = root.species
 						}
 					}
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 			}
 			event_target:fotd_seperatist_planet@root = {
@@ -4750,7 +4752,7 @@ ship_event = { # Scanning hunter planet
 		hidden_effect = {
 			from = {
 				every_owned_pop = {
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 				change_pc = pc_nuked
 				destroy_colony = yes
@@ -4862,6 +4864,13 @@ country_event = {
 					force_remove_civic = civic_corporate_anglers
 					force_add_civic = civic_anglers
 				}
+				if = {
+					limit = {
+						has_civic = civic_corporate_machine_anglers
+					}
+					force_remove_civic = civic_corporate_machine_anglers
+					force_add_civic = civic_machine_anglers
+				}
 			}
 			change_government = {
 				cooldown = no
@@ -4887,7 +4896,7 @@ country_event = {
 		hidden_effect = {
 			if = {
 				limit = {
-					has_civic = civic_barbaric_despoilers
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
 				}
 				force_remove_civic = civic_barbaric_despoilers
 			}
@@ -4924,7 +4933,7 @@ country_event = {
 						}
 					}
 				}
-				release_subject = yes
+				release_subject_stu = yes
 			}
 			every_playable_country = {
 				limit = {
@@ -4935,7 +4944,7 @@ country_event = {
 						}
 					}
 				}
-				remove_secret_fealty = root
+				remove_secret_fealty_stu = { target = root }
 			}
 			if = {
 				limit = {
@@ -4944,7 +4953,7 @@ country_event = {
 						is_same_species = root.species
 					}
 				}
-				release_subject = yes
+				release_subject_stu = yes
 			}
 			every_envoy = {
 				limit = {
@@ -4962,7 +4971,7 @@ country_event = {
 						}
 					}
 				}
-				end_all_treaties_with = root
+				end_all_treaties_with_stu = { who = root }
 			}
 			remove_from_galactic_community = yes
 		}
@@ -5056,10 +5065,10 @@ situation_event = {
 
 	immediate = {
 		target = {
-			every_owned_pop = { kill_pop = yes }
+			every_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
 			destroy_colony = yes
 			change_pc = pc_shattered
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_alloys_10
 		}
 		owner = {
@@ -5659,7 +5668,10 @@ country_event = {
 
 	trigger = {
 		from.owner = {#Aquatic pops prefer Ocean worlds to Gaia
-			NOT = { has_trait = trait_aquatic }
+			NOR = {
+				has_trait = trait_aquatic
+				has_trait = trait_robot_aquatic
+			}
 		}
 	}
 
@@ -6599,7 +6611,7 @@ country_event = { #Seperatists would rather die than give you their planet
 					has_planet_flag = fotd_seperatist_planet@root
 				}
 				every_owned_pop = {
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 				change_pc = pc_nuked
 				destroy_colony = yes

@@ -17,19 +17,23 @@ purge_normal = {
 	allow = {
 		hidden_trigger = { exists = from }
 		if = {
-			limit = { is_lonely_hive_mind_pop = yes }
+			limit = {
+				is_lonely_hive_mind_pop = yes
+			}
 			always = yes
 		}
 		else = {
 			custom_tooltip = {
 				fail_text = PURGES_ALLOWED
-				from = {
-					OR = {
-						is_robotic_species = yes
-						is_gestalt = yes # undercoat: moved to scripted trigger
-						has_valid_civic = civic_fanatic_purifiers
-						has_policy_flag = purge_allowed
+				OR = {
+					from = {
+						OR = {
+							is_gestalt = yes # undercoat: moved to scripted trigger
+							has_valid_civic = civic_fanatic_purifiers
+							has_policy_flag = purge_allowed
+						}
 					}
+					is_robotic_species = yes
 				}
 			}
 		}
@@ -128,7 +132,7 @@ purge_displacement = {
 		exists = from
 		if = {
 			limit = {
-				from = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+				from = { is_machine_empire = yes }
 			}
 			from = {
 				NOR = {
@@ -149,7 +153,7 @@ purge_displacement = {
 
 	allow = {
 		hidden_trigger = { exists = from }
-		
+
 		custom_tooltip = {
 			fail_text = "lonely_hive_mind_pops_kill_themselves_purge_type"
 			is_lonely_hive_mind_pop = no
@@ -178,14 +182,14 @@ purge_displacement = {
 		modifier = {
 			factor = 10
 			from = {
-				is_hive_empire = yes # undercoat: moved to scripted trigger
+				is_hive_empire = yes
 				NOT = { has_valid_civic = civic_hive_strength_of_legions }
 			}
 		}
 		modifier = {
 			factor = 10
 			from = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 			}
 		}
 	}
@@ -253,8 +257,7 @@ purge_matrix = {
 	}
 
 	potential = {
-		host_has_dlc = "Synthetic Dawn Story Pack"
-		from = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+		from = { is_machine_empire = yes }
 	}
 
 	allow = {
@@ -298,7 +301,7 @@ purge_processing = {
 	potential = {
 		host_has_dlc = "Utopia"
 		exists = from
-		from = { is_machine_empire = no } # undercoat: moved to scripted trigger
+		from = { is_machine_empire = no }
 	}
 
 	allow = {
@@ -354,7 +357,7 @@ purge_processing = {
 			factor = 0
 			from = {
 				has_valid_ai_personality = yes
-				NOT = {
+				NOR = {
 					has_ai_personality_behaviour = purger
 				}
 			}
@@ -374,6 +377,7 @@ purge_necrophage = {
 		exists = from
 		from = {
 			is_necrophage_empire = yes # undercoat: moved to scripted trigger
+			
 		}
 	}
 
@@ -398,5 +402,73 @@ purge_necrophage = {
 	}
 	ai_will_do = {
 		factor = 200
+	}
+}
+
+purge_cosmogenesis = {
+	pop_escape_chance = 0.05
+	pop_decline_rate = value:num_chip_slave_purge # 0.2 per pop used as neural chip
+
+	pop_modifier = {
+		pop_happiness = -0.33
+	}
+
+	potential = {
+		always = no
+	}
+
+	allow = {
+		always = yes
+	}
+
+	hidden = {
+		always = yes
+	}
+}
+
+purge_cosmogenesis_lathe_resettle = {
+	pop_escape_chance = 0.05
+	pop_decline_rate = 100 # 1 pop per month, overrides BASE_POP_DECLINE, will only work on purge types
+
+	pop_modifier = {
+		pop_happiness = -0.33
+	}
+
+	potential = {
+		from = {
+			has_ascension_perk = ap_cosmogenesis
+			any_owned_planet = {
+				has_designation = col_cosmogenesis_world
+			}
+		}
+		is_sapient = yes
+	}
+	ai_will_do = {
+		factor = 15
+	}
+}
+
+
+purge_clips = {
+	pop_escape_chance = 0.2
+	pop_decline_rate = 50 # 1 pop per 2 months, overrides BASE_POP_DECLINE, will only work on purge types
+
+	pop_modifier = {
+		pop_happiness = -10
+	}
+
+	potential = {
+		exists = from
+		from = {
+			is_obsessional_directive_empire = yes # undercoat: moved to scripted trigger
+			OR = {
+				has_ascension_perk = ap_become_the_crisis
+				has_valid_civic = civic_machine_terminator
+				has_country_flag = paperclip_shamed
+			}
+		}
+	}
+	allow = {
+		always = yes
 	}
 }

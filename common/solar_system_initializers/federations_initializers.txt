@@ -1033,9 +1033,22 @@ lost_colony_1 = {
 								is_gestalt = yes
 							}
 						}
-						set_starbase_module = {
-							slot = 1
-							module = solar_panel_network
+						if = {
+							limit = {
+								event_target:lost_colony_parent = {
+									is_astromining_drones_empire = yes # undercoat: moved to scripted trigger
+								}
+							}
+							set_starbase_module = {
+								slot = 1
+								module = astromining_bay
+							}
+						}
+						else = {
+							set_starbase_module = {
+								slot = 1
+								module = solar_panel_network
+							}
 						}
 					}
 					else = {
@@ -1380,6 +1393,7 @@ scion_fallen_1 = {
 				}
 			}
 			set_planet_flag = fallen_empire_world
+			set_planet_flag = fallen_empire_capital
 			prevent_anomaly = yes
 			set_owner = event_target:scion_fe
 			set_controller = event_target:scion_fe
@@ -1435,7 +1449,7 @@ scion_fallen_1 = {
 				country_event = { id = origin.20 days = 9000 random = 9000 }
 				event_target:scion_vassal = {
 					establish_communications_no_message = event_target:scion_fe
-					set_subject_of = {
+					set_subject_of_stu = {
 						who = event_target:scion_fe
 						preset = preset_scion
 					}
@@ -1636,6 +1650,7 @@ scion_fallen_2 = {
 
 
 			set_planet_flag = fallen_empire_world
+			set_planet_flag = fallen_empire_capital
 			prevent_anomaly = yes
 			set_owner = event_target:scion_fe
 			set_controller = event_target:scion_fe
@@ -1700,7 +1715,7 @@ scion_fallen_2 = {
 			}
 			event_target:scion_vassal = {
 				establish_communications_no_message = event_target:scion_fe
-				set_subject_of = {
+				set_subject_of_stu = {
 					who = event_target:scion_fe
 					preset = preset_scion
 				}
@@ -2062,9 +2077,17 @@ planet_with_too_many_moons_system = {
 					has_country_flag = fallen_empire_4
 				}
 			}
+			NOT = {
+				any_neighbor_system = {
+					exists = owner
+					owner = { has_country_flag = fallen_empire_4 }
+				}
+			}
 			any_neighbor_system = {
-				exists = owner
-				owner = { has_country_flag = fallen_empire_4 }
+				any_neighbor_system = {
+					exists = owner
+					owner = { has_country_flag = fallen_empire_4 }
+				}
 			}
 		}
 	}
@@ -2176,7 +2199,7 @@ planet_with_too_many_moons_system = {
 		name = "NAME_Darad"
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_minerals_4
 		}
 	}
@@ -2282,19 +2305,19 @@ planet_with_too_many_moons_system = {
 			random_list = {
 				4 = { }
 				2 = {
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 					set_deposit = d_minerals_3
 				}
 				2 = {
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 					set_deposit = d_minerals_4
 				}
 				1 = {
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 					set_deposit = d_minerals_5
 				}
 				1 = {
-					clear_deposits = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect
 					set_deposit = d_volatile_motes_2
 				}
 			}
@@ -2531,7 +2554,7 @@ wenkwort_initializer = {
 		home_planet = yes
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_modifier = {
 				modifier = "terraforming_candidate" days = -1
 			}
@@ -2683,7 +2706,7 @@ sol_system_void_dweller_system = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_society_3
 			save_global_event_target_as = sol_system_earth
 		}
@@ -2729,7 +2752,7 @@ sol_system_void_dweller_system = {
 		has_ring = no
 
 		init_effect = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_minerals_3
 		}
 	}
@@ -2830,7 +2853,7 @@ sol_system_void_dweller_system = {
 		}
 
 		init_effect = {
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_energy_4
 		}
 

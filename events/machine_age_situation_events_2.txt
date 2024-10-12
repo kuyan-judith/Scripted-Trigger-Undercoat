@@ -1,0 +1,3246 @@
+#################################################
+#												#
+# Machine Age DLC Digitization Situation Events	#
+#												#
+#################################################
+
+namespace = synth
+
+@synth_approach_mult = 5
+
+### DIGITIZATION SITUATION START ###
+# Fired by: tr_synthetics_adopt
+country_event = { # Digitization - First event
+	id = synth.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		start_situation = {
+			type = situation_digitization
+			target = root
+		}
+	}
+}
+
+# Event pools gatekeeping event | Situation Random Events
+# Fired by: situation on_monthly and situation flag
+situation_event = {
+	id = synth.5
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				has_situation_flag = synth_5_stage_1_fire
+				situation_progress >= 200
+			}
+			AND = {
+				has_situation_flag = synth_5_stage_2_fire
+				situation_progress >= 450
+			}
+			AND = {
+				has_situation_flag = synth_5_stage_3_fire
+				situation_progress >= 700
+			}
+		}
+	}
+
+	immediate = {
+		remove_situation_flag = synth_5_stage_1_fire
+		remove_situation_flag = synth_5_stage_2_fire
+		remove_situation_flag = synth_5_stage_3_fire
+
+		fire_on_action = {
+			on_action = on_digitization_situation_random_events_list
+		}
+	}
+}
+
+# DIGITIZATION STAGE 1
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 1 - Start event
+	id = synth.100
+	title = "synth.100.name"
+	desc = "synth.100.desc"
+	picture = GFX_evt_synth_situation
+	show_sound = event_robot_encounter
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+
+		owner = {
+			set_country_flag = identity_complex_available
+			set_country_flag = identity_complex_needed
+			set_country_flag = identity_designer_converter
+			set_variable = {
+				which = synth_opposition
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = "synth.100.a"
+		custom_tooltip = "synth.100.a.tt"
+		# The situation will pause until on_building_complete triggers synth.101
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_105_fire
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Job strata focus
+	id = synth.105
+	title = "synth.105.name"
+	desc = "synth.105.desc"
+	picture = GFX_evt_voting
+	show_sound = event_vote
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = synth_105_fire
+		situation_progress >= 100
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		remove_situation_flag = synth_105_fire
+	}
+
+	option = {
+		name = "synth.105.a"
+		custom_tooltip = "synth.105.a.tt"
+		owner = { set_country_flag = synth_focus_rulers }
+	}
+	option = {
+		name = "synth.105.b"
+		custom_tooltip = "synth.105.b.tt"
+		owner = { set_country_flag = synth_focus_specialists }
+	}
+	option = {
+		name = "synth.105.c"
+		custom_tooltip = "synth.105.c.tt"
+		owner = { set_country_flag = synth_focus_workers }
+	}
+	option = {
+		name = "synth.105.d"
+		custom_tooltip = "synth.105.d.tt"
+		owner = { set_country_flag = synth_focus_upkeep }
+	}
+
+	after = {
+		set_situation_flag = synth_5_stage_1_fire
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: on_digitization_situation_random_events_list
+situation_event = { # Stage 1 Opportunity
+	id = synth.120
+	title = "synth.120.name"
+	desc = "synth.120.desc"
+	picture = GFX_evt_organic_oppression
+	show_sound = event_activating_unknown_technology
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 0
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @synth_approach_mult
+			current_situation_approach = situation_digitization_errorcorrecting
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = synth_120_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_120_happened
+	}
+
+	option = {
+		name = "synth.120.a"
+		custom_tooltip = "synth.120.a.tt"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		set_timed_situation_flag = {
+			flag = kinesthetic_microfusion
+			months = 12
+		}
+	}
+	option = {
+		name = "synth.120.b"
+	}
+
+	option = {
+		name = "synth.120.c"
+		custom_tooltip = "synth.120.a.tt"
+		trigger = {
+			owner = {
+				is_militarist = yes
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_combat_reactors
+			}
+		}
+		set_timed_situation_flag = {
+			flag = kinesthetic_microfusion
+			months = 12
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: on_digitization_situation_random_events_list
+situation_event = { # Stage 1 Challenge
+	id = synth.160
+	title = "synth.160.name"
+	desc = "synth.160.desc"
+	picture = GFX_evt_synth_life
+	show_sound = event_screams
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 0
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @synth_approach_mult
+			current_situation_approach = situation_digitization_overclocked
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = synth_160_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_160_happened
+	}
+
+	option = {
+		name = "synth.160.a"
+		owner = {
+			add_modifier = {
+				modifier = bad_publicity
+				years = 5
+			}
+		}
+	}
+	option = {
+		name = "synth.160.b"
+		owner = {
+			add_modifier = {
+				modifier = researcher_media_relations
+				years = 1
+			}
+		}
+	}
+	option = {
+		name = "synth.160.c"
+		trigger = {
+			owner = { is_authoritarian = yes }
+		}
+		owner = {
+			add_modifier = {
+				modifier = state_censorship
+				years = 5
+			}
+		}
+	}
+	option = {
+		name = "synth.160.d"
+		trigger = {
+			owner = {
+				has_valid_civic = civic_media_conglomerate
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = media_blockade
+				years = 5
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# DIGITIZATION STAGE 2
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 2 - Start event
+	id = synth.200
+	title = "synth.200.name"
+	desc = "synth.200.desc"
+	picture = GFX_evt_tradedeal
+	show_sound = event_mystic_reveal
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+	}
+
+	option = {
+		name = "synth.200.a"
+		custom_tooltip = "synth.200.a.tt"
+		owner = {
+			add_modifier = {
+				modifier = synth_opposition_truth
+				days = 180
+			}
+			hidden_effect = {
+				change_variable = {
+					which = synth_opposition
+					value = 1
+				}
+			}
+		}
+		hidden_effect = {
+			situation_event = { id = synth.205 days = 180 random = 30 }
+		}
+	}
+	option = {
+		name = "synth.200.b"
+		custom_tooltip = "synth.200.b.tt"
+		owner = {
+			add_modifier = {
+				modifier = synth_opposition_deception
+				days = 180
+			}
+			hidden_effect = {
+				change_variable = {
+					which = synth_opposition
+					value = 2
+				}
+			}
+		}
+		hidden_effect = {
+			situation_event = { id = synth.205 days = 180 random = 30 }
+		}
+	}
+	option = {
+		name = "synth.200.c"
+		custom_tooltip = "synth.200.c.tt"
+		trigger = {
+			owner = { is_materialist = no }
+		}
+		owner = {
+			hidden_effect = {
+				change_variable = {
+					which = synth_opposition
+					value = 3
+				}
+			}
+		}
+		hidden_effect = {
+			situation_event = { id = synth.205 days = 180 random = 30 }
+		}
+	}
+	option = {
+		name = "synth.200.c.material"
+		custom_tooltip = "synth.200.c.material.tt"
+		trigger = {
+			owner = { is_materialist = yes }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		owner = {
+			hidden_effect = {
+				change_variable = {
+					which = synth_opposition
+					value = 2
+				}
+			}
+		}
+		hidden_effect = {
+			situation_event = { id = synth.205 days = 180 random = 30 }
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = {
+	id = synth.205
+	title = "synth.205.name"
+	desc = "synth.205.desc"
+	picture = GFX_evt_civil_action
+	show_sound = event_public_unrest
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = synth_205_happened }
+		situation_progress >= 350
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_205_happened
+	}
+
+	option = {
+		name = "synth.205.a.regular"
+		owner = {
+			add_modifier = {
+				modifier = synth_fund_heritage_sites
+				years = 1
+			}
+		}
+	}
+	option = {
+		name = "synth.205.a.spiritualist"
+		trigger = {
+			owner = { is_spiritualist = yes }
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_revere_the_past
+				years = 1
+			}
+		}
+	}
+	option = {
+		name = "synth.205.a.memorialist"
+		trigger = {
+			owner = { is_memorialist_empire = yes }
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_preserve_the_past
+				years = 1
+			}
+		}
+	}
+	option = {
+		name = "synth.205.b"
+		set_situation_flag = synth_resistance
+		owner.capital_scope = {
+			add_modifier = { modifier = synth_mass_demonstrations }
+		}
+	}
+
+	after = {
+		set_situation_flag = synth_5_stage_2_fire
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: on_digitization_situation_random_events_list
+situation_event = { # Stage 2 Opportunity
+	id = synth.220
+	title = "synth.220.name"
+	desc = "synth.220.desc"
+	picture = GFX_evt_emergency_workers
+	show_sound = event_life_support_fail
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 250
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @synth_approach_mult
+			current_situation_approach = situation_digitization_errorcorrecting
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = synth_220_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_220_happened
+	}
+
+	option = {
+		name = "synth.220.a"
+		random_list = {
+			50 = {
+				custom_tooltip = "synth.220.a.tt.negative"
+				set_timed_situation_flag = {
+					flag = synth_negative_media_coverage
+					months = 6
+				}
+			}
+			50 = {
+				custom_tooltip = "synth.220.a.tt.positive"
+				set_timed_situation_flag = {
+					flag = synth_positive_media_coverage
+					months = 6
+				}
+			}
+		}
+	}
+
+	option = {
+		name = "synth.220.b"
+	}
+	option = {
+		name = "synth.220.c"
+		custom_tooltip = "synth.220.c.tt"
+		trigger = {
+			owner = {
+				OR = {
+					has_valid_civic = civic_criminal_heritage
+					has_valid_civic = civic_public_relations_specialists
+					has_valid_civic = civic_shadow_council
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_AI_actor
+				months = 12
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: on_digitization_situation_random_events_list
+situation_event = { # Stage 2 Challenge
+	id = synth.260
+	title = "synth.260.name"
+	desc = "synth.260.desc"
+	picture = GFX_evt_glitchy_matrix
+	show_sound = event_power_down
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 250
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @synth_approach_mult
+			current_situation_approach = situation_digitization_overclocked
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = synth_260_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_260_happened
+	}
+
+	option = {
+		name = "synth.260.a"
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -1000
+			}
+		}
+	}
+	option = {
+		name = "synth.260.b"
+		custom_tooltip = "synth.260.b.tt"
+		set_timed_situation_flag = {
+			flag = test_subject_lottery
+			months = 12
+		}
+	}
+	option = {
+		name = "synth.260.c"
+		trigger = {
+			owner = { is_authoritarian = yes }
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_mandatory_volunteers
+				months = 6
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# DIGITIZATION STAGE 3
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 3 - Start event
+	id = synth.300
+	title = "synth.300.name"
+	desc = "synth.300.desc"
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_synthetic_evolution
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		owner = {
+			set_country_flag = synthetic_empire
+			set_country_flag = synth_assembly_stopped
+			capital_scope = {
+				remove_modifier = synth_mass_demonstrations
+			}
+		}
+	}
+
+	option = {
+		name = "synth.300.a"
+		trigger = {
+			NOT = { has_situation_flag = synth_resistance }
+		}
+		custom_tooltip = "synth.300.a.heritage.tt"
+		# When this flag is set, an event is called each month in the situation to digitize pops
+		set_situation_flag = digitization_ongoing
+		owner = {
+			set_country_flag = edict_subsidized_identity_backups
+		}
+		hidden_effect = {
+			owner = {
+				while = {
+					count = value:num_synth_opposition
+					random_owned_pop = {
+						limit = { is_same_species = owner.species }
+						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					}
+				}
+				capital_scope = {
+					add_deposit = d_old_towns
+					set_planet_flag = old_towns
+				}
+			}
+			situation_event = { id = synth.305 days = 360 random = 30 }
+		}
+	}
+	option = {
+		name = "synth.300.a"
+		trigger = {
+			has_situation_flag = synth_resistance
+		}
+		custom_tooltip = "synth.300.a.resistance.tt"
+		# When this flag is set, an event is called each month in the situation to digitize pops
+		set_situation_flag = digitization_ongoing
+		owner = {
+			set_country_flag = edict_subsidized_identity_backups
+		}
+		hidden_effect = {
+			owner = {
+				while = {
+					count = value:num_synth_opposition
+					random_owned_pop = {
+						limit = { is_same_species = owner.species }
+						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					}
+				}
+				capital_scope = {
+					add_deposit = d_biological_enclaves
+					set_planet_flag = biological_enclaves
+				}
+			}
+			situation_event = { id = synth.310 days = 360 random = 30 }
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Synthetic Tourism
+	id = synth.305
+	title = "synth.305.name"
+	desc = "synth.305.desc"
+	picture = GFX_evt_obelisk_tourists
+	show_sound = event_vote
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = synth_305_happened }
+		situation_progress >= 600
+		owner.capital_scope = {
+			any_deposit = {
+				is_deposit_type = d_old_towns
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_305_happened
+	}
+
+	option = {
+		name = synth.305.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+	option = {
+		name = synth.305.b
+		trigger = {
+			owner = {
+				has_corporate_government = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+	option = {
+		name = synth.305.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+	option = {
+		name = synth.305.d
+		trigger = {
+			owner = {
+				is_xenophile = yes
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_cultural_exchange
+				months = 12
+			}
+		}
+	}
+
+	after = {
+		set_situation_flag = synth_5_stage_3_fire
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # The Resistance
+	id = synth.310
+	title = "synth.310.name"
+	desc = "synth.310.desc"
+	picture = GFX_evt_night_raid
+	show_sound = event_burning_city
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = synth_310_happened }
+		situation_progress >= 600
+		owner.capital_scope = {
+			any_deposit = {
+				is_deposit_type = d_biological_enclaves
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_310_happened
+	}
+
+	option = {
+		name = synth.310.a
+		custom_tooltip = "synth.310.a.tt"
+		set_timed_situation_flag = {
+			flag = synth_resistance_fight
+			months = 12
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_resistance_fight
+				months = 12
+			}
+		}
+	}
+	option = {
+		name = synth.310.b
+		custom_tooltip = "synth.310.b.tt"
+		set_timed_situation_flag = {
+			flag = synth_resistance_diplomacy
+			months = 12
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_resistance_diplomacy
+				months = 12
+			}
+		}
+	}
+
+	after = {
+		set_situation_flag = synth_5_stage_3_fire
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Called when a blocker is cleared from on_blocker_cleared.
+# If it's the Biological Enclaves blocker, remove the synth_resistance country flags.
+# This = Planet
+# Fired by: on_blocker_cleared
+planet_event = {
+	id = synth.311
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_planet_flag = biological_enclaves
+		NOT = {
+			any_deposit = {
+				NOT = { is_same_value = From }
+				is_deposit_type = d_biological_enclaves
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			remove_modifier = synth_resistance_diplomacy
+			remove_modifier = synth_resistance_fight
+			random_situation = {
+				limit = { is_situation_type = situation_digitization }
+				remove_situation_flag = synth_resistance_diplomacy
+				remove_situation_flag = synth_resistance_fight
+			}
+		}
+	}
+}
+
+# Fired by: on_digitization_situation_random_events_list
+situation_event = { # Stage 3 Opportunity
+	id = synth.320
+	title = "synth.320.name"
+	desc = "synth.320.desc"
+	picture = GFX_evt_sapient_AI
+	show_sound = event_energy_field
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 500
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @synth_approach_mult
+			current_situation_approach = situation_digitization_errorcorrecting
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = synth_320_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_320_happened
+	}
+
+	option = {
+		name = "synth.320.a"
+		trigger = {
+			owner = {
+				is_egalitarian = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+	option = {
+		name = "synth.320.b"
+		owner = {
+			add_modifier = {
+				modifier = synth_tinkering_with_minds
+				days = 1800
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+	option = {
+		name = "synth.320.c"
+		owner = {
+			add_modifier = {
+				modifier = synth_brightest_minds
+				days = 1800
+			}
+		}
+	}
+	option = {
+		name = "synth.320.d"
+		trigger = {
+			owner = {
+				OR = {
+					is_authoritarian = yes
+					has_valid_civic = civic_police_state
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = synth_reprogram_minds
+				days = 1800
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: on_digitization_situation_random_events_list
+situation_event = { # Stage 3 Challenge
+	id = synth.360
+	title = "synth.360.name"
+	desc = "synth.360.desc"
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_power_down
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 500
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @synth_approach_mult
+			current_situation_approach = situation_digitization_overclocked
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = synth_360_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_360_happened
+	}
+
+	option = {
+		name = "synth.360.a"
+		custom_tooltip = "synth.360.a.tt"
+		owner = {
+			set_country_flag = synth_unscheduled_updates
+		}
+	}
+	option = {
+		name = "synth.360.b"
+		custom_tooltip = "synth.360.b.tt"
+		owner = {
+			set_country_flag = synth_safe_updates
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# DIGITIZATION STAGE 4
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 4 - Start event
+	id = synth.400
+	title = "synth.400.name"
+	desc = "synth.400.desc"
+	picture = GFX_evt_physics_research
+	show_sound = event_administrative_work
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+	}
+
+	option = {
+		name = "synth.400.a"
+		trigger = {
+			owner = {
+				is_egalitarian = yes
+			}
+		}
+		custom_tooltip = "synth.400.pop.tt"
+		owner = {
+			remove_country_flag = synth_assembly_stopped
+			remove_country_flag = identity_designer_converter
+			give_technology = { tech = tech_identity_copy }
+			set_country_flag = edict_optimized_identity_creation
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		hidden_effect = {
+			situation_event = { id = synth.405 days = 180 random = 30 }
+		}
+	}
+	option = {
+		name = "synth.400.b"
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		custom_tooltip = "synth.400.pop.tt"
+		owner = {
+			remove_country_flag = synth_assembly_stopped
+			remove_country_flag = identity_designer_converter
+			give_technology = { tech = tech_identity_copy }
+			set_country_flag = edict_optimized_identity_creation
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		hidden_effect = {
+			situation_event = { id = synth.405 days = 180 random = 30 }
+		}
+	}
+	option = {
+		name = UNDERSTOOD
+		trigger = {
+			owner = {
+				is_egalitarian = no
+				is_megacorp = no
+			}
+		}
+		custom_tooltip = "synth.400.pop.tt"
+		owner = {
+			remove_country_flag = synth_assembly_stopped
+			remove_country_flag = identity_designer_converter
+			give_technology = { tech = tech_identity_copy }
+			set_country_flag = edict_optimized_identity_creation
+		}
+		hidden_effect = {
+			situation_event = { id = synth.405 days = 180 random = 30 }
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Stage 4 - Mind Creation Methods
+	id = synth.405
+	title = "synth.405.name"
+	desc = "synth.405.desc"
+	picture = GFX_evt_rare_tech_cache
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = synth_405_happened }
+		situation_progress >= 850
+	}
+
+	immediate = {
+		set_situation_flag = situation_digitization_pause
+		set_situation_flag = synth_405_happened
+	}
+
+	option = {
+		name = "synth.405.a"
+		custom_tooltip = "synth.405.a.tt"
+		trigger = {
+			owner = {
+				is_memory_vault_empire = no
+			}
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = advanced_identity_creation
+				add_research_option = tech_identity_fusion
+			}
+			# No random events in stage 4
+		}
+	}
+	option = {
+		name = "synth.405.a.vault"
+		custom_tooltip = "synth.405.a.tt"
+		trigger = {
+			owner = {
+				is_memory_vault_empire = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = advanced_identity_creation
+				add_research_option = tech_identity_fusion
+			}
+			# No random events in stage 4
+		}
+	}
+	option = {
+		name = "synth.405.b"
+		custom_tooltip = "synth.405.b.tt"
+		hidden_effect = {
+			owner = {
+				set_country_flag = advanced_identity_creation
+				add_research_option = tech_identity_initialization
+			}
+			# No random events in stage 4
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_digitization_pause
+	}
+}
+
+# DIGITIZATION FINAL EVENT
+# Fired by: situation on_progress_complete
+situation_event = { # Digitization - Final hidden event
+	id = synth.2
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = digitization_ongoing
+		set_situation_flag = digitization_final
+		situation_event = { id = synth.3 } # Run digitization again to change remaining people
+		situation_event = { id = synth.4 days = 1 } # Real final event
+	}
+}
+
+# Fired by: event
+situation_event = { # Final event
+	id = synth.4
+	title = "synth.4.name"
+	desc = "synth.4.desc"
+	picture = GFX_evt_synth_situation
+	show_sound = event_ai_started
+	situation = this
+	is_triggered_only = yes
+
+	option = {
+		name = "synth.4.a"
+		custom_tooltip = "synth.4.a.tt"
+	}
+
+	after = {
+		destroy_situation = this
+		owner = {
+			hidden_effect = {
+				if = {
+					limit = { has_active_tradition = tr_synthetics_finish_situation }
+					country_event = { id = synth.500 days = 180 }
+				}
+			}
+			if = {
+				limit = { has_active_tradition = tr_synthetics_transubstatiation_synthesis_situation }
+				set_country_flag = synth_assimilation
+			}
+			set_country_flag = synthetics_traditions_unlocked
+		}
+	}
+}
+
+# Fired by: situation on_monthly and event
+situation_event = { # Event to digitize pops
+	id = synth.3
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = digitization_ongoing
+		if = {
+			limit = {
+				owner = {
+					is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
+				}
+			}
+			owner = {
+				check_variable_arithmetic = { which = value:num_active_buildings|BUILDING|building_identity_complex| value > 0 }
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			create_synth_species_effect = yes
+
+			if = { # Final event
+				limit = {
+					prev = {
+						has_situation_flag = digitization_final
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOT = {
+							has_trait = trait_mechanical
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+				}
+			}
+			else = { # Digitization ongoing
+				if = {
+					limit = {
+						owner = {
+							is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
+						}
+					}
+					while = {
+						limit = {
+							any_owned_pop = {
+								exists = event_target:synthspecies@root.owner
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+						}
+						count = value:pop_to_digitize_per_month_synthetic_fertility
+						random_owned_pop = {
+							limit = {
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+							change_species = event_target:synthspecies@root.owner
+						}
+					}
+				}
+				else = {
+					while = {
+						limit = {
+							any_owned_pop = {
+								exists = event_target:synthspecies@root.owner
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+						}
+						count = value:pop_to_digitize_per_month
+						random_owned_pop = {
+							limit = {
+								is_same_species = owner.species
+								NOT = {
+									has_trait = trait_mechanical
+								}
+							}
+							change_species = event_target:synthspecies@root.owner
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						OR = {
+							has_situation_flag = digitization_final
+							NOT = { has_situation_flag = synth_leaders_digitized }
+						}
+					}
+				}
+				every_owned_leader = {
+					limit = {
+						is_same_species = owner.species
+						NOT = {
+							has_trait = leader_trait_synthetic
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+					add_trait_no_notify = leader_trait_synthetic
+					remove_trait = leader_trait_brainslug
+					set_age = 1
+				}
+				every_pool_leader = {
+					limit = {
+						is_same_species = owner.species
+						NOT = {
+							has_trait = leader_trait_synthetic
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+					add_trait_no_notify = leader_trait_synthetic
+					remove_trait = leader_trait_brainslug
+					set_age = 1
+				}
+				every_envoy = {
+					limit = {
+						exists = species
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+					change_leader_portrait = species
+				}
+				every_controlled_ship = {
+					limit = {
+						is_ship_class = shipclass_colonizer
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+					}
+					change_species = event_target:synthspecies@root.owner
+				}
+				every_owned_army = {
+					limit = {
+						exists = species
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+						army_type = assault_army
+					}
+					modify_army = {
+						name = random
+						type = "robotic_army"
+						species = event_target:synthspecies@root.owner
+					}
+				}
+				every_owned_army = {
+					limit = {
+						exists = species
+						exists = planet
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+						OR = {
+							army_type = defense_army
+							army_type = fanatic_guardian
+						}
+					}
+					modify_army = {
+						name = random
+						type = "robotic_defense_army"
+						species = event_target:synthspecies@root.owner
+					}
+				}
+				prev = {
+					set_situation_flag = synth_leaders_digitized
+				}
+			}
+		}
+		# Check if there are any pops left to digitize, otherwise remove the digitization flag to unpause the situation.
+		if = {
+			limit = {
+				NOT = {
+					owner = {
+						any_owned_pop = {
+							exists = event_target:synthspecies@root.owner
+							is_same_species = owner.species
+							NOT = {
+								has_trait = trait_mechanical
+							}
+						}
+					}
+				}
+			}
+			remove_situation_flag = digitization_ongoing
+			owner = {
+				change_dominant_species = { species = event_target:synthspecies@root.owner change_all = yes }
+			}
+		}
+	}
+}
+
+### DIGITIZATION SITUATION END ###
+
+### SOCIETAL EFFECTS EVENT CHAIN START ###
+# Fired by: tr_synthetics_finish or event
+country_event = {
+	id = synth.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = {
+			which = "synth_physical_society"
+			value = 0
+		}
+		set_variable = {
+			which = "synth_virtual_society"
+			value = 0
+		}
+		if = {
+			limit = {
+				is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
+			}
+			if = {
+				limit = {
+					has_country_flag = synthetic_fertility_no_identity_left_behind
+				}
+				change_variable = {
+					which = "synth_physical_society"
+					value = 1
+				}
+			}
+			else = {
+				change_variable = {
+					which = "synth_virtual_society"
+					value = 1
+				}
+			}
+		}
+		switch = {
+			trigger = has_authority
+			auth_democratic = {
+				hidden_effect = {
+					country_event = { id = synth.505 }
+				}
+			}
+			auth_oligarchic = {
+				hidden_effect = {
+					country_event = { id = synth.510 }
+			 	}
+			}
+			auth_dictatorial = {
+			 	hidden_effect = {
+			 		country_event = { id = synth.515 }
+			 	}
+			}
+			auth_imperial = {
+				hidden_effect = {
+					country_event = { id = synth.520 }
+				}
+			}
+			auth_corporate = {
+				hidden_effect = {
+					country_event = { id = synth.525 }
+				}
+			}
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Democratic
+	id = synth.505
+	title = "synth.505.name"
+	desc = synth.505.desc
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = synthshock_chain
+			target = this
+		}
+	}
+	option = { # Physical World Focus
+		name = synth.505.a
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.505.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.505.b
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.505.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Oligarchic
+	id = synth.510
+	title = synth.510.name
+	desc = synth.510.desc
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = synthshock_chain
+			target = this
+		}
+	}
+	option = { # Physical World Focus
+		name = synth.510.a
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.510.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.510.b
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.510.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Dictatorial
+	id = synth.515
+	title = synth.515.name
+	desc = synth.515.desc
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = synthshock_chain
+			target = this
+		}
+	}
+	option = { # Physical World Focus
+		name = synth.515.a
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.515.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.515.b
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.515.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Imperial
+	id = synth.520
+	title = synth.520.name
+	desc = synth.520.desc
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = synthshock_chain
+			target = this
+		}
+	}
+	option = { # Physical World Focus
+		name = synth.520.a
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.520.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.520.b
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.520.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Corporate
+	id = synth.525
+	title = synth.525.name
+	desc = synth.525.desc
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = synthshock_chain
+			target = this
+		}
+	}
+	option = { # Physical World Focus
+		name = synth.525.a
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.525.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.525.b
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.525.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 2 # The first event is more impactful
+			}
+			country_event = { id = synth.600 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+### SOCIETAL EFFECTS EVENT CHAIN END ###
+
+# EVENT POOL 1: Identity
+
+# Event pool gatekeeping event
+country_event = {
+	id = synth.600
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fire_on_action = {
+			on_action = on_synthshock_chain_identity_events_list
+		}
+	}
+}
+
+# Fired by: on_synthshock_chain_identity_events_list
+country_event = { # Synth Provenance
+	id = synth.610
+	title = "synth.610.name"
+	desc = synth.610.desc
+	picture = GFX_evt_individualistic_machines_2
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = { # Physical World Focus
+		name = synth.610.a
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_character_force
+			days = 18000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.610.b
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_character_customize
+			days = 18000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = synth.610.c
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Virtual World Focus Elite
+		name = synth.610.d
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			owner = {
+				OR = {
+					is_pompous_empire = yes # undercoat: moved to scripted trigger
+					has_dystopian_society = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_character_customize_elite
+			days = 18000
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				is_authoritarian = yes
+			}
+		}
+	}
+
+	option = { # Corporate
+		name = synth.610.e
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			owner = { is_megacorp = yes }
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_character_customize_corpo
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_megacorp = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = synth.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_synthshock_chain_identity_events_list
+country_event = { # Organic Cravings
+	id = synth.620
+	title = "synth.620.name"
+	desc = synth.620.desc
+	picture = GFX_evt_synth_life
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = { # Physical World Focus
+		name = synth.620.a
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_cravings_imperfections
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.620.b
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_cravings_simulation
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = synth.620.c
+		add_modifier = {
+			modifier = synth_cravings_stop
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Pain simulations
+		name = synth.620.d
+		custom_tooltip = synth.social_consequences.tt
+		custom_tooltip = synth.620.d.tt
+		trigger = {
+			owner = {
+				OR = {
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+					has_warrior_culture = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_cravings_pain
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_militarist = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = synth.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_synthshock_chain_identity_events_list
+country_event = { # Home Server Architecture
+	id = synth.630
+	title = "synth.630.name"
+	desc = synth.630.desc
+	picture = GFX_evt_financial_instruments
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = { # Virtual World Focus
+		name = synth.630.a
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_home_centralized
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Physical World Focus
+		name = synth.630.b
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_home_distributed
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus Corporate
+		name = synth.630.c
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			owner = { is_megacorp = yes }
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_digital_homes
+			days = 9000
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_megacorp = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = synth.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# EVENT POOL 2: Possibilities
+
+# Event pool gatekeeping event
+# Fired by: event
+country_event = {
+	id = synth.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fire_on_action = {
+			on_action = on_synthshock_chain_opportunity_events_list
+		}
+	}
+}
+
+# Fired by: on_synthshock_chain_opportunity_events_list
+country_event = { # Infinite Possibility Matrix
+	id = synth.1010
+	title = "synth.1010.name"
+	desc = synth.1010.desc
+	picture = GFX_evt_rift_sphere
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = { # Physical World Focus
+		name = synth.1010.a
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_virtual_world_outlaw
+			days = 3600
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.1010.b
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			is_pleasure_seeker = no # undercoat: moved to scripted trigger
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_virtual_world_promote
+			days = 3600
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus Hedonist
+		name = synth.1010.b.hedonist
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			is_pleasure_seeker = yes # undercoat: moved to scripted trigger
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+		add_modifier = {
+			modifier = synth_virtual_world_promote
+			days = 3600
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = synth.1010.c
+		add_modifier = {
+			modifier = synth_virtual_world_regulate
+			days = 3600
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = synth.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_synthshock_chain_opportunity_events_list
+country_event = { # Synthetic Medicine
+	id = synth.1020
+	title = "synth.1020.name"
+	desc = synth.1020.desc
+	picture = GFX_evt_cybernetics
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = { # Physical World Focus
+		name = synth.1020.a
+		custom_tooltip = synth.social_consequences.tt
+		trigger = { is_spiritualist = no }
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_health_physical
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Physical World Focus Spiritual
+		name = synth.1020.a.spiritual
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			NOT = {
+				is_spiritualist = no
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_health_physical
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_spiritualist = yes
+			}
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.1020.b
+		custom_tooltip = synth.social_consequences.tt
+		trigger = { is_spiritualist = no }
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_health_virtual
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus Spiritual
+		name = synth.1020.b.spiritual
+		custom_tooltip = synth.social_consequences.tt
+		trigger = { is_spiritualist = yes }
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_health_virtual
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_spiritualist = yes
+			}
+		}
+	}
+	option = { # Neutral
+		name = synth.1020.c
+		add_modifier = {
+			modifier = synth_health_both
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Pharma State
+		name = synth.1020.d
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			owner = {
+				is_private_healthcare_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_health_corporate
+			days = 1800
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = synth.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_synthshock_chain_opportunity_events_list
+country_event = { # Respawn
+	id = synth.1030
+	title = "synth.1030.name"
+	desc = synth.1030.desc
+	picture = GFX_evt_space_walk
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = { # Physical World Focus
+		name = synth.1030.a
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_respawn_push
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Virtual World Focus
+		name = synth.1030.b
+		custom_tooltip = synth.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "synth_virtual_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_respawn_caution
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Physical World Focus Elite
+		name = synth.1030.c
+		custom_tooltip = synth.social_consequences.tt
+		trigger = {
+			owner = {
+				OR = {
+					is_aristocratic_empire = yes # undercoat: moved to scripted trigger
+					has_dystopian_society = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "synth_physical_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = synth_respawn_elite
+			days = 1800
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = synth.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Ending
+# Fired by: event
+country_event = {
+	id = synth.1500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		switch = {
+			trigger = has_authority
+			auth_democratic = {
+				hidden_effect = {
+					country_event = { id = synth.1505 }
+				}
+			}
+			auth_oligarchic = {
+			 	hidden_effect = {
+			 		country_event = { id = synth.1510 }
+			 	}
+			}
+			auth_dictatorial = {
+			 	hidden_effect = {
+			 		country_event = { id = synth.1515 }
+			 	}
+			}
+			auth_dictatorial = {
+			 	hidden_effect = {
+			 		country_event = { id = synth.1515 }
+			 	}
+			}
+			auth_imperial = {
+				hidden_effect = {
+					country_event = { id = synth.1520 }
+					}
+			}
+			auth_corporate = {
+				hidden_effect = {
+					country_event = { id = synth.1525 }
+				}
+			}
+		}
+	}
+}
+
+# Democratic Final Event
+# Fired by: event
+country_event = {
+	id = synth.1505
+	title = "synth.1505.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value > synth_virtual_society
+			}
+		}
+		text = synth.1505.desc.physical
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value < synth_virtual_society
+			}
+		}
+		text = synth.1505.desc.virtual
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value = synth_virtual_society
+			}
+		}
+		text = synth.1505.desc.neutral
+	}
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value >= synth_virtual_society
+			}
+		}
+		name = synth.1505.a
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1505.a.tt
+		set_country_flag = synth_physical
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value <= synth_virtual_society
+			}
+		}
+		name = synth.1505.b
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1505.b.tt
+		set_country_flag = synth_virtual
+		hidden_effect = {
+			owner = {
+				modify_species = {
+					species = owner_main_species
+					add_trait = trait_robot_digital_1
+				}
+				change_dominant_species = {
+					species = last_created_species
+					change_all = yes
+				}
+				refresh_portraits = character
+			}
+			advanced_authority_refresh = yes
+			country_event = { id = cybernetics.5046 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = synth.1505.c
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1505.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Oligarchic Final Event
+# Fired by: event
+country_event = {
+	id = synth.1510
+	title = "synth.1510.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value > synth_virtual_society
+			}
+		}
+		text = synth.1510.desc.physical
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value < synth_virtual_society
+			}
+		}
+		text = synth.1510.desc.virtual
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value = synth_virtual_society
+			}
+		}
+		text = synth.1510.desc.neutral
+	}
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value >= synth_virtual_society
+			}
+		}
+		name = synth.1510.a
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1510.a.tt
+		set_country_flag = synth_physical
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value <= synth_virtual_society
+			}
+		}
+		name = synth.1510.b
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1510.b.tt
+		set_country_flag = synth_virtual
+		hidden_effect = {
+			owner = {
+				modify_species = {
+					species = owner_main_species
+					add_trait = trait_robot_digital_1
+				}
+				change_dominant_species = {
+					species = last_created_species
+					change_all = yes
+				}
+				refresh_portraits = character
+			}
+			advanced_authority_refresh = yes
+			country_event = { id = cybernetics.5046 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = synth.1505.c
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1510.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Dictatorial Final Event
+# Fired by: event
+country_event = {
+	id = synth.1515
+	title = synth.1515.name
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value > synth_virtual_society
+			}
+		}
+		text = synth.1515.desc.physical
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value < synth_virtual_society
+			}
+		}
+		text = synth.1515.desc.virtual
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value = synth_virtual_society
+			}
+		}
+		text = synth.1515.desc.neutral
+	}
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value >= synth_virtual_society
+			}
+		}
+		name = synth.1515.a
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1515.a.tt
+		set_country_flag = synth_physical
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value <= synth_virtual_society
+			}
+		}
+		name = synth.1515.b
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1515.b.tt
+		set_country_flag = synth_virtual
+		hidden_effect = {
+			owner = {
+				modify_species = {
+					species = owner_main_species
+					add_trait = trait_robot_digital_1
+				}
+				change_dominant_species = {
+					species = last_created_species
+					change_all = yes
+				}
+				refresh_portraits = character
+			}
+			advanced_authority_refresh = yes
+			country_event = { id = cybernetics.5046 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = synth.1515.c
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1515.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Imperial Final Event
+# Fired by: event
+country_event = {
+	id = synth.1520
+	title = "synth.1520.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value > synth_virtual_society
+			}
+		}
+		text = synth.1520.desc.physical
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value < synth_virtual_society
+			}
+		}
+		text = synth.1520.desc.virtual
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value = synth_virtual_society
+			}
+		}
+		text = synth.1520.desc.neutral
+	}
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value >= synth_virtual_society
+			}
+		}
+		name = synth.1520.a
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1520.a.tt
+		set_country_flag = synth_physical
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value <= synth_virtual_society
+			}
+		}
+		name = synth.1520.b
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1520.b.tt
+		set_country_flag = synth_virtual
+		hidden_effect = {
+			owner = {
+				modify_species = {
+					species = owner_main_species
+					add_trait = trait_robot_digital_1
+				}
+				change_dominant_species = {
+					species = last_created_species
+					change_all = yes
+				}
+				refresh_portraits = character
+			}
+			advanced_authority_refresh = yes
+			country_event = { id = cybernetics.5046 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = synth.1520.c
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1520.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Corporate Final Event
+# Fired by: event
+country_event = {
+	id = synth.1525
+	title = "synth.1525.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value > synth_virtual_society
+			}
+		}
+		text = synth.1525.desc.physical
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value < synth_virtual_society
+			}
+		}
+		text = synth.1525.desc.virtual
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value = synth_virtual_society
+			}
+		}
+		text = synth.1525.desc.neutral
+	}
+	picture = GFX_evt_virtual_world
+	show_sound = event_cityscape
+	location = from
+	event_chain = synthshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value >= synth_virtual_society
+			}
+		}
+		name = synth.1525.a
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1525.a.tt
+		set_country_flag = synth_physical
+		hidden_effect = {
+			advanced_authority_refresh = yes
+			set_policy = {
+				policy = computation_core_allocation
+				option = computation_core_production
+				cooldown = no
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "synth_physical_society"
+				value <= synth_virtual_society
+			}
+		}
+		name = synth.1525.b
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1525.b.tt
+		set_country_flag = synth_virtual
+		hidden_effect = {
+			owner = {
+				modify_species = {
+					species = owner_main_species
+					add_trait = trait_robot_digital_1
+				}
+				change_dominant_species = {
+					species = last_created_species
+					change_all = yes
+				}
+				refresh_portraits = character
+			}
+			advanced_authority_refresh = yes
+			country_event = { id = cybernetics.5046 }
+			set_policy = {
+				policy = computation_core_allocation
+				option = computation_core_research
+				cooldown = no
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = synth.1525.c
+		end_event_chain = synthshock_chain
+		custom_tooltip = synth.1525.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Reassembled Armies: Upload new minds to defeated robot armies
+# An army has been killed in ground combat
+#	This = owner
+#	From = army
+#	FromFrom = opponent
+#	FromFromFrom = planet
+# Fired by: on_army_killed_in_combat
+country_event = {
+	id = synth.1550
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_synth_imperial = yes
+		has_country_flag = synth_virtual
+		from = {
+			OR = {
+				army_type = robotic_army
+				army_type = robotic_defense_army
+			}
+		}
+	}
+
+	immediate = {
+		random_list = {
+			2 = { }
+			1 = {
+				from = {
+					switch = {
+						trigger = army_type
+						robotic_army = {
+							create_army_on_planet = {
+								PLANET = fromfrom # Relative to the from scope wrapper
+								OWNER = root
+								TYPE = robotic_army
+								SPECIES = root.from.species
+							}
+						}
+						robotic_defense_army = {
+							create_army_on_planet = {
+								PLANET = fromfrom # Relative to the from scope wrapper
+								OWNER = root
+								TYPE = robotic_defense_army
+								SPECIES = root.from.species
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Synth Imperial physical swap, leader dies and gives research
+# Executed as a leader has died
+#	This = Country
+#	From = Leader
+# Fired by: on_leader_death
+country_event = {
+	id = synth.1555
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_synth_imperial = yes
+		has_country_flag = synth_physical
+	}
+
+	immediate = {
+		from = {
+			switch = {
+				trigger = has_skill
+				1 = {
+					switch = {
+						trigger = leader_class
+						official = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = society_research
+									value = 1
+									min = @tier1researchmin
+									max = @tier1researchmax
+								}
+							}
+						}
+						commander = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = engineering_research
+									value = 1
+									min = @tier1researchmin
+									max = @tier1researchmax
+								}
+							}
+						}
+						scientist = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = physics_research
+									value = 1
+									min = @tier1researchmin
+									max = @tier1researchmax
+								}
+							}
+						}
+					}
+				}
+				2 = {
+					switch = {
+						trigger = leader_class
+						official = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = society_research
+									value = 2
+									min = @tier2researchmin
+									max = @tier2researchmax
+								}
+							}
+						}
+						commander = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = engineering_research
+									value = 2
+									min = @tier2researchmin
+									max = @tier2researchmax
+								}
+							}
+						}
+						scientist = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = physics_research
+									value = 2
+									min = @tier2researchmin
+									max = @tier2researchmax
+								}
+							}
+						}
+					}
+				}
+				3 = {
+					switch = {
+						trigger = leader_class
+						official = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = society_research
+									value = 3
+									min = @tier3researchmin
+									max = @tier3researchmax
+								}
+							}
+						}
+						commander = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = engineering_research
+									value = 3
+									min = @tier3researchmin
+									max = @tier3researchmax
+								}
+							}
+						}
+						scientist = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = physics_research
+									value = 3
+									min = @tier3researchmin
+									max = @tier3researchmax
+								}
+							}
+						}
+					}
+				}
+				4 = {
+					switch = {
+						trigger = leader_class
+						official = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = society_research
+									value = 4
+									min = @tier4researchmin
+									max = @tier4researchmax
+								}
+							}
+						}
+						commander = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = engineering_research
+									value = 4
+									min = @tier4researchmin
+									max = @tier4researchmax
+								}
+							}
+						}
+						scientist = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = physics_research
+									value = 4
+									min = @tier4researchmin
+									max = @tier4researchmax
+								}
+							}
+						}
+					}
+				}
+				5 >= {
+					switch = {
+						trigger = leader_class
+						official = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = society_research
+									value = 5
+									min = @tier5researchmin
+									max = @tier5researchmax
+								}
+							}
+						}
+						commander = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = engineering_research
+									value = 5
+									min = @tier5researchmin
+									max = @tier5researchmax
+								}
+							}
+						}
+						scientist = {
+							root = {
+								add_monthly_resource_mult = {
+									resource = physics_research
+									value = 5
+									min = @tier5researchmin
+									max = @tier5researchmax
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#
+# THIS = country
+# Fired by: on_monthly_pulse_country
+country_event = {
+	id = cyber.1570
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_spynetwork = {
+			owner = {
+				is_same_value = root
+			}
+			has_modifier = clear_thought_clinic_modifier
+			target = {
+				any_owned_planet = {
+					NOT = {
+						has_holding = {
+							holding = building_clear_thought_clinic
+							owner = root
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		every_spynetwork = {
+			limit = {
+				owner = {
+					is_same_value = root
+				}
+				has_modifier = clear_thought_clinic_modifier
+			}
+			if = {
+				limit = {
+					target = {
+						any_owned_planet = {
+							has_holding = {
+								holding = building_clear_thought_clinic
+								owner = root
+							}
+						}
+					}
+				}
+				# Do nothing
+			}
+			else = {
+				remove_modifier = clear_thought_clinic_modifier
+			}
+		}
+	}
+}

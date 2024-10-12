@@ -672,7 +672,7 @@ diplomatic_stance = {
 		icon = "GFX_diplomatic_stance_rest"
 
 		potential = {
-			is_hive_empire = yes # undercoat: moved to scripted trigger
+			is_hive_empire = yes
 		}
 
 		valid = {
@@ -696,7 +696,7 @@ diplomatic_stance = {
 		icon = "GFX_diplomatic_stance_recompiling"
 
 		potential = {
-			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_machine_empire = yes
 		}
 
 		valid = {
@@ -1195,7 +1195,7 @@ subjugation_war_terms = {
 		}
 
 		potential = {
-			is_megacorp = no # undercoat: moved to scripted trigger
+			is_megacorp = no
 		}
 
 		on_enabled = {
@@ -1262,7 +1262,7 @@ subjugation_war_terms = {
 		}
 
 		potential = {
-			is_megacorp = no # undercoat: moved to scripted trigger
+			is_megacorp = no
 		}
 
 		on_enabled = {
@@ -1311,7 +1311,7 @@ subjugation_war_terms = {
 		}
 
 		potential = {
-			is_megacorp = no # undercoat: moved to scripted trigger
+			is_megacorp = no
 		}
 
 		on_enabled = {
@@ -1378,7 +1378,7 @@ subjugation_war_terms = {
 		}
 
 		potential = {
-			is_megacorp = yes # undercoat: moved to scripted trigger
+			is_megacorp = yes
 		}
 
 		on_enabled = {
@@ -1456,7 +1456,7 @@ subjugation_war_terms = {
 		}
 
 		potential = {
-			is_megacorp = yes # undercoat: moved to scripted trigger
+			is_megacorp = yes
 		}
 
 		ai_weight = {
@@ -1494,7 +1494,7 @@ subjugation_war_terms = {
 		}
 
 		potential = {
-			is_megacorp = yes # undercoat: moved to scripted trigger
+			is_megacorp = yes
 		}
 
 		on_enabled = {
@@ -2040,7 +2040,6 @@ resettlement = {
 
 appropriation = {
 	potential = {
-		is_gestalt = no # undercoat: moved to scripted trigger
 		has_comms_with_alien_empire = yes
 	}
 
@@ -2071,6 +2070,10 @@ appropriation = {
 			modifier = {
 				factor = 10
 				NOT = { has_ai_personality_behaviour = multispecies }
+			}
+			modifier = {
+				factor = 10
+				is_gestalt = yes
 			}
 		}
 	}
@@ -2349,7 +2352,7 @@ border_policy = {
 			factor = 10
 			modifier = {
 				factor = 0
-				is_megacorp = yes # undercoat: moved to scripted trigger
+				is_megacorp = yes
 			}
 			modifier = {
 				factor = 0
@@ -2801,6 +2804,10 @@ trade_policy = {
 			trade_policy_default
 		}
 
+		potential = {
+			is_worker_coop_empire = no
+		}
+
 		AI_weight = {
 			factor = 0
 		}
@@ -2817,6 +2824,7 @@ trade_policy = {
 				}
 			}
 			has_tradition = tr_mercantile_adaptive_economic_policies
+			is_worker_coop_empire = no
 		}
 
 		policy_flags = {
@@ -2846,6 +2854,7 @@ trade_policy = {
 				}
 			}
 			has_tradition = tr_mercantile_adaptive_economic_policies
+			is_worker_coop_empire = no
 		}
 
 		policy_flags = {
@@ -2975,26 +2984,31 @@ drone_policy = {
 }
 
 artificial_intelligence_policy = {
-
 	potential = {
 		is_gestalt = no # undercoat: moved to scripted trigger
 		OR = {
+			is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
 			can_set_ai_policy = yes
 			has_country_flag = synthetic_empire
+			is_individual_machine = yes
 		}
 	}
 
 	option = {
 		name = "ai_outlawed"
 
+		potential = {
+			is_individual_machine = no
+		}
 		valid = {
 			NOR = {
-				has_ethic = "ethic_materialist"
-				has_ethic = "ethic_fanatic_materialist"
+				is_materialist = yes
+				is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
 				custom_tooltip = {
 					success_text = is_a_synthetic_empire
 					has_country_flag = synthetic_empire
 				}
+				is_individual_machine = yes
 			}
 		}
 
@@ -3017,17 +3031,11 @@ artificial_intelligence_policy = {
 		AI_weight = {
 			modifier = {
 				factor = 0
-				OR = {
-					has_ethic = "ethic_materialist"
-					has_ethic = "ethic_fanatic_materialist"
-				}
+				is_materialist = yes
 			}
 			modifier = {
 				factor = 5
-				OR = {
-					has_ethic = "ethic_spiritualist"
-					has_ethic = "ethic_fanatic_spiritualist"
-				}
+				is_spiritualist = yes
 			}
 			modifier = {
 				factor = 0.1
@@ -3046,11 +3054,17 @@ artificial_intelligence_policy = {
 	option = {
 		name = "ai_servitude"
 
+		potential = {
+			is_individual_machine = no
+		}
+
 		valid = {
+			is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
 			custom_tooltip = {
 				fail_text = is_a_synthetic_empire_fail
 				NOT = { has_country_flag = synthetic_empire }
 			}
+			is_individual_machine = no
 		}
 
 		policy_flags = {
@@ -3070,10 +3084,7 @@ artificial_intelligence_policy = {
 			}
 			modifier = {
 				factor = 0
-				OR = {
-					has_ethic = "ethic_spiritualist"
-					has_ethic = "ethic_fanatic_spiritualist"
-				}
+				is_spiritualist = yes
 				NOT = {
 					has_valid_ai_personality = yes
 					is_ai = yes
@@ -3097,10 +3108,8 @@ artificial_intelligence_policy = {
 					fail_text = is_a_synthetic_empire
 					has_country_flag = synthetic_empire
 				}
-				NOR = {
-					has_ethic = "ethic_spiritualist"
-					has_ethic = "ethic_fanatic_spiritualist"
-				}
+				is_spiritualist = no
+				is_individual_machine = yes
 			}
 			NOT = { has_policy_flag = robots_outlawed }
 		}
@@ -3133,30 +3142,30 @@ artificial_intelligence_policy = {
 			}
 			modifier = {
 				factor = 0
-				OR = {
-					has_ethic = "ethic_spiritualist"
-					has_ethic = "ethic_fanatic_spiritualist"
-				}
+				is_spiritualist = yes
 			}
 		}
 	}
 }
 
 robot_pop_policy = {
-
 	potential = {
-		is_gestalt = no # undercoat: moved to scripted trigger
+		NOR = {
+			is_gestalt = yes # undercoat: moved to scripted trigger
+			is_individual_machine = yes
+		}
 	}
 
 	option = {
 		name = "robot_pops_outlawed"
 
 		valid = {
+			is_materialist = no
 			NOR = {
-				has_ethic = "ethic_materialist"
-				has_ethic = "ethic_fanatic_materialist"
+				is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
+				has_policy_flag = ai_full_rights
 			}
-			NOT = { has_policy_flag = ai_full_rights }
+			is_individual_machine = no
 		}
 
 		policy_flags = {
@@ -3178,13 +3187,6 @@ robot_pop_policy = {
 		AI_weight = {
 			factor = 1
 			modifier = {
-				factor = 0
-				OR = {
-					has_ethic = "ethic_materialist"
-					has_ethic = "ethic_fanatic_materialist"
-				}
-			}
-			modifier = {
 				factor = 10
 				has_valid_ai_personality = yes
 				NOR = {
@@ -3192,7 +3194,6 @@ robot_pop_policy = {
 					has_ai_personality_behaviour = robot_liberator
 				}
 			}
-
 			modifier = {
 				factor = 10
 				has_ethic = "ethic_fanatic_spiritualist"
@@ -3205,6 +3206,14 @@ robot_pop_policy = {
 
 		policy_flags = {
 			robots_allowed
+		}
+
+		on_enabled = {
+			hidden_effect = {
+				country_event = {
+					id = action.56 # Failsafe if you don't have a robot species to assemble.
+				}
+			}
 		}
 
 		AI_weight = {
@@ -3226,6 +3235,7 @@ pre_sapients = {
 					is_sapient = no
 				}
 			}
+			is_guided_sapience_empire = yes
 		}
 	}
 
@@ -3259,7 +3269,10 @@ pre_sapients = {
 		name = "pre_sapients_allow"
 
 		potential = {
-			is_homicidal = no # undercoat: moved to scripted trigger
+			NOR = {
+				is_homicidal = yes # undercoat: moved to scripted trigger
+				is_guided_sapience_empire = yes
+			}
 		}
 
 		on_enabled = {
@@ -3283,8 +3296,9 @@ pre_sapients = {
 		potential = {
 			host_has_dlc = "Utopia"
 			is_synthetic_empire = no
-			NOT = {
+			NOR = {
 				has_valid_civic = civic_fanatic_purifiers
+				is_guided_sapience_empire = yes
 			}
 		}
 
@@ -3323,6 +3337,7 @@ pre_sapients = {
 			NOR = {
 				has_ethic = "ethic_xenophile"
 				has_ethic = "ethic_fanatic_xenophile"
+				is_guided_sapience_empire = yes
 			}
 		}
 
@@ -3431,7 +3446,9 @@ refugees = {
 		}
 
 		valid = {
-			is_hive_empire = no # undercoat: moved to scripted trigger
+			NOT = {
+				is_hive_empire = yes
+			}
 		}
 
 		AI_weight = {
@@ -3607,6 +3624,7 @@ slavery = {
 				NOR = {
 					has_valid_civic = "civic_slaver_guilds"
 					has_trait = "trait_decadent"
+					has_trait = "trait_robot_decadent"
 				}
 			}
 		}
@@ -3619,7 +3637,7 @@ purge = {
 
 		valid = {
 			is_gestalt = no # undercoat: moved to scripted trigger
-			is_homicidal = no # undercoat: moved to scripted trigger
+			NOT = { has_valid_civic = "civic_fanatic_purifiers" }
 		}
 
 		policy_flags = {
@@ -3691,7 +3709,7 @@ purge = {
 				is_gestalt = yes # undercoat: moved to scripted trigger
 				has_ethic = ethic_xenophobe
 				has_ethic = ethic_fanatic_xenophobe
-				has_menace_perk = menp_undertaker	# Unlocked with Crisis Level 1
+				has_crisis_perk = menp_undertaker	# Unlocked with Crisis Level 1
 			}
 		}
 
@@ -3739,7 +3757,7 @@ purge = {
 			}
 			modifier = {
 				factor = 1000
-				is_necrophage_empire = yes # undercoat: moved to scripted trigger
+				is_necrophage_empire = yes # undercoat: moved to scripted trigger - AI will never invalidate its origin
 				is_xenophobe = yes
 			}
 		}
@@ -3880,34 +3898,6 @@ relentless_industrialists_policy = {
 				factor = 5
 				has_country_flag = relentless_industrialists_cleanup
 			}
-		}
-	}
-}
-
-roboticist_output = {
-	potential = {
-		has_tradition = tr_cybernetics_assembly_standards
-		is_regular_empire = yes
-	}
-
-	option = {
-		name = build_robots
-
-		policy_flags = {
-			roboticist_output_build_robots
-		}
-
-	}
-
-	option = {
-		name = build_cyborgs
-
-		policy_flags = {
-			roboticist_output_build_cyborgs
-		}
-
-		AI_weight = {
-			factor = 2
 		}
 	}
 }

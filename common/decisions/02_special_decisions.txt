@@ -153,10 +153,7 @@ decision_penal_colony = {
 				any_owned_planet = { has_modifier = penal_colony }
 			}
 		}
-	}
-
-	allow = {
-		planet_size >= 15
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	effect = {
@@ -222,6 +219,7 @@ decision_slave_colony = {
 			is_regular_empire = yes
 		}
 		is_artificial = no
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	allow = {
@@ -294,8 +292,8 @@ decision_resort_colony = {
 
 	potential = {
 		is_capital = no
-		NOR = { 
-			has_modifier = penal_colony 
+		NOR = {
+			has_modifier = penal_colony
 			has_modifier = slave_colony
 			has_modifier = resort_colony
 			is_city_world = yes # undercoat: moved to scripted trigger
@@ -303,8 +301,8 @@ decision_resort_colony = {
 				is_nuked_world = yes # undercoat: moved to scripted trigger
 				NOR = {
 					owner = {
-						OR = {	
-							is_memorialist_empire = yes	
+						OR = {
+							is_memorialist_empire = yes
 							has_trait = trait_survivor
 							has_trait = trait_pc_nuked_preference
 							has_trait = trait_plantoid_radiotrophic
@@ -324,6 +322,7 @@ decision_resort_colony = {
 			is_regular_empire = yes
 		}
 		is_artificial = no
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	allow = {
@@ -398,7 +397,7 @@ decision_abolish_resort_colony = {
 }
 
 # Crucible Colony
-decision_crucible_colony = {
+decision_gestation_colony = {
 	owned_planets_only = yes
 
 	resources = {
@@ -412,22 +411,22 @@ decision_crucible_colony = {
 		is_capital = no
 		is_artificial = no
 		owner = {
-			has_tradition = tr_cybernetics_assimilator_crucible
+			has_tradition = tr_cybernetics_assimilator_gestation
 		}
 		NOR = {
 			is_machine_world = yes # undercoat: moved to scripted trigger
 			is_city_world = yes # undercoat: moved to scripted trigger
-			has_modifier = crucible_colony
+			has_modifier = gestation_colony
 		}
 	}
 
 	allow = {
 		planet_size >= 15
 		custom_tooltip = {
-			fail_text = decision_crucible_colony_only_one
+			fail_text = decision_gestation_colony_only_one
 			NOT = {
 				owner = {
-					any_owned_planet = { has_modifier = crucible_colony }
+					any_owned_planet = { has_modifier = gestation_colony }
 				}
 			}
 		}
@@ -435,20 +434,20 @@ decision_crucible_colony = {
 
 	effect = {
 		add_modifier = {
-			modifier = crucible_colony
+			modifier = gestation_colony
 			days = -1
 		}
 		hidden_effect = { validate_planet_buildings_and_districts = yes }
 	}
 
 	ai_weight = {
-		weight = 0 #TODO AUG-37374
+		weight = 0
 	}
 }
 
-decision_abolish_crucible_colony = {
+decision_abolish_gestation_colony = {
 	owned_planets_only = yes
-	icon = decision_crucible_colony
+	icon = decision_gestation_colony
 
 	resources = {
 		category = decisions
@@ -458,11 +457,11 @@ decision_abolish_crucible_colony = {
 	}
 
 	potential = {
-		has_modifier = crucible_colony
+		has_modifier = gestation_colony
 	}
 
 	effect = {
-		remove_modifier = crucible_colony
+		remove_modifier = gestation_colony
 		hidden_effect = { validate_planet_buildings_and_districts = yes }
 	}
 
@@ -490,6 +489,7 @@ decision_mastery_of_nature = {
 			has_ascension_perk = ap_mastery_of_nature
 		}
 		NOT = { has_modifier = mastery_of_nature }
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	effect = {
@@ -536,6 +536,7 @@ decision_consecrated_worlds = {
 			has_modifier = consecrated_quality_3
 			has_modifier = consecrated_quality_4
 		}
+		NOT = { has_designation = col_nanotech_world } 
 	}
 
 	allow = {
@@ -742,12 +743,9 @@ decision_consecrated_worlds = {
 					}
 					20 = {
 						modifier = {
-						add = 20
-							AND = {
-								root.space_owner = {
-									is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
-								}
-								is_toxic_world = yes # undercoat: moved to scripted trigger
+							add = 20
+							root.space_owner = {
+								is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
 							}
 							is_toxic_world = yes # undercoat: moved to scripted trigger
 						}
@@ -773,12 +771,10 @@ decision_consecrated_worlds = {
 					0 = {
 						modifier = {
 							add = 20
-							AND = {
-								root.space_owner = {
-									is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
-								}
-								is_toxic_world = yes # undercoat: moved to scripted trigger
+							root.space_owner = {
+								is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
 							}
+							is_toxic_world = yes # undercoat: moved to scripted trigger
 						}
 						add_modifier = {
 							modifier = consecrated_quality_4
@@ -1145,6 +1141,7 @@ decision_arcology_project = {
 		is_artificial = no
 		exists = owner
 		owner = { has_ascension_perk = ap_arcology_project }
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	allow = {
@@ -1172,7 +1169,9 @@ decision_arcology_project = {
 		# Make city-planet
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {
-			clear_deposits = yes
+			save_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			restore_saved_deposits = yes
 			set_industrial_focus_flags = yes
 			change_pc = pc_city
 			relic_world_conversion_effect = {
@@ -1255,7 +1254,9 @@ decision_arcology_project_relic = {
 		# Make city-planet
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {
-			clear_deposits = yes
+			save_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			restore_saved_deposits = yes
 			set_industrial_focus_flags = yes
 			change_pc = pc_city
 			relic_world_conversion_effect = {
@@ -1331,6 +1332,7 @@ decision_market_nomination = {
 				NOT = { has_ethic = ethic_fanatic_xenophobe }
 			}
 		}
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	allow = {
@@ -1376,7 +1378,7 @@ decision_market_nomination = {
 					}
 					modifier = {
 						factor = 0.33
-						from = { is_megacorp = yes } # undercoat: moved to scripted trigger
+						from = { is_megacorp = yes }
 					}
 					modifier = {
 						factor = 0.5
@@ -1414,7 +1416,7 @@ decision_market_nomination = {
 					}
 					modifier = {
 						factor = 9
-						from = { is_megacorp = yes } # undercoat: moved to scripted trigger
+						from = { is_megacorp = yes }
 					}
 					modifier = {
 						factor = 2
@@ -1472,7 +1474,7 @@ decision_market_nomination = {
 		}
 		modifier = {
 			factor = 2
-			from = { is_megacorp = yes } # undercoat: moved to scripted trigger
+			from = { is_megacorp = yes }
 		}
 		modifier = {
 			factor = 1.5
@@ -1606,7 +1608,7 @@ decision_boost_market_nomination = {
 		}
 		modifier = {
 			factor = 2
-			from = { is_megacorp = yes } # undercoat: moved to scripted trigger
+			from = { is_megacorp = yes }
 		}
 	}
 }
@@ -1729,6 +1731,7 @@ decision_divine_algorithm = {
 			has_country_flag = divine_algorithm
 		}
 		NOT = { has_modifier = divine_algorithm }
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	effect = {
@@ -1776,6 +1779,7 @@ decision_art_monument = {
 			}
 		}
 		NOT = { has_modifier = artist_monument_erected }
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	effect = {
@@ -1860,6 +1864,7 @@ decision_lithoid_swarm_consume_world = {
 		NOT = {
 			has_planet_flag = being_devoured
 		}
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	effect = {
@@ -1937,6 +1942,7 @@ decision_project_cornucopia = {
 			is_active_resolution = "resolution_industry_project_cornucopia"
 		}
 		NOT = { has_deposit = d_project_cornucopia }
+		NOT = { has_designation = col_nanotech_world }
 	}
 
 	effect = {
@@ -2101,7 +2107,9 @@ decision_shattered_ring_project = {
 		# Make ringworld
 		custom_tooltip = decision_shattered_ring_project_effects
 		hidden_effect = {
-			clear_deposits = yes
+			save_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			restore_saved_deposits = yes
 			change_pc = pc_ringworld_habitable
 
 			set_planet_entity = {

@@ -1,0 +1,1132 @@
+###########################
+#
+# Anomaly Events
+# COSMIC STORMS
+#
+###########################
+
+namespace = cstorms
+
+############################
+# Anomaly Follow-up Events #
+############################
+
+### Antsteroid
+ship_event = {
+	id = cstorms.5020
+	title = "cstorms.5020.name"
+	desc = "cstorms.5020.desc"
+	picture = GFX_evt_hive
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.5020.a
+		FROM = {
+			set_deposit =  d_exotic_gases_1
+		}
+	}
+
+	option = {
+		name = cstorms.5020.b
+		FROM = {
+			set_deposit = d_society_3
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+
+# Brainstorm
+ship_event = {
+	id = cstorms.5025
+	title = "cstorms.5025.name"
+	desc = "cstorms.5025.desc"
+	picture = GFX_evt_surreal_visions
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = DISCONCERTING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Stationary Apocalypse
+ship_event = {
+	id = cstorms.5030
+	title = "cstorms.5030.name"
+	desc = "cstorms.5030.desc"
+	picture = GFX_evt_unidentified_monster
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = DISTURBING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Polychromatic Star
+ship_event = {
+	id = cstorms.5035
+	title = "cstorms.5035.name"
+	desc = "cstorms.5035.desc"
+	picture = GFX_evt_star_pulsar
+	show_sound = event_kaleidoscopic_lights
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = {
+			switch = {
+				trigger = has_planet_flag
+				affected_by_electric_storm = { set_planet_flag = collect_exotic_gases }
+				affected_by_solar_storm = { set_planet_flag = collect_exotic_gases }
+				affected_by_particle_storm = { set_planet_flag = collect_volatile_motes }
+				affected_by_celestial_storm = { set_planet_flag = collect_volatile_motes }
+				affected_by_gravity_storm = { set_planet_flag = collect_alloys }
+				affected_by_magnetic_storm = { set_planet_flag = collect_alloys }
+				affected_by_shroud_storm = { set_planet_flag = collect_crystals }
+				affected_by_nexus_storm = { set_planet_flag = collect_living_metal }
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5035.a
+		from = {
+			if = {
+				limit = { has_deposit_for = shipclass_mining_station }
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
+				hidden_effect = {
+					every_fleet_in_orbit = {
+						limit = {
+							is_owned_by = root.controller
+							is_ship_class = shipclass_mining_station
+						}
+						delete_fleet = this
+					}
+				}
+			}
+			add_deposit = d_physics_7
+		}
+	}
+
+	option = {
+		name = cstorms.5035.b
+		from = {
+			hidden_effect = {
+				every_fleet_in_orbit = {
+					limit = {
+						is_owned_by = root.controller
+						OR = {
+							is_ship_class = shipclass_mining_station
+							is_ship_class = shipclass_research_station
+						}
+					}
+					delete_fleet = this
+				}
+			}
+			if = {
+				limit = { has_deposit_for = shipclass_research_station }
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
+			}
+			add_deposit = d_energy_2
+			switch = {
+				trigger = has_planet_flag
+				collect_exotic_gases = { add_deposit = d_exotic_gases_3 }
+				collect_volatile_motes = { add_deposit = d_volatile_motes_3 }
+				collect_alloys = { add_deposit = d_alloys_5 }
+				collect_crystals = { add_deposit = d_rare_crystals_3 }
+				collect_living_metal = { add_deposit = d_living_metal_deposit }
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			from = {
+				save_event_target_as = target_planet
+				update_habitat_orbital_effect = yes
+				remove_planet_flag = collect_exotic_gases
+				remove_planet_flag = collect_volatile_motes
+				remove_planet_flag = collect_alloys
+				remove_planet_flag = collect_zro
+				remove_planet_flag = collect_living_metal
+				clear_affected_storm_flag = { SCOPE_TYPE = planet }
+			}
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Asteroid Triplets
+ship_event = {
+	id = cstorms.5040
+	title = "cstorms.5040.name"
+	desc = "cstorms.5040.desc"
+	picture = GFX_evt_crystal_asteroids
+	show_sound = event_space_crystals
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {
+		from.solar_system = {
+			if = {
+				limit = {
+					any_system_megastructure = {
+						OR = {
+							is_megastructure_type = orbital_arc_furnace_1
+							is_megastructure_type = orbital_arc_furnace_2
+							is_megastructure_type = orbital_arc_furnace_3
+							is_megastructure_type = orbital_arc_furnace_4
+							is_megastructure_type = orbital_arc_furnace_restored
+						}
+					}
+				}
+				every_system_planet = {
+					limit = { has_planet_flag = asteroid_triplet }
+					if = {
+						limit = {
+							prev = {
+								any_system_megastructure = {
+									is_megastructure_type = orbital_arc_furnace_1
+								}
+							}
+						}
+						add_modifier = {
+							modifier = orbital_arc_furnace_1_mod
+							days = -1
+						}
+					}
+					else_if = {
+						limit = {
+							prev = {
+								any_system_megastructure = {
+									is_megastructure_type = orbital_arc_furnace_2
+								}
+							}
+						}
+						add_modifier = {
+							modifier = orbital_arc_furnace_2_mod
+							days = -1
+						}
+					}
+					else_if = {
+						limit = {
+							prev = {
+								any_system_megastructure = {
+									is_megastructure_type = orbital_arc_furnace_3
+								}
+							}
+						}
+						add_modifier = {
+							modifier = orbital_arc_furnace_3_mod
+							days = -1
+						}
+					}
+					else_if = {
+						limit = {
+							prev = {
+								any_system_megastructure = {
+									OR = {
+										is_megastructure_type = orbital_arc_furnace_1
+										is_megastructure_type = orbital_arc_furnace_restored
+									}
+								}
+							}
+						}
+						add_modifier = {
+							modifier = orbital_arc_furnace_4_mod
+							days = -1
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		from.solar_system = {
+			every_system_planet = {
+				limit = { has_planet_flag = asteroid_triplet }
+				if = {
+					limit = { is_ice_asteroid = yes } # undercoat: moved to scripted trigger
+					add_deposit = d_energy_2
+				}
+				else_if = {
+					limit = { is_planet_class = pc_crystal_asteroid }
+					add_deposit = d_rare_crystals_1
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Displaced Travelers
+ship_event = {
+	id = cstorms.5050
+	title = "cstorms.5050.name"
+	desc = "cstorms.5050.desc"
+	picture = GFX_evt_ship_in_orbit
+	show_sound = event_encrypted_comms
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.5050.a
+		trigger = {
+			controller = { is_homicidal = no }
+		}
+		allow = {
+			controller = {
+				resource_stockpile_compare = {
+					resource = alloys
+					value >= 100
+				}
+			}
+		}
+		controller = {
+			add_resource = { alloys = -100 }
+			if = {
+				limit = { country_uses_consumer_goods = yes }
+				add_monthly_resource_mult = {
+					resource = consumer_goods
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5050.b
+		trigger = {
+			controller = { is_homicidal = no }
+		}
+	}
+
+	option = {
+		name = cstorms.5050.c.genocide
+		trigger = {
+			controller = {
+				is_xenophile = no
+				NOT = { has_civic = civic_hive_devouring_swarm }
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			if = {
+				limit = { country_uses_consumer_goods = yes }
+				add_monthly_resource_mult = {
+					resource = consumer_goods
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5050.d.devouring_swarm
+		trigger = {
+			controller = { has_civic = civic_hive_devouring_swarm }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			from = { clear_affected_storm_flag = { SCOPE_TYPE = planet } }
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Cosmic Sludge
+ship_event = {
+	id = cstorms.5060
+	title = "cstorms.5060.name"
+	desc = "cstorms.5060.desc"
+	picture = GFX_evt_physics_research
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = cstorms.5060.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			inverted_switch = {
+				trigger = has_technology
+				tech_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_industrial_storm_protection
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_manipulation
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				tech_storm_prediction_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_1
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				tech_advanced_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_industrial_storm_protection
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_advanced_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_storm_manipulation
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				tech_ship_hull_storm_breaker_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_hull_storm_breaker_1
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_ship_storm_weapons_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_storm_weapons_1
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_prediction_2 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_2
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier1researchreward
+						min = @tier1researchmin
+						max = @tier1researchmax
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5060.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = volatile_motes
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = rare_crystals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = exotic_gases
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			from = { clear_affected_storm_flag = { SCOPE_TYPE = planet } }
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Shattered Satellite
+ship_event = {
+	id = cstorms.5070
+	title = "cstorms.5070.name"
+	desc = "cstorms.5070.desc"
+	picture = GFX_evt_satellite_in_orbit
+	show_sound = event_encrypted_comms
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			inverted_switch = {
+				trigger = has_technology
+				tech_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_industrial_storm_protection
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_manipulation
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				tech_storm_prediction_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_1
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				tech_advanced_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_industrial_storm_protection
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_advanced_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_storm_manipulation
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				tech_ship_hull_storm_breaker_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_hull_storm_breaker_1
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_ship_storm_weapons_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_storm_weapons_1
+						PROGRESS = 0.1
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_prediction_2 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_2
+						PROGRESS = 0.1
+						CATEGORY = physics_research
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = physics_research
+						value = @tier1researchreward
+						min = @tier1researchmin
+						max = @tier1researchmax
+					}
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier1researchreward
+						min = @tier1researchmin
+						max = @tier1researchmax
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			from = { clear_affected_storm_flag = { SCOPE_TYPE = planet } }
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+### Eviscerated Fauna
+ship_event = {
+	id = cstorms.5080
+	title = cstorms.5080.name
+	desc = {
+		trigger = {
+			text = cstorms.5080.desc.common
+			text = newline
+			if = {
+				limit = { controller = { has_valid_civic = civic_hive_devouring_swarm } }
+				text = cstorms.5080.desc.swarm
+			}
+			else = { text = cstorms.5080.desc.default }
+		}
+	}
+	picture = GFX_evt_astral_rift_ancient_battlegrounds_leviathan
+	show_sound = event_encrypted_comms
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {
+		from.solar_system = {
+			every_system_ambient_object = {
+				limit = {
+					has_ambient_object_flag = eviscerated_space_fauna_object
+				}
+				save_event_target_as = eviscerated_space_fauna_object
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5080.a
+		trigger = {
+			controller = { has_valid_civic = civic_hive_devouring_swarm }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+		hidden_effect = {
+			event_target:eviscerated_space_fauna_object = {
+				destroy_ambient_object = this
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5080.b
+		trigger = {
+			controller = { NOT = { has_valid_civic = civic_hive_devouring_swarm } }
+		}
+		enable_special_project = {
+			name = FORENSIC_DISSECTION_PROJECT
+			location = event_target:eviscerated_space_fauna_object
+			owner = this.controller
+		}
+	}
+
+	option = {
+		name = cstorms.5080.c
+		trigger = {
+			controller = { NOT = { has_valid_civic = civic_hive_devouring_swarm } }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		hidden_effect = {
+			from.solar_system = {
+				every_system_ambient_object = {
+					limit = {
+						has_ambient_object_flag = eviscerated_space_fauna_object
+					}
+					destroy_ambient_object = this
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			from = { clear_affected_storm_flag = { SCOPE_TYPE = planet } }
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.5085
+	title = cstorms.5085.name
+	desc = cstorms.5085.desc
+	picture = GFX_evt_astral_rift_ancient_battlegrounds_leviathan
+	show_sound = event_encrypted_comms
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		controller = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_industrial_storm_protection
+						PROGRESS = 0.25
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_manipulation
+						PROGRESS = 0.25
+						CATEGORY = physics_research
+					}
+				}
+				tech_storm_prediction_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_1
+						PROGRESS = 0.25
+						CATEGORY = physics_research
+					}
+				}
+				tech_advanced_industrial_storm_protection = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_industrial_storm_protection
+						PROGRESS = 0.25
+						CATEGORY = engineering_research
+					}
+				}
+				tech_advanced_storm_manipulation = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_advanced_storm_manipulation
+						PROGRESS = 0.25
+						CATEGORY = physics_research
+					}
+				}
+				tech_ship_hull_storm_breaker_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_hull_storm_breaker_1
+						PROGRESS = 0.25
+						CATEGORY = engineering_research
+					}
+				}
+				tech_ship_storm_weapons_1 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_ship_storm_weapons_1
+						PROGRESS = 0.25
+						CATEGORY = engineering_research
+					}
+				}
+				tech_storm_prediction_2 = {
+					add_tech_option_or_research_effect = {
+						TECH = tech_storm_prediction_2
+						PROGRESS = 0.25
+						CATEGORY = physics_research
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = physics_research
+						value = @tier3researchreward
+						min = @tier3researchmin
+						max = @tier3researchmax
+					}
+				}
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_alien_life_studies } }
+				add_research_option = tech_alien_life_studies
+				add_tech_progress = {
+					tech = tech_alien_life_studies
+					progress = 0.25
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+### Displaced Tiyanki
+ship_event = {
+	id = cstorms.5090
+	title = cstorms.5090.name
+	desc = {
+		trigger = {
+			text = cstorms.5090.desc.common
+			if = {
+				limit = { controller = { is_homicidal = no } }
+				text = newline
+				text = cstorms.5090.desc.default
+			}
+			else_if = {
+				limit = { controller = { has_valid_civic = civic_hive_devouring_swarm } }
+				text = newline
+				text = cstorms.5090.desc.swarm
+			}
+		}
+	}
+	picture = GFX_evt_tiyanki_family
+	show_sound = evn_ove_tiyanki_family
+	location = FROM
+
+	is_triggered_only = yes
+
+	option = {
+		name = {
+			text = cstorms.5090.a.default
+			trigger = {
+				controller = { NOT = { has_valid_civic = civic_hive_devouring_swarm } }
+			}
+		}
+		name = {
+			text = cstorms.5090.b.swarm
+			trigger = {
+				controller = { has_valid_civic = civic_hive_devouring_swarm }
+			}
+		}
+		trigger = {
+			controller = {
+				NOR = {
+					has_valid_civic = civic_fanatic_purifiers
+					has_valid_civic = civic_machine_terminator
+				}
+			}
+		}
+		create_fleet = {
+			name = "NAME_Tiyanki_Space_Whale"
+			effect = {
+				set_owner = event_target:tiyanki_country
+				while = {
+					count = 3
+					create_ship = {
+						design = "NAME_Tiyanki_Hatchling"
+						effect = {
+							set_ship_flag = displaced_tiyanki_hatchling
+						}
+					}
+				}
+				set_location = {
+					target = root.from
+					distance = 30
+					angle = random
+				}
+				set_fleet_stance = passive
+				set_aggro_range_measure_from = self
+				set_aggro_range = 0
+				set_fleet_settings = {
+					garrison = yes
+				}
+				save_event_target_as = displaced_tiyanki_fleet
+			}
+		}
+		enable_special_project = {
+			name = REUNITE_POD_PROJECT
+			location = event_target:displaced_tiyanki_fleet
+			owner = this.controller
+		}
+	}
+
+	option = {
+		name = {
+			text = cstorms.5090.b.default
+			trigger = {
+				controller = {
+					NOR = {
+						has_valid_civic = civic_machine_terminator
+						has_valid_civic = civic_hive_devouring_swarm
+					}
+				}
+			}
+		}
+		name = {
+			text = cstorms.5090.b.machine
+			trigger = {
+				controller = { has_valid_civic = civic_machine_terminator }
+			}
+		}
+		name = {
+			text = cstorms.5090.b.swarm
+			trigger = {
+				controller = { has_valid_civic = civic_hive_devouring_swarm }
+			}
+		}
+		while = {
+			count = 3
+			create_ambient_object = {
+				type = small_dead_tiyanki_object
+				location = from
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev.from
+					distance = 30
+					angle = random
+				}
+			}
+		}
+		controller = {
+			if = {
+				limit = { has_valid_civic = civic_hive_devouring_swarm }
+				add_monthly_resource_mult = {
+					resource = food
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = cstorms.320 # for storm chaser challenges
+				}
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = cstorms.5095
+	title = cstorms.5095.name
+	desc = {
+		trigger = {
+			text = cstorms.5095.desc.common
+			if = {
+				limit = { controller = { has_valid_civic = civic_hive_devouring_swarm } }
+				text = newline
+				text = cstorms.5095.desc.swarm
+			}
+		}
+	}
+	picture = GFX_evt_tiyanki_observation
+	show_sound = evn_ove_tiyanki_family
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:displaced_tiyanki_fleet = {
+			set_fleet_settings = {
+				garrison = no
+			}
+			set_fleet_flag = NAME_Tiyanki_Space_Whale
+			every_owned_ship = {
+				remove_ship_flag = displaced_tiyanki_hatchling
+			}
+			create_ship = {
+				design = "NAME_Tiyanki_Cow"
+			}
+			create_ship = {
+				design = "NAME_Tiyanki_Bull"
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = FASCINATING
+			trigger = {
+				controller = { NOT = { has_valid_civic = civic_hive_devouring_swarm } }
+			}
+		}
+		name = {
+			text = cstorms.5090.b.swarm
+			trigger = {
+				controller = { has_valid_civic = civic_hive_devouring_swarm }
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = rare_crystals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}

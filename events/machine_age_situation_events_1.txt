@@ -1,0 +1,7353 @@
+#################################################
+#												#
+# Machine Age DLC Cyberization Situation Events #
+#												#
+#################################################
+
+namespace = cyber
+
+@cyber_approach_mult = 5
+
+### CYBERIZATION SITUATION START ###
+
+# Fired by: tr_cybernetics_adopt
+country_event = { # Cyberization - First event
+	id = cyber.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { # Hives get their own special situation
+			limit = {
+				is_hive_empire = yes
+			}
+			start_situation = {
+				type = situation_cyberization_hive
+				target = root
+			}
+		}
+		else = {
+			start_situation = {
+				type = situation_cyberization
+				target = root
+			}
+		}
+	}
+}
+
+# Event pools gatekeeping event | Situation Random Events
+# Fired by: situation on_monthly and situation flag
+situation_event = {
+	id = cyber.5
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				has_situation_flag = cyber_5_stage_2_fire
+				situation_progress >= 450
+			}
+			AND = {
+				has_situation_flag = cyber_5_stage_3_fire
+				situation_progress >= 700
+			}
+		}
+	}
+
+	immediate = {
+		remove_situation_flag = cyber_5_stage_1_fire
+		remove_situation_flag = cyber_5_stage_2_fire
+		remove_situation_flag = cyber_5_stage_3_fire
+
+		fire_on_action = {
+			on_action = on_cyberization_situation_random_events_list
+		}
+	}
+}
+
+# CYBERIZATION STAGE 1
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 1 - Start event - Controlling the Future
+	id = cyber.100
+	title = "cyber.100.name"
+	desc = {
+		trigger = {
+			owner = {
+				is_megacorp = no
+			}
+		}
+		text = "cyber.100.desc"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		text = "cyber.100.desc.megacorp"
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_worrying_signal
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.100.a"
+		trigger = {
+			owner = {
+				is_megacorp = no
+			}
+		}
+		custom_tooltip = cyber.100.a.tt
+		owner = {
+			set_country_flag = cyber_control_government
+			set_country_flag = cyber_rival_corporate
+		}
+	}
+	option = {
+		name = "cyber.100.a.megacorp"
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		custom_tooltip = cyber.100.a.tt
+		owner = {
+			set_country_flag = cyber_control_government
+			set_country_flag = cyber_rival_corporate
+		}
+	}
+	option = {
+		name = "cyber.100.b"
+		trigger = {
+			owner = {
+				is_megacorp = no
+			}
+		}
+		custom_tooltip = cyber.100.b.tt
+		owner = {
+			set_country_flag = cyber_control_corporate
+			set_country_flag = cyber_rival_government
+		}
+	}
+	option = {
+		name = "cyber.100.b.megacorp"
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		custom_tooltip = cyber.100.b.tt
+		owner = {
+			set_country_flag = cyber_control_corporate
+			set_country_flag = cyber_rival_government
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # By the People, For the People
+	id = cyber.105
+	title = "cyber.105.name"
+	desc = {
+		trigger = {
+			owner = {
+				is_megacorp = no
+			}
+		}
+		text = "cyber.105.desc"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		text = "cyber.105.desc.megacorp"
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_worrying_signal
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_105_happened }
+		situation_progress >= 100
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_105_happened
+		owner = {
+			remove_country_flag = cyber_rival_government
+			remove_country_flag = cyber_rival_corporate
+		}
+	}
+
+	option = {
+		name = "cyber.105.a"
+		trigger = {
+			owner = {
+				is_megacorp = no
+			}
+		}
+		custom_tooltip = "cyber.105.a.tt"
+		owner = {
+			set_country_flag = cyber_rival_independent
+		}
+	}
+	option = {
+		name = "cyber.105.a.megacorp"
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		custom_tooltip = "cyber.105.a.tt"
+		owner = {
+			set_country_flag = cyber_rival_independent
+		}
+	}
+	option = {
+		name = "cyber.105.b"
+		trigger = {
+			owner = {
+				is_megacorp = no
+				NOT = {
+					has_valid_civic = civic_crafters
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = { # Controller becomes rival
+					has_country_flag = cyber_control_government
+				}
+				custom_tooltip = cyber.105.b.gov.tt
+				remove_country_flag = cyber_control_government
+				set_country_flag = cyber_rival_government
+			}
+			else = { # Controller becomes rival
+				custom_tooltip = cyber.105.b.cor.tt
+				remove_country_flag = cyber_control_corporate
+				set_country_flag = cyber_rival_corporate
+			}
+			set_country_flag = cyber_control_independent
+		}
+	}
+	option = {
+		name = "cyber.105.b.crafters"
+		trigger = {
+			owner = {
+				has_valid_civic = civic_crafters
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			if = {
+				limit = { # Controller becomes rival
+					has_country_flag = cyber_control_government
+				}
+				custom_tooltip = cyber.105.b.gov.tt
+				remove_country_flag = cyber_control_government
+				set_country_flag = cyber_rival_government
+			}
+			else = { # Controller becomes rival
+				custom_tooltip = cyber.105.b.cor.tt
+				remove_country_flag = cyber_control_corporate
+				set_country_flag = cyber_rival_corporate
+			}
+			set_country_flag = cyber_control_independent
+		}
+	}
+	option = {
+		name = "cyber.105.b.megacorp"
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		owner = {
+			if = {
+				limit = { # Controller becomes rival
+					has_country_flag = cyber_control_government
+				}
+				custom_tooltip = cyber.105.b.gov.tt
+				remove_country_flag = cyber_control_government
+				set_country_flag = cyber_rival_government
+			}
+			else = { # Controller becomes rival
+				remove_country_flag = cyber_control_corporate
+				set_country_flag = cyber_rival_corporate
+			}
+			custom_tooltip = cyber.105.b.cor.tt
+			set_country_flag = cyber_control_independent
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Stage 1 Opportunity
+	id = cyber.120
+	title = "cyber.120.name"
+	desc = "cyber.120.desc"
+	picture = GFX_evt_bribery
+	show_sound = event_radio_chatter
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 450
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_cautious
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_120_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_120_happened
+	}
+
+	option = {
+		name = "cyber.120.a"
+		trigger = {
+			owner = {
+				is_spiritualist = no
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = AI_control
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = "cyber.120.a.spiritual"
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = unity
+					value >= 500
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				unity = -500
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = AI_control
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = "cyber.120.b"
+		trigger = {
+			owner = {
+				is_spiritualist = no
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+	option = {
+		name = "cyber.120.b.spiritual"
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+	option = {
+		name = "cyber.120.c"
+		trigger = {
+			owner = {
+				is_materialist = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_modifier = {
+				modifier = moderate_AI_control
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = "cyber.120.d"
+		trigger = {
+			owner = {
+				is_authoritarian = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_modifier = {
+				modifier = AI_forced_control
+				days = -1
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Stage 1 Challenge
+	id = cyber.160
+	title = "cyber.160.name"
+	desc = "cyber.160.desc"
+	picture = GFX_evt_scanning_remains
+	show_sound = event_screams
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 450
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_overdrive
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_160_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_160_happened
+	}
+
+	option = {
+		name = "cyber.160.a"
+		owner = {
+			add_modifier = {
+				modifier = researcher_media_relations
+				days = 180
+			}
+		}
+	}
+	option = {
+		name = "cyber.160.b"
+		custom_tooltip = "cyber.260.a.tt"
+		set_timed_situation_flag = {
+			flag = cyber_tests_paused
+			months = 6
+		}
+	}
+	option = {
+		name = "cyber.160.c"
+		owner = {
+			add_modifier = {
+				modifier = bad_publicity
+				days = 360
+			}
+		}
+	}
+	option = {
+		name = "cyber.160.d"
+		trigger = {
+			owner = {
+				is_authoritarian = yes
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = cyber_state_censorship
+				days = 180
+			}
+		}
+	}
+	option = {
+		name = "cyber.160.e"
+		trigger = {
+			owner = {
+				has_valid_civic = civic_media_conglomerate
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -1000
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = media_blockade
+				days = 360
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION STAGE 2
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 2 - Start event
+	id = cyber.200
+	title = "cyber.200.name"
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_government
+			}
+		}
+		text = "cyber.200.desc.gov"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_corporate
+			}
+		}
+		text = "cyber.200.desc.cor"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_independent
+			}
+		}
+		text = "cyber.200.desc.ind"
+	}
+	picture = GFX_evt_busy_spaceport
+	show_sound = event_construction
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		owner = {
+			set_country_flag = augmentation_center_available
+			set_country_flag = augmentation_center_needed
+		}
+	}
+
+	option = {
+		name = "cyber.200.a.gov"
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_government
+			}
+		}
+		custom_tooltip = cyber.200.a.tt
+	}
+	option = {
+		name = "cyber.200.a.cor"
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_corporate
+			}
+		}
+		custom_tooltip = cyber.200.a.tt
+	}
+	option = {
+		name = "cyber.200.a.ind"
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_independent
+			}
+		}
+		custom_tooltip = cyber.200.a.tt
+	}
+	# No new event triggered, wait for cyber.201
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# A building construction has been completed.
+# This = Planet
+# Fired by: on_building_complete
+planet_event = { # First Augmentation Center is built
+	id = cyber.201
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			has_country_flag = augmentation_center_needed
+		}
+		last_building_changed = building_augmentation_center
+	}
+
+	immediate = {
+		owner = {
+			remove_country_flag = augmentation_center_needed
+		}
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Pilot projects
+	id = cyber.205
+	title = "cyber.205.name"
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_government
+			}
+		}
+		text = "cyber.205.desc.gov"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_corporate
+			}
+		}
+		text = "cyber.205.desc.cor"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_control_independent
+			}
+		}
+		text = "cyber.205.desc.ind"
+	}
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_205_happened }
+		situation_progress >= 300
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_205_happened
+	}
+
+	option = {
+		name = "cyber.205.a"
+		custom_tooltip = cyber.205.a.tt
+		owner = {
+			set_country_flag = cyber_focus_rulers
+		}
+	}
+	option = {
+		name = "cyber.205.b"
+		custom_tooltip = cyber.205.b.tt
+		owner = {
+			set_country_flag = cyber_focus_specialists
+		}
+	}
+	option = {
+		name = "cyber.205.c"
+		custom_tooltip = cyber.205.c.tt
+		owner = {
+			set_country_flag = cyber_focus_workers
+		}
+	}
+	option = {
+		name = "cyber.205.d"
+		custom_tooltip = cyber.205.d.tt
+		owner = {
+			set_country_flag = cyber_focus_everyone
+		}
+	}
+
+	after = {
+		set_situation_flag = cyber_5_stage_2_fire # Fire a random event
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Parallel Development
+	id = cyber.210
+	title = "cyber.210.name"
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_rival_government
+			}
+		}
+		text = "cyber.210.desc.gov.rival"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_rival_corporate
+			}
+		}
+		text = "cyber.210.desc.cor.rival"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = cyber_rival_independent
+			}
+		}
+		text = "cyber.210.desc.ind.rival"
+	}
+	picture = GFX_evt_society_research
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_210_happened }
+		situation_progress >= 450
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_210_happened
+	}
+
+	option = {
+		name = "cyber.210.a"
+		custom_tooltip = "cyber.210.a.tt"
+		owner = {
+			add_modifier = {
+				modifier = borrowed_research
+				years = 1
+			}
+		}
+	}
+	option = {
+		name = "cyber.210.b"
+		custom_tooltip = "cyber.210.b.tt"
+		set_timed_situation_flag = {
+			flag = cyber_research_destroyed
+			months = 12
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Stage 2 Opportunity
+	id = cyber.220
+	title = "cyber.220.name"
+	desc = "cyber.220.desc"
+	picture = GFX_evt_cyberization_2
+	show_sound = event_administrative_work
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 250
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_cautious
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_220_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_220_happened
+	}
+
+	option = {
+		name = "cyber.220.a"
+		owner = {
+			add_modifier = {
+				modifier = helping_hand
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = "cyber.220.b"
+		owner = {
+			add_modifier = {
+				modifier = armed_forces
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = "cyber.220.c"
+		trigger = {
+			owner = {
+				is_egalitarian = yes
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = state_handouts
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = "cyber.220.d"
+		trigger = {
+			owner = {
+				is_megacorp = yes
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = branching_out
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = "cyber.220.e"
+		trigger = {
+			owner = {
+				OR = {
+					is_shared_burden_empire = yes # undercoat: moved to scripted trigger
+					is_worker_coop_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = handy_workers
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = "cyber.220.f"
+		trigger = {
+			owner = {
+				OR = {
+					has_dystopian_society = yes # undercoat: moved to scripted trigger
+					is_aristocratic_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = luxury_limbs
+				days = 720
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Stage 2 Challenge
+	id = cyber.260
+	title = "cyber.260.name"
+	desc = "cyber.260.desc"
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_life_support_fail
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 250
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_overdrive
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_260_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_260_happened
+	}
+
+	option = {
+		name = "cyber.260.a"
+		custom_tooltip = "cyber.260.a.tt"
+		set_timed_situation_flag = {
+			flag = cyber_tests_paused
+			months = 6
+		}
+	}
+
+	option = {
+		name = "cyber.260.b"
+		owner = {
+			add_modifier = {
+				modifier = cyber_victim_compensation
+				days = 360
+			}
+		}
+	}
+	option = {
+		name = "cyber.260.c"
+		trigger = {
+			owner = {
+				is_authoritarian = yes
+			}
+		}
+		owner = {
+			if = {
+				limit = { has_country_flag = cyber_focus_rulers }
+				add_modifier = {
+					modifier = cyber_rulers_force_tests
+					days = 180
+				}
+			}
+			else_if = {
+				limit = { has_country_flag = cyber_focus_specialists }
+				add_modifier = {
+					modifier = cyber_specialists_force_tests
+					days = 180
+				}
+			}
+			else_if = {
+				limit = { has_country_flag = cyber_focus_workers }
+				add_modifier = {
+					modifier = cyber_workers_force_tests
+					days = 180
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = cyber_everyone_force_tests
+					days = 180
+				}
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION STAGE 3
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 3 - Start event
+	id = cyber.300
+	title = "cyber.300.name"
+	desc = "cyber.300.desc"
+	picture = GFX_evt_cybernetics
+	show_sound = event_the_flesh_is_weak
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.300.a"
+		custom_tooltip = "cyber.300.a.tt"
+	}
+
+	after = {
+		set_situation_flag = cyberization_ongoing
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Traditionalists are Cybernetic Objectors
+	id = cyber.305
+	title = "cyber.305.name"
+	desc = {
+		trigger = {
+			owner = { is_spiritualist = no }
+			NOT = { has_situation_flag = no_spiritualists }
+		}
+		text = "cyber.305.desc"
+	}
+	desc = {
+		trigger = {	owner = { is_spiritualist = yes } }
+		text = "cyber.305.desc.spiritualist"
+	}
+	desc = {
+		trigger = {
+			owner = { is_spiritualist = no }
+			has_situation_flag = no_spiritualists
+		}
+		text = "cyber.305.desc.none"
+	}
+
+	trigger = {
+		has_situation_flag = cyber_305_fire
+		situation_progress >= 600
+	}
+
+	picture = GFX_evt_cybernetics
+	show_sound = event_vivisection
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		remove_situation_flag = cyber_305_fire
+
+		if = { # If there's no spiritualist pop in the empire, create one as objector
+			limit = {
+				owner = {
+					NOR = {
+						any_owned_pop = { has_ethic = ethic_spiritualist }
+						any_owned_leader = { has_ethic = ethic_spiritualist }
+					}
+				}
+			}
+			set_situation_flag = no_spiritualists
+		}
+	}
+
+	option = {
+		name = "cyber.305.a"
+		trigger = {
+			owner = {
+				is_spiritualist = no
+				is_materialist = no
+			}
+		}
+		custom_tooltip = "cyber.305.a.tt"
+		owner = {
+			set_country_flag = cyber_force_objectors
+			set_policy = {
+				policy = cyberization_standards
+				option = cyberization_standards_full
+				cooldown = yes
+			}
+		}
+		if = {
+			limit = { NOT = { has_situation_flag = no_spiritualists } }
+			# When this flag is set, an event is called each month in the situation to cyberize pops
+			set_situation_flag = cyberization_ongoing_forced
+		}
+	}
+	option = {
+		name = "cyber.305.a.spiritualist"
+		trigger = { owner = { is_spiritualist = yes } }
+		custom_tooltip = "cyber.305.a.tt"
+		owner = {
+			set_country_flag = cyber_force_objectors
+			set_policy = {
+				policy = cyberization_standards
+				option = cyberization_standards_full
+				cooldown = yes
+			}
+		}
+		if = {
+			limit = { NOT = { has_situation_flag = no_spiritualists } }
+			# When this flag is set, an event is called each month in the situation to cyberize pops
+			set_situation_flag = cyberization_ongoing_forced
+		}
+	}
+	option = {
+		name = "cyber.305.a.materialist"
+		trigger = { owner = { is_materialist = yes } }
+		custom_tooltip = "cyber.305.a.tt"
+		owner = {
+			set_country_flag = cyber_force_objectors
+			set_policy = {
+				policy = cyberization_standards
+				option = cyberization_standards_full
+				cooldown = yes
+			}
+			owner = {
+				add_modifier = {
+					modifier = cyber_anti_faith
+					days = 3600
+				}
+			}
+		}
+		if = {
+			limit = { NOT = { has_situation_flag = no_spiritualists } }
+			# When this flag is set, an event is called each month in the situation to cyberize pops
+			set_situation_flag = cyberization_ongoing_forced
+		}
+	}
+	option = {
+		name = "cyber.305.b"
+		trigger = {	owner = { is_spiritualist = no } }
+		custom_tooltip = "cyber.305.b.tt"
+		owner = {
+			set_country_flag = cyber_allow_objectors
+			set_policy = {
+				policy = cyberization_standards
+				option = cyberization_standards_limited
+				cooldown = yes
+			}
+		}
+		if = {
+			limit = { NOT = { has_situation_flag = no_spiritualists } }
+			# When this flag is set, an event is called each month in the situation to cyberize pops
+			set_situation_flag = cyberization_ongoing_limited
+		}
+	}
+	option = {
+		name = "cyber.305.b.spiritualist"
+		trigger = {	owner = { is_spiritualist = yes } }
+		custom_tooltip = "cyber.305.b.tt"
+		owner = {
+			set_country_flag = cyber_allow_objectors
+			set_policy = {
+				policy = cyberization_standards
+				option = cyberization_standards_limited
+				cooldown = yes
+			}
+		}
+		if = {
+			limit = { NOT = { has_situation_flag = no_spiritualists } }
+			# When this flag is set, an event is called each month in the situation to cyberize pops
+			set_situation_flag = cyberization_ongoing_limited
+		}
+	}
+
+	after = {
+		set_situation_flag = cyber_5_stage_3_fire
+		remove_situation_flag = no_spiritualists
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Stage 3 Opportunity
+	id = cyber.320
+	title = "cyber.320.name"
+	desc = {
+		trigger = {
+			owner_main_species = {
+				OR = {
+					is_species_class = MAM
+					is_species_class = HUM
+				}
+			}
+		}
+		text = cyber.320.birth.desc
+	}
+	desc = {
+		trigger = {
+			owner_main_species = {
+				is_species_class = ART
+			}
+		}
+		text = cyber.320.metamorphosis.desc
+	}
+	desc = {
+		trigger = {
+			owner_main_species = {
+				OR = {
+					is_species_class = AVI
+					is_species_class = REP
+					is_species_class = AQUATIC
+					is_species_class = MOL
+				}
+			}
+		}
+		text = cyber.320.egg.desc
+	}
+	desc = {
+		trigger = {
+			owner_main_species = {
+				is_species_class = LITHOID
+			}
+		}
+		text = cyber.320.lithoid.desc
+	}
+	desc = {
+		trigger = {
+			owner_main_species = {
+				is_flora_species = yes # undercoat: moved to scripted trigger
+			}
+		}
+		text = cyber.320.root.desc
+	}
+	desc = {
+		trigger = {
+			owner_main_species = {
+				NOR = {
+					is_species_class = MAM
+					is_species_class = HUM
+					is_species_class = ART
+					is_species_class = AVI
+					is_species_class = REP
+					is_species_class = AQUATIC
+					is_species_class = MOL
+					is_species_class = LITHOID
+					is_flora_species = yes # undercoat: moved to scripted trigger
+					
+				}
+			}
+		}
+		text = cyber.320.other.desc
+	}
+	picture = GFX_evt_vivisection
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 500
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_cautious
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_320_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_320_happened
+	}
+
+	option = {
+		name = "cyber.320.a"
+		owner = {
+			add_modifier = {
+				modifier = cyber_birth_implants
+				days = -1
+			}
+			set_country_flag = cyber_birth_implants
+		}
+	}
+	option = {
+		name = "cyber.320.b"
+		owner = {
+			add_modifier = {
+				modifier = cyber_natural_childhood
+				days = -1
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_situation_random_events_list
+situation_event = { # Stage 3 Challenge
+	id = cyber.360
+	title = "cyber.360.name"
+	desc = "cyber.360.desc"
+	picture = GFX_evt_deficit
+	show_sound = event_screams
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 500
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_overdrive
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_360_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_360_happened
+	}
+
+	option = {
+		name = cyber.360.a
+		custom_tooltip = "cyber.260.a.tt"
+		set_timed_situation_flag = {
+			flag = cyber_tests_paused
+			months = 6
+		}
+	}
+	option = {
+		name = cyber.360.b
+		trigger = {
+			owner = {
+				is_death_cult_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = murdered_martyrs
+				days = 180
+			}
+		}
+	}
+	option = {
+		name = cyber.360.c
+		trigger = {
+			owner = {
+				is_private_healthcare_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = artificial_pain_relief
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = cyber.360.d
+		trigger = {
+			owner = {
+				OR = {
+					any_owned_pop = {
+						has_citizenship_type = {
+							country = owner
+							type = citizenship_slavery
+						}
+					}
+					has_valid_civic = civic_slaver_guilds
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = chained_experiments
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = cyber.360.e
+		owner = {
+			add_modifier = {
+				modifier = cyber_opposition
+				days = 360
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION STAGE 4
+# Fired by: situation stage on_first_enter
+situation_event = { # Government rival
+	id = cyber.405
+	title = "cyber.405.name"
+	desc = "cyber.405.desc"
+	picture = GFX_evt_habitable_dig_site
+	show_sound = event_drilling
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { has_country_flag = cyber_rival_government	}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.405.a"
+		owner = {
+			add_modifier = {
+				modifier = cyber_implant_taxes
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = "cyber.405.b"
+		custom_tooltip = "cyber.405.b.tt"
+		set_situation_flag = cyber_repeal_taxes
+	}
+	option = {
+		name = "cyber.405.c"
+		custom_tooltip = "cyber.405.c.tt"
+		owner = {
+			add_modifier = {
+				modifier = cyber_reformed_implant_taxes
+				days = 360
+			}
+		}
+		set_timed_situation_flag = {
+			flag = cyber_reform_taxes
+			months = 12
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Government rival escalation
+	id = cyber.410
+	title = "cyber.410.name"
+	desc = "cyber.410.desc"
+	picture = GFX_evt_infiltration_neutral
+	show_sound = event_conversation
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_410_happened }
+		situation_progress >= 850
+		owner = { has_country_flag = cyber_rival_government	}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_410_happened
+	}
+
+	option = {
+		name = "cyber.410.a"
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = unity
+					value >= 500
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				unity = -500
+			}
+		}
+		custom_tooltip = "cyber.410.a.tt"
+		set_situation_flag = cyber_judicial_reset
+	}
+	option = {
+		name = "cyber.410.b"
+		custom_tooltip = "cyber.410.b.tt"
+		set_situation_flag = cyber_judicial_overhaul
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation stage on_first_enter
+situation_event = { # Corporate rival
+	id = cyber.415
+	title = "cyber.415.name"
+	desc = "cyber.415.desc"
+	picture = GFX_evt_black_market
+	show_sound = event_conversation
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { has_country_flag = cyber_rival_corporate }
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.415.a"
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = unity
+					value >= 1000
+				}
+			}
+		}
+		trigger = {
+			owner = {
+				is_relentless_industrialist_empire = no
+			}
+		}
+		owner = {
+			add_resource = {
+				unity = -1000
+			}
+		}
+		custom_tooltip = "cyber.415.a.tt"
+		set_situation_flag = cyber_free_market
+	}
+	option = {
+		name = "cyber.415.a_industrial"
+		custom_tooltip = "cyber.415.a.tt"
+		trigger = {
+			owner = {
+				is_relentless_industrialist_empire = yes
+			}
+		}
+		set_situation_flag = cyber_free_market
+	}
+	option = {
+		name = "cyber.415.b"
+		owner = {
+			add_modifier = {
+				modifier = cyber_market_standards
+				days = 360
+			}
+		}
+	}
+	option = {
+		name = "cyber.415.c"
+		custom_tooltip = "cyber.415.c.tt"
+		set_situation_flag = cyber_control_market
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Corporate rival escalation
+	id = cyber.420
+	title = "cyber.420.name"
+	desc = "cyber.420.desc"
+	picture = GFX_evt_engineering_research
+	show_sound = event_ground_battle
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_420_happened }
+		situation_progress >= 850
+		owner = { has_country_flag = cyber_rival_corporate }
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_420_happened
+	}
+
+	option = {
+		name = "cyber.420.a"
+		trigger = {
+			owner = {
+				NOT = {
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = cyber_implant_weapons
+				years = 5
+			}
+		}
+	}
+	option = {
+		name = "cyber.420.b"
+		custom_tooltip = "cyber.420.b.tt"
+		trigger = {
+			owner = {
+				is_pacifist = no
+			}
+		}
+		set_situation_flag = cyber_ban_implant_weapons
+	}
+	option = {
+		name = "cyber.420.b_pacifist"
+		trigger = {
+			owner = {
+				is_pacifist = yes
+			}
+		}
+		custom_tooltip = "cyber.420.b.tt"
+		custom_tooltip = "cyber.420.b.tt_pacifist"
+		owner = {
+			add_modifier = {
+				modifier = cyber_implants_dismantled
+				years = 5
+			}
+		}
+		set_situation_flag = cyber_ban_implant_weapons
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation stage on_first_enter
+situation_event = { # Independent rival
+	id = cyber.425
+	title = "cyber.425.name"
+	desc = "cyber.425.desc"
+	picture = GFX_evt_synth_sabotage
+	show_sound = event_espionage_concluded
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { has_country_flag = cyber_rival_independent }
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.425.a"
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 5000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -5000
+			}
+		}
+		set_situation_flag = cyber_ransom_paid
+	}
+	option = {
+		name = "cyber.425.b"
+		custom_tooltip = "cyber.425.b.tt"
+		set_timed_situation_flag = {
+			flag = cyber_rewrite_implant_software
+			months = 12
+		}
+	}
+	option = {
+		name = "cyber.425.c"
+		custom_tooltip = "cyber.425.c.tt"
+		trigger = {
+			owner = {
+				has_valid_civic = civic_criminal_heritage
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier4researchreward
+				min = @tier4researchmin
+				max = @tier4researchmax
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Independent rival escalation
+	id = cyber.430
+	title = "cyber.430.name"
+	desc = {
+		trigger = {
+			has_situation_flag = cyber_ransom_paid
+		}
+		text = "cyber.430.desc.demands"
+	}
+	desc = {
+		trigger = {
+			NOT = { has_situation_flag = cyber_ransom_paid }
+		}
+		text = "cyber.430.desc.protest"
+	}
+	picture = GFX_evt_civil_action
+	show_sound = event_public_unrest
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_430_happened }
+		situation_progress >= 850
+		owner = { has_country_flag = cyber_rival_independent }
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_430_happened
+	}
+
+	option = {
+		name = "cyber.430.a"
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = unity
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				unity = -1000
+			}
+		}
+	}
+	option = {
+		name = "cyber.430.b"
+		trigger = {
+			has_situation_flag = cyber_ransom_paid
+		}
+		owner = {
+			add_modifier = {
+				modifier = cyber_implant_hacks
+				years = 5
+			}
+		}
+	}
+	option = {
+		name = "cyber.430.b"
+		trigger = {
+			NOT = { has_situation_flag = cyber_ransom_paid }
+		}
+		owner = {
+			add_modifier = {
+				modifier = cyber_protests
+				years = 5
+			}
+		}
+	}
+	option = {
+		name = "cyber.430.c.demands"
+		trigger = {
+			has_situation_flag = cyber_ransom_paid
+		}
+		owner = {
+			add_modifier = {
+				modifier = cyber_counter_hacking
+				years = 1
+			}
+		}
+	}
+	option = {
+		name = "cyber.430.c.protest"
+		trigger = {
+			NOT = { has_situation_flag = cyber_ransom_paid }
+		}
+		owner = {
+			add_modifier = {
+				modifier = cyber_stop_protests
+				years = 1
+			}
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION FINAL EVENT
+# Fired by: situation on_progress_complete
+situation_event = { # Cyberization - Final hidden event - Full
+	id = cyber.2
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = cyberization_ongoing
+		set_situation_flag = cyberization_final
+		situation_event = { id = cyber.3 } # Run full cyberization again to change remaining non-spiritualists
+		if = {
+			limit = {
+				owner = {
+					NOR = {
+						any_owned_pop = { has_ethic = ethic_spiritualist }
+						any_owned_leader = { has_ethic = ethic_spiritualist }
+					}
+				}
+			}
+			situation_event = { id = cyber.21 days = 1 } # Real final event
+		}
+		else = {
+			situation_event = { id = cyber.20 days = 1 } # Go to final spiritualist cyberization
+		}
+	}
+}
+
+# Fired by: event
+situation_event = { # Cyberization - Final hidden event - Spiritualists
+	id = cyber.20
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				owner = { has_policy_flag = cyberization_standards_limited }
+			}
+			set_situation_flag = cyberization_ongoing_limited
+			set_situation_flag = cyberization_final
+			situation_event = { id = cyber.4 } # Run limited cyberization again to change remaining spiritualists
+			situation_event = { id = cyber.21 days = 1 } # Real final event
+		}
+		else = {
+			set_situation_flag = cyberization_ongoing_forced
+			set_situation_flag = cyberization_final
+			situation_event = { id = cyber.6 } # Run forced cyberization again to change remaining spiritualists
+			situation_event = { id = cyber.21 days = 1 } # Real final event
+		}
+	}
+}
+
+# Fired by: event
+situation_event = { # Final event
+	id = cyber.21
+	title = "cyber.21.name"
+	desc = cyber.21.desc
+	picture = GFX_evt_cyberization_1
+	show_sound = event_announcement
+	situation = this
+	is_triggered_only = yes
+
+	option = {
+		name = "cyber.21.a"
+		owner = {
+			switch = {
+				trigger = has_country_flag
+				cyber_control_government = {
+					custom_tooltip = "cyber.21.a.gov.tt"
+					set_country_flag = cyber_augmentation_center_government
+				}
+				cyber_control_corporate = {
+					custom_tooltip = "cyber.21.a.cor.tt"
+					set_country_flag = cyber_augmentation_center_corporate
+				}
+				cyber_control_independent = {
+					custom_tooltip = "cyber.21.a.ind.tt"
+					set_country_flag = cyber_augmentation_center_independent
+				}
+			}
+		}
+	}
+
+	after = {
+		destroy_situation = this
+		owner = {
+			hidden_effect = {
+				if = {
+					limit = { has_active_tradition = tr_cybernetics_finish_situation }
+					country_event = { id = cyber.500 days = 180 }
+				}
+			}
+			set_country_flag = cybernetics_traditions_unlocked
+		}
+	}
+}
+
+# Remove old effects before reforming cyber swap government
+# THIS = country
+# Fired by: on_pre_government_changed
+country_event = {
+	id = cyber.30
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		OR = {
+			has_auth_cyber_democratic_collectivist = yes # undercoat: moved to scripted trigger
+			has_auth_cyber_oligarchic_collectivist = yes # undercoat: moved to scripted trigger
+			has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_auth_cyber_oligarchic_collectivist = yes # undercoat: moved to scripted trigger
+				
+			}
+			every_pop_faction = {
+				limit = {
+					is_faction_extorted = yes
+				}
+				set_faction_extorted = no
+			}
+		}
+		else_if = {
+			limit = {
+				has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
+				
+			}
+			remove_relic = r_the_rulerchip
+			remove_modifier = rulerchip_intergenerational_knowledge
+		}
+	}
+}
+
+# Add new effects after reforming cyber swap government
+# THIS = country
+# Fired by: on_post_government_changed
+country_event = {
+	id = cyber.40
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
+		
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
+				
+			}
+			add_relic = r_the_rulerchip
+		}
+	}
+}
+
+# Fired by: situation on_monthly and event
+situation_event = { # Event to cyberize pops except Spiritualists
+	id = cyber.3
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = cyberization_ongoing
+		owner = {
+			check_variable_arithmetic = { which = value:num_active_buildings|BUILDING|building_augmentation_center| value > 0 }
+		}
+	}
+
+	immediate = {
+		owner = {
+			random_owned_pop = {
+				limit = {
+					is_same_species = owner.species
+					is_spiritualist = no
+					NOR = {
+						has_trait = trait_cybernetic
+						has_trait = trait_limited_cybernetic
+					}
+				}
+				species = {
+					save_event_target_as = changing_species
+					if = {
+						limit = {
+							NOT = { exists = event_target:cyberspecies@species }
+						}
+						create_cyber_species_effect = yes
+					}
+				}
+			}
+
+			if = { # Final event
+				limit = {
+					prev = {
+						has_situation_flag = cyberization_final
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOR = {
+							has_trait = trait_cybernetic
+							has_trait = trait_limited_cybernetic
+						}
+					}
+					change_species = event_target:cyberspecies@species
+				}
+			}
+			else = {
+				while = {
+					limit = {
+						any_owned_pop = {
+							exists = event_target:cyberspecies@species
+							exists = event_target:changing_species
+							is_exact_same_species = event_target:changing_species
+							is_spiritualist = no
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+					count = value:pop_to_cyberize_per_month
+					random_owned_pop = {
+						limit = {
+							is_exact_same_species = event_target:changing_species
+							is_spiritualist = no
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+						change_species = event_target:cyberspecies@species
+					}
+				}
+			}
+			cyberize_leaders_effect = yes
+			cyberize_colony_ships_effect = yes
+			cyberize_armies_effect = yes
+		}
+		# Check if there are any pops left to cyberize, otherwise remove the cyberization flag to unpause the situation.
+		if = {
+			limit = {
+				NOT = {
+					owner = {
+						any_owned_pop = {
+							is_same_species = owner.species
+							is_spiritualist = no
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+				}
+			}
+			remove_situation_flag = cyberization_ongoing
+			if = {
+				limit = {
+					NOT = { has_situation_flag = cyberization_final }
+				}
+				owner = {
+					change_dominant_species = { species = event_target:cyberspecies@species }
+				}
+				if = {
+					limit = {
+						owner = { is_hive_empire = yes }
+					}
+					set_situation_flag = cyber_2005_stage_3_fire
+				}
+				else = {
+					set_situation_flag = cyber_305_fire
+				}
+			}
+		}
+	}
+}
+
+# Fired by: situation on_monthly and event
+situation_event = { # Event to minimally cyberize spiritualist pops
+	id = cyber.4
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = cyberization_ongoing_limited
+		owner = {
+			check_variable_arithmetic = { which = value:num_active_buildings|BUILDING|building_augmentation_center| value > 0 }
+		}
+	}
+
+	immediate = {
+		owner = {
+			random_owned_pop = {
+				limit = {
+					is_same_species = owner.species
+					is_spiritualist = yes
+					NOR = {
+						has_trait = trait_cybernetic
+						has_trait = trait_limited_cybernetic
+					}
+				}
+				species = {
+					save_event_target_as = changing_species
+					if = {
+						limit = {
+							NOT = { exists = event_target:cyberspecies@species }
+						}
+						create_cyber_species_effect = yes
+					}
+				}
+			}
+
+			if = { # Final event
+				limit = {
+					prev = {
+						has_situation_flag = cyberization_final
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOR = {
+							has_trait = trait_cybernetic
+							has_trait = trait_limited_cybernetic
+						}
+					}
+					change_species = event_target:cyberspecies@species
+				}
+			}
+			else = {
+				while = {
+					limit = {
+						any_owned_pop = {
+							exists = event_target:cyberspecies@species
+							is_exact_same_species = event_target:changing_species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+					count = value:pop_to_cyberize_per_month
+					random_owned_pop = {
+						limit = {
+							is_exact_same_species = event_target:changing_species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+						change_species = event_target:cyberspecies@species
+						if = {
+							limit = { has_ethic = ethic_spiritualist }
+							modify_species = {
+								species = this
+								remove_trait = trait_cybernetic
+								add_trait = trait_limited_cybernetic
+								add_traits_at_start_of_list = yes
+							}
+						}
+					}
+				}
+			}
+			cyberize_leaders_limited_effect = yes
+		}
+		# Check if there are any pops left to cyberize, otherwise remove the cyberization flag to unpause the situation.
+		if = {
+			limit = {
+				NOT = {
+					owner = {
+						any_owned_pop = {
+							is_same_species = owner.species
+							is_spiritualist = yes
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+				}
+			}
+			remove_situation_flag = cyberization_ongoing_limited
+		}
+	}
+}
+
+# Fired by: situation on_monthly and event
+situation_event = { # Event to force cyberize spiritualist pops
+	id = cyber.6
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = cyberization_ongoing_forced
+		owner = {
+			check_variable_arithmetic = { which = value:num_active_buildings|BUILDING|building_augmentation_center| value > 0 }
+		}
+	}
+
+	immediate = {
+		owner = {
+			random_owned_pop = {
+				limit = {
+					is_same_species = owner.species
+					is_spiritualist = yes
+					NOR = {
+						has_trait = trait_cybernetic
+						has_trait = trait_limited_cybernetic
+					}
+				}
+				species = {
+					save_event_target_as = changing_species
+					if = {
+						limit = {
+							NOT = { exists = event_target:cyberspecies@species }
+						}
+						create_cyber_species_effect = yes
+					}
+				}
+			}
+
+			if = { # Final event
+				limit = {
+					prev = {
+						has_situation_flag = cyberization_final
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOR = {
+							has_trait = trait_cybernetic
+							has_trait = trait_limited_cybernetic
+						}
+					}
+					change_species = event_target:cyberspecies@species
+				}
+			}
+			else = {
+				while = {
+					limit = {
+						any_owned_pop = {
+							exists = event_target:cyberspecies@species
+							is_exact_same_species = event_target:changing_species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+					count = value:pop_to_cyberize_per_month
+					random_owned_pop = {
+						limit = {
+							is_exact_same_species = event_target:changing_species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+						change_species = event_target:cyberspecies@species
+					}
+				}
+			}
+
+			cyberize_leaders_effect = yes
+			cyberize_colony_ships_effect = yes
+			cyberize_armies_effect = yes
+		}
+		# Check if there are any pops left to cyberize, otherwise remove the cyberization flag to unpause the situation.
+		if = {
+			limit = {
+				NOT = {
+					owner = {
+						any_owned_pop = {
+							is_same_species = owner.species
+							is_spiritualist = yes
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+				}
+			}
+			remove_situation_flag = cyberization_ongoing_forced
+		}
+	}
+}
+
+# Handle Limited Cybernetics trait for grown or assembled pops
+# Fired by: on_pop_grown and on_pop_assembled
+# A pop has finished growing or assembling
+# This = Planet scope
+# From = Country
+# FromFrom = Pop
+planet_event = {
+	id = cyber.7
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_policy_flag = cyberization_standards_limited
+		}
+		fromfrom = {
+			has_ethic = ethic_spiritualist
+			has_trait = trait_cybernetic
+		}
+	}
+
+	immediate = {
+		fromfrom = {
+			modify_species = {
+				species = this
+				remove_trait = trait_cybernetic
+				add_trait = trait_limited_cybernetic
+				add_traits_at_start_of_list = yes
+			}
+		}
+	}
+}
+
+# Handle Limited Cybernetics trait when pops chance ethics
+# Fired by: on_pop_ethic_changed
+# Fired when a Pop has a change in their ethics
+#This = Pop
+#From = Planet Owner
+pop_event = {
+	id = cyber.8
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_policy_flag = cyberization_standards_limited
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_ethic = ethic_spiritualist
+				has_trait = trait_cybernetic
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_cybernetic
+				add_trait = trait_limited_cybernetic
+				add_traits_at_start_of_list = yes
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { has_ethic = ethic_spiritualist }
+				has_trait = trait_limited_cybernetic
+			}
+			modify_species = {
+				species = this
+				remove_trait = trait_limited_cybernetic
+				add_trait = trait_cybernetic
+				add_traits_at_start_of_list = yes
+			}
+		}
+	}
+}
+
+# Fired by: on_added_to_leader_pool
+# A leader is added to the leader pool, available for recruitment
+# scope: country, from: leader
+country_event = {
+	id = cyber.22
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_policy_flag = cyberization_standards_limited
+		from = {
+			has_ethic = ethic_spiritualist
+			has_trait = leader_trait_cyborg
+		}
+	}
+
+	immediate = {
+		from = {
+			remove_trait = leader_trait_cyborg
+			add_trait_no_notify = leader_trait_limited_cyborg
+		}
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Hive Cyberization - Event to minimally cyberize some non-cyborg pops
+	id = cyber.9
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = hive_cyberization_ongoing_limited
+		owner = {
+			check_variable_arithmetic = { which = value:num_active_buildings|BUILDING|building_augmentation_center| value > 0 }
+		}
+	}
+
+	immediate = {
+		owner = {
+			if = {
+				limit = {
+					NOT = { exists = event_target:cyberspecies@root.owner }
+				}
+
+				random_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOR = {
+							has_trait = trait_cybernetic
+							has_trait = trait_limited_cybernetic
+							has_pop_flag = cyber_hive_defective_pop
+						}
+					}
+					species = {
+						modify_species = {
+							remove_trait = trait_latent_psionic
+							remove_trait = trait_psionic
+							effect = {
+								# Fully cyberized species
+								create_species = {
+									is_mod = yes
+									name = this
+									plural = this
+									class = this
+									portrait = this
+									traits = this
+									can_be_modified = this
+									homeworld = this
+									namelist = this
+									gender = this
+									traits = {
+										ideal_planet_class = this
+										trait = trait_cybernetic
+									}
+								}
+								last_created_species = {
+									save_global_event_target_as = cyberspecies@root.owner
+								}
+
+								# Partly cyberized variant
+								create_species = {
+									is_mod = yes
+									name = this
+									plural = this
+									class = this
+									portrait = this
+									traits = this
+									can_be_modified = this
+									homeworld = this
+									namelist = this
+									gender = this
+									traits = {
+										ideal_planet_class = this
+										trait = trait_limited_cybernetic
+									}
+								}
+								last_created_species = {
+									save_global_event_target_as = limited_cyberspecies@root.owner
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if = { # Final event
+				limit = {
+					prev = {
+						has_situation_flag = cyberization_final
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_same_species = owner.species
+						NOR = {
+							has_trait = trait_cybernetic
+							has_trait = trait_limited_cybernetic
+						}
+					}
+					if = {
+						limit = {
+							has_pop_flag = cyber_hive_defective_pop
+						}
+						change_species = event_target:limited_cyberspecies@root.owner
+					}
+					else = {
+						change_species = event_target:cyberspecies@root.owner
+					}
+				}
+			}
+			else = {
+				while = {
+					limit = {
+						any_owned_pop = {
+							exists = event_target:cyberspecies@root.owner
+							is_same_species = owner.species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+					count = value:pop_to_cyberize_per_month
+					random_owned_pop = {
+						limit = {
+							is_same_species = owner.species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+						if = {
+							limit = {
+								has_pop_flag = cyber_hive_defective_pop
+							}
+							change_species = event_target:limited_cyberspecies@root.owner
+						}
+						else = {
+							change_species = event_target:cyberspecies@root.owner
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						OR = {
+							has_situation_flag = cyberization_final
+							NOT = { has_situation_flag = leaders_cyberized }
+						}
+					}
+				}
+				every_owned_leader = {
+					limit = {
+						exists = event_target:cyberspecies@root.owner
+						is_same_species = owner.species
+						NOR = {
+							has_trait = leader_trait_cyborg
+							has_trait = leader_trait_limited_cyborg
+						}
+						OR = {
+							is_spiritualist = no
+							owner = { has_country_flag = cyber_force_objectors }
+						}
+					}
+					change_species = event_target:cyberspecies@root.owner
+					add_trait_no_notify = leader_trait_cyborg
+				}
+				every_pool_leader = {
+					limit = {
+						exists = event_target:cyberspecies@root.owner
+						is_same_species = owner.species
+						NOR = {
+							has_trait = leader_trait_cyborg
+							has_trait = leader_trait_limited_cyborg
+						}
+						OR = {
+							is_spiritualist = no
+							owner = { has_country_flag = cyber_force_objectors }
+						}
+					}
+					change_species = event_target:cyberspecies@root.owner
+					add_trait_no_notify = leader_trait_cyborg
+				}
+				every_controlled_ship = {
+					limit = {
+						is_ship_class = shipclass_colonizer
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+					}
+					change_species = event_target:cyberspecies@root.owner
+				}
+				every_owned_army = {
+					limit = {
+						exists = species
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+						army_type = assault_army
+					}
+					modify_army = {
+						name = random
+						species = event_target:cyberspecies@root.owner
+					}
+				}
+				every_owned_army = {
+					limit = {
+						exists = species
+						exists = planet
+						species = {
+							is_robotic = no
+							is_livestock = no
+						}
+						army_type = defense_army
+					}
+					modify_army = {
+						name = random
+						species = event_target:cyberspecies@root.owner
+					}
+				}
+				prev = {
+					set_situation_flag = leaders_cyberized
+				}
+				if = {
+					limit = {
+						is_gestalt = yes
+					}
+					every_owned_leader = {
+						limit = {
+							is_councilor = yes
+							is_ruler = no
+						}
+						set_gestalt_node_portrait_effect = yes
+					}
+				}
+			}
+		}
+		# Check if there are any pops left to cyberize, otherwise remove the cyberization flag to unpause the situation.
+		if = {
+			limit = {
+				NOT = {
+					owner = {
+						exists = event_target:cyberspecies@root.owner
+						any_owned_pop = {
+							is_same_species = owner.species
+							NOR = {
+								has_trait = trait_cybernetic
+								has_trait = trait_limited_cybernetic
+							}
+						}
+					}
+				}
+			}
+			remove_situation_flag = hive_cyberization_ongoing_limited
+			if = {
+				limit = {
+					NOT = { has_situation_flag = cyberization_final }
+				}
+				owner = {
+					change_dominant_species = { species = event_target:cyberspecies@root.owner }
+				}
+				set_situation_flag = cyber_2005_stage_3_fire
+			}
+		}
+	}
+}
+
+### CYBERIZATION SITUATION END ###
+
+### SOCIETAL EFFECTS EVENT CHAIN START ###
+# Fired by: tr_cybernetics_finish or event
+country_event = {
+	id = cyber.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = {
+			which = "cyber_individualist_society"
+			value = 0
+		}
+		set_variable = {
+			which = "cyber_collectivist_society"
+			value = 0
+		}
+		switch = {
+			trigger = has_authority
+			auth_democratic = {
+				hidden_effect = {
+					country_event = { id = cyber.505 }
+				}
+			}
+			auth_oligarchic = {
+				hidden_effect = {
+					country_event = { id = cyber.510 }
+				}
+			}
+			auth_dictatorial = {
+				hidden_effect = {
+					country_event = { id = cyber.515 }
+				}
+			}
+			auth_imperial = {
+				hidden_effect = {
+					country_event = { id = cyber.520 }
+				}
+			}
+			auth_corporate = {
+				hidden_effect = {
+					country_event = { id = cyber.525 }
+				}
+			}
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Democratic
+	id = cyber.505
+	title = "cyber.505.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_government }
+		}
+		text = cyber.505.desc.gov
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_corporate }
+		}
+		text = cyber.505.desc.cor
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_independent }
+		}
+		text = cyber.505.desc.ind
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = futureshock_chain
+			target = this
+		}
+	}
+	option = { # Individualist
+		name = cyber.505.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.505.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.505.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.505.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.600 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Oligarchic
+	id = cyber.510
+	title = "cyber.510.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_government }
+		}
+		text = cyber.510.desc.gov
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_corporate }
+		}
+		text = cyber.510.desc.cor
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_independent }
+		}
+		text = cyber.510.desc.ind
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = futureshock_chain
+			target = this
+		}
+	}
+	option = { # Individualist
+		name = cyber.510.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.510.a.tt
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cyber_individualist_society"
+					value = 2
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.510.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.510.b.tt
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cyber_collectivist_society"
+					value = 2
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.600 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Dictatorial
+	id = cyber.515
+	title = "cyber.515.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_government }
+		}
+		text = cyber.515.desc.gov
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_corporate }
+		}
+		text = cyber.515.desc.cor
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_independent }
+		}
+		text = cyber.515.desc.ind
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = futureshock_chain
+			target = this
+		}
+	}
+	option = { # Individualist
+		name = cyber.515.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.515.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.515.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.515.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.600 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Imperial
+	id = cyber.520
+	title = "cyber.520.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_government }
+		}
+		text = cyber.520.desc.gov
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_corporate }
+		}
+		text = cyber.520.desc.cor
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_independent }
+		}
+		text = cyber.520.desc.ind
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = futureshock_chain
+			target = this
+		}
+	}
+	option = { # Individualist
+		name = cyber.520.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.520.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.520.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.520.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.600 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Corporate
+	id = cyber.525
+	title = "cyber.525.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_government }
+		}
+		text = cyber.525.desc.gov
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_corporate }
+		}
+		text = cyber.525.desc.cor
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = cyber_control_independent }
+		}
+		text = cyber.525.desc.ind
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = futureshock_chain
+			target = this
+		}
+	}
+	option = { # Individualist
+		name = cyber.525.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.505.a.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.525.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.505.b.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 2 # The first event is more impactful
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.600 days = 180 random = 90 }
+		}
+	}
+}
+
+# Event pools gatekeeping event | Work and Family
+# Fired by: event
+country_event = {
+	id = cyber.600
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fire_on_action = {
+			on_action = on_futureshock_chain_work_family_events_list
+		}
+	}
+}
+
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = { # Instant Bliss
+	id = cyber.610
+	title = "cyber.610.name"
+	desc = cyber.610.desc
+	picture = GFX_evt_black_market
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Individualist
+		name = cyber.610.a
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 3000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -3000
+			}
+		}
+		add_modifier = {
+			modifier = cyber_event_bliss_commercial
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.610.b
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -1000
+			}
+		}
+		add_modifier = {
+			modifier = cyber_event_bliss_underground
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = cyber.610.c
+		add_modifier = {
+			modifier = cyber_event_bliss_regulate
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = { # Work-Life Divide
+	id = cyber.615
+	title = "cyber.615.name"
+	desc = cyber.615.desc
+	picture = GFX_evt_cyberization_2
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Individualist
+		name = cyber.615.a
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			set_country_flag = cyber_event_worklife
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = cyber_event_worklife_own
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_egalitarian = yes
+			}
+		}
+	}
+	option = { # Neutral
+		name = cyber.615.b
+		hidden_effect = {
+			set_country_flag = cyber_event_worklife
+		}
+		add_modifier = {
+			modifier = cyber_event_worklife_leave
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.615.c
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			set_country_flag = cyber_event_worklife
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = cyber_event_worklife_isolate
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_megacorp = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Workplace Events 620-650
+
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = { # Cyber Subscription
+	id = cyber.625
+	title = cyber.625.name
+	desc = cyber.625.desc
+	picture = GFX_evt_cyberization_2
+	show_sound = event_finding_loot
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Collectivist
+		name = cyber.625.a
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_subscription_ban
+			days = -1
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist
+		name = cyber.625.b
+		trigger = {
+			is_megacorp = no
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber_subscription
+		hidden_effect = {
+			set_country_flag = cyber_subscription_model
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Neutral
+		name = cyber.625.c
+		add_modifier = {
+			modifier = cyber_subscription_limited
+			days = -1
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist Corporate
+		name = cyber.625.d
+		trigger = {
+			is_megacorp = yes
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber_subscription_megacorp
+		hidden_effect = {
+			set_country_flag = cyber_subscription_model_megacorp
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_megacorp = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Workplace Events 655-700
+
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = { # Unforeseeable Mechanical Failure
+	id = cyber.655
+	title = cyber.655.name
+	desc = cyber.655.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_briber
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_country_flag = cyber_control_independent
+			is_shared_burden_empire = yes # undercoat: moved to scripted trigger
+			is_worker_coop_empire = yes
+		}
+	}
+
+	option = { # Collectivist
+		name = cyber.655.a
+		custom_tooltip = cyber.655.a.tt
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist
+		name = cyber.655.b
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = worse_parts
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			random_list = {
+				5 = { country_event = { id = cyber.660 days = 90 random = 90 } }
+				95 = { country_event = { id = cyber.1000 days = 180 random = 90 } }
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Individualist
+		name = cyber.655.c
+		trigger = {
+			NOT = {
+				has_ethic = ethic_egalitarian
+				has_ethic = ethic_fanatic_egalitarian
+			}
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier4materialreward
+			min = @tier4materialmin
+			max = @tier4materialmax
+		}
+		add_modifier = {
+			modifier = worse_parts
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			random_list = {
+				30 = { country_event = { id = cyber.660 days = 90 random = 90 } }
+				70 = { country_event = { id = cyber.1000 days = 180 random = 90 } }
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Individualist
+		name = cyber.655.d
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = optimized_parts
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # Unforeseeable Societal Failure
+	id = cyber.660
+	title = cyber.660.name
+	desc = cyber.660.desc
+	picture = GFX_evt_civil_action
+	show_sound = event_open_revolt
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = cyber.660.a
+		remove_modifier = worse_parts
+	}
+	option = {
+		trigger = {
+			is_megacorp = no
+		}
+		name = cyber.660.b
+		add_modifier = {
+			modifier = discontent
+			years = 5
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			is_megacorp = yes
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = unity
+				value >= 500
+			}
+		}
+		add_resource = { unity = -500 }
+		name = cyber.660.b
+		add_modifier = {
+			modifier = discontent
+			years = 5
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			OR = {
+				has_valid_civic = civic_police_state
+				has_dystopian_society = yes # undercoat: moved to scripted trigger
+			}
+		}
+		name = cyber.660.c
+		add_modifier = {
+			modifier = discontent
+			months = 5
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 90 random = 90 }
+		}
+	}
+}
+
+
+# Workplace Events 705-750
+
+
+# Workplace Events 755-795
+
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = { # Parental Controls
+	id = cyber.805
+	title = "cyber.805.name"
+	desc = cyber.805.desc
+	picture = GFX_evt_overt_indoctrination
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = cyber_birth_implants
+	}
+
+	option = { # Individualist
+		name = cyber.805.a
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = cyber_event_parental_control
+			days = 3600
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				is_spiritualist = yes
+			}
+		}
+	}
+	option = { # Neutral
+		name = cyber.805.b
+		add_modifier = {
+			modifier = cyber_event_parental_limited
+			days = 3600
+		}
+	}
+	option = { # Collectivist
+		name = cyber.805.c
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		add_modifier = {
+			modifier = cyber_event_parental_enforcers
+			days = 3600
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_authoritarian = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = { # Knowledge Transfer
+	id = cyber.810
+	title = "cyber.810.name"
+	desc = cyber.810.desc
+	picture = GFX_evt_vivisection
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # COLLECTIVIST
+		name = cyber.810.a
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_event_knowledge_engineering
+			days = 1800
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {# COLLECTIVIST
+		name = cyber.810.b
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_event_knowledge_physics
+			days = 1800
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {# COLLECTIVIST
+		name = cyber.810.c
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_event_knowledge_society
+			days = 1800
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {# INDIVIDUALIST
+		name = cyber.810.d
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# "Decentralized Love" (Cybernetic Polycules) by Gemma Thomson
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = {
+	id = cyber.815
+	title = cyber.815.name
+	desc = cyber.815.desc
+	picture = {
+		trigger = {
+			OR = {
+				is_authoritarian = yes
+				any_pop_faction = {
+					is_pop_faction_type = traditionalist
+					faction_approval >= 0.5
+				}
+			}
+		}
+		picture = GFX_evt_overt_indoctrination
+	}
+	picture = {
+		trigger = {
+			NOR = {
+				is_authoritarian = yes
+				any_pop_faction = {
+					is_pop_faction_type = traditionalist
+					faction_approval < 0.5
+				}
+			}
+		}
+		picture = GFX_evt_happy_reunion
+	}
+	show_sound = event_default
+	location = capital_scope
+	is_triggered_only = yes
+	event_chain = futureshock_chain
+
+	trigger = {
+		NOR = {
+			is_gestalt = yes # undercoat: moved to scripted trigger
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_fanatic_egalitarian
+		}
+	}
+
+	# Allow self-determining polycules (Individualist)
+	option = {
+		name = cyber.815.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.815.a.tt
+		add_modifier = {
+			modifier = decentralized_families
+			years = 5
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 5
+				is_egalitarian = yes
+			}
+		}
+	}
+	# Discourage bespoke networking (Collectivist)
+	option = {
+		name = cyber.815.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.815.b.tt
+		add_modifier = {
+			modifier = centralized_families
+			years = 5
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 5
+				is_authoritarian = yes
+				is_megacorp = no
+			}
+			modifier = {
+				factor = 2
+				is_megacorp = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+###################################
+# "Radical Image" by Gemma Thomson
+###################################
+
+# "Radical Image": youths start experimenting with form-altering augments
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = {
+	id = cyber.820
+	title = cyber.820.name
+	desc = cyber.820.desc
+	picture = {
+		trigger = { is_xenophobe = no }
+		picture = GFX_evt_cybernetics
+	}
+	picture = {
+		trigger = { is_xenophobe = yes }
+		picture = GFX_evt_vivisection
+	}
+	show_sound = event_default
+	location = capital_scope
+	is_triggered_only = yes
+	event_chain = futureshock_chain
+
+	trigger = {
+		NOR = {
+			# Failsafe checks
+			is_gestalt = yes # undercoat: moved to scripted trigger
+			is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+			# Less impact or relevance for some multi-species Origins
+			is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
+			is_payback_empire = yes # undercoat: moved to scripted trigger
+			is_current_or_former_necrophage_empire = yes # undercoat: moved to scripted trigger
+			has_technology = tech_gene_tailoring # includes "Overtuned" Origin
+		}
+	}
+
+	# Restrict this behavior (Collectivist)
+	option = {
+		name = cyber.820.a
+		custom_tooltip = cyber.social_consequences.tt
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			random_list = {
+				1 = {
+					# Nothing
+					modifier = {
+						factor = 2
+						has_tradition = tr_harmony_adopt
+					}
+					country_event = { id = cyber.1000 days = 180 random = 90 } # Society & Leisure pool
+				}
+				1 = {
+					country_event = { id = cyber.821 days = 20 random = 20 } # "Radical Protests"
+				}
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 5
+				is_authoritarian = yes
+			}
+		}
+	}
+	# Let it pass (Neutral, by way of deferring the decision)
+	option = {
+		name = cyber.820.b
+		add_modifier = {
+			modifier = radical_image
+			years = 10
+		}
+		hidden_effect = {
+			random_list = {
+				1 = {
+					# Nothing
+					country_event = { id = cyber.1000 days = 180 random = 90 } # Society & Leisure pool
+				}
+				3 = {
+					country_event = { id = cyber.822 days = 40 random = 30 } # "Radical Physiology"
+				}
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 5
+				is_authoritarian = yes
+				is_megacorp = no
+			}
+			modifier = {
+				factor = 2
+				OR = {
+					is_egalitarian = yes
+					is_megacorp = yes
+				}
+			}
+		}
+	}
+	# Lean into this behavior (Individualist)
+	option = {
+		name = cyber.820.c
+		custom_tooltip = cyber.social_consequences.tt
+		trigger = {
+			NOT = { has_ethic = ethic_fanatic_xenophobe }
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = unity
+				value >= 600
+			}
+		}
+		add_resource = {
+			unity = -600
+		}
+		add_modifier = {
+			modifier = radical_insights
+			years = 10
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1000 days = 180 random = 90 } # Society & Leisure pool
+		}
+		ai_chance = {
+			modifier = {
+				factor = 3
+				is_xenophile = yes
+			}
+		}
+	}
+}
+
+# "Radical Protests": demanding relaxation of aesthetic guidelines
+# Fired by: event
+country_event = {
+	id = cyber.821
+	title = cyber.821.name
+	desc = cyber.821.desc
+	picture = GFX_evt_alien_propaganda
+	show_sound = event_public_unrest
+	location = capital_scope
+	is_triggered_only = yes
+	event_chain = futureshock_chain
+
+	# Stand firm (Collectivist)
+	option = {
+		name = cyber.821.a
+		custom_tooltip = cyber.821.a.tt
+		add_modifier = {
+			modifier = radical_image_denied
+			years = 10
+		}
+		ai_chance = {
+			modifier = {
+				factor = 5
+				is_authoritarian = yes
+			}
+		}
+	}
+	# Back down somewhat (Neutral)
+	option = {
+		name = cyber.821.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.821.b.tt
+		add_modifier = {
+			modifier = radical_image_upheld
+			years = 10
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = -1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# "Radical Physiology": medical complications ensue
+# Fired by: event
+country_event = {
+	id = cyber.822
+	title = cyber.822.name
+	desc = cyber.822.desc
+	picture = GFX_evt_cybernetics
+	show_sound = event_life_support_fail
+	location = capital_scope
+	is_triggered_only = yes
+	event_chain = futureshock_chain
+
+	trigger = {
+		has_modifier = radical_image
+	}
+
+	# Acknowledge (Individualist)
+	option = {
+		name = cyber.822.a
+		custom_tooltip = cyber.social_consequences.tt
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 300
+				mult = value:ten_percent_main_species
+			}
+		}
+		add_resource = {
+			energy = -300
+			mult = value:ten_percent_main_species
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	# Clamp down (Collectivist)
+	option = {
+		name = cyber.822.b
+		custom_tooltip = cyber.social_consequences.tt
+		remove_modifier = radical_image
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Family Events 830-850
+
+# Cold Metal | For species living in a cold climate
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = {
+	id = cyber.830
+	title = "cyber.830.name"
+	desc = "cyber.830.desc"
+	picture = GFX_evt_icelocked_settlement
+	show_sound = event_life_support_fail
+	location = event_target:cold_planet
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_planet = {
+			is_cold = yes
+			any_owned_species = {
+				has_trait = trait_cybernetic
+			}
+		}
+	}
+
+	immediate = {
+		set_country_flag = cold_metal_chain # -20 habitability in cold places, set in trait_cybernetic
+		random_owned_planet = {
+			limit = {
+				is_cold = yes
+				any_owned_species = {
+					has_trait = trait_cybernetic
+				}
+			}
+			save_event_target_as = cold_planet
+		}
+	}
+
+	option = {
+		name = cyber.830.a
+		custom_tooltip = cyber.830.tooltip
+		enable_special_project = {
+			name = COLD_METAL_PROJECT
+			owner = root
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.830.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.830.tooltip
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Special project follow-up
+# Fired by: special_project
+country_event = {
+	id = cyber.835
+	title = "cyber.835.name"
+	desc = "cyber.835.desc"
+	picture = GFX_evt_society_research
+	show_sound = event_laboratory_sound
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_planet = {
+			is_cold = yes
+			any_owned_species = {
+				has_trait = trait_cybernetic
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_planet = {
+			limit = {
+				is_cold = yes
+				any_owned_species = {
+					has_trait = trait_cybernetic
+				}
+			}
+			save_event_target_as = cold_planet
+		}
+		event_target:cold_planet = {
+			random_owned_species = {
+				limit = {
+					has_trait = trait_cybernetic
+					OR = {
+						ideal_planet_class = pc_arctic
+						ideal_planet_class = pc_tundra
+						ideal_planet_class = pc_alpine
+					}
+				}
+				save_event_target_as = cold_species
+			}
+		}
+	}
+
+	option = { # Individualist
+		name = cyber.835.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.835.tooltip
+		remove_country_flag = cold_metal_chain
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist
+		name = cyber.835.b
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value > 2000
+			}
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.835.tooltip
+		remove_country_flag = cold_metal_chain
+		add_resource = {
+			energy = -2000
+
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.835.c
+		trigger = {
+			exists = event_target:cold_planet
+			exists = event_target:cold_species
+			count_owned_planet = {
+				limit = {
+					is_cold = no
+				}
+				count > 0
+			}
+		}
+		random_owned_planet = {
+			limit = {
+				is_cold = no
+			}
+			save_event_target_as = warmer_planet
+		}
+		event_target:cold_planet = {
+			while = {
+				count = value:twenty_percent_species
+				random_owned_pop = {
+					limit = {
+						is_same_species = event_target:cold_species
+					}
+					resettle_pop = {
+						pop = this
+						planet = event_target:warmer_planet
+					}
+				}
+			}
+		}
+		# Change resettlement policy if it was set to no
+		if = {
+			limit = {
+				has_policy_flag = resettlement_not_allowed
+			}
+			set_policy = {
+				policy = resettlement
+				option = resettlement_allowed
+				cooldown = yes
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 1800 random = 100 }
+		}
+	}
+}
+
+# Wanderers don't want to be tracked
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = {
+	id = cyber.840
+	title = "cyber.840.name"
+	desc = cyber.840.desc
+	picture = GFX_evt_ship_in_orbit_3
+	show_sound = evn_ove_briber
+	is_triggered_only = yes
+	event_chain = futureshock_chain
+
+	trigger = {
+		any_owned_species = {
+			has_trait = trait_cybernetic
+			has_trait = trait_nomadic
+		}
+	}
+
+	# Increased chances if your people are also solitary
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = 2
+			any_owned_species = {
+				has_trait = trait_solitary
+			}
+		}
+	}
+
+	option = { # Ban tracking
+		name = cyber.840.a
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_wanderers
+			days = 3600
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Turn a blind eye
+		name = cyber.840.b
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Sell anti-tracking devices
+		name = cyber.840.c
+		trigger = {
+			is_megacorp = yes
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		add_resource = {
+			energy = 2000
+		}
+		add_modifier = {
+			modifier = cyber_wanderers_tracked
+			days = 1800
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Enforce tracking
+		name = cyber.840.d
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_wanderers_tracked
+			days = 1800
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				is_authoritarian = yes
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1000 days = 180 random = 100 }
+		}
+	}
+}
+
+# Family Events 855-900
+
+#Making the Grade - Funding Augmented Education
+# Fired by: on_futureshock_chain_work_family_events_list
+country_event = {
+	id = cyber.855
+	title = cyber.855.name
+	desc = {
+		trigger = { has_country_flag = cyber_control_government }
+		text = cyber.855.gov.desc
+	}
+	desc = {
+		trigger = {
+			OR = {
+				has_country_flag = cyber_control_corporate
+				has_country_flag = cyber_control_independent
+			}
+		 }
+		text = cyber.855.corp.desc
+	}
+	picture = GFX_evt_black_market
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = cyber.855.a
+		trigger = { has_country_flag = cyber_control_government }
+		hidden_effect = {
+			country_event = { id = cyber.865 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = cyber.855.b
+		trigger = {
+			OR = {
+				has_country_flag = cyber_control_corporate
+				has_country_flag = cyber_control_independent
+			}
+		}
+		add_modifier = {
+			modifier = cyber_education
+			days = -1
+		}
+		custom_tooltip = cyber_education.tt
+		hidden_effect = {
+			country_event = { id = cyber.860 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_egalitarian = yes
+			}
+		}
+	}
+
+	option = {
+		name = cyber.855.b
+		trigger = { has_country_flag = cyber_control_government }
+		add_modifier = {
+			modifier = cyber_education
+			days = -1
+		}
+		custom_tooltip = cyber_education.tt
+		hidden_effect = {
+			country_event = { id = cyber.860 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_egalitarian = yes
+			}
+		}
+	}
+
+	option = {
+		name = cyber.855.a
+		trigger = {
+			OR = {
+				has_country_flag = cyber_control_corporate
+				has_country_flag = cyber_control_independent
+			}
+		}
+		hidden_effect = {
+			country_event = { id = cyber.865 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = {
+	id = cyber.860
+	title = cyber.860.name
+	desc = cyber.860.desc
+	picture = GFX_evt_crystal_mining
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = egalitarian_excellence.tt
+		remove_modifier = cyber_education
+		add_modifier = {
+			modifier = egalitarian_excellence
+			days = 7200
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: event
+country_event = {
+	id = cyber.865
+	title = cyber.865.name
+	desc = cyber.865.desc
+	picture = GFX_evt_three_sided_deal
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = exceptional_leaders.tt
+		add_modifier = {
+			modifier = exceptional_leaders
+			days = 7200
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1000 days = 180 random = 90 }
+		}
+	}
+}
+
+# Family Events 905-950
+
+
+# Family Events 955-985
+
+# Event pools gatekeeping event | Leisure and Society
+# Fired by: event
+country_event = {
+	id = cyber.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fire_on_action = {
+			on_action = on_futureshock_chain_leisure_events_list
+		}
+	}
+}
+
+# Leisure Events 1005-1050
+
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = { # Limit Breaker
+	id = cyber.1005
+	title = cyber.1005.name
+	desc = cyber.1005.desc
+	picture = {
+		trigger = {
+			has_warrior_culture = no # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_arena
+	}
+	picture = {
+		trigger = {
+			has_warrior_culture = yes # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_gladiators
+	}
+	show_sound = event_burning_city # The actual sound is not so dramatic
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Collectivist
+		name = cyber.1005.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1005.a.tt
+		add_modifier = {
+			modifier = cyber_athletes
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				is_materialist = yes
+			}
+		}
+	}
+
+	option = { # Individualist
+		name = cyber.1005.b
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_athlete_leagues
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = cyber.1005.c
+		add_modifier = {
+			modifier = limited_cyber_athletes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = { # For Sale: The Sky
+	id = cyber.1010
+	title = cyber.1010.name
+	desc = cyber.1010.desc
+	picture = GFX_evt_announcement
+	show_sound = evn_ove_two_sided_deal
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		any_relation = {
+			is_megacorp = yes
+			has_commercial_pact = root
+		}
+		is_subterranean_empire = no #They won't have a sky to sell
+	}
+
+	immediate = {
+		random_relation = {
+			limit = {
+				is_megacorp = yes
+				has_commercial_pact = root
+			}
+			save_event_target_as = sky_megacorp
+		}
+	}
+
+	option = { # Collectivist
+		name = cyber.1010.a
+		trigger = {
+			NOR = {
+				is_megacorp = yes
+				has_valid_civic = civic_merchant_guilds
+			}
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = sold_sky_1
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1015 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Collectivist Negotiate
+		name = cyber.1010.c
+		trigger = {
+			OR = {
+				is_megacorp = yes
+				has_valid_civic = civic_merchant_guilds
+			}
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = sold_sky_1_mega
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1015 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist
+		name = cyber.1010.b
+		allow = {
+			is_megacorp = no
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = cyber.1010.d
+		trigger = {
+			NOR = {
+				is_megacorp = yes
+				has_valid_civic = civic_merchant_guilds
+			}
+		}
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = { # For Sale: The Sky, Follow-up
+	id = cyber.1015
+	title = cyber.1010.name
+	desc = cyber.1015.desc
+	picture = GFX_evt_tradestation_interior
+	show_sound = evn_ove_one_sided_deal
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:sky_megacorp
+		event_target:sky_megacorp = {
+			has_commercial_pact = root
+		}
+	}
+
+	immediate = {
+		ordered_owned_planet = {
+			order_by = trigger:num_pops
+			position = 0
+			save_event_target_as = most_populous
+		}
+	}
+
+	option = { # Collectivist
+		name = cyber.1015.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1015.a.tt
+		if = {
+			limit = {
+				has_modifier = sold_sky_1
+			}
+			event_target:most_populous = {
+				add_modifier = {
+					modifier = sold_sky_2
+				}
+			}
+		}
+		else = {
+			event_target:most_populous = {
+				add_modifier = {
+					modifier = sold_sky_2_mega
+				}
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			event_target:most_populous = {
+				while = {
+					count = 5
+					create_ambient_object = {
+						type = caravaneer_billboard_1
+						use_3d_location = yes
+						entity_offset_height = { min = -25 max = -5 }
+						entity_offset = { min = -10 max = 10 }
+						entity_offset_angle = { min = 0 max = 180 }
+						location = prev
+					}
+					last_created_ambient_object = {
+						set_ambient_object_flag = sold_sky_billboard
+					}
+				}
+				while = {
+					count = 5
+					create_ambient_object = {
+						type = caravaneer_billboard_2
+						use_3d_location = no
+						entity_offset_height = { min = -25 max = -5 }
+						entity_offset = { min = -12 max = 12 }
+						entity_offset_angle = { min = 0 max = 180 }
+						location = prev
+					}
+					last_created_ambient_object = {
+						set_ambient_object_flag = sold_sky_billboard
+					}
+				}
+				while = {
+					count = 5
+					create_ambient_object = {
+						type = caravaneer_billboard_3
+						use_3d_location = no
+						entity_offset_height = { min = -25 max = -5 }
+						entity_offset = { min = -15 max = 15 }
+						entity_offset_angle = { min = 0 max = 180 }
+						location = prev
+					}
+					last_created_ambient_object = {
+						set_ambient_object_flag = sold_sky_billboard
+					}
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Individualist
+		name = cyber.1010.b
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist - Cancel all deals
+		name = cyber.1010.c
+		allow = {
+			is_megacorp = no
+		}
+		remove_modifier = sold_sky_1
+		hidden_effect = {
+			remove_modifier = sold_sky_1_mega
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired when a Commercial Pact is Broken for both parties
+# This = Active Country
+# From = Other participating Country
+# Fired by: on_commercial_pact_broken
+country_event = { # For Sale: The Sky, Clean-up
+	id = cyber.1020
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_modifier = sold_sky_1
+			has_modifier = sold_sky_1_mega
+		}
+	}
+
+	immediate = {
+		remove_modifier = sold_sky_1
+		remove_modifier = sold_sky_1_mega
+		if = {
+			limit = {
+				any_owned_planet = {
+					OR = {
+						has_modifier = sold_sky_2
+						has_modifier = sold_sky_2_mega
+					}
+				}
+			}
+			random_owned_planet = {
+				limit = {
+					OR = {
+						has_modifier = sold_sky_2
+						has_modifier = sold_sky_2_mega
+					}
+				}
+				remove_modifier = sold_sky_2
+				remove_modifier = sold_sky_2_mega
+				solar_system = {
+					every_ambient_object = {
+						limit = {
+							has_ambient_object_flag = sold_sky_billboard
+						}
+						destroy_ambient_object = this
+					}
+				}
+			}
+		}
+	}
+}
+
+# Fired whenever a new owner is set for a planet, be it after a war or through a trade
+# FromFrom = Former Owner (if any)
+# From = Country scope (new owner)
+# FromFrom = Country scope (previous owner, if any)
+# This = Planet scope
+# Fired by: on_planet_transfer
+planet_event = { # For Sale: The Sky, Clean-up
+	id = cyber.1025
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			has_modifier = sold_sky_2
+			has_modifier = sold_sky_2_mega
+		}
+	}
+
+	immediate = {
+		remove_modifier = sold_sky_2
+		remove_modifier = sold_sky_2_mega
+		solar_system = {
+			every_ambient_object = {
+				limit = {
+					has_ambient_object_flag = sold_sky_billboard
+				}
+				destroy_ambient_object = this
+			}
+		}
+	}
+}
+
+# Illicit Entertainment
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = {
+	id = cyber.1030
+	title = cyber.1030.name
+	desc = cyber.1030.desc
+	picture = GFX_evt_smugglers_in_bar
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Collectivist
+		name = cyber.1030.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1030.a.tt
+		add_modifier = {
+			modifier = entertainment_crackdown
+			days = 1800
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Individualist
+		name = cyber.1030.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1030.b.tt
+		add_modifier = {
+			modifier = endorsed_entertainment
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Neutral
+		name = cyber.1030.c
+		custom_tooltip = cyber.1030.c.tt
+		add_modifier = {
+			modifier = illicit_entertainment
+			days = 1800
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Individualist - Pleasure Seekers
+		name = cyber.1030.d
+		trigger = {
+			has_civic = civic_pleasure_seekers
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1030.d.tt
+		add_modifier = {
+			modifier = decadent_entertainment
+			days = 3600
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { # Collectivist - Death Cult
+		name = cyber.1030.e
+		trigger = {
+			is_death_cult_empire = yes
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1030.e.tt
+		add_modifier = {
+			modifier = deadly_entertainment
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Leisure Events 1055-1100
+
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = { # Security Breach
+	id = cyber.1055
+	title = cyber.1055.name
+	desc = cyber.1055.desc
+	picture = GFX_evt_engineering_research
+	show_sound = event_espionage_concluded
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	trigger = {
+		is_galactic_community_formed = yes
+		is_galactic_community_member = yes
+		NOT = {
+			has_ascension_perk = ap_enigmatic_engineering
+		}
+	}
+
+	option = { # Collectivist
+		name = cyber.1055.a
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 2000
+			}
+		}
+		add_resource = {
+			energy = -2000
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1055.leak.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			every_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+					is_galactic_community_member = yes
+				}
+				add_intel_report = {
+					category = military
+					level = 2
+					days = 720
+					who = root
+				}
+			}
+		}
+		add_modifier = {
+			modifier = cyber_breach_overcome
+			years = 10
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 5
+				is_militarist = yes
+			}
+		}
+	}
+	option = { # Individualist
+		name = cyber.1055.b
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = cyber.1055.leak.tt
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+			every_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+					is_galactic_community_member = yes
+				}
+				add_intel_report = {
+					category = military
+					level = 2
+					days = 720
+					who = root
+				}
+			}
+		}
+		add_modifier = {
+			modifier = cyber_breach_forgive
+			years = 5
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = cyber.1055.c
+		custom_tooltip = cyber.1055.leak.tt
+		hidden_effect = {
+			every_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+					is_galactic_community_member = yes
+				}
+				add_intel_report = {
+					category = military
+					level = 2
+					days = 720
+					who = root
+				}
+			}
+		}
+		add_modifier = {
+			modifier = cyber_breach_ban
+			years = 5
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral Subterfuge
+		name = cyber.1055.d
+		trigger = {
+			has_tradition = tr_subterfuge_finish
+		}
+		icon = {
+			icon = GFX_tradition_category_icon_tradition_subterfuge
+			text = has_tradition_subterfuge_tt
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = influence
+				value >= 25
+			}
+		}
+		add_resource = {
+			influence = -25
+		}
+		custom_tooltip = cyber.1055.minorleak.tt
+		hidden_effect = {
+			every_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+					is_galactic_community_member = yes
+				}
+				add_intel_report = {
+					category = military
+					level = 1
+					days = 360
+					who = root
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Leisure Events 1105-1150
+
+
+# Leisure Events 1155-1195
+
+
+# Social Events 1205-1250
+
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = { # Sensory Censorship
+	id = cyber.1205
+	title = cyber.1205.name
+	desc = cyber.1205.desc
+	picture = GFX_evt_city_planet
+	show_sound = event_finding_loot
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Collectivist
+		name = cyber.1205.a
+		custom_tooltip = cyber.social_consequences.tt
+		trigger = {
+			is_authoritarian = no
+		}
+		add_modifier = {
+			modifier = cyber_censure_truth
+			years = 5
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist
+		name = cyber.1205.b
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_censure_total
+			days = -1
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = cyber.1205.c
+		add_modifier = {
+			modifier = cyber_censure_partial
+			days = -1
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Collectivist Auhtoritarian
+		name = cyber.1205.d
+		trigger = {
+			is_authoritarian = yes
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_censure_authoritarian
+			days = -1
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = { # Subliminhack Messaging
+	id = cyber.1210
+	title = cyber.1210.name
+	desc = cyber.1210.desc
+	picture = GFX_evt_spymaster
+	show_sound = event_finding_loot
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = { # Collectivist
+		name = cyber.1210.a
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_subliminhack_banned
+			years = 5
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Individualist
+		name = cyber.1210.b
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_subliminhack_allowed
+			days = -1
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_individualist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = { # Neutral
+		name = cyber.1210.c
+		add_modifier = {
+			modifier = cyber_subliminhack_licensed
+			days = -1
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 3
+				is_megacorp = yes
+			}
+		}
+	}
+	option = { # Collectivist - Spiritualist
+		name = cyber.1210.d
+		trigger = {
+			is_spiritualist = yes
+		}
+		custom_tooltip = cyber.social_consequences.tt
+		add_modifier = {
+			modifier = cyber_subliminhack_hallowed
+			days = -1
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+		}
+	}
+}
+
+
+# Social Events 1255-1300
+
+# Security Leak - Neuromancy
+# Fired by: on_futureshock_chain_leisure_events_list
+country_event = {
+	id = cyber.1255
+	title = cyber.1255.name
+	desc = {
+		trigger = {
+			OR = {
+				has_country_flag = cyber_control_government
+				has_country_flag = cyber_control_corporate
+			}
+		}
+		text = cyber.1255.gov.desc
+	}
+	desc = {
+		trigger = { has_country_flag = cyber_control_independent }
+		text = cyber.1255.hack.desc
+	}
+	picture = GFX_evt_decryption
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = cyber.1255.a #Neither
+		add_modifier = {
+			modifier = leak_investigation
+			days = -1
+		}
+		hidden_effect = {
+			country_event = { id = cyber.1260 days = 180 random = 60 }
+		}
+	}
+}
+
+# Fired by: event
+country_event = {
+	id = cyber.1260
+	title = cyber.1260.name
+	desc = cyber.1260.desc
+	picture = GFX_evt_deficit
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = UNDERSTOOD
+		custom_tooltip = hacked_leaders.tt
+		add_modifier = {
+			modifier = leak_distrust
+			days = -1
+		}
+		hidden_effect = {
+			country_event = { id = cyber.1265 days = 360 random = 60 }
+			# Ensures at least 1 Leader gets hacked
+			random_owned_leader = {
+				limit = {
+					has_trait = leader_trait_cyborg
+				}
+				add_trait = leader_trait_hacked
+			}
+			every_owned_leader = {
+				limit = {
+					has_trait = leader_trait_cyborg
+					NOT = {
+						has_trait = leader_trait_hacked
+					}
+				}
+				random_list = {
+					# 33% chance per leader to be hacked
+					33 = {
+						modifier = {
+							# Chance increases to 50% if they have a negative trait
+							factor = 2
+							num_leader_traits = {
+								value >= 1
+								negative = yes
+							}
+						}
+						add_trait = leader_trait_hacked
+					}
+					66 = { } # do nothing
+				}
+			}
+		}
+	}
+}
+
+# Fired by: event
+country_event = {
+	id = cyber.1265
+	title = cyber.1265.name
+	desc = cyber.1265.desc
+	picture = GFX_evt_cover_blown
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			NOT = {
+				has_civic = civic_shadow_council
+			}
+		}
+		name = cyber.1265.a
+		hidden_effect = {
+			country_event = { id = cyber.1275 days = 360 random = 60 }
+		}
+		remove_modifier = leak_investigation
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = cyber.1265.b
+		country_event = { id = cyber.1270 days = 90 random = 5 }
+		remove_modifier = leak_investigation
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		trigger = {
+			has_civic = civic_shadow_council
+		}
+		name = cyber.1265.c
+		hidden_effect = {
+			country_event = { id = cyber.1275 days = 360 random = 60 }
+		}
+		remove_modifier = leak_investigation
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# Fired by: event
+country_event = {
+	id = cyber.1270
+	title = cyber.1270.name
+	desc = cyber.1270.desc
+	picture = GFX_evt_salute
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		name = UNDERSTOOD
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = rebooted_leaders
+		remove_modifier = leak_distrust
+		hidden_effect = {
+			change_variable = {
+					which = "cyber_individualist_society"
+					value = 1
+			}
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+			every_owned_leader = {
+				limit = {
+					has_trait = leader_trait_hacked
+				}
+				# Remove Exp per Trait being removed
+				hidden_effect = {
+					add_experience = value:purge_traits_exp_change_total	# -300 per trait, not counting tiers.
+					# Restore pending traits and tiers, so they'll come back eventually.
+					change_variable = {
+						which = leader_pending_negative_traits_unmodified
+						value = value:leader_num_negative_leader_trait_tiers
+					}
+				}
+				remove_trait = all_negative
+			}
+		}
+	}
+}
+
+# Fired by: event
+country_event = {
+	id = cyber.1275
+	title = cyber.1275.name
+	desc = cyber.1275.desc
+	picture = GFX_evt_synth_sabotage
+	show_sound = event_cityscape
+	location = capital_scope
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = firewall_built
+	}
+
+	option = {
+		name = cyber.1275.a
+		custom_tooltip = cyber.social_consequences.tt
+		custom_tooltip = hacked_and_firewalled_leaders.tt
+		remove_modifier = leak_distrust
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_collectivist_society"
+				value = 1
+			}
+			country_event = { id = cyber.1500 days = 180 random = 90 }
+			every_owned_leader = {
+				limit = {
+					has_trait = leader_trait_cyborg
+				}
+				add_trait = leader_trait_firewalled
+				if = {
+					limit = {
+						has_trait = leader_trait_hacked
+					}
+					remove_trait = leader_trait_hacked
+				}
+			}
+			every_pool_leader = {
+				limit = {
+					has_trait = leader_trait_cyborg
+				}
+				add_trait = leader_trait_firewalled
+			}
+		}
+		add_modifier = {
+			modifier = leader_hack_resolution
+			days = 1800
+		}
+		inverted_switch = {
+			trigger = has_technology
+			tech_encryption_1 = { give_technology = { tech = tech_encryption_1 } }
+			tech_decryption_1 = { give_technology = { tech = tech_decryption_1 } }
+			tech_encryption_2 = { give_technology = { tech = tech_encryption_2 } }
+			tech_decryption_2 = { give_technology = { tech = tech_decryption_2 } }
+			tech_encryption_3 = { give_technology = { tech = tech_encryption_3 } }
+			tech_decryption_3 = { give_technology = { tech = tech_decryption_3 } }
+			default = {
+				add_random_research_option = {
+					add_progress = 1
+					category = computing
+					fail_effects = {
+						add_monthly_resource_mult = {
+							resource = physics_research
+							value = @tier3researchreward
+							min = @tier3researchmin
+							max = @tier3researchmax
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Social Events 1305-1350
+
+
+# Social Events 1355-1395
+
+# Ending
+# Fired by: event
+country_event = {
+	id = cyber.1500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		switch = {
+			trigger = has_authority
+			auth_democratic = {
+				hidden_effect = { country_event = { id = cyber.1505 }
+				}
+			}
+			auth_oligarchic = {
+				hidden_effect = { country_event = { id = cyber.1510 }
+				}
+			}
+			auth_dictatorial = {
+				hidden_effect = { country_event = { id = cyber.1515 }
+				}
+			}
+			auth_imperial = {
+				hidden_effect = { country_event = { id = cyber.1520 } }
+			}
+			auth_corporate = {
+				hidden_effect = { country_event = { id = cyber.1525 } }
+			}
+		}
+	}
+}
+
+# Democratic Final Event
+# Fired by: event
+country_event = {
+	id = cyber.1505
+	title = "cyber.1505.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value > cyber_collectivist_society
+			}
+		}
+		text = cyber.1505.desc.individualist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value < cyber_collectivist_society
+			}
+		}
+		text = cyber.1505.desc.collectivist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value = cyber_collectivist_society
+			}
+		}
+		text = cyber.1505.desc.neutral
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value >= cyber_collectivist_society
+			}
+		}
+		name = cyber.1505.a
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1505.a.tt
+		set_country_flag = cyber_individualist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1505.b
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1505.b.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.1505.c
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1505.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Oligarchic Final Event
+# Fired by: event
+country_event = {
+	id = cyber.1510
+	title = "cyber.1510.name"
+	desc = {
+		trigger = {
+			owner = {
+				check_variable = {
+					which = cyber_individualist_society
+					value > cyber_collectivist_society
+				}
+			}
+		}
+		text = cyber.1510.desc.individualist
+	}
+	desc = {
+		trigger = {
+			owner = {
+				check_variable = {
+					which = cyber_individualist_society
+					value < cyber_collectivist_society
+				}
+			}
+		}
+		text = cyber.1510.desc.collectivist
+	}
+	desc = {
+		trigger = {
+			owner = {
+				check_variable = {
+					which = cyber_individualist_society
+					value = cyber_collectivist_society
+				}
+			}
+		}
+		text = cyber.1510.desc.neutral
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			owner = {
+				check_variable = {
+					which = cyber_individualist_society
+					value >= cyber_collectivist_society
+				}
+			}
+		}
+		name = cyber.1510.a
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1510.a.tt
+		owner = {
+			set_country_flag = cyber_individualist
+		}
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			owner = {
+				check_variable = {
+					which = cyber_individualist_society
+					value <= cyber_collectivist_society
+				}
+			}
+		}
+		name = cyber.1510.b
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1510.b.tt
+		owner = {
+			set_country_flag = cyber_collectivist
+		}
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.1510.c
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1510.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Dictatorial Final Event
+# Fired by: event
+country_event = { # Augmented Despotism
+	id = cyber.1515
+	title = "cyber.1515.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value > cyber_collectivist_society
+			}
+		}
+		text = cyber.1515.desc.individualist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value < cyber_collectivist_society
+			}
+		}
+		text = cyber.1515.desc.collectivist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value = cyber_collectivist_society
+			}
+		}
+		text = cyber.1515.desc.neutral
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = {
+					any_owned_leader = {
+						is_ruler = yes
+					}
+				}
+			}
+			set_country_flag = cyber_dictatorial_vacant
+		}
+		else = {
+			ruler = {
+				switch = {
+					trigger = leader_class
+					official = {
+						prev = { set_country_flag = cyber_dictatorial_official }
+					}
+					commander = {
+						prev = { set_country_flag = cyber_dictatorial_commander }
+					}
+					scientist = {
+						prev = { set_country_flag = cyber_dictatorial_scientist }
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value >= cyber_collectivist_society
+			}
+		}
+		name = cyber.1515.a
+		custom_tooltip = cyber.1515.a.tt
+		set_country_flag = cyber_individualist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			has_country_flag = cyber_dictatorial_official
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1515.b
+		custom_tooltip = cyber.1515.b.official.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			has_country_flag = cyber_dictatorial_commander
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1515.b
+		custom_tooltip = cyber.1515.b.commander.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			has_country_flag = cyber_dictatorial_scientist
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1515.b
+		custom_tooltip = cyber.1515.b.scientist.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			has_country_flag = cyber_dictatorial_vacant
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1515.b
+		custom_tooltip = cyber.1515.b.vacant.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.1515.c
+		custom_tooltip = cyber.1515.c.tt
+		trigger = { is_ai = no }
+	}
+
+	after = {
+		remove_country_flag = cyber_dictatorial_official
+		remove_country_flag = cyber_dictatorial_commander
+		remove_country_flag = cyber_dictatorial_scientist
+		remove_country_flag = cyber_dictatorial_vacant
+		end_event_chain = futureshock_chain
+	}
+}
+
+# Imperial Final Event
+# Fired by: event
+country_event = {
+	id = cyber.1520
+	title = "cyber.1520.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value > cyber_collectivist_society
+			}
+		}
+		text = cyber.1520.desc.individualist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value < cyber_collectivist_society
+			}
+		}
+		text = cyber.1520.desc.collectivist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value = cyber_collectivist_society
+			}
+		}
+		text = cyber.1520.desc.neutral
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value >= cyber_collectivist_society
+			}
+		}
+		name = cyber.1520.a
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1520.a.tt
+		set_country_flag = cyber_individualist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+			add_relic = r_the_rulerchip
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1520.b
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1520.b.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.1520.c
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1520.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+# Imperial Leader Death
+# Fired by: on_leader_death
+country_event = {
+	id = cyber.1521
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_relic = r_the_rulerchip
+		FROM = {
+			is_ruler = yes
+		}
+	}
+
+	immediate = {
+		FROM = {
+			switch = {
+				trigger = leader_class
+				commander = {
+					root = {
+						change_variable = {
+							which = num_rulerchip_military
+							value = 1
+						}
+					}
+				}
+				scientist = {
+					root = {
+						change_variable = {
+							which = num_rulerchip_scientific
+							value = 1
+						}
+					}
+				}
+				official = {
+					root = {
+						change_variable = {
+							which = num_rulerchip_admin
+							value = 1
+						}
+					}
+				}
+			}
+
+			create_message = {
+				type = MESSAGE_RULERCHIP_LEADER_DEATH
+				localization = MESSAGE_RULERCHIP_LEADER_DEATH_DESC
+				days = @toast_message_days
+				target = THIS
+			}
+		}
+	}
+}
+
+# Initialize variables for the Rulerchip | Fired by on_relic_received
+country_event = {
+	id = cyber.1522
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		last_received_relic = r_the_rulerchip
+	}
+
+	immediate = {
+		set_variable = {
+			which = num_rulerchip_admin
+			value = 0
+		}
+		set_variable = {
+			which = num_rulerchip_military
+			value = 0
+		}
+		set_variable = {
+			which = num_rulerchip_scientific
+			value = 0
+		}
+	}
+}
+
+# Corporate Final Event
+# Fired by: event
+country_event = {
+	id = cyber.1525
+	title = "cyber.1525.name"
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value > cyber_collectivist_society
+			}
+		}
+		text = cyber.1525.desc.individualist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value < cyber_collectivist_society
+			}
+		}
+		text = cyber.1525.desc.collectivist
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value = cyber_collectivist_society
+			}
+		}
+		text = cyber.1525.desc.neutral
+	}
+	picture = GFX_evt_cyberization_1
+	show_sound = event_cityscape
+	location = from
+	event_chain = futureshock_chain
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value >= cyber_collectivist_society
+			}
+		}
+		name = cyber.1525.a
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1525.a.tt
+		set_country_flag = cyber_individualist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				which = "cyber_individualist_society"
+				value <= cyber_collectivist_society
+			}
+		}
+		name = cyber.1525.b
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1525.b.tt
+		set_country_flag = cyber_collectivist
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.1525.c
+		end_event_chain = futureshock_chain
+		custom_tooltip = cyber.1525.c.tt
+		trigger = { is_ai = no }
+	}
+}
+
+### SOCIETAL EFFECTS EVENT CHAIN END ###
+
+### CYBERIZATION FOR HIVES SITUATION START ###
+
+# Event pools gatekeeping event | Situation Random Events
+# Fired by: situation on_monthly and situation flag
+situation_event = {
+	id = cyber.2005
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				has_situation_flag = cyber_2005_stage_2_fire
+				situation_progress >= 450
+			}
+			AND = {
+				has_situation_flag = cyber_2005_stage_3_fire
+				situation_progress >= 650
+			}
+			AND = {
+				has_situation_flag = cyber_2005_stage_4_fire
+				situation_progress >= 850
+			}
+		}
+	}
+
+	immediate = {
+		remove_situation_flag = cyber_2005_stage_2_fire
+		remove_situation_flag = cyber_2005_stage_3_fire
+		remove_situation_flag = cyber_2005_stage_4_fire
+
+		fire_on_action = {
+			on_action = on_cyberization_hive_situation_random_events_list
+		}
+	}
+}
+
+# CYBERIZATION STAGE 1
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 1 - Start event
+	id = cyber.2100
+	title = "cyber.2100.name"
+	desc = "cyber.2100.desc"
+	picture = GFX_evt_hive_mind
+	show_sound = event_the_flesh_is_weak
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_variable = {
+			which = "cyber_volitional_hive"
+			value = 0
+		}
+		set_variable = {
+			which = "cyber_integrated_hive"
+			value = 0
+		}
+	}
+
+	option = {
+		name = "cyber.2100.a"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				max = @tier3researchmax
+				min = @tier3researchmin
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2100.b"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				max = @tier3researchmax
+				min = @tier3researchmin
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2100.c"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				max = @tier3researchmax
+				min = @tier3researchmin
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION STAGE 2
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 2 - Start event
+	id = cyber.2200
+	title = "cyber.2200.name"
+	desc = "cyber.2200.desc"
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		owner = {
+			set_country_flag = augmentation_center_available
+			set_country_flag = augmentation_center_needed
+		}
+	}
+
+	option = {
+		name = "cyber.2200.a"
+		custom_tooltip = "cyber.2200.a.tt"
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: situation stage on_monthly
+situation_event = { # Stage 2 - Augmentation Center built
+	id = cyber.2205
+	title = "cyber.2205.name"
+	desc = "cyber.2205.desc"
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = cyber_2205_happened }
+		situation_progress >= 300
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2205_happened
+	}
+
+	option = {
+		name = "cyber.2205.a"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_volitional_hive"
+				value = 2
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2205.b"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_integrated_hive"
+				value = 2
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		set_situation_flag = cyber_2005_stage_2_fire
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_hive_situation_random_events_list
+situation_event = { # Stage 2 Opportunity
+	id = cyber.2220
+	title = "cyber.2220.name"
+	desc = "cyber.2220.desc"
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 250
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_cautious
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_2220_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2220_happened
+	}
+
+	option = {
+		name = "cyber.2220.a"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_imperfect_drones
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_volitional_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2220.b"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_integrated_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_hive_situation_random_events_list
+situation_event = { # Stage 2 Challenge
+	id = cyber.2260
+	title = "cyber.2260.name"
+	desc = "cyber.2260.desc"
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_life_support_fail
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 250
+		owner = {
+			any_owned_pop = {
+				has_trait = trait_hive_mind
+				NOT = { has_trait = trait_cybernetic }
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_overdrive
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = cyber_2260_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2260_happened
+	}
+
+	option = {
+		name = "cyber.2260.a"
+		custom_tooltip = "cyber.2260.a.tt"
+		owner = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						has_trait = trait_hive_mind
+					}
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				}
+			}
+		}
+		set_timed_situation_flag = {
+			flag = situation_cyberization_culled_drones
+			months = 12
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2260.b"
+		custom_tooltip = "cyber.2260.b.tt"
+		set_situation_flag = cyber_hive_genetic_defects
+		if = {
+			limit = {
+				has_situation_flag = cyberization_ongoing
+			}
+			remove_situation_flag = cyberization_ongoing
+			set_situation_flag = hive_cyberization_ongoing_limited
+		}
+		owner = {
+			while = {
+				count = value:five_percent_species
+				random_owned_pop = {
+					limit = {
+						NOT = { has_trait = trait_cybernetic }
+						has_trait = trait_hive_mind
+					}
+					set_pop_flag = cyber_hive_defective_pop
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2260.c"
+		custom_tooltip = "cyber.2260.c.tt"
+		set_timed_situation_flag = {
+			flag = situation_cyberization_researching_alternatives
+			months = 60
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION STAGE 3
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 3 - Start event
+	id = cyber.2300
+	title = "cyber.2300.name"
+	desc = "cyber.2300.desc"
+	picture = GFX_evt_hive_cyberization
+	show_sound = event_machinery
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.2300.a"
+		custom_tooltip = "cyber.2300.a.tt"
+		set_situation_flag = prioritizing_cyberization
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2300.b"
+		custom_tooltip = "cyber.2300.b.tt"
+		set_situation_flag = prioritizing_resources
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		# When this flag is set, an event is called each month in the situation to cyberize pops
+		if = {
+			limit = {
+				has_situation_flag = cyber_hive_genetic_defects
+			}
+			set_situation_flag = hive_cyberization_ongoing_limited
+		}
+		else = {
+			set_situation_flag = cyberization_ongoing
+		}
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_hive_situation_random_events_list
+situation_event = { # Stage 3 Opportunity
+	id = cyber.2320
+	title = "cyber.2320.name"
+	desc = "cyber.2320.desc"
+	picture = GFX_evt_hive
+	show_sound = event_swarm
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 500
+		owner = {
+			is_homicidal = no
+			any_relation = {
+				has_communications = prev
+				is_gestalt = no
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_cautious
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_2320_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2320_happened
+	}
+
+	option = {
+		name = "cyber.2320.a"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2320.b"
+		custom_tooltip = "cyber.2320.b.tt"
+		owner = {
+			set_country_flag = nice_hive_envoys
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_volitional_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2320.c"
+		custom_tooltip = "cyber.2320.c.tt"
+		owner = {
+			set_country_flag = scary_hive_envoys
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_integrated_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_hive_situation_random_events_list
+situation_event = { # Stage 3 Challenge
+	id = cyber.2360
+	title = "cyber.2360.name"
+	desc = "cyber.2360.desc"
+	picture = GFX_evt_hive_cyberization
+	show_sound = event_swarm
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 500
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_overdrive
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = cyber_2360_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2360_happened
+	}
+
+	option = {
+		name = "cyber.2360.a"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_individual_drones
+				days = 1800
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_volitional_hive"
+				value = 2
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2360.b"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_no_individual_drones
+				days = 1800
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_integrated_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2360.c"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_individual_leader_drones
+				days = 1800
+			}
+		}
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_volitional_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# CYBERIZATION STAGE 4
+# Fired by: situation stage on_first_enter
+situation_event = { # Stage 4 - Start event
+	id = cyber.2400
+	title = "cyber.2400.name"
+	desc = "cyber.2400.desc"
+	picture = GFX_evt_hive_mind
+	show_sound = event_swarm
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+	}
+
+	option = {
+		name = "cyber.2400.a"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_volitional_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2400.b"
+		custom_tooltip = "cyber.hive_government_shift.tt"
+		hidden_effect = {
+			change_variable = {
+				which = "cyber_integrated_hive"
+				value = 1
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				has_situation_flag = cyber_hive_genetic_defects
+			}
+			set_situation_flag = hive_cyberization_ongoing_limited
+		}
+		else = {
+			set_situation_flag = cyberization_ongoing
+		}
+		set_situation_flag = cyber_2005_stage_4_fire
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_hive_situation_random_events_list
+situation_event = { # Stage 4 Opportunity
+	id = cyber.2420
+	title = "cyber.2420.name"
+	desc = "cyber.2420.desc"
+	picture = GFX_evt_vivisection
+	show_sound = event_life_support_fail
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 750
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_cautious
+		}
+		modifier = {
+			factor = 0
+			has_situation_flag = cyber_2420_happened
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2420_happened
+	}
+
+	option = {
+		name = "cyber.2420.a"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_recycling_implants
+				days = 3600
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2420.b"
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2420.c"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_recycling_everything
+				days = 3600
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# Fired by: on_cyberization_hive_situation_random_events_list
+situation_event = { # Stage 4 Challenge
+	id = cyber.2460
+	title = "cyber.2460.name"
+	desc = "cyber.2460.desc"
+	picture = GFX_evt_hive_cyberization
+	show_sound = event_swarm
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_progress > 750
+	}
+
+	weight_multiplier = {
+		factor = 1
+		modifier = {
+			factor = @cyber_approach_mult
+			current_situation_approach = situation_cyberization_overdrive
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				has_situation_flag = cyber_2460_happened
+				situation_monthly_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = situation_cyberization_pause
+		set_situation_flag = cyber_2460_happened
+	}
+
+	option = {
+		name = "cyber.2460.a"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_cyber_babies
+				days = 1800
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "cyber.2460.b"
+		owner = {
+			add_modifier = {
+				modifier = cyber_hive_no_cyber_babies
+				days = 1800
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_cyberization_pause
+	}
+}
+
+# HIVE CYBERIZATION FINAL EVENT
+# Fired by: situation on_progress_complete
+situation_event = {
+	id = cyber.2002
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = cyberization_ongoing
+		set_situation_flag = cyberization_final
+		situation_event = { id = cyber.3 } # Run cyberization again to change remaining people
+		situation_event = { id = cyber.2004 days = 1 } # Real final event
+	}
+}
+
+# Fired by: event
+situation_event = { # Final event
+	id = cyber.2004
+	title = "cyber.2004.name"
+	desc = {
+		trigger = {
+			success_text = {
+				text = "cyber.2004.desc.volitional"
+				check_variable = {
+					which = cyber_volitional_hive
+					value > cyber_integrated_hive
+				}
+			}
+			success_text = {
+				text = "cyber.2004.desc.integrated"
+				check_variable = {
+					which = cyber_volitional_hive
+					value < cyber_integrated_hive
+				}
+			}
+			success_text = {
+				text = "cyber.2004.desc.neutral"
+				check_variable = {
+					which = cyber_volitional_hive
+					value = cyber_integrated_hive
+				}
+			}
+			text = newline
+			text = "cyber.2004.end"
+		}
+	}
+	picture = GFX_evt_hive_cyberization
+	show_sound = event_the_flesh_is_weak
+	situation = this
+	is_triggered_only = yes
+
+	option = {
+		name = "cyber.2004.a"
+		trigger = {
+			check_variable = {
+				which = cyber_volitional_hive
+				value >= cyber_integrated_hive
+			}
+		}
+		custom_tooltip = "cyber.2004.a.tt"
+		owner = {
+			set_country_flag = cyber_hive_volitional
+			hidden_effect = {
+				advanced_authority_refresh = yes
+			}
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	option = {
+		name = "cyber.2004.b"
+		trigger = {
+			check_variable = {
+				which = cyber_integrated_hive
+				value >= cyber_volitional_hive
+			}
+		}
+		custom_tooltip = "cyber.2004.b.tt"
+		owner = {
+			set_country_flag = cyber_hive_integrated
+			hidden_effect = {
+				advanced_authority_refresh = yes
+			}
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	option = {
+		name = "cyber.2004.c"
+		custom_tooltip = "cyber.2004.c.tt"
+		ai_chance = {
+			factor = 0
+		}
+	}
+
+	after = {
+		owner = {
+			set_country_flag = cybernetics_traditions_unlocked
+		}
+		destroy_situation = this
+	}
+}
+
+### Driven Assimilator Cyberization Events ###
+
+# Fired by: tr_cybernetics_assimilator_adopt
+country_event = {
+	id = cyber.2010
+	title = cyber.2010.name
+	desc = cyber.2010.desc
+	picture = GFX_evt_hive_cyberization
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = driven_cybernetics
+	}
+
+	option = {
+		name = EXCELLENT
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+}
+
+# Fired by: tr_cybernetics_assimilator_finish
+country_event = {
+	id = cyber.2015
+	title = cyber.2015.name
+	desc = cyber.2015.desc
+	picture = GFX_evt_hive_cyberization
+	show_sound = event_the_flesh_is_weak
+
+	is_triggered_only = yes
+
+	option = {
+		name = cyber.2015.a
+		set_country_flag = driven_memory_aggregator
+		custom_tooltip = cyber.2015.a.tt
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = cyber.2015.b
+		set_country_flag = driven_neural_chorus
+		custom_tooltip = cyber.2015.b.tt
+		hidden_effect = {
+			advanced_authority_refresh = yes
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = cyber.2015.c
+		custom_tooltip = cyber.2015.c.tt
+		trigger = { is_ai = no }
+	}
+
+	after = {
+		ruler = {
+			add_trait = leader_trait_cyborg
+		}
+	}
+}

@@ -1,0 +1,1309 @@
+
+namespace = deficit
+
+
+#Energy Deficit
+
+situation_event = {
+	id = deficit.100
+	title = deficit.100.name
+	desc = {
+		text = deficit.100.desc
+		trigger = { owner = { is_gestalt = no } }
+	}
+	desc = {
+		text = deficit.100.desc.gestalt
+		trigger = { owner = { is_gestalt = yes } }
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_pop_faction = {
+				limit = {
+					is_owner_ethic_pop_faction = yes
+					NOT = { has_modifier = faction_loan_taken }
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = ruler_pop_faction
+			}
+			ordered_owned_planet = {
+				limit = { 
+					is_capital = no
+					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = looted_planet
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:looted_planet }
+				}
+				capital_scope = {
+					save_event_target_as = looted_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = deficit.100.A
+		trigger = {
+			exists = event_target:ruler_pop_faction
+		}
+		owner = {
+			add_resource = {
+				energy = 50
+				mult = event_target:ruler_pop_faction.trigger:num_pops
+			}
+			event_target:ruler_pop_faction = {
+				add_modifier = {
+					modifier = faction_loan_taken
+					years = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = deficit.100.B
+		owner = {
+			add_resource = {
+				energy = 100
+				mult = event_target:looted_planet.trigger:num_pops
+			}
+			event_target:looted_planet = {
+				add_planet_devastation = 50
+			}
+		}
+	}
+	option = {
+		name = deficit.100.C
+	}
+}
+
+
+situation_event = {
+	id = deficit.110
+	title = BANKRUPTCY
+	desc = {
+		text = deficit.110.desc
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+	}
+	desc = {
+		text = deficit.110.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				energy = @bailout_basic_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+
+#Mineral Deficit
+
+situation_event = {
+	id = deficit.125
+	title = deficit.125.name
+	desc = {
+		text = deficit.125.desc
+		trigger = { owner = { is_gestalt = no } }
+	}
+	desc = {
+		text = deficit.125.desc.gestalt
+		trigger = { owner = { is_gestalt = yes } }
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_pop_faction = {
+				limit = {
+					is_owner_ethic_pop_faction = yes
+					NOT = { has_modifier = faction_loan_taken }
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = ruler_pop_faction
+			}
+			ordered_owned_planet = {
+				limit = { 
+					is_capital = no
+					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = looted_planet
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:looted_planet }
+				}
+				capital_scope = {
+					save_event_target_as = looted_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = deficit.140.A
+		trigger = {
+			owner = {
+				is_lithoid_empire = yes
+				num_buildings = {
+					type = building_clone_vats
+					disabled = no
+					value > 0
+				}
+			}
+		}
+		owner = {
+			custom_tooltip = deficit.140.A.tooltip
+			add_resource = {
+				minerals = 100
+				mult = value:num_active_buildings|BUILDING|building_clone_vats|
+			}
+			hidden_effect = {
+				every_owned_planet = {
+					limit = { has_active_building = building_clone_vats }
+					ruin_building = building_clone_vats
+				}
+			}
+		}
+	}
+	option = {
+		name = deficit.100.A
+		trigger = {
+			exists = event_target:ruler_pop_faction
+		}
+		owner = {
+			add_resource = {
+				minerals = 50
+				mult = event_target:ruler_pop_faction.trigger:num_pops
+			}
+			event_target:ruler_pop_faction = {
+				add_modifier = {
+					modifier = faction_loan_taken
+					years = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = deficit.100.B
+		owner = {
+			add_resource = {
+				minerals = 100
+				mult = event_target:looted_planet.trigger:num_pops
+			}
+			event_target:looted_planet = {
+				add_planet_devastation = 50
+			}
+		}
+	}
+	option = {
+		name = deficit.100.C
+	}
+}
+
+
+situation_event = {
+	id = deficit.130
+	title = BANKRUPTCY
+	desc = {
+		text = deficit.130.desc
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+	}
+	desc = {
+		text = deficit.130.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				minerals = @bailout_basic_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+#Food Deficit
+
+situation_event = {
+	id = deficit.140
+	title = deficit.140.name
+	desc = deficit.140.desc
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_owned_planet = {
+				limit = {
+					OR = {
+						num_districts = {
+							type = district_farming
+							value >= 4
+						}
+						num_districts = {
+							type = district_farming_uncapped
+							value >= 4
+						}
+						num_districts = {
+							type = district_rw_farming
+							value >= 1
+						}
+					}
+				}
+				position = 0
+				order_by = value:farming_districts_value
+				save_event_target_as = looted_planet
+			}
+		}
+	}
+
+	option = {
+		name = deficit.140.A
+		trigger = {
+			owner = {
+				is_lithoid_empire = no
+				num_buildings = {
+					type = building_clone_vats
+					disabled = no
+					value > 0
+				}
+			}
+		}
+		owner = {
+			custom_tooltip = deficit.140.A.tooltip
+			add_resource = {
+				food = 100
+				mult = value:num_active_buildings|BUILDING|building_clone_vats|
+			}
+			hidden_effect = {
+				every_owned_planet = {
+					limit = { has_active_building = building_clone_vats }
+					ruin_building = building_clone_vats
+				}
+			}
+		}
+	}
+	option = {
+		name = deficit.140.B
+		trigger = {
+			owner = {
+				num_buildings = {
+					type = building_bio_reactor
+					disabled = no
+					value > 0
+				}
+			}
+		}
+		owner = {
+			custom_tooltip = deficit.140.B.tooltip
+			add_resource = {
+				food = 100
+				mult = value:num_active_buildings|BUILDING|building_bio_reactor|
+			}
+			hidden_effect = {
+				every_owned_planet = {
+					limit = { has_active_building = building_bio_reactor }
+					while = { #each planet can have multiple
+						limit = { has_active_building = building_bio_reactor }
+						ruin_building = building_bio_reactor
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = deficit.100.B
+		trigger = {
+			exists = event_target:looted_planet
+		}
+		owner = {
+			add_resource = {
+				food = 500
+				mult = event_target:looted_planet.value:farming_districts_value
+			}
+		}
+		event_target:looted_planet = {
+			add_planet_devastation = 50
+		}
+	}
+	option = {
+		name = deficit.100.C
+	}
+}
+
+
+situation_event = {
+	id = deficit.145
+	title = BANKRUPTCY
+	desc = {
+		text = deficit.145.desc
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+	}
+	desc = {
+		text = deficit.145.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				food = @bailout_basic_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+#Consumer Goods Deficit
+
+situation_event = {
+	id = deficit.155
+	title = deficit.155.name
+	desc = {
+		text = deficit.155.desc
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+	}
+	desc = {
+		text = deficit.155.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_pop_faction = {
+				limit = {
+					is_owner_ethic_pop_faction = yes
+					NOT = { has_modifier = faction_loan_taken }
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = ruler_pop_faction
+			}
+		}
+	}
+
+	option = {
+		name = deficit.100.A
+		trigger = {
+			exists = event_target:ruler_pop_faction
+		}
+		owner = {
+			add_resource = {
+				consumer_goods = 25
+				mult = event_target:ruler_pop_faction.trigger:num_pops
+			}
+			event_target:ruler_pop_faction = {
+				add_modifier = {
+					modifier = faction_loan_taken
+					years = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = deficit.155.A
+
+		owner = {
+			add_modifier = {
+				modifier = consumer_goods_rationing
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = deficit.100.C
+	}
+}
+
+situation_event = {
+	id = deficit.160
+	title = BANKRUPTCY
+	desc = deficit.160.desc
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				consumer_goods = @bailout_consumer_goods_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+#Alloys Deficit
+
+situation_event = {
+	id = deficit.170
+	title = deficit.170.name
+	desc = {
+		text = deficit.170.desc
+		trigger = { owner = { is_machine_empire = no } }
+	}
+	desc = {
+		text = deficit.170.desc.machine
+		trigger = { owner = { is_machine_empire = yes } }
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			# if normal empire, get all non-sapient or enslaved robots
+			if = {
+				limit = {
+					is_machine_empire = no
+				}
+				ordered_owned_planet = {
+					limit = {
+						any_owned_pop = {
+							OR = {
+								is_shackled_robot = yes
+								is_non_sapient_robot = yes
+							}
+						}
+					}
+					order_by = value:num_non_sapient_robots_on_planet
+					position = 0
+					save_event_target_as = robots_planet
+					event_target:robots_planet = {
+						count_robots_to_recycle = { ALLOYS = 100 }
+					}
+				}
+			}
+			# if machine empire, the planet with most pops...
+			else = {
+				ordered_owned_planet = {
+					limit = {
+						any_owned_pop = {
+							is_robot_pop = yes
+						}
+					}
+					order_by = trigger:num_pops
+					position = 0
+					save_event_target_as = robots_planet
+					event_target:robots_planet = {
+						# ...and halven the number of recycled bots here
+						count_robots_to_recycle = { ALLOYS = 100 }
+					}
+				}
+
+			}
+		}
+	}
+
+	# scrap all robots on a planet (normal empires)
+	option = {
+		name = deficit.170.A
+		custom_tooltip = deficit.170.A.tooltip
+		trigger = {
+			owner = {
+				is_machine_empire = no
+			}
+			exists = event_target:robots_planet
+		}
+		hidden_effect = {
+			event_target:robots_planet = {
+				every_owned_pop = {
+					limit = {
+						OR = {
+							is_shackled_robot = yes
+							is_non_sapient_robot = yes
+						}
+					}
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				}
+			}
+			owner = {
+				add_resource = {
+					alloys = 1
+					mult = event_target:robots_planet.total_alloys_gained
+				}
+			}
+		}
+	}
+	# scrap half robot pops on a planet (machine empires)
+	option = {
+		name = deficit.170.B
+		custom_tooltip = deficit.170.B.tooltip
+		trigger = {
+			owner = {
+				is_machine_empire = yes
+			}
+			exists = event_target:robots_planet
+		}
+		hidden_effect = {
+			event_target:robots_planet = {
+				while = {
+					count = recycled_robots
+					random_owned_pop = {
+						limit = {
+							is_robot_pop = yes
+						}
+						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					}
+				}
+			}
+
+			owner = {
+				add_resource = {
+					alloys = 1
+					mult = event_target:robots_planet.total_alloys_gained
+				}
+			}
+		}
+	}
+
+	option = {
+		name = deficit.100.C
+	}
+}
+
+situation_event = {
+	id = deficit.175
+	title = BANKRUPTCY
+	desc = deficit.175.desc
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				alloys = @bailout_alloys_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+#Crystals Deficit
+
+situation_event = {
+	id = deficit.185
+	title = deficit.185.name
+	desc = deficit.185.desc
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_owned_planet = {
+				limit = { 
+					is_capital = no
+					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = looted_planet
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:looted_planet }
+				}
+				capital_scope = {
+					save_event_target_as = looted_planet
+				}
+			}
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						exists = orbital_station
+						OR = {
+							has_deposit = d_rare_crystals_1
+							has_deposit = d_rare_crystals_2
+							has_deposit = d_rare_crystals_3
+							has_deposit = d_rare_crystals_4
+							has_deposit = d_rare_crystals_5
+						}
+					}
+				}
+				weights = {
+					base = 1
+					modifier = {
+						add = 2
+						any_system_planet = { has_deposit = d_rare_crystals_2 }
+					}
+					modifier = {
+						add = 4
+						any_system_planet = { has_deposit = d_rare_crystals_3 }
+					}
+					modifier = {
+						add = 6
+						any_system_planet = { has_deposit = d_rare_crystals_4 }
+					}
+					modifier = {
+						add = 8
+						any_system_planet = { has_deposit = d_rare_crystals_5 }
+					}
+				}
+				random_system_planet = {
+					limit = {
+						exists = orbital_station
+						OR = {
+							has_deposit = d_rare_crystals_1
+							has_deposit = d_rare_crystals_2
+							has_deposit = d_rare_crystals_3
+							has_deposit = d_rare_crystals_4
+							has_deposit = d_rare_crystals_5
+						}
+					}
+					weights = {
+						base = 1
+						modifier = {
+							add = 2
+							has_deposit = d_rare_crystals_2
+						}
+						modifier = {
+							add = 4
+							has_deposit = d_rare_crystals_3
+						}
+						modifier = {
+							add = 6
+							has_deposit = d_rare_crystals_4
+						}
+						modifier = {
+							add = 8
+							has_deposit = d_rare_crystals_5
+						}
+					}
+					save_event_target_as = deposit_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = deficit.185.A #blow something up, create a blocker or two
+		trigger = { exists = event_target:looted_planet }
+
+		owner = {
+			add_resource = {
+				rare_crystals = 10
+				mult = event_target:looted_planet.trigger:num_pops
+			}
+		}
+		event_target:looted_planet = {
+			add_planet_devastation = 25
+			add_blocker = { type = d_exploited_deposit_blocker }
+			add_blocker = { type = d_exploited_deposit_blocker }
+		}
+	}
+	option = { #sacrifice a deposit
+		name = deficit.185.B
+		trigger = { exists = event_target:deposit_planet }
+
+		event_target:deposit_planet = {
+			switch = {
+				trigger = has_deposit
+				d_rare_crystals_5 = {
+					root.owner = {
+						add_resource = {
+							rare_crystals = 1250
+						}
+					}
+				}
+				d_rare_crystals_4 = {
+					root.owner = {
+						add_resource = {
+							rare_crystals = 1000
+						}
+					}
+				}
+				d_rare_crystals_3 = {
+					root.owner = {
+						add_resource = {
+							rare_crystals = 750
+						}
+					}
+				}
+				d_rare_crystals_2 = {
+					root.owner = {
+						add_resource = {
+							rare_crystals = 500
+						}
+					}
+				}
+				d_rare_crystals_1 = {
+					root.owner = {
+						add_resource = {
+							rare_crystals = 250
+						}
+					}
+				}
+			}
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			hidden_effect = { orbital_station = { dismantle = yes } }
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+	option = {
+		name = deficit.185.C
+	}
+}
+
+situation_event = {
+	id = deficit.190
+	title = BANKRUPTCY
+	desc = deficit.190.desc
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				rare_crystals = @bailout_strategic_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+#Motes Deficit
+
+situation_event = {
+	id = deficit.200
+	title = deficit.200.name
+	desc = deficit.200.desc
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_owned_planet = {
+				limit = { 
+					is_capital = no
+					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = looted_planet
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:looted_planet }
+				}
+				capital_scope = {
+					save_event_target_as = looted_planet
+				}
+			}
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						exists = orbital_station
+						OR = {
+							has_deposit = d_volatile_motes_1
+							has_deposit = d_volatile_motes_2
+							has_deposit = d_volatile_motes_3
+							has_deposit = d_volatile_motes_4
+							has_deposit = d_volatile_motes_5
+						}
+					}
+				}
+				weights = {
+					base = 1
+					modifier = {
+						add = 2
+						any_system_planet = { has_deposit = d_volatile_motes_2 }
+					}
+					modifier = {
+						add = 4
+						any_system_planet = { has_deposit = d_volatile_motes_3 }
+					}
+					modifier = {
+						add = 6
+						any_system_planet = { has_deposit = d_volatile_motes_4 }
+					}
+					modifier = {
+						add = 8
+						any_system_planet = { has_deposit = d_volatile_motes_5 }
+					}
+				}
+				random_system_planet = {
+					limit = {
+						exists = orbital_station
+						OR = {
+							has_deposit = d_volatile_motes_1
+							has_deposit = d_volatile_motes_2
+							has_deposit = d_volatile_motes_3
+							has_deposit = d_volatile_motes_4
+							has_deposit = d_volatile_motes_5
+						}
+					}
+					weights = {
+						base = 1
+						modifier = {
+							add = 2
+							has_deposit = d_volatile_motes_2
+						}
+						modifier = {
+							add = 4
+							has_deposit = d_volatile_motes_3
+						}
+						modifier = {
+							add = 6
+							has_deposit = d_volatile_motes_4
+						}
+						modifier = {
+							add = 8
+							has_deposit = d_volatile_motes_5
+						}
+					}
+					save_event_target_as = deposit_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = deficit.200.A #blow something up, create a blocker or two
+		trigger = { exists = event_target:looted_planet }
+
+		owner = {
+			add_resource = {
+				volatile_motes = 10
+				mult = event_target:looted_planet.trigger:num_pops
+			}
+		}
+		event_target:looted_planet = {
+			add_planet_devastation = 25
+			add_blocker = { type = d_exploited_deposit_blocker }
+			add_blocker = { type = d_exploited_deposit_blocker }
+		}
+	}
+	option = { #sacrifice a deposit
+		name = deficit.200.B
+		trigger = { exists = event_target:deposit_planet }
+
+		event_target:deposit_planet = {
+			switch = {
+				trigger = has_deposit
+				d_volatile_motes_5 = {
+					root.owner = {
+						add_resource = {
+							volatile_motes = 1250
+						}
+					}
+				}
+				d_volatile_motes_4 = {
+					root.owner = {
+						add_resource = {
+							volatile_motes = 1000
+						}
+					}
+				}
+				d_volatile_motes_3 = {
+					root.owner = {
+						add_resource = {
+							volatile_motes = 750
+						}
+					}
+				}
+				d_volatile_motes_2 = {
+					root.owner = {
+						add_resource = {
+							volatile_motes = 500
+						}
+					}
+				}
+				d_volatile_motes_1 = {
+					root.owner = {
+						add_resource = {
+							volatile_motes = 250
+						}
+					}
+				}
+			}
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			hidden_effect = { orbital_station = { dismantle = yes } }
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+	option = {
+		name = deficit.200.C
+	}
+}
+
+situation_event = {
+	id = deficit.205
+	title = BANKRUPTCY
+	desc = {
+		text = deficit.205.desc
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+	}
+	desc = {
+		text = deficit.205.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				volatile_motes = @bailout_strategic_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}
+
+
+#Gases Deficit
+
+situation_event = {
+	id = deficit.215
+	title = deficit.215.name
+	desc = deficit.215.desc
+	picture = GFX_evt_deficit
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	situation = this
+
+	abort_trigger = {
+		situation_progress >= 100
+	}
+
+	immediate = {
+		owner = {
+			ordered_owned_planet = {
+				limit = { 
+					is_capital = no
+					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+				}
+				order_by = trigger:num_pops
+				position = 0
+				save_event_target_as = looted_planet
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:looted_planet }
+				}
+				capital_scope = {
+					save_event_target_as = looted_planet
+				}
+			}
+			random_system_within_border = {
+				limit = {
+					any_system_planet = {
+						exists = orbital_station
+						OR = {
+							has_deposit = d_exotic_gases_1
+							has_deposit = d_exotic_gases_2
+							has_deposit = d_exotic_gases_3
+							has_deposit = d_exotic_gases_4
+							has_deposit = d_exotic_gases_5
+						}
+					}
+				}
+				weights = {
+					base = 1
+					modifier = {
+						add = 2
+						any_system_planet = { has_deposit = d_exotic_gases_2 }
+					}
+					modifier = {
+						add = 4
+						any_system_planet = { has_deposit = d_exotic_gases_3 }
+					}
+					modifier = {
+						add = 6
+						any_system_planet = { has_deposit = d_exotic_gases_4 }
+					}
+					modifier = {
+						add = 8
+						any_system_planet = { has_deposit = d_exotic_gases_5 }
+					}
+				}
+				random_system_planet = {
+					limit = {
+						exists = orbital_station
+						OR = {
+							has_deposit = d_exotic_gases_1
+							has_deposit = d_exotic_gases_2
+							has_deposit = d_exotic_gases_3
+							has_deposit = d_exotic_gases_4
+							has_deposit = d_exotic_gases_5
+						}
+					}
+					weights = {
+						base = 1
+						modifier = {
+							add = 2
+							has_deposit = d_exotic_gases_2
+						}
+						modifier = {
+							add = 4
+							has_deposit = d_exotic_gases_3
+						}
+						modifier = {
+							add = 6
+							has_deposit = d_exotic_gases_4
+						}
+						modifier = {
+							add = 8
+							has_deposit = d_exotic_gases_5
+						}
+					}
+					save_event_target_as = deposit_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = deficit.215.A #blow something up, create a blocker or two
+		trigger = { exists = event_target:looted_planet }
+
+		owner = {
+			add_resource = {
+				exotic_gases = 10
+				mult = event_target:looted_planet.trigger:num_pops
+			}
+		}
+		event_target:looted_planet = {
+			add_planet_devastation = 25
+			add_blocker = { type = d_exploited_deposit_blocker }
+			add_blocker = { type = d_exploited_deposit_blocker }
+		}
+	}
+	option = { #sacrifice a deposit
+		name = deficit.215.B
+		trigger = { exists = event_target:deposit_planet }
+
+		event_target:deposit_planet = {
+			switch = {
+				trigger = has_deposit
+				d_exotic_gases_5 = {
+					root.owner = {
+						add_resource = {
+							exotic_gases = 1250
+						}
+					}
+				}
+				d_exotic_gases_4 = {
+					root.owner = {
+						add_resource = {
+							exotic_gases = 1000
+						}
+					}
+				}
+				d_exotic_gases_3 = {
+					root.owner = {
+						add_resource = {
+							exotic_gases = 750
+						}
+					}
+				}
+				d_exotic_gases_2 = {
+					root.owner = {
+						add_resource = {
+							exotic_gases = 500
+						}
+					}
+				}
+				d_exotic_gases_1 = {
+					root.owner = {
+						add_resource = {
+							exotic_gases = 250
+						}
+					}
+				}
+			}
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			hidden_effect = { orbital_station = { dismantle = yes } }
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+	option = {
+		name = deficit.215.C
+	}
+}
+
+situation_event = {
+	id = deficit.220
+	title = BANKRUPTCY
+	desc = deficit.220.desc
+	picture = GFX_evt_deficit
+	show_sound = event_life_support_fail
+	is_triggered_only = yes
+	situation = this
+	force_open = yes
+
+	option = {
+		name = UNFORTUNATE
+
+		owner = {
+			add_resource = {
+				exotic_gases = @bailout_strategic_base_amount
+				mult = value:bailout_scaling_factor
+			}
+			country_defaulted_effect = yes
+		}
+	}
+	after = {
+		destroy_situation = this
+	}
+}

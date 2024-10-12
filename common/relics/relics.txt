@@ -538,6 +538,146 @@ r_severed_head = {
 	}
 }
 
+r_odryskan_crystal = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_odryskan_crystal"
+	sound = "relic_activation_intact_zro_soulstone"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			unity = @activation_cost
+		}
+	}
+
+	ai_weight = {
+		weight = 50
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		country_rare_crystals_produces_mult = 0.15
+	}
+
+	score = 3000
+
+	active_effect = {
+		hidden_effect = {
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = 60
+		}
+		if = {
+			limit = { is_gestalt = no }
+			custom_tooltip = r_odryskan_crystal_regular_effect
+			hidden_effect = {
+				random_owned_leader = {
+					limit = {
+						leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+						NOR = {
+							has_trait = leader_trait_maniacal
+							has_trait = leader_trait_maniacal_2
+							has_trait = leader_trait_maniacal_3
+						}
+					}
+					add_trait = leader_trait_maniacal
+				}
+			}
+		}
+		custom_tooltip = relic_triumph_cooldown
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_odryskan_crystal
+		}
+	}
+}
+
+r_the_rulerchip = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_the_rulerchip"
+	sound = "relic_activation_the_rulerchip"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			unity = @activation_cost
+		}
+	}
+
+	can_be_stolen = no
+
+	ai_weight = {
+		weight = 100
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			is_variable_set = num_rulerchip_admin
+		}
+		planet_jobs_produces_mult = 0.05
+		mult = value:rulerchip_dead_leader_admin
+		custom_tooltip = "rulerchip_intergenerational_knowledge_admin_tooltip"
+		show_only_custom_tooltip = no
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			is_variable_set = num_rulerchip_military
+		}
+		ship_weapon_damage = 0.05
+		mult = value:rulerchip_dead_leader_military
+		custom_tooltip = "rulerchip_intergenerational_knowledge_military_tooltip"
+		show_only_custom_tooltip = no
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			is_variable_set = num_rulerchip_scientific
+		}
+		all_technology_research_speed = 0.05
+		mult = value:rulerchip_dead_leader_scientific
+		custom_tooltip = "rulerchip_intergenerational_knowledge_science_tooltip"
+		show_only_custom_tooltip = no
+	}
+
+	score = 0
+
+	active_effect = {
+		add_modifier = {
+			modifier = "rulerchip_intergenerational_knowledge"
+			days = @triumph_duration
+		}
+		custom_tooltip = relic_triumph_cooldown
+		hidden_effect = {
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+		}
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_the_rulerchip
+		}
+	}
+}
+
 ###################
 ### Crisis relics
 ###################
@@ -704,6 +844,65 @@ r_contingency_core = {
 		inline_script = {
 			script = relics/activation_checks
 			RELIC = r_contingency_core
+		}
+	}
+}
+
+r_cetanas_heart = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_cetanas_heart"
+	sound = "relic_activation_isolated_contingency_core"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			unity = @activation_cost
+			nanites = 500
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		planetary_ascension_cost_mult = -0.5
+	}
+
+	score = 5000
+
+	active_effect = {
+		if = {
+			limit = { is_hive_empire = no }
+			custom_tooltip = relic_cetanas_heart_active
+		}
+		else_if = {
+			limit = { is_hive_empire = yes }
+			add_modifier = {
+				modifier = "cetanas_heart_hive_modifier"
+				days = @triumph_duration
+			}
+		}
+
+		custom_tooltip = relic_triumph_cooldown
+		hidden_effect = {
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+			country_event = { id = crisis.10015 }
+		}
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_cetanas_heart
 		}
 	}
 }
@@ -1525,72 +1724,6 @@ r_toxic_god = {
 	}
 }
 
-r_odryskan_crystal = {
-	activation_duration = @triumph_duration
-	portrait = "GFX_relic_odryskan_crystal"
-	sound = "relic_activation_intact_zro_soulstone"
-
-	resources = {
-		category = relics
-		# Activation cost
-		cost = {
-			unity = @activation_cost
-		}
-	}
-
-	ai_weight = {
-		weight = 50
-	}
-
-	triggered_country_modifier = {
-		potential = {
-			always = yes
-		}
-		country_rare_crystals_produces_mult = 0.15
-	}
-
-	score = 3000
-
-	active_effect = {
-		hidden_effect = {
-			add_modifier = {
-				modifier = "relic_activation_cooldown"
-				days = @triumph_duration
-			}
-		}
-		add_monthly_resource_mult = {
-			resource = energy
-			value = 60
-		}
-		if = {
-			limit = { is_gestalt = no }
-			custom_tooltip = r_odryskan_crystal_regular_effect
-			hidden_effect = {
-				random_owned_leader = {
-					limit = {
-						leader_class = scientist
-						NOR = {
-							has_trait = leader_trait_maniacal
-							has_trait = leader_trait_maniacal_2
-							has_trait = leader_trait_maniacal_3
-						}
-					}
-					add_trait = leader_trait_maniacal
-				}
-			}
-		}
-		custom_tooltip = relic_triumph_cooldown
-	}
-
-	# Possible check for activation
-	possible = {
-		inline_script = {
-			script = relics/activation_checks
-			RELIC = r_odryskan_crystal
-		}
-	}
-}
-
 r_wormhole_key_fragment_1 = {
 	portrait = "GFX_relic_wormhole_key_1"
 
@@ -1945,7 +2078,7 @@ r_infinity_root = {
 			count_owned_leader = {
 				count <= 4
 				limit = {
-					leader_class = scientist
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -1954,7 +2087,7 @@ r_infinity_root = {
 			count_owned_leader = {
 				count <= 3
 				limit = {
-					leader_class = scientist
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -1963,7 +2096,7 @@ r_infinity_root = {
 			count_owned_leader = {
 				count <= 2
 				limit = {
-					leader_class = scientist
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -1972,7 +2105,7 @@ r_infinity_root = {
 			count_owned_leader = {
 				count <= 1
 				limit = {
-					leader_class = scientist
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 				}
 			}
 		}
@@ -2049,7 +2182,7 @@ r_time_crystal = {
 			count_owned_leader = {
 				count = 0
 				limit = {
-					leader_class = scientist
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 					has_skill > @paragon_trait_level
 				}
 			}
@@ -2400,6 +2533,177 @@ r_eternal_throne = {
 		modifier = {
 			factor = 100
 			has_resource = { type = unity amount < @activation_cost }
+		}
+	}
+}
+
+r_weather_manipulator = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_weather_manipulation"
+	sound = "relic_activation_weather_manipulator"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			unity = 3000
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		country_physics_research_produces_mult = 0.15
+	}
+
+	score = 1000
+
+	active_effect = {
+		custom_tooltip = storm_relic_repelling_field_modifier_tt
+		capital_scope = {
+			hidden_effect = {
+				add_modifier = {
+					modifier = storm_relic_repelling_field_modifier
+					months = 36
+				}
+			}
+			create_cosmic_storm_influence_field = {
+				center = this.solar_system
+				radius = {
+					base = 300
+					modifier = {
+						mult = value:storm_size_multiplier
+					}
+				}
+				is_timed_influence_field = yes
+			}
+		}
+
+		custom_tooltip = relic_triumph_cooldown
+		hidden_effect = {
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+		}
+	}
+
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_weather_manipulator
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 10
+			num_cosmic_storms_encountered > 3
+		}
+
+		modifier = {
+			factor = 0
+			 is_storm_chasers_empire = yes #undercoat: moved to scripted trigger
+		}
+	}
+}
+
+#Cosmic Storm Relics
+
+r_the_tempest_invocator = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_the_tempest_exsoulcillator"
+	sound = "relic_activation_vultaum_real_perforator"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			energy = 50000
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		country_unity_produces_mult = 0.1
+		ships_upkeep_mult = -0.15
+	}
+
+	score = 1000
+
+	active_effect = {
+		custom_tooltip = r_the_tempest_invocator_active_effect_tt
+
+		set_country_flag = "started_placing_storm"
+
+		start_storm_area_placing = {
+			sacrifice_leader_with_ui = yes
+			cosmic_storm = nexus_storm
+			immediate = yes
+
+			reticle_radius = {
+				base = 100
+				modifier = {
+					mult = value:storm_area_placing_reticle_radius_multiplier
+				}
+			}
+
+			max_range = {
+				base = 1500
+				modifier = {
+					mult = value:storm_area_placing_max_range_multiplier
+				}
+			}
+
+			on_confirm = {
+				add_modifier = {
+					modifier = tempest_invocator_active_modifier
+					days = 3600
+				}
+				custom_tooltip = relic_triumph_cooldown
+
+				hidden_effect = {
+					add_modifier = {
+						modifier = "relic_activation_cooldown"
+						days = @triumph_duration
+					}
+					set_country_flag = used_tempest_invocator_relic_achievement
+				}
+
+				remove_country_flag = "started_placing_storm"
+			}
+
+			on_cancel = {
+				add_resource = {
+					energy = 50000
+				}
+
+				remove_country_flag = "started_placing_storm"
+			}
+		}
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_the_tempest_invocator
+		}
+
+		custom_tooltip = {
+			fail_text = r_the_tempest_invocator_started_placing_fail_tt
+			NOT = { has_country_flag = "started_placing_storm" }
+		}
+
+		custom_tooltip = {
+			fail_text = r_the_tempest_invocator_requirement_fail_tt
+			any_owned_leader = {
+				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+			}
 		}
 	}
 }

@@ -144,7 +144,7 @@ fleet_event = {
 			modifier = {
 				factor = 5
 				owner = {
-					is_megacorp = yes # undercoat: moved to scripted trigger
+					is_megacorp = yes
 				}
 			}
 		}
@@ -1009,6 +1009,16 @@ country_event = {
 					is_country_type = ai_empire
 					has_communications = root
 				}
+				OR = {
+					any_country = {
+						is_country_type = awakened_synth_queen
+						has_communications = root
+					}
+					OR = {
+						has_special_project = THE_SYNTH_QUEENS_OUTPOST_AMBUSH
+						has_special_project = THE_SYNTH_QUEENS_CONVOY_AMBUSH
+					}
+				}
 			}
 			event_target:mercenary_enclave_country = {
 				trust = {
@@ -1135,7 +1145,7 @@ country_event = {
 					count_owned_leader = {
 						count = 0
 						limit = {
-							leader_class = commander
+							leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 							is_councilor = no
 							is_ruler = no
 						}
@@ -1156,7 +1166,7 @@ country_event = {
 			}
 			random_owned_leader = {
 				limit = {
-					leader_class = commander
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 					is_councilor = no
 					is_ruler = no
 				}
@@ -1827,6 +1837,55 @@ country_event = {
 			country_event = { id = enclave.265 }
 		}
 	}
+
+	# Cetana
+	option = {
+		name = enclave.240.f
+		trigger = {
+			NOT = { has_modifier = tactic_v_synth_queen }
+			OR = {
+				any_country = {
+					is_country_type = awakened_synth_queen
+					has_communications = root
+				}
+				OR = {
+					has_special_project = THE_SYNTH_QUEENS_OUTPOST_AMBUSH
+					has_special_project = THE_SYNTH_QUEENS_CONVOY_AMBUSH
+				}
+			}
+		}
+		allow = {
+			resource_stockpile_compare = { resource = energy value >= 5000 }
+		}
+		add_resource = { energy = -5000 }
+		add_modifier = {
+			modifier = tactic_v_synth_queen
+			days = -1
+		}
+		hidden_effect = {
+			country_event = { id = enclave.266 }
+		}
+	}
+
+	option = {
+		name = enclave.240.f
+		trigger = {
+			has_modifier = tactic_v_synth_queen
+			OR = {
+				any_country = {
+					is_country_type = awakened_synth_queen
+					has_communications = root
+				}
+				OR = {
+					has_special_project = THE_SYNTH_QUEENS_OUTPOST_AMBUSH
+					has_special_project = THE_SYNTH_QUEENS_CONVOY_AMBUSH
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = { id = enclave.266 }
+		}
+	}
 }
 
 ## Tactical Appraisal Events
@@ -1864,6 +1923,13 @@ country_event = {
 	base = enclave.205
 	desc_clear = yes
 	desc = enclave.265.desc
+}
+#Synth Queen
+country_event = {
+	id = enclave.266
+	base = enclave.205
+	desc_clear = yes
+	desc = enclave.266.desc
 }
 
 # Mercenary Enclave: HIRE ARMIES
@@ -2540,7 +2606,7 @@ country_event = {
 					count_owned_leader = {
 						count = 0
 						limit = {
-							leader_class = commander
+							leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 							is_councilor = no
 							is_ruler = no
 						}
@@ -2561,7 +2627,7 @@ country_event = {
 			}
 			random_owned_leader = {
 				limit = {
-					leader_class = commander
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 					is_councilor = no
 					is_ruler = no
 				}
@@ -8239,6 +8305,7 @@ situation_event = {
 		owner = {
 			is_ai = no
 			is_gestalt = no
+			is_individual_machine = no
 			NOT = { has_country_flag = too_lucid_flag }
 			num_pops > 4
 			count_owned_planet = {
@@ -8691,6 +8758,9 @@ country_event = {
 					graphical_culture = "extra_dimensional_01"
 					prefix = no
 					upgradable = no
+					effect = {
+						set_ship_flag = special_science_ship
+					}
 				}
 				set_location = event_target:shrouded_system
 				set_leader = event_target:shrouded_leader
@@ -10411,7 +10481,7 @@ planet_event = {
 		remove_modifier = shattered_frontier_looting
 		if = {
 			limit = {
-				hidden:owner = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+				hidden:owner = { is_hive_empire = yes }
 			}
 			add_modifier = {
 				modifier = shattered_frontier_lockdown_hive
@@ -10433,7 +10503,7 @@ planet_event = {
 				limit = {
 					NOT = { is_pop_category = ruler }
 				}
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 			planet_event = {
 				id = enclave.5503
@@ -10642,13 +10712,13 @@ planet_event = {
 				limit = {
 					colonizable_planet = no
 					NOR = {
-						is_shattered_world = yes # undercoat: moved to scripted trigger
+						is_planet_class = pc_shattered
 						habitable_planet = yes
 						is_habitat = yes # undercoat: moved to scripted trigger
 					}
 				}
 				clear_planet_modifiers = yes
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 				change_pc = pc_shrouded
 				save_event_target_as = shrouded_moon
 			}
@@ -12006,7 +12076,7 @@ fleet_event = {
 					ethic_xenophobe = { text = enclave.6000.b.desc }
 					ethic_gestalt_consciousness = {
 						if = {
-							limit = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+							limit = { is_machine_empire = yes }
 							text = enclave.6000.d.desc
 						}
 						else = { text = enclave.6000.e.desc }
@@ -12140,7 +12210,7 @@ fleet_event = {
 		trigger = {
 			owner = {
 				is_gestalt = yes # undercoat: moved to scripted trigger
-				is_machine_empire = no # undercoat: moved to scripted trigger
+				NOT = {is_machine_empire = yes }
 			}
 		}
 		leader = {
@@ -12167,8 +12237,8 @@ fleet_event = {
 		trigger = {
 			owner = {
 				NOR = {
-					is_hive_empire = yes # undercoat: moved to scripted trigger
-					is_machine_empire = yes # undercoat: moved to scripted trigger
+					is_hive_empire = yes
+					is_machine_empire = yes
 				}
 			}
 		}
@@ -12178,7 +12248,7 @@ fleet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_hive_empire = yes # undercoat: moved to scripted trigger
+				is_hive_empire = yes
 			}
 		}
 		text = enclave.6005.b.desc
@@ -12187,7 +12257,7 @@ fleet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 			}
 		}
 		text = enclave.6005.c.desc
@@ -12260,8 +12330,8 @@ fleet_event = {
 		trigger = {
 			owner = {
 				NOR = {
-					is_hive_empire = yes # undercoat: moved to scripted trigger
-					is_machine_empire = yes # undercoat: moved to scripted trigger
+					is_hive_empire = yes
+					is_machine_empire = yes
 				}
 			}
 		}
@@ -12271,7 +12341,7 @@ fleet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_hive_empire = yes # undercoat: moved to scripted trigger
+				is_hive_empire = yes
 			}
 		}
 		text = enclave.6010.b.desc
@@ -12280,7 +12350,7 @@ fleet_event = {
 	desc = {
 		trigger = {
 			owner = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 			}
 		}
 		text = enclave.6010.c.desc
@@ -12578,7 +12648,10 @@ country_event = { # Salvagers
 
 	trigger = {
 		is_ai = no
-		NOT = { has_country_flag = salvager_enclave_diplomacy_engaged }
+		NOR = {
+			has_country_flag = salvager_enclave_diplomacy_engaged
+			has_country_flag = cosmogenesis_empire_has_won
+		}
 		exists = event_target:salvager_enclave_country
 		NOR = {
 			is_hostile = event_target:salvager_enclave_country
@@ -12591,7 +12664,7 @@ country_event = { # Salvagers
 			has_technology = tech_mega_engineering
 			AND = {
 				has_technology = tech_habitat_1
-				has_void_dweller_origin = no # undercoat: moved to scripted trigger
+				has_void_dweller_origin = no
 			}
 		}
 	}

@@ -13,7 +13,15 @@ progressive = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @faction_base_unity
+			unity = @faction_base_output
+		}
+	}
+
+	extortion_resource = {
+		category = pop_factions
+		produces = {
+			society_research = @faction_base_output
+			mult = @faction_extortion_research_ratio
 		}
 	}
 
@@ -73,7 +81,7 @@ progressive = {
 		modifier = {
 			factor = 0
 			is_ruler = yes
-			owner = { has_authority_imperial = yes } # undercoat: moved to scripted trigger
+			owner = { is_imperial_authority = yes }
 		}
 
 		modifier = {
@@ -109,8 +117,8 @@ progressive = {
 		trigger = {
 			owner = {
 				NOR = {
-					has_authority_imperial = yes # undercoat: moved to scripted trigger
-					has_authority_dictatorial = yes # undercoat: moved to scripted trigger
+					is_imperial_authority = yes
+					is_dictatorial_authority = yes
 				}
 			}
 		}
@@ -292,7 +300,7 @@ progressive = {
 		ETHIC = ethic_egalitarian
 		ETHIC_FANATIC = ethic_fanatic_egalitarian
 		ETHIC_OPPOSED = ethic_authoritarian
-	} 
+	}
 
 	on_create = {
 		pop_faction_event = { id = factions.1 }
@@ -313,184 +321,13 @@ progressive = {
 		}
 	}
 
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-
-			cost = {
-				unity = 5000
-			}
-
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > 0.20
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_egalitarian" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = 3600 }
-				parameter:empire = {
-					shift_ethic = ethic_egalitarian
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = 3600 }
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = 3600 }
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								is_playable = yes # undercoat: moved to scripted trigger
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_egalitarian
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_egalitarian
-						has_modifier = promoted_egalitarian
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_egalitarian days = -1 }
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_egalitarian
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_egalitarian
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_egalitarian
-						has_modifier = promoted_egalitarian
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_egalitarian days = -1 }
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_egalitarian
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_egalitarian
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
+	# Undercoat inline_script
+	inline_script = {
+		script = pop_faction_types/standard_action_block
+		faction = progressive
+		ethic = egalitarian
+		opposite = authoritarian
+		apply_to_other_factions = "always = no"
+		extortion_resource = society_research
 	}
 }

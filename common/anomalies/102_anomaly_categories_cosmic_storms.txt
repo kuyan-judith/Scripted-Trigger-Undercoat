@@ -1,0 +1,322 @@
+######################################
+# ANOMALY CATEGORIES - Cosmic Storms #
+######################################
+
+@precursor_easy = 6
+@precursor_medium = 8
+@precursor_hard = 10
+
+# Precursor - Weather Manipulators: 1 Ancient Shelters
+STORMS_PREC_WM_ONE = {
+	desc = "STORMS_PREC_WM_ONE_DESC"
+	picture = "GFX_evt_relic_world_street"
+	level = @precursor_easy
+	max_once = yes
+
+	# Spawned through add_anomaly effect in cstorms.100
+	spawn_chance = {
+		base = 0
+	}
+
+	on_spawn = {
+		set_planet_flag = precursor_world
+	}
+
+	on_success = cstorms.105
+}
+
+# Precursor - adAkkaria: 1 A signal from Benevolence
+STORMS_PREC_ONE = {
+	desc = "STORMS_PREC_ONE_DESC"
+	picture = "GFX_evt_ship_in_orbit"
+	level = @precursor_easy
+	max_once = yes
+
+	# Spawned through add_anomaly effect in cstorms.200
+	spawn_chance = {
+		base = 0
+	}
+
+	on_spawn = {
+		# Mark as used, so we can avoid in other precursor events.
+		set_planet_flag = precursor_world
+		solar_system = { set_star_flag = precursor_system }
+	}
+
+	on_success = cstorms.205
+}
+
+# Crimson Crawlers - They Are Edible trigger event
+crimson_crawlers_category = {
+	desc = "crimson_crawlers_category_desc"
+	picture = GFX_evt_crimson_crawlers
+	level = 3
+
+	should_ai_use = no
+	max_once_global = yes
+
+	spawn_chance = {
+		base = 10
+		modifier = {
+			add = 5
+			OR = {
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+				is_continental_world = yes # undercoat: moved to scripted trigger
+				is_savannah_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				is_starting_planet_type = no
+				has_cosmic_storms_dlc = no
+				is_colonizable = no
+				has_planet_flag = prescripted_ideal
+
+				from.owner = {
+					OR = {
+						cares_for_crimson_crawlers = no
+						country_uses_food = no
+					}
+				}
+			}
+		}
+	}
+
+	on_spawn = {
+		add_modifier = {
+			modifier = crimson_crawlers
+		}
+	}
+
+	on_success = cstorms.1255
+}
+
+#### These anomalies are left behind by storms
+
+STORMS_ANOM_ANTS = {
+	desc = "STORMS_ANOM_ANTS_DESC"
+	picture = "GFX_evt_asteroid_field"
+	level = 3
+	max_once_global = yes
+
+	spawn_chance = {
+		base = 0
+	}
+
+	# triggered by cstorms.5
+	on_spawn = {
+		create_ambient_object = {
+			type = small_debris_object
+		}
+	}
+
+	on_success = cstorms.5020
+}
+
+STORMS_ANOM_BRAIN = {
+	desc = "STORMS_ANOM_BRAIN_DESC"
+	picture = "GFX_evt_cosmic_storms_shroud_storm"
+	level = 5
+	max_once_global = yes
+
+	# triggered by cstorms.5
+	spawn_chance = {
+		base = 0
+	}
+
+	on_spawn = {
+		create_ambient_object = {
+			type = small_debris_object
+		}
+	}
+
+	on_success = cstorms.5025
+}
+
+STORMS_ANOM_STAT = {
+	desc = "STORMS_ANOM_STAT_DESC"
+	picture = "GFX_evt_ruined_system"
+	level = 3
+	max_once_global = yes
+
+	# triggered by cstorms.5
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5030
+}
+
+
+# But They Are Cute
+but_they_are_cute_category = {
+	desc = "but_they_are_cute_category_desc"
+	picture = GFX_evt_but_they_are_cute
+	max_once = yes
+	level = 2
+
+	spawn_chance = {
+		modifier = {
+			add = 3
+			colonizable_planet = yes
+		}
+		modifier = {
+			factor = 0
+			from.owner = {
+				OR = {
+					is_homicidal = yes
+					is_gestalt = yes
+				}
+			}
+		}
+	}
+
+	on_success = cstorms.1500
+}
+
+# Terrestial Telescope
+terrestial_telescope_category = {
+	desc = "terrestial_telescope_category_desc"
+	picture = GFX_evt_space_station
+	level = 3
+
+	should_ai_use = no
+
+	# triggered by cstorms.5
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.1605
+}
+
+# The Imitator
+the_imitator_category = {
+	desc = "the_imitator_category_desc"
+	picture = GFX_evt_space_debris
+	max_once = yes
+	level = 3
+	should_ai_use = no
+
+	# triggered by cstorms.5
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.1550
+}
+
+# Polychromatic Star
+STORMS_ANOM_POLYCHROMATIC = {
+	desc = "STORMS_ANOM_POLYCHROMATIC_DESC"
+	picture = GFX_evt_star_pulsar
+	max_once = yes
+	level = 2
+	should_ai_use = no
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_spawn = {
+		clear_deposits_stu = yes # undercoat: moved to scripted effect
+	}
+
+	on_success = cstorms.5035
+}
+
+# Asteroid Triplets
+STORMS_ANOM_TRIPLETS = {
+	desc = "STORMS_ANOM_TRIPLETS_DESC"
+	picture = GFX_evt_crystal_asteroids
+	max_once = yes
+	level = 2
+	should_ai_use = no
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5040
+}
+
+# Displaced Travellers
+STORMS_ANOM_TRAVELLERS = {
+	desc = "STORMS_ANOM_TRAVELLERS_DESC"
+	picture = GFX_evt_ship_in_orbit
+	max_once = yes
+	level = 2
+	should_ai_use = no
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5050
+}
+
+# Cosmic Sludge
+STORMS_COSMIC_SLUDGE = {
+	desc = "STORMS_COSMIC_SLUDGE_DESC"
+	picture = GFX_evt_star_chart
+	max_once = yes
+	level = 2
+	should_ai_use = no
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5060
+}
+
+# Shattered Satellite
+STORMS_SHATTERED_SATTELITE = {
+	desc = "STORMS_SHATTERED_SATTELITE_DESC"
+	picture = GFX_evt_star_chart
+	max_once = yes
+	level = 2
+	should_ai_use = no
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5070
+}
+
+# Eviscerated Fauna
+STORMS_EVISCERATED_FAUNA = {
+	desc = "STORMS_EVISCERATED_FAUNA_DESC"
+	picture = GFX_evt_star_chart
+	level = 2
+	max_once_global = yes
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5080
+}
+
+# Displaced Tiyanki
+STORMS_DISPLACED_TIYANKI = {
+	desc = "STORMS_DISPLACED_TIYANKI_DESC"
+	picture = GFX_evt_tiyanki_family
+	level = 2
+	max_once_global = yes
+
+	# triggered by cstorms.10
+	spawn_chance = {
+		base = 0
+	}
+
+	on_success = cstorms.5090
+}

@@ -2311,9 +2311,20 @@ hostile_init_13 = {
 # Mining Drone Home
 hostile_init_14 = {
 	class = "rl_standard_stars"
+
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 90
+	}
+
 	asteroid_belt = {
 		type = rocky_asteroid_belt
 		radius = 120
+	}
+
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 150
 	}
 
 	usage = misc_system_init
@@ -2357,7 +2368,7 @@ hostile_init_14 = {
 		count = 3
 		class = pc_asteroid
 		orbit_distance = 0
-		orbit_angle = 70
+		orbit_angle = { min = 30 max = 70 }
 
 		init_effect = {
 			create_fleet = {
@@ -2440,20 +2451,174 @@ hostile_init_14 = {
 		}
 	}
 
-	change_orbit = -80
+	change_orbit = 30
+
+	planet = {
+		count = 6
+		class = pc_asteroid
+		orbit_distance = 0
+		orbit_angle = { min = 30 max = 60 }
+		init_effect = {
+			create_fleet = {
+				name = "NAME_Mining_Corps"
+				effect = {
+					set_owner = event_target:drone_country
+					while = {
+						count = 4
+						create_ship = {
+							name = ""
+							design = "NAME_Ancient_Mining_Drone"
+						}
+					}
+					while = {
+						count = 1
+						create_ship = {
+							name = ""
+							design = "NAME_Ancient_Combat_Drone"
+						}
+					}
+					set_location = {
+						target = prev
+						distance = 20
+						angle = 0
+					}
+					set_formation_scale = 2
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = return_point
+					set_aggro_range = 200
+				}
+			}
+			create_mining_station = {
+				owner = event_target:drone_country
+			}
+		}
+	}
+
+	change_orbit = -60
+
+	planet = {
+		count = 6
+		class = pc_asteroid
+		orbit_distance = 0
+		orbit_angle = { min = 30 max = 60 }
+		init_effect = {
+			create_fleet = {
+				name = "NAME_Mining_Corps"
+				effect = {
+					set_owner = event_target:drone_country
+					while = {
+						count = 4
+						create_ship = {
+							name = ""
+							design = "NAME_Ancient_Mining_Drone"
+						}
+					}
+					while = {
+						count = 1
+						create_ship = {
+							name = ""
+							design = "NAME_Ancient_Combat_Drone"
+						}
+					}
+					set_location = {
+						target = prev
+						distance = 20
+						angle = 0
+					}
+					set_formation_scale = 2
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = return_point
+					set_aggro_range = 200
+				}
+			}
+			create_mining_station = {
+				owner = event_target:drone_country
+			}
+		}
+	}
+
+	change_orbit = -50
 
 	planet = {
 		count = 1
 		orbit_distance = 20
+		class = pc_molten
 		orbit_angle = { min = 90 max = 270 }
-	}
+		init_effect = {
+			if = {
+				limit = {
+					has_machine_age_dlc = yes
+				}
+				random_list = {
+					1 = {
+						save_event_target_as = ruined_furnace_planet
+						prevent_anomaly = yes
+						clear_deposits_stu = yes # undercoat: moved to scripted effect
+						add_deposit = d_minerals_3
+						add_deposit = d_alloys_1
+						solar_system = {
+							spawn_megastructure = {
+								type = "orbital_arc_furnace_destroyed"
+								planet = event_target:ruined_furnace_planet
 
-	change_orbit = 80
-
-	planet = {
-		count = { min = 0 max = 2 }
-		orbit_distance = 40
-		orbit_angle = { min = 90 max = 270 }
+								init_effect = {
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = this
+									}
+									last_created_ambient_object = {
+										set_location = {
+											target = prev
+											distance = 20
+											angle = 20
+										}
+									}
+									create_ambient_object = {
+										type = "large_debris_object"
+										location = this
+									}
+									last_created_ambient_object = {
+										set_location = {
+											target = prev
+											distance = 20
+											angle = 150
+										}
+									}
+									create_ambient_object = {
+										type = "medium_debris_01_object"
+										location = this
+									}
+									last_created_ambient_object = {
+										set_location = {
+											target = prev
+											distance = 35
+											angle = 90
+										}
+									}
+									create_ambient_object = {
+										type = "medium_debris_02_object"
+										location = this
+									}
+									last_created_ambient_object = {
+										set_location = {
+											target = prev
+											distance = 3
+											angle = 270
+										}
+									}
+								}
+							}
+						}
+						event_target:ruined_furnace_planet = {
+							set_planet_entity = { entity = invisible_turret_entity }
+						}
+					}
+					3 = {
+						# No Ruined Arc Furnace for you!
+					}
+				}
+			}
+		}
 	}
 
 	neighbor_system = {
@@ -2582,7 +2747,7 @@ hostile_init_16 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_physics_6
 			create_ambient_object = {
 				type = "space_storm_2"
@@ -2609,7 +2774,7 @@ hostile_init_16 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = giant1
 			add_deposit = d_society_6
 		}
@@ -2626,7 +2791,7 @@ hostile_init_16 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = giant2
 			add_deposit = d_society_6
 		}
@@ -2643,7 +2808,7 @@ hostile_init_16 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = giant3
 			add_deposit = d_society_6
 		}
@@ -2660,7 +2825,7 @@ hostile_init_16 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = giant4
 			add_deposit = d_society_6
 		}
@@ -2950,7 +3115,7 @@ hostile_init_20 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_energy_8
 			save_event_target_as = amoeba_star
 			set_planet_flag = amoeba_star
@@ -3038,7 +3203,7 @@ hostile_init_20 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_volatile_motes_2
 		}
 	}
@@ -3050,7 +3215,7 @@ hostile_init_20 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_volatile_motes_1
 			add_deposit = d_minerals_3
 		}
@@ -3116,7 +3281,7 @@ hostile_init_20 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = amoeba_giant
 			add_deposit = d_exotic_gases_3
 		}
@@ -3131,7 +3296,7 @@ hostile_init_20 = {
 
 			init_effect = {
 				prevent_anomaly = yes
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 				add_deposit = d_minerals_4
 			}
 		}
@@ -3144,7 +3309,7 @@ hostile_init_20 = {
 
 			init_effect = {
 				prevent_anomaly = yes
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 				add_deposit = d_society_6
 			}
 		}
@@ -3164,7 +3329,7 @@ hostile_init_20 = {
 			save_event_target_as = amoeba_ice_asteroid_1
 			set_planet_flag = amoeba_ice_asteroid_1
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_minerals_5
 		}
 	}
@@ -3194,7 +3359,7 @@ hostile_init_20 = {
 			save_event_target_as = amoeba_ice_asteroid_3
 			set_planet_flag = amoeba_ice_asteroid_3
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_rare_crystals_2
 		}
 	}
@@ -3246,7 +3411,7 @@ hostile_init_21 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			add_deposit = d_physics_6
 			save_event_target_as = graveyard_star
 			set_planet_flag = graveyard_star
@@ -3290,7 +3455,7 @@ hostile_init_21 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = graveyard_site
 			set_planet_flag = graveyard_site
 			create_archaeological_site = site_tiyanki_graveyard
@@ -3302,7 +3467,7 @@ hostile_init_21 = {
 			}
 		}
 	}
-	
+
 	planet = {
 		count = 1
 		class = pc_ice_asteroid
@@ -3312,7 +3477,7 @@ hostile_init_21 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = graveyard_asteroid
 			set_planet_flag = graveyard_asteroid
 			add_anomaly = {
@@ -3331,7 +3496,7 @@ hostile_init_21 = {
 
 		init_effect = {
 			prevent_anomaly = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			save_event_target_as = graveyard_gas
 			set_planet_flag = graveyard_gas
 			add_deposit = d_volatile_motes_3

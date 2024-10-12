@@ -22,6 +22,7 @@ planet_event = {
 		exists = owner
 		owner = {
 			is_necrophage_empire = yes # undercoat: moved to scripted trigger
+			
 		}
 		num_assigned_jobs = {
 			job = necro_apprentice
@@ -132,7 +133,7 @@ planet_event = {
 				}
 				add_opinion_modifier = { who = root.owner modifier = opinion_necrophage_our_species }
 			}
-			kill_pop = yes
+			kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 		}
 		create_message = {
 			type = MESSAGE_NECROPHAGE_POPS_NECROPHAGED
@@ -229,6 +230,7 @@ planet_event = {
 		owner = {
 			is_ai = yes
 			is_necrophage_empire = yes # undercoat: moved to scripted trigger
+			
 			any_owned_species = {
 				species_can_be_necrophaged = yes
 				NOT = {
@@ -765,9 +767,15 @@ planet_event = {
 		}
 		exists = fromfrom #crisis.202 can remove the last pop
 		fromfrom = {
-			NOT = {
+			NOR = {
 				has_purge_type = {
 					type = purge_displacement
+				}
+				has_purge_type = {
+					type = purge_cosmogenesis
+				}
+				has_purge_type = {
+					type = purge_cosmogenesis_lathe_resettle
 				}
 			}
 			is_robotic_species = no
@@ -804,25 +812,14 @@ planet_event = {
 						type = citizenship_full_machine
 					}
 					if = { # assimilator empire
-						limit = {
-							root.owner = {
-								is_machine_empire = yes # undercoat: moved to scripted trigger
-								is_machine_assimilator = yes # undercoat: moved to scripted trigger
-								NOT = { has_tradition = tr_cybernetics_assimilator_adopt }
-							}
+					limit = {
+						root.owner = {
+							is_machine_empire = yes
+							is_machine_assimilator = yes # undercoat: moved to scripted trigger
 						}
-						root.owner = { generate_cyborg_treats = yes } # scripted effect
 					}
-					else_if = {
-						limit = {
-							root.owner = {
-								is_machine_empire = yes # undercoat: moved to scripted trigger
-								is_machine_assimilator = yes # undercoat: moved to scripted trigger
-								has_tradition = tr_cybernetics_assimilator_adopt
-							}
-						}
-						root.owner = { generate_cyborg_extra_treats = yes } # scripted effect
-					}
+					root.owner = { generate_cyborg_treats = yes } # scripted effect
+				}
 				}
 			}
 		}

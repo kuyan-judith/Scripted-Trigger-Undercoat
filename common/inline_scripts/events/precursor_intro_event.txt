@@ -1,0 +1,68 @@
+location = from
+event_chain = $EVENT_CHAIN$
+
+is_triggered_only = yes
+
+trigger = {
+	solar_system = {
+		NOT = { is_same_value = root.owner.capital_scope.solar_system }
+		
+		# Precursors get allocated a chunk of the galaxy, in which all systems have the associated flag set by the engine.
+		has_star_flag = $PRECURSOR_FLAG$
+	}
+	owner = {
+		is_ai = no
+
+		# No other precursor should be active.
+		has_precursor_intro = no
+	}
+	FROM = {
+		has_anomaly = no
+		is_star = no
+	}
+}
+
+# Increase the weight for this origin, to help it catch up.
+weight_multiplier = {
+	factor = 1
+	modifier = {
+		factor = @origin_shoulders_multiplier
+		owner = {
+			is_shoulders_of_giants_empire = yes # undercoat: moved to scripted trigger
+			has_country_flag = origin_shoulders_closure
+		}
+	}
+}
+
+immediate = {
+	owner = {
+		# Immediately begin the chain, so this event can also be a part of it.
+		begin_event_chain = {
+			event_chain = $EVENT_CHAIN$
+			target = THIS
+		}
+
+		# This disables other precursor event-chains from starting
+		set_country_flag = $INTRO_FLAG$
+	}
+}
+
+option = {
+	name = INTERESTING
+
+	# This might be the first time the player encounters another species, so queue the discovery event.
+	hidden_effect = { owner = { country_event = { id = story.5 days = 30 } } }
+	
+	owner = {
+		tooltip = {
+			begin_event_chain = {
+				event_chain = $EVENT_CHAIN$
+				target = THIS
+			}
+		}
+		if = {
+			limit = { has_ancrel = yes }
+			small_artifact_reward = yes
+		}
+	}
+}

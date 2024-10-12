@@ -13,6 +13,7 @@ planet_event = {
 	}
 
 	trigger = {
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 		planet_stability < @stabilitylevel2
 		num_pops >= 10
 		has_orbital_bombardment = no
@@ -73,6 +74,7 @@ planet_event = {
 	}
 
 	trigger = {
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 		planet_stability < @stabilitylevel2
 		num_pops >= 10
 		has_orbital_bombardment = no
@@ -303,11 +305,11 @@ situation_event = {
 					}
 					modifier = {
 						factor = 0.5
-						owner = { has_authority_imperial = yes } # undercoat: moved to scripted trigger
+						owner = { is_imperial_authority = yes }
 					}
 					modifier = {
 						factor = 2
-						owner = { has_authority_democratic = yes } # undercoat: moved to scripted trigger
+						owner = { is_democratic_authority = yes }
 					}
 				}
 				1 = {
@@ -437,11 +439,11 @@ situation_event = {
 					}
 					modifier = {
 						factor = 0.5
-						owner = { has_authority_democratic = yes } # undercoat: moved to scripted trigger
+						owner = { is_democratic_authority = yes }
 					}
 					modifier = {
 						factor = 2
-						owner = { has_authority_imperial = yes } # undercoat: moved to scripted trigger
+						owner = { is_imperial_authority = yes }
 					}
 				}
 				1 = {
@@ -1396,9 +1398,21 @@ situation_event = {
 					}
 					else_if = {
 						limit = {
+							has_trait = trait_void_dweller_2
+						}
+						set_origin = origin_void_machines
+					}
+					else_if = {
+						limit = {
 							has_trait = trait_cave_dweller
 						}
 						set_origin = origin_subterranean
+					}
+					else_if = {
+						limit = {
+							has_trait = trait_robot_cave_dweller
+						}
+						set_origin = origin_subterranean_machines
 					}
 					else_if = {
 						limit = {
@@ -1410,14 +1424,26 @@ situation_event = {
 
 					if = {
 						limit = {
-							OR = {
-								has_trait = trait_machine_unit
-								has_trait = trait_hive_mind
-							}
+							has_trait = trait_machine_unit
+							root.owner = { is_individual_machine = no }
 							is_gestalt = no # undercoat: moved to scripted trigger
 						}
 						shift_ethic = ethic_gestalt_consciousness
-						change_government = random
+						change_government = {
+							authority = auth_machine_intelligence
+							civics = random
+						}
+					}
+					else_if = {
+						limit = {
+							has_trait = trait_hive_mind
+							is_gestalt = no # undercoat: moved to scripted trigger
+						}
+						shift_ethic = ethic_gestalt_consciousness
+						change_government = {
+							authority = auth_hive_mind
+							civics = random
+						}
 					}
 					else_if = {
 						limit = {
@@ -2177,7 +2203,10 @@ situation_event = {
 			has_situation_flag = slave_hunger_strikes
 			current_stage = revolt_severity_1
 		}
-		owner = { is_playable = yes } # undercoat: moved to scripted trigger
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_individual_machine = no
+		}
 		target = {
 			exists = controller
 			controller = { is_same_value = root.owner }

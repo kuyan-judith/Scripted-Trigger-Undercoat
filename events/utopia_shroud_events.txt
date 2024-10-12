@@ -325,7 +325,7 @@ country_event = {
 
 		hidden_effect = {
 			country_event = { id = utopia.2657 }
-			
+
 			add_modifier = {
 				modifier = "shroud_cooldown"
 				days = 2160
@@ -338,7 +338,7 @@ country_event = {
 	option = { #Try to contact a specific patron
 		name = "utopia.3000.b"
 		trigger = {
-			NOR = { 
+			NOR = {
 				has_country_flag = shroud_intro
 				has_country_flag = has_shroud_patron
 				has_special_project = FORM_COVENANT_PROJECT
@@ -357,7 +357,7 @@ country_event = {
 			}
 		}
 
-		add_resource = { 
+		add_resource = {
 			energy = -2000
 			sr_zro = -500
 			mult = value:scripted_modifier_mult|MODIFIER|shroud_delve_cost|
@@ -366,6 +366,43 @@ country_event = {
 		hidden_effect = {
 			country_event = { id = utopia.3005 }
 
+			add_modifier = {
+				modifier = "shroud_cooldown"
+				days = 2160
+				time_multiplier = value:scripted_modifier_mult|MODIFIER|shroud_delve_cooldown|
+			}
+		}
+	}
+	option = { #Try to contact the Animator
+		name = "animator.shroud"
+		trigger = {
+			has_country_flag = synth_queen_can_contact_the_animator_of_clay
+			NOR = {
+				has_country_flag = shroud_intro
+				has_country_flag = synth_queen_contacted_the_animator_already
+			}
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 2000
+				mult = value:scripted_modifier_mult|MODIFIER|shroud_delve_cost|
+			}
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 500
+				mult = value:scripted_modifier_mult|MODIFIER|shroud_delve_cost|
+			}
+		}
+
+		add_resource = {
+			energy = -2000
+			sr_zro = -500
+			mult = value:scripted_modifier_mult|MODIFIER|shroud_delve_cost|
+		}
+
+		hidden_effect = {
+			country_event = { id = crisis.24100 }
 			add_modifier = {
 				modifier = "shroud_cooldown"
 				days = 2160
@@ -3457,7 +3494,7 @@ country_event = {
 		custom_tooltip = "shroud.unknown.chances.medium"
 		hidden_effect = {
 			random_list = {
-				60 = { 
+				60 = {
 					modifier = {
 						factor = 1.5
 						has_country_flag = jaunted_traveler_secret_revealed
@@ -3917,7 +3954,7 @@ country_event = {
 				}
 			}
 			save_event_target_as = leader_3
-			set_leader_flag = high_psi 
+			set_leader_flag = high_psi
 		}
 	}
 
@@ -5087,6 +5124,10 @@ country_event = {
 			}
 			2 = {
 				modifier = {
+					factor = 0
+					has_global_flag = no_end_of_cycle
+				}
+				modifier = {
 					factor = 5
 					any_country = {
 						NOT = { is_same_value = ROOT }
@@ -5269,7 +5310,7 @@ country_event = {
 		}
 	}
 	option = { #Tradition Covenant
-		name = "utopia.3305.a" 
+		name = "utopia.3305.a"
 		trigger = {
 			has_country_flag = tradition_covenant
 		}
@@ -5352,7 +5393,7 @@ country_event = {
 						is_sapient = yes
 						is_robot_pop = no
 					}
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 			}
 			set_variable = {
@@ -5385,7 +5426,7 @@ country_event = {
 						is_sapient = yes
 						is_robot_pop = no
 					}
-					kill_pop = yes
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 				}
 			}
 			if = {
@@ -5632,6 +5673,10 @@ country_event = {
 
 	is_triggered_only = yes
 
+	trigger = {
+		NOT = { has_global_flag = no_end_of_cycle }
+	}
+
 	desc = {
 		text = "utopia.3320.desc.a"
 		trigger = { has_country_flag = exile_world }
@@ -5685,7 +5730,7 @@ country_event = {
 		}
 
 		every_subject = {
-			set_subject_of = {
+			set_subject_of_stu = {
 				who = none
 			}
 		}
@@ -5875,12 +5920,12 @@ country_event = {
 				}
 				change_pc = pc_ringworld_habitable_damaged
 				clear_planet_modifiers = yes
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 			}
 			else = {
 				change_pc = pc_shrouded
 				clear_planet_modifiers = yes
-				clear_deposits = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect
 			}
 		}
 
@@ -6194,12 +6239,12 @@ planet_event = {
 			}
 			change_pc = pc_ringworld_habitable_damaged
 			clear_planet_modifiers = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 		else = {
 			change_pc = pc_shrouded
 			clear_planet_modifiers = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 		}
 	}
 
@@ -6270,7 +6315,7 @@ country_event = {
 				30 = { country_event = { id = utopia.3336 } }	# Pops devoured
 				15 = { country_event = { id = utopia.3343 } }	# Part of Planet devoured
 				10 = { country_event = { id = utopia.3337 } }	# Planet devoured
-				
+
 			}
 		}
 		if = {
@@ -6411,7 +6456,7 @@ country_event = {
 				}
 			}
 			random_owned_pop = {
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 		}
 	}
@@ -6462,7 +6507,7 @@ country_event = {
 				}
 			}
 			random_owned_pop = {
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 		}
 	}
@@ -6495,7 +6540,7 @@ country_event = {
 
 	immediate = {
 		ordered_owned_leader = {
-			limit = { 
+			limit = {
 				NOT = { has_leader_flag = leader_death_events_blocked }
 			}
 			position = 0
@@ -6507,7 +6552,7 @@ country_event = {
 
 	option = {
 		name = "utopia.3335.opt.a"
-		
+
 	}
 }
 
@@ -6543,13 +6588,13 @@ country_event = {
 			}
 			save_event_target_as = planet_target
 			random_owned_pop = {
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 			random_owned_pop = {
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 			random_owned_pop = {
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 		}
 	}
@@ -6605,7 +6650,7 @@ country_event = {
 			save_event_target_as = planet_target
 			change_pc = pc_shrouded
 			clear_planet_modifiers = yes
-			clear_deposits = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect
 			if = {
 				limit = { has_orbital_station = yes }
 				orbital_station = {
@@ -6706,7 +6751,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = exotic_gases
 						value < 5
 					}
@@ -6716,7 +6761,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = rare_crystals
 						value < 5
 					}
@@ -6726,7 +6771,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = volatile_motes
 						value < 5
 					}
@@ -6736,7 +6781,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = sr_zro
 						value < 1
 					}
@@ -6746,7 +6791,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = sr_dark_matter
 						value < 1
 					}
@@ -6756,7 +6801,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = sr_living_metal
 						value < 1
 					}
@@ -6766,7 +6811,7 @@ country_event = {
 			10 = {
 				modifier = {
 					factor = 0
-					has_monthly_income = { 
+					has_monthly_income = {
 						resource = nanites
 						value < 1
 					}
@@ -6853,7 +6898,7 @@ country_event = {
 
 	option = {
 		name = "utopia.3342.opt.a"
-		
+
 	}
 }
 
@@ -6889,7 +6934,7 @@ country_event = {
 			}
 			save_event_target_as = planet_target
 			random_owned_pop = {
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 		}
 	}
@@ -6906,7 +6951,7 @@ country_event = {
 }
 
 #Instrument - flag cleanup event
-country_event = { 
+country_event = {
 	id = utopia.3344
 	hide_window = yes
 
@@ -7044,9 +7089,9 @@ country_event = {
 			# Either you've not Imperial and have a Chosen One
 			AND = {
 				OR = {
-					has_authority_democratic = yes # undercoat: moved to scripted trigger
-					has_authority_oligarchic = yes # undercoat: moved to scripted trigger
-					has_authority_dictatorial = yes # undercoat: moved to scripted trigger
+					is_democratic_authority = yes
+					is_oligarchic_authority = yes
+					is_dictatorial_authority = yes
 					# MegaCorps deliberately excluded.
 				}
 				any_owned_leader = {
@@ -7055,7 +7100,7 @@ country_event = {
 			}
 			# Or you're Imperial and the Chosen One is your current ruler or heir.
 			AND = {
-				has_authority_imperial = yes # undercoat: moved to scripted trigger
+				is_imperial_authority = yes
 				any_owned_leader = {
 					has_chosen_one_leader_trait = yes
 					has_trait = trait_imperial_heir
@@ -7073,9 +7118,9 @@ country_event = {
 		if = {
 			limit = {
 				OR = {
-					has_authority_democratic = yes # undercoat: moved to scripted trigger
-					has_authority_oligarchic = yes # undercoat: moved to scripted trigger
-					has_authority_dictatorial = yes # undercoat: moved to scripted trigger
+					is_democratic_authority = yes
+					is_oligarchic_authority = yes
+					is_dictatorial_authority = yes
 					# MegaCorps deliberately excluded.
 				}
 			}

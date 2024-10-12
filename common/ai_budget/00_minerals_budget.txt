@@ -172,9 +172,10 @@ minerals_expenditure_colonies_lithoid_expand = {
 	category = colonies
 
 	potential = {
-		is_machine_empire = no
+		is_robot_empire = no
 		is_lithoid_empire = yes
-		ai_colonize_plans > 0
+		is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
+		has_resource = { type = minerals amount > 400 }
 		has_monthly_income = {
 			resource = minerals
 			value > 0
@@ -186,11 +187,33 @@ minerals_expenditure_colonies_lithoid_expand = {
 	}
 
 	desired_min = {
-		base = 200
+		base = 0
+		modifier = {
+			add = @colony_cost_base
+			is_hive_empire = no
+		}
+		modifier = {
+			add = @colony_cost_high
+			OR = {
+				is_hive_empire = yes
+				is_calamitous_birth_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
 	}
 
 	desired_max = {
-		base = 550
+		base = 0
+		modifier = {
+			add = @colony_cost_base_max
+			is_hive_empire = no
+		}
+		modifier = {
+			add = @colony_cost_high_max
+			OR = {
+				is_hive_empire = yes
+				is_calamitous_birth_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
 	}
 }
 
@@ -403,7 +426,7 @@ minerals_upkeep_country = {
 	potential = {
 		always = yes
 	}
-	
+
 	weight = {
 		weight = 0.1
 	}

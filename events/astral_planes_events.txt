@@ -332,7 +332,7 @@ country_event = {
 				if = {
 					limit = {
 						NOT = { has_astral_rift_flag = description_machine_consciousness }
-						explorer = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+						explorer = { is_machine_empire = yes }
 					}
 					set_astral_rift_flag = description_machine_consciousness
 				}
@@ -341,7 +341,7 @@ country_event = {
 				if = {
 					limit = {
 						NOT = { has_astral_rift_flag = description_hive_mind }
-						explorer = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+						explorer = { is_hive_empire = yes }
 					}
 					set_astral_rift_flag = description_hive_mind
 				}
@@ -447,7 +447,10 @@ country_event = {
 				limit = {
 					NOT = { has_astral_rift_flag = description_aquatic }
 					leader.species = {
-						has_trait = trait_aquatic
+						OR = {
+							has_trait = trait_aquatic
+							has_trait = trait_robot_aquatic
+						}
 					}
 				}
 				set_astral_rift_flag = description_aquatic
@@ -1129,7 +1132,10 @@ country_event = {
 	trigger = {
 		has_astral_planes_dlc = yes
 		last_increased_tech = "tech_astral_harvesting"
-		is_riftworld_empire = no # undercoat: moved to scripted trigger
+		NOR = {
+			is_riftworld_empire = yes # undercoat: moved to scripted trigger
+			has_country_flag = cosmogenesis_empire_has_won
+		}
 	}
 
 	option = {
@@ -2483,7 +2489,7 @@ country_event = {
 			}
 		}
 		event_target:formless_country = {
-			set_subject_of = {
+			set_subject_of_stu = {
 				who = root
 				preset = preset_luminarium
 			}
@@ -3550,6 +3556,41 @@ event = {
 	}
 }
 
+# Eternal Throne Effect - species modification complete
+event = {
+	id = astral_planes.5120
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		owner = { has_relic = r_eternal_throne }
+		OR = {
+			any_owned_leader = {
+				is_immortal = no
+			}
+			any_pool_leader = {
+				is_immortal = no
+			}
+		}
+	}
+
+	immediate = {
+		every_owned_leader = {
+			limit = {
+				is_immortal = no
+			}
+			set_immortal = yes
+		}
+		every_pool_leader = {
+			limit = {
+				is_immortal = no
+			}
+			set_immortal = yes
+		}
+	}
+}
+
 ####################
 # Anomalies - 6000 #
 ####################
@@ -4303,7 +4344,7 @@ planet_event = {
 	option = {
 		name = astral_planes.6045.a
 		random_owned_pop = {
-			kill_pop = yes
+			kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 		}
 		hidden_effect = {
 			planet_event = {
@@ -4752,6 +4793,184 @@ ship_event = {
 				value = @tier2materialreward
 				min = @tier2materialmin
 				max = @tier2materialmax
+			}
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.6095
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		species = { NOT = { species_portrait = fun12 } }
+		NOT = {
+			any_playable_country = {
+				has_country_flag = prescripted_blorg
+			}
+		}
+		NOT = {
+			has_global_flag = mercedes_spawned
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				is_ai = yes
+			}
+			random_list = {
+				1 = {
+					set_global_flag = mercedes_spawned
+					country_event = { id = astral_planes.6100 days = 1 }
+				}
+				20 = {}
+			}
+		}
+		else = {
+			set_global_flag = mercedes_spawned
+			country_event = { id = astral_planes.6100 days = 1 }
+		}
+	}
+}
+
+country_event = {
+	id = astral_planes.6100
+	title = astral_planes.6100.name
+	desc = astral_planes.6100.desc
+	picture = GFX_evt_ship_travel
+	show_sound = event_alien_signal
+	location = fromfrom
+	is_triggered_only = yes
+
+	option = {
+		name = ONSCREEN
+		country_event = { id = astral_planes.6105 }
+	}
+	option = {
+		name = astral_planes.6100.b
+	}
+	option = {
+		exclusive_trigger = {
+			is_homicidal = yes
+		}
+		name = astral_planes.6100.c
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+
+}
+
+country_event = { # Mercedes
+	id = astral_planes.6105
+	title = "NAME_Mercedes"
+	desc = {
+		trigger = {
+			is_human_species = no
+		}
+		text = "astral_planes.6105.desc.reg"
+	}
+	desc = {
+		trigger = {
+			is_human_species = yes
+		}
+		text = "astral_planes.6105.desc.human"
+	}
+	show_sound = cute_fungoid_greetings
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+	notification_event_icon = "GFX_message_leader_recruitment_nasuz"
+
+	immediate = {
+		create_species = {
+			name = "PRESCRIPTED_species_name_blorg"
+			plural = "PRESCRIPTED_species_plural_blorg"
+			adjective = "PRESCRIPTED_species_adjective_blorg"
+			class = FUN
+			portrait = fun12
+			gender = indeterminable
+			traits = {
+				ideal_planet_class = capital_scope
+				trait = "trait_repugnant"
+				trait = "trait_solitary"
+				trait = "trait_venerable"
+				trait = "trait_nomadic"
+			}
+		}
+		create_leader = {
+			species = last_created_species
+			name = "NAME_Mercedes"
+			custom_description = "Mercedes_DESC"
+			class = official
+			gender = indeterminable
+			event_leader = no # Leader is allowed to lead factions and win elections
+			background_ethic = ethic_fanatic_xenophile
+			skill = 4
+			skip_background_generation = yes
+			background_ethic = ethic_xenophile
+			custom_catch_phrase = mercedes_catch_phrase
+			randomize_traits = no
+			immortal = yes
+			hide_age = no
+			traits = {
+				trait = leader_trait_blorg_insight
+				trait = subclass_official_diplomacy_councilor
+				trait = leader_trait_ambassador_ear_to_the_ground_2
+				trait = leader_trait_ambassador_favor_maker_2
+			}
+			effect = {
+				save_event_target_as = mercedes_leader
+			}
+		}
+		last_created_leader = {
+			set_leader_flag = renowned_leader
+			set_leader_flag = is_in_recruit_window
+			set_age = 206
+		}
+		event_target:mercedes_leader = {
+			set_owner = root
+			exile_leader_as = mercedes_leader
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:mercedes_leader
+		room = ethic_spaceship_room
+	}
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+	}
+	option = {
+		name = astral_planes.6105.a
+		response_text = astral_planes.6105.a.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = astral_planes.6105.b
+		response_text = astral_planes.6105.b.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = astral_planes.6105.c
+		response_text = astral_planes.6105.c.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = HIRE
+		tag = hire_leader
+		custom_tooltip = astral_planes.6105.hire_custom_tooltip
+		hidden_effect = {
+			hire_event_leader_effect = {
+				LEADER = mercedes_leader
 			}
 		}
 	}

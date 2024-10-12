@@ -1,4 +1,4 @@
-﻿#  First Contact
+#  First Contact
 #  -----------------------
 #
 #  The First Contact process starts whenever two empires meet for the first time. 

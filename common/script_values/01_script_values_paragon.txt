@@ -120,7 +120,7 @@ leader_class_government_match_bonus_mult = {
 		mult = 1.2
 		OR = {
 			AND = { # COMMANDER good.
-				leader_class = commander
+				leader_is_commander_stu = yes
 				owner = {
 					OR = {
 						has_government = gov_star_empire
@@ -137,11 +137,16 @@ leader_class_government_match_bonus_mult = {
 						has_government = gov_bandit_commune
 						has_government = gov_band_blood
 						has_government = gov_defensive_union
+						has_government = gov_cyber_dictatorial_individualist
+						has_government = gov_cyber_dictatorial_collectivist
+						has_government = gov_synth_democracy_virtual
+						has_government = gov_synth_imperial_physical
+						has_government = gov_synth_imperial_virtual
 					}
 				}
 			}
 			AND = { # SCIENTIST good.
-				leader_class = scientist
+				leader_is_scientist_stu = yes
 				owner = {
 					OR = {
 						has_government = gov_irenic_monarchy
@@ -153,11 +158,14 @@ leader_class_government_match_bonus_mult = {
 						has_government = gov_science_directorate
 						has_government = gov_rational_consensus
 						has_government = gov_dimensional_covenant
+						has_government = gov_cyber_oligarchy_individualist
+						has_government = gov_cyber_corporate_collectivist
+						has_government = gov_synth_corporate_physical
 					}
 				}
 			}
 			AND = { # OFFICIAL good.
-				leader_class = official
+				leader_is_official_stu = yes
 				owner = {
 					OR = {
 						has_government = gov_theocratic_monarchy
@@ -183,6 +191,18 @@ leader_class_government_match_bonus_mult = {
 						has_government = gov_grim_council
 						has_government = gov_band_blood
 						has_government = gov_sacrificial_megachurch
+						has_government = gov_cyber_democracy_individualist
+						has_government = gov_cyber_democracy_collectivist
+						has_government = gov_cyber_oligarchy_collectivist
+						has_government = gov_cyber_imperial_individualist
+						has_government = gov_cyber_imperial_collectivist
+						has_government = gov_cyber_corporate_individualist
+						has_government = gov_synth_democracy_physical
+						has_government = gov_synth_oligarchy_physical
+						has_government = gov_synth_oligarchy_virtual
+						has_government = gov_synth_dictatorship_physical
+						has_government = gov_synth_dictatorship_virtual
+						has_government = gov_synth_corporate_virtual
 					}
 				}
 			}
@@ -374,7 +394,30 @@ country_salvage_ships_from_debris_chance = {
 	}
 }
 
-agenda_gestalt_purge_traits_exp_change_total = {
+country_num_unlockable_council_slots = {
+	# How many Civics do we have.
+	add = trigger:has_total_civic_points
+	subtract = trigger:has_unused_civic_points
+
+	# Exclude Galactic Sovereign which doesn't add a Councilor position.
+	modifier = {
+		OR = {
+			has_civic = civic_galactic_sovereign
+			has_civic = civic_galactic_sovereign_megacorp
+			has_civic = civic_psionic_sovereign
+		}
+		subtract = 1
+	}
+
+	# We only support unlocking 3 positions, even if we have more normal civics for some reason.
+	max = @max_unlocked_council_positions
+
+	# Subtract how many we've already unlocked.
+	subtract = trigger:has_unlocked_council_positions
+	min = 0
+}
+
+purge_traits_exp_change_total = {
 	base = @agenda_gestalt_purge_traits_exp_change
 	complex_trigger_modifier = {
 		trigger = num_leader_traits
@@ -382,8 +425,14 @@ agenda_gestalt_purge_traits_exp_change_total = {
 			negative = yes
 			count_tiers = no	# Only costs Exp per TRAIT, ignoring Tiers.
 		}
-		mode = add
+		mode = mult
 	}
+	min = value:current_leader_experience
+}
+
+current_leader_experience = {
+	add = trigger:has_experience
+	mult = -1
 }
 
 leader_num_negative_leader_trait_tiers = {
@@ -440,7 +489,20 @@ country_assigned_priests = {
 		}
 		mode = add
 	}
-
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = technophant
+		}
+		mode = add
+	}
+	complex_trigger_modifier = {
+		trigger = num_assigned_jobs
+		parameters = {
+			job = haruspex
+		}
+		mode = add
+	}
 	complex_trigger_modifier = {
 		trigger = num_assigned_jobs
 		parameters = {
@@ -910,7 +972,7 @@ heir_class_weight_commander = {
 		owner = {
 			has_philosopher_king = yes # undercoat: moved to scripted trigger
 			ruler = {
-				leader_class = commander
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -936,7 +998,7 @@ heir_class_weight_official = {
 		owner = {
 			has_philosopher_king = yes # undercoat: moved to scripted trigger
 			ruler = {
-				leader_class = official
+				leader_is_official_stu = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -961,7 +1023,7 @@ heir_class_weight_scientist = {
 		owner = {
 			has_philosopher_king = yes # undercoat: moved to scripted trigger
 			ruler = {
-				leader_class = scientist
+				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 			}
 		}
 	}
@@ -1070,18 +1132,18 @@ restored_node_skill = {
 		add = owner.modifier:leader_initial_skill
 	}
 	modifier = {
-		leader_class = commander
+		leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 		exists = owner
 		add = owner.modifier:commander_initial_skill
 	}
 
 	modifier = {
-		leader_class = official
+		leader_is_official_stu = yes # undercoat: moved to scripted trigger
 		exists = owner
 		add = owner.modifier:official_initial_skill
 	}
 	modifier = {
-		leader_class = scientist
+		leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 		exists = owner
 		add = owner.modifier:scientist_initial_skill
 	}

@@ -2,7 +2,9 @@ triggered_planet_modifier = {
 	potential = {
 		exists = owner
 		owner = {
-			has_authority_imperial = yes # undercoat: moved to scripted trigger
+			is_imperial_authority = yes
+			is_cyber_imperial = no
+			is_synth_imperial = no
 			capital_scope.solar_system = {
 				is_same_value = ROOT.solar_system
 			}
@@ -18,4 +20,144 @@ inline_script = {
 	desc = 0
 	trigger = " "
 	mult_line = "mult = modifier:job_soldier_or_warrior_add"
+}
+
+# Cyber Organ Harvesting
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_active_tradition = tr_cybernetics_organ_harvesting }
+		has_current_purge = yes
+		exists = growing_species
+		growing_species = {
+			OR = {
+				has_trait = trait_cybernetic
+				has_trait = trait_cyborg_ritualistic_implants
+			}
+		}
+	}
+	pop_growth_speed = 0.10
+}
+
+# Cyber Implant Taxes
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_modifier = cyber_implant_taxes }
+		exists = growing_species
+		growing_species = {
+			species = { has_trait = trait_cybernetic }
+		}
+	}
+	planet_augmentors_upkeep_mult = 0.10
+}
+
+# Cyber Imperial Collectivist
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = {
+			is_cyber_imperial = yes
+			NOT = { has_edict = neurocasted_spectacles }
+		}
+		OR = {
+			NOT = { exists = sector }
+			AND = {
+				exists = sector
+				NOT = {
+					sector = { has_sector_type = core_sector }
+				}
+			}
+		}
+	}
+	pop_happiness = -0.1
+}
+
+# Cyber Imperial Collectivist
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = {
+			is_cyber_imperial = yes
+			has_edict = neurocasted_spectacles
+			capital_scope = {
+				NOT = { is_same_value = ROOT }
+			}
+		}
+	}
+	pop_happiness = 0.1
+}
+
+# Synthetic Identity Policy: Identity Fusion
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_policy_flag = identity_fusion }
+		assembling_species = { is_robotic_species = yes }
+	}
+	planet_pop_assemblers_upkeep_mult = 0.10
+}
+
+# Synthetic Identity Policy: Identity Initialization
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_policy_flag = identity_initialization }
+		assembling_species = { is_robotic_species = yes }
+	}
+	planet_pop_assemblers_upkeep_mult = 0.20
+}
+# Synthetic Physical District Upkeep
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = {
+			has_auth_synth_democratic_physical = yes # undercoat: moved to scripted trigger
+		}
+	}
+	key = auth_synth_democratic_physical
+	planet_districts_energy_upkeep_mult = 0.01
+	mult = value:count_any_districts
+}
+
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_active_tradition = tr_virtuality_5 }
+		has_planetary_ascension_tier >= 1
+	}
+	planet_max_districts_add = 1
+}
+
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_active_tradition = tr_virtuality_5 }
+		has_planetary_ascension_tier >= 5
+	}
+	planet_max_districts_add = 1
+}
+
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { has_active_tradition = tr_virtuality_5 }
+		has_planetary_ascension_tier >= 10
+	}
+	planet_max_districts_add = 1
+}
+
+# prefabricated components
+# +1 Replicator
+inline_script = {
+	script = jobs/triggered/roboticists_add
+	AMOUNT = 1
+	desc = 0
+	mult_line = " "
+	trigger = "
+		owner = {
+			is_gestalt = yes
+			has_active_tradition = tr_synthetics_prefabricated_components_machine
+		}
+	"
 }

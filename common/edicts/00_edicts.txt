@@ -1488,7 +1488,7 @@ zro_crystal_machine = {
 
 	modifier = {
 		species_leader_exp_gain = 0.25
-		custom_tooltip = edict_zro_crystal_machine_effect
+		leader_lifespan_add = 30
 	}
 
 	ai_weight = {
@@ -1890,5 +1890,137 @@ dimensional_artificing = {
 
 	modifier = {
 		custom_tooltip = edict_dimensional_artificing_tooltip
+	}
+}
+
+storm_attraction_field = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		cost = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+	}
+
+	allow = {
+		NOT = {
+			has_edict = storm_repel_field
+		}
+	}
+
+	modifier = {
+		country_storm_attraction_influence_add = 0.15
+	}
+
+	prerequisites = {
+		"tech_storm_manipulation"
+	}
+
+	ai_weight = {
+		weight = 0
+		modifier = {
+			set = @EdictMedPrio
+			OR = {
+				has_storm_attraction_civic = yes
+				is_storm_chasers_empire = yes #undercoat: moved to scripted trigger
+			}
+		}	
+	}
+}
+
+storm_repel_field = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		cost = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+	}
+	
+	allow = {
+		NOT = {
+			has_edict = storm_attraction_field
+		}
+	}
+
+	modifier = {
+		country_storm_repulsion_influence_add = 0.15
+	}
+
+	prerequisites = {
+		"tech_storm_manipulation"
+	}
+	
+	ai_weight = {
+		weight = @EdictLowPrio
+		modifier = {
+			set = @EdictMedPrio
+			AND = {
+				num_cosmic_storms_encountered >= 1
+				num_storm_exploitation_buildings < 3
+			}
+		}	
+	}
+}
+
+auto_hunker_down = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		cost = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+	}
+
+	effect = {
+		custom_tooltip = edict_auto_hunker_down_tt
+		every_planet_within_border = {
+			limit = {
+				solar_system = {
+					has_star_flag = storm_system
+				}
+			}
+			select_decision = {
+				name = decision_hunker_down
+			}
+		}
+	}
+
+	on_disabled = {
+		every_planet_within_border = {
+			limit = {
+				solar_system = {
+					has_star_flag = storm_system
+				}
+			}
+			select_decision = {
+				name = decision_stop_hunker_down
+			}
+		}
+	}
+
+	prerequisites = {
+		"tech_advanced_industrial_storm_protection"
 	}
 }

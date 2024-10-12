@@ -17,7 +17,7 @@ situation_event = {
 		owner = {
 			is_country_type = fallen_empire
 			is_at_war = no
-			fleet_power < 5000
+			fleet_power < 100000
 			NOT = { has_country_flag = fallen_empire_fleet_spawn }
 		}
 	}
@@ -49,7 +49,7 @@ country_event = {
 	trigger = {
 		from = {
 			is_country_type = fallen_empire
-			is_machine_empire = no # undercoat: moved to scripted trigger
+			is_machine_empire = no
 		}
 		is_gestalt = no # undercoat: moved to scripted trigger
 		exists = ruler
@@ -83,7 +83,7 @@ situation_event = {
 			is_at_war = no
 			NOT = { has_country_flag = fallen_empire_lost_war }
 			NOT = { has_country_flag = fallen_empire_sent_warning }
-			fleet_power > 20000
+			fleet_power > 100000
 			any_playable_country = {
 				is_playable = yes # undercoat: moved to scripted trigger
 				has_communications = root.owner
@@ -159,7 +159,12 @@ situation_event = {
 
 			# Demand - prostrate yourself, mere mortal!
 			else_if = {
-				limit = { NOT = { has_modifier = humiliated } }
+				limit = {
+					NOR = {
+						has_modifier = humiliated
+						has_modifier = humiliated_cosmogenesis
+					}
+				}
 				country_event = { id = fallen_empires.8 scopes = { from = root.owner } }
 			}
 		}
@@ -188,7 +193,7 @@ country_event = {
 			factor = 90
 			modifier = {
 				factor = 0
-				fleet_power > 100000
+				fleet_power > 300000
 			}
 		}
 		from = { save_event_target_as = fallen_empire_humiliator }
@@ -232,7 +237,7 @@ country_event = {
 			factor = 90
 			modifier = {
 				factor = 0
-				fleet_power > 100000
+				fleet_power > 300000
 			}
 		}
 		allow = {
@@ -283,7 +288,7 @@ country_event = {
 			factor = 90
 			modifier = {
 				factor = 0
-				fleet_power > 100000
+				fleet_power > 300000
 			}
 		}
 		custom_tooltip = fallen_empires.6.a.tooltip
@@ -328,7 +333,7 @@ country_event = {
 			factor = 90
 			modifier = {
 				factor = 0
-				fleet_power > 100000
+				fleet_power > 300000
 			}
 		}
 		from = { save_event_target_as = fallen_empire_humiliator }
@@ -376,14 +381,25 @@ country_event = {
 			factor = 90
 			modifier = {
 				factor = 0
-				fleet_power > 100000
+				fleet_power > 300000
 			}
 		}
 		fallen_empire_humiliate_effect = yes
 		from = { save_event_target_as = fallen_empire_humiliator }
-		tooltip = {
-			add_modifier = { modifier = humiliated days = 3600 }
+		if = {
+			limit = {
+				has_ascension_perk = ap_cosmogenesis
+			}
+			tooltip = {
+				add_modifier = { modifier = humiliated_cosmogenesis days = 3600 }
+			}
 		}
+		else = {
+			tooltip = {
+				add_modifier = { modifier = humiliated days = 3600 }
+			}
+		}
+
 		custom_tooltip = "fallen_empires.8.a.tooltip"
 		hidden_effect = { remove_country_flag = fe_demand_made }
 	}
@@ -567,7 +583,7 @@ situation_event = {
 						}
 						if = {
 							limit = {
-								root.owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+								root.owner = { is_machine_empire = yes }
 							}
 							create_ship = {
 								name = random

@@ -12,11 +12,22 @@ building_military_academy = {
 	potential = {
 		exists = owner
 		owner = { has_reanimated_armies = no } # undercoat: moved to scripted trigger
-		NOT = { has_modifier = resort_colony }
+		NOR = { 
+			has_modifier = resort_colony 
+			has_modifier = penal_colony 
+		}
 	}
 
 	allow = {
-		has_major_upgraded_capital = yes
+		OR = {
+			has_major_upgraded_capital = yes
+			AND = {
+				exists = owner
+				owner = {
+					is_tactical_algorithms_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
 	}
 
 	country_modifier = {
@@ -43,14 +54,52 @@ building_military_academy = {
 		}
 	}
 
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tactical_algorithms_empire = yes } # undercoat: moved to scripted trigger
+
+		}
+		ship_evasion_mult = 0.02
+		ship_tracking_mult = 0.01
+		ship_shield_penetration_add = 0.05
+		ship_armor_penetration_add = 0.05
+		mult = owner.value:tactical_algorithms_scaling_mult
+	}
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tactical_algorithms_empire = yes } # undercoat: moved to scripted trigger
+
+		}
+		ship_shield_hardening_add = 0.1
+		mult = owner.value:tactical_algorithms_enclave_scaling_mult
+	}
+
 	resources = {
 		category = planet_buildings
 		cost = {
 			minerals = @b2_minerals
+		}
+		cost = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_tactical_algorithms_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			volatile_motes = @b2_rare_cost
 		}
 		upkeep = {
 			energy = @b2_upkeep
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_tactical_algorithms_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			volatile_motes = @b2_rare_upkeep
 		}
 	}
@@ -191,7 +240,6 @@ building_planetary_shield_generator = {
 
 	allow = {
 		has_upgraded_capital = yes
-		hidden_trigger = { owner = { is_ai = no } }
 		if = {
 			limit = {
 				exists = orbital_defence
@@ -209,12 +257,38 @@ building_planetary_shield_generator = {
 	}
 
 	destroy_trigger = {
-		exists = owner
-		owner = { is_ai = yes }
 	}
 
 	planet_modifier = {
 		planet_orbital_bombardment_damage = -0.5
+	}
+	triggered_planet_modifier = {
+		potential = { has_cosmic_storms_dlc = yes }
+		planet_storm_devastation_mult = -0.5
+	}
+
+	inline_script = {
+		script = cosmic_storms/StormBuildingModifiers
+	}
+
+	on_built = {
+		if = {
+			limit = { has_cosmic_storms_dlc = yes }
+			solar_system = {
+				set_star_flag = storm_no_negative_effects
+				remove_modifier = storm_base_modifier
+			}
+		}
+	}
+
+	on_destroy = {
+		if = {
+			limit = { has_cosmic_storms_dlc = yes }
+			owner = { set_country_flag = shield_on_destroy } #an action when destroyed
+			solar_system = {
+				remove_star_flag = storm_no_negative_effects
+			}
+		}
 	}
 
 	resources = {
@@ -229,5 +303,18 @@ building_planetary_shield_generator = {
 
 	prerequisites = {
 		"tech_planetary_shield_generator"
+	}
+
+	custom_storm_ai_weight = {
+		weight = 5
+		modifier = {
+			factor = 5
+			AND = {
+				exists = owner
+				solar_system = {
+					owner = { num_cosmic_storms_encountered >=2 }
+				}
+			}
+		}
 	}
 }

@@ -64,7 +64,7 @@ country_event = {
 	id = paragon.102
 	title = paragon.102.name
 	desc = paragon.102.desc
-	picture = GFX_evt_alien_cavemen # PARAGON TO DO: Paragon art
+	picture = GFX_evt_alien_cavemen
 	show_sound = event_default
 	location = event_target:beholder_planet
 	is_triggered_only = yes
@@ -99,7 +99,7 @@ ship_event = {
 	id = paragon.3
 	title = paragon.3.name
 	desc = paragon.3.desc
-	picture = GFX_evt_alien_cavemen # PARAGON TO DO: Paragon art
+	picture = GFX_evt_alien_cavemen
 	show_sound = event_default
 	location = from
 	is_triggered_only = yes
@@ -741,7 +741,7 @@ planet_event = {
 				remove_trait = leader_trait_cautious
 				remove_trait = leader_trait_psionic
 				remove_trait = subclass_commander_admiral
-				change_leader_class = official
+				change_leader_class = official # undercoat: moved to scripted trigger
 				add_trait_no_notify = subclass_official_governor
 				add_trait_no_notify = leader_trait_governor_psionic_communion
 				add_trait_no_notify = leader_trait_mediator
@@ -1654,6 +1654,7 @@ country_event = {
 						effect = {
 							set_ship_flag = is_azaryn_ship
 							save_global_event_target_as = azaryn_ship
+							set_ship_flag = special_science_ship
 						}
 					}
 					set_fleet_stance = evasive
@@ -2425,7 +2426,7 @@ country_event = {
 			count = 5
 			random_owned_pop = {
 				limit = { planet = { is_same_value = event_target:nucleus_building_planet } }
-				kill_pop = yes
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 		}
 		event_target:nucleus_building_planet = {
@@ -2727,7 +2728,7 @@ country_event = {
 	immediate = {
 		if = {
 			limit = {
-				has_authority_democratic = yes # undercoat: moved to scripted trigger
+				is_democratic_authority = yes
 				exists = ruler
 				ruler = {
 					NOT = {
@@ -2763,7 +2764,7 @@ country_event = {
 		exists = from
 		from = {
 			is_pool_leader = no
-			NOT = { leader_class = envoy }
+			leader_is_envoy_stu = no # undercoat: moved to scripted trigger
 			leader_years_of_service >= 2
 			NOT = {
 				has_leader_flag = leader_death_events_blocked
@@ -3124,6 +3125,7 @@ country_event = {
 							species = {
 								NOR = {
 									is_flora_species = yes # undercoat: moved to scripted trigger
+									
 									is_species_class = PRE_PLANT
 									is_species_class = PRE_FUN
 								}
@@ -3345,7 +3347,7 @@ country_event = {
 	option = {
 		name = paragon.550.l
 		trigger = {
-			is_megacorp = yes # undercoat: moved to scripted trigger
+			is_megacorp = yes
 		}
 
 		inline_script = {
@@ -3718,7 +3720,7 @@ country_event = {
 	show_sound = event_power_down
 	is_triggered_only = yes
 
-	trigger = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+	trigger = { is_machine_empire = yes }
 
 	after = {
 		# Clean up the clone since we aren't using it anymore
@@ -3745,7 +3747,7 @@ country_event = {
 	show_sound = event_life_support_fail
 	is_triggered_only = yes
 
-	trigger = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+	trigger = { is_hive_empire = yes }
 
 	after = {
 		# Clean up the clone since we aren't using it anymore
@@ -3847,7 +3849,10 @@ country_event = {
 	hide_window = yes
 	trigger = {
 		is_gestalt = yes
-		is_empire = yes # undercoat: moved to scripted trigger
+		OR = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_country_type = fallen_empire
+		}
 		NOR = {
 			has_councilor = {
 				COUNCILOR = councilor_gestalt_growth
@@ -4075,7 +4080,7 @@ leader_event = {
 	fire_only_once = yes
 
 	trigger = {
-		leader_class = scientist
+		leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -4131,7 +4136,7 @@ leader_event = {
 	fire_only_once = yes
 
 	trigger = {
-		leader_class = official
+		leader_is_official_stu = yes # undercoat: moved to scripted trigger
 		NOR = {
 			has_trait_tier1or2 = { TRAIT = leader_trait_corrupt }
 			has_trait_tier1or2 = { TRAIT = leader_trait_embezzler }
@@ -4251,7 +4256,7 @@ leader_event = {
 	fire_only_once = yes
 
 	trigger = {
-		leader_class = scientist
+		leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -4405,11 +4410,11 @@ leader_event = {
 		owner = { is_at_war = yes }
 		OR = {
 			AND = {
-				leader_class = commander
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 				exists = fleet
 			}
 			AND = {
-				leader_class = commander
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 				exists = planet
 			}
 		}

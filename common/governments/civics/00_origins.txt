@@ -195,16 +195,19 @@ origin_mechanists = {
 			}
 		}
 		civics = { NOT = { value = civic_permanent_employment } }
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	modifier = {
 		planet_pop_assembly_mult = 0.15
 		ROBOT_species_trait_picks_add = 1
+		ROBOT_species_trait_points_add = 2
 	}
 
 	description = "origin_tooltip_mechanists_effects"
 
 	advanced_start = yes
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 10
@@ -222,7 +225,18 @@ origin_syncretic_evolution = {
 
 	possible = {
 		ethics = { NOT = { value = ethic_gestalt_consciousness } }
-		civics = { NOT = { value = civic_fanatic_purifiers } }
+		civics = {
+			NOT = {
+				value = civic_fanatic_purifiers
+			}
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
+			}
+		}
 	}
 
 	description = origin_tooltip_syncretic_evolution_effects
@@ -255,15 +269,27 @@ origin_life_seeded = {
 	}
 
 	possible = {
-		authority = { NOT = { value = auth_machine_intelligence } }
 		civics = {
-			NOT = {
+			NOR = {
+				text = civic_tooltip_not_mutagenic
 				value = civic_toxic_baths
+				value = civic_toxic_baths_individual_machine
+				value = civic_corporate_toxic_baths
+				value = civic_corporate_toxic_baths_individual_machine
+				value = civic_hive_toxic_baths
+				value = civic_machine_toxic_baths
 			}
 			NOR = {
 				text = civic_tooltip_not_relentless_industrialists
 				value = civic_relentless_industrialists
 				value = civic_corporate_relentless_industrialists
+			}
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
 			}
 		}
 	}
@@ -272,6 +298,27 @@ origin_life_seeded = {
 	negative_description = "origin_tooltip_life_seeded_negative_effects"
 	random_weight = {
 		base = 5
+	}
+
+	swap_type = {
+		description = "origin_tooltip_life_seeded_effects"
+		negative_description = "origin_tooltip_life_seeded_machine_negative_effects"
+
+		trigger = {
+			OR = {
+				AND = {
+					is_scope_valid = no
+					local_human_species_class = MACHINE
+				}
+				AND = {
+					is_scope_valid = yes
+					OR = {
+						is_individual_machine = yes
+						is_machine_empire = yes
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -306,14 +353,22 @@ origin_post_apocalyptic = {
 		host_has_dlc = "Apocalypse"
 	}
 
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
 	possible = {
-		authority = { NOR = { inline_script = governments/conditions/auth_machine_intelligence } } # undercoat: moved to inline script
+		species_archetype = { NOT = { value = MACHINE } }
 		civics = {
-			NOT = { value = civic_agrarian_idyll }
+			NOT = {
+				value = civic_agrarian_idyll
+			}
 			NOR = {
 				text = civic_tooltip_not_anglers
 				value = civic_anglers
 				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
 			}
 		}
 	}
@@ -323,6 +378,53 @@ origin_post_apocalyptic = {
 	traits = {
 		trait = trait_survivor
 	}
+
+	advanced_start = yes
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 5
+	}
+}
+
+origin_post_apocalyptic_machines = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origins_post_apocalyptic.dds"
+	picture = GFX_origin_post_apocalyptic
+
+	starting_colony = pc_nuked
+
+	playable = {
+		host_has_dlc = "Apocalypse"
+	}
+
+	potential = {
+		species_archetype = { value = MACHINE }
+	}
+
+	possible = {
+		species_archetype = { value = MACHINE }
+		civics = {
+			NOR = {
+				value = civic_agrarian_idyll
+			}
+			NOR = {
+				text = civic_tooltip_not_anglers
+				value = civic_anglers
+				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
+			}
+		}
+	}
+
+	description = "origin_tooltip_post_apocalyptic_machines_effects"
+
+	traits = {
+		trait = trait_robot_survivor
+	}
+
+	flags = { custom_start_screen }
 
 	advanced_start = yes
 
@@ -389,6 +491,8 @@ origin_shattered_ring = {
 				text = civic_tooltip_not_anglers
 				value = civic_anglers
 				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
 			}
 		}
 	}
@@ -431,7 +535,7 @@ origin_void_dwellers = {
 	}
 
 	possible = {
-		authority = { NOR = { inline_script = governments/conditions/auth_machine_intelligence } } # undercoat: moved to inline script
+		species_archetype = { NOT = { value = MACHINE } }
 		civics = {
 			NOR = {
 				text = civic_tooltip_not_idyllic_bloom
@@ -443,11 +547,18 @@ origin_void_dwellers = {
 				text = civic_tooltip_not_anglers
 				value = civic_anglers
 				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
 			}
 		}
 	}
 
 	description = "origin_tooltip_void_dwellers_effects"
+
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
 	modifier = {
 		megastructures_habitat_cost_mult = -0.25
 		habitat_districts_building_slots_add = 0.25
@@ -460,6 +571,62 @@ origin_void_dwellers = {
 	traits = {
 		trait = trait_void_dweller_1
 	}
+
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 3
+	}
+}
+
+origin_void_machines = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origin_void_dwellers.dds"
+	picture = GFX_origin_void_dwellers
+
+	starting_colony = pc_habitat
+	initializers = { void_dweller_system sol_system_void_dweller_system }
+	habitability_preference = pc_habitat
+	preferred_planet_class_neighbor = no
+
+	playable = {
+		host_has_dlc = Federations
+	}
+
+	possible = {
+		species_archetype = { value = MACHINE }
+		civics = {
+			NOT = { value = civic_agrarian_idyll }
+			NOR = {
+				text = civic_tooltip_not_anglers
+				value = civic_anglers
+				value = civic_corporate_anglers
+				value = civic_machine_anglers
+				value = civic_corporate_machine_anglers
+			}
+		}
+	}
+
+	description = "origin_tooltip_void_machines_effects"
+
+	potential = {
+		species_archetype = { value = MACHINE }
+	}
+
+	modifier = {
+		megastructures_habitat_cost_mult = -0.25
+		habitat_districts_building_slots_add = 0.25
+		habitat_max_districts_add = 2
+		habitat_district_jobs_add = 1
+	}
+
+	flags = { custom_start_screen }
+
+	traits = {
+		trait = trait_void_dweller_2
+	}
+
+	negative_description = ORIGIN_REQUIRES_ROBO_MODDING
 
 	random_weight = {
 		base = 3
@@ -487,10 +654,13 @@ origin_scion = {
 		civics = {
 			NOT = { value = civic_pompous_purists }
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = "origin_tooltip_scion_effects"
 	flags = { custom_start_screen }
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 0
@@ -579,6 +749,7 @@ origin_shoulders_of_giants = {
 				value = ethic_gestalt_consciousness
 			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = "origin_tooltips_shoulders_of_giants_effects"
@@ -587,6 +758,8 @@ origin_shoulders_of_giants = {
 
 	traits = {
 	}
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 5
@@ -609,9 +782,18 @@ origin_lithoid = {
 		}
 		civics = {
 			NOR = {
+				text = civic_tooltip_not_catalytic
 				value = civic_catalytic_processing
-				value = civic_hive_catalytic_processing
 				value = civic_corporate_catalytic_processing
+				value = civic_hive_catalytic_processing
+				value = civic_machine_catalytic_processing
+			}
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
 			}
 		}
 	}
@@ -632,6 +814,7 @@ origin_machine = {
 	icon = "gfx/interface/icons/origins/origins_resource_consolidation.dds"
 	picture = GFX_origin_resource_consolidation
 	starting_colony = pc_machine
+	preferred_planet_class_neighbor = no
 	max_once_global = yes
 
 	playable = {
@@ -644,6 +827,7 @@ origin_machine = {
 			NOR = {
 				value = civic_machine_servitor
 				value = civic_machine_catalytic_processing
+				value = civic_machine_guided_sapience
 			}
 		}
 	}
@@ -675,6 +859,7 @@ origin_common_ground = {
 	possible = {
 		ethics = {
 			NOR = {
+				text = civic_tooltip_not_xenophobe
 				value = ethic_xenophobe
 				value = ethic_fanatic_xenophobe
 			}
@@ -682,8 +867,11 @@ origin_common_ground = {
 		civics = {
 			NOR = {
 				value = civic_barbaric_despoilers
-				value = civic_fanatic_purifiers
 				value = civic_inwards_perfection
+			}
+			NOR = {
+				text = civic_tooltip_not_genocidal
+				value = civic_fanatic_purifiers
 				value = civic_hive_devouring_swarm
 				value = civic_machine_terminator
 			}
@@ -712,8 +900,11 @@ origin_common_ground_npc = {
 
 	possible = {
 		civics = {
-			NOR = {
+			NOT = {
 				value = civic_barbaric_despoilers
+			}
+			NOR = {
+				text = civic_tooltip_not_genocidal
 				value = civic_fanatic_purifiers
 				value = civic_hive_devouring_swarm
 				value = civic_machine_terminator
@@ -741,16 +932,23 @@ origin_hegemon = {
 	possible = {
 		ethics = {
 			NOR = {
+				text = civic_tooltip_not_xenophobe
 				value = ethic_xenophobe
 				value = ethic_fanatic_xenophobe
-				value = ethic_egalitarian
-				value = ethic_fanatic_egalitarian
+			}
+			NOR = {
+				text = civic_tooltip_not_egalitarian
+				value = ethic_xenophobe
+				value = ethic_fanatic_xenophobe
 			}
 		}
 		civics = {
-			NOR = {
-				value = civic_fanatic_purifiers
+			NOT = {
 				value = civic_inwards_perfection
+			}
+			NOR = {
+				text = civic_tooltip_not_genocidal
+				value = civic_fanatic_purifiers
 				value = civic_hive_devouring_swarm
 				value = civic_machine_terminator
 			}
@@ -779,9 +977,12 @@ origin_hegemon_npc = {
 
 	possible = {
 		civics = {
-			NOR = {
-				value = civic_fanatic_purifiers
+			NOT = {
 				value = civic_inwards_perfection
+			}
+			NOR = {
+				text = civic_tooltip_not_genocidal
+				value = civic_fanatic_purifiers
 				value = civic_hive_devouring_swarm
 				value = civic_machine_terminator
 			}
@@ -858,22 +1059,31 @@ origin_necrophage = {
 	}
 
 	possible = {
-		authority = { NOR = { inline_script = governments/conditions/auth_machine_intelligence } } # undercoat: moved to inline script
+		authority = {
+			NOR = { inline_script = governments/conditions/auth_machine_intelligence } # undercoat: moved to inline script
+		}
 		ethics = {
 			NOR = {
+				text = civic_tooltip_not_xenophile
 				value = ethic_xenophile
 				value = ethic_fanatic_xenophile
+			}
+			NOR = {
 				value = ethic_fanatic_egalitarian
 			}
 		}
 		civics = {
 			NOR = {
+				text = civic_tooltip_not_death_cult
 				value = civic_death_cult
 				value = civic_death_cult_corporate
+			}
+			NOR = {
 				value = civic_hive_empath
 				value = civic_permanent_employment
 			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = origin_tooltip_necrophage_effects
@@ -888,6 +1098,7 @@ origin_necrophage = {
 	}
 
 	advanced_start = yes
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 5
@@ -909,8 +1120,12 @@ origin_clone_army = {
 			NOT = {	value = ethic_gestalt_consciousness	}
 		}
 		civics = {
-			NOT = { value = civic_permanent_employment }
+			NOR = {
+				value = civic_permanent_employment
+				value = civic_natural_design
+			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = origin_tooltip_clone_army_effects
@@ -920,6 +1135,7 @@ origin_clone_army = {
 	}
 
 	advanced_start = no
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 2
@@ -939,6 +1155,7 @@ origin_here_be_dragons = {
 	possible = {
 		civics = {
 			NOR = {
+				text = civic_tooltip_not_genocidal
 				value = civic_fanatic_purifiers
 				value = civic_hive_devouring_swarm
 				value = civic_machine_terminator
@@ -970,17 +1187,57 @@ origin_ocean_paradise = {
 		has_aquatics = yes
 	}
 
-	possible = {
-		authority = {
-			NOR = { inline_script = governments/conditions/auth_machine_intelligence } # undercoat: moved to inline script
-		}
+	description = origin_ocean_paradise_effects
+
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
-	description = origin_ocean_paradise_effects
+	possible = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
 
 	traits = {
 		trait = trait_aquatic
 	}
+
+	advanced_start = yes
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 5
+	}
+}
+
+origin_ocean_machines = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origins_ocean_paradise.dds"
+	picture = GFX_origin_ocean_paradise
+	flags = { custom_start_screen }
+
+	starting_colony = pc_ocean
+	habitability_preference = pc_ocean
+	initializers = { ocean_paradise_start }
+
+	playable = {
+		has_aquatics = yes
+	}
+
+	description = origin_ocean_machines_effects
+
+	potential = {
+		species_archetype = { value = MACHINE }
+	}
+
+	possible = {
+		species_archetype =  { value = MACHINE }
+	}
+
+	traits = {
+		trait = trait_robot_aquatic
+	}
+
+	negative_description = ORIGIN_REQUIRES_ROBO_MODDING
 
 	advanced_start = yes
 
@@ -1025,18 +1282,21 @@ origin_subterranean = {
 	icon = "gfx/interface/icons/origins/origins_subterranean.dds"
 	picture = GFX_origin_subterranean
 	flags = { custom_start_screen }
-	#set_city_graphical_culture = SUBTERRANEAN
 	playable = {
 		has_overlord_dlc = yes
-	}
-
-	possible = {
-		authority = { NOR = { inline_script = governments/conditions/auth_machine_intelligence } } # undercoat: moved to inline script
 	}
 
 	description = "origin_tooltip_subterranean_effects"
 
 	advanced_start = yes
+
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
+	possible = {
+		species_archetype = { NOT = { value = MACHINE } }
+	}
 
 	traits = {
 		trait = trait_cave_dweller
@@ -1049,12 +1309,56 @@ origin_subterranean = {
 		planet_structures_cost_mult = 0.10
 		planet_structures_upkeep_mult = 0.10
 		planet_building_build_speed_mult = -0.10
+		planet_storm_devastation_mult = -0.25
+	}
+
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 5
+	}
+}
+
+origin_subterranean_machines = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origins_subterranean.dds"
+	picture = GFX_origin_subterranean
+	flags = { custom_start_screen }
+	playable = {
+		has_overlord_dlc = yes
+	}
+
+	description = "origin_tooltip_robot_subterranean_effects"
+
+	advanced_start = yes
+
+	potential = {
+		species_archetype = { value = MACHINE }
+	}
+
+	possible = {
+		species_archetype = { value = MACHINE }
+	}
+
+	traits = {
+		trait = trait_robot_cave_dweller
+	}
+
+	modifier = {
+		mining_district_housing_add = 2
+		mining_district_buildings_add = 0.34
+		planet_orbital_bombardment_damage = -0.75
+		planet_structures_cost_mult = 0.10
+		planet_structures_upkeep_mult = 0.10
+		planet_building_build_speed_mult = -0.10
+		planet_storm_devastation_mult = -0.25
 	}
 
 	random_weight = {
 		base = 5
 	}
 }
+
 origin_star_slingshot = {
 	is_origin = yes
 	icon = "gfx/interface/icons/origins/origins_star_slingshot.dds"
@@ -1100,10 +1404,13 @@ origin_shroudwalker_apprentice = {
 			}
 		}
 		civics = {
-			NOT = {
+			NOR = {
 				value = civic_fanatic_purifiers
+				value = civic_natural_design
+				value = civic_augmentation_bazaars
 			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = "origin_tooltip_shroudwalker_apprentice_effects"
@@ -1112,6 +1419,8 @@ origin_shroudwalker_apprentice = {
 	traits = {
 		trait = trait_latent_psionic
 	}
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 5
@@ -1131,9 +1440,12 @@ origin_imperial_vassal = {
 		civics = {
 			NOR = {
 				value = civic_inwards_perfection
+				value = civic_machine_assimilator
+			}
+			NOR = {
+				text = civic_tooltip_not_genocidal
 				value = civic_fanatic_purifiers
 				value = civic_hive_devouring_swarm
-				value = civic_machine_assimilator
 				value = civic_machine_terminator
 			}
 		}
@@ -1179,7 +1491,17 @@ origin_overtuned = {
 	}
 
 	possible = {
-		authority = { NOR = { inline_script = governments/conditions/auth_machine_intelligence } } # undercoat: moved to inline script
+		authority = {
+			NOR = { inline_script = governments/conditions/auth_machine_intelligence } # undercoat: moved to inline script
+		}
+		civics = {
+			NOR = {
+				text = civic_tooltip_not_natural_design
+				value = civic_natural_design
+				value = civic_hive_natural_design
+			}
+		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = "origin_tooltip_overtuned_effects"
@@ -1189,6 +1511,8 @@ origin_overtuned = {
 #		advanced_gene_modding
 #		add_advanced_traits
 #	}
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 0
@@ -1217,6 +1541,7 @@ origin_toxic_knights = {
 				value = civic_dystopian_society
 			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = origin_toxic_knights_effects
@@ -1224,6 +1549,7 @@ origin_toxic_knights = {
 
 	advanced_start = yes
 	max_once_global = yes
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 2
@@ -1254,13 +1580,19 @@ origin_payback = {
 				value = civic_pompous_purists
 				value = civic_slaver_guilds
 				value = civic_indentured_assets
-				# Or low tech starts
-				value = civic_eager_explorers
-				value = civic_privatized_exploration
 				# Or advanced tech
 				value = civic_private_healthcare_corporate
 			}
+			NOR = {
+				# Or low tech starts
+				text = civic_tooltip_not_eager_explorers
+				value = civic_eager_explorers
+				value = civic_privatized_exploration
+				value = civic_hive_stargazers
+				value = civic_machine_exploration_protocol
+			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	modifier = {
@@ -1272,6 +1604,7 @@ origin_payback = {
 	flags = { custom_start_screen }
 
 	advanced_start = no
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 0
@@ -1310,13 +1643,19 @@ origin_broken_shackles = {
 				value = civic_fanatic_purifiers
 				value = civic_dystopian_society
 				value = civic_selective_kinship
-				# Or low tech starts
-				value = civic_eager_explorers
-				value = civic_privatized_exploration
 				# Or advanced tech
 				value = civic_private_healthcare_corporate
 			}
+			NOR = {
+				# Or low tech starts
+				text = civic_tooltip_not_eager_explorers
+				value = civic_eager_explorers
+				value = civic_privatized_exploration
+				value = civic_hive_stargazers
+				value = civic_machine_exploration_protocol
+			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = "origin_tooltip_broken_shackles_effects"
@@ -1328,6 +1667,8 @@ origin_broken_shackles = {
 		first_contact_speed_mult = 0.20
 		spy_network_daily_value_mult = 0.20
 	}
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 0
@@ -1354,11 +1695,17 @@ origin_fear_of_the_dark = {
 			NOR = {
 				value = civic_inwards_perfection
 				value = civic_fanatic_purifiers
+			}
+			NOR = {
 				# Or low tech starts
+				text = civic_tooltip_not_eager_explorers
 				value = civic_eager_explorers
 				value = civic_privatized_exploration
+				value = civic_hive_stargazers
+				value = civic_machine_exploration_protocol
 			}
 		}
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = "origin_tooltip_fear_of_the_dark_effects"
@@ -1374,6 +1721,8 @@ origin_fear_of_the_dark = {
 
 	traits = {
 	}
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 5
@@ -1414,6 +1763,7 @@ origin_legendary_leader = {
 
 	possible = {
 		authority = { OR = { inline_script = governments/conditions/auth_dictatorial } } # undercoat: moved to inline script
+		species_archetype = { NOT = { value = MACHINE } }
 	}
 
 	description = origin_tooltip_legendary_leader_effects
@@ -1424,6 +1774,8 @@ origin_legendary_leader = {
 	traits = {
 		trait = trait_perfected_genes
 	}
+
+	blocks_random_machine_empire_generation	= yes
 
 	random_weight = {
 		base = 5
@@ -1580,5 +1932,178 @@ origin_riftworld = {
 
 	random_weight = {
 		base = 2
+	}
+}
+
+origin_cybernetic_creed = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origins_cybernetic_creed.dds"
+	picture = GFX_origin_cybernetic_creed
+	flags = { custom_start_screen }
+
+	playable = {
+		has_machine_age_dlc = yes
+	}
+
+	possible = {
+		ethics = {
+			OR = {
+				text = civic_tooltip_spiritualist
+				value = ethic_spiritualist
+				value = ethic_fanatic_spiritualist
+			}
+			NOR = {
+				text = civic_tooltip_not_egalitarian
+				value = ethic_egalitarian
+				value = ethic_fanatic_egalitarian
+			}
+		}
+		civics = {
+			NOR = {
+				text = civic_tooltip_not_death_cult
+				value = civic_death_cult
+				value = civic_death_cult_corporate
+			}
+			NOR = {
+				value = civic_permanent_employment
+				value = civic_natural_design
+			}
+		}
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
+	description = origin_tooltip_cybernetic_creed_effects
+
+	advanced_start = yes
+	max_once_global = yes
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 5
+	}
+}
+
+origin_synthetic_fertility = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origin_synthetic_fertility.dds"
+	picture = GFX_origin_synthetic_fertility
+	flags = { custom_start_screen }
+
+	playable = {
+		has_machine_age_dlc = yes
+	}
+
+	possible = {
+		ethics = {
+			NOT = { value = ethic_gestalt_consciousness }
+			NOR = {
+				text = civic_tooltip_not_spiritualist
+				value = ethic_spiritualist
+				value = ethic_fanatic_spiritualist
+			}
+		}
+		civics = {
+			NOR = {
+				value = civic_permanent_employment
+				value = civic_reanimated_armies
+				value = civic_natural_design
+				value = civic_augmentation_bazaars
+			}
+			NOR = {
+				text = civic_tooltip_not_mutagenic
+				value = civic_toxic_baths
+				value = civic_toxic_baths_individual_machine
+				value = civic_corporate_toxic_baths
+				value = civic_corporate_toxic_baths_individual_machine
+				value = civic_hive_toxic_baths
+				value = civic_machine_toxic_baths
+			}
+			NOR = {
+				# Or low tech starts
+				text = civic_tooltip_not_eager_explorers
+				value = civic_eager_explorers
+				value = civic_privatized_exploration
+				value = civic_hive_stargazers
+				value = civic_machine_exploration_protocol
+			}
+		}
+		species_archetype = { NOT = { value = MACHINE } }
+	}
+
+	traits = {
+		trait = trait_pathogenic_genes
+	}
+
+	description = origin_tooltip_synthetic_fertility_effects
+	negative_description = origin_tooltip_synthetic_fertility_negative_effects
+	advanced_start = no
+	max_once_global = yes
+	blocks_random_machine_empire_generation	= yes
+
+	random_weight = {
+		base = 5
+	}
+}
+
+origin_arc_welders = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origin_arc_welders.dds"
+	picture = GFX_origin_arc_welders
+	max_once_global = yes
+	flags = { custom_start_screen }
+
+	initializers = { custom_starting_init_01 custom_starting_init_02 custom_starting_init_03 custom_starting_init_04 custom_starting_init_05 custom_starting_init_06 sol_system_initializer deneb_system titawin_init }
+
+	playable = {
+		has_machine_age_dlc = yes
+	}
+
+	possible = {
+		species_archetype = { value = MACHINE }
+	}
+
+	description = "origin_tooltip_arc_builders_effects"
+	negative_description = "origin_tooltip_arc_builders_negative_effects"
+
+	modifier = {
+		country_megastructure_build_cap_add = 1
+		arc_furnace_limit_add = 1
+	}
+
+	advanced_start = yes
+
+	random_weight = {
+		base = 2
+	}
+}
+
+origin_storm_chasers = {
+	is_origin = yes
+	icon = "gfx/interface/icons/origins/origin_storm_chasers.dds"
+	picture = GFX_origin_storm_chasers
+	max_once_global = yes
+	flags = { custom_start_screen }
+	description = "origin_tooltip_storm_chasers_effects"
+
+	playable = {
+		has_cosmic_storms_dlc = yes
+	}
+
+	possible = {
+		civics = {
+			NOR = {
+				value = civic_hive_devouring_swarm
+				value = civic_fanatic_purifiers
+				value = civic_machine_terminator
+			}
+		}
+	}
+
+	modifier = {
+		planet_storm_devastation_mult = -0.33
+	}
+
+	random_weight = {
+		base = 1
 	}
 }

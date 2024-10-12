@@ -1,8 +1,17 @@
 is_valid_refugee_pop = {
-	is_robot_pop = no
+	is_non_sapient_robot = no
 	NOR = {
 		has_trait = trait_hive_mind
 		can_think = no
+		AND = {
+			has_virtual_species_trait = yes
+			exists = owner
+			owner = {
+				NOT = {
+					has_active_tradition = tr_virtuality_finish
+				}
+			}
+		}
 	}
 	owner = {
 		any_relation = {
@@ -18,6 +27,13 @@ is_valid_refugee_pop = {
 						prev = { has_policy_flag = refugees_allowed }
 					}
 				}
+			}
+			OR = {
+				AND = {
+					has_policy_flag = robots_allowed
+					prevprev = { is_robotic_species = yes }
+				}
+				prevprev = { is_robotic_species = no }
 			}
 			any_owned_planet = {
 				is_under_colonization = no
@@ -98,6 +114,7 @@ has_any_habitability_and_housing = {
 		is_under_colonization = no
 		is_controlled_by = owner
 		has_orbital_bombardment = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 	}
 }
 
@@ -114,10 +131,18 @@ has_any_habitability = {
 				prev = { has_policy_flag = refugees_allowed }
 			}
 		}
+		OR = {
+			AND = {
+				prev = { has_policy_flag = robots_allowed }
+				is_robotic_species = yes
+			}
+			is_robotic_species = no
+		}
 	}
 	any_owned_planet = {
 		is_under_colonization = no
 		is_controlled_by = owner
 		has_orbital_bombardment = no
+		is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 	}
 }

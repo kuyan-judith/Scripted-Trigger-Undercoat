@@ -39,7 +39,7 @@ defense_army = {
 		owner = {
 			is_primitive = no
 			OR = {
-				is_machine_empire = no # undercoat: moved to scripted trigger
+				is_machine_empire = no
 				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -115,7 +115,7 @@ robotic_defense_army = {
 			has_trait = "trait_mechanical"
 		}
 		owner = {
-			is_machine_empire = no # undercoat: moved to scripted trigger
+			is_machine_empire = no
 		}
 	}
 
@@ -149,7 +149,9 @@ machine_defense = {
 	has_species = yes
 
 	potential = {
-		owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+		owner = {
+			is_machine_empire = yes
+		}
 		from = {
 			has_trait = "trait_machine_unit"
 		}
@@ -242,19 +244,8 @@ fanatic_guardian = {
 	}
 
 	potential = {
-		from = {
-			NOR = {
-				has_trait = "trait_mechanical"
-				has_trait = "trait_machine_unit"
-				is_sapient = no
-			}
-		}
 		owner = {
-			is_primitive = no
-			OR = {
-				is_machine_empire = no # undercoat: moved to scripted trigger
-				is_machine_assimilator = yes # undercoat: moved to scripted trigger
-			}
+			is_gestalt = no
 			is_sovereign_guardianship_empire = yes
 		}
 	}
@@ -264,7 +255,7 @@ fanatic_guardian = {
 	}
 }
 
-machine_fanatic_guardian = {
+machine_fanatic_guardian = {	# Actually gestalt
 	defensive = yes
 	is_pop_spawned = yes
 	health = 2.20
@@ -278,22 +269,47 @@ machine_fanatic_guardian = {
 
 	potential = {
 		owner = {
-			OR = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
-				has_ascension_perk = ap_synthetic_evolution
-				any_owned_pop = {
-					is_species_class = "ROBOT"
-				}
-			}
+			is_gestalt = yes
 			is_sovereign_guardianship_empire = yes
-		}
-		from = {
-			has_trait = "trait_machine_unit"
 		}
 	}
 
 	army_modifier = {
 		army_damage_empire_sprawl_penalty_mult = 1
+	}
+
+	resources = {
+		category = armies
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_active_tradition = tr_unyielding_resistance_is_frugal }
+			}
+			unity = 0.5
+		}
+	}
+}
+
+### Individual Machine Empire Armies
+individual_machine_defense = {
+	defensive = yes
+	is_pop_spawned = yes
+	health = 1.10
+	damage = 1.10
+	morale = 1.25
+	morale_damage = 1.00
+	collateral_damage = 0.0
+	war_exhaustion = 0.0 # No WE from defense armies
+	icon = GFX_army_type_machine_defensive
+	has_species = yes
+
+	potential = {
+		owner = {
+			is_individual_machine = yes
+		}
+		from = {
+			has_trait = "trait_machine_unit"
+		}
 	}
 
 	resources = {

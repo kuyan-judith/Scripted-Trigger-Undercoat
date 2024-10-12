@@ -6,11 +6,7 @@ citizenship_full = {
 
 	potential = {
 		exists = from
-		NOT = { from = { is_machine_empire = yes } } # undercoat: moved to scripted trigger
-		NOR = {
-			has_trait = trait_machine_unit
-			is_shackled_robot_species_rights = yes
-		}
+		NOT = { from = { is_machine_empire = yes } }
 	}
 
 	allow = {
@@ -24,14 +20,14 @@ citizenship_full = {
 			fail_text = "lonely_hive_mind_pops_kill_themselves_citizenship"
 			is_lonely_hive_mind_pop = no
 		}
-		custom_tooltip = {
-			fail_text = "disconnected_machine_pops_kill_themselves_citizenship"
-			is_disconnected_machine_pop = no
-		}
+#		custom_tooltip = {
+#			fail_text = "disconnected_machine_pops_kill_themselves_citizenship"
+#			is_disconnected_machine_pop = no
+#		}
 		custom_tooltip = {
 			fail_text = "HIVE_MIND_SPECIES_CITIZENS_ONLY"
 			OR = {
-				NOT = { from = { is_hive_empire = yes } } # undercoat: moved to scripted trigger
+				NOT = { from = { is_hive_empire = yes } }
 				has_trait = trait_hive_mind
 			}
 		}
@@ -44,18 +40,26 @@ citizenship_full = {
 		}
 		custom_tooltip = {
 			fail_text = too_alien
-			OR = {
-				is_same_species = from
-				from = {
-					AND = {
-						is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
-						is_same_species_class = root
+			if = {
+				limit = {
+					from = {
+						is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
 					}
+					has_trait = trait_mechanical
 				}
-				from = {
-					NOR = {
-						has_ethic = ethic_xenophobe
-						has_ethic = ethic_fanatic_xenophobe
+				OR = {
+					is_same_species = from
+					from = {
+						AND = {
+							is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
+							is_same_species_class = root
+						}
+					}
+					from = {
+						NOR = {
+							has_ethic = ethic_xenophobe
+							has_ethic = ethic_fanatic_xenophobe
+						}
 					}
 				}
 			}
@@ -78,9 +82,32 @@ citizenship_full = {
 				has_military_service_type = { type = military_service_full country = from }
 			}
 		}
+		custom_tooltip = {
+			fail_text = "ROBOTS_NO_RIGHTS"
+			if = {
+				limit = {
+					OR = {
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+					}
+				}
+				from = {
+					has_policy_flag = ai_full_rights
+				}
+			}
+		}
 	}
 	ai_will_do = {
 		factor = 1
+		modifier = {
+			factor = 35
+			root = {
+				is_robotic_species = yes
+			}
+			from = {
+				is_individual_machine = yes
+			}
+		}
 	}
 }
 
@@ -88,9 +115,12 @@ citizenship_full_machine = {
 	is_full_citizenship = yes
 
 	potential = {
-		host_has_dlc = "Synthetic Dawn Story Pack"
+		OR = {
+			has_synthetic_dawn = yes
+			has_machine_age_dlc = yes
+		}
 		exists = from
-		from = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+		from = { is_machine_empire = yes }
 	}
 
 	allow = {
@@ -135,8 +165,9 @@ citizenship_assimilation = {
 
 	potential = {
 		OR = {
-			host_has_dlc = "Synthetic Dawn Story Pack"
-			host_has_dlc = "Utopia"
+			has_synthetic_dawn = yes
+			has_utopia = yes
+			has_machine_age_dlc = yes
 		}
 		exists = from
 		from = {
@@ -150,7 +181,6 @@ citizenship_assimilation = {
 				}
 				AND = {
 					has_civic = civic_machine_terminator
-					has_active_tradition = tr_synthetics_adopt_machine
 					root = {
 						is_robotic_species = yes
 					}
@@ -158,11 +188,10 @@ citizenship_assimilation = {
 			}
 			OR = {
 				AND = { # machine cyborg assimilator
-					is_machine_empire = yes # undercoat: moved to scripted trigger
+					is_machine_empire = yes
 					is_machine_assimilator = yes # undercoat: moved to scripted trigger
 					OR = {
 						AND = {
-							has_active_tradition = tr_synthetics_adopt_machine
 							root = {
 								is_robotic_species = yes
 							}
@@ -177,8 +206,7 @@ citizenship_assimilation = {
 					}
 				}
 				AND = { # machine synthetic assimilator
-					is_machine_empire = yes # undercoat: moved to scripted trigger
-					has_active_tradition = tr_synthetics_adopt_machine
+					is_machine_empire = yes
 					root = {
 						is_robotic_species = yes
 					}
@@ -187,23 +215,30 @@ citizenship_assimilation = {
 					OR = {
 						AND = {
 							# non-devouring hive mind
-							is_hive_empire = yes # undercoat: moved to scripted trigger
+							is_hive_empire = yes
 							NOT = { has_civic = civic_hive_devouring_swarm }
 						}
 						# Regular empire
-						is_gestalt = no # undercoat: moved to scripted trigger
+						AND = {
+							is_gestalt = no # undercoat: moved to scripted trigger
+							is_individual_machine = no
+						}
 					}
 					OR = {
-						has_tradition = tr_genetics_creation	# genetic assimilation
-						has_tradition = tr_cybernetics_transubstantiation_synthesis # cybernetic assimilation
+						has_active_tradition = tr_genetics_creation	# genetic assimilation
+						has_active_tradition = tr_cybernetics_transubstantiation_synthesis # cybernetic assimilation
 					}
 					ROOT = { is_robotic_species = no }
 				}
 				AND = {
 					has_country_flag = synth_assimilation # synth assimilation
-					is_machine_empire = no # undercoat: moved to scripted trigger
+					is_machine_empire = no
 				}
-				has_tradition = tr_psionics_psionic_assimilation # psionic assimilation
+				has_active_tradition = tr_psionics_psionic_assimilation # psionic assimilation
+				AND = {
+					is_individual_machine = yes
+					ROOT = { is_robotic_species = yes }
+				}
 			}
 		}
 	}
@@ -224,9 +259,9 @@ citizenship_assimilation = {
 				limit = { is_lonely_hive_mind_pop = yes }
 				from = {
 					OR = {
-						has_tradition = tr_genetics_creation
-						has_tradition = tr_cybernetics_transubstantiation_synthesis
-						has_tradition = tr_cybernetics_assimilator_inevitable_assimilation
+						has_active_tradition = tr_genetics_creation
+						has_active_tradition = tr_cybernetics_transubstantiation_synthesis
+						has_active_tradition = tr_cybernetics_assimilator_inevitable_assimilation
 					}
 				}
 			}
@@ -243,7 +278,7 @@ citizenship_assimilation = {
 		if = {
 			limit = {
 				from = {
-					is_machine_empire = yes # undercoat: moved to scripted trigger
+					is_machine_empire = yes
 				}
 			}
 			custom_tooltip = { # machine assimilator
@@ -256,7 +291,7 @@ citizenship_assimilation = {
 		else_if = {
 			limit = {
 				from = {
-					is_hive_empire = yes # undercoat: moved to scripted trigger
+					is_hive_empire = yes
 					has_active_tradition = tr_genetics_creation
 				}
 			}
@@ -272,7 +307,7 @@ citizenship_assimilation = {
 		else_if = {
 			limit = {
 				from = {
-					is_hive_empire = yes # undercoat: moved to scripted trigger
+					is_hive_empire = yes
 					has_active_tradition = tr_cybernetics_transubstantiation_synthesis
 				}
 			}
@@ -291,7 +326,7 @@ citizenship_assimilation = {
 		else_if = {
 			limit = {
 				from = {
-					is_hive_empire = no # undercoat: moved to scripted trigger
+					is_hive_empire = no
 					has_active_tradition = tr_cybernetics_transubstantiation_synthesis
 				}
 			}
@@ -301,7 +336,9 @@ citizenship_assimilation = {
 					AND = {
 						has_trait = trait_hive_mind
 						from = {
-							is_hive_empire = no # undercoat: moved to scripted trigger
+							NOT = {
+								is_hive_empire = yes
+							}
 						}
 					}
 					AND = {
@@ -309,20 +346,21 @@ citizenship_assimilation = {
 							has_trait = trait_hive_mind
 						}
 						from = {
-							is_hive_empire = yes # undercoat: moved to scripted trigger
+							is_hive_empire = yes
 						}
 					}
 					NOR = {
 						has_trait = trait_mechanical
 						has_trait = trait_machine_unit
 						has_trait = trait_cybernetic
+						has_trait = trait_limited_cybernetic
 					}
 				}
 			}
 		}
 		else_if = {
 			limit = {
-				from = { has_tradition = tr_psionics_psionic_assimilation }
+				from = { has_active_tradition = tr_psionics_psionic_assimilation }
 			}
 			custom_tooltip = { # species must be organic to transcend
 				fail_text = TRANSCENDING_SPECIES_MUST_BE_ORGANIC
@@ -339,7 +377,7 @@ citizenship_assimilation = {
 		}
 		else_if = {
 			limit = {
-				from = { has_tradition = tr_genetics_creation }
+				from = { has_active_tradition = tr_genetics_creation }
 			}
 			custom_tooltip = {
 				fail_text = CAN_ONLY_ASSIMILATE_HIVES
@@ -356,16 +394,22 @@ citizenship_assimilation = {
 				is_homicidal = yes # undercoat: moved to scripted trigger
 			}
 		}
+		modifier = {
+			factor = 0.3
+			from = {
+				is_individual_machine = yes
+			}
+		}
 	}
 }
 
 
 citizenship_organic_trophy = {
 	potential = {
-		host_has_dlc = "Synthetic Dawn Story Pack"
+		has_synthetic_dawn = yes
 		exists = from
 		from = {
-			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_machine_empire = yes
 			is_servitor_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
@@ -408,14 +452,17 @@ citizenship_limited = {
 				exists = from
 				from = {
 					NOR = {
-						is_hive_empire = yes # undercoat: moved to scripted trigger
-						is_machine_empire = yes # undercoat: moved to scripted trigger
+						is_hive_empire = yes
+						is_machine_empire = yes
 					}
 				}
 			}
 		}
 		NOR = {
-			has_trait = trait_machine_unit
+			AND = {
+				from = { is_individual_machine = no }
+				has_trait = trait_machine_unit
+			}
 			is_shackled_robot_species_rights = yes
 		}
 	}
@@ -436,14 +483,17 @@ citizenship_limited = {
 		custom_tooltip = {
 			fail_text = "HIVE_MIND_SPECIES_CITIZENS_ONLY"
 			OR = {
-				NOT = { from = { is_hive_empire = yes } } # undercoat: moved to scripted trigger
+				OR = {
+					NOT = { from = { is_hive_empire = yes } }
+					from = { has_valid_civic = civic_hive_guided_sapience }
+				}
 				has_trait = trait_hive_mind
 			}
 		}
 		custom_tooltip = {
 			fail_text = "HIVE_MIND_MAIN_SPECIES_ALWAYS_CITIZEN"
 			NAND = {
-				from = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+				from = { is_hive_empire = yes }
 				has_trait = trait_hive_mind
 			}
 		}
@@ -523,6 +573,13 @@ citizenship_slavery = {
 		NAND = {
 			exists = this
 			OR = {
+				AND = {
+					from = { is_individual_machine = yes }
+					OR = {
+						has_trait = trait_machine_unit
+						has_trait = trait_mechanical
+					}
+				}
 				has_trait = trait_machine_unit
 				has_trait = trait_mechanical
 			}
@@ -557,7 +614,7 @@ citizenship_slavery = {
 		custom_tooltip = {
 			fail_text = "HIVE_MIND_MAIN_SPECIES_ALWAYS_CITIZEN"
 			NAND = {
-				from = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+				from = { is_hive_empire = yes }
 				has_trait = trait_hive_mind
 			}
 		}
@@ -686,7 +743,10 @@ citizenship_robot_servitude = {
 	potential = {
 		exists = from
 		from = { is_gestalt = no }
-		has_trait = trait_mechanical
+		OR = {
+			has_trait = trait_mechanical
+			has_trait = trait_machine_unit
+		}
 	}
 
 	allow = {
@@ -707,6 +767,12 @@ citizenship_robot_servitude = {
 
 	ai_will_do = {
 		factor = 1
+		modifier = {
+			factor = 35
+			from = {
+				is_individual_machine = yes
+			}
+		}
 	}
 }
 
@@ -717,12 +783,15 @@ citizenship_purge = {
 
 	potential = {
 		exists = from
-		NOT = { from = { is_machine_empire = yes } } # undercoat: moved to scripted trigger
+		NOT = { from = { is_machine_empire = yes } }
 		OR = {
-			NOT = { has_trait = trait_mechanical }
+			NOT = {
+				has_trait = trait_mechanical
+				has_trait = trait_machine_unit
+			}
 			from = { has_policy_flag = robots_outlawed }
 			AND = {
-				from = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+				from = { is_hive_empire = yes }
 				is_robotic = yes
 			}
 		}
@@ -731,7 +800,9 @@ citizenship_purge = {
 	allow = {
 		hidden_trigger = { exists = from }
 		if = {
-			limit = { is_lonely_hive_mind_pop = yes }
+			limit = {
+				is_lonely_hive_mind_pop = yes
+			}
 			hidden_trigger = { always = yes }
 		}
 		else = {
@@ -787,6 +858,18 @@ citizenship_purge = {
 					}
 				}
 			}
+			if = {
+				limit = {
+					from = {
+						is_hive_empire = yes
+					}
+					has_trait = trait_hive_mind
+				}
+				custom_tooltip = {
+					fail_text = hive_cant_purge_hive
+					has_genesis_preserve_trait = no
+				}
+			}
 			custom_tooltip = {
 				fail_text = yes_service_yes_citizenship
 				if = {
@@ -813,14 +896,14 @@ citizenship_purge = {
 			factor = 0
 			has_trait = trait_machine_unit
 			from = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 			}
 		}
 		modifier = {
 			factor = 0
 			from = {
 				has_valid_ai_personality = no
-				is_hive_empire = no # undercoat: moved to scripted trigger
+				is_hive_empire = no
 			}
 		}
 		modifier = {
@@ -844,14 +927,14 @@ citizenship_purge = {
 		modifier = {
 			factor = 0
 			from = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
+				is_machine_empire = yes
 				has_government = gov_machine_industrial
 			}
 		}
 		modifier = {
 			factor = 0
 			from = {
-				is_hive_empire = yes # undercoat: moved to scripted trigger
+				is_hive_empire = yes
 				NOT = { has_valid_civic = civic_hive_devouring_swarm }
 				is_necrophage_empire = no # undercoat: moved to scripted trigger
 				OR = {
@@ -893,7 +976,7 @@ citizenship_purge_machine = {
 
 	potential = {
 		exists = from
-		from = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+		from = { is_machine_empire = yes }
 		NOR = {
 			has_trait = trait_machine_unit
 			has_trait = trait_mechanical
@@ -908,6 +991,7 @@ citizenship_purge_machine = {
 		NAND = {
 			is_lonely_hive_mind_pop = no
 			from = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
+			from = { has_ascension_perk = ap_become_the_crisis }
 		}
 	}
 

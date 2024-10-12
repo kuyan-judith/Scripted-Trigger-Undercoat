@@ -13,12 +13,31 @@ traditionalist = {
 	resources = {
 		category = pop_factions
 		produces = {
-			unity = @faction_base_unity
+			unity = @faction_base_output
+		}
+	}
+
+	extortion_resource = {
+		category = pop_factions
+		produces = {
+			trigger = {
+				is_lithoid_empire = no
+			}
+			food = @faction_base_output
+			mult = @faction_extortion_food_ratio
+		}
+		produces = {
+			trigger = {
+				is_lithoid_empire = yes
+			}
+			minerals = @faction_base_output
+			mult = @faction_extortion_minerals_ratio
 		}
 	}
 
 	is_potential = {
 		is_faction_allowed = yes
+		is_cybernetic_creed_empire = no # undercoat: moved to scripted trigger
 	}
 
 	parameters = {
@@ -33,7 +52,6 @@ traditionalist = {
 	can_join_pre_triggers = {
 		is_enslaved = no
 		is_being_purged = no
-		is_robot_pop = no
 	}
 
 	can_join_faction = {
@@ -68,6 +86,9 @@ traditionalist = {
 			species = {
 				has_trait = "trait_mechanical"
 			}
+			owner = {
+				is_individual_machine = no
+			}
 		}
 
 		modifier = {
@@ -98,6 +119,12 @@ traditionalist = {
 
 		potential = {
 			exists = owner
+			owner = {
+				NOT = {
+					is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+					is_individual_machine = yes
+				}
+			}
 		}
 
 		trigger = {
@@ -120,6 +147,7 @@ traditionalist = {
 			owner = {
 				can_set_ai_policy = yes
 				NOT = { has_policy_flag = ai_full_rights }
+				is_individual_machine = no
 			}
 		}
 
@@ -141,6 +169,7 @@ traditionalist = {
 		potential = {
 			exists = owner
 			owner = {
+				is_individual_machine = no
 				can_set_ai_policy = yes
 				has_policy_flag = ai_full_rights
 			}
@@ -188,7 +217,7 @@ traditionalist = {
 			owner = {
 				has_surveyed_class = pc_nuked
 				NOR = {
-					is_post_apocalyptic_empire = yes # undercoat: moved to scripted trigger
+					is_apocalyptic_empire = yes # undercoat: moved to scripted trigger
 					has_country_flag = worm_tomb_ending
 					is_memorialist_empire = yes # undercoat: moved to scripted trigger (other versions are gestalt so won't get factions)
 				}
@@ -254,11 +283,15 @@ traditionalist = {
 			host_has_dlc = "Utopia"
 			exists = owner
 			owner = {
-				is_shroudwalker_apprentice_empire = no # undercoat: moved to scripted trigger
+				NOR = {
+					is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
+					is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+				}
 				OR = {
 					num_ascension_perks > 0
 					num_ascension_perk_slots > 0
 				}
+				is_individual_machine = no
 			}
 		}
 
@@ -291,7 +324,8 @@ traditionalist = {
 		}
 	}
 
-	demand = { # "TRADITIONALIST_FLESH_IS_STRONG"
+	# THE FLESH IS STRONG/WEAK (FULL)
+	demand = { # Standard Traditionalist variant: reject full cyberization
 		title = "TRADITIONALIST_FLESH_IS_STRONG"
 		unfulfilled_title = "TRADITIONALIST_FLESH_IS_WEAK"
 		desc = "TRADITIONALIST_FLESH_IS_STRONG_DESC"
@@ -303,15 +337,40 @@ traditionalist = {
 			exists = owner
 			owner = {
 				has_ascension_perk = ap_the_flesh_is_weak
+				NOR = {
+					has_policy_flag = cyberization_standards_limited
+					is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+				}
 			}
 		}
 
 		trigger = {
 			owner = {
-				NOR = {
-					has_country_flag = cyborg_empire # i.e. has completed "FLESH_IS_WEAK_PROJECT"
-					is_cyborg_empire = yes # checks for the Cybernetic trait
-				}
+				is_cyborg_empire = no
+			}
+		}
+	}
+	# THE FLESH IS STRONG/WEAK (LIMITED)
+	demand = { # Alternate Traditionalist variant: reject limited cyberization
+		title = "TRADITIONALIST_FLESH_IS_STRONG"
+		unfulfilled_title = "TRADITIONALIST_FLESH_IS_WEAK"
+		desc = "TRADITIONALIST_FLESH_IS_STRONG_LIMITED_DESC"
+
+		unfulfilled_effect = -5
+		fulfilled_effect = 0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_the_flesh_is_weak
+				has_policy_flag = cyberization_standards_limited
+				is_cybernetic_creed_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+
+		trigger = {
+			owner = {
+				is_cyborg_empire = no
 			}
 		}
 	}
@@ -434,6 +493,59 @@ traditionalist = {
 		}
 	}
 
+	demand = { # Individualist Machines demand Ascension
+		title = "TRADITIONALIST_MACHINE_ASCEND"
+		unfulfilled_title = "TRADITIONALIST_MACHINE_ASCEND_NO"
+		desc = "TRADITIONALIST_MACHINE_ASCEND_DESC"
+
+		unfulfilled_effect = -0.001
+		fulfilled_effect = 15
+
+		potential = {
+			exists = owner
+			owner = {
+				is_individual_machine = yes
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_ascension_perk = ap_synthetic_age # Has begun Machine Ascensions
+			}
+		}
+	}
+
+	demand = { # Individualist Machines demand few materialist machines
+		title = "TRADITIONALIST_AUTOMATAS_ASTRAY"
+		unfulfilled_title = "TRADITIONALIST_AUTOMATAS_ASTRAY_NO"
+		desc = "TRADITIONALIST_AUTOMATAS_ASTRAY_DESC"
+
+		unfulfilled_effect = -5
+		fulfilled_effect = +0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				is_individual_machine = yes
+				any_pop_faction = {
+					is_pop_faction_type = technologist
+				}
+			}
+		}
+
+		trigger = {
+			exists = owner
+			owner = {
+				count_owned_pop = {
+					limit = {
+						pop_has_ethic = ethic_materialist
+					}
+					count < 10
+				}
+
+			}
+		}
+	}
 
 	# Faction Demands for Ruler and Council positions.
 	inline_script = {
@@ -441,8 +553,8 @@ traditionalist = {
 		ETHIC = ethic_spiritualist
 		ETHIC_FANATIC = ethic_fanatic_spiritualist
 		ETHIC_OPPOSED = ethic_materialist
-	} 
-	
+	}
+
 	on_create = {
 		pop_faction_event = { id = factions.1 }
 	}
@@ -462,184 +574,13 @@ traditionalist = {
 		}
 	}
 
-	actions = {
-		embrace_faction = {
-			title = "EMBRACE_FACTION"
-			description = "EMBRACE_FACTION_DESC"
-
-			cost = {
-				unity = 5000
-			}
-
-			potential = {
-				exists = owner
-				owner = {
-					OR = {
-						is_subject = no
-						NOT = { any_agreement = { agreement_preset = preset_dominion } }
-					}
-				}
-			}
-
-			valid = {
-				custom_tooltip = {
-					fail_text = EMBRACE_FACTION_COOLDOWN
-					parameter:empire = {
-						NOT = { has_modifier = embraced_faction_timer }
-					}
-				}
-				support > 0.20
-				parameter:empire = {
-					NOT = { has_ethic = "ethic_fanatic_spiritualist" }
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = embraced_faction days = 3600 }
-				parameter:empire = {
-					shift_ethic = ethic_spiritualist
-					hidden_effect = {
-						add_modifier = { modifier = embraced_faction_timer days = 3600 }
-						every_pop_faction = {
-							limit = { NOT = { is_same_value = root } }
-							add_modifier = { modifier = embraced_another_faction days = 3600 }
-						}
-					}
-				}
-				hidden_effect = {
-					save_event_target_as = TargetFaction
-					parameter:empire = {
-						every_relation = {
-							limit = {
-								is_ai = no
-								is_playable = yes # undercoat: moved to scripted trigger
-								has_communications = prev
-								has_intel_level = {
-									who = prev
-									category = government
-									level >= 1
-								}
-							}
-							country_event = { id = factions.2000 }
-						}
-					}
-				}
-			}
-
-			ai_weight = {
-				base = 1
-				modifier = {
-					factor = 0
-					support < 0.50
-					owner = {
-						has_ethic = ethic_spiritualist
-					}
-				}
-				modifier = {
-					factor = 0
-					owner = { has_valid_civic = civic_fanatic_purifiers }
-				}
-				modifier = {
-					factor = 0
-					owner = {
-						count_pop_faction = {
-							count < 4
-						}
-					}
-				}
-			}
-		}
-		promote_faction = {
-			title = "PROMOTE_FACTION"
-			description = "PROMOTE_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_spiritualist
-						has_modifier = promoted_spiritualist
-					}
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					add_modifier = { modifier = promoted_spiritualist days = -1 }
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_promote_faction = {
-			title = "CANCEL_PROMOTE_FACTION"
-			description = "CANCEL_PROMOTE_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = promoted_spiritualist
-				}
-			}
-
-			effect = {
-				parameter:empire = {
-					remove_modifier = promoted_spiritualist
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
-		suppress_faction = {
-			title = "SUPPRESS_FACTION"
-			description = "SUPPRESS_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					NOR = {
-						has_modifier = suppressed_spiritualist
-						has_modifier = promoted_spiritualist
-					}
-				}
-			}
-
-			effect = {
-				add_modifier = { modifier = suppressed_faction days = -1 }
-				parameter:empire = {
-					add_modifier = { modifier = suppressed_spiritualist days = -1 }
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
-		cancel_suppress_faction = {
-			title = "CANCEL_SUPPRESS_FACTION"
-			description = "CANCEL_SUPPRESS_FACTION_DESC"
-
-			potential = {
-				exists = owner
-				parameter:empire = {
-					has_modifier = suppressed_spiritualist
-				}
-			}
-
-			effect = {
-				remove_modifier = suppressed_faction
-				parameter:empire = {
-					remove_modifier = suppressed_spiritualist
-				}
-			}
-
-			ai_weight = {
-				base = 0
-			}
-		}
+	# Undercoat scripted trigger
+	inline_script = {
+		script = pop_faction_types/standard_action_block
+		faction = traditionalist
+		ethic = spiritualist
+		opposite = materialist
+		apply_to_other_factions = "always = no"
+		extortion_resource = food
 	}
 }

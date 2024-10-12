@@ -1137,6 +1137,14 @@ espionage_sabotage_starbase_module = {
 			remove_starbase_module = { module = detection_array }
 			owner = { set_country_flag = detection_array_sabotaged }
 		}
+		1 = {
+			modifier = {
+				factor = 0
+				NOT = { has_starbase_module = astromining_bay }
+			}
+			remove_starbase_module = { module = astromining_bay }
+			owner = { set_country_flag = astromining_bay_sabotaged }
+		}
 		#Orbital Ring
 		1 = {
 			modifier = {
@@ -1257,14 +1265,6 @@ espionage_sabotage_starbase_building = {
 			}
 			remove_starbase_building = { building = hydroponics_bay }
 			owner = { set_country_flag = hydroponics_bay_sabotaged }
-		}
-		1 = {
-			modifier = {
-				factor = 0
-				NOT = { has_starbase_building = mining_bay }
-			}
-			remove_starbase_building = { building = mining_bay }
-			owner = { set_country_flag = mining_bay_sabotaged }
 		}
 		1 = {
 			modifier = {
@@ -1475,6 +1475,14 @@ espionage_sabotage_starbase_building = {
 			remove_starbase_building = { building = feeder }
 			owner = { set_country_flag = feeder_sabotaged }
 		}
+		1 = {
+			modifier = {
+				factor = 0
+				NOT = { has_starbase_building = astromining_hub }
+			}
+			remove_starbase_building = { building = astromining_hub }
+			owner = { set_country_flag = astromining_hub_sabotaged }
+		}
 		# Orbital Ring
 		1 = {
 			modifier = {
@@ -1571,6 +1579,7 @@ remove_sabotage_starbase_flag = {
 		solar_panel_network_sabotaged = { remove_country_flag = solar_panel_network_sabotaged }
 		trading_hub_sabotaged = { remove_country_flag = trading_hub_sabotaged }
 		feeder_sabotaged = { remove_country_flag = feeder_sabotaged }
+		astromining_bay_sabotaged = { remove_country_flag = astromining_bay_sabotaged }
 		#Buildings
 		art_college_sabotaged = { remove_country_flag = art_college_sabotaged }
 		black_hole_observatory_sabotaged = { remove_country_flag = black_hole_observatory_sabotaged }
@@ -1582,7 +1591,6 @@ remove_sabotage_starbase_flag = {
 		disruption_field_sabotaged = { remove_country_flag = disruption_field_sabotaged }
 		fleet_academy_sabotaged = { remove_country_flag = fleet_academy_sabotaged }
 		hydroponics_bay_sabotaged = { remove_country_flag = hydroponics_bay_sabotaged }
-		mining_bay_sabotaged = { remove_country_flag = mining_bay_sabotaged }
 		listening_post_sabotaged = { remove_country_flag = listening_post_sabotaged }
 		naval_logistics_office_sabotaged = { remove_country_flag = naval_logistics_office_sabotaged }
 		nebula_refinery_sabotaged = { remove_country_flag = nebula_refinery_sabotaged }
@@ -1598,6 +1606,7 @@ remove_sabotage_starbase_flag = {
 		offspring_outlook_sabotaged = { remove_country_flag = offspring_outlook_sabotaged }
 		dimensional_shrine_sabotaged = { remove_country_flag = dimensional_shrine_sabotaged }
 		reloading_bay_sabotaged = { remove_country_flag = reloading_bay_sabotaged }
+		astromining_hub_sabotaged = { remove_country_flag = astromining_hub_sabotaged }
 		#Orbital Ring Modules
 		orbital_ring_anchorage_sabotaged = { remove_country_flag = orbital_ring_anchorage_sabotaged }
 		orbital_ring_gun_battery_sabotaged = { remove_country_flag = orbital_ring_gun_battery_sabotaged }
@@ -1636,9 +1645,9 @@ espionage_smear_campaign_spiritualist = {
 		limit = {
 			root.target = {
 				OR = {
-					has_authority_democratic = yes # undercoat: moved to scripted trigger
-					has_authority_oligarchic = yes # undercoat: moved to scripted trigger
-					has_authority_imperial = yes # undercoat: moved to scripted trigger
+					is_democratic_authority = yes
+					is_oligarchic_authority = yes
+					is_imperial_authority = yes
 				}
 			}
 		}
@@ -1647,7 +1656,7 @@ espionage_smear_campaign_spiritualist = {
 	}
 	else_if = {
 		limit = {
-			root.target = { is_megacorp = yes } # undercoat: moved to scripted trigger
+			root.target = { is_megacorp = yes }
 		}
 		set_country_flag = smear_spiritualist_merch@root.target
 		set_country_flag = smear_campaign_insulted@root.owner
@@ -1678,7 +1687,7 @@ espionage_smear_campaign_militarist = {
 			root.target = {
 				OR = {
 					is_militarist = yes
-					is_megacorp = yes # undercoat: moved to scripted trigger
+					is_megacorp = yes
 					has_valid_civic = civic_merchant_guilds
 				}
 			}
@@ -1703,8 +1712,9 @@ espionage_smear_campaign_xenophobe = {
 	if = {
 		limit = {
 			root.target = {
+				is_individual_machine = no
 				OR = {
-					is_megacorp = yes # undercoat: moved to scripted trigger
+					is_megacorp = yes
 					has_valid_civic = civic_merchant_guilds
 				}
 				has_technology = tech_gene_tailoring
@@ -1793,7 +1803,7 @@ espionage_smear_campaign_pacifist = {
 		limit = {
 			root.target = {
 				OR = {
-					is_megacorp = yes # undercoat: moved to scripted trigger
+					is_megacorp = yes
 					has_valid_civic = civic_merchant_guilds
 				}
 			}
@@ -1835,7 +1845,7 @@ espionage_smear_campaign_xenophile = {
 		limit = {
 			root.target = {
 				OR = {
-					is_megacorp = yes # undercoat: moved to scripted trigger
+					is_megacorp = yes
 					has_valid_civic = civic_merchant_guilds
 					has_commercial_pact = event_target:smear_campaign_recipient
 				}
@@ -1870,12 +1880,12 @@ espionage_smear_campaign_xenophile = {
 espionage_smear_campaign_authoritarian = {
 	if = {
 		limit = {
-			has_authority_dictatorial = yes # undercoat: moved to scripted trigger
+			is_dictatorial_authority = yes
 			root.target = {
 				OR = {
-					has_authority_democratic = yes # undercoat: moved to scripted trigger
-					has_authority_oligarchic = yes # undercoat: moved to scripted trigger
-					has_authority_imperial = yes # undercoat: moved to scripted trigger
+					is_democratic_authority = yes
+					is_oligarchic_authority = yes
+					is_imperial_authority = yes
 				}
 			}
 		}
@@ -1920,7 +1930,7 @@ espionage_smear_campaign_corporate = {
 			modifier = {
 				factor = 0
 				root.target = {
-					is_machine_empire = no # undercoat: moved to scripted trigger
+					is_machine_empire = no
 				}
 			}
 			set_country_flag = smear_corporate_machine@root.target
@@ -2730,28 +2740,28 @@ operation_random_events_pre_ftl = {
 	if = {
 		limit = {
 			owner = { is_regular_empire = yes }
-			target = { is_hive_empire = no } # undercoat: moved to scripted trigger
+			target = { is_hive_empire = no }
 		}
 		operation_random_events_pre_ftl_regular_regular = yes
 	}
 	else_if = {
 		limit = {
 			owner = { is_regular_empire = yes }
-			target = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+			target = { is_hive_empire = yes }
 		}
 		operation_random_events_pre_ftl_regular_gestalt = yes
 	}
 	else_if = {
 		limit = {
 			owner = { is_gestalt = yes }
-			target = { is_hive_empire = no } # undercoat: moved to scripted trigger
+			target = { is_hive_empire = no }
 		}
 		operation_random_events_pre_ftl_gestalt_regular = yes
 	}
 	else_if = {
 		limit = {
 			owner = { is_gestalt = yes }
-			target = { is_hive_empire = yes } # undercoat: moved to scripted trigger
+			target = { is_hive_empire = yes }
 		}
 		operation_random_events_pre_ftl_gestalt_gestalt = yes
 	}

@@ -5,11 +5,13 @@ repeal_all_galactic_focus_resolutions = {
 	remove_global_flag = galactic_focus_crisis_greatkhan
 	remove_global_flag = galactic_focus_crisis_nanites
 	remove_global_flag = galactic_focus_war_in_heaven
+	remove_global_flag = galactic_focus_crisis_synth_queen
 	cancel_resolution = resolution_galactic_focus_crisis_prethoryn
 	cancel_resolution = resolution_galactic_focus_crisis_contingency
 	cancel_resolution = resolution_galactic_focus_crisis_unbidden
 	cancel_resolution = resolution_galactic_focus_crisis_greatkhan
 	cancel_resolution = resolution_galactic_focus_crisis_nanites
+	cancel_resolution = resolution_galactic_focus_crisis_synth_queen
 	if = { #these are in IFs because the hidden description raises error messages on their names otherwise
 		limit = {
 			OR = {
@@ -29,6 +31,51 @@ repeal_all_galactic_focus_resolutions = {
 		cancel_resolution = resolution_galactic_focus_war_in_heaven_support_side_2
 	}
 	cancel_resolution = resolution_galactic_focus_war_in_heaven_denounce_both
+}
+
+declare_crisis_effect = {
+	if = {
+		limit = { any_playable_country = { is_galactic_custodian = yes } }
+		random_playable_country = {
+			limit = { is_galactic_custodian = yes }
+			pass_targeted_resolution = {
+				resolution = resolution_declare_crisis
+				target = root.owner
+			}
+		}
+	}
+	else_if = {
+		limit = { any_playable_country = { is_galactic_emperor = yes } }
+		random_playable_country = {
+			limit = { is_galactic_emperor = yes }
+			pass_targeted_resolution = {
+				resolution = resolution_declare_crisis_empire
+				target = root.owner
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { any_neighbor_country = { is_galactic_community_member = yes } } }
+		owner = {
+			random_neighbor_country = {
+				limit = { is_galactic_community_member = yes }
+				pass_targeted_resolution = {
+					resolution = resolution_declare_crisis
+					target = root.owner
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = { any_playable_country = { is_galactic_community_member = yes } }
+		random_playable_country = {
+			limit = { is_galactic_community_member = yes }
+			pass_targeted_resolution = {
+				resolution = resolution_declare_crisis
+				target = root.owner
+			}
+		}
+	}
 }
 
 store_galactic_community_leader_backup_data = {
@@ -201,7 +248,7 @@ breach_fix_resolution_greatergood_greater_than_ourselves_living_standards = {
 			in_breach_of = resolution_greatergood_greater_than_ourselves
 		}
 		if = {
-			limit = { has_civic = civic_dystopian_society } # undercoat: not changed
+			limit = { has_dystopian_society = yes } # undercoat: moved to scripted trigger
 			force_remove_civic = civic_dystopian_society
 			hidden_effect = {
 				every_owned_species = {
@@ -618,7 +665,10 @@ breach_fix_resolution_divinity_a_defined_purpose_machine = {
 		limit = {
 			is_active_resolution = "resolution_divinity_a_defined_purpose"
 			in_breach_of = resolution_divinity_a_defined_purpose
-			is_machine_empire = yes
+			OR = {
+				is_machine_empire = yes
+				is_individual_machine = yes
+			}
 			is_servitor_empire = no # undercoat: moved to scripted trigger
 			is_machine_assimilator = no # undercoat: moved to scripted trigger
 			exists = event_target:defined_purpose_random_species
@@ -645,7 +695,10 @@ breach_fix_resolution_divinity_a_defined_purpose_machine = {
 		limit = {
 			is_active_resolution = "resolution_divinity_a_defined_purpose"
 			in_breach_of = resolution_divinity_a_defined_purpose
-			is_machine_empire = yes
+			OR = {
+				is_machine_empire = yes
+				is_individual_machine = yes
+			}
 			is_servitor_empire = no # undercoat: moved to scripted trigger
 			is_machine_assimilator = no # undercoat: moved to scripted trigger
 			NOT = { exists = event_target:defined_purpose_random_species }

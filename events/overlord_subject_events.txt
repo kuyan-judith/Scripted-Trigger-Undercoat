@@ -1,0 +1,4013 @@
+############################
+#
+# Subject Events
+#
+# Written by Joachim Holmsen
+#
+############################
+
+namespace = subject
+
+### Bulwark 1 - 2000
+# Event Chain - Veterans interested in moving from Overlord to Subject
+country_event = { # OVERLORD - Veterans approach Overlord
+	id = subject.1
+	title = subject.1.title
+	desc = subject.1.desc
+	picture = GFX_evt_outpost
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_bulwark_event_chain_1_overlord }
+		is_gestalt = no
+		is_overlord = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_bulwark_event_chain_1_subject }
+			is_gestalt = no
+			OR = {
+				is_specialist_subject_type = { TYPE = bulwark }
+				AND = {
+					is_militarist = yes
+					is_specialist_subject = yes
+				}
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_bulwark_event_chain_1_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_bulwark_event_chain_1_subject }
+				OR = {
+					is_specialist_subject_type = { TYPE = bulwark }
+					AND = {
+						is_militarist = yes
+						is_specialist_subject = yes
+					}
+				}
+			}
+			set_country_flag = cooldown_bulwark_event_chain_1_subject
+			save_event_target_as = subject_empire
+		}
+	}
+
+	option = {
+		name = subject.1.a
+		custom_tooltip = subject.1.a.tt
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.3
+					days = 30
+				}
+			}
+		}
+	}
+
+	option = {
+		name = subject.1.b
+		custom_tooltip = subject.1.b.tt
+		trigger = {
+			is_ai = no
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		hidden_effect = {
+			random_list = {
+				50 = {
+					modifier = {
+						factor = 1.25
+						is_pacifist = yes
+					}
+					modifier = {
+						factor = 1.25
+						is_spiritualist = yes
+					}
+					event_target:subject_empire = {
+						country_event = {
+							id = subject.3
+							days = 30
+						}
+					}
+				}
+				50 = {
+					modifier = {
+						factor = 1.25
+						is_militarist = yes
+					}
+					modifier = {
+						factor = 1.25
+						is_materialist = yes
+					}
+					modifier = {
+						factor = 0
+						event_target:subject_empire = {
+							NOT = {
+								any_system_within_border = {
+									is_capital_system = no
+								}
+							}
+						}
+					}
+					country_event = {
+						id = subject.14
+						days = 15
+					}
+					event_target:subject_empire = {
+						country_event = {
+							id = subject.5
+							days = 30
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = subject.1.c
+		custom_tooltip = subject.1.c.tt
+		trigger = {
+			is_ai = no
+		}
+		hidden_effect = {
+			random_list = {
+				80 = {}
+				10 = {
+					modifier = {
+						factor = 1.25
+						is_pacifist = yes
+					}
+					modifier = {
+						factor = 1.25
+						is_spiritualist = yes
+					}
+					country_event = {
+						id = subject.16
+						days = 15
+					}
+					event_target:subject_empire = {
+						country_event = {
+							id = subject.3
+							days = 30
+						}
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 1.25
+						is_militarist = yes
+					}
+					modifier = {
+						factor = 1.25
+						is_materialist = yes
+					}
+					modifier = {
+						factor = 0
+						event_target:subject_empire = {
+							NOT = {
+								any_system_within_border = {
+									is_capital_system = no
+								}
+							}
+						}
+					}
+					country_event = {
+						id = subject.18
+						days = 15
+					}
+					event_target:subject_empire = {
+						country_event = {
+							id = subject.5
+							days = 30
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Veterans approach the subject
+	id = subject.3
+	title = subject.3.title
+	desc = subject.3.desc
+	picture = GFX_evt_smugglers_in_bar
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = { # Veterans sent home
+		name = subject.3.a
+		capital_scope = {
+			create_pop = {
+				species = event_target:overlord_empire.species
+			}
+		}
+		add_modifier = {
+			modifier = specialist_bulwark_veterans_modifier
+			days = 7200
+		}
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.10
+					days = 15
+				}
+			}
+		}
+	}
+	option = { # Veterans sent home
+		name = subject.3.b
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = { id = subject.12 }
+			}
+		}
+	}
+}
+
+country_event = { # HIDDEN - Veterans cause havoc in subject system
+	id = subject.5
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		any_system_within_border = {
+			is_capital_system = no
+		}
+	}
+
+	immediate = {
+		random_system_within_border = {
+			limit = {
+				is_capital_system = no
+			}
+			save_event_target_as = pirate_system
+		}
+		country_event = { id = pirate.50 }
+	}
+}
+
+country_event = { # Ping event - OVERLORD - Veterans found themselves at home at subject's place
+	id = subject.10
+	title = subject.10.title
+	desc = subject.10.desc
+	picture = GFX_evt_bribery
+	show_sound = evn_ove_briber
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.10.a
+	}
+}
+
+country_event = { # Ping event - OVERLORD - Veterans sent home
+	id = subject.12
+	title = subject.12.title
+	desc = subject.12.desc
+	picture = GFX_evt_smugglers_in_bar
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.12.a
+	}
+}
+
+country_event = { # Ping event - OVERLORD - veterans decided to privateer
+	id = subject.14
+	title = subject.14.title
+	desc = subject.14.desc
+	picture = GFX_evt_pirate_armada
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.14.a
+	}
+}
+
+country_event = { # Ping event - OVERLORD - veterans decided to go to subject's place nonetheless
+	id = subject.16
+	title = subject.16.title
+	desc = subject.16.desc
+	picture = GFX_evt_bribery
+	show_sound = evn_ove_briber
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.16.a
+	}
+}
+
+country_event = { # Ping event - OVERLORD - veterans decided to become privateers nonetheless
+	id = subject.18
+	title = subject.18.title
+	desc = subject.18.desc
+	picture = GFX_evt_pirate_armada
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.18.a
+	}
+}
+
+# Event Chain - Subject asking for an upgrade to their starbase
+country_event = { # HIDDEN - Check if overlord has any Bulwark subjects that is lagging behind in starbase tech
+	id = subject.50
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_bulwark_event_chain_2_overlord }
+		is_overlord = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_bulwark_event_chain_2_subject }
+			is_specialist_subject_type = { TYPE = bulwark }
+			OR = {
+				AND = {
+					ROOT = { has_technology = tech_starbase_5 }
+					NOT = { has_technology = tech_starbase_5 }
+					any_owned_starbase = {
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_citadel
+					}
+					has_country_resource = {
+						type = alloys
+						amount >= 4000
+					}
+				}
+				AND = {
+					ROOT = { has_technology = tech_starbase_4 }
+					NOT = { has_technology = tech_starbase_4 }
+					any_owned_starbase = {
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_starfortress
+					}
+					has_country_resource = {
+						type = alloys
+						amount >= 1500
+					}
+				}
+				AND = {
+					ROOT = { has_technology = tech_starbase_3 }
+					NOT = { has_technology = tech_starbase_3 }
+					any_owned_starbase = {
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_starhold
+					}
+					has_country_resource = {
+						type = alloys
+						amount >= 750
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_bulwark_event_chain_2_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_bulwark_event_chain_2_subject }
+				is_specialist_subject_type = { TYPE = bulwark }
+				OR = {
+					AND = {
+						ROOT = { has_technology = tech_starbase_5 }
+						NOT = { has_technology = tech_starbase_5 }
+						any_owned_starbase = {
+							has_starbase_size > starbase_outpost
+							has_starbase_size < starbase_citadel
+						}
+						has_country_resource = {
+							type = alloys
+							amount >= 4000
+						}
+					}
+					AND = {
+						ROOT = { has_technology = tech_starbase_4 }
+						NOT = { has_technology = tech_starbase_4 }
+						any_owned_starbase = {
+							has_starbase_size > starbase_outpost
+							has_starbase_size < starbase_starfortress
+						}
+						has_country_resource = {
+							type = alloys
+							amount >= 1500
+						}
+					}
+					AND = {
+						ROOT = { has_technology = tech_starbase_3 }
+						NOT = { has_technology = tech_starbase_3 }
+						any_owned_starbase = {
+							has_starbase_size > starbase_outpost
+							has_starbase_size < starbase_starhold
+						}
+						has_country_resource = {
+							type = alloys
+							amount >= 750
+						}
+					}
+				}
+			}
+			set_country_flag = cooldown_bulwark_event_chain_2_subject
+			save_event_target_as = subject_empire
+			if = {
+				limit = {
+					ROOT = { has_technology = tech_starbase_5 }
+					NOT = { has_technology = tech_starbase_5 }
+					any_owned_starbase = {
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_citadel
+					}
+					has_country_resource = {
+						type = alloys
+						amount >= 4000
+					}
+				}
+				set_country_flag = bulwark_specialist_request_citadel
+			}
+			else_if = {
+				limit = {
+					ROOT = { has_technology = tech_starbase_4 }
+					NOT = { has_technology = tech_starbase_4 }
+					any_owned_starbase = {
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_starfortress
+					}
+					has_country_resource = {
+						type = alloys
+						amount >= 1500
+					}
+				}
+				set_country_flag = bulwark_specialist_request_star_fortress
+			}
+			else_if = {
+				limit = {
+					ROOT = { has_technology = tech_starbase_3 }
+					NOT = { has_technology = tech_starbase_3 }
+					any_owned_starbase = {
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_starhold
+					}
+					has_country_resource = {
+						type = alloys
+						amount >= 750
+					}
+				}
+				set_country_flag = bulwark_specialist_request_starhold
+			}
+			country_event = { id = subject.55 }
+		}
+	}
+}
+
+country_event = { # SUBJECT - Subject is given the chance to ask the overlord for an upgrade
+	id = subject.55
+	title = subject.55.title
+	desc = subject.55.desc
+	picture = GFX_evt_space_station
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		any_owned_starbase = {
+			OR = {
+				AND = {
+					ROOT = { has_country_flag = bulwark_specialist_request_citadel }
+					has_starbase_size > starbase_outpost
+					has_starbase_size < starbase_citadel
+				}
+				AND = {
+					ROOT = { has_country_flag = bulwark_specialist_request_star_fortress }
+					has_starbase_size < starbase_outpost
+					has_starbase_size > starbase_starfortress
+				}
+				AND = {
+					ROOT = { has_country_flag = bulwark_specialist_request_starhold }
+					has_starbase_size < starbase_outpost
+					has_starbase_size > starbase_starhold
+				}
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_starbase = {
+			limit = {
+				OR = {
+					AND = {
+						ROOT = { has_country_flag = bulwark_specialist_request_citadel }
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_citadel
+					}
+					AND = {
+						ROOT = { has_country_flag = bulwark_specialist_request_star_fortress }
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_starfortress
+					}
+					AND = {
+						ROOT = { has_country_flag = bulwark_specialist_request_starhold }
+						has_starbase_size > starbase_outpost
+						has_starbase_size < starbase_starhold
+					}
+				}
+			}
+			save_event_target_as = targeted_starbase
+		}
+	}
+
+	option = {
+		name = subject.55.a
+		add_resource = { influence = -15 }
+		if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_citadel
+			}
+			add_resource = { alloys = -4000 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_star_fortress
+			}
+			add_resource = { alloys = -1500 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_starhold
+			}
+			add_resource = { alloys = -750 }
+		}
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.60
+					days = 15
+				}
+			}
+		}
+
+	}
+	option = {
+		name = subject.55.b
+	}
+}
+
+country_event = { # OVERLORD - Overlord gets the request for an upgrade
+	id = subject.60
+	title = subject.60.title
+	desc = subject.60.desc
+	picture = GFX_evt_space_station
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		exists = event_target:targeted_starbase
+		event_target:targeted_starbase = {
+			is_owned_by = event_target:subject_empire
+		}
+	}
+
+	option = {
+		name = subject.60.a
+		custom_tooltip = subject.60.a.tt
+		add_modifier = {
+			modifier = "specialist_bulwark_helpful_overlord_modifier"
+			days = 1800
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.62
+					days = 150
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.60.b
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.65
+					days = 15
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping event - SUBJECT - Overlord chose to help upgrade the starbase
+	id = subject.62
+	title = subject.62.title
+	desc = {
+		text = subject.62.desc
+		trigger = {
+			event_target:overlord_empire = {
+				is_gestalt = no
+			}
+		}
+	}
+	desc = {
+		text = subject.62.desc_overlord_gestalt
+		trigger = {
+			event_target:overlord_empire = {
+				is_gestalt = yes
+			}
+		}
+	}
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		exists = event_target:targeted_starbase
+		event_target:targeted_starbase = {
+			is_owned_by = event_target:subject_empire
+		}
+	}
+
+	option = {
+		name = subject.62.a
+		if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_citadel
+			}
+			event_target:targeted_starbase = {
+				set_starbase_size = starbase_citadel
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_star_fortress
+			}
+			event_target:targeted_starbase = {
+				set_starbase_size = starbase_starfortress
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_starhold
+			}
+			event_target:targeted_starbase = {
+				set_starbase_size = starbase_starhold
+			}
+		}
+		if = {
+			limit = {
+				NOT = { has_technology = tech_starbase_3 }
+				OR = {
+					has_country_flag = bulwark_specialist_request_star_fortress
+					has_country_flag = bulwark_specialist_request_citadel
+					has_country_flag = bulwark_specialist_request_starhold
+				}
+			}
+			add_tech_progress = {
+				tech = tech_starbase_3
+				progress = 0.25
+			}
+			add_research_option = tech_starbase_3
+		}
+		else_if = {
+			limit = {
+				NOT = { has_technology = tech_starbase_4 }
+				OR = {
+					has_country_flag = bulwark_specialist_request_star_fortress
+					has_country_flag = bulwark_specialist_request_citadel
+				}
+			}
+			add_tech_progress = {
+				tech = tech_starbase_4
+				progress = 0.25
+			}
+			add_research_option = tech_starbase_4
+		}
+		else_if = {
+			limit = {
+				NOT = { has_technology = tech_starbase_5 }
+				has_country_flag = bulwark_specialist_request_citadel
+			}
+			add_tech_progress = {
+				tech = tech_starbase_5
+				progress = 0.25
+			}
+			add_research_option = tech_starbase_5
+		}
+	}
+
+	after = {
+		remove_country_flag = bulwark_specialist_request_citadel
+		remove_country_flag = bulwark_specialist_request_star_fortress
+		remove_country_flag = bulwark_specialist_request_starhold
+	}
+}
+
+country_event = { # Ping event - SUBJECT - Overlord chose to not help out
+	id = subject.65
+	title = subject.65.title
+	desc = subject.65.desc
+	picture = GFX_evt_one_sided_deal
+	show_sound = evn_ove_one_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.65.a
+		if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_citadel
+			}
+			add_resource = { alloys = 4000 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_star_fortress
+			}
+			add_resource = { alloys = 1500 }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = bulwark_specialist_request_starhold
+			}
+			add_resource = { alloys = 750 }
+		}
+	}
+
+	after = {
+		remove_country_flag = bulwark_specialist_request_citadel
+		remove_country_flag = bulwark_specialist_request_star_fortress
+		remove_country_flag = bulwark_specialist_request_starhold
+	}
+}
+
+# Event Chain - Occupied Bulwark
+country_event = { # OVERLORD - Overlord is informed about the Bulwark being occupied, and struggling
+	id = subject.100
+	title = subject.100.title
+	desc = subject.100.desc
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_bulwark_event_chain_3_overlord }
+		is_overlord = yes
+		is_pacifist = no
+		any_subject = {
+			NOT = { has_country_flag = cooldown_bulwark_event_chain_3_subject }
+			is_specialist_subject_type = { TYPE = bulwark }
+			any_owned_planet = {
+				NOT = { is_controlled_by = PREV }
+			}
+			any_owned_planet = {
+				is_controlled_by = PREV
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_bulwark_event_chain_3_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_bulwark_event_chain_3_subject }
+				is_specialist_subject_type = { TYPE = bulwark }
+				any_owned_planet = {
+					NOT = { is_controlled_by = PREV }
+				}
+				any_owned_planet = {
+					is_controlled_by = PREV
+				}
+			}
+			set_country_flag = cooldown_bulwark_event_chain_3_subject
+			save_event_target_as = subject_empire
+		}
+	}
+
+	option = {
+		name = subject.100.a
+		custom_tooltip = subject.100.a.tt
+		add_resource = { influence = -15 }
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.105
+					days = 15
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.100.b
+		trigger = {
+			is_ai = no
+		}
+		add_resource = { influence = -15 }
+		add_modifier = {
+			modifier = specialist_bulwark_defensive_overlord_modifier
+			days = 3600
+		}
+	}
+	option = {
+		trigger = {
+			is_ai = no
+		}
+		name = subject.100.c
+	}
+}
+
+country_event = { # SUBJECT - Subject is given the choice if they want to be more militarized
+	id = subject.105
+	title = subject.105.title
+	desc = {
+		text = subject.105.desc
+		trigger = {
+			event_target:overlord_empire = {
+				is_gestalt = no
+			}
+			event_target:subject_empire = {
+				is_gestalt = no
+			}
+		}
+	}
+	desc = {
+		text = subject.105.desc_subject_gestalt
+		trigger = {
+			event_target:overlord_empire = {
+				is_gestalt = no
+			}
+			event_target:subject_empire = {
+				is_gestalt = yes
+			}
+		}
+	}
+	desc = {
+		text = subject.105.desc_overlord_gestalt
+		trigger = {
+			event_target:overlord_empire = {
+				is_gestalt = yes
+			}
+			event_target:subject_empire = {
+				is_gestalt = no
+			}
+		}
+	}
+	desc = {
+		text = subject.105.desc_both_gestalt
+		trigger = {
+			event_target:overlord_empire = {
+				is_gestalt = yes
+			}
+			event_target:subject_empire = {
+				is_gestalt = yes
+			}
+		}
+	}
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.105.a
+		add_resource = { influence = -15 }
+		if = {
+			limit = {
+				is_militarist = no
+			}
+			shift_ethic = ethic_militarist
+		}
+		else_if = {
+			limit = {
+				has_ethic = ethic_militarist
+			}
+			shift_ethic = ethic_fanatic_militarist
+		}
+		add_modifier = {
+			modifier = specialist_bulwark_home_defense_force_modifier
+			days = 3600
+		}
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.107
+					days = 15
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.105.b
+		trigger = {
+			OR = {
+				is_ai = no
+				is_pacifist = yes
+			}
+		}
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.110
+					days = 15
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping Event - OVERLORD - Overlord informed that the subject has agreed to the militarization efforts
+	id = subject.107
+	title = subject.107.title
+	desc = subject.107.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.107.a
+	}
+}
+
+country_event = { # Ping Event - OVERLORD - Overlord informed that the subject has declined the militarization efforts
+	id = subject.110
+	title = subject.110.title
+	desc = subject.110.desc
+	picture = GFX_evt_one_sided_deal
+	show_sound = evn_ove_one_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.110.a
+	}
+}
+
+# Event Chain - War Fever
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.1001
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_bulwark_event_chain_4_overlord }
+		is_overlord = yes
+		is_at_war = no
+		any_subject = {
+			NOT = { has_country_flag = cooldown_bulwark_event_chain_4_subject }
+			OR = {
+				is_specialist_subject_type = { TYPE = bulwark }
+				AND = {
+					is_militarist = yes
+					is_specialist_subject = yes
+				}
+			}
+			is_pacifist = no
+			is_gestalt = no
+			is_at_war = no
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_bulwark_event_chain_4_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_bulwark_event_chain_4_subject }
+				OR = {
+					is_specialist_subject_type = { TYPE = bulwark }
+					AND = {
+						is_militarist = yes
+						is_specialist_subject = yes
+					}
+				}
+				is_pacifist = no
+				is_gestalt = no
+				is_at_war = no
+			}
+			set_country_flag = cooldown_bulwark_event_chain_4_subject
+			save_event_target_as = subject_empire
+			country_event = {
+				id = subject.1003
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Subject is informed of the increased war fever among their population
+	id = subject.1003
+	title = subject.1003.title
+	desc = subject.1003.desc
+	picture = GFX_evt_small_space_battle
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = { # Stoke war fever
+		name = subject.1003.a
+		hidden_effect = {
+			country_event = {
+				id = subject.1005
+				days = 30
+			}
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.1010
+					days = 45
+				}
+			}
+		}
+	}
+	option = { # Quench war fever
+		name = subject.1003.b
+		add_resource = { influence = -25 }
+	}
+}
+
+country_event = { # SUBJECT - Subject gets to choose a reward for their war fever
+	id = subject.1005
+	title = subject.1005.title
+	desc = subject.1005.desc
+	picture = GFX_evt_metropolis
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.1005.a
+		custom_tooltip = subject.1005.a.tt
+		create_leader = {
+			class = commander
+			species = root.species
+			name = random
+			skill = 5
+			effect = {
+				set_age = 55
+			}
+		}
+	}
+	option = {
+		name = subject.1005.b
+		trigger = {
+			NOT = { has_ethic = ethic_fanatic_militarist }
+		}
+		if = {
+			limit = {
+				is_militarist = no
+			}
+			shift_ethic = ethic_militarist
+		}
+		else_if = {
+			limit = {
+				has_ethic = ethic_militarist
+			}
+			shift_ethic = ethic_fanatic_militarist
+		}
+	}
+	option = {
+		name = subject.1005.c
+		add_modifier = {
+			modifier = specialist_overlord_war_fever_modifier
+			days = 7200
+		}
+	}
+}
+
+country_event = { # Ping Event - OVERLORD - Overlord is informed about the situation
+	id = subject.1010
+	title = subject.1010.title
+	desc = subject.1010.desc
+	picture = GFX_evt_grand_speech
+	show_sound = evn_ove_grand_speech
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.1010.a
+	}
+}
+
+# Event Chain - War Exhaustion
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.1050
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_bulwark_event_chain_5_overlord }
+		is_overlord = yes
+		is_at_war = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_bulwark_event_chain_5_subject }
+			OR = {
+				is_specialist_subject_type = { TYPE = bulwark }
+				AND = {
+					is_pacifist = yes
+					is_specialist_subject = yes
+				}
+			}
+			is_militarist = no
+			is_at_war = yes
+			NOT = { has_modifier = specialist_overlord_war_fever_modifier }
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_bulwark_event_chain_5_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_bulwark_event_chain_5_subject }
+				OR = {
+					is_specialist_subject_type = { TYPE = bulwark }
+					AND = {
+						is_pacifist = yes
+						is_specialist_subject = yes
+					}
+				}
+				is_militarist = no
+				is_at_war = yes
+				NOT = { has_modifier = specialist_overlord_war_fever_modifier }
+			}
+			set_country_flag = cooldown_bulwark_event_chain_5_subject
+			save_event_target_as = subject_empire
+			country_event = {
+				id = subject.1052
+				days = 150
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Ask for an end to the wars
+	id = subject.1052
+	title = subject.1052.title
+	desc = {
+		text = subject.1052.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = subject.1052.desc_gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_small_space_battle
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		is_at_war = yes
+	}
+
+	option = { # Ask your overlord to put an end to the war
+		name = subject.1052.a
+		add_resource = { influence = -10 }
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.1055
+					days = 30
+				}
+			}
+		}
+	}
+	option = { # Deal with it
+		name = subject.1052.b
+		if = {
+			limit = {
+				is_lithoid_empire = yes
+			}
+			add_modifier = {
+				modifier = specialist_overlord_war_exhaustion_lithoid_modifier
+				days = 7200
+			}
+		}
+		else_if = {
+			limit = {
+				is_robot_empire = yes
+			}
+			add_modifier = {
+				modifier = specialist_overlord_war_exhaustion_robot_modifier
+				days = 7200
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = specialist_overlord_war_exhaustion_modifier
+				days = 7200
+			}
+		}
+	}
+}
+
+country_event = { # OVERLORD - Getting a request from the subject, about putting an end to the wars they are currently in
+	id = subject.1055
+	title = subject.1055.title
+	desc = subject.1055.desc
+	picture = GFX_evt_small_space_battle
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = { # Positive feedback
+		name = subject.1055.a
+		add_resource = { influence = -10 }
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.1057
+					days = 30
+				}
+			}
+		}
+	}
+	option = { # Negative feedback
+		name = subject.1055.b
+		custom_tooltip = subject.1055.b.tt
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.1060
+					days = 30
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping event - SUBJECT - Swayed by Overlord's positive response
+	id = subject.1057
+	title = subject.1057.title
+	desc = subject.1057.desc
+	picture = GFX_evt_alien_propaganda
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.1057.a
+	}
+}
+
+country_event = { # SUBJECT - Dismayed by Overlord's negative response
+	id = subject.1060
+	title = subject.1060.title
+	desc = {
+		text = subject.1060.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = subject.1060.desc_gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_alien_propaganda
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = { # Deal with it
+		name = subject.1060.a
+		if = {
+			limit = {
+				is_lithoid_empire = yes
+			}
+			add_modifier = {
+				modifier = specialist_overlord_war_exhaustion_lithoid_modifier
+				days = 7200
+			}
+		}
+		else_if = {
+			limit = {
+				is_robot_empire = yes
+			}
+			add_modifier = {
+				modifier = specialist_overlord_war_exhaustion_robot_modifier
+				days = 7200
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = specialist_overlord_war_exhaustion_modifier
+				days = 7200
+			}
+		}
+	}
+	option = { # Embrace group that opposes Overlord
+		name = subject.1060.b
+		origin_ungrateful_vassal_effect = yes
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.1062
+					days = 15
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping event - OVERLORD - Rising opposition to Overlord among Subject
+	id = subject.1062
+	title = subject.1062.title
+	desc = {
+		text = subject.1062.desc
+		trigger = {
+			event_target:subject_empire = {
+				is_gestalt = no
+			}
+		}
+	}
+	desc = {
+		text = subject.1062.desc_gestalt
+		trigger = {
+			event_target:subject_empire = {
+				is_gestalt = yes
+			}
+		}
+	}
+	picture = GFX_evt_grand_speech
+	show_sound = evn_ove_grand_speech
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		tooltip = {
+			event_target:subject_empire = {
+				origin_ungrateful_vassal_effect = yes
+			}
+		}
+	}
+
+	option = {
+		name = subject.1062.a
+	}
+}
+
+# Event Chain - Rival Admirals
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.1100
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_bulwark_event_chain_6_overlord }
+		is_overlord = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_bulwark_event_chain_6_subject }
+			is_specialist_subject_type = { TYPE = bulwark }
+			is_gestalt = no
+			is_pacifist = no
+			OR = {
+				is_democracy = yes
+				is_oligarchy = yes
+			}
+			count_owned_leader = {
+				count >= 2
+				limit = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_bulwark_event_chain_6_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_bulwark_event_chain_6_subject }
+				is_specialist_subject_type = { TYPE = bulwark }
+				is_gestalt = no
+				is_pacifist = no
+				OR = {
+					is_democracy = yes
+					is_oligarchy = yes
+				}
+				count_owned_leader = {
+					count >= 2
+					limit = {
+						leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+					}
+				}
+			}
+			set_country_flag = cooldown_bulwark_event_chain_6_subject
+			save_event_target_as = subject_empire
+			country_event = { id = subject.1102 }
+		}
+	}
+}
+
+country_event = { # SUBJECT - Start the story of the bickering admirals
+	id = subject.1102
+	title = subject.1102.title
+	desc = subject.1102.desc
+	picture = GFX_evt_arguing_senate
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		count_owned_leader = {
+			count >= 2
+			limit = {
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_leader = {
+			limit = {
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+			}
+			set_leader_flag = admiral_democracy
+			save_event_target_as = admiral_democracy
+		}
+		random_owned_leader = {
+			limit = {
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				NOT = { has_leader_flag = admiral_democracy }
+			}
+			set_leader_flag = admiral_oligarchy
+			save_event_target_as = admiral_oligarchy
+		}
+	}
+
+	option = {
+		name = subject.1102.a
+		hidden_effect = {
+			random_list = {
+				75 = {} # They end their conflict
+				25 = { # The conflict continues
+					country_event = {
+						id = subject.1105
+						days = 150
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.1102.b
+		hidden_effect = {
+			random_list = {
+				90 = { # The conflict continues
+					country_event = {
+						id = subject.1105
+						days = 150
+					}
+				}
+				10 = { # They end their conflict
+					country_event = {
+						id = subject.1110
+						days = 150
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Continued bickering between the admirals and their followers
+	id = subject.1105
+	title = subject.1105.title
+	desc = {
+		text = subject.1105.desc_democracy
+		trigger = {
+			is_democracy = yes
+		}
+	}
+	desc = {
+		text = subject.1105.desc_oligarchy
+		trigger = {
+			is_oligarchy = yes
+		}
+	}
+	desc = {
+		text = subject.1105.desc_neither
+		trigger = {
+			NOR = {
+				is_democracy = yes
+				is_oligarchy = yes
+			}
+		}
+	}
+	picture = GFX_evt_arguing_senate
+
+	is_triggered_only = yes
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.1105.a
+		hidden_effect = {
+			if = {
+				limit = {
+					overlord_subject_event_trigger = yes
+				}
+				event_target:overlord_empire = {
+					country_event = {
+						id = subject.1107
+						days = 150
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # OVERLORD - Can try to intervene to stop the bickering before it gets out of hand
+	id = subject.1107
+	title = subject.1107.title
+	desc = subject.1107.desc
+	picture = GFX_evt_arguing_senate
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = { # Tries to intervene
+		name = subject.1107.a
+		hidden_effect = {
+			random_list = {
+				75 = {
+					event_target:subject_empire = {
+						country_event = { id = subject.1110 }
+					}
+				}
+				25 = {
+					event_target:subject_empire = {
+						country_event = { id = subject.1112 }
+					}
+				}
+			}
+		}
+	}
+	option = { # Ignores the problem
+		name = subject.1107.b
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.1115
+					days = 150
+				}
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Overlord successfully stopped the fighting
+	id = subject.1110
+	title = subject.1110.title
+	desc = subject.1110.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.1110.a
+	}
+}
+
+country_event = { # SUBJECT - Overlord failed at stopping the fighting
+	id = subject.1112
+	title = subject.1112.title
+	desc = subject.1112.desc
+	picture = GFX_evt_grand_speech
+	show_sound = evn_ove_grand_speech
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.1112.a
+		hidden_effect = {
+			country_event = {
+				id = subject.1115
+				days = 150
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Fighting between the two sides comes to a head (start of random events where you have to take a side in their disagreements)
+	id = subject.1115
+	title = subject.1115.title
+	desc = subject.1115.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.1115.a
+		hidden_effect = {
+			set_variable = {
+				which = overlord_admirals_bickering_value
+				value = 1
+			}
+			set_variable = {
+				which = overlord_admirals_bickering_democratic_side
+				value = 50
+			}
+			set_variable = {
+				which = overlord_admirals_bickering_oligarchic_side
+				value = 50
+			}
+			country_event = {
+				id = subject.1117
+				days = 150
+			}
+		}
+	}
+}
+
+country_event = { # Event firing the on-action
+	id = subject.1117
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		fire_on_action = { on_action = on_admirals_bickering_event_chain }
+	}
+}
+
+# Random Events for the Event Chain #
+# 3 events will be a chosen at random, then the empire will move on to the finale of the event chain, see subject.1142
+country_event = { # SUBJECT - Mineral cargo ship crash
+	id = subject.1120
+	title = subject.1120.title
+	desc = subject.1120.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = bickering_admirals_cargo_ship_cd }
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+		random_owned_planet = {
+			save_event_target_as = crash_planet
+		}
+		set_timed_country_flag = {
+			flag = bickering_admirals_cargo_ship_cd
+			days = 600
+		}
+	}
+
+	option = {
+		name = subject.1120.a
+		custom_tooltip = bickering_admirals_democratic_boon_tt
+		hidden_effect = {
+			admirals_bickering_increase_democratic_influence_effect = yes
+			admirals_bickering_decrease_oligarchic_influence_effect = yes
+		}
+	}
+	option = {
+		name = subject.1120.b
+		add_resource = { minerals = 500 }
+		event_target:crash_planet = {
+			add_deposit = d_admirals_bickering_crashed_cargo_ship
+		}
+		custom_tooltip = bickering_admirals_oligarchic_boon_tt
+		hidden_effect = {
+			admirals_bickering_increase_oligarchic_influence_effect = yes
+			admirals_bickering_decrease_democratic_influence_effect = yes
+		}
+	}
+
+	after = {
+		admirals_bickering_event_effect = yes
+	}
+}
+
+country_event = { # SUBJECT - Funding disagreements
+	id = subject.1125
+	title = subject.1125.title
+	desc = subject.1125.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = bickering_admirals_funding_cd }
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+		set_timed_country_flag = {
+			flag = bickering_admirals_funding_cd
+			days = 600
+		}
+	}
+
+	option = {
+		name = subject.1125.a
+		custom_tooltip = bickering_admirals_democratic_boon_tt
+		capital_scope = {
+			add_modifier = {
+				modifier = specialist_overlord_admirals_bickering_democratic_funding_modifier
+				days = 7200
+			}
+		}
+		hidden_effect = {
+			admirals_bickering_increase_democratic_influence_effect = yes
+			admirals_bickering_decrease_oligarchic_influence_effect = yes
+		}
+	}
+	option = {
+		name = subject.1125.b
+		custom_tooltip = bickering_admirals_oligarchic_boon_tt
+		add_modifier = {
+			modifier = specialist_overlord_admirals_bickering_oligarchic_funding_modifier
+			days = 3600
+		}
+		hidden_effect = {
+			admirals_bickering_increase_oligarchic_influence_effect = yes
+			admirals_bickering_decrease_democratic_influence_effect = yes
+		}
+	}
+
+	after = {
+		admirals_bickering_event_effect = yes
+	}
+}
+
+country_event = { # SUBJECT - Protesters outside Oligarchs
+	id = subject.1130
+	title = subject.1130.title
+	desc = subject.1130.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = admirals_bickering_protesters }
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+		set_timed_country_flag = {
+			flag = admirals_bickering_protesters
+			days = 600
+		}
+	}
+
+	option = {
+		name = subject.1130.a
+		custom_tooltip = bickering_admirals_democratic_boon_tt
+		add_resource = { influence = 40 }
+		hidden_effect = {
+			admirals_bickering_increase_democratic_influence_effect = yes
+			admirals_bickering_decrease_oligarchic_influence_effect = yes
+		}
+	}
+	option = {
+		name = subject.1130.b
+		custom_tooltip = bickering_admirals_oligarchic_boon_tt
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		hidden_effect = {
+			admirals_bickering_increase_oligarchic_influence_effect = yes
+			admirals_bickering_decrease_democratic_influence_effect = yes
+		}
+	}
+
+	after = {
+		admirals_bickering_event_effect = yes
+	}
+}
+
+country_event = { # SUBJECT - Democratic scandal - Using public funds for their own luxuries
+	id = subject.1135
+	title = subject.1135.title
+	desc = subject.1135.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = bickering_admirals_scandal }
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+		set_timed_country_flag = {
+			flag = bickering_admirals_scandal
+			days = 600
+		}
+	}
+
+	option = { # Reduce the impact of the scandal as much as can be done
+		name = subject.1135.a
+		add_resource = { influence = -25 }
+	}
+	option = { # Let it play out
+		name = subject.1135.b
+		custom_tooltip = bickering_admirals_oligarchic_boon_tt
+		hidden_effect = {
+			admirals_bickering_increase_oligarchic_influence_effect = yes
+			admirals_bickering_decrease_democratic_influence_effect = yes
+		}
+	}
+
+	after = {
+		admirals_bickering_event_effect = yes
+	}
+}
+
+country_event = { # SUBJECT - Oligarchic scandal - Murderer found for first murder
+	id = subject.1140
+	title = subject.1140.title
+	desc = subject.1140.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = bickering_admirals_scandal }
+	}
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+		set_timed_country_flag = {
+			flag = bickering_admirals_scandal
+			days = 600
+		}
+	}
+
+	option = { # Reduce the impact of the scandal as much as can be done
+		name = subject.1140.a
+		add_resource = { influence = -25 }
+	}
+	option = { # Let it play out
+		name = subject.1140.b
+		custom_tooltip = bickering_admirals_democratic_boon_tt
+		hidden_effect = {
+			admirals_bickering_increase_democratic_influence_effect = yes
+			admirals_bickering_decrease_oligarchic_influence_effect = yes
+		}
+	}
+
+	after = {
+		admirals_bickering_event_effect = yes
+	}
+}
+# End of the Random Events for the Event Chain #
+
+country_event = { # SUBJECT - Penultimate event, where you get to try and change the outcome one last time
+	id = subject.1142
+	title = subject.1142.title
+	desc = subject.1142.desc
+	picture = GFX_evt_bribery
+	show_sound = evn_ove_briber
+
+	is_triggered_only = yes
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.1142.a
+		custom_tooltip = bickering_admirals_democratic_boon_significant_tt
+		hidden_effect = {
+			change_variable = {
+				which = overlord_admirals_bickering_democratic_side
+				value = 10
+			}
+			subtract_variable = {
+				which = overlord_admirals_bickering_oligarchic_side
+				value = 10
+			}
+		}
+	}
+	option = {
+		name = subject.1142.b
+		custom_tooltip = bickering_admirals_oligarchic_boon_significant_tt
+		hidden_effect = {
+			change_variable = {
+				which = overlord_admirals_bickering_oligarchic_side
+				value = 10
+			}
+			subtract_variable = {
+				which = overlord_admirals_bickering_democratic_side
+				value = 10
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = {
+				id = subject.1145
+				days = 15
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - The outcome of the bickering between the admirals and their sides
+	id = subject.1145
+	title = subject.1145.title
+	desc = subject.1145.desc
+	picture = GFX_evt_grand_speech
+	show_sound = evn_ove_grand_speech
+
+	is_triggered_only = yes
+
+	immediate = {
+		admirals_bickering_replacement_effect = yes
+		random_list = { # Random chance for which side wins, based on choices in previous events
+			1 = { # Democratic side
+				modifier = {
+					factor = overlord_admirals_bickering_democratic_side
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_democratic_victory
+					days = 360
+				}
+				event_target:admiral_democracy = {
+					save_event_target_as = admiral_winner
+				}
+			}
+			1 = { # Oligarchic side
+				modifier = {
+					factor = overlord_admirals_bickering_oligarchic_side
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_oligarchic_victory
+					days = 360
+				}
+				event_target:admiral_oligarchy = {
+					save_event_target_as = admiral_loser
+				}
+			}
+		}
+		random_list = { # Random chance for what happened to the losers
+			30 = { # They killed their opponents
+				modifier = {
+					factor = 2
+					has_country_flag = admirals_bickering_oligarchic_victory
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_killed_opponents
+					days = 360
+				}
+			}
+			30 = { # Their opponents were released after their faction was dismantled
+				modifier = {
+					factor = 2
+					has_country_flag = admirals_bickering_democratic_victory
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_released_opponents
+					days = 360
+				}
+			}
+			10 = { # Their opponents ran off to form their own country
+				modifier = {
+					factor = 0
+					NOT = {
+						any_owned_planet = {
+							is_capital = no
+						}
+					}
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_separatist_opponents
+					days = 360
+				}
+			}
+		}
+		random_list = { # Random chance for how serious they are about their demands
+			50 = { # Just instituting their leadership (be it democratic or oligarchic)
+				modifier = {
+					factor = 0
+					OR = {
+						AND = {
+							has_country_flag = admirals_bickering_democratic_victory
+							is_democracy = yes
+						}
+						AND = {
+							has_country_flag = admirals_bickering_oligarchic_victory
+							is_oligarchy = yes
+						}
+					}
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_imposed_government
+					days = 360
+				}
+			}
+			50 = { # Their side is already in charge (e.g democracy won in a democracy), so they'll leave it at that
+				modifier = {
+					factor = 0
+					OR = {
+						AND = {
+							has_country_flag = admirals_bickering_democratic_victory
+							is_democracy = no
+						}
+						AND = {
+							has_country_flag = admirals_bickering_oligarchic_victory
+							is_oligarchy = no
+						}
+					}
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_goverment_continues
+					days = 360
+				}
+			}
+			25 = { # Side won, and demands for their leader to be put in charge of the government
+				modifier = {
+					factor = 0.25
+					OR = {
+						AND = {
+							has_country_flag = admirals_bickering_democratic_victory
+							is_democracy = yes
+						}
+						AND = {
+							has_country_flag = admirals_bickering_oligarchic_victory
+							is_oligarchy = yes
+						}
+					}
+				}
+				set_timed_country_flag = {
+					flag = admirals_bickering_imposed_leadership
+					days = 360
+				}
+			}
+		}
+		if = { # Separatist movement happens on Immediate, while the rest is checked in option
+			limit = {
+				has_country_flag = admirals_bickering_separatist_opponents
+				any_owned_planet = {
+					is_capital = no
+				}
+			}
+			custom_tooltip = subject.1145.a.separatist.tt
+			hidden_effect = {
+				random_owned_planet = {
+					limit = {
+						is_capital = no
+					}
+					save_event_target_as = separatist_home
+					if = { # Democratic victory
+						limit = {
+							root = { has_country_flag = admirals_bickering_democratic_victory }
+						}
+						create_country = {
+							name_list = random
+							species = root.species
+							type = default
+							ignore_initial_colony_error = yes
+							day_zero_contact = no
+							civics = {
+								civic = civic_aristocratic_elite
+								civic = civic_citizen_service
+							}
+							ethos = {
+								ethic = ethic_authoritarian
+								ethic = ethic_militarist
+								ethic = ethic_materialist
+							}
+							effect = {
+								event_target:admiral_oligarchy = { exile_leader_as = exiled_leader }
+								set_leader = event_target:admiral_oligarchy
+							}
+						}
+					}
+					else_if = { # Oligarchic victory
+						limit = {
+							root = { has_country_flag = admirals_bickering_oligarchic_victory }
+						}
+						create_country = {
+							name_list = random
+							species = root.species
+							type = default
+							ignore_initial_colony_error = yes
+							day_zero_contact = no
+							civics = {
+								civic = civic_meritocracy
+								civic = civic_citizen_service
+							}
+							ethos = {
+								ethic = ethic_egalitarian
+								ethic = ethic_militarist
+								ethic = ethic_materialist
+							}
+							effect = {
+								event_target:admiral_oligarchy = { exile_leader_as = exiled_leader }
+								set_leader = event_target:admiral_democracy
+							}
+						}
+					}
+					last_created_country = {
+						save_event_target_as = separatist_country
+						establish_communications_no_message = root
+						copy_techs_from = { target = root }
+						if = {
+							limit = {
+								root = {
+									is_subject = yes
+								}
+							}
+							root.overlord = {
+								save_event_target_as = current_overlord_empire
+							}
+							establish_communications_no_message = event_target:current_overlord_empire
+							event_target:current_overlord_empire = {
+								country_event = { id = subject.1147 }
+							}
+							set_subject_of_stu = {
+								who = event_target:current_overlord_empire
+							}
+						}
+					}
+					set_owner = event_target:separatist_country
+					set_capital = yes
+					if = {
+						limit = {
+							exists = starbase
+						}
+						starbase = {
+							set_owner = event_target:separatist_country
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = subject.1145.a
+		### FIRST - Check if you are changing government type
+		if = { # Democratic victory
+			limit = {
+				NOT = { is_democracy = yes }
+				has_country_flag = admirals_bickering_democratic_victory
+				OR = {
+					has_country_flag = admirals_bickering_imposed_government
+					has_country_flag = admirals_bickering_imposed_leadership
+				}
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						is_authoritarian = yes
+					}
+					shift_ethic = ethic_egalitarian
+				}
+			}
+			change_government = {
+				authority = auth_democratic
+				remove_invalid_civics = yes
+			}
+		}
+		else_if = { # Oligarchic Victory
+			limit = {
+				NOT = { is_oligarchy = yes }
+				has_country_flag = admirals_bickering_oligarchic_victory
+				OR = {
+					has_country_flag = admirals_bickering_imposed_government
+					has_country_flag = admirals_bickering_imposed_leadership
+				}
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						OR = {
+							is_egalitarian = yes
+							has_ethic = ethic_fanatic_authoritarian
+						}
+					}
+					shift_ethic = ethic_authoritarian
+				}
+			}
+			change_government = {
+				authority = auth_oligarchic
+				remove_invalid_civics = yes
+			}
+		}
+		### SECOND - Check if you are changing leadership
+		if = {
+			limit = {
+				has_country_flag = admirals_bickering_imposed_leadership
+			}
+			if = { # Democratic
+				limit = {
+					has_country_flag = admirals_bickering_democratic_victory
+				}
+				set_leader = event_target:admiral_democracy
+			}
+			else_if = { # Oligarchic
+				limit = {
+					has_country_flag = admirals_bickering_oligarchic_victory
+				}
+				set_leader = event_target:admiral_oligarchy
+			}
+		}
+		### THIRDLY - Check if you are killing/exiling old rivals
+		if = { # Killing rivals
+			limit = {
+				has_country_flag = admirals_bickering_killed_opponents
+			}
+			if = { # Democrats killing Oligarchs
+				limit = {
+					has_country_flag = admirals_bickering_democratic_victory
+				}
+				event_target:admiral_oligarchy = {
+					kill_leader = { show_notification = no }
+				}
+			}
+			else_if = { # Oligarchs killing Democrats
+				limit = {
+					has_country_flag = admirals_bickering_oligarchic_victory
+				}
+				event_target:admiral_democracy = {
+					kill_leader = { show_notification = no }
+				}
+			}
+		}
+		else_if = { # Exiling rivals
+			limit = {
+				has_country_flag = admirals_bickering_released_opponents
+			}
+			if = { # Democrats exiling Oligarchs
+				limit = {
+					has_country_flag = admirals_bickering_democratic_victory
+				}
+				event_target:admiral_oligarchy = {
+					exile_leader_as = missing_admiral_rival
+				}
+			}
+			else_if = { # Oligarchs exiling Democrats
+				limit = {
+					has_country_flag = admirals_bickering_oligarchic_victory
+				}
+				event_target:admiral_democracy = {
+					exile_leader_as = missing_admiral_rival
+				}
+			}
+		}
+		hidden_effect = {
+			clear_variable = overlord_admirals_bickering_value
+			clear_variable = overlord_admirals_bickering_democratic_side
+			clear_variable = overlord_admirals_bickering_oligarchic_side
+		}
+	}
+}
+
+country_event = { # Ping event - OVERLORD - Informed about the outcome
+	id = subject.1147
+	title = subject.1147.title
+	desc = subject.1147.desc
+	picture = GFX_evt_grand_speech
+	show_sound = evn_ove_grand_speech
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.1147.a
+	}
+}
+
+### Scholarium 2001 - 3000
+# Event Chain - Technological Advancement
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.2001
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_scholarium_event_chain_1_overlord }
+		is_overlord = yes
+		is_at_war = no
+		any_subject = {
+			NOT = { has_country_flag = cooldown_scholarium_event_chain_1_subject }
+			is_specialist_subject_type = { TYPE = scholarium }
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_scholarium_event_chain_1_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_scholarium_event_chain_1_subject }
+				is_specialist_subject_type = { TYPE = scholarium }
+			}
+			set_country_flag = cooldown_scholarium_event_chain_1_subject
+			save_event_target_as = subject_empire
+			country_event = {
+				id = subject.2005
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Technological boost among pops in capital
+	id = subject.2005
+	title = subject.2005.title
+	desc = {
+		text = subject.2005.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = subject.2005.desc_gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_metropolis
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.2005.a
+		add_modifier = {
+			modifier = specialist_technocracy_technology_inflation_general
+			days = 7200
+		}
+		hidden_effect = {
+			country_event = {
+				id = subject.2010
+				days = 45
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Share some with your Overlord?
+	id = subject.2010
+	title = subject.2010.title
+	desc = subject.2010.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.2010.a
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.2015
+					days = 45
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.2010.b
+		add_resource = { influence = -10 }
+	}
+}
+
+country_event = { # OVERLORD - Technology shared by underling in Scholarium
+	id = subject.2015
+	title = subject.2015.title
+	desc = subject.2015.desc
+	picture = GFX_evt_metropolis
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = { # Let them continue
+		name = subject.2015.a
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.2020
+					days = 45
+				}
+			}
+		}
+	}
+	option = { # Focus on Physics
+		name = subject.2015.b
+		add_resource = { influence = -25 }
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.2025
+					days = 45
+				}
+			}
+		}
+	}
+	option = { # Focus on Society
+		name = subject.2015.c
+		add_resource = { influence = -25 }
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.2030
+					days = 45
+				}
+			}
+		}
+	}
+	option = { # Focus on Engineering
+		name = subject.2015.d
+		add_resource = { influence = -25 }
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.2035
+					days = 45
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Overlord is appreciative, and will let us do as we wish
+	id = subject.2020
+	title = subject.2020.title
+	desc = subject.2020.desc
+	picture = GFX_evt_alien_propaganda
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.2020.a
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Overlord wants us to focus on Physics
+	id = subject.2025
+	title = subject.2025.title
+	desc = subject.2025.desc
+	picture = GFX_evt_alien_propaganda
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		remove_modifier = specialist_technocracy_technology_inflation_general
+		add_modifier = {
+			modifier = specialist_technocracy_technology_inflation_physics
+			days = 7200
+		}
+	}
+
+	option = {
+		name = subject.2025.a
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Overlord wants us to focus on Society
+	id = subject.2030
+	title = subject.2030.title
+	desc = subject.2030.desc
+	picture = GFX_evt_alien_propaganda
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		remove_modifier = specialist_technocracy_technology_inflation_general
+		add_modifier = {
+			modifier = specialist_technocracy_technology_inflation_society
+			days = 7200
+		}
+	}
+
+	option = {
+		name = subject.2030.a
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Overlord wants us to focus on Engineering
+	id = subject.2035
+	title = subject.2035.title
+	desc = subject.2035.desc
+	picture = GFX_evt_alien_propaganda
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		remove_modifier = specialist_technocracy_technology_inflation_general
+		add_modifier = {
+			modifier = specialist_technocracy_technology_inflation_engineering
+			days = 7200
+		}
+	}
+
+	option = {
+		name = subject.2035.a
+	}
+}
+
+# Event Chain - Destructive Research
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.2050
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_scholarium_event_chain_2_overlord }
+		is_overlord = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_scholarium_event_chain_2_subject }
+			is_specialist_subject_type = { TYPE = scholarium }
+			any_owned_planet = {
+				has_research_building = yes
+				OR = {
+					is_wet = yes
+					is_cold = yes
+					is_dry = yes
+				}
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_scholarium_event_chain_2_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_scholarium_event_chain_2_subject }
+				is_specialist_subject_type = { TYPE = scholarium }
+				any_owned_planet = {
+					has_research_building = yes
+					OR = {
+						is_wet = yes
+						is_cold = yes
+						is_dry = yes
+					}
+				}
+			}
+			set_country_flag = cooldown_scholarium_event_chain_2_subject
+			random_owned_planet = {
+				limit = {
+					has_research_building = yes
+					OR = {
+						is_wet = yes
+						is_cold = yes
+						is_dry = yes
+					}
+				}
+				save_event_target_as = targeted_planet
+			}
+			save_event_target_as = subject_empire
+			country_event = {
+				id = subject.2055
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Planet X is affected by the tech of the Scholarium
+	id = subject.2055
+	title = subject.2055.title
+	desc = subject.2055.desc
+	picture = GFX_evt_toxic
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		exists = event_target:targeted_planet
+		event_target:targeted_planet = {
+			is_owned_by = event_target:subject_empire
+		}
+	}
+
+	immediate = {
+		event_target:targeted_planet = {
+			add_deposit = d_technocracy_toxic_waste_blocker
+		}
+	}
+
+	option = { # They continue their research
+		name = subject.2055.a
+		custom_tooltip = subject.2055.a.tt
+		hidden_effect = {
+			random_list = {
+				90 = { # The first crisis happens
+					country_event = {
+						id = subject.2060
+						days = 100
+						random = 100
+					}
+				}
+				10 = {} # Nothing happens
+			}
+		}
+	}
+	option = { # They put a damper on their research for the time being
+		name = subject.2055.b
+		event_target:targeted_planet = {
+			add_modifier = {
+				modifier = specialist_technocracy_reduced_research
+				days = 7200
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - First crisis - Warm and inhospitable
+	id = subject.2060
+	title = subject.2060.title
+	desc = subject.2060.desc
+	picture = GFX_evt_warm_barren
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		exists = event_target:targeted_planet
+		event_target:targeted_planet = {
+			is_owned_by = event_target:subject_empire
+		}
+	}
+
+	immediate = {
+		event_target:targeted_planet = {
+			add_deposit = d_technocracy_barren_lands_blocker
+		}
+	}
+
+	option = { # And yet the research must continue!
+		name = subject.2060.a
+		custom_tooltip = subject.2060.a.tt
+		hidden_effect = {
+			random_list = {
+				70 = { # The second crisis happens
+					country_event = {
+						id = subject.2065
+						days = 200
+						random = 200
+					}
+				}
+				30 = {} # Nothing happens
+			}
+		}
+	}
+	option = { # Time to put things on hold for now
+		name = subject.2060.b
+		event_target:targeted_planet = {
+			add_modifier = {
+				modifier = specialist_technocracy_reduced_research
+				days = 7200
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Second crisis - Rising oceans
+	id = subject.2065
+	title = subject.2065.title
+	desc = subject.2065.desc
+	picture = GFX_evt_ocean
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		exists = event_target:targeted_planet
+		event_target:targeted_planet = {
+			is_owned_by = event_target:subject_empire
+		}
+	}
+
+	immediate = {
+		event_target:targeted_planet = {
+			add_deposit = d_technocracy_toxic_ocean_blocker
+		}
+	}
+
+	option = { # For some reason they still do the thing
+		name = subject.2065.a
+		custom_tooltip = subject.2065.a.tt
+		hidden_effect = {
+			random_list = {
+				50 = { # The third crisis happens
+					country_event = {
+						id = subject.2070
+						days = 300
+						random = 300
+					}
+				}
+				50 = {} # Nothing happens
+			}
+		}
+	}
+	option = { # Finally learned
+		name = subject.2065.b
+		event_target:targeted_planet = {
+			add_modifier = {
+				modifier = specialist_technocracy_reduced_research
+				days = 7200
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Third crisis - Volcanic eruptions
+	id = subject.2070
+	title = subject.2070.title
+	desc = {
+		text = subject.2070.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = subject.2070.desc_gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_molten
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+		exists = event_target:targeted_planet
+		event_target:targeted_planet = {
+			is_owned_by = event_target:subject_empire
+		}
+	}
+
+	immediate = {
+		event_target:targeted_planet = {
+			add_deposit = d_technocracy_molten_waste_blocker
+		}
+	}
+
+	option = { # At least they've hit rock bottom
+		name = subject.2070.a
+	}
+}
+
+# Event Chain - Experiments!
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.2100
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_scholarium_event_chain_3_overlord }
+		is_overlord = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_scholarium_event_chain_3_subject }
+			is_specialist_subject_type = { TYPE = scholarium }
+			OR = {
+				count_owned_leader = {
+					count >= 1
+					limit = {
+						leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+					}
+				}
+				is_gestalt = yes
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_scholarium_event_chain_3_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_scholarium_event_chain_3_subject }
+				is_specialist_subject_type = { TYPE = scholarium }
+				OR = {
+					count_owned_leader = {
+						count >= 1
+						limit = {
+							leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+						}
+					}
+					is_gestalt = yes
+				}
+			}
+			set_country_flag = cooldown_scholarium_event_chain_3_subject
+			if = {
+				limit = {
+					is_gestalt = no
+				}
+				random_owned_leader = {
+					limit = {
+						leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+					}
+					save_event_target_as = targeted_scientist
+					set_leader_flag = experiments_scientist
+				}
+			}
+			save_event_target_as = subject_empire
+			country_event = {
+				id = subject.2105
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Experimental researcher wants more leeway
+	id = subject.2105
+	title = subject.2105.title
+	desc = {
+		text = subject.2105.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = subject.2105.desc_gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_bribery
+	show_sound = evn_ove_briber
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.2105.a
+		trigger = {
+			is_gestalt = no
+		}
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.2112
+					days = 60
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.2105.b
+		trigger = {
+			is_gestalt = no
+		}
+		hidden_effect = {
+			random_list = {
+				75 = {} # Nothing happens
+				25 = { # Researcher goes amok
+					country_event = {
+						id = subject.2110
+						days = 160
+						random = 160
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.2105.c
+		trigger = {
+			is_gestalt = yes
+		}
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.2112
+					days = 60
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.2105.d
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Experimental researcher goes amok
+	id = subject.2110
+	title = subject.2110.title
+	desc = subject.2110.desc
+	picture = GFX_evt_news_room
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.2110.a
+		event_target:targeted_scientist = {
+			exile_leader_as = exiled_scientist
+		}
+	}
+}
+
+country_event = { # OVERLORD - Hear news of their vassal's research
+	id = subject.2112
+	title = subject.2112.title
+	desc = {
+		text = subject.2112.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = subject.2112.desc_gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.2112.a # Leave them be
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.2120
+					days = 60
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.2112.b # Shut it down
+		trigger = {
+			OR = {
+				is_ai = no
+				is_pacifist = yes
+				is_spiritualist = yes
+			}
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.2115
+					days = 60
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Overlord has demanded a shut down
+	id = subject.2115
+	title = subject.2115.title
+	desc = subject.2115.desc
+	picture = GFX_evt_one_sided_deal
+	show_sound = evn_ove_one_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = OK
+	}
+}
+
+country_event = { # SUBJECT - Green light for continued experiments
+	id = subject.2120
+	title = subject.2120.title
+	desc = subject.2120.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = { # Extreme experiments
+		name = subject.2120.a
+		custom_tooltip = subject.2120.a.tt
+		hidden_effect = {
+			random_list = {
+				30 = { # Successful research
+					country_event = {
+						id = subject.2135
+						days = 100
+						random = 100
+					}
+				}
+				10 = { # Mutating species
+					country_event = {
+						id = subject.2140
+						days = 100
+						random = 100
+					}
+				}
+				10 = { # Mixing species
+					country_event = {
+						id = subject.2145
+						days = 100
+						random = 100
+					}
+				}
+				10 = { # Failure
+					country_event = {
+						id = subject.2150
+						days = 100
+						random = 100
+					}
+				}
+			}
+		}
+	}
+	option = { # Light experiments
+		name = subject.2120.b
+		custom_tooltip = subject.2120.b.tt
+		hidden_effect = {
+			random_list = {
+				50 = { # Nothing much came out of it
+					country_event = {
+						id = subject.2125
+						days = 100
+						random = 100
+					}
+				}
+				50 = { # A small research boon
+					country_event = {
+						id = subject.2130
+						days = 100
+						random = 100
+					}
+				}
+			}
+		}
+	}
+}
+
+# Light Research
+country_event = { # Ping Event - SUBJECT - Nothing much came out of the experiments
+	id = subject.2125
+	title = subject.2125.title
+	desc = subject.2125.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = OK
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Subject gets a little research out of it
+	id = subject.2130
+	title = subject.2130.title
+	desc = subject.2130.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.2130.a
+		if = {
+			limit = {
+				is_robot_empire = yes
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# Extreme Research
+country_event = { # Ping Event - SUBJECT - Subject gets a lot of research out of it
+	id = subject.2135
+	title = subject.2135.title
+	desc = subject.2135.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.2135.a
+		if = {
+			limit = {
+				is_robot_empire = yes
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		experiments_kill_pop_effect = yes
+		experiments_scientist_skill_effect = yes
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Mutate species
+	id = subject.2140
+	title = subject.2140.title
+	desc = subject.2140.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = subject.2140.a
+		root.species = {
+			mutate_species = yes
+		}
+		experiments_kill_pop_effect = yes
+		experiments_scientist_skill_effect = yes
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Mix species
+	id = subject.2145
+	title = subject.2145.title
+	desc = subject.2145.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		#overlord_subject_event_trigger = yes
+		capital_scope = {
+			count_owned_pop = {
+				count > 1
+				limit = {
+					NOT = { is_same_species = root.species }
+				}
+			}
+			count_owned_pop = {
+				count > 1
+				limit = {
+					is_same_species = root.species
+				}
+			}
+		}
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+		capital_scope = {
+			random_owned_pop = {
+				limit = {
+					NOT = { is_same_species = root.species }
+				}
+				save_event_target_as = targeted_species
+			}
+			create_half_species = {
+				species_one = root.species
+				species_two = event_target:targeted_species
+				country = root
+			}
+			random_owned_pop = {
+				limit = {
+					is_same_species = root.species
+				}
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			}
+			random_owned_pop = {
+				limit = {
+					is_same_species = event_target:targeted_species
+				}
+				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			}
+			create_pop = {
+				species = last_created_species
+			}
+			last_created_species = {
+				save_event_target_as = new_species
+			}
+		}
+	}
+
+	option = {
+		name = subject.2145.a
+		custom_tooltip = subject.2145.a.tt
+		experiments_scientist_skill_effect = yes
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Experimental failure
+	id = subject.2150
+	title = subject.2150.title
+	desc = subject.2150.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = evn_ove_scientific_experiments
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		experiments_scientist_replacement_effect = yes
+	}
+
+	option = {
+		name = OK
+		experiments_kill_pop_effect = yes
+	}
+}
+
+### General 3001 - 4000
+## Event Chain - Overlord Tourist Disagreements
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.3001
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_spiritualist_specialist_event_chain_1_overlord }
+		is_overlord = yes
+		is_gestalt = no
+		any_subject = {
+			NOT = { has_country_flag = cooldown_spiritualist_specialist_event_chain_1_subject }
+			is_specialist_subject = yes
+			is_spiritualist = yes
+			is_gestalt = no
+			OR = {
+				is_xenophobe = yes
+				overlord = { is_xenophobe = yes }
+				subject_pacifist_overlord_opposing = yes
+				subject_militarist_overlord_opposing = yes
+				subject_authoritarian_overlord_opposing = yes
+				subject_egalitarian_overlord_opposing = yes
+				subject_materialist_overlord_opposing = yes
+				subject_spiritualist_overlord_opposing = yes
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_spiritualist_specialist_event_chain_1_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_spiritualist_specialist_event_chain_1_subject }
+				is_specialist_subject = yes
+				is_spiritualist = yes
+				is_gestalt = no
+				OR = {
+					is_xenophobe = yes
+					overlord = { is_xenophobe = yes }
+					subject_pacifist_overlord_opposing = yes
+					subject_militarist_overlord_opposing = yes
+					subject_authoritarian_overlord_opposing = yes
+					subject_egalitarian_overlord_opposing = yes
+					subject_materialist_overlord_opposing = yes
+					subject_spiritualist_overlord_opposing = yes
+				}
+			}
+			set_country_flag = cooldown_spiritualist_specialist_event_chain_1_subject
+			save_event_target_as = subject_empire
+			country_event = {
+				id = subject.3005
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - Disagreements with overlord's pops
+	id = subject.3005
+	title = subject.3005.title
+	desc = subject.3005.desc
+	picture = GFX_evt_obelisk_tourists
+	show_sound = evn_ove_obelisk_tourists
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.3005.a
+		capital_scope = {
+			add_modifier = {
+				modifier = specialist_overlord_frustrated_population
+				days = 7200
+			}
+		}
+	}
+	option = {
+		name = subject.3005.b
+		add_resource = { influence = -15 }
+		hidden_effect = {
+			event_target:overlord_empire = {
+				country_event = {
+					id = subject.3010
+					days = 45
+				}
+			}
+		}
+	}
+}
+
+country_event = { # OVERLORD - Overlord's tourists rejected by subject
+	id = subject.3010
+	title = subject.3010.title
+	desc = subject.3010.desc
+	picture = GFX_evt_obelisk_tourists
+	show_sound = evn_ove_obelisk_tourists
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.3010.a
+		event_target:subject_empire = {
+			origin_ungrateful_vassal_effect = yes
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.3015
+					days = 45
+				}
+			}
+		}
+	}
+	option = {
+		name = subject.3010.b
+		add_resource = { influence = -30 }
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		hidden_effect = {
+			event_target:subject_empire = {
+				country_event = {
+					id = subject.3020
+					days = 45
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Demands an opening of the borders
+	id = subject.3015
+	title = subject.3015.title
+	desc = subject.3015.desc
+	picture = GFX_evt_one_sided_deal
+	show_sound = evn_ove_one_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	immediate = {
+		tooltip = {
+			origin_ungrateful_vassal_effect = yes
+		}
+	}
+
+	option = {
+		name = subject.3015.a
+	}
+}
+
+country_event = { # Ping Event - SUBJECT - Overlord accepts it
+	id = subject.3020
+	title = subject.3020.title
+	desc = subject.3020.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.3020.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+
+## Event Chain - Pilgrimages
+country_event = { # HIDDEN - Find a relevant subject for the event chain
+	id = subject.3050
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = cooldown_spiritualist_specialist_event_chain_2_overlord }
+		is_overlord = yes
+		any_subject = {
+			NOT = { has_country_flag = cooldown_spiritualist_specialist_event_chain_2_subject }
+			is_specialist_subject = yes
+			is_spiritualist = yes
+			is_gestalt = no
+		}
+	}
+
+	immediate = {
+		save_event_target_as = overlord_empire
+		set_timed_country_flag = {
+			flag = cooldown_spiritualist_specialist_event_chain_2_overlord
+			days = 10800
+		}
+		random_subject = {
+			limit = {
+				NOT = { has_country_flag = cooldown_spiritualist_specialist_event_chain_2_subject }
+				is_specialist_subject = yes
+				is_spiritualist = yes
+				is_gestalt = no
+			}
+			set_country_flag = cooldown_spiritualist_specialist_event_chain_2_subject
+			save_event_target_as = subject_empire
+		}
+		country_event = {
+			id = subject.3055
+		}
+	}
+}
+
+country_event = { # OVERLORD - A large group of pilgrims from subject
+	id = subject.3055
+	title = subject.3055.title
+	desc = subject.3055.desc
+	picture = GFX_evt_obelisk_tourists
+	show_sound = evn_ove_obelisk_tourists
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.3055.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		hidden_effect = {
+			country_event = {
+				id = subject.3060
+				days = 90
+			}
+		}
+	}
+}
+
+country_event = { # SUBJECT - A chance to grow closer to the Overlord
+	id = subject.3060
+	title = subject.3060.title
+	desc = subject.3060.desc
+	picture = GFX_evt_obelisk_tourists
+	show_sound = evn_ove_obelisk_tourists
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.3060.a
+		add_resource = { influence = -25 }
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		hidden_effect = {
+			country_event = {
+				id = subject.3065
+				days = 90
+			}
+		}
+	}
+	option = {
+		name = subject.3060.b
+		hidden_effect = {
+			country_event = {
+				id = subject.3070
+				days = 90
+			}
+		}
+	}
+}
+
+country_event = { # Ping Event - OVERLORD - Closer Bond
+	id = subject.3065
+	title = subject.3065.title
+	desc = subject.3065.desc
+	picture = GFX_evt_two_sided_deal
+	show_sound = evn_ove_two_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = subject.3065.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+
+country_event = { # Ping Event - OVERLORD - An end to the many pilgrimages
+	id = subject.3070
+	title = subject.3070.title
+	desc = subject.3070.desc
+	picture = GFX_evt_one_sided_deal
+	show_sound = evn_ove_one_sided_deal
+
+	is_triggered_only = yes
+
+	trigger = {
+		overlord_subject_event_trigger = yes
+	}
+
+	option = {
+		name = OK
+	}
+}
+
+### Prospectorium 4001 - 5000
+
+planet_event = {
+	id = subject.5005
+	is_triggered_only = yes
+	hide_window = yes
+
+	pre_triggers = {
+		has_owner = yes
+	}
+
+	trigger = {
+		has_holding = {
+			holding = holding_experimental_crater
+			owner = owner.overlord
+		}
+		NOT = {
+			has_planet_flag = crater_anti_cheese
+		}
+	}
+
+	immediate = {
+		add_planet_devastation = 30
+		set_timed_planet_flag = {
+			flag = crater_anti_cheese
+			days = 700
+		}
+		planet_event = {
+			id = subject.5005
+			days = 720
+			random = 360
+		}
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						owner = { is_hive_empire = yes }
+						owner.overlord = { is_hive_empire = yes }
+					}
+					AND = {
+						owner = { is_gestalt = no }
+						owner.overlord = { is_gestalt = no }
+					}
+				}
+			}
+			random_list = {
+				2 = { add_deposit = d_buried_lithoids_overlord }
+				8 = {}
+			}
+		}
+		create_message = {
+			type = MESSAGE_OVERLORD_CRATER
+			localization = MESSAGE_OVERLORD_CRATER_DESC
+			days = 30
+			target = this
+			variable = {
+				type = name
+				localization = PLANET
+				scope = this
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = subject.5010
+	is_triggered_only = yes
+	hide_window = yes
+
+	pre_triggers = {
+		has_owner = yes
+	}
+
+	trigger = {
+		has_holding = {
+			holding = holding_recruitment_office
+			owner = owner.overlord
+		}
+		NOT = {
+			has_planet_flag = recruitment_anti_cheese
+		}
+
+	}
+
+	immediate = {
+		set_timed_planet_flag = {
+			flag = recruitment_anti_cheese
+			days = 1700
+		}
+		if = {
+			limit = {
+				owner = { is_gestalt = no }
+			}
+			random_list = {
+				2 = {
+					modifier = {
+						factor = 0
+						NOT = {
+							any_owned_pop = {
+								has_citizenship_type = { type = citizenship_full country = root.owner.overlord }
+								has_job = overlord_recruiter
+							}
+						}
+					}
+					random_owned_pop = {
+						limit = {
+							has_job = overlord_recruiter
+							has_citizenship_type = { type = citizenship_full country = root.owner.overlord }
+						}
+						save_event_target_as = moving_pop
+						resettle_pop = {
+							pop = this
+							planet = root.owner.overlord.capital_scope
+						}
+					}
+					owner = {
+						random_agreement = {
+							limit = {
+								owner = { is_same_value = root.owner.overlord }
+								target = { is_same_value = root.owner }
+							}
+							add_loyalty = -3
+						}
+					}
+					owner.overlord = {
+						create_message = {
+							type = MESSAGE_OVERLORD_RECRUIT
+							localization = MESSAGE_OVERLORD_RECRUIT_DESC
+							days = 30
+							target = capital_scope
+							variable = {
+								type = name
+								localization = PLANET
+								scope = capital_scope
+							}
+						}
+					}
+				}
+				8 = {}
+			}
+			planet_event = {
+				id = subject.5010
+				days = 1800
+				random = 100
+			}
+		}
+	}
+}

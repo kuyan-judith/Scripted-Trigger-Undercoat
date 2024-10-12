@@ -101,9 +101,10 @@ ap_lord_of_war = {
 	potential = {
 		host_has_dlc = "Overlord"
 		NOT = { has_ascension_perk = ap_lord_of_war }
-		NOR = {
-			is_gestalt = yes # undercoat: moved to scripted trigger
-			has_valid_civic = civic_fanatic_purifiers
+		NOT = {	has_valid_civic = civic_fanatic_purifiers }
+		OR = {
+			is_regular_empire = yes
+			is_tactical_algorithms_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 
@@ -129,7 +130,7 @@ ap_lord_of_war = {
 		}
 		modifier = {
 			factor = 2
-			is_megacorp = yes # undercoat: moved to scripted trigger
+			is_megacorp = yes
 		}
 		modifier = {
 			factor = 0
@@ -151,14 +152,16 @@ ap_become_the_crisis = {
 		has_nemesis = yes
 		NOR = {
 			has_ascension_perk = ap_become_the_crisis
+			has_ascension_perk = ap_cosmogenesis
+			has_ascension_perk = ap_defender_of_the_galaxy
 			is_minamar = yes # undercoat: moved to scripted trigger
 		}
 	}
 
 	possible = {
 		custom_tooltip = {
-			fail_text = "requires_ascension_perks_2"
-			num_ascension_perks > 1
+			fail_text = "requires_ascension_perks_3"
+			num_ascension_perks > 2
 		}
 		custom_tooltip = {
 			fail_text = "requires_independence"
@@ -185,7 +188,7 @@ ap_become_the_crisis = {
 		hidden_effect = {
 			set_ai_personality = became_the_crisis
 		}
-		activate_crisis_progression = yes
+		activate_crisis_progression = nemesis_path
 	}
 
 	ai_weight = {
@@ -231,6 +234,95 @@ ap_become_the_crisis = {
 }
 
 #################
+# Cybernetics ASCENSION PERKS
+#################
+
+ap_cosmogenesis = {
+	potential = {
+		has_machine_age_dlc = yes
+		NOR = {
+			has_ascension_perk = ap_become_the_crisis
+			has_ascension_perk = ap_cosmogenesis
+			has_ascension_perk = ap_defender_of_the_galaxy
+			is_minamar = yes # No crisis for MSI # undercoat: moved to scripted trigger
+		}
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_ascension_perks_3"
+			num_ascension_perks > 2
+		}
+		custom_tooltip = {
+			fail_text = "requires_independence"
+			is_subject = no
+		}
+		custom_tooltip = {
+			fail_text = "must_not_be_custodian"
+			is_galactic_custodian = no
+		}
+		custom_tooltip = {
+			fail_text = "must_not_be_emperor"
+			is_galactic_emperor = no
+		}
+	}
+
+	on_enabled = {
+		hidden_effect = {
+			set_variable = {
+				which = cosmogenesis_world_advanced_logic_produced
+				value = 0
+			}
+		}
+		activate_crisis_progression = cosmogenesis_path
+	}
+
+	ai_weight = {
+		factor = 7.5
+		modifier = {
+			factor = 0
+			OR = {
+				is_egalitarian = yes
+				is_xenophile = yes
+			}
+		}
+		modifier = {
+			factor = 2
+			has_tradition = tr_discovery_finish
+		}
+		modifier = {
+			factor = 2
+			has_ascension_perk = ap_technological_ascendancy
+		}
+		modifier = {
+			factor = 2
+			has_ascension_perk = ap_enigmatic_engineering
+		}
+		modifier = {
+			factor = 2
+			vassals > 0
+			any_subject = {
+				any_agreement = {
+					has_active_specialization = specialist_scholarium
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			has_country_flag = whisperers_covenant_confirmed
+		}
+		modifier = {
+			factor = 0
+			galaxy_percentage < 0.1
+		}
+		modifier = {
+			factor = 2
+			galaxy_percentage > 0.2
+		}
+	}
+}
+
+#################
 # AQUATICS ASCENSION PERKS
 #################
 
@@ -238,10 +330,16 @@ ap_hydrocentric = {
 	potential = {
 		has_aquatics = yes
 		NOT = { has_ascension_perk = ap_hydrocentric }
-		has_trait = trait_pc_ocean_preference
+		OR = {
+			has_trait = trait_pc_ocean_preference
+			has_trait = trait_robot_aquatic
+		}
 	}
 	possible = {
-		has_trait = trait_aquatic
+		OR = {
+			has_trait = trait_aquatic
+			has_trait = trait_robot_aquatic
+		}
 		has_technology = tech_terrestrial_sculpting
 	}
 
@@ -384,7 +482,9 @@ ap_nihilistic_acquisition = {
 			factor = 0
 			OR = {
 				is_homicidal = yes # undercoat: moved to scripted trigger
+				
 				is_inwards_perfection_empire = yes # undercoat: moved to scripted trigger
+				
 			}
 		}
 	}
@@ -441,7 +541,7 @@ ap_colossus = {
 		}
 		modifier = {
 			factor = 2
-			is_machine_empire = yes #just because # undercoat: moved to scripted trigger
+			is_machine_empire = yes #just because
 		}
 		modifier = {
 			factor = 2
@@ -482,9 +582,9 @@ ap_world_shaper = {
 		NOT = {
 			has_ascension_perk = ap_world_shaper
 		}
-		is_hive_empire = no # undercoat: moved to scripted trigger
+		is_hive_empire = no
 		OR = {
-			is_machine_empire = no # undercoat: moved to scripted trigger
+			is_machine_empire = no
 			is_servitor_empire = yes # undercoat: moved to scripted trigger
 			is_machine_assimilator = yes # undercoat: moved to scripted trigger
 		}
@@ -495,7 +595,7 @@ ap_world_shaper = {
 		modifier = {
 			factor = 0
 			OR = {
-				has_void_dweller_origin = yes # undercoat: moved to scripted trigger
+				is_void_dweller_empire = yes
 				is_shattered_ring_empire = yes # undercoat: moved to scripted trigger
 				has_trait = trait_aquatic
 				is_gestalt = yes # undercoat: moved to scripted trigger
@@ -593,9 +693,13 @@ ap_defender_of_the_galaxy = {
 			num_ascension_perks > 2
 		}
 	}
+	custom_tooltip = ap_defender_of_the_galaxy_modifier_desc
+
 	modifier = {
-		description = ap_defender_of_the_galaxy_modifier_desc
 		damage_vs_crisis_mult = 0.5 # undercoat: moved to static modifier
+		damage_vs_country_type_awakened_synth_queen_mult = 0.5
+		damage_vs_country_type_synth_queen_convoys_mult = 0.5
+		damage_vs_country_type_synth_queen_outposts_mult = 0.5
 	}
 
 	on_enabled = {
@@ -604,8 +708,10 @@ ap_defender_of_the_galaxy = {
 	}
 
 	potential = {
-		NOT = {
+		NOR = {
 			has_ascension_perk = ap_defender_of_the_galaxy
+			has_ascension_perk = ap_become_the_crisis
+			has_ascension_perk = ap_cosmogenesis
 		}
 	}
 
@@ -620,7 +726,10 @@ ap_defender_of_the_galaxy = {
 						who = prev
 						value > equivalent
 					}
-					has_ascension_perk = ap_become_the_crisis
+					OR = {
+						has_ascension_perk = ap_become_the_crisis
+						has_ascension_perk = ap_cosmogenesis
+					}
 				}
 			}
 		}
@@ -631,8 +740,11 @@ ap_defender_of_the_galaxy = {
 				is_galactic_custodian = yes
 				is_galactic_emperor = yes
 				any_country = {
-					has_crisis_level = crisis_level_5
-					is_crisis_faction = yes
+					OR = {
+						has_crisis_level = crisis_level_5
+						has_crisis_level = crisis_cosmogenesis_level_5
+						is_crisis_faction = yes
+					}
 				}
 			}
 		}
@@ -649,6 +761,7 @@ ap_defender_of_the_galaxy = {
 				any_country = {
 					OR = {
 						has_crisis_level = crisis_level_5
+						has_crisis_level = crisis_cosmogenesis_level_5
 						is_crisis_faction = yes
 					}
 				}
@@ -913,8 +1026,9 @@ ap_mastery_of_nature = {
 	}
 
 	potential = {
-		NOT = {
+		NOR = {
 			has_ascension_perk = ap_mastery_of_nature
+			is_environmental_architects_empire = yes
 		}
 	}
 
@@ -923,7 +1037,7 @@ ap_mastery_of_nature = {
 		modifier = {
 			factor = 0
 			OR = {
-				has_void_dweller_origin = yes # undercoat: moved to scripted trigger
+				is_void_dweller_empire = yes
 				is_shattered_ring_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -950,7 +1064,7 @@ ap_imperial_prerogative = {
 		NOT = {
 			has_ascension_perk = ap_imperial_prerogative
 		}
-		is_megacorp = no # undercoat: moved to scripted trigger
+		is_megacorp = no
 	}
 
 	ai_weight = {
@@ -1026,7 +1140,9 @@ ap_shared_destiny = {
 	potential = {
 		NOR = {
 			is_homicidal = yes # undercoat: moved to scripted trigger
+			
 			is_inwards_perfection_empire = yes # undercoat: moved to scripted trigger
+			
 		}
 		NOT = {
 			has_ascension_perk = ap_shared_destiny
@@ -1052,10 +1168,7 @@ ap_shared_destiny = {
 ap_voidborn = {
 	potential = {
 		host_has_dlc = "Utopia"
-		NOR = {
-			has_ascension_perk = ap_voidborn
-			has_void_dweller_origin = yes # undercoat: moved to scripted trigger
-		}
+		is_void_dweller_empire = no
 	}
 
 	possible = {
@@ -1357,7 +1470,7 @@ ap_machine_worlds = {
 
 	potential = {
 		host_has_dlc = "Synthetic Dawn Story Pack"
-		is_machine_empire = yes # undercoat: moved to scripted trigger
+		is_machine_empire = yes
 		NOT = {
 			has_ascension_perk = ap_machine_worlds
 		}
@@ -1391,7 +1504,7 @@ ap_hive_worlds = {
 
 	potential = {
 		host_has_dlc = "Utopia"
-		is_hive_empire = yes # undercoat: moved to scripted trigger
+		is_hive_empire = yes
 		NOT = {
 			has_ascension_perk = ap_hive_worlds
 		}
@@ -1601,7 +1714,7 @@ ap_detox = {
 ap_mechromancy = {
 	potential = {
 		has_necroids = yes
-		is_machine_empire = yes # undercoat: moved to scripted trigger
+		is_machine_empire = yes
 		NOT = {
 			has_ascension_perk = ap_mechromancy
 		}
@@ -1654,5 +1767,58 @@ ap_mechromancy = {
 
 			}
 		}
+	}
+}
+
+#################
+# WEATHER CONTROL ASCENSION PERK
+#################
+
+ap_weather_control = {
+	potential = {
+		has_cosmic_storms_dlc = yes
+		NOT = {
+			has_ascension_perk = ap_weather_control
+		}
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_technology_tech_advanced_storm_manipulation"
+			has_technology = tech_advanced_storm_manipulation
+		}
+		custom_tooltip = {
+			fail_text = "requires_ascension_perks_1"
+			num_ascension_perks > 0
+		}
+	}
+
+	modifier = {
+	}
+
+	on_enabled = {
+		custom_tooltip = ap_weather_control_effect_tt
+		if = {
+			limit = {
+				NOR = {
+					has_technology = tech_ship_hull_storm_breaker_1
+					has_tech_option = tech_ship_hull_storm_breaker_1
+				}
+			}
+			add_research_option = tech_ship_hull_storm_breaker_1
+		}
+		if = {
+			limit = {
+				NOR = {
+					has_technology = tech_ship_storm_weapons_1
+					has_tech_option = tech_ship_storm_weapons_1
+				}
+			}
+			add_research_option = tech_ship_storm_weapons_1
+		}
+	}
+
+	ai_weight = {
+		factor = 0
 	}
 }

@@ -1,0 +1,1682 @@
+
+choose_storm_location_weighted = {
+	random_system = {
+		weights = {
+			base = 1
+
+			# Storm chasers origin gives an increased chance for storms to spawn in their systems.
+			modifier = {
+				exists = owner
+				owner = { is_storm_chasers_empire = yes } #undercoat: moved to scripted trigger
+
+				factor = @storm_chasers_storm_spawn_chance_mult
+			}
+
+			# Don't spawn inside an existing storm
+			modifier = {
+				is_inside_storm = yes
+				factor = 0
+			}
+
+			# Drastically decrease the chance of picking a system in a sector that already has a storm.
+			# We want to avoid this, but if there's no other option we allow it.
+			modifier = {
+				is_storm_active_in_storm_sector = yes
+				factor = 0.0001
+			}
+		}
+
+		save_event_target_as = $EVENT_TARGET_NAME$
+	}
+}
+
+spawn_random_storm_weighted = {
+	choose_storm_location_weighted = {
+		EVENT_TARGET_NAME = new_storm_location
+	}
+	spawn_random_storm = {
+		cosmic_storm_start_position = event_target:new_storm_location
+	}
+}
+
+## Tech effects ##
+
+swap_to_positive_storm_effect = {
+	remove_modifier = storm_$STORM$_modifier
+	add_modifier = {
+		modifier = storm_$STORM$_modifier_positive
+	}
+	every_system_planet = {
+		remove_modifier = storm_$STORM$_modifier
+		add_modifier = {
+			modifier = storm_$STORM$_modifier_positive
+		}
+	}
+}
+
+swap_to_nomal_storm_effect = {
+	remove_modifier = storm_$STORM$_modifier_positive
+	add_modifier = {
+		modifier = storm_$STORM$_modifier
+	}
+	every_system_planet = {
+		remove_modifier = storm_$STORM$_modifier_positive
+		add_modifier = {
+			modifier = storm_$STORM$_modifier
+		}
+	}
+}
+
+### Storm dodger handling ###
+
+
+### Electric storm behaviour effects ###
+
+electric_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "electric_storm"
+	}
+}
+
+electric_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+	electric_storm_apply_aftermath_modifier = yes
+	electric_storm_apply_deposits = yes
+}
+
+### Particle storm behaviour ###
+
+particle_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "particle_storm"
+	}
+}
+
+particle_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+	particle_storm_apply_aftermath_modifier = yes
+	particle_storm_apply_deposits = yes
+}
+
+### Gravity storm behaviour ###
+
+gravity_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "gravity_storm"
+	}
+
+	if = {
+		limit = {
+			has_owner = yes
+		}
+		owner = {
+	 		set_country_flag = affected_by_gravity_storm
+	 	}
+	}
+}
+
+gravity_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+
+	if = {
+		limit = {
+			has_owner = yes
+		}
+		owner = {
+	 		remove_country_flag = affected_by_gravity_storm
+	 	}
+	}
+
+	gravity_storm_apply_aftermath_modifier = yes
+	gravity_storm_apply_deposits = yes
+}
+
+### Magnetic storm behaviour ###
+
+magnetic_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "magnetic_storm"
+	}
+}
+
+magnetic_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+	magnetic_storm_apply_aftermath_modifier = yes
+	magnetic_storm_apply_deposit = yes
+}
+
+### Solar storm behaviour ###
+
+solar_storm_add = {
+	set_star_flag = storm_system
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "solar_storm"
+	}
+}
+
+solar_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+	solar_storm_apply_aftermath_modifier = yes
+	solar_storm_apply_deposits = yes
+}
+
+### Celestial storm behaviour ###
+
+celestial_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "celestial_storm"
+	}
+}
+
+celestial_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+	celestial_storm_apply_aftermath_modifier = yes
+	celestial_storm_apply_deposits = yes
+}
+
+### Shroud storm behaviour ###
+
+shroud_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "shroud_storm"
+	}
+
+	if = {
+		limit = {
+			has_owner = yes
+		}
+		owner = {
+	 		set_country_flag = affected_by_shroud_storm
+	 	}
+	}
+	shroud_storm_events = yes
+}
+
+shroud_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+
+	if = {
+		limit = {
+			has_owner = yes
+		}
+		owner = {
+	 		remove_country_flag = affected_by_shroud_storm
+	 	}
+	}
+
+	shroud_storm_apply_aftermath_modifier = yes
+	shroud_storm_apply_deposits = yes
+}
+
+### Nexus storm behaviour ###
+
+nexus_storm_add = {
+	set_star_flag = storm_system
+	set_global_flag = cosmic_storm_has_occurred
+
+	inline_script = {
+		script = cosmic_storms/StormVisuals
+		STORM_NAME = "nexus_storm"
+	}
+}
+
+nexus_storm_remove = {
+	remove_storm_visuals_effect = yes
+	remove_star_flag = storm_system
+	nexus_storm_apply_aftermath_modifier = yes
+}
+
+added_to_storm_base_effect = {
+	set_cosmic_storm = {
+		cosmic_storm = prev
+	}
+
+	if = {
+		limit = {
+			exists = owner
+			owner = { has_edict = auto_hunker_down }
+		}
+
+		every_system_planet = {
+			select_decision = {
+				name = decision_hunker_down
+			}
+		}
+	}
+}
+
+removed_from_storm_base_effect = {
+	unset_cosmic_storm = yes
+
+	if = {
+		limit = {
+			exists = owner
+			owner = { has_edict = auto_hunker_down }
+		}
+		every_system_planet = {
+			select_decision = {
+				name = decision_stop_hunker_down
+			}
+		}
+	}
+}
+
+remove_storm_visuals_effect = {
+	random_system_ambient_object = {
+		limit = {
+			has_ambient_object_flag = space_storm_object
+		}
+		destroy_ambient_object = this
+	}
+}
+
+
+#Aftermath Modifier Scripted Effects
+
+electric_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+			severity = {
+				modifier = "electric_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "electric_storm_aftermath_modifier_severity_2"
+							has_modifier = "electric_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "electric_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "electric_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "electric_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = ELECTRIC_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = electric_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+electric_storm_apply_deposits = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_electric_storm_1_engineering
+				has_deposit = d_electric_storm_2_unity
+				has_deposit = d_electric_storm_3_physics
+			}
+		}
+
+		random_list = {
+			80 = {}
+			20 = {
+				random_list = {
+					30 = { add_deposit = d_electric_storm_1_engineering }
+					30 = { add_deposit = d_electric_storm_2_unity }
+					30 = { add_deposit = d_electric_storm_3_physics }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+particle_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+			severity = {
+				modifier = "particle_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "particle_storm_aftermath_modifier_severity_2"
+							has_modifier = "particle_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "particle_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "particle_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "particle_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = PARTICLE_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = particle_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+particle_storm_apply_deposits = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_particle_storm_1_society
+				has_deposit = d_particle_storm_2_unity
+				has_deposit = d_particle_storm_3_motes
+			}
+		}
+
+		random_list = {
+			80 = {}
+			20 = {
+				random_list = {
+					30 = { add_deposit = d_particle_storm_1_society }
+					30 = { add_deposit = d_particle_storm_2_unity }
+					30 = { add_deposit = d_particle_storm_3_motes }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+gravity_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+			severity = {
+				modifier = "gravity_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "gravity_storm_aftermath_modifier_severity_2"
+							has_modifier = "gravity_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "gravity_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "gravity_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "gravity_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = GRAVITY_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = gravity_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+gravity_storm_apply_deposits = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_gravity_storm_1_districts
+				has_deposit = d_gravity_storm_2_unity
+				has_deposit = d_gravity_storm_3_engineering
+			}
+		}
+
+		random_list = {
+			80 = {}
+			20 = {
+				random_list = {
+					30 = { add_deposit = d_gravity_storm_1_districts }
+					30 = { add_deposit = d_gravity_storm_2_unity }
+					30 = { add_deposit = d_gravity_storm_3_engineering }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+magnetic_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+			severity = {
+				modifier = "magnetic_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "magnetic_storm_aftermath_modifier_severity_2"
+							has_modifier = "magnetic_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "magnetic_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "magnetic_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "magnetic_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = MAGNETIC_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = magnetic_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+magnetic_storm_apply_deposit = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_magnetic_storm_1_minerals
+				has_deposit = d_magnetic_storm_2_alloys
+				has_deposit = d_magnetic_storm_3_mix
+			}
+		}
+
+		random_list = {
+			75 = {}
+			25 = {
+				random_list = {
+					30 = { add_deposit = d_magnetic_storm_1_minerals }
+					30 = { add_deposit = d_magnetic_storm_2_alloys }
+					30 = { add_deposit = d_magnetic_storm_3_mix }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+solar_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+			severity = {
+				modifier = "solar_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "solar_storm_aftermath_modifier_severity_2"
+							has_modifier = "solar_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "solar_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "solar_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "solar_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = SOLAR_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = solar_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+solar_storm_apply_deposits = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_solar_storm_1_energy
+				has_deposit = d_solar_storm_2_districts
+				has_deposit = d_solar_storm_3_output
+			}
+		}
+
+		random_list = {
+			80 = {}
+			20 = {
+				random_list = {
+					30 = { add_deposit = d_solar_storm_1_energy }
+					30 = { add_deposit = d_solar_storm_2_districts }
+					30 = { add_deposit = d_solar_storm_3_output }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+celestial_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+			severity = {
+				modifier = "celestial_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "celestial_storm_aftermath_modifier_severity_2"
+							has_modifier = "celestial_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "celestial_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "celestial_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+			}
+
+			severity = {
+				modifier = "celestial_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = CELESTIAL_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = celestial_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+celestial_storm_apply_deposits = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_celestial_storm_1_mines
+				has_deposit = d_celestial_storm_2_society
+				has_deposit = d_celestial_storm_3_crystal
+			}
+		}
+
+		random_list = {
+			80 = {}
+			20 = {
+				random_list = {
+					30 = { add_deposit = d_celestial_storm_1_mines }
+					30 = { add_deposit = d_celestial_storm_2_society }
+					30 = { add_deposit = d_celestial_storm_3_crystal }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+shroud_storm_apply_aftermath_modifier = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+		}
+
+		storm_apply_aftermath_modifier = {
+
+			severity = {
+				modifier = "shroud_storm_aftermath_modifier_severity_1"
+				days = @Severity1Duration
+				chance = {
+					base = @Severity1BaseChance
+					modifier = {
+						factor = 0
+						OR = {
+							has_modifier = "shroud_storm_aftermath_modifier_severity_2"
+							has_modifier = "shroud_storm_aftermath_modifier_severity_3"
+						}
+					}
+					modifier = {
+						factor =  $FactorSev1|1$
+					}
+				}
+
+				effect = {
+					set_timed_planet_flag = {
+						flag = AFFECTED_BY_SHROUD_AFTERMATH
+						days = @Severity1Duration
+					}
+				}
+			}
+
+			severity = {
+				modifier = "shroud_storm_aftermath_modifier_severity_2"
+				days = @Severity2Duration
+				chance = {
+					base = @Severity2BaseChance
+					modifier = {
+						factor = 0
+						has_modifier = "shroud_storm_aftermath_modifier_severity_3"
+					}
+					modifier = {
+						factor =  $FactorSev2|1$
+					}
+				}
+
+				effect = {
+					set_timed_planet_flag = {
+						flag = AFFECTED_BY_SHROUD_AFTERMATH
+						days = @Severity2Duration
+					}
+				}
+			}
+
+			severity = {
+				modifier = "shroud_storm_aftermath_modifier_severity_3"
+				days = @Severity3Duration
+				chance = {
+					base = @Severity3BaseChance
+					modifier = {
+						factor =  $FactorSev3|1$
+					}
+				}
+
+				effect = {
+					set_timed_planet_flag = {
+						flag = AFFECTED_BY_SHROUD_AFTERMATH
+						days = @Severity3Duration
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = { is_colony = yes }
+			owner = {
+				create_message = {
+					type = SHROUD_STORM_AFTERMATH
+					localization = MESSAGE_STORM_AFTERMATH_DESC
+					days = @toast_important_message_days
+					target = prev
+					variable = {
+						type = name
+						localization = PLANET
+						scope = prev
+					}
+					custom_toast_content_text = shroud_storm_aftermath_custom_desc
+				}
+			}
+		}
+	}
+}
+
+
+shroud_storm_events = {
+	random_system_planet = {
+		limit = {
+			NOT = { has_planet_flag = shroud_storm_changed }
+			is_artificial = no
+			is_astral_scar = no
+			is_asteroid = no
+			is_molten_world = no # undercoat: moved to scripted trigger
+			NOT = { has_modifier = terraforming_candidate }
+		}
+		random_list = {
+			80 = {}
+			20 = {
+				planet_event = { id = cstorms.8500 }
+			}
+		}
+	}
+}
+
+shroud_storm_apply_deposits = {
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_artificial = no
+			NOR = {
+				has_deposit = d_shroud_storm_1_society
+				has_deposit = d_shroud_storm_2_zro
+				has_deposit = d_shroud_storm_3_happy
+			}
+		}
+
+		random_list = {
+			80 = {}
+			20 = {
+				random_list = {
+					30 = { add_deposit = d_shroud_storm_1_society }
+					30 = { add_deposit = d_shroud_storm_2_zro }
+					30 = { add_deposit = d_shroud_storm_3_happy }
+				}
+				if = {
+					limit = {
+						has_owner = yes
+					}
+					planet_event = { id = cstorms.8000 }
+				}
+			}
+		}
+	}
+}
+
+nexus_storm_apply_aftermath_modifier = {
+    random_list = {
+        10 = {
+            electric_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+        10 = {
+            particle_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+        10 = {
+            gravity_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+        10 = {
+            magnetic_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+        10 = {
+            solar_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+        10 = {
+            celestial_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+        10 = {
+            shroud_storm_apply_aftermath_modifier = {
+                FactorSev1 = 0
+                FactorSev2 = 0
+                FactorSev3 = @Severity3BaseChance
+            }
+        }
+    }
+}
+
+create_influence_field_if_needed = {
+	if = {
+		limit = {
+			solar_system = { is_influence_center = no }
+		}
+		create_cosmic_storm_influence_field = {
+			center = this.solar_system
+			radius = {
+				base = 120
+				modifier = {
+					mult = value:storm_size_multiplier
+				}
+			}
+		}
+	}
+}
+
+# sets upStorm fever challenge 2. Find a rim system, ideally unkown and reasonably far away,
+# for the player to go to as part of the challenge.
+STORM_FEVER_ENABLE_CHALLENGE_2 = {
+	capital_scope = {
+		# First try to find a far-away rim system with low intel
+		try_find_far_edge_rim_system = {
+			MIN_STEPS = 10
+			INTEL = low
+		}
+
+		# If no matching system could be found, attempt fallback to medium intel
+		if = {
+			limit = { NOT = { has_planet_flag = far_edge_system_found } }
+
+			try_find_far_edge_rim_system = {
+				MIN_STEPS = 10
+				INTEL = medium
+			}
+		}
+
+		# If still no matching system could be found, fallback to allow high intel
+		if = {
+			limit = { NOT = { has_planet_flag = far_edge_system_found } }
+
+			try_find_far_edge_rim_system = {
+				MIN_STEPS = 10
+				INTEL = high
+			}
+		}
+
+		# If even that didn't work, remove the distance constraint.
+		if = {
+			limit = { NOT = { has_planet_flag = far_edge_system_found } }
+
+			try_find_far_edge_rim_system = {
+				MIN_STEPS = 0
+				INTEL = high
+			}
+		}
+
+		# If all else fails, we simply ask for a rim system without any further constraints, which should always succeed.
+		if = {
+			limit = { NOT = { has_planet_flag = far_edge_system_found } }
+
+			closest_system = {
+				min_steps = 5
+				limit = { is_rim_system = yes }
+
+				save_event_target_as = stormfever_challenge_2_target
+				set_star_flag = stormfever_challenge_2_target_system
+			}
+		}
+
+		# Flag was only necessary during this effect to check if we found good location.
+		remove_planet_flag = far_edge_system_found
+	}
+
+	# Start mission with target system as location.
+	enable_mission = {
+		name = MISSION_CS_STORM_FEVER_CHALLENGE_2
+		location = event_target:stormfever_challenge_2_target
+	}
+}
+
+# This: capital_scope (planet)
+try_find_far_edge_rim_system = {
+	closest_system = {
+		min_steps = $MIN_STEPS$
+		limit = {
+			is_rim_system = yes
+			has_owner = no
+
+			NOR = {
+				has_star_flag = hostile_system
+				root = {
+					intel_level = {
+						level > $INTEL$
+						system = prev
+					}
+				}
+			}
+		}
+
+		save_event_target_as = stormfever_challenge_2_target
+		set_star_flag = stormfever_challenge_2_target_system
+
+		prev = {
+			set_planet_flag = far_edge_system_found
+		}
+	}
+}
+
+# This: Planet
+change_planet_to_previously_terraformed = {
+	set_planet_entity = {
+		entity = "previously_terraformed_planet_entity"
+	}
+	add_modifier = {
+		modifier = previously_terraformed_planet
+		days = -1
+	}
+}
+
+# This: Planet
+start_patriotic_institute_spawn_storm_repeated = {
+	if = {
+		limit = {
+			# Used to ensure we don't try to start the repeated event while it's already active.
+			NOT = { has_planet_flag = patriotic_institute_spawning_storms }
+
+			exists = owner
+			owner = {
+				has_country_flag = patriotic_institute_supercharged
+			}
+		}
+
+		set_planet_flag = patriotic_institute_spawning_storms
+		planet_event = {
+			id = galactic_features.411
+			days = 2880
+			random = 4320
+		}
+	}
+}
+
+# Changes the pop's species to a storm-fused subspecies.
+# This: Planet
+make_pops_storm_fused_with_chance = {
+	every_owned_pop = {
+		limit = {
+			NOT = { species = { has_species_flag = is_storm_fused_mod } }
+		}
+
+		random = {
+			chance = $CHANCE$
+
+			# Ensure a storm-fused subspecies exists for the pop's species.
+			if = {
+				limit = {
+					species = {
+						NOT = { has_species_flag = storm_fused_mod_created }
+					}
+				}
+
+				create_species = {
+					name = this
+					plural = this
+					class = this
+					can_be_modified = this
+					portrait = this
+					homeworld = this
+
+					is_mod = yes
+					mod_name_affix = "Name_Storm_Fused_affix"
+
+					# Copy base traits, add storm-fused.
+					traits = this
+					traits = {
+						trait = trait_storm_fused
+					}
+
+					effect = {
+						set_species_flag = is_storm_fused_mod
+						save_event_target_as = storm_fused_species
+					}
+				}
+
+				species = {
+					set_species_flag = storm_fused_mod_created
+				}
+			}
+			# Find the storm-fused mod subspecies.
+			else = {
+				owner = {
+					every_owned_species = {
+						limit = {
+							is_subspecies = prevprev.species
+							has_species_flag = is_storm_fused_mod
+						}
+
+						save_event_target_as = storm_fused_species
+					}
+				}
+			}
+
+			change_species = event_target:storm_fused_species
+		}
+	}
+}
+
+# Triggered from on_success in the storm fever challenge missions
+# This: Country
+add_challenge_completed = {
+	# Increment the counter
+	add_event_chain_counter = {
+		event_chain = "cs_stormfever_chain"
+		counter = "challenges_completed"
+		amount = 1
+	}
+
+	# Trigger event if we've completed enough challenges.
+	if = {
+		limit = {
+			has_completed_event_chain_counter = {
+				event_chain = cs_stormfever_chain
+				counter = challenges_completed
+			}
+		}
+
+		country_event = {
+			id = cstorms.3215
+		}
+	}
+}
+
+create_green_skies_pirates_fleet = {
+	owner_species = {
+		save_event_target_as = owner_species
+	}
+
+	create_country = {
+		name = NAME_green_skies_pirates_country
+		species = event_target:owner_species
+		type = faction
+		name_list = PRT1
+
+		effect = {
+			set_country_flag = green_skies_pirates
+			establish_communications_no_message = root
+			establish_contact = {
+				who = root
+				location = event_target:planet_green_skies.solar_system
+			}
+			create_leader = {
+				class = commander
+				species = event_target:owner_species
+				name = random
+				skill = 2
+			}
+			create_fleet = {
+				name = NAME_green_skies_pirate_fleet
+				effect = {
+					set_fleet_flag = green_skies_pirate_fleet
+					set_owner = prev
+					set_location = event_target:planet_green_skies
+					set_aggro_range_measure_from = return_point
+					set_aggro_range = 50
+
+					create_pirate_ships_10 = yes
+					set_fleet_stance = aggressive
+
+					assign_leader = last_created_leader
+					queue_actions = {
+						repeat = {
+							wait = {
+								duration = 100
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# This: Planet
+mark_used_by_precursor = {
+	set_planet_flag = precursor_world
+	solar_system = { set_star_flag = precursor_system }
+}
+
+try_spawn_natural_storm = {
+	if = {
+		limit = {
+			num_cosmic_storms < $MAX_STORM_COUNT$
+		}
+		random = {
+			chance = $SPAWN_CHANCE$
+			spawn_random_storm_weighted = yes
+		}
+
+		country_event = {
+			id = cstorms.905
+			days = $COOLDOWN$
+			random = $COOLDOWN_VARIANCE$
+		}
+	}
+	else = {
+		country_event = {
+			id = cstorms.905
+			days = 30
+		}
+	}
+}
+
+try_spawn_natural_nexus_storm = {
+	# Try to spawn a nexus storm.
+	if = {
+		limit = {
+			NOT = { has_country_flag = nexus_storm_on_cooldown }
+			num_cosmic_storms < $MAX_STORM_COUNT$
+		}
+
+		random = {
+			chance = $SPAWN_CHANCE$
+
+			choose_storm_location_weighted = {
+				EVENT_TARGET_NAME = new_storm_location
+			}
+
+			# Spawn the Nexus storm
+			spawn_random_storm = {
+				type = nexus_storm
+				cosmic_storm_start_position = event_target:new_storm_location
+			}
+
+			# Nexus storms have a separate cooldown, tracked through a flag.
+			# The flag is unset by cstorms.910.
+			set_country_flag = nexus_storm_on_cooldown
+			country_event = {
+				id = cstorms.910
+				days = $COOLDOWN$
+			}
+
+			set_country_flag = nexus_storm_spawned
+		}
+	}
+}
+
+# This: Planet
+destroy_collided_planets = {
+	remove_modifier = collided_planet_collapsing
+
+	hidden_effect = {
+		create_ambient_object = {
+			location = this
+			type = habitat_cracker_object
+			duration = 5
+
+			use_3d_location = yes
+			base_angle_towards = star
+			entity_face_object = star
+
+			entity_offset = { min = 0 max = 0 }
+
+			entity_scale_to_size = yes
+			scale = 0.10
+		}
+
+		change_pc = pc_shattered
+	}
+
+	destroy_colony = yes
+
+	custom_tooltip = collided_planets_destroyed_tt
+}
+
+#This = country
+
+stormbound_final_reward = {
+
+	inverted_switch = {
+		trigger = has_technology
+		tech_hyper_drive_1 = {
+			add_tech_progress = {
+				tech = tech_hyper_drive_1
+				progress = 0.1
+			}
+		}
+		tech_hyper_drive_2 = {
+			add_tech_progress = {
+				tech = tech_hyper_drive_2
+				progress = 0.1
+			}
+		}
+		tech_experimental_subspace_navigation = {
+			add_tech_progress = {
+				tech = tech_experimental_subspace_navigation
+				progress = 0.1
+			}
+		}
+		tech_hyper_drive_3 = {
+			add_tech_progress = {
+				tech = tech_hyper_drive_3
+				progress = 0.1
+			}
+		}
+		tech_wormhole_stabilization = {
+			add_tech_progress = {
+				tech = tech_wormhole_stabilization
+				progress = 0.1
+			}
+		}
+		tech_jump_drive_1 = {
+			add_tech_progress = {
+				tech = tech_jump_drive_1
+				progress = 0.1
+			}
+		}
+		default = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier4researchreward
+				min = @tier4researchmin
+				max = @tier4researchmax
+			}
+		}
+	}
+}
+
+# This: Planet
+add_anomaly_in_owned_space = {
+	if = {
+		limit = {
+			exists = solar_system
+			solar_system = {
+				exists = owner
+			}
+		}
+		add_anomaly = {
+			category = $CATEGORY$
+			target = solar_system.owner
+		}
+	}
+	else = {
+		add_anomaly = {
+			category = $CATEGORY$
+		}
+	}
+}
+
+add_storm_type_flag = {
+	$STORM_SCOPE$ = {
+		switch = {
+			trigger = is_storm_type
+			electric_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_electric_storm } }
+			particle_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_particle_storm } }
+			gravity_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_gravity_storm } }
+			magnetic_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_magnetic_storm } }
+			solar_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_solar_storm } }
+			celestial_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_celestial_storm } }
+			shroud_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_shroud_storm } }
+			nexus_storm = { prev = { set_$SCOPE_TYPE$_flag = affected_by_nexus_storm } }
+		}
+	}
+}
+
+clear_affected_storm_flag = {
+	remove_$SCOPE_TYPE$_flag = affected_by_electric_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_particle_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_gravity_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_magnetic_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_solar_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_celestial_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_shroud_storm
+	remove_$SCOPE_TYPE$_flag = affected_by_nexus_storm
+}
+
+planetscaper_pop_effect = {
+	if = {
+		limit = {
+			exists = owner
+			owner = { is_environmental_architects_empire = yes }
+			NOT = {
+				owner = { has_country_flag = environmentalist_pop }
+			}
+		}
+		if = {
+			limit = {
+				any_owned_pop = {
+					NOT = { has_trait = trait_hive_mind }
+					is_robot_pop = no
+				}
+			}
+			random_owned_pop = {
+				limit = {
+					NOT = { has_trait = trait_hive_mind }
+					is_robot_pop = no
+				}
+				root = {
+					create_pop = {
+						species = prev
+					}
+				}
+			}
+		}
+		else = {
+			random_owned_pop = {
+				root = {
+					create_pop = {
+						species = prev
+					}
+				}
+			}
+		}
+		owner = { set_country_flag = environmentalist_pop }
+	}
+}

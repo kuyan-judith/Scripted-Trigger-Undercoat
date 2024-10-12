@@ -1,0 +1,110 @@
+kill_pop_stu = {
+	fire_on_action = { on_action = on_pop_killed_by_effect }
+	kill_pop = yes
+}
+
+# effect when diplo treaties are force-ended
+end_all_treaties_with_stu = {
+	if = {
+		limit = { has_defensive_pact = $who$ }
+		fire_on_action = {
+			on_action = on_defensive_pact_broken_victim
+			scopes = { from = $who$ }
+		}
+	}
+	if = {
+		limit = { has_non_aggression_pact = $who$ }
+		fire_on_action = {
+			on_action = on_non_aggression_pact_broken_victim
+			scopes = { from = $who$ }
+		}
+	}
+	if = {
+		limit = { has_research_agreement = $who$ }
+		fire_on_action = {
+			on_action = on_research_pact_broken_victim
+			scopes = { from = $who$ }
+		}
+	}
+	if = {
+		limit = { has_diplo_migration_treaty = $who$ }
+		fire_on_action = {
+			on_action = on_migration_pact_broken_victim
+			scopes = { from = $who$ }
+		}
+	}
+	if = {
+		limit = { has_defensive_pact = $who$ }
+		fire_on_action = {
+			on_action = on_defensive_pact_broken_victim
+			scopes = { from = $who$ }
+		}
+	}
+	end_all_treaties_with = $who$
+}
+
+release_subject_stu = {
+	fire_on_action = { on_action = on_leave_subjugation }
+	release_subject = yes
+}
+
+set_subject_of_stu = {
+	if = {
+		limit = { exists = overlord }
+		overlord = { save_event_target_as = stu_old_overlord }
+	}
+	set_subject_of = {
+		who = $who$
+		[[use_demanded_terms]use_demanded_terms = $use_demanded_terms$]
+		[[allow_instant_negotiation]allow_instant_negotiation = $allow_instant_negotiation$]
+		[[preset]preset = $preset$]
+	}
+	if = {
+		limit = {
+			exists = event_target:stu_old_overlord
+			NOT = { has_overlord = event_target:stu_old_overlord }
+		}
+		fire_on_action = { on_action = on_leave_subjugation }
+	}
+}
+
+# effect to add on_actions to diplo actions that lack them
+stu_diplo_acceptance_on_action = {
+	hidden_effect = {
+		# scopes match on_sign_commercial_pact etc.
+		from = {
+			fire_on_action = {
+				on_action = $action$
+				scopes = { from = prev }
+			}
+		}
+	}
+}
+
+remove_secret_fealty_stu = {
+	if = {
+		limit = {
+			has_secret_fealty_with = $target$
+			is_subject = yes
+		}
+		fire_on_action = {
+			on_action = on_break_secret_fealty
+			scopes = { from = $target$ }
+		}
+	}
+	remove_secret_fealty = $target$
+}
+
+clear_deposits_stu = {
+	every_deposit = {
+		limit = {
+			NOT = { has_deposit_flag = ignore_clear_deposits_stu }
+		}
+		remove_deposit = yes
+	}
+}
+
+add_protected_deposit_stu = {
+	add_deposit = $deposit_type$
+	last_added_deposit = { set_deposit_flag = ignore_clear_deposit_stu }
+}

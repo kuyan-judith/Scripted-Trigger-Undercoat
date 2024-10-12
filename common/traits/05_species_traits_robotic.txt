@@ -1,5 +1,36 @@
+#Leave at start of list
+trait_auto_mod_robotic = {
+	cost = {
+		base = 3
+		modifier = {
+			add = -1
+			is_mechanist_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	auto_mod = yes
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+	slave_cost = {
+		energy = 1000
+	}
+	assembly_score = {
+		base = 2
+	}
+	custom_tooltip_with_modifiers = automodding_trait_robotic_tooltip
+}
+
 trait_robot_power_drills = {
 	cost = 2
+	category = robotic
 
 	allowed_archetypes = { ROBOT MACHINE }
 
@@ -23,6 +54,7 @@ trait_robot_power_drills = {
 
 trait_robot_harvesters = {
 	cost = 2
+	category = robotic
 
 	allowed_archetypes = { ROBOT MACHINE }
 
@@ -54,6 +86,7 @@ trait_robot_harvesters = {
 
 trait_robot_superconductive = {
 	cost = 2
+	category = robotic
 
 	allowed_archetypes = { ROBOT MACHINE }
 
@@ -77,6 +110,7 @@ trait_robot_superconductive = {
 
 trait_robot_efficient_processors = {
 	cost = 3
+	category = robotic
 
 	allowed_archetypes = { ROBOT MACHINE }
 
@@ -96,18 +130,17 @@ trait_robot_efficient_processors = {
 
 trait_robot_logic_engines = {
 	cost = 2
+	category = robotic
 
 	allowed_archetypes = { ROBOT MACHINE }
 
-	# Droids and Machines
+	# Droids, Synths and Machines
 	species_potential_add = {
-		exists = from
-		from = {
-			OR = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
-				has_technology = tech_droid_workers
-			}
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
 		}
 	}
 	modifier = {
@@ -128,17 +161,18 @@ trait_robot_logic_engines = {
 
 trait_robot_loyalty_circuits = {
 	cost = 2
+	category = robotic
 
-	allowed_archetypes = { ROBOT }
+	allowed_archetypes = { ROBOT MACHINE }
 
-	# Synth only
+	# Synth or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			has_technology = tech_synthetic_workers
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
 		}
 	}
+	forbidden_ethics = { ethic_gestalt_consciousness }
 	modifier = {
 		pop_happiness = 0.1
 	}
@@ -149,20 +183,22 @@ trait_robot_loyalty_circuits = {
 
 trait_robot_domestic_protocols = {
 	cost = 2
+	category = robotic
 
 	initial = no
 	randomized = no
 
-	allowed_archetypes = { ROBOT }
+	allowed_archetypes = { ROBOT MACHINE }
 
-	# Synth or Droid only
+	# Droid, Synth or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			has_technology = tech_droid_workers
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
 		}
 	}
+	forbidden_ethics = { ethic_gestalt_consciousness }
 	modifier = {
 		pop_job_amenities_mult = 0.20
 	}
@@ -175,6 +211,7 @@ trait_robot_domestic_protocols = {
 
 trait_robot_double_jointed = {
 	cost = 1
+	category = robotic
 	opposites = { "trait_robot_bulky" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -189,6 +226,7 @@ trait_robot_double_jointed = {
 
 trait_robot_bulky = {
 	cost = -1
+	category = robotic
 	opposites = { "trait_robot_double_jointed" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -206,18 +244,16 @@ trait_robot_bulky = {
 
 trait_robot_enhanced_memory = {
 	cost = 2
+	category = robotic
 
 	allowed_archetypes = { ROBOT MACHINE }
 
-	# Synth or Machine only
+	# Synth, Machine Intelligence or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			OR = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
-				has_technology = tech_synthetic_leaders
-			}
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
 		}
 	}
 	modifier = {
@@ -234,8 +270,9 @@ trait_robot_enhanced_memory = {
 
 trait_robot_emotion_emulators = {
 	cost = 1
+	category = robotic
 	opposites = { "trait_robot_uncanny" }
-	allowed_archetypes = { MACHINE }
+	allowed_archetypes = { ROBOT MACHINE }
 	modifier = {
 		pop_job_amenities_mult = 0.20
 	}
@@ -246,8 +283,9 @@ trait_robot_emotion_emulators = {
 
 trait_robot_uncanny = {
 	cost = -1
+	category = robotic
 	opposites = { "trait_robot_emotion_emulators" }
-	allowed_archetypes = { MACHINE }
+	allowed_archetypes = { ROBOT MACHINE }
 	modifier = {
 		pop_job_amenities_mult = -0.20
 	}
@@ -261,6 +299,7 @@ trait_robot_uncanny = {
 
 trait_robot_durable = {
 	cost = 1
+	category = robotic
 	opposites = { "trait_robot_high_maintenance" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -275,6 +314,7 @@ trait_robot_durable = {
 
 trait_robot_high_maintenance = {
 	cost = -1
+	category = robotic
 	opposites = { "trait_robot_durable" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -292,19 +332,17 @@ trait_robot_high_maintenance = {
 
 trait_robot_learning_algorithms = {
 	cost = 1
+	category = robotic
 	opposites = { "trait_robot_repurposed_hardware" }
 
 	allowed_archetypes = { ROBOT MACHINE }
 
-	# Synth or Machine only
+	# Synth, Machine Intelligence or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			OR = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
-				has_technology = tech_synthetic_leaders
-			}
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
 		}
 	}
 	modifier = {
@@ -317,19 +355,17 @@ trait_robot_learning_algorithms = {
 
 trait_robot_repurposed_hardware = {
 	cost = -1
+	category = robotic
 	opposites = { "trait_robot_learning_algorithms" }
 
 	allowed_archetypes = { ROBOT MACHINE }
 
-	# Synth or Machine only
+	# Synth, Machine Intelligence or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			OR = {
-				is_machine_empire = yes # undercoat: moved to scripted trigger
-				has_technology = tech_synthetic_leaders
-			}
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
 		}
 	}
 	modifier = {
@@ -349,6 +385,7 @@ trait_robot_repurposed_hardware = {
 
 trait_robot_mass_produced = {
 	cost = 1
+	category = robotic
 	opposites = { "trait_robot_custom_made" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -363,6 +400,7 @@ trait_robot_mass_produced = {
 
 trait_robot_custom_made = {
 	cost = -1
+	category = robotic
 	opposites = { "trait_robot_mass_produced" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -380,6 +418,7 @@ trait_robot_custom_made = {
 
 trait_robot_recycled = {
 	cost = 2
+	category = robotic
 	opposites = { "trait_robot_luxurious" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -395,6 +434,7 @@ trait_robot_recycled = {
 
 trait_robot_luxurious = {
 	cost = -2
+	category = robotic
 	opposites = { "trait_robot_recycled" }
 
 	allowed_archetypes = { ROBOT MACHINE }
@@ -417,18 +457,20 @@ trait_robot_luxurious = {
 
 trait_robot_propaganda_machines = {
 	cost = 1
+	category = robotic
 
-	allowed_archetypes = { ROBOT }
+	allowed_archetypes = { ROBOT MACHINE }
 
-	# Synth or Droid only
+	# Droid, Synth, Machine Intelligence or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			has_technology = tech_droid_workers
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
 		}
 	}
-
+	opposites = { "trait_robot_quarrelsome" }
 	modifier = {
 		planet_jobs_unity_produces_mult = 0.15
 		planet_jobs_unity_upkeep_mult = -0.1
@@ -446,6 +488,7 @@ trait_robot_propaganda_machines = {
 
 trait_robot_streamlined_protocols = {
 	cost = 2
+	category = robotic
 	opposites = { "trait_robot_high_bandwidth" }
 	allowed_archetypes = { ROBOT MACHINE }
 	modifier = {
@@ -458,6 +501,7 @@ trait_robot_streamlined_protocols = {
 
 trait_robot_high_bandwidth = {
 	cost = -2
+	category = robotic
 	opposites = { "trait_robot_streamlined_protocols" }
 	allowed_archetypes = { ROBOT MACHINE }
 	modifier = {
@@ -470,21 +514,1174 @@ trait_robot_high_bandwidth = {
 
 trait_robot_trading_algorithms = {
 	cost = 2
-	allowed_archetypes = { ROBOT }
-	opposites = {  }
-
-	# Synth or Droid only
+	category = robotic
+	allowed_archetypes = { ROBOT MACHINE }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	opposites = { trait_robot_scarcity_algorithms }
+	# Droid, Synth, or Individualist Machine
 	species_potential_add = {
-		exists = from
-		from = {
-			has_technology = tech_droid_workers
-			NOT = { has_policy_flag = ai_outlawed }
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
 		}
+		owner_is_machine_intelligence = no
+		owner_is_hive_empire = no
 	}
 	modifier = {
 		pop_job_trade_mult = 0.25
 	}
 	slave_cost = {
 		energy = 500
+	}
+}
+
+trait_robot_quarrelsome = {
+	icon = "gfx/interface/icons/traits/trait_quarrelsome.dds"
+	cost = -1
+    category = robotic
+	# Synths and Individualist Machines
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	opposites = { "trait_robot_propaganda_machines" }
+	allowed_archetypes = { MACHINE ROBOT }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	modifier = {
+		planet_jobs_unity_produces_mult = -0.1
+	}
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			years_passed > 5
+		}
+	}
+	slave_cost = {
+		energy = -200
+	}
+}
+
+trait_robot_deviants = {
+	icon = "gfx/interface/icons/traits/trait_deviants.dds"
+	cost = -1
+    category = robotic
+	# Synths and Individualist Machines
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	potential_crossbreeding_chance = 1.0
+	modifier = { pop_government_ethic_attraction = -0.15 }
+
+	allowed_archetypes = { MACHINE ROBOT }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	ai_weight = {
+		weight = 0
+	}
+	slave_cost = {
+		energy = -200
+	}
+}
+
+trait_robot_decadent = {
+	icon = "gfx/interface/icons/traits/trait_decadent.dds"
+	cost = -1
+    category = robotic
+	# Synths and Individualist Machines
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	allowed_archetypes = { MACHINE ROBOT }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	modifier = {
+		pop_cat_worker_happiness = -0.1
+		pop_cat_slave_happiness = -0.1
+	}
+	ai_weight = {
+		weight = 0
+	}
+	slave_cost = {
+		energy = -200
+	}
+}
+
+trait_robot_wasteful = {
+	icon = "gfx/interface/icons/traits/trait_wasteful.dds"
+	cost = -1
+    category = robotic
+	# Synths and Individualist Machines
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	allowed_archetypes = { MACHINE ROBOT }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	modifier = {
+		planet_pops_consumer_goods_upkeep_mult = 0.10
+	}
+	ai_weight = {
+		weight = 0
+	}
+	slave_cost = {
+		energy = -200
+	}
+}
+
+trait_robot_artificial_engineers = {
+	host_has_dlc = "The Machine Age"
+	cost = 1
+	category = robotic
+	allowed_archetypes = { ROBOT MACHINE }
+	opposites = {
+		"trait_robot_artificial_physicists"
+		"trait_robot_artificial_sociologists"
+	}
+	# Droid, Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	modifier = {
+		planet_jobs_engineering_research_produces_mult = 0.15
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_artificial_physicists = {
+	host_has_dlc = "The Machine Age"
+	cost = 1
+	category = robotic
+	allowed_archetypes = { ROBOT MACHINE }
+	opposites = {
+		"trait_robot_artificial_sociologists"
+		"trait_robot_artificial_engineers"
+	}
+	# Droid, Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	modifier = {
+		planet_jobs_physics_research_produces_mult = 0.15
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_artificial_sociologists = {
+	host_has_dlc = "The Machine Age"
+	cost = 1
+	category = robotic
+	allowed_archetypes = { ROBOT MACHINE }
+	opposites = {
+		"trait_robot_artificial_physicists"
+		"trait_robot_artificial_engineers"
+	}
+
+	# Droid, Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	modifier = {
+		planet_jobs_society_research_produces_mult = 0.15
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_integrated_weaponry = {
+	host_has_dlc = "The Machine Age"
+	cost = 2
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+	opposites = { "trait_robot_delicate_frames" }
+	# Droid, Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	randomized = no
+	modifier = {
+		army_damage_mult = 1.0
+	}
+	custom_tooltip = INTEGRATED_WEAPONRY_TT
+
+	slave_cost = {
+		energy = 1000
+	}
+}
+
+trait_robot_delicate_frames = {
+	host_has_dlc = "The Machine Age"
+	cost = -1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+	opposites = { "trait_robot_integrated_weaponry" }
+	# Droid, Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	randomized = no
+	modifier = {
+		army_damage_mult = -0.5
+		planet_jobs_robot_worker_produces_mult = -0.05
+	}
+
+	slave_cost = {
+		energy = -250
+	}
+}
+
+trait_robot_scarcity_algorithms = {
+	host_has_dlc = "The Machine Age"
+	cost = -1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	opposites = { "trait_robot_trading_algorithms" "trait_robot_matrix_trading" }
+
+	# Droid, Synth, or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
+		}
+		owner_is_machine_intelligence = no
+		owner_is_hive_empire = no
+	}
+	randomized = no
+	modifier = {
+		pop_job_trade_mult = -0.25
+	}
+
+	slave_cost = {
+		energy = -150
+	}
+}
+
+#### Leviathan traits
+
+trait_robot_ancient_dreadnought = {
+	host_has_dlc = "The Machine Age"
+	cost = 3
+	category = robotic
+	# Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+		exists = from
+		from = {
+			has_technology = tech_leviathan_techgenesis
+			has_country_flag = harvested_dreadnought_parts
+		}
+	}
+	potential_crossbreeding_chance = 1.0
+	initial = no
+	randomized = no
+	opposites = {}
+	allowed_archetypes = { ROBOT MACHINE }
+
+	modifier = {
+		army_damage_mult = 5
+		planet_metallurgists_produces_mult = 0.15
+	}
+
+	slave_cost = {
+		energy = 1500
+	}
+}
+
+trait_robot_enigmatic_fortress = {
+	host_has_dlc = "The Machine Age"
+	cost = 3
+	category = robotic
+	# Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+		exists = from
+		from = {
+			has_technology = tech_leviathan_techgenesis
+			has_country_flag = harvested_fortress_parts
+		}
+	}
+	potential_crossbreeding_chance = 1.0
+	initial = no
+	randomized = no
+	opposites = {}
+	allowed_archetypes = { ROBOT MACHINE }
+
+	modifier = {
+		pop_amenities_usage_mult = -0.5
+	}
+
+	slave_cost = {
+		energy = 1500
+	}
+}
+
+trait_robot_infinity_sphere = {
+	host_has_dlc = "The Machine Age"
+	cost = 3
+	category = robotic
+	# Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+		exists = from
+		from = {
+			has_technology = tech_leviathan_techgenesis
+			has_country_flag = harvested_sphere_parts
+		}
+	}
+	potential_crossbreeding_chance = 1.0
+	initial = no
+	randomized = no
+	opposites = {}
+	allowed_archetypes = { ROBOT MACHINE }
+
+	modifier = {
+		planet_researchers_upkeep_mult = -0.5
+	}
+
+	slave_cost = {
+		energy = 1500
+	}
+}
+
+trait_robot_scavenger_bot = {
+	host_has_dlc = "The Machine Age"
+	cost = 3
+	category = robotic
+	# Synth, Machine Intelligence or Individualist Machine
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+		exists = from
+		from = {
+			has_technology = tech_leviathan_techgenesis
+			has_country_flag = harvested_scavenger_parts
+		}
+	}
+	potential_crossbreeding_chance = 1.0
+	initial = no
+	randomized = no
+	opposites = {}
+	allowed_archetypes = { ROBOT MACHINE }
+
+	modifier = {
+		planet_pop_assembly_mult = 0.5
+	}
+
+	slave_cost = {
+		energy = 1500
+	}
+}
+
+
+### Background Traits
+
+trait_robot_history_warbot = {
+	host_has_dlc = "The Machine Age"
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	opposites = { "trait_robot_history_artbot" "trait_robot_history_explorebot" "trait_robot_history_researchbot" "trait_robot_history_resourcebot" "trait_robot_history_chatbot"}
+
+	modifier = {
+		army_damage_mult = 0.05
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_history_artbot = {
+	host_has_dlc = "The Machine Age"
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	opposites = { "trait_robot_history_warbot" "trait_robot_history_explorebot" "trait_robot_history_researchbot" "trait_robot_history_resourcebot" "trait_robot_history_chatbot"}
+
+	modifier = {
+		pop_job_amenities_mult = 0.05
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_history_explorebot = {
+	host_has_dlc = "The Machine Age"
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	opposites = { "trait_robot_history_warbot" "trait_robot_history_artbot" "trait_robot_history_researchbot" "trait_robot_history_resourcebot" "trait_robot_history_chatbot"}
+
+	modifier = {
+		planet_jobs_unity_produces_mult = 0.02
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_history_researchbot = {
+	host_has_dlc = "The Machine Age"
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	opposites = { "trait_robot_history_warbot" "trait_robot_history_artbot" "trait_robot_history_explorebot" "trait_robot_history_resourcebot" "trait_robot_history_chatbot"}
+
+	modifier = {
+		planet_jobs_physics_research_produces_mult = 0.02
+		planet_jobs_society_research_produces_mult = 0.02
+		planet_jobs_engineering_research_produces_mult = 0.02
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_history_resourcebot = {
+	host_has_dlc = "The Machine Age"
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	opposites = { "trait_robot_history_warbot" "trait_robot_history_artbot" "trait_robot_history_explorebot" "trait_robot_history_researchbot" "trait_robot_history_chatbot"}
+
+	modifier = {
+		planet_jobs_minerals_produces_mult = 0.05
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_history_chatbot = {
+	host_has_dlc = "The Machine Age"
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	opposites = { "trait_robot_history_warbot" "trait_robot_history_artbot" "trait_robot_history_explorebot" "trait_robot_history_researchbot" "trait_robot_history_resourcebot"}
+
+	modifier = {
+		planet_jobs_upkeep_mult = -0.02
+	}
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_survivor = {
+	cost = 0
+	category = robotic
+
+	initial = no
+	randomized = no
+
+	species_potential_add = {
+		always = no
+	}
+
+	allowed_archetypes = { MACHINE ROBOT }
+
+	modifier = {
+		pc_nuked_habitability = 0.7
+		leader_lifespan_add = 10
+	}
+	slave_cost = {
+		energy = 500
+	}
+}
+
+trait_robot_digital_1 = {
+	cost = 0
+	category = robotic
+	initial = no
+	randomized = no
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	modifier = {
+		habitability_floor_add = 0.25
+		pop_housing_usage_mult = -0.9
+	}
+
+	custom_tooltip = trait_robot_digital_1_tt
+
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_digital_2 = {
+	icon = "gfx/interface/icons/traits/trait_robot_digital_1.dds"
+	cost = 0
+	category = robotic
+	initial = no
+	randomized = no
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = no
+	}
+
+	species_possible_remove = {
+		always = no
+	}
+
+	modifier = {
+		habitability_floor_add = 0.25
+		pop_housing_usage_mult = -0.9
+	}
+
+	triggered_pop_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_tradition = tr_virtuality_1
+			}
+		}
+		planet_jobs_produces_mult = 1
+		mult = value:virtuality_concentrated_production_mult
+	}
+
+	custom_tooltip = trait_robot_digital_2_tt
+
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_suppressed = {
+	cost = 3
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	opposites = { trait_robot_inquisitative_axioms trait_robot_learning_algorithms trait_robot_logic_engines trait_robot_enhanced_memory
+	}
+
+	modifier = {
+		planet_jobs_produces_mult = 0.1
+		species_leader_exp_gain = -1
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_suppressed_tt
+}
+
+trait_robot_shielded_components = {
+	cost = 3
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		pop_environment_tolerance = 0.30
+		planet_jobs_produces_mult = 0.05
+		leader_lifespan_add = 50
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_monoform = {
+	cost = 4
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		pop_housing_usage_mult = -0.8
+		planet_pop_assembly_mult = 0.2
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_inquisitative_axioms = {
+	cost = 4
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		planet_researchers_produces_mult = 0.2
+		leaders_upkeep_mult = -0.1
+		negative_traits_leader = -1
+	}
+
+	opposites = { trait_robot_suppressed }
+
+	slave_cost = {
+		energy = 750
+	}
+}
+
+trait_robot_ceaseless_symmetric_annihilation_engine = {
+	cost = 2
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		planet_jobs_produces_mult = 0.40
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_ceaseless_symmetric_annihilation_engine_tt
+}
+
+trait_robot_ferro_viscosity_augmentation = {
+	cost = 2
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		leader_lifespan_mult = 0.5
+	}
+
+	triggered_pop_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		pop_amenities_usage_no_happiness_mult = -0.50
+	}
+
+	triggered_pop_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+			}
+		}
+		pop_amenities_usage_mult = -0.50
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_ferro_viscosity_augmentation_tt
+}
+
+trait_robot_biomimetic_assembly = {
+	cost = 1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	assembling_modifier = {
+		planet_pop_assemblers_upkeep_mult = -0.80
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_biomimetic_assembly_tt
+}
+
+trait_robot_matrix_trading = {
+	cost = 1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+	opposites = { trait_robot_scarcity_algorithms }
+	forbidden_ethics = { ethic_gestalt_consciousness }
+	# Droid, Synth, or Individualist Machine
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+		OR = {
+			can_add_droid_traits = yes
+			can_add_synth_traits = yes
+			owner_is_individual_machine = yes
+		}
+		owner_is_machine_intelligence = no
+		owner_is_hive_empire = no
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		pop_job_trade_mult = 0.5
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_matrix_trading_tt
+}
+
+trait_robot_mote_powered_tools = {
+	cost = 1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		can_do_advanced_robo_modding = yes
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	triggered_pop_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				country_uses_consumer_goods = yes
+			}
+		}
+		planet_metallurgists_produces_mult = 0.2
+		planet_artisans_produces_mult = 0.2
+	}
+
+	triggered_pop_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				country_uses_consumer_goods = no
+			}
+		}
+		planet_metallurgists_produces_mult = 0.2
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_mote_powered_tools_tt
+}
+
+trait_robot_exotic_fuel_consumption = {
+	host_has_dlc = "The Machine Age"
+	cost = 1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = yes
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		planet_jobs_produces_mult = 0.10
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_exotic_fuel_consumption_tt
+}
+
+trait_robot_rare_crystal_exterior = {
+	host_has_dlc = "The Machine Age"
+	cost = 1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = yes
+	}
+	species_possible_add = {
+		custom_tooltip = {
+			fail_text = "requires_im_or_droid"
+			exists = from
+			from = {
+				OR = {
+					is_individual_machine = yes
+					is_machine_empire = yes
+					has_technology = tech_droid_workers
+				}
+			}
+		}
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		planet_metallurgists_produces_mult = 0.2
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_rare_crystal_exterior_tt
+}
+
+trait_robot_volatile_mote_reactor = {
+	host_has_dlc = "The Machine Age"
+	cost = 1
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		always = yes
+	}
+	species_possible_add = {
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = no
+	randomized = no
+
+	modifier = {
+		pop_environment_tolerance = 0.3
+	}
+
+	slave_cost = {
+		energy = 750
+	}
+
+	custom_tooltip_with_modifiers = trait_robot_volatile_mote_reactor_tt
+}
+
+trait_robot_immortality = {
+	cost = 4
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		OR = {
+			can_add_synth_traits = yes
+			owner_is_machine_intelligence = yes
+			owner_is_individual_machine = yes
+		}
+	}
+	species_possible_add = {
+		always = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	initial = yes
+	randomized = no
+	immortal_leaders = yes
+
+	slave_cost = {
+		energy = 1000
+	}
+	custom_tooltip = trait_robot_immortality_tt
+}
+
+trait_robot_synthetic_dawn = {
+	cost = 0
+	category = robotic
+
+	allowed_archetypes = { ROBOT MACHINE }
+
+	species_potential_add = {
+		hidden_trigger = { exists = from }
+		from = {
+			has_modifier = synthetic_dawn
+		}
+		can_add_synth_traits = yes
+	}
+	species_possible_add = {
+		always = yes
+	}
+	species_possible_remove = {
+		always = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
+	}
+
+	modifier = {
+		pop_government_ethic_attraction = 0.50
+		pop_happiness = 0.05
+		planet_jobs_unity_produces_mult = 0.05
+	}
+
+	initial = no
+	randomized = no
+	immortal_leaders = no
+
+	slave_cost = {
+		energy = 1000
 	}
 }

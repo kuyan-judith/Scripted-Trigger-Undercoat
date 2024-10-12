@@ -1,0 +1,740 @@
+#########################################
+# Astral Planes - Astral Thread Actions #
+#########################################
+
+@ASTRAL_ACTION_10_YEARS_COOLDOWN = 3600
+@ASTRAL_ACTION_5_YEARS_COOLDOWN = 1800
+@ASTRAL_ACTION_2_HALF_YEARS_COOLDOWN = 900
+@ASTRAL_ACTION_YEAR_COOLDOWN = 360
+
+action_astral_boost = {
+	sound = action_activation_astral_boost
+	unlock_threshold = 1
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1
+			multiplier = value:scaled_astral_action_cost|BASE|500|INCREASE|50|INCREASE_VARIABLE|astral_boost_usage_count|MAX|1000|
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_5_YEARS_COOLDOWN
+	picture = GFX_astral_action_astral_boost
+
+	effect = {
+		add_modifier = {
+			modifier = "astral_boost_modifier"
+			days = @ASTRAL_ACTION_5_YEARS_COOLDOWN
+		}
+		hidden_effect = {
+			change_variable = {
+				which = astral_boost_usage_count
+				value = 1
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 100
+			is_at_war = yes
+		}
+	}
+}
+
+action_quantum_catapult_insight = {
+	sound = event_administrative_work
+	unlock_threshold = 2
+	usages = 1
+	upgrade = action_quantum_catapult_insight_2
+
+	activation_cost = {
+		cost = {
+			astral_threads = 750
+		}
+	}
+
+	picture = GFX_astral_action_quantum_catapult_insight
+
+	potential = {
+		has_overlord_dlc = yes
+		NOR = {
+			has_technology = tech_quantum_catapult
+			has_tech_option = tech_quantum_catapult
+		}
+	}
+
+	effect = {
+		hidden_effect = {
+			set_country_flag = has_quantum_catapult_insight
+		}
+		add_tech_progress = {
+			tech = tech_quantum_catapult
+			progress = 0.25
+		}
+	}
+
+	ai_weight = {
+		weight = 1000
+	}
+}
+
+action_quantum_catapult_insight_2 = {
+	sound = event_administrative_work
+	unlock_threshold = 2
+	usages = 1
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1500
+		}
+	}
+
+	picture = GFX_astral_action_quantum_catapult_insight
+
+	potential = {
+		has_overlord_dlc = yes
+		OR = {
+			has_technology = tech_quantum_catapult
+			has_tech_option = tech_quantum_catapult
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "action_quantum_catapult_insight_2_requirement_tooltip"
+			any_owned_megastructure = {
+				OR = {
+					is_megastructure_type = quantum_catapult_1
+					is_megastructure_type = quantum_catapult_2
+					is_megastructure_type = quantum_catapult_3
+					is_megastructure_type = quantum_catapult_restored
+					is_megastructure_type = quantum_catapult_restored_slingshot
+					is_megastructure_type = quantum_catapult_improved_slingshot
+				}
+			}
+		}
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = quantum_catapult_insight_2_modifier
+		}
+	}
+
+	ai_weight = {
+		weight = 1000
+	}
+}
+
+action_summon_dimensional_fleet = {
+	sound = action_activation_phase_fleet
+	unlock_threshold = 5
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1750
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_5_YEARS_COOLDOWN
+	picture = GFX_astral_action_summon_dimensional_fleet
+
+	allow_unlock = {
+		has_technology = tech_psionic_theory
+	}
+
+	effect = {
+		custom_tooltip = "action_summon_dimensional_fleet_tooltip"
+
+		hidden_effect = {
+			set_variable = {
+				which = current_naval_capacity
+				value = trigger:max_naval_capacity
+			}
+			set_variable = {
+				which = years_passed
+				value = trigger:years_passed
+			}
+			
+			set_variable = {
+				which = final_dimensional_fleet_value
+				value = value:dimensional_fleet_power_scaling|YEARS|root.years_passed|NAVAL_CAPACITY|root.current_naval_capacity|
+			}
+		}
+
+		create_fleet = {
+			name = "NAME_Dimensional_Fleet"
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				uses_naval_capacity = no
+				spawn_debris = no
+			}
+			effect = {
+				set_owner = root
+				while = {
+					count = value:num_dimensional_fleet_big_ships|VALUE|root.final_dimensional_fleet_value|SHIP_STRENGTH|1200|
+					create_ship = {
+						name = "NAME_Astral_Avatar"
+						design = "NAME_Astral_Avatar"
+						upgradable = no
+						graphical_culture = "extra_dimensional_01"
+					}
+				}
+				while = {
+					count = value:num_dimensional_fleet_small_ships|VALUE|root.final_dimensional_fleet_value|BIG_SHIP_STRENGTH|1200|SMALL_SHIP_STRENGTH|400|
+					create_ship = {
+						name = "NAME_Astral_Avatar_Small"
+						design = "NAME_Astral_Avatar_Small"
+						upgradable = no
+						graphical_culture = "extra_dimensional_01"
+					}
+				}
+				set_location = root.capital_scope
+				set_fleet_flag = dimensional_fleet
+			}
+		}
+
+		hidden_effect = {
+			last_created_fleet = {
+				fleet_event = {
+					id = astral_planes.1000
+					days = @ASTRAL_ACTION_5_YEARS_COOLDOWN
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 10
+			is_militarist = yes
+		}
+		modifier = {
+			factor = 100
+			is_at_war = yes
+		}
+	}
+}
+
+action_astral_splitting = {
+	sound = rift_open
+	usages = 4
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1
+			multiplier = value:scaled_astral_action_cost|BASE|300|INCREASE|300|INCREASE_VARIABLE|num_rifts_splitted|MAX|1200|
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_10_YEARS_COOLDOWN
+	picture = GFX_astral_action_astral_splitting
+
+	allow_unlock = {
+		has_technology = tech_rift_sphere
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "action_astral_splitting_too_many_rifts"
+			check_variable = {
+				which = num_rifts_splitted
+				value < 4
+			}
+			is_astral_rift_pool_empty = no
+		}
+		custom_tooltip = {
+			fail_text = "action_astral_splitting_no_rift_spawning_location"
+			any_system_within_border = {
+				can_spawn_astral_rift = yes
+			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = "action_astral_splitting_tooltip"
+
+		hidden_effect = {
+			change_variable = {
+				which = num_rifts_splitted
+				value = 1
+			}
+			
+			random_system_within_border = {
+				limit = {
+					can_spawn_astral_rift = yes
+				}
+
+				weights = {
+					inline_script = "astral_rift/spawn_weights"
+					modifier = {
+						factor = 0.25
+						any_system = {
+							distance = {
+								source = prev
+								min_jumps  = 2
+								max_jumps = 2
+							}
+							OR = {
+								has_astral_rift = yes
+								any_system_planet = {
+									is_astral_scar = yes
+								}
+							}
+						}
+					}
+					modifier = {
+						factor = 0.5
+						any_system = {
+							distance = {
+								source = prev
+								min_jumps  = 2
+								max_jumps = 4
+							}
+							OR = {
+								has_astral_rift = yes
+								any_system_planet = {
+									is_astral_scar = yes
+								}
+							}
+						}
+					}
+				}
+
+				spawn_astral_rift = {
+					random_pos = yes
+					orbit_angle = 360
+					spawn_sound = no
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+		modifier = {
+			add = 200
+			count_owned_leader = {
+				count >= 2
+				limit = {
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		modifier = {
+			add = 100
+			count_owned_leader = {
+				count > 2
+				limit = {
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+	}
+}
+
+action_gain_physics_insight = {
+	sound = event_administrative_work
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1
+			multiplier = value:scaled_astral_action_cost|BASE|250|INCREASE|50|INCREASE_VARIABLE|physics_insight_usage_count|MAX|1750|
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_5_YEARS_COOLDOWN
+	picture = GFX_astral_action_gain_physics_insight
+
+	effect = {
+		add_modifier = {
+			modifier = gain_physics_insight_modifier
+			days = @ASTRAL_ACTION_5_YEARS_COOLDOWN
+		}
+		hidden_effect = {
+			change_variable = {
+				which = physics_insight_usage_count
+				value = 1
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+}
+
+action_hyper_relay_insight = {
+	sound = event_administrative_work
+	unlock_threshold = 2
+	upgrade = action_flash_forge_hyper_relay
+
+	activation_cost = {
+		cost = {
+			astral_threads = 300
+		}
+	}
+
+	picture = GFX_astral_action_hyper_relay_insight
+
+	potential = {
+		has_overlord_dlc = yes
+		NOR = {
+			has_technology = tech_hyper_relays
+			has_tech_option = tech_hyper_relays
+		}
+	}
+
+	allow = {
+		has_technology = tech_hyper_drive_2
+	}
+
+	is_exhausted = {
+		has_tech_option = tech_hyper_relays
+	}
+
+	effect = {
+		add_tech_progress = {
+			tech = tech_hyper_relays
+			progress = 0.5
+		}
+	}
+
+	ai_weight = {
+		weight = 1000
+	}
+}
+
+action_flash_forge_hyper_relay = {
+	sound = evn_ove_hyper_relay_construction
+	unlock_threshold = 2
+
+	activation_cost = {
+		cost = {
+			influence = 50
+		}
+		cost = {
+			astral_threads = 1
+			multiplier = value:scaled_astral_action_cost|BASE|500|INCREASE|50|INCREASE_VARIABLE|flash_forge_usage_count|MAX|1000|
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_2_HALF_YEARS_COOLDOWN
+	uses_custom_cooldown = yes
+	picture = GFX_astral_action_flash_forge_hyper_relay
+
+	potential = {
+		OR = {
+			has_technology = tech_hyper_relays
+			has_tech_option = tech_hyper_relays
+		}
+	}
+
+	effect = {
+		custom_tooltip = "action_flash_forge_hyper_relay_tooltip"
+		set_country_flag = flash_forge_hyper_relay_activated
+		hidden_effect = {
+			change_variable = {
+				which = flash_forge_usage_count
+				value = 1
+			}
+		}
+	}
+
+	allow = {
+		has_technology = tech_hyper_relays
+		custom_tooltip = {
+			fail_text = "action_flash_forge_hyper_relay_available_tooltip"
+			NOT = { has_country_flag = flash_forge_hyper_relay_activated }
+		}
+		custom_tooltip = {
+			fail_text = "action_flash_forge_hyper_relay_executing_tooltip"
+			NOT = {
+				any_owned_fleet = {
+					is_ship_class = shipclass_constructor
+					has_fleet_flag = flash_forging_hyper_relay
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+		modifier = {
+			add = 200
+			any_system_within_border = {
+				NOR = {
+					has_megastructure = hyper_relay
+					has_megastructure = hyper_relay_ruined
+					has_megastructure = hyper_relay_restored
+				}
+			}
+		}
+	}
+}
+
+action_lateral_artifacting = {
+	sound = action_activation_refresh_triumph
+	unlock_threshold = 4
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1
+			multiplier = value:lateral_artifacting_cost|BASE|1000|BASE_DAYS|3600|INCREASE|100|INCREASE_VARIABLE|lateral_artifacting_usage_count|MAX|2000|
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_10_YEARS_COOLDOWN
+	picture = GFX_astral_action_lateral_artifacting
+
+	allow_unlock = {
+		num_owned_relics >= 2
+	}
+
+	allow = {
+		has_modifier = relic_activation_cooldown
+	}
+
+	effect = {
+		hidden_effect = {
+			export_modifier_duration_to_variable = {
+				modifier = relic_activation_cooldown
+				variable = lateral_artifacting_remaining_duration
+			}
+			set_timed_country_flag = {
+				flag = lateral_artifacting_available
+				days = lateral_artifacting_remaining_duration
+			}
+			remove_modifier = relic_activation_cooldown
+			clear_variable = lateral_artifacting_remaining_duration
+			change_variable = {
+				which = lateral_artifacting_usage_count
+				value = 1
+			}
+		}
+		custom_tooltip = "action_lateral_artifacting_tooltip"
+	}
+
+	ai_weight = {
+		weight = 500
+		modifier = {
+			factor = 0
+			has_resource = {
+				type = unity
+				amount < 10000
+			}
+		}
+	}
+}
+
+action_dimensional_lock = {
+	sound = action_activation_construct_lock
+	unlock_threshold = 3
+
+	activation_cost = {
+		cost = {
+			astral_threads = @dimensional_lock_cost
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_10_YEARS_COOLDOWN # Overriden by define DIMENSIONAL_LOCK_EXPIRATION_TIME
+	uses_custom_cooldown = yes
+	picture = GFX_astral_action_dimensional_lock
+
+	allow_unlock = {
+		has_technology = tech_wormhole_stabilization
+	}
+
+	effect = {
+		custom_tooltip = "action_dimensional_lock_tooltip"
+		set_country_flag = dimensional_lock_available
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 10
+			is_militarist = yes
+		}
+		modifier = {
+			factor = 100
+			is_at_war = yes
+		}
+		modifier = {
+			factor = 0
+			NOT = {
+				any_system_within_border = {
+					has_natural_wormhole = yes
+				}
+			}
+		}
+	}
+}
+
+action_folding_hyperspace = {
+	sound = action_activation_astral_hyperjump
+	unlock_threshold = 3
+	usages = 1
+	custom_usage_tooltip = ASTRAL_ACTION_UNIQUE_USAGE_DESC_FLEET_ABILITY
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1000
+		}
+	}
+
+	picture = GFX_astral_action_folding_hyperspace
+
+	allow_unlock = {
+		OR = {
+			has_technology = tech_jump_drive_1
+			has_technology = tech_psi_jump_drive_1
+			has_technology = tech_subspace_drive
+		}
+	}
+
+	effect = {
+		custom_tooltip = "action_folding_hyperspace_tooltip"
+		set_country_flag = unlock_astral_jump
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 10
+			is_militarist = yes
+		}
+		modifier = {
+			factor = 100
+			is_at_war = yes
+		}
+	}
+}
+
+action_dimensional_shifting = {
+	sound = action_activation_phase_fleet
+	unlock_threshold = 4
+	usages = 1
+	custom_usage_tooltip = ASTRAL_ACTION_UNIQUE_USAGE_DESC_FLEET_ABILITY
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1000
+		}
+	}
+
+	picture = GFX_astral_action_dimensional_shifting
+
+	effect = {
+		custom_tooltip = "action_dimensional_shifting_tooltip"
+		set_country_flag = unlock_phase_fleet
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 10
+			is_militarist = yes
+		}
+		modifier = {
+			factor = 100
+			is_at_war = yes
+		}
+	}
+}
+
+action_astral_siphon = {
+	sound = action_activation_astral_siphon
+	unlock_threshold = 1
+	usages = 3
+
+	activation_cost = {
+		cost = {
+			trigger = {
+				check_variable = { which = astral_siphon_unlocked value <= 0 }
+			}
+			astral_threads = 700
+		}
+		cost = {
+			trigger = {
+				check_variable = { which = astral_siphon_unlocked value = 1 }
+			}
+			astral_threads = 800
+		}
+		cost = {
+			trigger = {
+				check_variable = { which = astral_siphon_unlocked value >= 2 }
+			}
+			astral_threads = 900
+		}
+	}
+
+	cooldown = @ASTRAL_ACTION_10_YEARS_COOLDOWN
+	picture = GFX_astral_action_astral_siphon
+
+	effect = {
+		hidden_effect = {
+			if = {
+				limit = {
+					check_variable = {
+						which = astral_siphon_unlocked
+						value < 1
+					}
+				}
+				custom_tooltip = action_astral_siphon_unlock_tooltip_lvl1
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						which = astral_siphon_unlocked
+						value = 1
+					}
+				}
+				custom_tooltip = action_astral_siphon_unlock_tooltip_lvl2
+			}
+			else = {
+				custom_tooltip = action_astral_siphon_unlock_tooltip_lvl3
+			}
+			change_variable = {
+				which = astral_siphon_unlocked
+				value = 1
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 200
+	}
+}
+
+action_planar_mastery = {
+	sound = ap_rift_event_0_astral_wonder
+	unlock_threshold = 5
+	usages = 1
+
+	activation_cost = {
+		cost = {
+			astral_threads = 1500
+		}
+	}
+
+	picture = GFX_astral_action_planar_mastery
+
+	effect = {
+		custom_tooltip = "action_planar_mastery_tooltip"
+		set_country_flag = action_planar_mastery_activated
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 100
+			end_game_years_passed > 0
+		}
+	}
+}

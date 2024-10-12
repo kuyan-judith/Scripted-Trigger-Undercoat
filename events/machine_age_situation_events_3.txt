@@ -1,0 +1,938 @@
+###################################################
+#                                                 #
+# Machine Age DLC Transformation Situation Events #
+#                                                 #
+###################################################
+
+namespace = machine_age
+
+### TRANSFORMATION SITUATION START ###
+
+# Fired by: ap_synthetic_age
+country_event = { # Transformation - First event
+	id = machine_age.4000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		start_situation = {
+			type = situation_transformation
+			target = root
+		}
+	}
+}
+
+# TRANSFORMATION STAGE 1
+# Fired by: situation stage on_first_enter
+situation_event = {
+	id = machine_age.4100
+	title = "machine_age.4100.name"
+	desc = "machine_age.4100.desc"
+	picture = GFX_evt_machine_sapience
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+	}
+
+	option = {
+		name = OK
+	}
+
+	after = {
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Nanite Study
+	id = machine_age.4110
+	title = "machine_age.4110.name"
+	desc = "machine_age.4110.desc"
+	picture = GFX_evt_gray_gooed_planet
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4110_happened }
+		situation_progress >= 50
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4110_happened
+	}
+
+	option = {
+		name = "machine_age.4110.a"
+		custom_tooltip = "machine_age.4110.a.tt"
+		set_situation_flag = transformation_engineering_max
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4110.b"
+		custom_tooltip = "machine_age.4110.b.tt"
+		set_situation_flag = transformation_engineering_med
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4110.c"
+		custom_tooltip = "machine_age.4110.c.tt"
+		set_situation_flag = transformation_engineering_min
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4110.d"
+		trigger = {
+			owner = { has_country_flag = machine_age_nanites_studied }
+		}
+		custom_tooltip = "machine_age.4110.d.tt"
+		set_situation_flag = transformation_society_min
+		set_situation_flag = transformation_physics_min
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Nanite Conclusion: Full
+	id = machine_age.4130
+	title = "machine_age.4130.name"
+	desc = "machine_age.4130.desc"
+	picture = GFX_evt_gray_gooed_planet
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4130_happened }
+		OR = {
+			has_situation_flag = transformation_engineering_max
+			owner = { has_country_flag = machine_age_nanites_studied }
+		}
+		situation_progress >= 200
+	}
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4130_happened
+		remove_situation_flag = transformation_engineering_max
+		owner = { remove_country_flag = machine_age_nanites_studied }
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4130.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_nanites_medium
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Nanite Conclusion: Moderate
+	id = machine_age.4140
+	title = "machine_age.4140.name"
+	desc = "machine_age.4140.desc"
+	picture = GFX_evt_gray_gooed_planet
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4140_happened }
+		has_situation_flag = transformation_engineering_med
+		situation_progress >= 200
+	}
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4140_happened
+		remove_situation_flag = transformation_engineering_med
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4140.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_nanites_small
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Nanite Conclusion: Limited
+	id = machine_age.4150
+	title = "machine_age.4150.name"
+	desc = "machine_age.4150.desc"
+	picture = GFX_evt_gray_goo
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4150_happened }
+		has_situation_flag = transformation_engineering_min
+		situation_progress >= 200
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4150_happened
+		remove_situation_flag = transformation_engineering_min
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4150.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_nanites_tiny
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# TRANSFORMATION STAGE 2: Modularity
+# Fired by: situation stage on_first_enter
+situation_event = {
+	id = machine_age.4210
+	title = "machine_age.4210.name"
+	desc = "machine_age.4210.desc"
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4210_happened }
+		situation_progress >= 280
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4210_happened
+	}
+
+	option = {
+		name = "machine_age.4210.a"
+		custom_tooltip = "machine_age.4210.a.tt"
+		set_situation_flag = transformation_society_max
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4210.b"
+		custom_tooltip = "machine_age.4210.b.tt"
+		set_situation_flag = transformation_society_med
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4210.c"
+		custom_tooltip = "machine_age.4210.c.tt"
+		set_situation_flag = transformation_society_min
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4210.d"
+		if = {
+			limit = {
+				owner = {
+					is_individual_machine = yes
+				}
+			}
+			custom_tooltip = "machine_age.4210.d.individual.tt"
+		}
+		else = {
+			custom_tooltip = "machine_age.4210.d.machine.tt"
+		}
+		set_situation_flag = transformation_society_min
+		hidden_effect = {
+			owner = {
+				while = {
+					count = 4
+					random_owned_pop = {
+						limit = {
+							OR = {
+								is_pop_category = simple_drone
+								is_pop_category = worker
+							}
+						}
+						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					}
+				}
+				while = {
+					count = 3
+					random = {
+						chance = 50
+						random_owned_pop = {
+							limit = {
+								OR = {
+									is_pop_category = complex_drone
+									is_pop_category = specialist
+								}
+							}
+							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						}
+					}
+				}
+			}
+		}
+		ai_chance = {
+			factor = 2
+		}
+	}
+	after = {
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Modularity: Full
+	id = machine_age.4230
+	title = "machine_age.4230.name"
+	desc = "machine_age.4230.desc"
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4230_happened }
+		has_situation_flag = transformation_society_max
+		situation_progress >= 480
+	}
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4230_happened
+		remove_situation_flag = transformation_society_max
+		owner = { remove_country_flag = machine_age_nanites_studied }
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4230.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_living_metal_medium
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Modularity: Moderate
+	id = machine_age.4240
+	title = "machine_age.4240.name"
+	desc = "machine_age.4240.desc"
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4240_happened }
+		has_situation_flag = transformation_society_med
+		situation_progress >= 480
+	}
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4240_happened
+		remove_situation_flag = transformation_society_med
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4240.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_living_metal_small
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Modularity: Limited
+	id = machine_age.4250
+	title = "machine_age.4250.name"
+	desc = "machine_age.4250.desc"
+	picture = GFX_evt_robot_assembly_plant
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4250_happened }
+		has_situation_flag = transformation_society_min
+		situation_progress >= 480
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4250_happened
+		remove_situation_flag = transformation_society_min
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4250.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_living_metal_tiny
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# TRANSFORMATION STAGE 3: Virtuality
+# Fired by: situation stage on_first_enter
+situation_event = {
+	id = machine_age.4310
+	title = "machine_age.4310.name"
+	desc = "machine_age.4310.desc"
+	picture = GFX_evt_virtual_world
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4310_happened }
+		situation_progress >= 520
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4310_happened
+		owner = {
+			random_neighbor_country = {
+				limit = {
+					OR = {
+						has_country_flag = synth_virtual
+						has_country_flag = transformation_virtuality
+					}
+					has_embassy = prev
+				}
+				save_event_target_as = virtual_country
+			}
+		}
+	}
+
+	option = {
+		name = "machine_age.4310.a"
+		custom_tooltip = "machine_age.4310.a.tt"
+		set_situation_flag = transformation_physics_max
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4310.b"
+		custom_tooltip = "machine_age.4310.b.tt"
+		set_situation_flag = transformation_physics_med
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4310.c"
+		custom_tooltip = "machine_age.4310.c.tt"
+		set_situation_flag = transformation_physics_min
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4310.d"
+		custom_tooltip = "machine_age.4310.d.tt"
+		set_situation_flag = transformation_physics_min
+		set_situation_flag = virtuality_data_scraped
+
+		trigger = {
+			owner = {
+				exists = event_target:virtual_country
+			}
+		}
+		owner = {
+			event_target:virtual_country = {
+				add_trust = {
+					who = prev
+					amount = -50
+				}
+				add_opinion_modifier = {
+					who = prev
+					modifier = opinion_virtuality_data_scraped
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4310.e"
+		custom_tooltip = "machine_age.4310.e.tt"
+		set_situation_flag = transformation_physics_min
+		trigger = {
+			owner = { has_country_flag = machine_age_virtuality_studied }
+		}
+		ai_chance = {
+			factor = 5
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Virtuality Conclusion: Full
+	id = machine_age.4330
+	title = "machine_age.4330.name"
+	desc = "machine_age.4330.desc"
+	picture = GFX_evt_virtual_world
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4330_happened }
+		OR = {
+			has_situation_flag = transformation_physics_max
+			has_situation_flag = virtuality_data_scraped
+			owner = { has_country_flag = machine_age_virtuality_studied }
+		}
+		situation_progress >= 720
+	}
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4330_happened
+		remove_situation_flag = transformation_physics_min
+		remove_situation_flag = virtuality_data_scraped
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4330.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_virtual_power_medium
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Virtuality Conclusion: Moderate
+	id = machine_age.4340
+	title = "machine_age.4340.name"
+	desc = "machine_age.4340.desc"
+	picture = GFX_evt_virtual_world
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4340_happened }
+		has_situation_flag = transformation_physics_med
+		situation_progress >= 720
+	}
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4340_happened
+		remove_situation_flag = transformation_physics_med
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4340.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_virtual_power_small
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Virtuality Conclusion: Limited
+	id = machine_age.4350
+	title = "machine_age.4350.name"
+	desc = "machine_age.4350.desc"
+	picture = GFX_evt_virtual_world
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4350_happened }
+		has_situation_flag = transformation_physics_min
+		situation_progress >= 720
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4350_happened
+		remove_situation_flag = transformation_physics_min
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		custom_tooltip = "machine_age.4350.a.tt"
+	}
+	after = {
+		owner = {
+			random_owned_planet = {
+				limit = {
+					is_capital = yes
+				}
+				add_deposit = d_virtual_power_tiny
+			}
+		}
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# TRANSFORMATION STAGE 4
+# Fired by: situation stage on_first_enter
+situation_event = { # Tradition 1
+	id = machine_age.4400
+	title = "machine_age.4400.name"
+	desc = {
+		trigger = {
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		text = "machine_age.4400.desc.machine_intelligence"
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_gestalt = no
+			}
+		}
+		text = "machine_age.4400.desc.individualist_machines"
+	}
+	picture = GFX_evt_machine_sapience
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+	}
+
+	option = {
+		name = "machine_age.4400.a"
+		custom_tooltip = "machine_age.4400.a.tt"
+		owner = { set_country_flag = transformation_nanotech }
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4400.b"
+		custom_tooltip = "machine_age.4400.b.tt"
+		owner = { set_country_flag = transformation_modularity }
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4400.c"
+		custom_tooltip = "machine_age.4400.c.tt"
+		owner = { set_country_flag = transformation_virtuality }
+		ai_chance = {
+			factor = 0
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_monthly
+situation_event = { # Tradition 2
+	id = machine_age.4490
+	title = "machine_age.4490.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = transformation_nanotech }
+		}
+		text = "machine_age.4490.desc.nanotech"
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = transformation_modularity }
+		}
+		text = "machine_age.4490.desc.modularity"
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = transformation_virtuality }
+		}
+		text = "machine_age.4490.desc.virtuality"
+	}
+	picture = GFX_evt_space_walk
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_situation_flag = machine_age_4490_happened }
+		situation_progress >= 850
+	}
+
+	immediate = {
+		set_situation_flag = situation_transformation_pause
+		set_situation_flag = machine_age_4490_happened
+	}
+
+	option = {
+		name = "machine_age.4490.a"
+		trigger = {
+			owner = { has_country_flag = transformation_nanotech }
+		}
+		custom_tooltip = "machine_age.4490.a.nanotech.tt"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = nanites
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		set_situation_flag = transformation_waste_recycle
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4490.a"
+		trigger = {
+			owner = { has_country_flag = transformation_modularity }
+		}
+		custom_tooltip = "machine_age.4490.a.modularity.tt"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = sr_living_metal
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		set_situation_flag = transformation_waste_recycle
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4490.a"
+		trigger = {
+			owner = { has_country_flag = transformation_virtuality }
+		}
+		custom_tooltip = "machine_age.4490.a.virtuality.tt"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		set_situation_flag = transformation_waste_recycle
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4490.b"
+		custom_tooltip = "machine_age.4490.b.tt"
+		set_situation_flag = transformation_waste_discard
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		remove_situation_flag = situation_transformation_pause
+	}
+}
+
+# Fired by: situation on_progress_complete
+situation_event = { # Final Event
+	id = machine_age.4005
+	title = "machine_age.4005.name"
+	desc = {
+		trigger = {
+			owner = { has_country_flag = transformation_nanotech }
+		}
+		text = "machine_age.4005.desc.nanotech"
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = transformation_modularity }
+		}
+		text = "machine_age.4005.desc.modularity"
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = transformation_virtuality }
+		}
+		text = "machine_age.4005.desc.virtuality"
+	}
+	picture = GFX_evt_machine_sapience
+	show_sound = event_laboratory_sound
+	situation = this
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				owner = { has_country_flag = transformation_nanotech }
+			}
+			owner = {
+				set_variable = {
+					which = nanotech_worlds_created
+					value = 0
+				}
+			}
+		}
+	}
+
+	option = {
+		name = "machine_age.4005.a.nanotech"
+		trigger = {
+			owner = { has_country_flag = transformation_nanotech }
+		}
+		owner = {
+			if = {
+				limit = {
+					num_tradition_categories < @max_tradition_trees
+				}
+				set_country_flag = nanotech_traditions_unlocked
+				add_tradition = tr_nanotech_adopt
+				custom_tooltip = "machine_age.4005.a.nanotech.tt"
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4005.a.modularity"
+		trigger = {
+			owner = { has_country_flag = transformation_modularity }
+		}
+		owner = {
+			if = {
+				limit = {
+					num_tradition_categories < @max_tradition_trees
+				}
+				custom_tooltip = "machine_age.4005.a.modularity.tt"
+				set_country_flag = modularity_traditions_unlocked
+				add_tradition = tr_modularity_adopt
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+	option = {
+		name = "machine_age.4005.a.virtuality"
+		trigger = {
+			owner = { has_country_flag = transformation_virtuality }
+		}
+		owner = {
+
+			if = {
+				limit = {
+					num_tradition_categories < @max_tradition_trees
+				}
+				custom_tooltip = "machine_age.4005.a.virtuality.tt"
+				set_country_flag = virtuality_traditions_unlocked
+				add_tradition = tr_virtuality_adopt
+				refresh_portraits = character
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	after = {
+		destroy_situation = this
+	}
+}

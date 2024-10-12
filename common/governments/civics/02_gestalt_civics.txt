@@ -12,7 +12,7 @@
 #	ai_weight = { base = 5 }					# scriptable weight for AI picking civics in-game (when unlocking a new slot).
 #												# Note: If omitted, a default weight of 1 is used. Not needed when "modification = no"
 #
-#   alternate_civic_version = civic_key			# Key of the civic that will try to replace the current one during a government reform if the current civic is locked (ex: corporate version of the civic that will replace it when attempting to reform to Megacorporation)
+#	alternate_civic_version = civic_key			# Key of the civic that will try to replace the current one during a government reform if the current civic is locked (ex: corporate version of the civic that will replace it when attempting to reform to Megacorporation)
 #												# Note: if no replacement civic is indicated, it fallback to non-moddable civics behaviour, i.e. you can't change authority
 #
 #	modifier = {}								# modifier added to the country if the civic is selected and valid
@@ -102,7 +102,7 @@ civic_hive_divided_attention = {
 	}
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
-		empire_size_colonies_mult = -0.50
+		empire_size_penalty_mult = -0.25
 	}
 }
 
@@ -139,6 +139,7 @@ civic_hive_subsumed_will = {
 	modifier = {
 		councilor_gestalt_regulatory_exp_gain = @gestalt_civic_node_xp_rate
 		empire_size_pops_mult = -0.20
+		planet_resettlement_unemployed_mult = 0.5
 		country_edict_fund_add = 25
 	}
 }
@@ -174,6 +175,15 @@ civic_hive_devouring_swarm = {
 				value = origin_common_ground
 				value = origin_hegemon
 				value = origin_tree_of_life
+			}
+		}
+		civics = {
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
 			}
 		}
 	}
@@ -245,7 +255,9 @@ civic_hive_empath = {
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		envoys_add = 2
-		diplo_weight_mult = 0.1
+		diplo_weight_mult = 0.20
+		country_trust_cap_add = 50
+		envoy_improve_relations_mult = 0.25
 	}
 }
 
@@ -414,7 +426,12 @@ civic_hive_stargazers = {
 		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
 	}
 	possible = {
-		civics = { NOT = { value = civic_hive_hyperspace_specialty } }
+		civics = {
+			NOR = {
+				value = civic_hive_hyperspace_specialty
+				value = civic_hive_guided_sapience
+			}
+		}
 	}
 	modifier = {
 		councilor_gestalt_legion_exp_gain = @gestalt_civic_node_xp_rate
@@ -542,11 +559,141 @@ civic_hive_sovereign_guardianship = {
 	}
 }
 
+civic_hive_natural_design = {
+	modification = no
+	playable = { has_machine_age_dlc = yes }
+	ai_playable = { has_machine_age_dlc = yes }
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+	possible = {
+		origin = {
+			NOT = {
+				value = origin_overtuned
+			}
+		}
+	}
+	modifier = {
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+		BIOLOGICAL_species_trait_picks_add = 2
+		BIOLOGICAL_species_trait_points_add = 2
+		planet_researchers_society_research_produces_add = 0.5
+	}
+
+	description = civic_hive_tooltip_natural_design_effects
+	negative_description = civic_hive_tooltip_natural_design_negative_effects
+}
+
+civic_hive_guided_sapience = {
+	modification = yes
+	playable = { has_machine_age_dlc = yes }
+	ai_playable = { has_machine_age_dlc = yes }
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	potential = {
+		species_archetype = { NOT = { value = MACHINE } }
+		authority = {
+			value = auth_hive_mind
+			NOR = {
+				value = auth_corporate
+				value = auth_machine_intelligence
+			}
+		}
+	}
+	possible = {
+		origin = {
+			NOT = { value = origin_life_seeded }
+		}
+		civics = {
+			NOT = {
+				value = civic_hive_stargazers
+			}
+		}
+	}
+
+	modifier = {
+		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
+		terraforming_cost_mult = -0.25
+		terraform_speed_mult = 0.25
+	}
+	description = civic_tooltip_guided_sapience_effects
+	negative_description = civic_tooltip_guided_sapience_gestalt_negative_effects
+}
+
+civic_astrometeorology_hive = {
+	playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	ai_playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+	description = civic_astrometeorology_hive_effect_tooltip
+	modifier = {
+		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+	ai_weight = {
+		base = @ai_civic_default_base_weight
+	}
+}
+
+civic_environmental_architects_hive = {
+	playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	ai_playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+	possible = {
+		civics = {
+			NOT = {
+				value = civic_hive_toxic_baths
+			}
+		}
+		origin = {
+			NOR = {
+				value = origin_remnants
+				value = origin_post_apocalyptic
+				value = origin_void_dwellers
+				value = origin_shattered_ring
+				value = origin_lithoid
+				value = origin_machine
+			}
+		}
+	}
+	modification = no
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+	description = civic_environmental_architects_hive_effect_tooltip
+	negative_description = civic_environmental_architects_negative_effect_tooltip
+	modifier = {
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+		planet_jobs_produces_mult = 0.1
+		pop_growth_speed = 0.1
+		planet_pops_upkeep_mult = -0.15
+		planet_clear_blocker_speed_mult = 0.25
+	}
+}
+
 ##################
 # Machine Empire
 ##################
 
 civic_machine_servitor = {
+	playable = { has_synthetic_dawn = yes }
 	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	possible = {
 		civics = {
@@ -566,7 +713,7 @@ civic_machine_servitor = {
 		base = @civic_default_random_weight
 		modifier = {
 			factor = 0
-			NOT = { host_has_dlc = "Synthetic Dawn Story Pack" }
+			has_synthetic_dawn = no
 		}
 		modifier = {
 			# civic has no effect after galaxy generation, disable for random generation
@@ -575,7 +722,7 @@ civic_machine_servitor = {
 		}
 	}
 	description = civic_tooltip_machine_servitor_effects
-	has_secondary_species = {	# see game_start.11
+	has_secondary_species = {	# see game_start.12
 		title = civic_machine_servitor_secondary_species
 	}
 	modifier = {
@@ -584,15 +731,8 @@ civic_machine_servitor = {
 }
 
 civic_machine_terminator = {
-	potential = {
-		authority = {
-			OR = {
-				value = auth_ancient_machine_intelligence
-				value = auth_machine_intelligence
-			}
-		}
-	}
-	starting_colony = pc_nuked # Changes homeworld class regardless of what is picked for empire
+	playable = { has_synthetic_dawn = yes }
+	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	possible = {
 		civics = {
 			NOR = {
@@ -600,6 +740,14 @@ civic_machine_terminator = {
 				value = civic_machine_assimilator
 				value = civic_machine_memorialist
 				value = civic_machine_exploration_protocol
+				value = civic_machine_diplomatic_protocols
+			}
+			NOR = {
+				text = civic_tooltip_not_guided
+				value = civic_guided_sapience
+				value = civic_corporate_guided_sapience
+				value = civic_hive_guided_sapience
+				value = civic_machine_guided_sapience
 			}
 		}
 		origin = {
@@ -614,7 +762,7 @@ civic_machine_terminator = {
 		base = @civic_default_random_weight
 		modifier = {
 			factor = 0
-			NOT = { host_has_dlc = "Synthetic Dawn Story Pack" }
+			has_synthetic_dawn = no
 		}
 		modifier = {
 			factor = 0
@@ -632,6 +780,7 @@ civic_machine_terminator = {
 }
 
 civic_machine_assimilator = {
+	playable = { has_synthetic_dawn = yes }
 	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	possible = {
 		civics = {
@@ -648,7 +797,7 @@ civic_machine_assimilator = {
 		base = @civic_default_random_weight
 		modifier = {
 			factor = 0
-			NOT = { host_has_dlc = "Synthetic Dawn Story Pack" }
+			has_synthetic_dawn = no
 		}
 		modifier = {
 			# civic has no effect after galaxy generation, disable for random generation
@@ -661,7 +810,7 @@ civic_machine_assimilator = {
 		}
 	}
 	description = civic_tooltip_machine_assimilator_effects
-	has_secondary_species = {	# see game_start.11
+	has_secondary_species = {	# see game_start.12
 		title = civic_machine_assimilator_secondary_species
 		traits = {
 			trait = trait_cybernetic
@@ -673,8 +822,9 @@ civic_machine_assimilator = {
 }
 
 civic_machine_builder = {
-	description = "civic_tooltip_functional_architecture_effects"
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -682,13 +832,16 @@ civic_machine_builder = {
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		planet_structures_cost_mult = -0.15
+		planet_building_build_speed_mult = 0.15
 		planet_max_buildings_add = 1
 	}
 }
 
 civic_machine_factory_overclock = {
 	icon = "gfx/interface/icons/governments/civics/civic_machine_factory_overclock.dds"
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -702,7 +855,9 @@ civic_machine_factory_overclock = {
 }
 
 civic_machine_unitary_cohesion = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -714,7 +869,9 @@ civic_machine_unitary_cohesion = {
 }
 
 civic_machine_rockbreakers = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -726,7 +883,9 @@ civic_machine_rockbreakers = {
 }
 
 civic_machine_zero_waste_protocols = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -734,14 +893,14 @@ civic_machine_zero_waste_protocols = {
 	modifier = {
 		councilor_gestalt_regulatory_exp_gain = @gestalt_civic_node_xp_rate
 		planet_pops_robotics_upkeep_mult = -0.10
+		planet_structures_upkeep_mult = -0.1
+		ships_upkeep_mult = -0.05
 	}
 }
 
 civic_machine_built_to_last = {
 	potential = {
-		authority = {
-			value = auth_ancient_machine_intelligence
-		}
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
 	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
@@ -754,7 +913,9 @@ civic_machine_built_to_last = {
 }
 
 civic_machine_ota_updates = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -762,17 +923,20 @@ civic_machine_ota_updates = {
 	description = civic_machine_ota_updates_effect
 	modifier = {
 		councilor_gestalt_legion_exp_gain = @gestalt_civic_node_xp_rate
-		empire_size_pops_mult = -0.20
+		empire_size_pops_mult = -0.15
+		planet_resettlement_unemployed_mult = 0.5
 		country_edict_fund_add = 25
 	}
 }
 
 civic_machine_warbots = {
 	potential = {
-		authority = {
-			OR = {
-				value = auth_ancient_machine_intelligence
-				value = auth_machine_intelligence
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	possible = {
+		civics = {
+			NOT = {
+				value = civic_machine_obsessional_directive
 			}
 		}
 	}
@@ -802,7 +966,9 @@ civic_machine_warbots = {
 }
 
 civic_machine_introspective = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -826,7 +992,9 @@ civic_machine_introspective = {
 }
 
 civic_machine_delegated_functions = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -850,6 +1018,7 @@ civic_machine_delegated_functions = {
 }
 
 civic_machine_predictive_analysis = {
+	description = "civic_tooltip_machine_predictive_analysis_effects"
 	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
@@ -863,7 +1032,9 @@ civic_machine_predictive_analysis = {
 }
 
 civic_machine_replication = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -875,13 +1046,16 @@ civic_machine_replication = {
 }
 
 civic_machine_maintenance_protocols = {
-	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
 	}
 	description = civic_tooltip_machine_maintenance_protocols_effects
 	modifier = {
+		planet_jobs_simple_drone_produces_mult = 0.05
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 	}
 }
@@ -889,9 +1063,7 @@ civic_machine_maintenance_protocols = {
 civic_machine_memorialist = {
 	playable = { host_has_dlc = "Necroids Species Pack" }
 	description = "civic_tooltip_memorialist_gestalt_effects"
-	potential = {
-		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
-	}
+	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
@@ -1020,6 +1192,7 @@ civic_machine_exploration_protocol = {
 				value = civic_machine_terminator
 				value = civic_machine_assimilator
 				value = civic_machine_hyperspace_specialty
+				value = civic_machine_guided_sapience
 			}
 		}
 	}
@@ -1039,9 +1212,7 @@ civic_machine_hyperspace_specialty = {
 	playable = { has_astral_planes_dlc = yes }
 	ai_playable = { has_astral_planes_dlc = yes }
 	description = "civic_machine_hyperspace_specialty_effects"
-	potential = {
-		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
-	}
+	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	possible = {
 		civics = { NOT = { value = civic_machine_exploration_protocol } }
 	}
@@ -1060,9 +1231,7 @@ civic_memory_vault_machine = {
 		base = 4
 	}
 	description = "civic_tooltip_memory_vault_machine_effects"
-	potential = {
-		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
-	}
+	potential = { inline_script = "governments/conditions/is_machine" } # undercoat: moved to inline script
 	possible = {
 	}
 	modifier = {
@@ -1121,5 +1290,259 @@ civic_machine_sovereign_guardianship = {
 	}
 	ai_weight = {
 		base = @civic_rare_random_weight
+	}
+}
+
+civic_machine_obsessional_directive = {
+	modification = no
+	playable = { has_machine_age_dlc = yes }
+	ai_playable = { has_machine_age_dlc = yes }
+	description = "civic_machine_obsessional_directive_effects"
+
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	possible = {
+		civics = {
+			NOT = {
+				value = civic_machine_warbots
+			}
+		}
+	}
+	modifier = {
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+	}
+}
+
+civic_machine_diplomatic_protocols = {
+	playable = { has_machine_age_dlc = yes }
+	ai_playable = { has_machine_age_dlc = yes }
+	random_weight = {
+		base = 4
+	}
+
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	possible = {
+		civics = {
+			NOT = { value = civic_machine_terminator }
+		}
+	}
+
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	ai_weight = {
+		base = @civic_rare_random_weight
+	}
+
+	modifier = {
+		councilor_gestalt_regulatory_exp_gain = @gestalt_civic_node_xp_rate
+		envoys_add = 2
+		diplo_weight_mult = 0.25
+		country_trust_cap_add = 35
+		envoy_improve_relations_mult = 0.50
+	}
+}
+
+civic_machine_tactical_algorithms = {
+	modification = no
+	playable = { has_machine_age_dlc = yes }
+	ai_playable = { has_machine_age_dlc = yes }
+	description = "civic_machine_tactical_algorithms_effects"
+
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	possible = {
+		civics = {
+			NOT = { value = civic_machine_terminator }
+		}
+	}
+	modifier = {
+		councilor_gestalt_legion_exp_gain = @gestalt_civic_node_xp_rate
+		add_base_country_intel = 20
+	}
+
+	swap_type = {
+		description = "civic_machine_tactical_algorithms_effects"
+		trigger = {
+			host_has_dlc = "Overlord"
+		}
+		modifier = {
+			country_enclave_capacity_add = 1
+		}
+	}
+}
+
+civic_machine_guided_sapience = {
+	modification = yes
+	playable = { has_machine_age_dlc = yes }
+	ai_playable = { has_machine_age_dlc = yes }
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	potential = {
+		authority = {
+			value = auth_machine_intelligence
+			NOR = {
+				value = auth_corporate
+				value = auth_hive_mind
+			}
+		}
+		ethics = {
+			value = ethic_gestalt_consciousness
+		}
+	}
+	possible = {
+		origin = {
+			NOT = {
+				value = origin_machine
+			}
+			NOT = { value = origin_life_seeded }
+		}
+		civics = {
+			NOR = {
+				value = civic_machine_exploration_protocol
+				value = civic_machine_terminator
+			}
+		}
+	}
+
+	modifier = {
+		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
+		terraforming_cost_mult = -0.25
+		terraform_speed_mult = 0.25
+	}
+	description = civic_tooltip_guided_sapience_effects
+	negative_description = civic_tooltip_guided_sapience_gestalt_negative_effects
+}
+
+civic_machine_spybots = {
+	playable = {
+		has_nemesis = yes
+	}
+	ai_playable = {
+		has_nemesis = yes
+	}
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+	modifier = {
+		intel_decryption_add = 1
+		spy_network_daily_value_mult = 0.25
+		envoys_add = 1
+		country_trust_cap_add = -25
+		councilor_gestalt_regulatory_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	swap_type = {
+		trigger = {
+			has_first_contact_dlc = yes
+		}
+		description = civic_machine_spybots_effects
+		modifier = {
+			ship_cloaking_strength_add = 2
+		}
+	}
+	ai_weight = {
+		base = @ai_civic_uncommon_base_weight
+	}
+}
+
+civic_machine_astromining_drones = {
+	playable = {
+		has_megacorp = yes
+	}
+	ai_playable = {
+		has_megacorp = yes
+	}
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+
+	description = civic_tooltip_machine_astromining_drones_effects
+	modifier = {
+		planet_miners_minerals_produces_add = -2
+		planet_technician_energy_produces_add = -1
+		station_gatherers_produces_mult = 0.5
+		country_starbase_capacity_mult = 0.50
+		stations_cost_mult = -0.50
+		planet_jobs_simple_drone_produces_mult = -0.50
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	ai_weight = {
+		base = @ai_civic_uncommon_base_weight
+	}
+}
+
+civic_astrometeorology_machine = {
+	playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	ai_playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	description = civic_astrometeorology_machine_effect_tooltip
+	modifier = {
+		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+	ai_weight = {
+		base = @ai_civic_default_base_weight
+	}
+}
+
+civic_environmental_architects_machine = {
+	playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	ai_playable = {
+		has_cosmic_storms_dlc = yes
+	}
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+	possible = {
+		civics = {
+			NOT = {
+				value = civic_machine_toxic_baths
+			}
+		}
+		origin = {
+			NOR = {
+				value = origin_remnants
+				value = origin_post_apocalyptic_machines
+				value = origin_void_machines
+				value = origin_shattered_ring
+				value = origin_lithoid
+				value = origin_machine
+			}
+		}
+	}
+	modification = no
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+	description = civic_environmental_architects_machine_effect_tooltip
+	negative_description = civic_environmental_architects_negative_effect_tooltip
+	modifier = {
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+		planet_jobs_produces_mult = 0.1
+		planet_pop_assembly_mult = 0.1
+		planet_pops_upkeep_mult = -0.15
+		planet_clear_blocker_speed_mult = 0.25
 	}
 }

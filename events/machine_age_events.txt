@@ -1,0 +1,418 @@
+##########################
+#                        #
+# Machine Age DLC Events #
+#                        #
+##########################
+
+namespace = cyber
+
+
+###################################
+#Guided Sapience
+###################################
+
+#Guided Sapience create pre-sapients
+planet_event = {
+	id = cyber.7000
+	title = cyber.7000.name
+	desc = cyber.7000.desc
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+	is_triggered_only = yes
+	trigger = {
+		owner = { is_guided_sapience_empire = yes }
+		has_planet_flag = create_presapients_no_colonize
+		NOT = { has_planet_flag = pre_sapient_planet }
+		is_artificial = no
+	}
+
+	option = {
+		name = cyber.7000.a
+		owner = {
+			add_resource = {
+				unity = 500
+				influence = 25
+				mult = value:presapients_guided_mult
+			}
+			if = {
+				limit = {
+					NOT = { has_technology = tech_epigenetic_triggers }
+				}
+				add_tech_progress = {
+					tech = tech_epigenetic_triggers
+					progress = 0.05
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = presapients_guided
+					value = 1
+				}
+			}
+		}
+	}
+	after = {
+		hidden_effect = {
+			remove_planet_flag = create_presapients_no_colonize
+			planet_event = { id = cyber.7010 }
+		}
+	}
+}
+
+#Guided Sapience Found Presapients
+planet_event = {
+	id = cyber.7001
+	title = cyber.7001.name
+	desc = cyber.7001.desc
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+	is_triggered_only = yes
+	trigger = {
+		owner = { is_guided_sapience_empire = yes }
+		has_planet_flag = pre_sapient_planet
+		NOT = { has_planet_flag = genesis_guided_pre_sapient_planet }
+	}
+
+	option = {
+		name = cyber.7001.a
+		owner = {
+			add_resource = {
+				unity = 500
+				influence = 25
+				mult = value:presapients_guided_mult
+			}
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = presapients_guided
+					value = 1
+				}
+			}
+		}
+	}
+}
+
+# create pre-sapients effects
+planet_event = {
+	id = cyber.7010
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		save_event_target_as = pre_sapient_planet
+		spawn_presapient_species_randomizer_effect = yes
+		set_planet_flag = pre_sapient_planet
+		set_planet_flag = genesis_guided_pre_sapient_planet
+		IF = {
+			limit = {
+				any_owned_pop = {
+					has_trait = trait_presapient_forcefully_devolved
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					has_trait = trait_presapient_forcefully_devolved
+				}
+				species = {
+					change_species_characteristics = {
+						remove_trait = trait_presapient_forcefully_devolved
+						add_trait = trait_presapient_starborn
+					}
+				}
+			}
+		}
+		IF = {
+			limit = {
+				planet = { is_nuked_world = no } # undercoat: moved to scripted trigger
+				any_owned_pop = {
+					has_trait = trait_presapient_irradiated
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					has_trait = trait_presapient_irradiated
+				}
+				species = {
+					change_species_characteristics = {
+						remove_trait = trait_presapient_irradiated
+						add_trait = trait_presapient_earthbound
+					}
+				}
+			}
+		}
+	}
+}
+
+# check for guided sapience ship
+planet_event = {
+	id = cyber.7005
+	hide_window = yes
+
+	is_triggered_only = yes
+	trigger = {
+		exists = FROM
+		FROM = {
+			is_ship_size = guided_sapience_colonizer
+		}
+		is_artificial = no
+	}
+
+	immediate = {
+		set_planet_flag = create_presapients_no_colonize
+		add_deposit = d_genesis_preserve
+	}
+}
+
+#Removes Genesis Preserves from Planets if not Genesis Guides
+planet_event = {
+	id = cyber.7015
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_deposit = d_genesis_preserve
+	}
+
+	immediate = {
+		IF = {
+			limit = {
+				owner = { is_guided_sapience_empire = no }
+			}
+			remove_deposit = d_genesis_preserve
+		}
+		IF = {
+			limit = {
+				has_owner = no
+			}
+			remove_deposit = d_genesis_preserve
+		}
+	}
+}
+
+#Bonsus Unity for Uplifiting
+planet_event = {
+	id = cyber.7020
+	title = cyber.7020.name
+	desc = cyber.7020.desc
+	picture = GFX_evt_friendly_enlightenment
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_guided_sapience_empire = yes
+		}
+		has_planet_flag = pre_sapient_planet
+	}
+
+	option = {
+		name = cyber.7020.a
+		owner = {
+			add_resource = {
+				unity = 1000
+				mult = value:presapients_guided_mult
+			}
+		}
+	}
+	after = {
+		remove_deposit = d_genesis_preserve
+		add_deposit = d_genesis_monument
+	}
+}
+
+
+# Checks if you give your pre-sapient babies away as vassals and lowers `presapients_guided_mult`
+# on_released_as_vassal
+# This = released vassal
+# From = overlord
+country_event = {
+	id = cyber.7030
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_planet = {
+			has_deposit = d_genesis_preserve
+		}
+		from = {
+			is_guided_sapience_empire = yes
+		}
+	}
+
+	immediate = {
+		from = {
+			change_variable = {
+				which = presapients_guided
+				value = -1
+			}
+		}
+	}
+}
+
+# If you steal someone elses pre-sapient babies vassal or re-intergrate your babies you regain `presapients_guided_mult`
+# fires when a country finishes being integrated
+# This = overlord
+# From = subject
+country_event = {
+	id = cyber.7035
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			any_planet_within_border = {
+				has_deposit = d_genesis_preserve
+			}
+		}
+		is_guided_sapience_empire = yes
+	}
+
+	immediate = {
+		change_variable = {
+			which = presapients_guided
+			value = +1
+		}
+	}
+}
+
+# country_event = {
+# 	id = cyber.8000
+# 	title = cyber.8000.name
+# 	desc = cyber.8000.desc
+
+# 	picture = GFX_evt_hive_cyberization
+
+# 	is_triggered_only = yes
+
+# 	trigger = {
+# 		always = no
+# 	}
+
+# 	immediate = {
+# 		remove_country_flag = cyber_individualist
+# 		remove_country_flag = cyber_collectivist
+# 		remove_country_flag = synth_physical
+# 		remove_country_flag = synth_virtual
+# 		remove_country_flag = cyber_hive_volitional
+# 		remove_country_flag = cyber_hive_integrated
+# 		remove_country_flag = driven_memory_aggregator
+# 		remove_country_flag = driven_neural_chorus
+# 		advanced_authority_refresh = yes
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_gestalt = no
+# 			NOT = {
+# 				is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+# 			}
+# 		}
+# 		name = cyber.8000.cyber_individualist
+# 		set_country_flag = cyber_individualist
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_gestalt = no
+# 			NOT = {
+# 				is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+# 			}
+# 		}
+# 		name = cyber.8000.cyber_collectivist
+# 		set_country_flag = cyber_collectivist
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_gestalt = no
+# 			NOT = {
+# 				is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+# 			}
+# 		}
+# 		name = cyber.8000.synth_physical
+# 		set_country_flag = synth_physical
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_gestalt = no
+# 			NOT = {
+# 				is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+# 			}
+# 		}
+# 		name = cyber.8000.synth_virtual
+# 		set_country_flag = synth_virtual
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_hive_empire = yes
+# 		}
+# 		name = cyber.8000.cyber_hive_volitional
+# 		set_country_flag = cyber_hive_volitional
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_hive_empire = yes
+# 		}
+# 		name = cyber.8000.cyber_hive_integrated
+# 		set_country_flag = cyber_hive_integrated
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_machine_empire = yes
+# 		}
+# 		name = cyber.8000.driven_memory_aggregator
+# 		set_country_flag = driven_memory_aggregator
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_machine_empire = yes
+# 		}
+# 		name = cyber.8000.driven_neural_chorus
+# 		set_country_flag = driven_neural_chorus
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+# 			has_country_flag = cyber_creed_advanced_government
+# 		}
+# 		name = cyber.8000.cyber_creed_disable
+# 		remove_country_flag = cyber_creed_advanced_government
+# 	}
+
+# 	option = {
+# 		trigger = {
+# 			is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+# 			NOT = {
+# 				has_country_flag = cyber_creed_advanced_government
+# 			}
+# 		}
+# 		name = cyber.8000.cyber_creed_enable
+# 		set_country_flag = cyber_creed_advanced_government
+# 	}
+
+# 	after = {
+# 		hidden_effect = {
+# 			advanced_authority_refresh = yes
+# 		}
+# 		set_government_cooldown = no
+# 	}
+# }

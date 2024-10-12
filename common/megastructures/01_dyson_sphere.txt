@@ -18,10 +18,18 @@ dyson_sphere_0 = {
 		}
 	}
 
+	custom_tooltip_requirements = "MEGASTRUCTURE_TOOLTIP_REQUIREMENTS_DYSON_SPHERE"
+
 	prerequisites = { "tech_dyson_sphere" }
 
+	potential = {
+		has_machine_age_dlc = no
+	}
+
 	possible = {
-		exists = starbase
+		hidden_trigger = {
+			exists = starbase
+		}
 		custom_tooltip = {
 			fail_text = "requires_inside_border"
 			is_inside_border = from
@@ -36,8 +44,17 @@ dyson_sphere_0 = {
 			}
 		}
 		custom_tooltip = {
+			fail_text = "requires_no_machine_age"
+			from = { has_machine_age_dlc = no }
+		}
+		custom_tooltip = {
 			fail_text = "requires_no_existing_dyson_sphere_two"
-			from = { NOT = { has_country_flag = built_dyson_sphere_contingency } }
+			from = {
+				NOR = {
+					has_country_flag = built_dyson_sphere_contingency
+					has_country_flag = built_dyson_sphere_contingency_swarm
+				}
+			}
 		}
 		custom_tooltip = {
 			fail_text = "requires_surveyed_system"
@@ -51,10 +68,48 @@ dyson_sphere_0 = {
 			}
 		}
 		custom_tooltip = {
-			fail_text = "requires_no_habitable_planets"
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
 			NOT = {
 				any_system_planet = {
-					colonizable_planet = yes
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
 				}
 			}
 		}
@@ -87,8 +142,12 @@ dyson_sphere_0 = {
 		}
 		custom_tooltip = {
 			fail_text = "requires_no_existing_megastructure"
-			#NOT = { has_any_megastructure = yes }
 			has_no_non_gate_megastructure = yes
+			NOT = {
+				any_system_planet = {
+					is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
+				}
+			}
 		}
 	}
 
@@ -126,9 +185,14 @@ dyson_sphere_0 = {
 		}
 	}
 
-	on_build_start = {}
-	on_build_cancel = {}
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		set_star_flag = dyson_sphere_built
 		remove_system_terraforming_candidates = yes
 		from = {
@@ -166,13 +230,71 @@ dyson_sphere_1 = {
 		}
 	}
 
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
+		}
+	}
+
 	upgrade_from = {
 		dyson_sphere_0
 	}
 
 	prerequisites = { "tech_dyson_sphere" }
 
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		remove_system_terraforming_candidates = yes
 	}
 }
@@ -183,6 +305,72 @@ dyson_sphere_2 = {
 	construction_entity = "dyson_sphere_part_1_entity"
 	portrait = "GFX_megastructure_construction_background"
 	build_time = 3600
+	use_planet_resource = yes
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_no_existing_dyson_sphere"
+			from = {
+				OR = {
+					has_relic = r_contingency_core
+					NOT = { has_country_flag = built_dyson_sphere_swarm }
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_existing_dyson_sphere_two"
+			from = {
+				NOT = { has_country_flag = built_dyson_sphere_contingency_swarm } }
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					OR = {
+						has_colony_progress > 0
+						is_colony = yes
+					}
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
+		}
+	}
 	resources = {
 		category = megastructures
 		cost = {
@@ -197,12 +385,61 @@ dyson_sphere_2 = {
 
 	upgrade_from = {
 		dyson_sphere_1
+		dyson_swarm_3
 	}
 
 	prerequisites = { "tech_dyson_sphere" }
 
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+		from = {
+			if = {
+				limit = {
+					NOR = {
+						has_country_flag = build_dyson_sphere_swarm
+						has_country_flag = built_dyson_sphere_contingency_swarm
+					}
+				}
+				if = {
+					limit = {
+						has_relic = r_contingency_core
+						has_country_flag = built_dyson_sphere_swarm
+					}
+					set_country_flag = built_dyson_sphere_contingency_swarm
+				}
+			set_country_flag = built_dyson_sphere_swarm
+			}
+		}
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		remove_system_terraforming_candidates = yes
+		from = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = swarm_counter_decreased }
+				}
+				if = {
+					limit = {
+						check_variable = {
+							which = dyson_swarm_counter
+							value >= 1
+						}
+					}
+					change_variable = {
+						which = dyson_swarm_counter
+						value = -1
+					}
+					set_country_flag = swarm_counter_decreased
+				}
+				set_country_flag = swarm_counter_decreased
+			}
+		}
 	}
 }
 
@@ -212,6 +449,7 @@ dyson_sphere_3 = {
 	construction_entity = "dyson_sphere_part_2_entity"
 	portrait = "GFX_megastructure_construction_background"
 	build_time = 3600
+	use_planet_resource = yes
 	resources = {
 		category = megastructures
 		cost = {
@@ -224,13 +462,71 @@ dyson_sphere_3 = {
 		}
 	}
 
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
+		}
+	}
+
 	upgrade_from = {
 		dyson_sphere_2
 	}
 
 	prerequisites = { "tech_dyson_sphere" }
 
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		remove_system_terraforming_candidates = yes
 	}
 }
@@ -241,6 +537,7 @@ dyson_sphere_4 = {
 	construction_entity = "dyson_sphere_part_3_entity"
 	portrait = "GFX_megastructure_construction_background"
 	build_time = 3600
+	use_planet_resource = yes
 	resources = {
 		category = megastructures
 		cost = {
@@ -259,7 +556,65 @@ dyson_sphere_4 = {
 
 	prerequisites = { "tech_dyson_sphere" }
 
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
+		}
+	}
+
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		remove_system_terraforming_candidates = yes
 	}
 }
@@ -270,6 +625,7 @@ dyson_sphere_5 = {
 	construction_entity = "dyson_sphere_part_4_entity"
 	portrait = "GFX_megastructure_dyson_sphere_background"
 	build_time = 3600
+	use_planet_resource = yes
 	resources = {
 		category = megastructures
 		cost = {
@@ -289,7 +645,72 @@ dyson_sphere_5 = {
 	prerequisites = { "tech_dyson_sphere" }
 	show_prereqs = yes
 
+	outliner_trigger = {
+		exists = owner
+		owner = {
+			has_country_flag = can_build_disco_sphere
+		}
+	}
+
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
+		}
+	}
+
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		from = {
 			set_country_flag = has_built_or_repaired_megastructure
 		}
@@ -299,7 +720,20 @@ dyson_sphere_5 = {
 				OR = {
 					is_molten_world = yes # undercoat: moved to scripted trigger
 					is_toxic_world = yes # undercoat: moved to scripted trigger
+					habitable_planet = yes
 				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_colony_progress > 0
+						is_colony = yes
+					}
+				}
+				every_owned_pop = {
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				}
+				destroy_colony = yes
 			}
 			change_pc = pc_frozen
 		}
@@ -356,23 +790,95 @@ dyson_sphere_restored = {
 		dyson_sphere_ruined
 	}
 
+	outliner_trigger = {
+		exists = owner
+		owner = {
+			has_country_flag = can_build_disco_sphere
+		}
+	}
+
 	possible = {
 		from = { has_technology = tech_mega_engineering }
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
+		}
 	}
 
 	on_build_start = {
+		set_star_flag = dyson_sphere_construction
 		fromfrom = {
 			set_graphical_culture = root.from
 		}
 	}
 
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		every_system_planet = {
 			limit = {
 				OR = {
 					is_molten_world = yes # undercoat: moved to scripted trigger
 					is_toxic_world = yes # undercoat: moved to scripted trigger
+					habitable_planet = yes
 				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_colony_progress > 0
+						is_colony = yes
+					}
+				}
+				every_owned_pop = {
+					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				}
+				destroy_colony = yes
 			}
 			change_pc = pc_frozen
 		}
@@ -429,13 +935,13 @@ dyson_sphere_disco = {
 
 	potential = {
 		has_nemesis = yes
-		has_country_flag = can_build_disco_sphere 
+		has_country_flag = can_build_disco_sphere
 	}
 
 	possible = {
-		from = { 
+		from = {
 			has_nemesis = yes
-			has_country_flag = can_build_disco_sphere 
+			has_country_flag = can_build_disco_sphere
 		}
 	}
 
@@ -443,7 +949,16 @@ dyson_sphere_disco = {
 		planet_amenities_mult = 0.3
 	}
 
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		set_star_flag = mega_art_installation_built
 		fromfrom = {
 			create_ambient_object = {
@@ -478,6 +993,7 @@ dyson_sphere_disco = {
 			}
 		}
 		from = {
+			remove_country_flag = can_build_disco_sphere
 			remove_country_flag = built_dyson_sphere
 			remove_country_flag = built_dyson_sphere_contingency
 			country_event = { id = situation.2049 }
@@ -512,13 +1028,59 @@ dyson_sphere_disco_restored = {
 
 	potential = {
 		has_nemesis = yes
-		has_country_flag = can_build_disco_sphere 
+		has_country_flag = can_build_disco_sphere
 	}
 
 	possible = {
-		from = { 
+		from = {
 			has_nemesis = yes
-			has_country_flag = can_build_disco_sphere 
+			has_country_flag = can_build_disco_sphere
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace"
+			system_has_arc_furnace = no
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_arc_furnace_construction"
+			if = {
+				limit = {
+					system_has_arc_furnace = no
+				}
+				NOT = {
+					solar_system = {
+						has_star_flag = arc_furnace_construction
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonies"
+			NOT = {
+				any_system_planet = {
+					is_colony = yes
+					is_artificial = no
+					exists = owner
+					owner = {
+						is_primitive = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "blocked_by_pre_ftl_policy"
+			if = {
+				limit = {
+					any_system_planet = {
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+					}
+				}
+				from = {
+					has_policy_flag = interference_aggressive
+				}
+			}
 		}
 	}
 
@@ -526,7 +1088,16 @@ dyson_sphere_disco_restored = {
 		planet_amenities_mult = 0.3
 	}
 
+	on_build_start = {
+		set_star_flag = dyson_sphere_construction
+	}
+
+	on_build_cancel = {
+		remove_star_flag = dyson_sphere_construction
+	}
+
 	on_build_complete = {
+		remove_star_flag = dyson_sphere_construction
 		set_star_flag = mega_art_installation_built
 		fromfrom = {
 			create_ambient_object = {
@@ -561,6 +1132,7 @@ dyson_sphere_disco_restored = {
 			}
 		}
 		from = {
+			remove_country_flag = can_build_disco_sphere
 			remove_country_flag = built_dyson_sphere
 			remove_country_flag = built_dyson_sphere_contingency
 			country_event = { id = situation.2049 }
