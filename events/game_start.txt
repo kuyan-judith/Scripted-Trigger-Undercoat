@@ -184,6 +184,28 @@ event = {
 			}
 		}
 
+		every_country = {
+			limit = { is_voidworm_country = yes }
+			every_country = {
+				limit = {
+					OR = {
+						is_amoeba_country_type = yes
+						is_tiyanki_country_type = yes
+						is_drone_country_type = yes
+						is_crystal_country_type = yes
+						is_country_type = cloud
+						is_guardian_country = yes
+					}
+				}
+				set_faction_hostility = {
+					target = prev
+					set_hostile = no
+					set_neutral = yes
+					set_friendly = no
+				}
+			}
+		}
+
 		### MARAUDER FLAGS
 		every_country = {
 			limit = { is_country_type = dormant_marauders }
@@ -522,6 +544,15 @@ event = {
 				is_obsessional_directive_empire = yes # undercoat: moved to scripted trigger
 			}
 			obsessional_directive_start_effect = yes
+		}
+
+		if = { #If someone has Beastmasters civic, spawn amoeba already to give them communication
+			limit = {
+				any_country = {
+					is_beastmasters_empire = yes
+				}
+			}
+			create_amoeba_country = yes
 		}
 	}
 }
@@ -950,9 +981,15 @@ country_event = {
 		}
 		if = {
 			limit = {
-				is_storm_chasers_empire = yes #undercoat: moved to scripted trigger
+				is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
 			}
 			give_technology = { message = no tech = tech_storm_prediction_1 }
+		}
+		if = {
+			limit = {
+				is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+			}
+			give_technology = { message = no tech = tech_genome_mapping }
 		}
 	}
 
@@ -1145,6 +1182,61 @@ country_event = {
 		}
 
 		if = {
+			limit = { is_beastmasters_empire = yes }
+			# required before trying to give space fauna
+			give_dna = {
+				ship_category = space_amoeba
+				rarity = common
+			}
+			create_fleet = {
+				effect = {
+					set_owner = prev
+					while = {
+						count = 3
+						create_ship = {
+							name = random
+							random_existing_design = space_amoeba
+							rarity = common
+							age = 0
+						}
+					}
+					set_location = prev.capital_star
+					owner = {
+						create_leader = {
+							class = commander
+							name = random
+							species = owner_main_species
+						}
+					}
+					last_created_leader = {
+						if = {
+							limit = {
+								has_skill > 1
+								num_traits = 0
+							}
+							add_trait_no_notify = random_common
+						}
+					}
+					set_leader = last_created_leader
+					save_event_target_as = beastmasters_starting_fleet
+				}
+			}
+		
+			if = {
+				limit = { is_fruitful_empire = yes } # undercoat: moved to scripted trigger
+				event_target:beastmasters_starting_fleet = {
+					fleet_event = {
+						id = origin.7303
+						days = 20
+						scopes = {
+							from = prev.capital_star.starbase
+						}
+					}
+				}
+			}
+		}
+
+		else_if = {
 			limit = {
 				is_low_tech_start = no
 			}

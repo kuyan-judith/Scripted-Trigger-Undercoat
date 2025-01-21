@@ -910,13 +910,22 @@ planet_event = {
 		if = {
 			limit = {
 				has_modifier = titanic_life
-				NOR = {
-					has_planet_flag = titanic_life_colony_flag
-					owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
-				}
+				NOT = { has_planet_flag = titanic_life_colony_flag }
 			}
-			planet_event = { id = colony_mod.2 days = 30 random = 90 }
-			break = yes
+			if = {
+				limit = {					
+					owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
+				}
+				planet_event = { id = grand_archive.1010 days = 30 random = 90 }
+				break = yes
+			}
+			else_if = {
+				limit = {					
+					NOT = { owner = { is_gestalt = yes } } # undercoat: moved to scripted trigger
+				}
+				planet_event = { id = colony_mod.2 days = 30 random = 90 }
+				break = yes
+			}
 		}
 
 		if = {
@@ -1346,7 +1355,10 @@ planet_event = { #science
 			}
 		}
 		custom_tooltip = portal_closed_tooltip
-		hidden_effect = { set_planet_flag = dportal_closed }
+		hidden_effect = { 
+			set_planet_flag = dportal_closed
+			remove_planet_flag = dportal_hell
+		}
 	}
 }
 
@@ -1401,7 +1413,10 @@ planet_event = { #prayer
 			}
 		}
 		custom_tooltip = portal_closed_tooltip
-		hidden_effect = { set_planet_flag = dportal_closed }
+		hidden_effect = { 
+			set_planet_flag = dportal_closed
+			remove_planet_flag = dportal_hell
+		}
 	}
 }
 
@@ -1460,7 +1475,10 @@ planet_event = { #rocks
 			}
 		}
 		custom_tooltip = portal_closed_tooltip
-		hidden_effect = { set_planet_flag = dportal_closed }
+		hidden_effect = { 
+			set_planet_flag = dportal_closed
+			remove_planet_flag = dportal_hell
+		}
 	}
 }
 
@@ -2344,6 +2362,7 @@ planet_event = { #Corrupted Knight
 		custom_tooltip = demonic_armies_tooltip
 		hidden_effect = {
 			set_planet_flag = dportal_closed
+			remove_planet_flag = dportal_hell
 			save_global_event_target_as = demonic_incursion_planet
 			create_country = {
 				name = "NAME_Demonic_Creatures"
@@ -2659,7 +2678,10 @@ planet_event = { #Demonic Refugees
 			}
 		}
 		custom_tooltip = portal_closed_tooltip
-		hidden_effect = { set_planet_flag = dportal_closed }
+		hidden_effect = {
+			set_planet_flag = dportal_closed
+			remove_planet_flag = dportal_hell
+		}
 	}
 
 	option = { #Welcome the refugees
@@ -2692,7 +2714,10 @@ planet_event = { #Quest Complete!
 
 	option = {
 		name = colony.3060.a
-		hidden_effect = { set_planet_flag = dportal_closed }
+		hidden_effect = { 
+			set_planet_flag = dportal_closed
+			remove_planet_flag = dportal_hell
+		}
 		owner = {
 			add_modifier = {
 				modifier = doomslayer_quest_complete
@@ -2975,6 +3000,7 @@ planet_event = { # Choosing between Lonely Bot and instant resources
 					max = @tier2researchmax
 				}
 			}
+			give_specimen = { key = destroyed_mascot_of_colony }
 		}
 	}
 }
@@ -6272,6 +6298,8 @@ planet_event = { # third opportunity - green care - can lower the upkeep or incr
 				OR = {
 					is_despoiler_empire = yes # undercoat: moved to scripted trigger
 					is_homicidal = yes # undercoat: moved to scripted trigger
+					
+					
 				}
 			}
 		}
@@ -6348,6 +6376,9 @@ planet_event = { # fourth opportunity/problem - can increase production by incre
 			owner = {
 				OR = {
 					is_catalytic_empire = yes # undercoat: moved to scripted trigger
+					
+					
+					
 					is_tree_of_life_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
@@ -6791,6 +6822,7 @@ planet_event = {
 						has_valid_civic = civic_idyllic_bloom
 						is_scavenger = yes # undercoat: moved to scripted trigger
 						has_valid_civic = civic_eager_explorers
+						
 						has_valid_civic = civic_hive_stargazers
 						has_valid_civic = civic_machine_zero_waste_protocols
 					}

@@ -1611,9 +1611,9 @@ country_event = {
 				has_communications = root
 				NOT = { is_in_federation_with = root }
 			}
-			end_all_treaties_with_stu = { who = root }
+			end_all_treaties_with_stu = { who = root } # undercoat: moved to scripted effect with on_action
 			root = {
-				end_all_treaties_with_stu = { who = prev }
+				end_all_treaties_with_stu = { who = prev } # undercoat: moved to scripted effect with on_action
 			}
 		}
 	}
@@ -2781,6 +2781,14 @@ country_event = {
 				has_trait = trait_imperial_heir
 			}
 			remove_trait = trait_imperial_heir
+
+			# Treasure Hunters origin - Adds the Adventurous Spirit trait
+			if = {
+				limit = {
+					root = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+				}
+				add_trait_no_notify = leader_trait_adventurous_spirit_3
+			}
 		}
 	}
 }
@@ -3683,27 +3691,32 @@ country_event = {
 	}
 
 	immediate = {
-		create_message = {
-			type = TOAST_TRUCE_IS_OVER
-			localization = TOAST_TRUCE_IS_OVER_DESC
-			days = @toast_important_message_days
-			target = from
-			variable = {
-				type = name
-				localization = ENEMY
-				scope = from
+		if = {
+			limit = {
+				exists = this
 			}
-		}
-		from = {
 			create_message = {
 				type = TOAST_TRUCE_IS_OVER
 				localization = TOAST_TRUCE_IS_OVER_DESC
 				days = @toast_important_message_days
-				target = root
+				target = from
 				variable = {
 					type = name
 					localization = ENEMY
-					scope = root
+					scope = from
+				}
+			}
+			from = {
+				create_message = {
+					type = TOAST_TRUCE_IS_OVER
+					localization = TOAST_TRUCE_IS_OVER_DESC
+					days = @toast_important_message_days
+					target = root
+					variable = {
+						type = name
+						localization = ENEMY
+						scope = root
+					}
 				}
 			}
 		}

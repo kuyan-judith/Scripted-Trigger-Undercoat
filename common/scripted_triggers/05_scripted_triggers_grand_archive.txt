@@ -1,0 +1,891 @@
+#####################################
+# Grand Archive - Scripted Triggers #
+#####################################
+
+#####################
+# Artifact Analysis #
+#####################
+
+can_artifact_analysis_give = {
+	owner = {
+		can_give_specimen = $SPECIMEN$
+		can_artifact_analysis_give_$SPECIMEN$ = yes
+	}
+}
+
+# Xeno Geology
+can_artifact_analysis_give_fossilized_voidworm_tooth = {
+	has_encountered_voidworm = yes
+}
+can_artifact_analysis_give_starmetal = {
+}
+can_artifact_analysis_give_perfectly_faceted_carbon = {
+}
+can_artifact_analysis_give_striated_sand = {
+}
+can_artifact_analysis_give_memorial_stone = {
+}
+
+# Aesthetic Wonder
+can_artifact_analysis_give_crystallized_cutholoid_eye = {
+	has_encountered_cutholoid = yes
+}
+can_artifact_analysis_give_ancient_bust = {
+}
+can_artifact_analysis_give_oiled_fabric = {
+}
+can_artifact_analysis_give_veil_of_selene = {
+}
+can_artifact_analysis_give_uranium_glassware = {
+}
+
+# Historical Items
+can_artifact_analysis_give_tiny_ancient_sarcophagus = {
+}
+can_artifact_analysis_give_chambered_clay_pot = {
+	is_human_species = no
+}
+can_artifact_analysis_give_ancient_kinetic_launcher = {
+}
+can_artifact_analysis_give_sullebaster_control_column = {
+}
+can_artifact_analysis_give_ancient_political_memoir = {
+}
+
+can_artifact_analysis_give_xeno_geology = {
+	OR = {
+		can_artifact_analysis_give = { SPECIMEN = fossilized_voidworm_tooth }
+		can_artifact_analysis_give = { SPECIMEN = starmetal }
+		can_artifact_analysis_give = { SPECIMEN = perfectly_faceted_carbon }
+		can_artifact_analysis_give = { SPECIMEN = striated_sand }
+		can_artifact_analysis_give = { SPECIMEN = memorial_stone }
+	}
+}
+can_artifact_analysis_give_other_than_xeno_geology = {
+	OR = {
+		can_artifact_analysis_give_aesthetic_wonder = yes
+		can_artifact_analysis_give_historical_item = yes
+	}
+}
+
+can_artifact_analysis_give_aesthetic_wonder = {
+	OR = {
+		can_artifact_analysis_give = { SPECIMEN = crystallized_cutholoid_eye }
+		can_artifact_analysis_give = { SPECIMEN = ancient_bust }
+		can_artifact_analysis_give = { SPECIMEN = oiled_fabric }
+		can_artifact_analysis_give = { SPECIMEN = veil_of_selene }
+		can_artifact_analysis_give = { SPECIMEN = uranium_glassware }
+	}
+}
+can_artifact_analysis_give_other_than_aesthetic_wonder = {
+	OR = {
+		can_artifact_analysis_give_xeno_geology = yes
+		can_artifact_analysis_give_historical_item = yes
+	}
+}
+
+can_artifact_analysis_give_historical_item = {
+	OR = {
+		can_artifact_analysis_give = { SPECIMEN = tiny_ancient_sarcophagus }
+		can_artifact_analysis_give = { SPECIMEN = chambered_clay_pot }
+		can_artifact_analysis_give = { SPECIMEN = ancient_kinetic_launcher }
+		can_artifact_analysis_give = { SPECIMEN = sullebaster_control_column }
+		can_artifact_analysis_give = { SPECIMEN = ancient_political_memoir }
+	}
+}
+can_artifact_analysis_give_other_than_historical_item = {
+	OR = {
+		can_artifact_analysis_give_xeno_geology = yes
+		can_artifact_analysis_give_aesthetic_wonder = yes
+	}
+}
+
+###############
+# Collection  #
+###############
+
+can_get_collection_rewards_from_curators = {
+	OR = {
+		AND = {
+			exists = event_target:curator_enclave_country
+			has_communications = event_target:curator_enclave_country
+		}
+		exists = event_target:backup_curator_country
+	}
+	has_country_flag = curator_collection_reward_chain_started
+	NOT = { has_country_flag = attacked_curators }
+	is_homicidal = no
+}
+
+has_received_every_xeno_geology_reward = {
+	has_country_flag = received_collection_stage_1_reward_xeno_geology
+	has_country_flag = received_collection_stage_2_reward_xeno_geology
+	has_country_flag = received_collection_stage_3_reward_xeno_geology
+}
+
+has_received_every_aesthetic_wonder_reward = {
+	has_country_flag = received_collection_stage_1_reward_aesthetic_wonder
+	has_country_flag = received_collection_stage_2_reward_aesthetic_wonder
+	has_country_flag = received_collection_stage_3_reward_aesthetic_wonder
+}
+
+has_received_every_historical_item_reward = {
+	has_country_flag = received_collection_stage_1_reward_historical_item
+	has_country_flag = received_collection_stage_2_reward_historical_item
+	has_country_flag = received_collection_stage_3_reward_historical_item
+}
+
+# this = exhibit
+contains_specimen = {
+	OR = {
+		is_specimen_category = xeno_geology
+		is_specimen_category = aesthetic_wonder
+		is_specimen_category = historical_item
+	}
+}
+
+	###########
+	# Stage 1 #
+	###########
+
+is_eligible_for_collection_stage_1_reward = {
+	AND = {
+		count_exhibit = {
+			limit = {
+				is_exhibit_active = yes
+				is_specimen_category = $CATEGORY$
+			}
+			count >= @curator_reward_first_threshold
+		}
+		NOR = {
+			has_modifier = $MODIFIER_1$
+			has_modifier = $MODIFIER_2$
+		}
+	}
+}
+
+is_eligible_for_collection_stage_1_reward_xeno_geology = {
+	is_eligible_for_collection_stage_1_reward = {
+		CATEGORY = xeno_geology
+		MODIFIER_1 = mineral_insight
+		MODIFIER_2 = void_mining
+	}
+}
+
+is_eligible_for_collection_stage_1_reward_aesthetic_wonder = {
+	is_eligible_for_collection_stage_1_reward = {
+		CATEGORY = aesthetic_wonder
+		MODIFIER_1 = cultural_enrichment
+		MODIFIER_2 = auctioneering_curation
+	}
+}
+
+is_eligible_for_collection_stage_1_reward_historical_item = {
+	is_eligible_for_collection_stage_1_reward = {
+		CATEGORY = historical_item
+		MODIFIER_1 = historical_insight
+		MODIFIER_2 = lessons_from_the_past
+	}
+}
+
+is_eligible_for_collection_stage_1_reward_any_reward = {
+	OR = {
+		is_eligible_for_collection_stage_1_reward_xeno_geology = yes
+		is_eligible_for_collection_stage_1_reward_aesthetic_wonder = yes
+		is_eligible_for_collection_stage_1_reward_historical_item = yes
+	}
+}
+
+is_eligible_collection_stage_1_reward_not_skipped_xeno_geology = {
+	is_eligible_for_collection_stage_1_reward_xeno_geology = yes
+	NOT = { has_country_flag = skipped_collection_stage_1_reward_xeno_geology }
+}
+
+is_eligible_collection_stage_1_reward_not_skipped_aesthetic_wonder = {
+	is_eligible_for_collection_stage_1_reward_aesthetic_wonder = yes
+	NOT = { has_country_flag = skipped_collection_stage_1_reward_aesthetic_wonder }
+}
+
+is_eligible_collection_stage_1_reward_not_skipped_historical_item = {
+	is_eligible_for_collection_stage_1_reward_historical_item = yes
+	NOT = { has_country_flag = skipped_collection_stage_1_reward_historical_item }
+}
+
+is_eligible_collection_stage_1_reward_not_skipped_any = {
+	OR = {
+		is_eligible_collection_stage_1_reward_not_skipped_xeno_geology = yes
+		is_eligible_collection_stage_1_reward_not_skipped_aesthetic_wonder = yes
+		is_eligible_collection_stage_1_reward_not_skipped_historical_item = yes
+	}
+}
+
+has_received_every_stage_1_reward = {
+	has_country_flag = received_collection_stage_1_reward_xeno_geology
+	has_country_flag = received_collection_stage_1_reward_aesthetic_wonder
+	has_country_flag = received_collection_stage_1_reward_historical_item
+}
+
+is_eligible_for_homicidal_collection_stage_1_reward = {
+	AND = {
+		count_exhibit = {
+			limit = {
+				is_exhibit_active = yes
+				is_specimen_category = $CATEGORY$
+			}
+			count >= @curator_reward_first_threshold
+		}
+		NOT = { has_country_flag = received_homicidal_stage_1_reward_$CATEGORY$ }
+	}
+}
+
+is_eligible_for_homicidal_stage_1_reward_any_reward = {
+	OR = {
+		is_eligible_for_homicidal_collection_stage_1_reward = { CATEGORY = xeno_geology }
+		is_eligible_for_homicidal_collection_stage_1_reward = { CATEGORY = aesthetic_wonder }
+		is_eligible_for_homicidal_collection_stage_1_reward = { CATEGORY = historical_item }
+	}
+}
+
+	###########
+	# Stage 2 #
+	###########
+
+is_eligible_for_collection_stage_2_reward = {
+	AND = {
+		count_exhibit = {
+			limit = {
+				is_exhibit_active = yes
+				is_specimen_category = $CATEGORY$
+			}
+			count >= @curator_reward_second_threshold
+		}
+		NOT = { has_country_flag = received_collection_stage_2_reward_$CATEGORY$ }
+	}
+}
+
+is_eligible_for_collection_stage_2_reward_xeno_geology = {
+	is_eligible_for_collection_stage_2_reward = {
+		CATEGORY = xeno_geology
+	}
+}
+
+is_eligible_for_collection_stage_2_reward_aesthetic_wonder = {
+	is_eligible_for_collection_stage_2_reward = {
+		CATEGORY = aesthetic_wonder
+	}
+}
+
+is_eligible_for_collection_stage_2_reward_historical_item = {
+	is_eligible_for_collection_stage_2_reward = {
+		CATEGORY = historical_item
+	}
+}
+
+is_eligible_for_collection_stage_2_reward_any_reward = {
+	OR = {
+		is_eligible_for_collection_stage_2_reward_xeno_geology = yes
+		is_eligible_for_collection_stage_2_reward_aesthetic_wonder = yes
+		is_eligible_for_collection_stage_2_reward_historical_item = yes
+	}
+}
+
+is_eligible_collection_stage_2_reward_not_skipped_xeno_geology = {
+	is_eligible_for_collection_stage_2_reward_xeno_geology = yes
+	NOT = { has_country_flag = skipped_collection_stage_2_reward_xeno_geology }
+}
+
+is_eligible_collection_stage_2_reward_not_skipped_aesthetic_wonder = {
+	is_eligible_for_collection_stage_2_reward_aesthetic_wonder = yes
+	NOT = { has_country_flag = skipped_collection_stage_2_reward_aesthetic_wonder }
+}
+
+is_eligible_collection_stage_2_reward_not_skipped_historical_item = {
+	is_eligible_for_collection_stage_2_reward_historical_item = yes
+	NOT = { has_country_flag = skipped_collection_stage_2_reward_historical_item }
+}
+
+is_eligible_collection_stage_2_reward_not_skipped_any = {
+	OR = {
+		is_eligible_collection_stage_2_reward_not_skipped_xeno_geology = yes
+		is_eligible_collection_stage_2_reward_not_skipped_aesthetic_wonder = yes
+		is_eligible_collection_stage_2_reward_not_skipped_historical_item = yes
+	}
+}
+
+has_received_every_stage_2_reward = {
+	has_country_flag = received_collection_stage_2_reward_xeno_geology
+	has_country_flag = received_collection_stage_2_reward_aesthetic_wonder
+	has_country_flag = received_collection_stage_2_reward_historical_item
+}
+
+is_eligible_for_homicidal_collection_stage_2_reward = {
+	AND = {
+		count_exhibit = {
+			limit = {
+				is_exhibit_active = yes
+				is_specimen_category = $CATEGORY$
+			}
+			count >= @curator_reward_second_threshold
+		}
+		NOT = { has_country_flag = received_homicidal_stage_2_reward_$CATEGORY$ }
+	}
+}
+
+is_eligible_for_homicidal_stage_2_reward_any_reward = {
+	OR = {
+		is_eligible_for_homicidal_collection_stage_2_reward = { CATEGORY  = xeno_geology }
+		is_eligible_for_homicidal_collection_stage_2_reward = { CATEGORY  = aesthetic_wonder }
+		is_eligible_for_homicidal_collection_stage_2_reward = { CATEGORY  = historical_item }
+	}
+}
+
+	###########
+	# Stage 3 #
+	###########
+
+is_eligible_for_collection_stage_3_reward = {
+	AND = {
+		count_exhibit = {
+			limit = {
+				is_exhibit_active = yes
+				is_specimen_category = $CATEGORY$
+			}
+			count >= @collection_max_exhibit_count
+		}
+	}
+	NOT = { has_country_flag = received_collection_stage_3_reward_$CATEGORY$ }
+}
+
+is_eligible_for_collection_stage_3_reward_xeno_geology = {
+	is_eligible_for_collection_stage_3_reward = {
+		CATEGORY = xeno_geology
+	}
+}
+
+is_eligible_for_collection_stage_3_reward_aesthetic_wonder = {
+	is_eligible_for_collection_stage_3_reward = {
+		CATEGORY = aesthetic_wonder
+	}
+}
+
+is_eligible_for_collection_stage_3_reward_historical_item = {
+	is_eligible_for_collection_stage_3_reward = {
+		CATEGORY = historical_item
+	}
+}
+
+is_eligible_for_collection_stage_3_reward_any_reward = {
+	OR = {
+		is_eligible_for_collection_stage_3_reward_xeno_geology = yes
+		is_eligible_for_collection_stage_3_reward_aesthetic_wonder = yes
+		is_eligible_for_collection_stage_3_reward_historical_item = yes
+	}
+}
+
+is_eligible_collection_stage_3_reward_not_skipped_xeno_geology = {
+	is_eligible_for_collection_stage_3_reward_xeno_geology = yes
+	NOT = { has_country_flag = skipped_collection_stage_3_reward_xeno_geology }
+}
+
+is_eligible_collection_stage_3_reward_not_skipped_aesthetic_wonder = {
+	is_eligible_for_collection_stage_3_reward_aesthetic_wonder = yes
+	NOT = { has_country_flag = skipped_collection_stage_3_reward_aesthetic_wonder }
+}
+
+is_eligible_collection_stage_3_reward_not_skipped_historical_item = {
+	is_eligible_for_collection_stage_3_reward_historical_item = yes
+	NOT = { has_country_flag = skipped_collection_stage_3_reward_historical_item }
+}
+
+is_only_eligible_collection_stage_3_reward_not_skipped_xeno_geology = {
+	is_eligible_collection_stage_3_reward_not_skipped_xeno_geology = yes
+}
+
+is_only_eligible_collection_stage_3_reward_not_skipped_aesthetic_wonder = {
+	is_eligible_collection_stage_3_reward_not_skipped_xeno_geology = no
+	is_eligible_collection_stage_3_reward_not_skipped_aesthetic_wonder = yes
+}
+
+is_only_eligible_collection_stage_3_reward_not_skipped_historical_item = {
+	is_eligible_collection_stage_3_reward_not_skipped_xeno_geology = no
+	is_eligible_collection_stage_3_reward_not_skipped_aesthetic_wonder = no
+	is_eligible_collection_stage_3_reward_not_skipped_historical_item = yes
+}
+
+is_eligible_collection_stage_3_reward_not_skipped_any = {
+	OR = {
+		is_eligible_collection_stage_3_reward_not_skipped_xeno_geology = yes
+		is_eligible_collection_stage_3_reward_not_skipped_aesthetic_wonder = yes
+		is_eligible_collection_stage_3_reward_not_skipped_historical_item = yes
+	}
+}
+
+has_received_every_stage_3_reward = {
+	has_country_flag = received_collection_stage_3_reward_xeno_geology
+	has_country_flag = received_collection_stage_3_reward_aesthetic_wonder
+	has_country_flag = received_collection_stage_3_reward_historical_item
+}
+
+is_eligible_for_homicidal_collection_stage_3_reward = {
+	AND = {
+		count_exhibit = {
+			limit = {
+				is_exhibit_active = yes
+				is_specimen_category = $CATEGORY$
+			}
+			count >= @collection_max_exhibit_count
+		}
+		NOT = { has_country_flag = received_homicidal_stage_3_reward_$CATEGORY$ }
+	}
+}
+
+is_eligible_for_homicidal_stage_3_reward_any_reward = {
+	OR = {
+		is_eligible_for_homicidal_collection_stage_3_reward = { CATEGORY  = xeno_geology }
+		is_eligible_for_homicidal_collection_stage_3_reward = { CATEGORY  = aesthetic_wonder }
+		is_eligible_for_homicidal_collection_stage_3_reward = { CATEGORY  = historical_item }
+	}
+}
+
+###################
+# Treasure Troves #
+###################
+
+has_treasure_trove_candidate = {
+	any_planet_within_border = {
+		is_star = no
+		is_colonizable = no
+		NOR = {
+			is_gas_giant = yes # undercoat: moved to scripted trigger
+			has_planet_flag = treasure_trove
+			solar_system = {
+				any_system_planet = {
+					has_planet_flag = treasure_trove_active
+				}
+			}
+		}
+	}
+}
+
+is_planet_eligible_for_treasure_planet = {
+	is_colony = yes
+	has_upgraded_capital = yes
+	has_orbital_bombardment = no
+	# system isn't occupied
+	exists = starbase
+	starbase = { controller = { is_same_value = prev.owner } }
+	is_occupied_flag = no	 # planet isn't occupied
+	has_ground_combat = no
+	is_under_colonization = no
+	any_owned_pop = { has_citizenship_rights = yes } # pops weren't purged
+	NOT = { has_modifier = slave_colony }
+	planet_stability >= @stabilitylevel2	# Planet doesn't have a revolt situation brewing
+	planet_crime < 20	# Planet doesn't have a rebellion situation brewing
+}
+
+should_use_increased_treasure_trove_drops = {
+	OR = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		has_all_treasure_troves_specimens = yes
+	}
+}
+
+has_all_treasure_troves_specimens = {
+	has_specimen = flag_of_the_jaro_lyjo
+	has_specimen = hemterine_magnetic_figurehead
+	has_specimen = sembelami_alms_basket
+	has_specimen = tricorne_of_aussan
+	has_specimen = verdingo_tendril_hook
+}
+
+is_active_treasure_trove_planet = {
+	has_planet_flag = treasure_trove_active
+}
+
+#################
+# Wrangler Jobs #
+#################
+
+has_wrangler_job = {
+	is_regular_empire = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = wrangler_alignment
+	has_warrior_culture = no # undercoat: moved to scripted trigger
+}
+
+has_rancher_job = {
+	is_regular_empire = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = rancher_alignment
+	has_warrior_culture = no # undercoat: moved to scripted trigger
+}
+
+has_trophy_hunter_job = {
+	is_regular_empire = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = trophy_hunter_alignment
+	has_warrior_culture = no # undercoat: moved to scripted trigger
+}
+
+has_animal_handler_job = {
+	is_regular_empire = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = animal_handler_alignment
+	has_warrior_culture = no # undercoat: moved to scripted trigger
+}
+
+has_beastfighter_job = {
+	is_regular_empire = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_warrior_culture = yes # undercoat: moved to scripted trigger
+}
+
+has_drone_wrangler_job = {
+	is_gestalt = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = wrangler_alignment
+}
+
+has_hunter_drone_job = {
+	is_gestalt = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = trophy_hunter_alignment
+}
+
+has_symbiosis_integrator_job = {
+	is_gestalt = yes
+	is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	has_country_flag = animal_handler_alignment
+}
+
+##################
+# Primal Calling #
+##################
+
+has_encountered_tiyanki = {
+	exists = event_target:tiyanki_country
+	has_communications = event_target:tiyanki_country
+}
+
+has_encountered_space_amoeba = {
+	exists = event_target:amoeba_country
+	has_communications = event_target:amoeba_country
+}
+
+has_encountered_crystalline_entity = {
+	exists = event_target:crystal_country
+	has_communications = event_target:crystal_country
+}
+
+has_encountered_voidworm = {
+	exists = event_target:voidworms_country
+	has_communications = event_target:voidworms_country
+}
+
+has_encountered_cutholoid = {
+	exists = event_target:cutholoids_country
+	has_communications = event_target:cutholoids_country
+}
+
+has_encountered_every_fauna = {
+	has_encountered_tiyanki = yes
+	has_encountered_space_amoeba = yes
+	has_encountered_crystalline_entity = yes
+	OR = { # Not encountering voidworms when they don't exist should not block the player
+		voidworms_enabled = no
+		has_encountered_voidworm = yes
+	}
+	OR = { # Not encountering cutholoids when they don't exist should not block the player
+		cutholoids_enabled = no
+		has_encountered_cutholoid = yes
+	}
+}
+
+has_encountered_any_fauna = {
+	OR = {
+		has_encountered_tiyanki = yes
+		has_encountered_space_amoeba = yes
+		has_encountered_crystalline_entity = yes
+		has_encountered_voidworm = yes
+		has_encountered_cutholoid = yes
+	}
+}
+
+has_any_dna = {
+	OR = {
+		has_dna = { ship_category = space_amoeba }
+		has_dna = { ship_category = tiyanki }
+		has_dna = { ship_category = crystalline_entity }
+		has_dna = { ship_category = voidworm }
+		has_dna = { ship_category = cutholoid }
+	}
+}
+
+is_tiyanki_country = {
+	exists = event_target:tiyanki_country
+	is_same_value = event_target:tiyanki_country
+}
+
+is_space_amoeba_country = {
+	exists = event_target:amoeba_country
+	is_same_value = event_target:amoeba_country
+}
+
+is_crystalline_entity_country = {
+	exists = event_target:crystal_country
+	is_same_value = event_target:crystal_country
+}
+
+is_voidworm_country = {
+	exists = event_target:voidworms_country
+	is_same_value = event_target:voidworms_country
+}
+
+is_cutholoid_country = {
+	exists = event_target:cutholoids_country
+	is_same_value = event_target:cutholoids_country
+}
+
+is_fauna_country = {
+	OR = {
+		is_tiyanki_country = yes
+		is_space_amoeba_country = yes
+		is_crystalline_entity_country = yes
+		is_voidworm_country = yes
+		is_cutholoid_country = yes
+	}
+}
+
+is_system_home_to_tiyanki = {
+	any_system_planet = {
+		is_gas_giant = yes # undercoat: moved to scripted trigger
+	}
+}
+
+is_system_home_to_space_amoeba = {
+	is_inside_nebula = yes
+}
+
+is_system_home_to_crystalline_entity = {
+	is_star_class = sc_pulsar
+}
+
+is_system_home_to_voidworm = {
+	is_star_class = sc_black_hole
+}
+
+is_system_home_to_cutholoid = {
+	any_system_planet = {
+		is_asteroid = yes
+	}
+}
+
+gains_genetic_materials_from_fauna_kill = {
+	OR = {
+		is_cordyceptic_empire = yes # undercoat: moved to scripted trigger
+		AND = {
+			is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+			OR = {
+				has_modifier = primal_calling_hunt_modifier
+				has_modifier = primal_calling_feed_modifier
+			}
+		}
+	}
+}
+
+# Used by component templates
+is_design_space_fauna = {
+	is_scope_valid = yes
+	OR = {
+		AND = {
+			is_scope_type = country
+			exists = from
+			from = {
+				OR = {
+					is_scope_type = design
+					is_scope_type = ship
+					is_scope_type = fleet
+				}
+				is_space_fauna = yes
+			}
+		}
+		AND = {
+			OR = {
+				is_scope_type = design
+				is_scope_type = ship
+				is_scope_type = fleet
+			}
+			is_space_fauna = yes
+		}
+	}
+}
+
+##########
+# Civics #
+##########
+is_galactic_curators_empire = {
+	OR = {
+		has_valid_civic = civic_galactic_curators
+		has_valid_civic = civic_hive_galactic_curators
+		has_valid_civic = civic_machine_galactic_curators
+		has_valid_civic = civic_corporate_galactic_curators
+	}
+}
+
+is_beastmasters_empire = {
+	OR = {
+		has_valid_civic = civic_beastmasters
+		has_valid_civic = civic_hive_beastmasters
+		has_valid_civic = civic_machine_beastmasters
+		has_valid_civic = civic_corporate_beastmasters
+	}
+}
+
+#############
+# Mutations #
+#############
+
+cloaking_should_nullify_shield_mutation = {
+	is_cloaked = yes
+}
+
+cloaking_should_nullify_shield_psi_mutation = {
+	cloaking_should_nullify_shield_mutation = yes
+	has_non_psionic_shields_mutation = yes
+}
+
+has_non_psionic_shields_mutation = {
+	OR = {
+		has_component = ENERGY_EPIDERMIS_SMALL
+		has_component = ENERGY_EPIDERMIS_MEDIUM
+		has_component = ENERGY_EPIDERMIS_LARGE
+		has_component = ENERGY_EPIDERMIS_EXTRA_LARGE
+		has_component = IMPROVED_ENERGY_EPIDERMIS_SMALL
+		has_component = IMPROVED_ENERGY_EPIDERMIS_MEDIUM
+		has_component = IMPROVED_ENERGY_EPIDERMIS_LARGE
+		has_component = IMPROVED_ENERGY_EPIDERMIS_EXTRA_LARGE
+		has_component = HIGH_ENERGY_SKIN_SMALL
+		has_component = HIGH_ENERGY_SKIN_MEDIUM
+		has_component = HIGH_ENERGY_SKIN_LARGE
+		has_component = HIGH_ENERGY_SKIN_EXTRA_LARGE
+		has_component = ADVANCED_ENERGY_SKIN_SMALL
+		has_component = ADVANCED_ENERGY_SKIN_MEDIUM
+		has_component = ADVANCED_ENERGY_SKIN_LARGE
+		has_component = ADVANCED_ENERGY_SKIN_EXTRA_LARGE
+		has_component = HYPER_ENERGY_SKIN_SMALL
+		has_component = HYPER_ENERGY_SKIN_MEDIUM
+		has_component = HYPER_ENERGY_SKIN_LARGE
+		has_component = HYPER_ENERGY_SKIN_EXTRA_LARGE
+		has_component = DARK_MATTER_ENERGY_EPIDERMIS_SMALL
+		has_component = DARK_MATTER_ENERGY_EPIDERMIS_MEDIUM
+		has_component = DARK_MATTER_ENERGY_EPIDERMIS_LARGE
+		has_component = DARK_MATTER_ENERGY_EPIDERMIS_EXTRA_LARGE
+		has_component = ANCIENT_SUSPENSION_EPIDERMIS_SMALL
+		has_component = ANCIENT_SUSPENSION_EPIDERMIS_MEDIUM
+		has_component = ANCIENT_SUSPENSION_EPIDERMIS_LARGE
+		has_component = ANCIENT_SUSPENSION_EPIDERMIS_EXTRA_LARGE
+		has_component = ANCIENT_ENERGISED_CARAPACE_SMALL
+		has_component = ANCIENT_ENERGISED_CARAPACE_MEDIUM
+		has_component = ANCIENT_ENERGISED_CARAPACE_LARGE
+		has_component = ANCIENT_ENERGISED_CARAPACE_EXTRA_LARGE
+	}
+}
+
+has_starborne_biology_mutation = {
+	OR = {
+		has_component = STARBORNE_BIOLOGY_SMALL
+		has_component = STARBORNE_BIOLOGY_MEDIUM
+		has_component = STARBORNE_BIOLOGY_LARGE
+		has_component = STARBORNE_BIOLOGY_EXTRA_LARGE
+	}
+}
+
+has_catalytic_bladder_mutation = {
+	OR = {
+		has_component = CATALYTIC_BLADDER_SMALL
+		has_component = CATALYTIC_BLADDER_MEDIUM
+		has_component = CATALYTIC_BLADDER_LARGE
+		has_component = CATALYTIC_BLADDER_EXTRA_LARGE
+	}
+}
+
+has_berserker_glands_mutation = {
+	OR = {
+		has_component = BERSERKER_GLANDS_SMALL
+		has_component = BERSERKER_GLANDS_MEDIUM
+		has_component = BERSERKER_GLANDS_LARGE
+		has_component = BERSERKER_GLANDS_EXTRA_LARGE
+	}
+}
+
+cutholoids_enabled = {
+	cutholoids_scaling > 0
+}
+
+#############
+# Voidworms #
+#############
+
+voidworms_enabled = {
+	voidworms_scaling > 0
+}
+
+is_system_eligible_for_voidworm_respawn = {
+	has_star_flag = voidworms_system
+	check_variable_arithmetic = {
+		which = value:voidworm_ships_owned_in_system
+		value < @voidworms_maximum_in_home_system_for_crisis_respawn
+	}
+}
+
+is_voidworm_eligible_for_respawn = {
+	check_variable_arithmetic = {
+		which = value:voidworm_ships_owned
+		value < value:voidworm_nest_spawn_minimum
+	}
+}
+
+is_voidworm_crisis_eligible_for_respawn = {
+	check_variable_arithmetic = {
+		which = value:voidworm_ships_owned
+		value < value:voidworm_crisis_maximum_population
+	}
+}
+
+is_voidworms_crisis_active = {
+	has_global_flag = voidworms_plague_crisis_started
+	NOT = { has_global_flag = voidworms_plague_crisis_ended }
+}
+
+############
+# Crystals #
+############
+
+is_crystal_ship_size = {
+	OR = {
+		is_ship_size = crystal_ship_small_blue
+		is_ship_size = crystal_ship_medium_blue
+		is_ship_size = crystal_ship_large_blue
+		is_ship_size = crystal_ship_small_blue_elite
+		is_ship_size = crystal_ship_medium_blue_elite
+		is_ship_size = crystal_ship_large_blue_elite
+		is_ship_size = crystal_ship_small_green
+		is_ship_size = crystal_ship_medium_green
+		is_ship_size = crystal_ship_large_green
+		is_ship_size = crystal_ship_small_green_elite
+		is_ship_size = crystal_ship_medium_green_elite
+		is_ship_size = crystal_ship_large_green_elite
+		is_ship_size = crystal_ship_small_yellow
+		is_ship_size = crystal_ship_medium_yellow
+		is_ship_size = crystal_ship_large_yellow
+		is_ship_size = crystal_ship_small_yellow_elite
+		is_ship_size = crystal_ship_medium_yellow_elite
+		is_ship_size = crystal_ship_large_yellow_elite
+		is_ship_size = crystal_ship_small_red
+		is_ship_size = crystal_ship_medium_red
+		is_ship_size = crystal_ship_large_red
+		is_ship_size = crystal_ship_small_red_elite
+		is_ship_size = crystal_ship_medium_red_elite
+		is_ship_size = crystal_ship_large_red_elite
+	}
+}

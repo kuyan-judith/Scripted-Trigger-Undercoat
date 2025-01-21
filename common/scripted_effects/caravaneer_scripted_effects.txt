@@ -206,9 +206,18 @@ cara_generate_deal1 = {
 			0 = {
 				modifier = {
 					add = 1
-					any_owned_ship = {
+					any_owned_fleet = {
 						is_ship_class = shipclass_science_ship
-						NOT = { has_ship_flag = special_science_ship }
+						OR = {
+							NOT = { exists = leader }
+							AND = {
+								exists = leader
+								leader = { is_exploring_astral_rift = no }
+							}
+						}
+						any_owned_ship = {
+							NOT = { has_ship_flag = special_science_ship }
+						}
 					}
 				}
 
@@ -381,20 +390,27 @@ cara_execute_deal1 = {
 
 		else_if = { limit = { has_country_flag = fleet1dealcost5 }
 			custom_tooltip = fleet1dealcost5_tooltip
-			random_controlled_ship = {
+			random_controlled_fleet = {
 				limit = {
 					is_ship_class = shipclass_science_ship
-					NOT = { has_ship_flag = special_science_ship }
+					OR = {
+						NOT = { exists = leader }
+						AND = {
+							exists = leader
+							leader = { is_exploring_astral_rift = no }
+						}
+					}
+					any_owned_ship = {
+						NOT = { has_ship_flag = special_science_ship }
+					}
 				}
 				# exile science officer from ship
 				# and reinstate into pool
-				fleet = {
-					if = {
-						limit = { exists = leader }
-						leader = { unassign_leader = this }
-					}
-					delete_fleet = this
+				if = {
+					limit = { exists = leader }
+					leader = { unassign_leader = this }
 				}
+				delete_fleet = this
 			}
 			remove_country_flag = fleet1dealcost5
 		}

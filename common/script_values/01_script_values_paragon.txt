@@ -80,6 +80,30 @@ ethic_leader_randomizer = {
 	}
 }
 
+council_agenda_early_activation_cost = {
+	# At 10% progress, returns 1, 2000 * Empire Size
+	# At 50% progress, returns 0.12, Or 250 * Empire Size
+	# At 70% progress, returns 0.03. Cost tweaked to be 64 * Empire Size
+	# At 90% progress, returns 0.015. Or 30 * Empire Size
+	# Cost = MIN(EmpireSize - 100, 10) * 2000 * (0.008 + 1 / (POW(progress * 3, 5) + 1.008))
+	base = -100
+	add = trigger:empire_size
+	min = 0
+	add = 10
+	mult = 0.1	# Ceil up to even 10.
+	ceiling = yes
+	mult = 10
+	mult = 2000	# Tweaked multiplier.
+
+	# Apply curve multiplier, depending on current Agenda's progress.
+	mult = value:council_agenda_early_activation_cost_curve
+
+	# Rounded to closest 100
+	divide = 100
+	round = yes
+	mult = 100
+}
+
 # At   0% progress, returns 1.00
 # At  10% progress, returns 0.75
 # At  50% progress, returns 0.10
@@ -120,7 +144,7 @@ leader_class_government_match_bonus_mult = {
 		mult = 1.2
 		OR = {
 			AND = { # COMMANDER good.
-				leader_is_commander_stu = yes
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 				owner = {
 					OR = {
 						has_government = gov_star_empire
@@ -146,7 +170,7 @@ leader_class_government_match_bonus_mult = {
 				}
 			}
 			AND = { # SCIENTIST good.
-				leader_is_scientist_stu = yes
+				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 				owner = {
 					OR = {
 						has_government = gov_irenic_monarchy
@@ -165,7 +189,7 @@ leader_class_government_match_bonus_mult = {
 				}
 			}
 			AND = { # OFFICIAL good.
-				leader_is_official_stu = yes
+				leader_is_official_stu = yes # undercoat: moved to scripted trigger
 				owner = {
 					OR = {
 						has_government = gov_theocratic_monarchy

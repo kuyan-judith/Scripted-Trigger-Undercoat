@@ -72,14 +72,13 @@ overlord_has_num_armies_on_planet = {
 	}
 }
 
-# undercoat: removed assumption of being in root scope
 overlord_has_more_than_num_armies_on_planet = {
 	count_planet_army = {
 		count > $NUM$
 		limit = {
 			exists = owner
-			exists = prev.owner
-			prev.owner = { has_overlord = PREV.owner }
+			exists = ROOT.owner
+			ROOT.owner = { has_overlord = PREV.owner }
 		}
 	}
 }
@@ -155,7 +154,7 @@ is_merc_enclave_founding_allowed = {
 						is_hostile = prevprevprev.owner
 					}
 				}
-			}	
+			}
 		}
 	}
 	custom_tooltip = {
@@ -200,6 +199,14 @@ is_merc_enclave_founding_allowed = {
 			has_ship_owner_type = galactic_community
 		}
 	}
+	custom_tooltip = {
+		fail_text = enclave.2.tooltip.g
+		NOT = {
+			any_owned_ship = {
+				is_space_fauna = yes
+			}
+		}
+	}
 }
 
 ######################
@@ -229,7 +236,7 @@ shroudwalker_insight_save_spynetwork_trigger = {
 			NOT = {
 				any_spynetwork = {
 					owner = { is_same_value = root }
-					target = { 
+					target = {
 						is_playable = yes # undercoat: moved to scripted trigger
 						is_same_value = event_target:$EVENT_TARGET$
 					}

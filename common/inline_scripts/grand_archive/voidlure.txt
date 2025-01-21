@@ -1,0 +1,150 @@
+voidlure_$CATEGORY$ = {
+	name = {
+		trigger = {
+			OR = {
+				is_scope_valid = no
+				owner = {
+					has_encountered_$CATEGORY$ = yes
+				}
+			}
+		}
+		text = sm_voidlure_$CATEGORY$
+	}
+	name = {
+		trigger = {
+			is_scope_valid = yes
+			owner = {
+				has_encountered_$CATEGORY$ = no
+			}
+		}
+		text = sm_voidlure
+	}
+
+	desc = {
+		trigger = {
+			OR = {
+				is_scope_valid = no
+				owner = {
+					has_encountered_$CATEGORY$ = yes
+				}
+			}
+		}
+		text = sm_voidlure_$CATEGORY$_desc
+	}
+	desc = {
+		trigger = {
+			is_scope_valid = yes
+			owner = {
+				has_encountered_$CATEGORY$ = no
+			}
+		}
+		text = sm_voidlure_desc
+	}
+
+	icon = {
+		trigger = {
+			OR = {
+				is_scope_valid = no
+				owner = {
+					has_encountered_$CATEGORY$ = yes
+				}
+			}
+		}
+		text = "GFX_starbase_voidlure_$CATEGORY$"
+	}
+	icon = {
+		trigger = {
+			is_scope_valid = yes
+			owner = {
+				has_encountered_$CATEGORY$ = no
+			}
+		}
+		text = "GFX_starbase_voidlure"
+	}
+
+	construction_days = @b1_time
+
+	potential = {
+		exists = owner
+		owner = {
+			OR = {
+				has_tradition = tr_domestication_finish
+				is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+			}
+			OR = {
+				has_encountered_$CATEGORY$ = yes
+				has_country_flag = force_voidlure_without_communication
+			}
+		}
+	}
+
+	possible = {
+		solar_system = {
+			is_system_home_to_$CATEGORY$ = yes
+		}
+	}
+
+	resources = {
+		category = starbase_buildings
+		cost = {
+			alloys = 100
+		}
+		upkeep = {
+			energy = @b2_upkeep
+		}
+	}
+
+	country_modifier = {
+		country_vivarium_max_capacity_add = 5
+	}
+
+	on_finished = {
+		owner = {
+			set_country_flag = voidlure_built_$CATEGORY$
+		}
+		if = {
+			limit = {
+				NOT = { has_starbase_flag = recently_built_voidlure_$CATEGORY$ }
+			}
+			set_timed_starbase_flag = {
+				flag = recently_built_voidlure_$CATEGORY$
+				days = @voidlures_capture_delay
+			}
+			set_timed_starbase_flag = {
+				flag = capture_cooldown_for_$CATEGORY$
+				days = @voidlures_capture_delay
+			}
+			starbase_event = {
+				id = $SPAWN_EVENT_ID$
+				days = @voidlures_capture_delay
+			}
+		}
+	}
+
+	scripted_effect_cooldown = @voidlures_capture_delay
+	scripted_effect_cooldown_flag = capture_cooldown_for_$CATEGORY$
+	scripted_effect_cooldown_flag_desc = {
+		trigger = {
+			OR = {
+				is_scope_valid = no
+				owner = {
+					has_encountered_$CATEGORY$ = yes
+				}
+			}
+		}
+		text = capture_cooldown_for_$CATEGORY$_desc
+	}
+	scripted_effect_cooldown_flag_desc = {
+		trigger = {
+			is_scope_valid = yes
+			owner = {
+				has_encountered_$CATEGORY$ = no
+			}
+		}
+		text = capture_cooldown_desc
+	}
+
+	ai_weight = {
+		weight = 100 #use same weight here - ai weighting is done in starbase_types.txt
+	}
+}

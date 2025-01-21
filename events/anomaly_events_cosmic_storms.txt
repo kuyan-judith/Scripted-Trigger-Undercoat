@@ -885,7 +885,10 @@ ship_event = {
 				}
 			}
 			if = {
-				limit = { NOT = { has_technology = tech_alien_life_studies } }
+				limit = { 
+					is_regular_empire = yes
+					NOT = { has_technology = tech_alien_life_studies }
+				}
 				add_research_option = tech_alien_life_studies
 				add_tech_progress = {
 					tech = tech_alien_life_studies
@@ -950,10 +953,32 @@ ship_event = {
 				}
 			}
 		}
+		hidden_effect = {
+			if = {
+				limit = {
+					exists = event_target:tiyanki_garrison_country
+					event_target:tiyanki_garrison_country = {
+						is_hostile = prev.controller
+					}
+				}
+				controller = {
+					# Reset hostility so we can spawn the tiyankis without issues
+					set_faction_hostility = {
+						target = event_target:tiyanki_garrison_country
+						set_hostile = no
+						set_neutral = yes
+						set_friendly = no
+					}
+				}
+			}
+			else = {
+				create_tiyanki_garrison_country = yes
+			}
+		}
 		create_fleet = {
 			name = "NAME_Tiyanki_Space_Whale"
 			effect = {
-				set_owner = event_target:tiyanki_country
+				set_owner = event_target:tiyanki_garrison_country
 				while = {
 					count = 3
 					create_ship = {
@@ -969,11 +994,8 @@ ship_event = {
 					angle = random
 				}
 				set_fleet_stance = passive
-				set_aggro_range_measure_from = self
+				set_aggro_range_measure_from = return_point
 				set_aggro_range = 0
-				set_fleet_settings = {
-					garrison = yes
-				}
 				save_event_target_as = displaced_tiyanki_fleet
 			}
 		}
@@ -1035,6 +1057,27 @@ ship_event = {
 		}
 	}
 
+	option = {
+		name = cstorms.5090.c
+		trigger = {
+			has_grand_archive_dlc = yes
+			controller = {
+				check_variable_arithmetic = {
+					which = value:get_vivarium_slots_left
+					value >= 3
+				}
+				has_technology = tech_gravity_wells	
+			}
+		}
+		custom_tooltip = cstorms.5090.c.tt
+		controller = {
+			while = {
+				count = 3
+				add_to_vivarium = { design = NAME_Tiyanki_Hatchling }
+			}
+		}
+	}
+
 	after = {
 		hidden_effect = {
 			controller = {
@@ -1067,9 +1110,7 @@ ship_event = {
 
 	immediate = {
 		event_target:displaced_tiyanki_fleet = {
-			set_fleet_settings = {
-				garrison = no
-			}
+			set_owner = event_target:tiyanki_country
 			set_fleet_flag = NAME_Tiyanki_Space_Whale
 			every_owned_ship = {
 				remove_ship_flag = displaced_tiyanki_hatchling

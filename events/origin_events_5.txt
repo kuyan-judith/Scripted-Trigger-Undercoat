@@ -15,7 +15,22 @@ namespace = origin
 country_event = {
 	id = origin.7000
 	title = origin.7000.name
-	desc = origin.7000.desc
+	desc = {
+		trigger = {
+			owner = {
+				is_beastmasters_empire = no
+			}
+		}
+		text = origin.7000.desc.default
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_beastmasters_empire = yes
+			}
+		}
+		text = origin.7000.desc.beastmasters
+	}
 	picture = GFX_evt_tiyanki_family
 	show_sound = evn_ove_tiyanki_family
 	is_triggered_only = yes
@@ -369,7 +384,6 @@ country_event = {
 				}
 				set_fleet_flag = fruitful_seeded_critter
 				save_event_target_as = seeded_fleet
-				fruitful_add_seed_to_critter = yes # changes the name to display the seed icon
 
 				solar_system.owner = {
 					set_country_flag = put_seed_on@event_target:seeded_fleet # used to notify players once the seed lands on a planet
@@ -434,7 +448,6 @@ fleet_event = {
 	immediate = {
 		set_fleet_flag = fruitful_seeded_critter
 		save_event_target_as = seeded_fleet
-		fruitful_add_seed_to_critter = yes
 
 		from.owner = {
 			set_country_flag = put_seed_on@event_target:seeded_fleet # used to notify players once the seed lands on a planet
@@ -485,7 +498,6 @@ fleet_event = {
 	immediate = {
 		set_fleet_flag = fruitful_seeded_critter
 		save_event_target_as = seeded_fleet
-		fruitful_add_seed_to_critter = yes # changes the name to display the seed icon
 
 		from.owner = {
 			set_country_flag = put_seed_on@event_target:seeded_fleet # used to notify players once the seed lands on a planet
@@ -523,6 +535,11 @@ country_event = {
 
 	trigger = {
 		is_fruitful_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = fruitful_partnership_tutorial_bubbles  }
+	}
+
+	immediate = {
+		set_country_flag = fruitful_partnership_tutorial_bubbles
 	}
 
 	option = {
@@ -530,6 +547,30 @@ country_event = {
 	}
 }
 
+# Spawn seeds on newly built fauna ship
+# Root = Ship
+# From = Planet
+ship_event = {
+	id = origin.7305
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_space_fauna = yes
+		owner = {
+			is_fruitful_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		fleet = {
+			fleet_event = {
+				id = origin.7303
+				scopes = { from = from }
+			}
+		}
+	}
+}
 
 # Seeded critters have a chance of leaving seed on planet (HIDDEN) | fired by on_entering_system_fleet
 # Scope = Fleet
@@ -540,8 +581,11 @@ fleet_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		controller = {
+			is_fauna_country = yes # random seeding is only for wild space fauna
+		}
 		has_fleet_flag = fruitful_seeded_critter
-		from  = {
+		from = {
 			# we're looking for an habitable planet with no seeds.
 			any_system_planet = {
 				is_valid_planet_for_seed = yes
@@ -581,7 +625,7 @@ fleet_event = {
 	}
 }
 
-# Seeded critters leave seed on planet
+# Seeded critters leave seed on planet (AI country)
 # Scope = Fleet
 # Fromfrom = System
 fleet_event = {
@@ -637,117 +681,9 @@ fleet_event = {
 					}
 					effect = {
 						id = garden.critters.2@root
-						set_planet_flag = seeds_planted_by@event_target:seeds_owner
-						set_surveyed = {
-							surveyed = yes
-							surveyor = event_target:seeds_owner
-						}
-						# If the planet has an owner:
-						# YOU
-						# - Get a positive opinion modifier
-						# THEM
-						# - Get a planet modifier (nice forests) or levels up an existing one
-						# - Get a decision to remove the modifier
-						if = {
-							limit = {
-								exists = owner
-							}
-							switch = {
-								trigger = has_modifier
-								seeded_planet_1_modifier = {
-									add_modifier = {
-										modifier = seeded_planet_2_modifier
-									}
-									remove_modifier = seeded_planet_1_modifier
-								}
-								seeded_planet_2_modifier = {
-									add_modifier = {
-										modifier = seeded_planet_3_modifier
-									}
-									remove_modifier = seeded_planet_2_modifier
-								}
-								default = {
-									add_modifier = {
-										modifier = seeded_planet_1_modifier
-									}
-								}
-							}
-							if = {
-								limit = {
-									owner = {
-										NOT = { is_same_value = event_target:seeds_owner }
-									}
-								}
-								planet_event = { id = origin.7327 days = 1 }
-								owner = {
-									add_opinion_modifier = {
-										modifier = opinion_nice_forests
-										who = event_target:seeds_owner
-									}
-								}
-							}
-							# notify the seeds owner
-							event_target:seeds_owner = {
-								remove_country_flag = put_seed_on@event_target:seeded_fleet
-								set_country_flag = seed_on_planet@event_target:seeded_planet
-								set_visited = fromfrom
-								create_message = {
-									type = MESSAGE_FRUITFUL_SEED_PLANTED
-									localization = MESSAGE_FRUITFUL_SEED_PLANTED_OWNER
-									days = 30
-									target = event_target:seeded_planet
-									variable = {
-										type = name
-										localization = PLANET
-										scope = event_target:seeded_planet
-									}
-									variable = {
-										type = name
-										localization = SYSTEM
-										scope = fromfrom
-									}
-								}
-							}
-						}
-						# If the planet has no owner:
-						# YOU
-						# - Get a planet modifier (dormant seed pod)
-						# - Get a special project to open it, colonizing the planet
-						else = {
-							add_modifier = {
-								modifier = seeded_planet_0_modifier
-							}
-							enable_special_project = {
-								name = OPEN_SEED_PODS_PROJECT
-								owner = event_target:seeds_owner
-								location = this
-							}
-							# notify the seeds owner
-							event_target:seeds_owner = {
-								remove_country_flag = put_seed_on@event_target:seeded_fleet
-								set_country_flag = seed_on_planet@event_target:seeded_planet
-								set_visited = fromfrom
-								create_message = {
-									type = MESSAGE_FRUITFUL_SEED_PLANTED
-									localization = MESSAGE_FRUITFUL_SEED_PLANTED_NO_OWNER
-									days = 30
-									target = event_target:seeded_planet
-									variable = {
-										type = name
-										localization = PLANET
-										scope = event_target:seeded_planet
-									}
-									variable = {
-										type = name
-										localization = SYSTEM
-										scope = fromfrom
-									}
-								}
-							}
-						}
-						prev = {
-							fruitful_remove_seed_to_critter = yes
-							remove_fleet_flag = fruitful_seeded_critter
+						plant_fruitful_seeds = {
+							SEEDS_OWNER = event_target:seeds_owner
+							SEEDED_FLEET = event_target:seeded_fleet
 						}
 					}
 				}
@@ -761,6 +697,36 @@ fleet_event = {
 				NOT = { has_global_flag = fruitful_first_colony }
 			}
 			set_global_flag = fruitful_first_colony
+		}
+	}
+}
+
+# Seeded critters leave seed on planet (player country)
+#From = Planet/Starbase/Megastructure scope
+#This = Fleet scope
+fleet_event = {
+	id = origin.7315
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_space_fauna = yes
+		controller = {
+			is_fauna_country = no
+		}
+		has_fleet_flag = fruitful_seeded_critter
+		from = {
+			is_scope_type = planet
+			is_valid_planet_for_seed = yes
+		}
+	}
+
+	immediate = {
+		from = {
+			plant_fruitful_seeds = {
+				SEEDS_OWNER = root.controller
+				SEEDED_FLEET = root
+			}
 		}
 	}
 }

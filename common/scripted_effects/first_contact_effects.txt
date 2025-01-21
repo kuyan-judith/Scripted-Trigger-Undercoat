@@ -89,6 +89,10 @@ set_first_contact_starting_stage = {
 					drone = { setup_first_contact_path = { TYPE = drones } }
 					drone_faction = { setup_first_contact_path = { TYPE = drones } }
 					cloud = { setup_first_contact_path = { TYPE = void_clouds } }
+					voidworms = { setup_first_contact_path = { TYPE = voidworms } }
+					voidworms_crisis = { setup_first_contact_path = { TYPE = voidworms } }
+					voidworms_treasure_hunters = { setup_first_contact_path = { TYPE = voidworms } }
+					cutholoids = { setup_first_contact_path = { TYPE = cutholoids } }
 					# NPC factions
 					dormant_marauders = { setup_first_contact_path = { TYPE = marauders } }
 					pirate = { setup_first_contact_path = { TYPE = pirates } }
@@ -454,6 +458,92 @@ finish_first_contact_effect = {
 					}
 				}
 			}
+			voidworms_first_contact = {
+				owner = {
+					set_country_flag = voidworms_encountered
+					hidden_effect = { country_event = { id = tutorial.61 } }
+					if = {
+						limit = {
+							any_active_first_contact = {
+								NOT = { is_same_value = root }
+								contact_country = {
+									is_voidworms_country_type = yes
+								}
+							}
+						}
+						every_active_first_contact = {
+							limit = {
+								NOT = { is_same_value = root }
+								contact_country = {
+									is_voidworms_country_type = yes
+								}
+							}
+							custom_tooltip = further_fc_voidworms_completed
+						}
+					}
+				}
+				hidden_effect = {
+					every_country = {
+						limit = {
+							NOT = { is_same_value = root.contact_country }
+							NOT = { has_communications = root.owner }
+							is_voidworms_country_type = yes
+						}
+						root.owner = {
+							establish_communications_no_message = prev
+							establish_communication_with_subjects_and_federation = { FLAG = voidworms_encountered }
+						}
+					}
+					root.contact_country = {
+						root.owner = {
+							establish_communication_with_subjects_and_federation = { FLAG = voidworms_encountered }
+						}
+					}
+				}
+			}
+			cutholoids_first_contact = {
+				owner = {
+					set_country_flag = cutholoids_encountered
+					hidden_effect = { country_event = { id = tutorial.61 } }
+					if = {
+						limit = {
+							any_active_first_contact = {
+								NOT = { is_same_value = root }
+								contact_country = {
+									is_cutholoids_country_type = yes
+								}
+							}
+						}
+						every_active_first_contact = {
+							limit = {
+								NOT = { is_same_value = root }
+								contact_country = {
+									is_cutholoids_country_type = yes
+								}
+							}
+							custom_tooltip = further_fc_cutholoids_completed
+						}
+					}
+				}
+				hidden_effect = {
+					every_country = {
+						limit = {
+							NOT = { is_same_value = root.contact_country }
+							NOT = { has_communications = root.owner }
+							is_cutholoids_country_type = yes
+						}
+						root.owner = {
+							establish_communications_no_message = prev
+							establish_communication_with_subjects_and_federation = { FLAG = cutholoids_encountered }
+						}
+					}
+					root.contact_country = {
+						root.owner = {
+							establish_communication_with_subjects_and_federation = { FLAG = cutholoids_encountered }
+						}
+					}
+				}
+			}
 			caravaneers_first_contact = {
 				contact_country = {
 					hidden_effect = { country_event = { id = tutorial.63 } }
@@ -712,6 +802,27 @@ finish_first_contact_effect = {
 						country_event = { id = nomad.10 }
 					}
 				}
+			}
+		}
+	}
+
+	owner = {
+		if = {
+			limit = {
+				is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+				root.contact_country = { is_fauna_country = yes }
+				NOT = { has_country_flag = primal_calling_fc_gravity_wells_insight_given }
+				NOT = { has_technology = tech_gravity_wells }
+			}
+			tooltip = {
+				add_tech_progress = {
+					tech = tech_gravity_wells
+					progress = 0.25
+				}
+			}
+			hidden_effect = {
+				country_event = { id = grand_archive.9950 days = 1 } # delay by 1 day for tech fauna encounter prereq to be fulfilled
+				set_country_flag = primal_calling_fc_gravity_wells_insight_given
 			}
 		}
 	}

@@ -53,113 +53,118 @@ generate_chosen_pre_ftls_on_planet = {
 
 # This is called before the pre-ftl species is created due to interactions between various origins and the pop creation effect.
 select_pre_ftl_origin = {
-	# Void Dwellers
 	if = {
 		limit = {
-			is_habitat = yes # undercoat: moved to scripted trigger
+			NOT = { has_planet_flag = pre_ftl_default }
 		}
-		set_planet_flag = pre_ftl_void_dwellers
-	}
-	else_if = {
-		limit = {
-			is_unshattered_ring_habitable_segment = yes # undercoat: moved to scripted trigger
+		# Void Dwellers
+		if = {
+			limit = {
+				is_habitat = yes # undercoat: moved to scripted trigger
+			}
+			set_planet_flag = pre_ftl_void_dwellers
 		}
-		# Do nothing!
-	}
-	else_if = {
-		limit = { is_shattered_ring_habitable = yes } # undercoat: moved to scripted trigger
-		set_planet_flag = pre_ftl_shattered_ring
-	}
-	else = {
-		random_list = {
-			# Default pre-ftl origin
-			# All other origins require First Contact.
-			100 = { set_planet_flag = pre_ftl_default }
-
-			# Mechanists (requires Utopia)
-			5 = {
-				modifier = {
-					factor = 0
-					OR = {
-						has_first_contact_dlc = no
-						has_utopia = no
-						has_planet_flag = pre_ftl_hive_mind
-						any_galaxy_planet = {
-							has_planet_flag = pre_ftl_mechanists
-						}
-					}
-				}
-				set_planet_flag = pre_ftl_mechanists
+		else_if = {
+			limit = {
+				is_unshattered_ring_habitable_segment = yes # undercoat: moved to scripted trigger
 			}
+			# Do nothing!
+		}
+		else_if = {
+			limit = { is_shattered_ring_habitable = yes } # undercoat: moved to scripted trigger
+			set_planet_flag = pre_ftl_shattered_ring
+		}
+		else = {
+			random_list = {
+				# Default pre-ftl origin
+				# All other origins require First Contact.
+				100 = { set_planet_flag = pre_ftl_default }
 
-			# Life-Seeded (requires Apocalypse)
-			5 = {
-				modifier = {
-					factor = 0
-					NOT = {
-						host_has_dlc = "Apocalypse"
+				# Mechanists (requires Utopia)
+				5 = {
+					modifier = {
+						factor = 0
+						OR = {
+							has_first_contact_dlc = no
+							has_utopia = no
+							has_planet_flag = pre_ftl_hive_mind
+							any_galaxy_planet = {
+								has_planet_flag = pre_ftl_mechanists
+							}
+						}
 					}
+					set_planet_flag = pre_ftl_mechanists
 				}
-				modifier = {
-					factor = 0
-					OR = {
-						has_first_contact_dlc = no
+
+				# Life-Seeded (requires Apocalypse)
+				5 = {
+					modifier = {
+						factor = 0
+						NOT = {
+							host_has_dlc = "Apocalypse"
+						}
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							has_first_contact_dlc = no
+							any_galaxy_planet = {
+								has_planet_flag = pre_ftl_life_seeded
+							}
+							any_country = {
+								is_life_seeded_empire = yes # undercoat: moved to scripted trigger
+							}
+						}
+					}
+					set_planet_flag = pre_ftl_life_seeded
+					change_pc = pc_gaia
+					create_life_seeded_planet = yes
+				}
+
+				# Ocean Paradise (Requires Aquatics)
+				5 = {
+					modifier = {
+						factor = 0
+						OR = {
+							has_aquatics = no
+							has_first_contact_dlc = no
+						}
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							any_galaxy_planet = {
+								has_planet_flag = pre_ftl_ocean_paradise
+							}
+							any_country = {
+								has_origin = origin_ocean_paradise
+							}
+						}
+					}
+					set_planet_flag = pre_ftl_ocean_paradise
+					change_pc = pc_ocean
+					set_planet_size = 30
+					create_ocean_paradise_planet = yes
+				}
+
+				# Subterranean (requires Overlord)
+				5 = {
+					modifier = {
+						factor = 0
+						OR = {
+							has_overlord_dlc = no
+							has_first_contact_dlc = no
+						}
+
+					}
+					modifier = {
+						factor = 0
 						any_galaxy_planet = {
-							has_planet_flag = pre_ftl_life_seeded
-						}
-						any_country = {
-							is_life_seeded_empire = yes # undercoat: moved to scripted trigger
+							has_planet_flag = pre_ftl_subterranean
 						}
 					}
+					set_planet_flag = pre_ftl_subterranean
 				}
-				set_planet_flag = pre_ftl_life_seeded
-				change_pc = pc_gaia
-				create_life_seeded_planet = yes
-			}
-
-			# Ocean Paradise (Requires Aquatics)
-			5 = {
-				modifier = {
-					factor = 0
-					OR = {
-						has_aquatics = no
-						has_first_contact_dlc = no
-					}
-				}
-				modifier = {
-					factor = 0
-					OR = {
-						any_galaxy_planet = {
-							has_planet_flag = pre_ftl_ocean_paradise
-						}
-						any_country = {
-							has_origin = origin_ocean_paradise
-						}
-					}
-				}
-				set_planet_flag = pre_ftl_ocean_paradise
-				change_pc = pc_ocean
-				set_planet_size = 30
-				create_ocean_paradise_planet = yes
-			}
-
-			# Subterranean (requires Overlord)
-			5 = {
-				modifier = {
-					factor = 0
-					OR = {
-						has_overlord_dlc = no
-						has_first_contact_dlc = no
-					}
-
-				}
-				modifier = {
-					factor = 0
-					any_galaxy_planet = {
-						has_planet_flag = pre_ftl_subterranean
-					}
-				}
-				set_planet_flag = pre_ftl_subterranean
 			}
 		}
 	}

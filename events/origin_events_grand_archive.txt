@@ -1,0 +1,7139 @@
+################################
+# Grand Archive Origins Events #
+################################
+
+namespace = grand_archive
+
+# Home system initialization Primal Calling
+country_event = {
+	id = grand_archive.1000
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		capital_star.solar_system = {
+			if = {
+				limit = {
+					NOT = {
+						any_system_planet = {
+							is_gas_giant = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+				ordered_system_planet = {
+					order_by = value:distance_to_system_star
+					save_event_target_as = furthest_planet_from_system_star
+				}
+				set_variable = {
+					which = local_distance_from_star
+					value = 15
+				}
+				event_target:furthest_planet_from_system_star = {
+					change_variable = {
+						which = local_distance_from_star
+						value = value:distance_to_system_star
+					}
+				}
+				spawn_planet = {
+					class = pc_gas_giant
+					location = star
+					orbit_location = yes
+					orbit_angle_offset = 45
+					orbit_distance_offset = local_distance_from_star
+					size = 25
+					has_ring = yes
+					# Undercoat on_action
+					init_effect = {
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+			}
+		}
+		set_country_flag = wrangler_alignment
+		if = {
+			limit = {
+				NOT = { has_civic = civic_guided_sapience }
+			}
+			add_tech_option_or_research_effect = {
+				TECH = tech_alien_life_studies
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+		}
+		capital_scope = {
+			add_modifier = { modifier = untamed_wilds days = -1 }
+		}
+		set_country_flag = force_voidlure_without_communication
+		solar_system = {
+			if = {
+				limit = { exists = starbase }
+				starbase = {
+					remove_starbase_module = { slot = 2 module = all }
+					set_starbase_module = { slot = 2 module = vivarium_tank }
+					remove_starbase_building = { slot = 1 building = all }
+					set_starbase_building = { slot = 1 building = voidlure_tiyanki }
+					remove_starbase_flag = capture_cooldown_for_tiyanki
+				}
+			}
+		}
+		remove_country_flag = force_voidlure_without_communication
+		country_event = { id = grand_archive.7010 days = 30 }
+	}
+}
+
+# From = space fauna
+# FROMFROM = contact system
+country_event = {
+	id = grand_archive.1001
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+		from = { is_capturable_space_critter_country_type = yes }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				check_variable = {
+					which = space_fauna_contacted
+					value = 1
+				}
+				NOT = { has_country_flag = origin_primal_calling_alignment_chosen }
+			}
+			set_country_flag = origin_primal_calling_alignment_chosen
+			country_event = {
+				id = grand_archive.1002
+				days = 30
+				scopes = { from = from }
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = space_fauna_contacted
+					value = 3
+				}
+				NOT = { has_country_flag = origin_primal_calling_debris_spawned }
+			}
+			set_country_flag = origin_primal_calling_debris_spawned
+			country_event = {
+				id = grand_archive.1060
+				days = 1
+				scopes = {
+					from = from
+					fromfrom = fromfrom
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_encountered_every_fauna = yes
+				NOT = { has_country_flag = origin_primal_calling_paragon_met }
+			}
+			set_country_flag = origin_primal_calling_paragon_met
+			random_list = {
+				1 = {
+					modifier = {
+						factor = 0
+						is_homicidal = no
+						check_variable = {
+							which = hunted_space_fauna
+							value < 2
+						}
+					}
+					# Hunter Paragon Leader
+					if = {
+						limit = { is_homicidal = yes }
+						country_event = {
+							id = grand_archive.1069
+							days = 180
+							scopes = { from = fromfrom }
+						}
+					}
+					else = {
+						country_event = {
+							id = grand_archive.1070
+							days = 180
+							scopes = { from = fromfrom }
+						}
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						OR = {
+							check_variable = {
+								which = hunted_space_fauna
+								value > 2
+							}
+							is_homicidal = yes
+						}
+					}
+					# Researcher Paragon Leader
+					country_event = {
+						id = grand_archive.1080
+						days = 180
+						scopes = { from = fromfrom }
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1002
+	title = grand_archive.1002.name
+	desc = {
+		trigger = { is_homicidal = no }
+		text = grand_archive.1002.desc.default
+	}
+	desc = {
+		trigger = { is_homicidal = yes }
+		text = grand_archive.1002.desc.homicidal
+	}
+	picture = GFX_evt_primal_calling
+	show_sound = ga_event_hunter_fanfare_announcement
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = primal_calling_alignment_chosen }
+	}
+
+	immediate = {
+		set_country_flag = primal_calling_alignment_chosen
+	}
+
+	option = {
+		name = grand_archive.1002.a
+		trigger = { is_gestalt = no }
+		custom_tooltip = primal_calling_exhibit_bonus_tt
+		refresh_primal_calling_exhibit_modifier = yes
+	}
+
+	option = {
+		name = grand_archive.1002.b
+		trigger = { is_gestalt = no }
+		custom_tooltip = primal_calling_exploit_bonus_tt
+		refresh_primal_calling_exploit_modifier = yes
+		hidden_effect = {
+			remove_country_flag = wrangler_alignment
+			set_country_flag = rancher_alignment
+		}
+	}
+
+	option = {
+		name = grand_archive.1002.c
+		trigger = { is_gestalt = no }
+		allow = {
+			OR = {
+				is_xenophile = yes
+				is_pacifist = yes
+			}
+		}
+		custom_tooltip = primal_calling_shelter_bonus_tt
+		add_modifier = {
+			modifier = primal_calling_shelter_modifier
+			days = -1
+		}
+		hidden_effect = {
+			remove_country_flag = wrangler_alignment
+			set_country_flag = animal_handler_alignment
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				NOT = { has_valid_civic = civic_fanatic_purifiers }
+			}
+			text = grand_archive.1002.d
+		}
+		name = {
+			trigger = {
+				has_valid_civic = civic_fanatic_purifiers
+			}
+			text = grand_archive.1002.d.purifier
+		}
+		trigger = { is_gestalt = no }
+		allow = {
+			OR = {
+				is_xenophobe = yes
+				is_militarist = yes
+			}
+		}
+		custom_tooltip = primal_calling_hunt_bonus_tt
+		add_modifier = {
+			modifier = primal_calling_hunt_modifier
+			days = -1
+		}
+		hidden_effect = {
+			remove_country_flag = wrangler_alignment
+			set_country_flag = trophy_hunter_alignment
+		}
+	}
+
+	option = {
+		name = grand_archive.1002.e
+		trigger = { is_gestalt = yes }
+		allow = {
+			NOT = { has_valid_civic = civic_hive_devouring_swarm }
+		}
+		custom_tooltip = primal_calling_assimilate_bonus_tt
+		refresh_primal_calling_assimilate_modifier = yes
+	}
+
+	option = {
+		name = grand_archive.1002.f
+		trigger = { is_gestalt = yes }
+		allow = {
+			NOT = { has_valid_civic = civic_hive_devouring_swarm }
+		}
+		custom_tooltip = primal_calling_symbiosis_bonus_tt
+		add_modifier = {
+			modifier = primal_calling_symbiosis_modifier
+			days = -1
+		}
+		hidden_effect = {
+			remove_country_flag = wrangler_alignment
+			set_country_flag = animal_handler_alignment
+		}
+	}
+
+	option = {
+		name = grand_archive.1002.g
+		trigger = { is_gestalt = yes }
+		custom_tooltip = primal_calling_feed_bonus_tt
+		add_modifier = {
+			modifier = primal_calling_feed_modifier
+			days = -1
+		}
+		hidden_effect = {
+			remove_country_flag = wrangler_alignment
+			set_country_flag = trophy_hunter_alignment
+		}
+	}
+}
+
+# Primal Calling Space Fauna spawn for communication
+country_event = {
+	id = grand_archive.1005
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		mid_game_years_passed >= 0
+		is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+		OR = {
+			NOR = {
+				has_communications = event_target:tiyanki_country
+				has_active_first_contact_with = event_target:tiyanki_country
+			}
+			NOR = {
+				has_communications = event_target:amoeba_country
+				has_active_first_contact_with = event_target:amoeba_country
+			}
+			NOR = {
+				has_communications = event_target:crystal_country
+				has_active_first_contact_with = event_target:crystal_country
+			}
+			NOR = {
+				has_communications = event_target:voidworms_country
+				has_active_first_contact_with = event_target:voidworms_country
+			}
+			NOR = {
+				has_communications = event_target:cutholoids_country
+				has_active_first_contact_with = event_target:cutholoids_country
+			}
+		}
+	}
+
+	immediate = {
+		every_system_within_border = {
+			limit = {
+				NOT = { exists = event_target:spawn_system }
+				any_neighbor_system = {
+					NOT = { exists = owner }
+				}
+			}
+			random_neighbor_system = {
+				limit = {
+					NOT = { exists = owner }
+				}
+				save_event_target_as = spawn_system
+			}
+		}
+		if = {
+			limit = {
+				NOT = { exists = event_target:spawn_system }
+			}
+			random_system_within_border = {
+				save_event_target_as = spawn_system
+			}
+		}
+		event_target:spawn_system = {
+			random_system_planet = {
+				random_list = {
+					1 = {
+						modifier = {
+							factor = 0
+							root = {
+								OR = {
+									has_communications = event_target:tiyanki_country
+									has_active_first_contact_with = event_target:tiyanki_country
+								}
+							}
+						}
+						create_tiyanki_country = yes
+						spawn_from_location_tiyanki = { LOCATION = prevprev }
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							root = {
+								OR = {
+									has_communications = event_target:amoeba_country
+									has_active_first_contact_with = event_target:amoeba_country
+								}
+							}
+						}
+						create_amoeba_country = yes
+						spawn_from_location_space_amoeba = { LOCATION = prevprev }
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							root = {
+								OR = {
+									has_communications = event_target:crystal_country
+									has_active_first_contact_with = event_target:crystal_country
+								}
+							}
+						}
+						create_crystal_country = yes
+						spawn_from_location_crystalline_entity = { LOCATION = prevprev }
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							voidworms_enabled = no
+						}
+						modifier = {
+							factor = 0
+							root = {
+								OR = {
+									has_communications = event_target:voidworms_country
+									has_active_first_contact_with = event_target:voidworms_country
+								}
+							}
+						}
+						create_voidworms_country = yes
+						spawn_from_location_voidworm = { LOCATION = prevprev }
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							cutholoids_enabled = no
+						}
+						modifier = {
+							factor = 0
+							root = {
+								OR = {
+									has_communications = event_target:cutholoids_country
+									has_active_first_contact_with = event_target:cutholoids_country
+								}
+							}
+						}
+						create_cutholoids_country = yes
+						spawn_from_location_cutholoid = { LOCATION = prevprev }
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = grand_archive.1010
+	title = "colony_mod.2.name"
+	desc = "grand_archive.1010.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_air_raid_siren
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+	}
+
+	trigger = {
+		has_modifier = "titanic_life"
+		owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
+		NOT = { has_planet_flag = titanic_life_colony_flag }
+		num_pops > 0
+	}
+
+	immediate = {
+		set_planet_flag = titanic_life_colony_flag
+	}
+
+	option = {
+		name = grand_archive.1010.a
+		add_modifier = {
+			modifier = untamed_wilds
+			days = -1
+		}
+	}
+}
+
+# Chance to spawn Titanic Life if Primal Calling
+ship_event = {
+	id = grand_archive.1015
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
+		from = {
+			OR = {
+				is_starting_planet_type = yes # undercoat: moved to scripted trigger
+				
+				
+				
+				
+				
+				
+				
+				
+				is_gaia_world = yes # undercoat: moved to scripted trigger
+				is_relic_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			random = {
+				chance = value:titanic_life_spawn_chance
+				add_modifier = {
+					modifier = titanic_life
+					days = -1
+				}
+			}
+		}
+	}
+}
+
+# Primal Calling bonus refresh
+country_event = {
+	id = grand_archive.1020
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		if = {
+			limit = { has_modifier = primal_calling_exhibit_modifier }
+			refresh_primal_calling_exhibit_modifier = yes
+		}
+		else_if = {
+			limit = { has_modifier = primal_calling_exploit_modifier }
+			refresh_primal_calling_exploit_modifier = yes
+		}
+		else_if = {
+			limit = { has_modifier = primal_calling_assimilate_modifier }
+			refresh_primal_calling_assimilate_modifier = yes
+		}
+	}
+}
+
+# Space Fauna Ships size increase
+ship_event = {
+	id = grand_archive.1030
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		is_space_fauna = yes
+	}
+
+	immediate = {
+		owner = {
+			append_cloned_fauna_size = { SHIP_SCOPE = prev }
+		}
+	}
+}
+
+# Space Fauna Ships size decrease
+# This = owner of ship 1 (destroyed)
+# From = owner of ship 2 (combatant)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+country_event = {
+	id = grand_archive.1031
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		fromfrom = { is_space_fauna = yes }
+	}
+
+	immediate = {
+		remove_cloned_fauna_size = { SHIP_SCOPE = fromfrom }
+	}
+}
+
+# Primal Calling / Cordyceptic Drones effects when killing space fauna
+# This = owner of ship 1 (combatant)
+# From = owner of ship 2 (destroyed)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+country_event = {
+	id = grand_archive.1050
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		gains_genetic_materials_from_fauna_kill = yes
+		fromfromfrom = { is_space_fauna = yes }
+	}
+
+	immediate = {
+		export_resource_stockpile_to_variable = {
+			resource = minerals
+			variable = minerals_before
+		}
+		export_resource_stockpile_to_variable = {
+			resource = food
+			variable = food_before
+		}
+		export_resource_stockpile_to_variable = {
+			resource = energy
+			variable = energy_before
+		}
+		export_resource_stockpile_to_variable = {
+			resource = unity
+			variable = unity_before
+		}
+		export_resource_stockpile_to_variable = {
+			resource = exotic_gases
+			variable = exotic_gases_before
+		}
+		export_resource_stockpile_to_variable = {
+			resource = rare_crystals
+			variable = rare_crystals_before
+		}
+		give_culling_rewards = {
+			design = fromfromfrom.design
+		}
+		if = {
+			limit = {
+				OR = {
+					has_modifier = primal_calling_hunt_modifier
+					has_modifier = primal_calling_feed_modifier
+				}
+			}
+			add_resource = {
+				unity = @primal_calling_fauna_kill_unity_reward
+				mult = fromfromfrom.trigger:ship_size_multiplier
+			}
+			# Harvest rewards
+			fromfromfrom = {
+				switch = {
+					trigger = is_ship_category
+					tiyanki = {
+						root = {
+							add_resource = {
+								energy = 125
+								exotic_gases = 10
+								mult = prev.trigger:ship_size_multiplier
+							}
+						}
+					}
+					space_amoeba = {
+						root = {
+							add_resource = {
+								food = 200
+								mult = prev.trigger:ship_size_multiplier
+							}
+						}
+					}
+					crystalline_entity = {
+						root = {
+							add_resource = {
+								minerals = 125
+								rare_crystals = 10
+								mult = prev.trigger:ship_size_multiplier
+							}
+						}
+					}
+					voidworm = {
+						root = {
+							add_resource = {
+								food = 100
+								minerals = 100
+								mult = prev.trigger:ship_size_multiplier
+							}
+						}
+					}
+					cutholoid = {
+						root = {
+							add_resource = {
+								minerals = 200
+								mult = prev.trigger:ship_size_multiplier
+							}
+						}
+					}
+				}
+			}
+		}
+		add_trophy_hunter_resource_diff_to_variable = { RESOURCE = minerals }
+		add_trophy_hunter_resource_diff_to_variable = { RESOURCE = food }
+		add_trophy_hunter_resource_diff_to_variable = { RESOURCE = energy }
+		add_trophy_hunter_resource_diff_to_variable = { RESOURCE = unity }
+		add_trophy_hunter_resource_diff_to_variable = { RESOURCE = exotic_gases }
+		add_trophy_hunter_resource_diff_to_variable = { RESOURCE = rare_crystals }
+	}
+}
+
+country_event = {
+	id = grand_archive.1060
+	title = grand_archive.1060.name
+	desc = grand_archive.1060.desc
+	picture = GFX_evt_fauna_debris
+	show_sound = event_default
+	location = fromfrom
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { save_event_target_as = met_critter }
+		fromfrom = { save_event_target_as = contact_system }
+	}
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			event_target:contact_system.star = {
+				create_ambient_object = {
+					type = carcass_01_object
+				}
+				last_created_ambient_object = {
+					set_location = {
+						target = prev
+						distance = 120
+						angle = random
+					}
+					enable_special_project = {
+						name = CARRION_DEBRIS_PROJECT
+						location = this
+						owner = root
+					}
+				}
+			}
+		}
+		tooltip = {
+			enable_special_project = {
+				name = CARRION_DEBRIS_PROJECT
+				owner = root
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1065
+	title = grand_archive.1065.name
+	desc = grand_archive.1065.desc
+	picture = GFX_evt_fauna_debris
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		custom_tooltip = grand_archive.1065.specimen_tt
+		hidden_effect = {
+			event_target:met_critter = {
+				switch = {
+					trigger = is_country_type
+					tiyanki = {
+						root = {
+							give_specimen = { key = tiyanki_radioactive_sac origin = "CARRION_DEBRIS_PROJECT" }
+						}
+					}
+					amoeba = {
+						root = {
+							give_specimen = { key = amoeba_flagella_gland origin = "CARRION_DEBRIS_PROJECT" }
+						}
+					}
+					crystal = {
+						root = {
+							give_specimen = { key = crystal_core origin = "CARRION_DEBRIS_PROJECT" }
+						}
+					}
+					voidworms = {
+						root = {
+							give_specimen = { key = voidworm_amniotics origin = "CARRION_DEBRIS_PROJECT" }
+						}
+					}
+					cutholoids = {
+						root = {
+							give_specimen = { key = cutholoid_digestive_acids origin = "CARRION_DEBRIS_PROJECT" }
+						}
+					}
+				}
+			}
+		}
+		inverted_switch = {
+			trigger = has_technology
+			tech_galactic_archivism = {
+				add_tech_progress = {
+					tech = tech_galactic_archivism
+					progress = 0.1
+				}
+			}
+			tech_gravity_wells = {
+				add_tech_progress = {
+					tech = tech_gravity_wells
+					progress = 0.1
+				}
+			}
+			tech_genome_mapping = {
+				add_tech_progress = {
+					tech = tech_genome_mapping
+					progress = 0.1
+				}
+			}
+			tech_alien_cloning = {
+				add_tech_progress = {
+					tech = tech_alien_cloning
+					progress = 0.1
+				}
+			}
+			tech_improved_incubators = {
+				add_tech_progress = {
+					tech = tech_improved_incubators
+					progress = 0.1
+				}
+			}
+			tech_metabolic_gases = {
+				add_tech_progress = {
+					tech = tech_metabolic_gases
+					progress = 0.1
+				}
+			}
+			default = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1069
+	title = grand_archive.1069.name
+	desc = grand_archive.1069.desc
+	picture = GFX_evt_primal_calling_hunter
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.1069.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		give_specimen = { key = spaceborne_hunter_handbook }
+	}
+}
+
+country_event = {
+	id = grand_archive.1070
+	title = grand_archive.1070.name
+	desc = grand_archive.1070.desc
+	picture = GFX_evt_primal_calling_hunter
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.1070.a
+		country_event = {
+			id = grand_archive.1075
+			days = 1
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1075
+	title = grand_archive.1075.name
+	diplomatic_title = NAME_PrimalHunter
+	desc = grand_archive.1075.desc
+	show_sound = event_first_contact_reptilian
+	is_triggered_only = yes
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+
+	immediate = {
+		create_primal_leader = {
+			SPECIES_CLASS = REP
+			LEADER_PORTRAIT = rep10
+			CLASS = commander
+			NAME = NAME_PrimalHunter
+			LEVEL = 5
+			GENDER = indeterminable
+			ETHIC = militarist
+			DESC = primal_hunter_desc
+			CATCH_PHRASE = primal_hunter_catchphrase
+		}
+		event_target:primal_leader = {
+			add_trait = subclass_commander_admiral
+			add_trait = leader_trait_trophy_hunter
+			add_trait = leader_trait_void_hunter
+			add_trait = leader_trait_cautious
+			add_trait = leader_trait_scout
+			set_age = 39
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:primal_leader
+		room = ethic_spaceship_room
+	}
+
+	option = {
+		name = grand_archive.1075.a
+		response_text = grand_archive.1075.a.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1075.b
+		response_text = grand_archive.1075.b.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1075.c
+		response_text = grand_archive.1075.c.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1075.d
+		response_text = grand_archive.1075.d.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1075.hire
+		tag = hire_leader
+		custom_tooltip = grand_archive.1075.hire_tt
+		hidden_effect = {
+			hire_event_leader_effect = {
+				LEADER = primal_leader
+			}
+			create_fleet = {
+				effect = {
+					set_owner = root
+					create_ship = {
+						name = random
+						design = "NAME_BoneShip"
+						graphical_culture = "reptilian_01"
+					}
+					set_location = root.capital_scope.star
+					assign_leader = event_target:primal_leader
+				}
+			}
+		}
+		give_specimen = {
+			key = spaceborne_hunter_handbook
+			origin = "NAME_PrimalHunter"
+		}
+	}
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1080
+	title = grand_archive.1080.name
+	desc = grand_archive.1080.desc
+	picture = GFX_evt_primal_calling_rancher
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.1080.a
+		country_event = {
+			id = grand_archive.1085
+			days = 1
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1085
+	title = grand_archive.1080.name
+	diplomatic_title = NAME_PrimalRancher
+	desc = grand_archive.1085.desc
+	show_sound = event_first_contact_avian
+	is_triggered_only = yes
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+
+	immediate = {
+		create_primal_leader = {
+			SPECIES_CLASS = AVI
+			LEADER_PORTRAIT = avi14
+			CLASS = scientist
+			NAME = NAME_PrimalRancher
+			LEVEL = 5
+			GENDER = female
+			ETHIC = xenophile
+			DESC = primal_rancher_desc
+			CATCH_PHRASE = primal_rancher_catchphrase
+		}
+		event_target:primal_leader = {
+			add_trait = subclass_scientist_explorer
+			add_trait = leader_trait_gifted_trapper
+			add_trait = leader_trait_emotional_support_pet
+			add_trait = leader_trait_void_tracker
+			add_trait = leader_trait_slippery
+			set_age = 39
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:primal_leader
+		room = ethic_spaceship_room
+	}
+
+	option = {
+		name = grand_archive.1085.a
+		response_text = grand_archive.1085.a.reply
+		is_dialog_only = yes
+		set_country_flag = asked_rancher_who_she_is
+	}
+
+	option = {
+		name = grand_archive.1085.b
+		trigger = {
+			has_country_flag = asked_rancher_who_she_is
+		}
+		response_text = grand_archive.1085.b.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1085.c
+		response_text = grand_archive.1085.c.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1085.d
+		response_text = grand_archive.1085.d.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.1085.hire
+		tag = hire_leader
+		custom_tooltip = grand_archive.1085.hire_tt
+		hidden_effect = {
+			hire_event_leader_effect = {
+				LEADER = primal_leader
+			}
+			create_fleet = {
+				effect = {
+					set_owner = root
+					create_ship = {
+						name = random
+						random_existing_design = science
+						graphical_culture = "avian_01"
+					}
+					set_location = root.capital_scope.star
+					assign_leader = event_target:primal_leader
+				}
+			}
+		}
+		give_specimen = {
+			key = spaceborne_xeno_encyclopedia
+			origin = "NAME_PrimalRancher"
+		}
+	}
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1100
+	title = grand_archive.1100.name
+	desc = grand_archive.1100.desc
+	picture = GFX_evt_communication_event
+	show_sound = ga_event_mutated_voidworms_muted
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_primal_calling_empire = yes # undercoat: moved to scripted trigger
+		mid_game_years_passed > 0
+		has_encountered_every_fauna = yes
+		NOT = { has_country_flag = origin_primal_calling_frenzied_voidworms_start }
+	}
+
+	immediate = {
+		set_country_flag = origin_primal_calling_frenzied_voidworms_start
+	}
+
+	option = {
+		name = grand_archive.1100.a
+		country_event = {
+			id = grand_archive.1105
+			days = 180
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1105
+	title = grand_archive.1105.name
+	desc = {
+		trigger = {
+			text = grand_archive.1105.desc
+			success_text = {
+				text = grand_archive.1105.desc_no_homicidal
+				is_homicidal = no
+			}
+			text = grand_archive.1105.desc_2
+		}
+	}
+	picture = GFX_evt_frenzied_voidworms
+	show_sound = ga_event_mutated_voidworms
+
+	is_triggered_only = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		event_target:frenzied_voidworms_target = {
+			solar_system = {
+				spawn_system = {
+					min_distance = 20
+					max_distance = 25
+					initializer = "frenzied_voidworms_system"
+					hyperlane = no
+					effect = {
+						add_hyperlane = {
+							from = this
+							to = prev
+						}
+						save_event_target_as = frenzied_voidworms_system
+						set_star_flag = spawned_by@root
+						root = {
+							set_visited = prev
+						}
+					}
+				}
+			}
+		}
+		event_target:frenzied_voidworms_country = {
+			establish_communications_no_message = root
+		}
+		start_situation = {
+			type = situation_frenzied_voidworms
+			target = event_target:frenzied_voidworms_system
+		}
+	}
+
+	option = {
+		name = grand_archive.1105.a
+	}
+}
+
+# Update Frenzied Voidworms "at home" buff
+# Scope = Fleet
+# From = System
+fleet_event = {
+	id = grand_archive.1110
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:frenzied_voidworms_country
+		exists = owner
+		owner = {
+			is_same_value = event_target:frenzied_voidworms_country
+		}
+		has_fleet_flag = frenzied_voidworms_fleet
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				from = { has_star_flag = frenzied_voidworms_system }
+				NOT = { has_modifier = frenzied_voidworms_at_home_modifier }
+			}
+			add_modifier = {
+				modifier = frenzied_voidworms_at_home_modifier
+				days = -1
+			}
+		}
+		else_if = {
+			limit = {
+				has_modifier = frenzied_voidworms_at_home_modifier
+				from = {
+					NOT = { has_star_flag = frenzied_voidworms_system }
+				}
+			}
+			remove_modifier = frenzied_voidworms_at_home_modifier
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1115
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		event_target:frenzied_voidworms_target.solar_system = {
+			starbase = {
+				add_modifier = { modifier = hide_presence_starbase_modifier }
+			}
+			every_system_planet = {
+				limit = {
+					OR = {
+						is_capital = yes
+						is_colony = yes
+					}
+					NOT = { has_modifier = hide_presence_modifier }
+				}
+				add_modifier = {
+					modifier = hide_presence_modifier
+					days = -1
+					clear_on_owner_change = yes
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.1120
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		event_target:frenzied_voidworms_target.solar_system = {
+			starbase = {
+				if = {
+					limit = { has_modifier = hide_presence_starbase_modifier }
+					remove_modifier = hide_presence_starbase_modifier
+				}
+			}
+			every_system_planet = {
+				limit = { has_modifier = hide_presence_modifier }
+				remove_modifier = hide_presence_modifier
+			}
+		}
+	}
+}
+
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = grand_archive.1125
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		any_situation = { is_situation_type = situation_frenzied_voidworms }
+		fromfromfrom = {
+			has_fleet_flag = frenzied_voidworms_fleet
+		}
+		exists = event_target:frenzied_voidworms_country
+		from = {
+			is_same_value = event_target:frenzied_voidworms_country
+		}
+	}
+
+	immediate = {
+		every_situation = {
+			limit = { is_situation_type = situation_frenzied_voidworms }
+			add_situation_progress = 30
+		}
+	}
+}
+
+# invisible monthly event to update Frenzied Voidworms status
+situation_event = {
+	id = grand_archive.1150
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		# Update hostility based on situation approach
+		switch = {
+			trigger = current_situation_approach
+			approach_frenzied_voidworms_do_nothing = {
+				owner = {
+					if = {
+						limit = {
+							check_variable = {
+								which = frenzied_voidworms_hostility
+								value < @frenzied_hostility_max
+							}
+						}
+						change_variable = {
+							which = frenzied_voidworms_hostility
+							value = @frenzied_hostility_nothing_progress
+						}
+					}
+				}
+			}
+			approach_frenzied_voidworms_hide_presence = {
+				# Hostility doesn't progress
+			}
+			approach_frenzied_voidworms_stir_nests = {
+				owner = {
+					if = {
+						limit = {
+							check_variable = {
+								which = frenzied_voidworms_hostility
+								value < @frenzied_hostility_max
+							}
+						}
+						change_variable = {
+							which = frenzied_voidworms_hostility
+							value = @frenzied_hostility_stir_progress
+						}
+					}
+				}
+			}
+			approach_frenzied_voidworms_feed_nests = {
+				owner = {
+					if = {
+						limit = {
+							check_variable = {
+								which = frenzied_voidworms_hostility
+								value > @frenzied_hostility_min
+							}
+						}
+						change_variable = {
+							which = frenzied_voidworms_hostility
+							value = @frenzied_hostility_feed_progress
+						}
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = frenzied_voidworms_hostility
+					value >= @frenzied_hostility_hostile_threshold
+				}
+			}
+			change_variable = {
+				which = months_since_last_wave
+				value = 1
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = months_since_last_wave
+						value >= 12
+					}
+				}
+				set_variable = {
+					which = months_since_last_wave
+					value = 0
+				}
+				owner = {
+					get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+				}
+				create_frenzied_voidworms_fleet = {
+					LOCATION = root.target
+					FLEET_STRENGTH = root.frenzied_voidworms_strength
+				}
+				event_target:frenzied_voidworms_fleet = {
+					auto_move_to_planet = {
+						target = event_target:frenzied_voidworms_target
+						clear_auto_move_on_arrival = no
+					}
+				}
+				change_variable = {
+					which = frenzied_voidworms_strength
+					value = 1
+				}
+			}
+		}
+	}
+}
+
+# Frenzied Voidworms killed
+# This = owner of ship 1 (destroyed)
+# From = owner of ship 2 (combatant)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+country_event = {
+	id = grand_archive.1160
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		fromfrom = {
+			has_ship_flag = frenzied_voidworms_starbase
+			solar_system = { has_star_flag = frenzied_voidworms_system }
+		}
+		NOT = {
+			any_owned_ship = {
+				has_ship_flag = frenzied_voidworms_starbase
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			save_event_target_as = frenzied_voidworms_killer
+		}
+
+		if = { # Third Party Killer (they didn't spawn the frenzied voidworms)
+			limit = {
+				fromfrom.solar_system = {
+					NOT = { has_star_flag = spawned_by@event_target:frenzied_voidworms_killer }
+				}
+			}
+			from = { country_event = { id = grand_archive.1180 } }
+			random_playable_country = {
+				limit = {
+					root.fromfrom = {
+						solar_system = { has_star_flag = spawned_by@prevprev }
+					}
+				}
+				country_event = { id = grand_archive.1185 }
+			}
+		}
+		else = {
+			from = {
+				if = {
+					limit = {
+						any_situation = { is_situation_type = situation_frenzied_voidworms }
+					}
+					country_event = { id = grand_archive.1165 }
+				}
+				else_if = {
+					limit = {
+						has_country_flag = tormented_by_frenzied_voidworms
+					}
+					country_event = {
+						id = grand_archive.1170
+						scopes = { from = root }
+					}
+				}
+				else_if = {
+					limit = {
+						has_country_flag = destroyed_by_frenzied_voidworms
+					}
+					country_event = {
+						id = grand_archive.1210
+						scopes = { from = root.fromfrom.solar_system }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Frenzied Voidworms killed during situation
+country_event = {
+	id = grand_archive.1165
+	title = grand_archive.1165.name
+	desc = {
+		trigger = { is_homicidal = yes }
+		text = grand_archive.1165.desc.homicidal
+	}
+	desc = {
+		trigger = { is_homicidal = no }
+		text = grand_archive.1165.desc.default
+	}
+	picture = GFX_evt_frenzied_voidworms_destroyed
+	show_sound = ga_event_hunter_fanfare_aggressive
+
+	is_triggered_only = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		every_situation = {
+			limit = { is_situation_type = situation_frenzied_voidworms }
+			abort_situation = this
+		}
+	}
+
+	option = {
+		name = grand_archive.1165.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+		add_relic = r_mutated_voidworm_nest
+	}
+}
+
+# Frenzied Voidworms killed after situation
+country_event = {
+	id = grand_archive.1170
+	title = grand_archive.1170.name
+	desc = {
+		trigger = { is_homicidal = yes }
+		text = grand_archive.1170.desc.homicidal
+	}
+	desc = {
+		trigger = { is_homicidal = no }
+		text = grand_archive.1170.desc.default
+	}
+	picture = GFX_evt_frenzied_voidworms_destroyed
+	show_sound = ga_event_hunter_fanfare_aggressive
+
+	is_triggered_only = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		if = {
+			limit = {
+				from = { has_country_flag = enraged_voidworms }
+			}
+			set_country_flag = killed_enraged_voidworms
+		}
+	}
+
+	option = {
+		name = grand_archive.1170.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+		add_relic = r_mutated_voidworm_nest
+	}
+}
+
+# Frenzied Voidworms killed by someone else (killer view)
+country_event = {
+	id = grand_archive.1180
+	title = grand_archive.1180.name
+	desc = grand_archive.1180.desc
+	picture = GFX_evt_frenzied_voidworms_destroyed
+	show_sound = ga_event_hunter_fanfare_aggressive
+
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.1180.a
+		add_relic = r_mutated_voidworm_nest
+	}
+}
+
+# Frenzied Voidworms killed by someone else (origin view)
+country_event = {
+	id = grand_archive.1185
+	title = grand_archive.1185.name
+	desc = grand_archive.1185.desc
+	picture = GFX_evt_frenzied_voidworms_destroyed
+	show_sound = ga_event_mutated_voidworms_muted
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				any_situation = { is_situation_type = situation_frenzied_voidworms }
+			}
+			every_situation = {
+				limit = { is_situation_type = situation_frenzied_voidworms }
+				abort_situation = this
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.1185.a
+	}
+}
+
+# Frenzied Voidworms situation cleanup event
+country_event = {
+	id = grand_archive.1190
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		event_target:frenzied_voidworms_target.solar_system = {
+			starbase = {
+				if = {
+					limit = { has_modifier = hide_presence_starbase_modifier }
+					remove_modifier = hide_presence_starbase_modifier
+				}
+			}
+			every_system_planet = {
+				limit = { has_modifier = hide_presence_modifier }
+				remove_modifier = hide_presence_modifier
+			}
+		}
+	}
+}
+
+# Hostile Result
+country_event = {
+	id = grand_archive.1200
+	title = grand_archive.1200.name
+	desc = grand_archive.1200.desc
+	picture = GFX_evt_frenzied_voidworms
+	show_sound = ga_event_mutated_voidworms
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = tormented_by_frenzied_voidworms
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		event_target:frenzied_voidworms_country = {
+			set_country_flag = can_bombard
+			every_owned_fleet = {
+				limit = { is_mobile = yes }
+				if = {
+					limit = {
+						prev = { has_country_flag = enraged_voidworms }
+					}
+					add_modifier = {
+						modifier = frenzied_voidworms_enraged_modifier
+					}
+				}
+				auto_move_to_planet = {
+					target = event_target:frenzied_voidworms_target
+					clear_auto_move_on_arrival = no
+				}
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.1200.a
+	}
+}
+
+# Planet destroyed by Frenzied Voidworms
+# This = Planet
+# From = Bombarder
+planet_event = {
+	id = grand_archive.1205
+	title = grand_archive.1205.name
+	desc = {
+		trigger = {
+			event_target:victim_country = { is_gestalt = yes }
+		}
+		text = grand_archive.1205.desc.gestalt
+	}
+	desc = {
+		trigger = {
+			event_target:victim_country = { is_gestalt = no }
+		}
+		text = grand_archive.1205.desc.default
+	}
+	picture = GFX_evt_shattered_planet
+	show_sound = event_bad_omen
+
+	is_triggered_only = yes
+
+	trigger = {
+		planet_devastation >= 100
+		controller = { has_country_flag = tormented_by_frenzied_voidworms }
+		from = {
+			any_owned_ship = {
+				has_ship_flag = frenzied_voidworms_starbase
+			}
+		}
+	}
+
+	immediate = {
+		# For desc + further manipulations
+		controller = {
+			save_event_target_as = victim_country
+		}
+		change_pc = pc_shattered
+
+		save_global_event_target_as = homeworld_destroyed_by_frenzied_voidworms@event_target:victim_country
+		event_target:victim_country = {
+			remove_country_flag = tormented_by_frenzied_voidworms
+			set_country_flag = destroyed_by_frenzied_voidworms
+		}
+		event_target:frenzied_voidworms_country = {
+			remove_country_flag = can_bombard
+			random_owned_ship = {
+				limit = { has_ship_flag = frenzied_voidworms_starbase }
+				solar_system = {
+					save_event_target_as = frenzied_voidworms_home
+				}
+			}
+			every_owned_fleet = {
+				limit = { is_mobile = yes }
+				clear_fleet_actions = this
+				queue_actions = {
+					move_to = event_target:frenzied_voidworms_home
+					find_random_fleet = {
+						trigger = {
+							id = frenzied_voidworms.1
+							any_owned_ship = { has_ship_flag = frenzied_voidworms_starbase }
+						}
+						found_fleet = {
+							move_to = this
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.1205.a
+	}
+}
+
+# From = Frenzied Voidworms system
+country_event = {
+	id = grand_archive.1210
+	title = grand_archive.1210.name
+	desc = grand_archive.1210.desc
+	picture = GFX_evt_frenzied_voidworms_destroyed
+	show_sound = ga_event_hunter_fanfare_aggressive
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:homeworld_destroyed_by_frenzied_voidworms@this = {
+			save_event_target_as = avenged_homeworld
+		}
+	}
+
+	option = {
+		name = grand_archive.1210.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+		add_relic = r_mutated_voidworm_nest
+	}
+}
+
+# Frenzied Voidworms pacified
+country_event = {
+	id = grand_archive.1220
+	title = grand_archive.1220.name
+	desc = {
+		trigger = { is_homicidal = yes }
+		text = grand_archive.1220.desc.homicidal
+	}
+	desc = {
+		trigger = { is_homicidal = no }
+		text = grand_archive.1220.desc.default
+	}
+	picture = GFX_evt_frenzied_voidworms_pacified
+	show_sound = ga_event_hunter_fanfare_collaborative
+
+	is_triggered_only = yes
+
+	immediate = {
+		get_frenzied_voidworms_target = { TARGET = frenzied_voidworms_target }
+		event_target:frenzied_voidworms_country = {
+			set_faction_hostility = {
+				target = root
+				set_hostile = no
+				set_neutral = no
+				set_friendly = yes
+			}
+			random_owned_ship = {
+				limit = { has_ship_flag = frenzied_voidworms_starbase }
+				solar_system = {
+					save_event_target_as = frenzied_home_system
+				}
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.1220.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+		add_relic = r_mutated_voidworm_nest
+		custom_tooltip = grand_archive.1220.tt
+		hidden_effect = {
+			event_target:frenzied_voidworms_country = {
+				random_owned_ship = {
+					limit = { has_ship_flag = frenzied_voidworms_starbase }
+					delete_fleet = fleet
+				}
+				every_owned_fleet = {
+					limit = { is_mobile = yes }
+					if = {
+						limit = { has_modifier = frenzied_voidworms_at_home_modifier }
+						remove_modifier = frenzied_voidworms_at_home_modifier
+					}
+					add_modifier = {
+						modifier = frenzied_voidworms_pacified_modifier
+					}
+					set_owner = root
+				}
+			}
+		}
+	}
+}
+
+#############################
+# Origin - Treasure Hunters #
+#############################
+
+# Give starting Relic
+country_event = {
+	id = grand_archive.2220
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		add_relic = r_celestial_chart_0
+	}
+}
+
+# Buccaneer Council position effect
+# FromFromFrom = ship 2
+country_event = {
+	id = grand_archive.2230
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		NOT = { is_same_empire = from }
+		is_hostile = from
+	}
+
+	immediate = {
+		add_resource = {
+			energy = 1
+			mult = value:enemy_ship_size_energy_add|SHIP_SCOPE|fromfromfrom|
+		}
+	}
+}
+
+# On surveying a planet
+ship_event = {
+	id = grand_archive.2240
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+			check_variable_arithmetic = {
+				which = value:deposit_increase_on_survey_chance
+				value > 0
+			}
+		}
+	}
+
+	immediate = {
+		# We wait a day in order to check if any anomalies or dig sites have spawned.
+		# Treasure Hoarder Council position effect
+		ship_event = {
+			id = grand_archive.2241
+			scopes = { from = from }
+			days = 1
+		}
+	}
+}
+
+# Treasure Hoarder Council position effect
+ship_event = {
+	id = grand_archive.2241
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		FROM = {
+			NOT = {
+				has_planet_flag = hoarded_by@root.owner
+			}
+			OR = {
+				has_deposit_for = shipclass_mining_station
+				has_deposit_for = shipclass_research_station
+			}
+		}
+	}
+
+	immediate = {
+		FROM = {
+			set_planet_flag = hoarded_by@root.owner
+		}
+		scientist_prospector_effect = { CHANCE = value:deposit_increase_on_survey_chance }
+	}
+}
+
+country_event = {
+	id = grand_archive.7999
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		country_event = {
+			id = grand_archive.8000
+			days = 1
+		}
+	}
+}
+
+# Treasure Hunters Story start
+country_event = {
+	id = grand_archive.8000
+	title = grand_archive.8000.name
+	desc = grand_archive.8000.desc
+	picture = GFX_evt_astral_rift_psionic_stranger_2
+	show_sound = event_celebration
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.8000.a
+		tooltip = {
+			add_relic = r_celestial_chart_0
+		}
+		begin_event_chain = {
+			event_chain = treasure_hunters_origin_story_chain
+			target = this
+		}
+		capital_scope = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_ANCIENT_CAPSULE_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# TREASURE_HUNTERS_ANCIENT_CAPSULE_PROJECT on success
+country_event = {
+	id = grand_archive.8005
+	title = grand_archive.8005.name
+	desc = grand_archive.8005.desc
+	picture = GFX_evt_treasure_hunt_1
+	show_sound = relic_activation_celestial_chart
+
+	location = event_target:first_hidden_system_for@this
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		spawn_treasure_hidden_system = yes
+		upgrade_celestial_chart_relic = yes
+	}
+
+	option = {
+		name = FASCINATING
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8005.a.lom
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = grand_archive.8015 days = 1 }
+		}
+		tooltip = {
+			upgrade_celestial_chart_relic = yes
+		}
+		add_tech_option_or_research_effect = {
+			TECH = tech_hyper_drive_2
+			PROGRESS = 0.25
+			CATEGORY = physics_research
+		}
+	}
+}
+
+# First system found reward
+country_event = {
+	id = grand_archive.8015
+	title = grand_archive.8015.name
+	desc = {
+		trigger = { is_gestalt = yes }
+		text = grand_archive.8015.desc.gestalt
+	}
+	desc = {
+		trigger = { is_gestalt = no }
+		text = grand_archive.8015.desc.default
+	}
+	picture = GFX_evt_news_room
+	show_sound = event_announcement
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = grand_archive.8015.a.default
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8015.a.lom
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		if = {
+			limit = { is_gestalt = yes }
+			add_modifier = {
+				modifier = celestial_chart_modifier_gestalt
+				years = 2
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = celestial_chart_modifier
+				years = 2
+			}
+		}
+	}
+}
+
+# Treasure Hunters hidden system POI 1
+ship_event = {
+	id = grand_archive.8020
+	title = grand_archive.8020.name
+	desc = grand_archive.8020.desc
+	picture = GFX_evt_treasure_trove_pirate_fleet
+	show_sound = ga_event_black_needle
+
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		exists = controller
+		controller = {
+			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+			has_event_chain = "treasure_hunters_origin_story_chain"
+			FROM = {
+				is_point_of_interest = {
+					id = treasure_hunters_hidden_system_poi.1
+					event_chain = treasure_hunters_origin_story_chain
+					owner = root.controller
+				}
+			}
+		}
+	}
+
+	immediate = {
+		controller = {
+			remove_point_of_interest = treasure_hunters_hidden_system_poi.1
+			create_black_needle_country = yes
+			establish_communications_no_message = event_target:black_needle_country
+			create_captain_hoo_leader = yes
+			create_black_needle_fleet_01 = { LOCATION = from }
+			event_target:black_needle_fleet = {
+				set_fleet_flag = is_in_combat_with@prev
+			}
+		}
+	}
+
+	option = {
+		name = ON_SCREEN
+		trigger = {
+			controller = { is_privateer_empire = no } # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8020.a.lom
+		trigger = {
+			controller = { is_privateer_empire = yes } # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		controller = {
+			country_event = {
+				id = grand_archive.8025
+				days = 1
+				scopes = { from = event_target:black_needle_fleet }
+			}
+		}
+	}
+}
+
+# Captain Hoo (hidden_system_poi.1)
+country_event = {
+	id = grand_archive.8025
+	title = grand_archive.8025.name
+	diplomatic_title = grand_archive.8025.name
+	desc = grand_archive.8025.desc
+	show_sound = event_first_contact_avian
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			has_fleet_flag = is_in_combat_with@root
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:captain_hoo
+		tooltip = no
+	}
+
+	immediate = {
+		set_country_flag = met_captain_hoo
+		# They're now aware of alien life
+		set_country_flag = first_alien_life
+		set_country_flag = Story1
+		set_country_flag = Story2
+		set_country_flag = Story3
+		set_country_flag = Story5
+		set_country_flag = Story7
+	}
+
+	option = {
+		name = grand_archive.8025.a
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8025_end_dialog }
+		}
+		response_text = grand_archive.8025.a.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8025.b
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8025_end_dialog }
+		}
+		response_text = grand_archive.8025.b.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = grand_archive_8025_next_dialog_step } }
+			set_country_flag = grand_archive_8025_next_dialog_step
+		}
+	}
+
+	option = {
+		name = grand_archive.8025.c
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8025_end_dialog }
+		}
+		response_text = grand_archive.8025.c.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = grand_archive_8025_next_dialog_step } }
+			set_country_flag = grand_archive_8025_next_dialog_step
+		}
+	}
+
+	option = {
+		name = grand_archive.8025.d
+		trigger = {
+			has_country_flag = grand_archive_8025_next_dialog_step
+			NOT = { has_country_flag = grand_archive_8025_end_dialog }
+		}
+		response_text = grand_archive.8025.d.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8025.e
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8025_end_dialog }
+		}
+		response_text = grand_archive.8025.e.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = grand_archive_8025_end_dialog } }
+			set_country_flag = grand_archive_8025_end_dialog
+		}
+	}
+
+	option = {
+		name = CLOSE_COMMUNICATIONS
+		trigger = {
+			has_country_flag = grand_archive_8025_end_dialog
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8025.f.lom
+		trigger = {
+			has_country_flag = grand_archive_8025_end_dialog
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			remove_country_flag = grand_archive_8025_end_dialog
+			country_event = {
+				id = grand_archive.8030
+				days = 1
+				scopes = {
+					from = from.solar_system
+					fromfrom = from
+				}
+			}
+		}
+	}
+}
+
+# from = System
+# fromfrom = Black Needle Fleet
+country_event = {
+	id = grand_archive.8030
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		fromfrom = {
+			has_fleet_flag = is_in_combat_with@root
+		}
+	}
+
+	immediate = {
+		set_black_needle_actively_hostile = {
+			FLEET_SCOPE = fromfrom
+			EVENT_ID = grand_archive.8030
+		}
+		create_point_of_interest = {
+			id = black_needle_fleet_poi.1
+			name = "black_needle_fleet_poi"
+			desc = "black_needle_fleet_poi_desc"
+			event_chain = "treasure_hunters_origin_story_chain"
+			location = fromfrom
+		}
+	}
+}
+
+# Captain Hoo disabled
+ship_event = {
+	id = grand_archive.8040
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_ship_flag = captain_hoo_ship
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				fleet = { has_fleet_flag = is_in_combat_with@from.controller }
+			}
+			ship_event = {
+				id = grand_archive.8044
+				scopes = { from = from.controller }
+			}
+		}
+		else = { # Captain Hoo disabled by someone else
+			random_playable_country = {
+				limit = {
+					root = {
+						fleet = { has_fleet_flag = is_in_combat_with@prevprev }
+					}
+				}
+				root = {
+					ship_event = {
+						id = grand_archive.8044
+						scopes = { from = prev }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Captain Hoo disabled (common event)
+# from = country which triggered appearance of fleet
+ship_event = {
+	id = grand_archive.8044
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_ship_flag = captain_hoo_ship
+		from = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		fleet = {
+			remove_fleet_flag = is_in_combat_with@root.from
+			delete_fleet = {
+				target = this
+			}
+		}
+		from = {
+			if = {
+				limit = { has_point_of_interest = { poi = black_needle_fleet_poi.1 } }
+				remove_point_of_interest = black_needle_fleet_poi.1
+			}
+			country_event = { id = grand_archive.8045 }
+		}
+	}
+}
+
+# Captain Hoo after being disabled
+country_event = {
+	id = grand_archive.8045
+	title = grand_archive.8045.name
+	diplomatic_title = grand_archive.8045.name
+	desc = grand_archive.8045.desc
+	show_sound = event_first_contact_avian
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = event_target:captain_hoo
+		tooltip = no
+	}
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		event_target:first_hidden_system_for@this = {
+			save_event_target_as = treasure_hunters_hidden_system_1
+		}
+	}
+
+	option = {
+		name = CLOSE_COMMUNICATIONS
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8045.a.lom
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		event_target:treasure_hunters_hidden_system_1 = {
+			random_system_planet = {
+				limit = { has_planet_flag = shattered_ytterite_world }
+				save_event_target_as = shattered_ytterite_world
+			}
+		}
+		if = {
+			limit = {
+				event_target:shattered_ytterite_world = {
+					is_surveyed = {
+						who = root
+						status = yes
+					}
+				}
+			}
+			event_target:shattered_ytterite_world = {
+				enable_special_project = {
+					name = "TREASURE_HUNTERS_CHART_PIECE_2_PROJECT"
+					location = this
+					owner = root
+				}
+			}
+		}
+		else = {
+			create_point_of_interest = {
+				id = treasure_hunters_explore_system_poi.1
+				name = "treasure_hunters_explore_system_1_poi"
+				desc = "treasure_hunters_explore_system_1_poi_desc"
+				event_chain = "treasure_hunters_origin_story_chain"
+				location = event_target:treasure_hunters_hidden_system_1
+			}
+		}
+	}
+}
+
+# Shatter world surveyed
+# Scope = Country
+# From = Planet
+country_event = {
+	id = grand_archive.8050
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		from = {
+			has_planet_flag = shattered_ytterite_world
+			solar_system = {
+				is_point_of_interest = {
+					id = treasure_hunters_explore_system_poi.1
+					event_chain = treasure_hunters_origin_story_chain
+					owner = root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_CHART_PIECE_2_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+		remove_point_of_interest = treasure_hunters_explore_system_poi.1
+	}
+}
+
+# Shattered world surveyed
+# Scope = Ship
+# From = Planet
+ship_event = {
+	id = grand_archive.8051
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		controller = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+		from = { has_planet_flag = shattered_ytterite_world }
+	}
+
+	immediate = {
+		controller = {
+			country_event = {
+				id = grand_archive.8050
+				scopes = { from = from }
+			}
+		}
+	}
+}
+
+# Shatter world system gained
+# Scope = Country
+# From = System
+country_event = {
+	id = grand_archive.8052
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = {
+			random_system_planet = {
+				limit = { has_planet_flag = shattered_ytterite_world }
+				root = {
+					country_event = {
+						id = grand_archive.8050
+						scopes = { from = prev }
+					}
+				}
+			}
+		}
+	}
+}
+
+# TREASURE_HUNTERS_CHART_PIECE_2_PROJECT on_success
+country_event = {
+	id = grand_archive.8055
+	title = grand_archive.8055.name
+	desc = grand_archive.8055.desc
+	picture = GFX_evt_astral_rift_psionic_stranger_2
+	show_sound = event_lootbox_good
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					has_specimen = ytterite_preserved_corpse
+				}
+				set_country_flag = ytterite_preserved_corpse
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					has_specimen = ytterite_kaleidoscopic_fascinator
+				}
+				set_country_flag = ytterite_kaleidoscopic_fascinator
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					has_specimen = ytterite_royal_scepter
+				}
+				set_country_flag = ytterite_royal_scepter
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			switch = {
+				trigger = has_country_flag
+				ytterite_preserved_corpse = {
+					give_specimen = { key = ytterite_preserved_corpse origin = "NAME_Soropegma" }
+					remove_country_flag = ytterite_preserved_corpse
+				}
+				ytterite_kaleidoscopic_fascinator = {
+					 give_specimen = { key = ytterite_kaleidoscopic_fascinator origin = "NAME_Soropegma" }
+					remove_country_flag = ytterite_kaleidoscopic_fascinator
+				}
+				ytterite_royal_scepter = {
+					give_specimen = { key = ytterite_royal_scepter origin = "NAME_Soropegma" }
+					remove_country_flag = ytterite_royal_scepter
+				}
+			}
+			country_event = { id = grand_archive.8070 days = 1 }
+		}
+		if = {
+			limit = { has_ancrel = yes }
+			add_resource = { minor_artifacts = 10 }
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = minerals
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		capital_scope = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_ANCIENT_CAPSULE_2_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# TREASURE_HUNTERS_ANCIENT_CAPSULE_2_PROJECT on_success
+country_event = {
+	id = grand_archive.8060
+	title = grand_archive.8060.name
+	desc = grand_archive.8060.desc
+	picture = GFX_evt_treasure_hunt_2
+	show_sound = relic_activation_celestial_chart
+
+	location = event_target:black_needle_base_system_for@this
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		spawn_black_needle_base_system = yes
+		upgrade_celestial_chart_relic = yes
+	}
+
+	option = {
+		name = GOOD
+		tooltip = {
+			upgrade_celestial_chart_relic = yes
+		}
+	}
+}
+
+# Ytterite Specimen handling
+country_event = {
+	id = grand_archive.8070
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = treasure_hunters_ytterite_specimen_acquired }
+	}
+
+	immediate = {
+		set_country_flag = treasure_hunters_ytterite_specimen_acquired
+		if = {
+			limit = { has_country_flag = grand_archive_kickstart_proposed }
+			country_event = { id = grand_archive.8076 }
+		}
+		else = {
+			country_event = { id = grand_archive.8075 }
+		}
+	}
+}
+
+# Ytterite Specimen is first specimen story event
+country_event = {
+	id = grand_archive.8075
+	title = grand_archive.8075.name
+	desc = grand_archive.8075.desc
+	picture = GFX_evt_ancient_artifact
+	show_sound = ga_event_grand_archive
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		NOR = {
+			has_technology = tech_galactic_archivism
+			has_country_flag = grand_archive_kickstart_proposed
+		}
+	}
+
+	immediate = {
+		set_country_flag = grand_archive_kickstart_proposed
+	}
+
+	option = {
+		allow = {
+			has_resource = { type = energy amount >= 500 }
+		}
+		name = grand_archive.4006.a
+		add_resource = {
+			energy = -500
+		}
+		add_tech_progress = {
+			tech = tech_galactic_archivism
+			progress = 0.5
+		}
+	}
+
+	option = {
+		name = grand_archive.4006.b
+	}
+
+	after = {
+		capital_scope = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_EXHIBITION_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# Ytterite Specimen is NOT first specimen story event
+country_event = {
+	id = grand_archive.8076
+	title = grand_archive.8076.name
+	desc = grand_archive.8076.desc
+	picture = GFX_evt_ancient_artifact
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = grand_archive.8076.a
+		capital_scope = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_EXHIBITION_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# TREASURE_HUNTERS_EXHIBITION_PROJECT on_success event
+country_event = {
+	id = grand_archive.8080
+	title = grand_archive.8080.name
+	desc = grand_archive.8080.desc
+	picture = GFX_evt_ancient_artifact
+	show_sound = ga_event_grand_archive
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = GOOD
+		if = {
+			limit = { NOT = { has_technology = tech_galactic_archivism } }
+			add_tech_progress = {
+				tech = tech_galactic_archivism
+				progress = 0.25
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		add_modifier = {
+			modifier = exhibition_enhancement_modifier
+		}
+	}
+}
+
+# Galactic Archivism researched
+country_event = {
+	id = grand_archive.8085
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_grand_archive_dlc = yes
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		last_increased_tech = tech_galactic_archivism
+		has_modifier = exhibition_enhancement_modifier
+		NOT = { has_megastructure = grand_archive_0 }
+	}
+
+	immediate = {
+		capital_scope = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_BUILD_GRAND_ARCHIVE"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# Grand Archive built
+# Root = Country
+# From = Megastructure
+# FromFrom = System
+# FromFromFrom = Fleet
+country_event = {
+	id = grand_archive.8090
+	title = "grand_archive.8090.name"
+	desc = "grand_archive.8090.desc"
+	picture = GFX_evt_grand_archive
+	show_sound = ga_event_grand_archive
+	location = FROMFROM
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_grand_archive_dlc = yes
+		FROM = { is_megastructure_type = grand_archive_0 }
+		OR = {
+			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+			is_beastmasters_empire = yes
+			is_galactic_curators_empire = yes
+		}
+	}
+
+	option = {
+		name = MARVELOUS
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		if = {
+			limit = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+			if = {
+				limit = { has_astral_planes_dlc = yes }
+				add_modifier = {
+					modifier = fervor_for_discovery_ap_modifier
+					years = 3
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = fervor_for_discovery_modifier
+					years = 3
+				}
+			}
+		}
+	}
+}
+
+# Black Needle Base planet surveyed
+# Scope = Country
+# From = Planet
+country_event = {
+	id = grand_archive.8100
+	title = grand_archive.8100.name
+	desc = grand_archive.8100.desc
+	picture = GFX_evt_black_needle_base
+	show_sound = ga_event_black_needle_muted
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			has_deposit = d_black_needle_base
+			solar_system = {
+				is_point_of_interest = {
+					id = black_needle_base_system_poi
+					event_chain = treasure_hunters_origin_story_chain
+					owner = root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		remove_point_of_interest = black_needle_base_system_poi
+		from = {
+			set_planet_flag = can_have_scripted_bombardment
+		}
+	}
+
+	option = {
+		name = grand_archive.8100.a
+		if = {
+			limit = {
+				is_pacifist = no
+			}
+			enable_special_project = {
+				name = "BLACK_NEEDLE_BASE_BOMBARD"
+				location = from
+				owner = root
+			}
+			enable_special_project = {
+				name = "BLACK_NEEDLE_BASE_DEPLOY_ARMIES"
+				location = from
+				owner = root
+			}
+		}
+		enable_special_project = {
+			name = "BLACK_NEEDLE_BASE_HACK"
+			location = from
+			owner = root
+		}
+	}
+}
+
+# Black Needle Base planet surveyed
+# Scope = Ship
+# From = Planet
+ship_event = {
+	id = grand_archive.8101
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		controller = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+		from = { has_deposit = d_black_needle_base }
+	}
+
+	immediate = {
+		controller = {
+			country_event = {
+				id = grand_archive.8100
+				scopes = { from = from }
+			}
+		}
+	}
+}
+
+# Black Needle Base system gained
+# Scope = Country
+# From = System
+country_event = {
+	id = grand_archive.8102
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = {
+			random_system_planet = {
+				limit = { has_deposit = d_black_needle_base }
+				root = {
+					country_event = {
+						id = grand_archive.8100
+						scopes = { from = prev }
+					}
+				}
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8103
+	title = grand_archive.8103.name
+	desc = grand_archive.8103.desc
+	picture = GFX_evt_treasure_trove_pirate_fleet
+	show_sound = ga_event_black_needle
+
+	is_triggered_only = yes
+	location = event_target:black_needle_reinforcement_fleet
+
+	trigger = {
+		from = {
+			NOT = { has_planet_flag = reinforcement_fleet_spawned }
+		}
+	}
+
+	immediate = {
+		from = {
+			set_planet_flag = reinforcement_fleet_spawned
+			solar_system = {
+				random_system_planet = {
+					limit = {
+						has_planet_flag = reinforcement_fleet_spawn_point
+					}
+					save_event_target_as = reinforcement_fleet_spawn_point
+				}
+			}
+		}
+		create_black_needle_country = yes
+		create_fleet = {
+			name = "NAME_Pirate_Fleet"
+			effect = {
+				set_owner = event_target:black_needle_country
+				create_pirate_ships_2 = yes
+				create_pirate_ships_4 = yes
+				set_location = event_target:reinforcement_fleet_spawn_point
+				set_fleet_stance = aggressive
+				set_aggro_range_measure_from = self
+				set_aggro_range = 800
+				save_event_target_as = black_needle_reinforcement_fleet
+				auto_follow_fleet = { target = root.fleet attack_fleet = yes }
+				set_fleet_flag = black_needle_reinforcement_fleet@root.controller
+			}
+		}
+	}
+
+	option = {
+		name = VERYWELL
+	}
+}
+
+country_event = {
+	id = grand_archive.8104
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		fromfromfrom = {
+			has_fleet_flag = black_needle_reinforcement_fleet@root
+		}
+	}
+
+	immediate = {
+		fromfrom.solar_system = {
+			random_system_planet = {
+				limit = {
+					has_deposit = d_black_needle_base
+				}
+				save_event_target_as = black_needle_base_planet
+			}
+		}
+		abort_special_project = {
+			type = "BLACK_NEEDLE_BASE_BOMBARD"
+			location = event_target:black_needle_base_planet
+		}
+		event_target:black_needle_base_planet = {
+			enable_special_project = {
+				name = "BLACK_NEEDLE_BASE_BOMBARD_REINFORCEMENTS_KILLED"
+				location = this
+				owner = root
+			}
+		}
+		fromfrom = {
+			fleet_action_research_special_project = {
+				special_project = "BLACK_NEEDLE_BASE_BOMBARD_REINFORCEMENTS_KILLED"
+				target = event_target:black_needle_base_planet
+			}
+		}
+	}
+}
+
+@leader_experience_gain_bombardment = 300
+ship_event = {
+	id = grand_archive.8105
+	title = grand_archive.8105.name
+	desc = grand_archive.8105.desc
+	picture = GFX_evt_black_needle_base
+	show_sound = ga_event_black_needle_muted
+
+	location = fromfrom
+	is_triggered_only = yes
+
+	trigger = {
+		fromfrom = {
+			NOT = { has_planet_flag = black_needle_base_destroyed }
+		}
+	}
+
+	immediate = {
+		fromfrom = {
+			set_planet_flag = black_needle_base_destroyed
+		}
+	}
+
+	option = {
+		name = GOOD
+		custom_tooltip = grand_archive.8105.a.custom_tooltip
+		trigger = {
+			controller = {
+				NOR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+	}
+	option = {
+		name = grand_archive.8105.a.lom
+		custom_tooltip = grand_archive.8105.a.custom_tooltip
+		trigger = {
+			controller = {
+				OR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+	}
+
+	after = {
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		if = {
+			limit = { exists = leader }
+			leader = {
+				add_experience = @leader_experience_gain_bombardment
+			}
+		}
+		else = {
+			controller = {
+				random_owned_leader = {
+					limit = {
+						is_councilor = yes
+						is_councilor_type = councilor_defense
+					}
+					add_experience = @leader_experience_gain_bombardment
+				}
+			}
+		}
+		hidden_effect = {
+			fromfrom = {
+				remove_planet_flag = planet_defended_forbid_colonization
+			}
+			ship_event = {
+				id = grand_archive.8130
+				days = 5
+				scopes = { from = fromfrom }
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8110
+	title = grand_archive.8110.name
+	desc = grand_archive.8110.desc
+	picture = GFX_evt_black_needle_base
+	show_sound = ga_event_black_needle_muted
+
+	location = fromfrom
+	is_triggered_only = yes
+
+	option = {
+		name = GOOD
+		custom_tooltip = grand_archive.8110.a.custom_tooltip
+		trigger = {
+			controller = {
+				NOR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+	}
+	option = {
+		name = grand_archive.8110.a.lom
+		custom_tooltip = grand_archive.8110.a.custom_tooltip
+		trigger = {
+			controller = {
+				OR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+	}
+
+	after = {
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		if = {
+			limit = { exists = leader }
+			leader = {
+				add_experience = @leader_experience_gain_bombardment
+			}
+		}
+		else = {
+			controller = {
+				random_owned_leader = {
+					limit = {
+						is_councilor = yes
+						is_councilor_type = councilor_defense
+					}
+					add_experience = @leader_experience_gain_bombardment
+				}
+			}
+		}
+		hidden_effect = {
+			fromfrom = {
+				remove_planet_flag = planet_defended_forbid_colonization
+			}
+			ship_event = {
+				id = grand_archive.8130
+				days = 5
+				scopes = { from = fromfrom }
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8115
+	title = grand_archive.8115.name
+	desc = {
+		trigger = {
+			leader = {
+				NOR = {
+					has_trait_tier1or2or3 = { TRAIT = leader_trait_slippery }
+					has_trait_tier1or2 = { TRAIT = trait_ruler_charismatic }
+					has_trait = leader_trait_psionic
+				}
+			}
+		}
+		text = grand_archive.8115.desc.default
+	}
+	desc = {
+		trigger = {
+			leader = {
+				has_trait_tier1or2or3 = { TRAIT = leader_trait_slippery }
+			}
+		}
+		text = grand_archive.8115.desc.slippery
+	}
+	desc = {
+		trigger = {
+			leader = {
+				has_trait_tier1or2 = { TRAIT = trait_ruler_charismatic }
+			}
+		}
+		text = grand_archive.8115.desc.charismatic
+	}
+	desc = {
+		trigger = {
+			leader = {
+				has_trait = leader_trait_psionic
+			}
+		}
+		text = grand_archive.8115.desc.psionic
+	}
+	picture = GFX_evt_intelligence_report
+	show_sound = event_espionage_concluded
+
+	location = fromfrom
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.8115.a
+		leader = {
+			add_experience = 800
+		}
+		hidden_effect = {
+			ship_event = {
+				id = grand_archive.8125
+				months = 1
+			}
+		}
+		controller = {
+			enable_special_project = {
+				name = "DECODE_THIRD_MAP_PIECE"
+				owner = this
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8120
+	title = grand_archive.8120.name
+	desc = grand_archive.8120.desc
+	picture = GFX_evt_intelligence_report
+	show_sound = event_espionage_concluded
+
+	location = fromfrom
+	is_triggered_only = yes
+
+	immediate = {
+		fromfrom = {
+			set_planet_flag = scientist_died_while_hacking
+		}
+	}
+
+	option = {
+		name = grand_archive.8120.a
+		kill_leader = { show_notification = yes }
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+			enable_special_project = {
+				name = "DECODE_THIRD_MAP_PIECE"
+				owner = this
+			}
+		}
+		hidden_effect = {
+			ship_event = {
+				id = grand_archive.8125
+				days = 1
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8125
+	title = grand_archive.8125.name
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					fromfromfrom = {
+						has_planet_flag = scientist_died_while_hacking
+					}
+				}
+				text = grand_archive.8125.desc.dead
+			}
+			else = {
+				text = grand_archive.8125.desc.alive
+			}
+		}
+	}
+	picture = GFX_evt_black_needle_base
+	show_sound = ga_event_black_needle_muted
+
+	location = fromfromfrom
+	is_triggered_only = yes
+
+	immediate = {
+		fromfromfrom = {
+			remove_deposit = d_black_needle_base
+			add_deposit = d_abandoned_black_needle_base
+		}
+		controller = {
+			set_country_flag = black_needle_base_stolen_tech
+		}
+	}
+
+	option = {
+		name = grand_archive.8125.a
+		custom_tooltip = grand_archive.8125.a.custom_tooltip
+		hidden_effect = {
+			fromfromfrom = {
+				remove_planet_flag = planet_defended_forbid_colonization
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8130
+	title = grand_archive.8130.name
+	desc = {
+		trigger = {
+			from = {
+				has_planet_flag = black_needle_base_destroyed
+			}
+		}
+		text = grand_archive.8130.desc.bombarded
+	}
+	desc = {
+		trigger = {
+			from = {
+				NOT = { has_planet_flag = black_needle_base_destroyed }
+			}
+		}
+		text = grand_archive.8130.desc.landed
+	}
+	picture = GFX_evt_black_needle_base
+	show_sound = ga_event_treasure_muted
+
+	location = from
+	is_triggered_only = yes
+
+	specimen = black_needle_ceremonial_sword
+
+	immediate = {
+		from = {
+			remove_deposit = d_black_needle_base
+			add_deposit = d_abandoned_black_needle_base
+		}
+		controller = {
+			set_country_flag = black_needle_base_ransacked
+		}
+	}
+
+	option = {
+		name = grand_archive.8130.a
+		allow = {
+			controller = {
+				NOR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			custom_tooltip = opinion_black_needle_base_repatriate_stolen_items_tt
+			every_playable_country = {
+				limit = {
+					has_communications = prev
+					NOT = { is_at_war_with = prev }
+					is_homicidal = no
+				}
+				add_opinion_modifier = {
+					who = prev
+					modifier = opinion_black_needle_base_repatriate_stolen_items
+				}
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8130.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			add_modifier = {
+				modifier = black_needle_base_sold_stolen_items
+				days = 360
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				controller = {
+					OR = {
+						is_privateer_empire = yes # undercoat: moved to scripted trigger
+						is_despoiler_empire = yes # undercoat: moved to scripted trigger
+					}
+				}
+			}
+			text = grand_archive.8130.c.lom
+		}
+		name = {
+			trigger = {
+				controller = {
+					NOR = {
+						is_privateer_empire = yes # undercoat: moved to scripted trigger
+						is_despoiler_empire = yes # undercoat: moved to scripted trigger
+					}
+				}
+			}
+			text = grand_archive.8130.c.default
+		}
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				if = {
+					limit = { is_gestalt = yes }
+					add_monthly_resource_mult = {
+						resource = unity
+						value = @tier2unityreward
+						min = @tier2unitymin
+						max = @tier2unitymax
+					}
+				}
+				else = {
+					add_monthly_resource_mult = {
+						resource = consumer_goods
+						value = @tier2materialreward
+						min = @tier2materialmin
+						max = @tier2materialmax
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				if = {
+					limit = { is_gestalt = yes }
+					add_monthly_resource_mult = {
+						resource = unity
+						value = @tier2unityreward
+						min = @tier2unitymin
+						max = @tier2unitymax
+					}
+					add_monthly_resource_mult = {
+						resource = alloys
+						value = @tier2materialreward
+						min = @tier2materialmin
+						max = @tier2materialmax
+					}
+				}
+				else = {
+					add_monthly_resource_mult = {
+						resource = consumer_goods
+						value = @tier3materialreward
+						min = @tier3materialmin
+						max = @tier3materialmax
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		controller = {
+			enable_special_project = {
+				name = "DECODE_THIRD_MAP_PIECE"
+				owner = this
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8135
+	title = grand_archive.8135.name
+	desc = grand_archive.8135.desc
+	picture = GFX_evt_treasure_hunt_3
+	show_sound = relic_activation_celestial_chart
+
+	location = event_target:smeegibb_system_for@this
+	is_triggered_only = yes
+
+	immediate = {
+		spawn_smeegibb_shelter_system = yes
+		upgrade_celestial_chart_relic = yes
+	}
+
+	option = {
+		name = grand_archive.8135.a
+		tooltip = {
+			upgrade_celestial_chart_relic = yes
+		}
+		add_random_research_option = {
+			add_progress = 0.25
+			category = materials
+		}
+	}
+}
+
+# Smeegibb shelter surveyed
+# Scope = Country
+# From = Planet
+country_event = {
+	id = grand_archive.8200
+	title = grand_archive.8200.name
+	desc = {
+		trigger = {
+			has_country_flag = grand_archive_8025_next_dialog_step
+		}
+		text = grand_archive.8200.desc.alt
+	}
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8025_next_dialog_step }
+		}
+		text = grand_archive.8200.desc
+	}
+	picture = GFX_evt_treasure_hunt_savannah
+	show_sound = event_sensor_ping
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_planet_flag = smeegibb_shelter
+			solar_system = {
+				is_point_of_interest = {
+					id = smeegibb_shelter_system_poi.1
+					event_chain = treasure_hunters_origin_story_chain
+					owner = root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		remove_point_of_interest = smeegibb_shelter_system_poi.1
+	}
+
+	option = {
+		name = ON_SCREEN
+		country_event = {
+			id = grand_archive.8205
+			days = 1
+		}
+	}
+}
+
+# Smeegibb shelter surveyed
+# Scope = Ship
+# From = Planet
+ship_event = {
+	id = grand_archive.8201
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		controller = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+		from = { has_planet_flag = smeegibb_shelter }
+	}
+
+	immediate = {
+		controller = {
+			country_event = {
+				id = grand_archive.8200
+				scopes = { from = from }
+			}
+		}
+	}
+}
+
+# Smeegibb shelter system gained
+# Scope = Country
+# From = System
+country_event = {
+	id = grand_archive.8202
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = {
+			random_system_planet = {
+				limit = { has_planet_flag = smeegibb_shelter }
+				root = {
+					country_event = {
+						id = grand_archive.8200
+						scopes = { from = prev }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Smeegibb (smeegibb_shelter_system_poi)
+country_event = {
+	id = grand_archive.8205
+	title = NAME_Smeegibb
+	diplomatic_title = NAME_Smeegibb
+	desc = {
+		trigger = { is_gestalt = yes }
+		text = grand_archive.8205.desc.gestalt
+	}
+	desc = {
+		trigger = { is_gestalt = no }
+		text = grand_archive.8205.desc.default
+	}
+	show_sound = event_first_contact_molluscoid
+	picture = GFX_evt_treasure_hunt_savannah
+
+	event_window_type = leader_story
+	is_triggered_only = yes
+	force_open = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		create_smeegibb_leader = yes
+	}
+
+	picture_event_data = {
+		portrait = event_target:smeegibb
+	}
+
+	option = {
+		name = grand_archive.8205.a
+		response_text = grand_archive.8205.a.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8205.b
+		response_text = grand_archive.8205.b.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8205.c
+		response_text = grand_archive.8205.c.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8205.d
+		response_text = grand_archive.8205.d.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = CLOSE_COMMUNICATIONS
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8210
+				scopes = { from = from }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8210
+	title = grand_archive.8210.name
+	desc = grand_archive.8210.desc
+	picture = GFX_evt_archaeological_dig
+	show_sound = event_dig_site
+
+	location = event_target:smeegibb_arc_site
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = smeegibb_arc_site_spawned }
+	}
+
+	immediate = {
+		event_target:first_hidden_system_for@this = {
+			random_system_planet = {
+				limit = {
+					has_planet_flag = smeegibb_arc_site
+				}
+				save_event_target_as = smeegibb_arc_site
+			}
+		}
+		set_country_flag = smeegibb_arc_site_spawned
+	}
+
+	option = {
+		name = grand_archive.8210.a
+		event_target:smeegibb_arc_site = {
+			create_archaeological_site = smeegibb_digsite
+		}
+		create_point_of_interest = {
+			id = smeegibb_digsite_poi
+			name = "smeegibb_digsite_poi"
+			desc = smeegibb_digsite_poi_desc
+			event_chain = "treasure_hunters_origin_story_chain"
+			location = event_target:smeegibb_arc_site
+		}
+	}
+}
+
+fleet_event = {
+	id = grand_archive.8220
+	title = grand_archive.8220.name
+	desc = grand_archive.8220.desc
+	picture = GFX_evt_cold_barren
+	show_sound = event_dig_site
+
+	location = from
+	is_triggered_only = yes
+	archaeology = yes
+
+	trigger = {
+		controller = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = grand_archive.8220.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else_if = {
+				limit = { is_gestalt = no }
+				add_monthly_resource_mult = {
+					resource = consumer_goods
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						is_gestalt = no
+						has_ancrel = yes
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = energy
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = energy
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {
+	id = grand_archive.8225
+	title = grand_archive.8225.name
+	desc = grand_archive.8225.desc
+	picture = GFX_evt_cold_barren
+	show_sound = event_dig_site
+
+	location = from
+	is_triggered_only = yes
+	archaeology = yes
+
+	trigger = {
+		controller = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = grand_archive.8225.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {
+	id = grand_archive.8230
+	title = grand_archive.8230.name
+	desc = grand_archive.8230.desc
+	picture = GFX_evt_cold_barren
+	show_sound = event_dig_site
+
+	location = from
+	is_triggered_only = yes
+	archaeology = yes
+
+	specimen = captain_ness_logbook
+
+	trigger = {
+		controller = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+		controller = { remove_point_of_interest = smeegibb_digsite_poi }
+	}
+
+	option = {
+		name = grand_archive.8230.a
+		hidden_effect = {
+			controller = {
+				country_event = { id = grand_archive.8235 days = 1 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8235
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		event_target:smeegibb_system_for@this = {
+			save_event_target_as = smeegibb_system
+		}
+		create_point_of_interest = {
+			id = smeegibb_shelter_system_poi.2
+			name = "smeegibb_shelter_system_2_poi"
+			desc = "smeegibb_shelter_system_2_poi_desc"
+			event_chain = "treasure_hunters_origin_story_chain"
+			location = event_target:smeegibb_system
+		}
+		event_target:smeegibb_system = {
+			if = {
+				limit = {
+					NOT = {
+						any_fleet_in_system = {
+							is_controlled_by = root
+						}
+					}
+				}
+				root = {
+					country_event = {
+						id = grand_archive.8236
+						scopes = { from = prev }
+					}
+				}
+			}
+			else = {
+				root = {
+					country_event = {
+						id = grand_archive.8241
+						scopes = { from = prev }
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8236
+	title = grand_archive.8236.name
+	desc = {
+		trigger = { is_xenophile = yes }
+		text = grand_archive.8236.desc.xenophile
+	}
+	desc = {
+		trigger = { is_xenophile = no }
+		text = grand_archive.8236.desc.default
+	}
+	picture = GFX_evt_treasure_hunt_savannah
+	show_sound = event_comms_cutoff
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		from = {
+			save_event_target_as = smeegibb_system
+		}
+	}
+
+	option = {
+		name = grand_archive.8236.a
+	}
+}
+
+# Treasure Hunters Smeegibb System POI entered
+# Scope = Fleet
+# From = System
+fleet_event = {
+	id = grand_archive.8240
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = controller
+		controller = {
+			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+			has_event_chain = "treasure_hunters_origin_story_chain"
+			FROM = {
+				is_point_of_interest = {
+					id = smeegibb_shelter_system_poi.2
+					event_chain = treasure_hunters_origin_story_chain
+					owner = root.controller
+				}
+			}
+		}
+	}
+
+	immediate = {
+		controller = {
+			country_event = {
+				id = grand_archive.8241
+				scopes = { from = from }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8241
+	title = grand_archive.8241.name
+	desc = grand_archive.8241.desc
+	picture = GFX_evt_treasure_trove_pirate_fleet
+	show_sound = ga_event_black_needle
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		if = {
+			limit = { has_point_of_interest = { poi = smeegibb_shelter_system_poi.2 } }
+			remove_point_of_interest = smeegibb_shelter_system_poi.2
+		}
+		event_target:smeegibb_system_for@this = {
+			random_system_planet = {
+				limit = { has_planet_flag = smeegibb_shelter }
+				remove_deposit = d_hive_dwelling
+				add_deposit = d_ruined_hive_dwelling
+				save_event_target_as = smeegibb_shelter
+				remove_planet_flag = cannot_colonize_smeegibb_shelter
+			}
+		}
+		create_captain_inax_leader = yes
+		create_black_needle_fleet_02 = { LOCATION = from }
+		event_target:black_needle_fleet = {
+			set_fleet_flag = is_in_combat_with@root
+		}
+	}
+
+	option = {
+		name = ON_SCREEN
+		country_event = {
+			id = grand_archive.8245
+			days = 1
+			scopes = { from = event_target:black_needle_fleet }
+		}
+	}
+}
+
+# Inax (smeegibb_shelter_system_poi.2)
+country_event = {
+	id = grand_archive.8245
+	title = grand_archive.8245.name
+	diplomatic_title = grand_archive.8245.name
+	desc = {
+		trigger = {
+			has_country_flag = black_needle_base_ransacked
+		}
+		text = grand_archive.8245.desc.ransacked
+	}
+	desc = {
+		trigger = {
+			has_country_flag = black_needle_base_stolen_tech
+		}
+		text = grand_archive.8245.desc.stolen
+	}
+	show_sound = event_first_contact_arthropoid
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			has_fleet_flag = is_in_combat_with@root
+		}
+	}
+
+	immediate = {
+		event_target:black_needle_base_system_for@this = {
+			random_system_planet = {
+				limit = { has_deposit = d_black_needle_base }
+				save_event_target_as = black_needle_base
+			}
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:captain_inax
+		tooltip = no
+	}
+
+	option = {
+		name = grand_archive.8245.a
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8245_end_dialog }
+		}
+		response_text = grand_archive.8245.a.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8245.b
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8245_end_dialog }
+			OR = {
+				is_species_class = ROBOT
+				is_species_class = MACHINE
+			}
+		}
+		response_text = grand_archive.8245.b.reply.robot
+		is_dialog_only = yes
+	}
+	option = {
+		name = grand_archive.8245.b
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8245_end_dialog }
+			NOR = {
+				is_species_class = ROBOT
+				is_species_class = MACHINE
+			}
+		}
+		response_text = grand_archive.8245.b.reply.default
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8245.c
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8245_end_dialog }
+		}
+		response_text = grand_archive.8245.c.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8245.d
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8245_end_dialog }
+		}
+		response_text = grand_archive.8245.d.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8245.e
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8245_end_dialog }
+		}
+		response_text = grand_archive.8245.e.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = grand_archive_8245_end_dialog } }
+			set_country_flag = grand_archive_8245_end_dialog
+		}
+	}
+
+	option = {
+		name = CLOSE_COMMUNICATIONS
+		trigger = {
+			has_country_flag = grand_archive_8245_end_dialog
+		}
+		hidden_effect = {
+			remove_country_flag = grand_archive_8245_end_dialog
+			country_event = {
+				id = grand_archive.8250
+			}
+		}
+	}
+}
+
+# FROMFROM = Black Needle Fleet
+country_event = {
+	id = grand_archive.8250
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		fromfrom = {
+			has_fleet_flag = is_in_combat_with@root
+		}
+	}
+
+	immediate = {
+		set_black_needle_actively_hostile = {
+			FLEET_SCOPE = fromfrom
+			EVENT_ID = grand_archive.8250
+		}
+		create_point_of_interest = {
+			id = black_needle_fleet_poi.2
+			name = "black_needle_fleet_2_poi"
+			desc = "black_needle_fleet_2_poi_desc"
+			event_chain = "treasure_hunters_origin_story_chain"
+			location = fromfrom
+		}
+	}
+}
+
+# Captain Inax disabled
+# This = Ship
+# From = Disabler Ship
+ship_event = {
+	id = grand_archive.8260
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_ship_flag = captain_inax_ship
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				fleet = { has_fleet_flag = is_in_combat_with@from.controller }
+			}
+			ship_event = {
+				id = grand_archive.8264
+				scopes = { from = from.controller }
+			}
+		}
+		else = { # Captain Inax disabled by someone else
+			random_playable_country = {
+				limit = {
+					root = {
+						fleet = { has_fleet_flag = is_in_combat_with@prevprev }
+					}
+				}
+				root = {
+					ship_event = {
+						id = grand_archive.8264
+						scopes = { from = prev }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Captain Inax disabled (common event)
+# from = country which triggered appearance of fleet
+ship_event = {
+	id = grand_archive.8264
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_ship_flag = captain_inax_ship
+		from = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		fleet = {
+			delete_fleet = {
+				target = this
+			}
+		}
+		from = {
+			if = {
+				limit = { has_point_of_interest = { poi = black_needle_fleet_poi.2 } }
+				remove_point_of_interest = black_needle_fleet_poi.2
+			}
+			country_event = { id = grand_archive.8265 }
+		}
+	}
+}
+
+# Captain Inax after being disabled
+country_event = {
+	id = grand_archive.8265
+	title = grand_archive.8265.name
+	diplomatic_title = grand_archive.8265.name
+	desc = grand_archive.8265.desc
+	show_sound = event_first_contact_arthropoid
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = event_target:captain_inax
+		tooltip = no
+	}
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = grand_archive.8265.a.scared
+		trigger = {
+			is_gestalt = no
+			is_homicidal = no
+		}
+	}
+	option = {
+		name = grand_archive.8265.a.homicidal
+		trigger = {
+			is_gestalt = no
+			is_homicidal = yes
+		}
+	}
+	option = {
+		name = grand_archive.8265.a.gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+
+	after = {
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		if = {
+			limit = { NOT = { has_technology = tech_boarding_cables } }
+			give_technology = { tech = tech_boarding_cables }
+		}
+		event_target:smeegibb_system_for@this = {
+			random_system_planet = {
+				limit = { has_planet_flag = smeegibb_shelter }
+				enable_special_project = {
+					name = "TREASURE_HUNTERS_CHART_PIECE_3_PROJECT"
+					location = this
+					owner = root
+				}
+			}
+		}
+	}
+}
+
+# TREASURE_HUNTERS_CHART_PIECE_3_PROJECT on_success
+country_event = {
+	id = grand_archive.8270
+	title = grand_archive.8270.name
+	desc = grand_archive.8270.desc
+	picture = GFX_evt_treasure_hunt_savannah
+	show_sound = event_collapsing_ruins
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = FASCINATING
+		capital_scope = {
+			enable_special_project = {
+				name = "TREASURE_HUNTERS_ANCIENT_CAPSULE_4_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = minerals
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		give_specimen = { key = smeegibb_statue origin = "[from.GetName]" }
+	}
+}
+
+# TREASURE_HUNTERS_ANCIENT_CAPSULE_4_PROJECT on_success
+country_event = {
+	id = grand_archive.8280
+	title = grand_archive.8280.name
+	desc = grand_archive.8280.desc
+	picture = GFX_evt_treasure_hunt_4
+	show_sound = relic_activation_celestial_chart
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		upgrade_celestial_chart_relic = yes
+	}
+
+	option = {
+		name = GOOD
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8280.a.lom
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		tooltip = {
+			upgrade_celestial_chart_relic = yes
+		}
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8285
+				days = 30
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8285
+	title = grand_archive.8285.name
+	desc = grand_archive.8285.desc
+	picture = GFX_evt_news_room
+	show_sound = event_announcement
+
+	location = event_target:gateway_to_ness_treasure_system
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		spawn_gateway_to_ness_treasure_system = yes
+		event_target:gateway_to_ness_treasure_system_for@this = {
+			random_system_megastructure = {
+				limit = { is_megastructure_type = gateway_ness_ruined }
+				set_megastructure_flag = gateway_to_ness_for@root
+			}
+			save_event_target_as = gateway_to_ness_treasure_system
+		}
+	}
+
+	option = {
+		name = grand_archive.8285.a.default
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8285.a.lom
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+}
+
+# from = planet w/ treasure vault/trove
+country_event = {
+	id = grand_archive.8290
+	title = grand_archive.8290.name
+	desc = {
+		trigger = {
+			has_country_flag = called_8290_from_celestial_chart
+			is_gestalt = no
+		}
+		text = grand_archive.8290.desc.chart.default
+	}
+	desc = {
+		trigger = {
+			has_country_flag = called_8290_from_celestial_chart
+			is_gestalt = yes
+		}
+		text = grand_archive.8290.desc.chart.gestalt
+	}
+	desc = {
+		trigger = {
+			has_country_flag = called_8290_from_treasure_trove
+			is_gestalt = no
+		}
+		text = grand_archive.8290.desc.trove.default
+	}
+	desc = {
+		trigger = {
+			has_country_flag = called_8290_from_treasure_trove
+			is_gestalt = yes
+		}
+		text = grand_archive.8290.desc.trove.gestalt
+	}
+	picture = GFX_evt_treasure_hunt_4
+	show_sound = relic_activation_celestial_chart
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		has_paragon_dlc = yes
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		has_relic = r_celestial_chart_4
+		NOT = { has_country_flag = treasure_hunters_council_position_acquired }
+	}
+
+	immediate = {
+		set_country_flag = treasure_hunters_council_position_acquired
+	}
+
+	option = {
+		name = GOOD
+		if = {
+			limit = { is_gestalt = yes }
+			add_modifier = {
+				modifier = prospect_of_treasure_modifier
+				mult = value:get_ruler_level
+			}
+		}
+		else = {
+			custom_tooltip = grand_archive.8290.tt
+			hidden_effect = {
+				set_country_flag = unlocks_head_treasure_hunter_council
+			}
+		}
+	}
+
+	after = {
+		remove_country_flag = called_8290_from_celestial_chart
+		remove_country_flag = called_8290_from_treasure_trove
+	}
+}
+
+# Prospect of treasure modifier update (ruler level up)
+country_event = {
+	id = grand_archive.8295
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = prospect_of_treasure_modifier
+		from = { is_ruler = yes }
+	}
+
+	immediate = {
+		remove_modifier = prospect_of_treasure_modifier
+		add_modifier = {
+			modifier = prospect_of_treasure_modifier
+			mult = value:get_ruler_level
+		}
+	}
+}
+
+# Prospect of treasure modifier update (ruler changed)
+country_event = {
+	id = grand_archive.8296
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_modifier = prospect_of_treasure_modifier
+	}
+
+	immediate = {
+		remove_modifier = prospect_of_treasure_modifier
+		add_modifier = {
+			modifier = prospect_of_treasure_modifier
+			mult = value:get_ruler_level
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8300
+	title = grand_archive.8300.name
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					controller = {
+						has_communications = event_target:voidworms_country
+					}
+				}
+				text = grand_archive.8300.desc.did_encounter_voidworms
+			}
+			else = {
+				text = grand_archive.8300.desc.didnt_encounter_voidworms
+			}
+		}
+	}
+	picture = GFX_evt_voidworm_flock
+	show_sound = ga_voidworms_troika_attack
+
+	location = event_target:voidworms_fleet
+	is_triggered_only = yes
+
+	trigger = {
+		fromfrom = {
+			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		}
+		from = {
+			is_point_of_interest = {
+				id = gateway_to_ness_treasure_system_poi
+				event_chain = treasure_hunters_origin_story_chain
+				owner = root.controller
+			}
+		}
+	}
+
+	immediate = {
+		controller = {
+			remove_point_of_interest = gateway_to_ness_treasure_system_poi
+		}
+		from = {
+			random_fleet_in_system = {
+				limit = {
+					controller = {
+						is_country_type = voidworms_treasure_hunters
+					}
+				}
+				set_fleet_flag = gateway_voidworms
+				save_event_target_as = voidworms_fleet
+				controller = {
+					set_hostile = prevprevprev.controller
+				}
+				enable_special_project = {
+					name = GATEWAY_VOIDWORMS_KILL_PROJECT
+					location = this
+					owner = root.controller
+				}
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			controller = {
+				OR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		name = grand_archive.8300.a.lom
+	}
+	option = {
+		trigger = {
+			controller = {
+				NOR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+				is_pacifist = no
+			}
+		}
+		name = grand_archive.8300.a
+	}
+	option = {
+		trigger = {
+			controller = {
+				NOR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+				is_pacifist = yes
+			}
+		}
+		name = grand_archive.8300.a.pacifist
+	}
+}
+
+# This = Country triggering event
+# From = owner of voidworms fleet
+# FromFromFrom = voidworms fleet
+country_event = {
+	id = grand_archive.8305
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_country_type = voidworms_treasure_hunters
+		}
+		fromfromfrom = {
+			has_fleet_flag = gateway_voidworms
+		}
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				exists = event_target:gateway_to_ness_treasure_system_for@this
+			}
+			if = {
+				limit = { NOT = { has_communications = root.from } }
+				establish_communications_no_message = root.from
+			}
+			complete_special_project = {
+				type = "GATEWAY_VOIDWORMS_KILL_PROJECT"
+				location = root.fromfromfrom
+			}
+			root.fromfromfrom = {
+				create_ambient_object = {
+					type = voidworm_carcass_01_object
+					location = this
+				}
+			}
+			last_created_ambient_object = {
+				enable_special_project = {
+					name = GATEWAY_VOIDWORMS_DEBRIS_PROJECT
+					location = this
+					owner = prev
+				}
+			}
+			if = {
+				limit = { has_technology = tech_gateway_activation }
+				if = {
+					limit = {
+						event_target:gateway_to_ness_treasure_system_for@this = {
+							any_system_megastructure = {
+								is_megastructure_type = gateway_ness_restored
+							}
+						}
+					}
+					country_event = { id = grand_archive.8400 }
+				}
+				else = {
+					country_event = { id = grand_archive.8325 }
+				}
+			}
+			else = {
+				country_event = { id = grand_archive.8315 }
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = grand_archive.8310
+	title = grand_archive.8310.name
+	desc = {
+		trigger = {
+			controller = {
+				has_communications = event_target:voidworms_country
+			}
+		}
+		text = grand_archive.8310.desc.did_encounter_voidworms
+	}
+	desc = {
+		trigger = {
+			controller = {
+				NOT = { has_communications = event_target:voidworms_country }
+			}
+		}
+		text = grand_archive.8310.desc.didnt_encounter_voidworms
+	}
+	picture = GFX_evt_voidworm_flock
+	show_sound = ga_voidworms_troika_attack
+
+	location = this
+	is_triggered_only = yes
+
+	trigger = {
+		controller = {
+			NOT = { has_country_flag = voidworm_carcass_researched }
+		}
+	}
+
+	immediate = {
+		controller = {
+			set_country_flag = voidworm_carcass_researched
+		}
+		solar_system = {
+			random_system_megastructure = {
+				limit = { has_megastructure_flag = gateway_to_ness_for@root.controller }
+				save_event_target_as = gateway_voidworms
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8310.a
+		custom_tooltip = grand_archive.8310.a.tt
+		hidden_effect = {
+			create_fleet = {
+				effect = {
+					set_owner = root.controller
+					while = {
+						count = @gateway_voidworm_nymph_reward_count
+						create_ship = {
+							name = random
+							random_existing_design = voidworms_small
+							rarity = epic
+						}
+					}
+					set_location = event_target:gateway_voidworms
+				}
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8310.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			give_dna = {
+				ship_category = voidworm
+				rarity = epic
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { exists = event_target:voidworms_country }
+				}
+				create_voidworms_country = yes
+			}
+			controller = {
+				if = {
+					limit = {
+						NOT = { has_communications = event_target:voidworms_country }
+					}
+					country_event = {
+						id = grand_archive.2006
+						scopes = { from = root.solar_system }
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8315
+	title = grand_archive.8315.name
+	desc = grand_archive.8315.desc
+	show_sound = event_administrative_work
+	picture = GFX_evt_drifting_gateway
+
+	location = event_target:gateway_ness_treasure
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_technology = tech_gateway_activation }
+	}
+
+	immediate = {
+		fromfromfrom.solar_system = {
+			random_system_megastructure = {
+				limit = { has_megastructure_flag = gateway_to_ness_for@root }
+				save_event_target_as = gateway_ness_treasure
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		if = {
+			limit = { NOT = { has_technology = tech_gateway_activation } }
+			add_tech_progress = {
+				tech = tech_gateway_activation
+				progress = 0.5
+			}
+			event_target:gateway_ness_treasure = {
+				enable_special_project = {
+					name = RESEARCH_GATEWAY_ACTIVATION_PROJECT
+					location = this
+					owner = root
+				}
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			country_event = {
+				id = grand_archive.8321
+				days = 30
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8320
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		last_increased_tech = tech_gateway_activation
+		has_special_project = RESEARCH_GATEWAY_ACTIVATION_PROJECT
+	}
+
+	immediate = {
+		country_event = { id = grand_archive.8321 }
+	}
+}
+
+country_event = {
+	id = grand_archive.8321
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = activate_gateway_from_tech
+		event_target:gateway_to_ness_treasure_system_for@this = {
+			random_system_megastructure = {
+				limit = { has_megastructure_flag = gateway_to_ness_for@root }
+				save_event_target_as = gateway_ness_treasure
+			}
+		}
+		if = {
+			limit = { has_special_project = RESEARCH_GATEWAY_ACTIVATION_PROJECT }
+			complete_special_project = {
+				type = "RESEARCH_GATEWAY_ACTIVATION_PROJECT"
+				location = event_target:gateway_ness_treasure
+			}
+		}
+		country_event = { id = grand_archive.8325 }
+	}
+}
+
+country_event = {
+	id = grand_archive.8325
+	title = grand_archive.8325.name
+	desc = {
+		trigger = {
+			has_country_flag = activate_gateway_from_tech
+		}
+		text = grand_archive.8325.desc.tech
+	}
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = activate_gateway_from_tech }
+			has_country_flag = voidworms_encountered
+		}
+		text = grand_archive.8325.desc.kill.known
+	}
+	desc = {
+		trigger = {
+			NOR = {
+				has_country_flag = activate_gateway_from_tech
+				has_country_flag = voidworms_encountered
+			}
+		}
+		text = grand_archive.8325.desc.kill.unknown
+	}
+	show_sound = event_mega_structure_other_empire_build_start
+	picture = GFX_evt_drifting_gateway
+
+	location = event_target:gateway_ness_treasure
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = activate_gateway_started }
+		exists = event_target:gateway_to_ness_treasure_system_for@this
+		event_target:gateway_to_ness_treasure_system_for@this = {
+			any_system_megastructure = {
+				has_megastructure_flag = gateway_to_ness_for@root
+			}
+		}
+	}
+
+	immediate = {
+		set_country_flag = activate_gateway_started
+		event_target:gateway_to_ness_treasure_system_for@this = {
+			random_system_megastructure = {
+				limit = {
+					has_megastructure_flag = gateway_to_ness_for@root
+				}
+				save_event_target_as = gateway_ness_treasure
+				enable_special_project = {
+					name = ACTIVATE_GATEWAY_PROJECT
+					location = this
+					owner = root
+				}
+			}
+			save_event_target_as = gateway_to_ness_treasure_system
+		}
+	}
+
+	option = {
+		name = FASCINATING
+	}
+}
+
+# from = megastructure
+country_event = {
+	id = grand_archive.8400
+	title = grand_archive.8400.name
+	desc = grand_archive.8400.desc
+	picture = GFX_evt_treasure_hunt_4
+	show_sound = relic_activation_celestial_chart
+
+	location = event_target:gateway_ness_treasure
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		spawn_ness_treasure_system = yes
+		event_target:ness_treasure_system_for@this = {
+			random_system_megastructure = {
+				limit = { is_megastructure_type = gateway_ness_restored }
+				save_event_target_as = gateway_ness_treasure
+			}
+			save_event_target_as = ness_treasure_system
+		}
+		if = {
+			limit = { has_special_project = ACTIVATE_GATEWAY_PROJECT }
+			complete_special_project = {
+				type = "ACTIVATE_GATEWAY_PROJECT"
+				location = from
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8400.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		create_point_of_interest = {
+			id = ness_treasure_system_poi
+			name = "ness_treasure_system_poi"
+			desc = "ness_treasure_system_poi_desc"
+			event_chain = "treasure_hunters_origin_story_chain"
+			location = from
+		}
+	}
+
+	after = {
+		from = {
+			link_to = event_target:gateway_ness_treasure
+		}
+	}
+}
+
+# Treasure Hunters - Ness system POI entered
+ship_event = {
+	id = grand_archive.8405
+	title = grand_archive.8405.name
+	desc = grand_archive.8405.desc
+	picture = GFX_evt_treasure_trove_pirate_fleet
+	show_sound = ga_event_black_needle
+
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		exists = controller
+		exists = event_target:ness_treasure_system_for@controller
+		event_target:ness_treasure_system_for@controller = {
+			is_same_value = from
+		}
+		controller = {
+			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+			has_event_chain = "treasure_hunters_origin_story_chain"
+			has_point_of_interest = { poi = ness_treasure_system_poi }
+		}
+	}
+
+	immediate = {
+		event_target:ness_treasure_system_for@controller = {
+			save_event_target_as = ness_treasure_system
+		}
+		controller = { remove_point_of_interest = ness_treasure_system_poi }
+		create_cobalt_quill_leader = yes
+		create_final_black_needle_fleet = { LOCATION = from }
+		event_target:black_needle_fleet = {
+			set_fleet_flag = is_spawned_for@root.controller
+		}
+	}
+
+	option = {
+		name = ON_SCREEN
+		trigger = {
+			controller = {
+				is_privateer_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+	}
+	option = {
+		name = grand_archive.8405.a.lom
+		trigger = {
+			controller = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+
+	after = {
+		controller = {
+			country_event = {
+				id = grand_archive.8410
+				days = 1
+				scopes = { from = event_target:black_needle_fleet }
+			}
+		}
+	}
+}
+
+# Cobalt Quill (ness_treasure_system_poi)
+country_event = {
+	id = grand_archive.8410
+	title = grand_archive.8410.name
+	diplomatic_title = grand_archive.8410.name
+	desc = grand_archive.8410.desc
+	show_sound = event_first_contact_mammalian
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+	location = from
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			has_fleet_flag = is_spawned_for@root
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:cobalt_quill
+	}
+
+	option = {
+		name = grand_archive.8410.a
+		trigger = {
+			NOT = { has_country_flag = grand_archive_8410_end_dialog }
+		}
+		response_text = grand_archive.8410.a.reply
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8410_dialog_1
+	}
+
+	option = {
+		name = grand_archive.8410.b
+		trigger = {
+			has_country_flag = grand_archive_8410_dialog_1
+			NOT = { has_country_flag = grand_archive_8410_end_dialog }
+			is_regular_empire = yes
+		}
+		response_text = grand_archive.8410.b.reply.default
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8410_dialog_2
+	}
+	option = {
+		name = grand_archive.8410.b
+		trigger = {
+			has_country_flag = grand_archive_8410_dialog_1
+			NOT = { has_country_flag = grand_archive_8410_end_dialog }
+			is_hive_empire = yes
+		}
+		response_text = grand_archive.8410.b.reply.hive_mind
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8410_dialog_2
+	}
+	option = {
+		name = grand_archive.8410.b
+		trigger = {
+			has_country_flag = grand_archive_8410_dialog_1
+			NOT = { has_country_flag = grand_archive_8410_end_dialog }
+			is_machine_empire = yes
+		}
+		response_text = grand_archive.8410.b.reply.machine
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8410_dialog_2
+	}
+
+	option = {
+		name = grand_archive.8410.c
+		trigger = {
+			has_country_flag = grand_archive_8410_dialog_2
+			NOT = { has_country_flag = grand_archive_8410_end_dialog }
+		}
+		response_text = grand_archive.8410.c.reply
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8410_dialog_3
+	}
+
+	option = {
+		name = grand_archive.8410.d
+		trigger = {
+			has_country_flag = grand_archive_8410_dialog_3
+			NOT = { has_country_flag = grand_archive_8410_end_dialog }
+		}
+		response_text = grand_archive.8410.d.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = CLOSE_COMMUNICATIONS
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = grand_archive_8410_end_dialog }
+				remove_country_flag = grand_archive_8410_end_dialog
+			}
+			country_event = {
+				id = grand_archive.8415
+				days = 1
+			}
+		}
+	}
+}
+
+# Treasure Hunters - Conversation with Cobalt Quill over
+country_event = {
+	id = grand_archive.8415
+	title = grand_archive.8415.name
+	desc = grand_archive.8415.desc
+	picture = GFX_evt_treasure_hunt_4
+	show_sound = relic_activation_celestial_chart
+
+	location = event_target:black_needle_fleet
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		has_event_chain = "treasure_hunters_origin_story_chain"
+		exists = event_target:cobalt_quill
+		fromfrom = {
+			has_fleet_flag = is_spawned_for@root
+		}
+	}
+
+	immediate = {
+		event_target:ness_treasure_system_for@root = {
+			every_fleet_in_system = {
+				limit = { has_fleet_flag = black_needle_fleet }
+				save_event_target_as = black_needle_fleet
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8415.a
+		event_target:black_needle_fleet = {
+			set_fleet_stance = aggressive
+			set_aggro_range_measure_from = self
+			set_aggro_range = 300
+		}
+		set_black_needle_hostile = yes
+		country_event = {
+			id = grand_archive.8505
+			days = 1
+			scopes = { from = fromfrom }
+		}
+	}
+
+	option = {
+		name = grand_archive.8415.b
+		custom_tooltip = grand_archive.8415.b.effect_tt
+		country_event = {
+			id = grand_archive.8500
+			days = 1
+			scopes = { from = fromfrom }
+		}
+	}
+}
+
+# Ending 1 - Map Sold
+country_event = {
+	id = grand_archive.8500
+	title = grand_archive.8500.name
+	desc = grand_archive.8500.desc
+	picture = GFX_evt_treasure_pile
+	show_sound = ga_event_treasure_muted
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_fleet_flag = is_spawned_for@root
+		}
+	}
+
+	immediate = {
+		# Sell relic
+		remove_relic = r_celestial_chart_4
+		export_resource_maximum_to_variable = {
+			resource = energy
+			variable = energy_max_value
+		}
+		add_resource = {
+			energy = @max_credit_mult
+			mult = energy_max_value
+		}
+		clear_variable = energy_max_value
+		create_fleet = {
+			name = "NAME_Black_Needle_Eye"
+			settings = {
+				can_upgrade = yes
+				can_change_composition = yes
+				can_change_leader = yes
+				uses_naval_capacity = yes
+				spawn_debris = no
+			}
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = "NAME_Black_Needle_Eye"
+					design = "NAME_Black_Needle_Eye"
+				}
+				set_location = root.capital_scope
+			}
+		}
+
+		# Cleanup
+		from = { delete_fleet = this }
+		event_target:ness_treasure_system_for@this = {
+			every_fleet_in_system = {
+				limit = {
+					owner = { is_default_or_fallen = yes }
+				}
+				set_mia = mia_return_home
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8500.a
+		custom_tooltip = grand_archive.8500.a.tt
+	}
+
+	after = {
+		event_target:ness_treasure_system_for@this = {
+			every_system_ambient_object = {
+				limit = { is_ambient_object_type = NESS_GRAND_ARCHIVE }
+				create_ambient_object = {
+					location = this
+					type = NESS_GRAND_ARCHIVE_HOARDED
+				}
+				destroy_ambient_object = this
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8505
+	title = grand_archive.8505.name
+	desc = grand_archive.8505.desc
+	picture = GFX_evt_treasure_trove_pirate_fleet
+	show_sound = ga_event_black_needle
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.8505.a
+		start_situation = {
+			type = situation_sabotage
+			target = root
+		}
+	}
+}
+
+# Black Needle Sabotage: losing sabotaged system
+# THIS = System: system whos controller has changed
+# FROM = Country: New controller of the system
+# FROMFROM = Country: Old controller of the system
+system_event = {
+	id = grand_archive.8508
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_star_flag = available_for_sabotage
+		fromfrom = {
+			any_situation = { is_situation_type = situation_sabotage }
+		}
+	}
+
+	immediate = {
+		remove_star_flag = available_for_sabotage
+	}
+}
+
+situation_event = {
+	id = grand_archive.8509
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			count_system_within_border = {
+				count < value:systems_available_for_sabotage
+				limit = {
+					has_star_flag = available_for_sabotage
+				}
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			if = {
+				limit = { is_difficulty = 6 }
+				every_system_within_border = {
+					limit = {
+						NOT = { has_star_flag = available_for_sabotage }
+						OR = {
+							is_capital_system = yes
+							any_system_planet = {
+								is_owned_by = root.owner
+								is_colony = yes
+								num_pops >= 10
+							}
+						}
+					}
+					set_star_flag = available_for_sabotage
+				}
+			}
+			else = {
+				capital_scope.solar_system = {
+					if = {
+						limit = {
+							NOT = { has_star_flag = available_for_sabotage }
+						}
+						set_star_flag = available_for_sabotage
+					}
+				}
+				export_trigger_value_to_variable = {
+					trigger = is_difficulty
+					variable = difficulty_value
+				}
+				while = {
+					count = difficulty_value
+					random_system_within_border = {
+						limit = {
+							NOT = { has_star_flag = available_for_sabotage }
+							any_system_planet = {
+								is_owned_by = root.owner
+								is_colony = yes
+								num_pops >= 10
+							}
+						}
+						set_star_flag = available_for_sabotage
+					}
+				}
+			}
+		}
+	}
+}
+
+# Sabotage fleet spawn check
+situation_event = {
+	id = grand_archive.8510
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			NOR = {
+				has_country_flag = periodic_spawn_block
+				has_country_flag = destroyed_fleet_spawn_cooldown
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			random_system_within_border = {
+				limit = {
+					NOT = { has_star_flag = sabotage_pirate_fleet_spawn_check }
+					has_star_flag = available_for_sabotage
+				}
+				set_star_flag = sabotage_pirate_fleet_spawn_check
+				prev = { set_country_flag = periodic_spawn_block }
+				system_event = {
+					id = grand_archive.8515
+					scopes = { from = root.owner }
+					days = 120
+					random = 90
+				}
+			}
+		}
+	}
+}
+
+# Sabotage fleet spawn
+# from = situation owner
+system_event = {
+	id = grand_archive.8515
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				has_star_flag = available_for_sabotage
+				exists = from
+				is_owned_by = from
+				from = {
+					any_situation = { is_situation_type = situation_sabotage }
+					has_country_flag = periodic_spawn_block
+					NOT = { has_country_flag = destroyed_fleet_spawn_cooldown }
+				}
+			}
+			random_list = {
+				25 = {
+					create_sabotage_fleet = yes
+				}
+				75 = {
+					remove_star_flag = sabotage_pirate_fleet_spawn_check
+				}
+			}
+		}
+		from = { remove_country_flag = periodic_spawn_block }
+	}
+}
+
+# Black Needle Sabotage fleet destroyed during Sabotage situation
+# This = owner of fleet 1 (destroyed)
+# From = owner of fleet 2 (combatant)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = grand_archive.8516
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:black_needle_country
+		is_same_value = event_target:black_needle_country
+		fromfrom = {
+			has_fleet_flag = sabotage_situation_fleet
+		}
+	}
+
+	immediate = {
+		solar_system = {
+			remove_star_flag = sabotage_pirate_fleet_spawn_check
+		}
+		random_playable_country = {
+			limit = {
+				root.fromfrom = {
+					has_fleet_flag = spawned_for@prev
+				}
+				any_situation = { is_situation_type = situation_sabotage }
+			}
+			if = {
+				limit = { has_country_flag = destroyed_fleet_spawn_cooldown }
+				remove_country_flag = destroyed_fleet_spawn_cooldown
+			}
+			set_timed_country_flag = {
+				flag = destroyed_fleet_spawn_cooldown
+				days = 3600
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8520
+	title = grand_archive.8520.name
+	diplomatic_title = grand_archive.8520.name
+	desc = {
+		trigger = { is_machine_empire = yes }
+		text = grand_archive.8520.desc.machine
+	}
+	desc = {
+		trigger = { is_hive_empire = yes }
+		text = grand_archive.8520.desc.hive
+	}
+	desc = {
+		trigger = { is_gestalt = no }
+		text = grand_archive.8520.desc.default
+	}
+	picture = GFX_leader_recruitment_bg_renowned
+	show_sound = event_nem_begin_operation
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+
+	trigger = {
+		any_owned_leader = {
+			is_ruler = no
+			is_heir = no
+			is_gestalt_node = no
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:traitor_leader
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_owned_leader = {
+					has_level >= 3
+					OR = {
+						AND = {
+							owner = { is_gestalt = no }
+							is_gestalt = no
+						}
+						AND = {
+							owner = { is_gestalt = yes }
+							is_gestalt = yes
+						}
+					}
+					NOR = {
+						has_leader_flag = leader_death_events_blocked
+						has_leader_flag = legendary_leader
+					}
+				}
+			}
+			random_owned_leader = {
+				limit = {
+					is_ruler = no
+					is_heir = no
+					is_gestalt_node = no
+					has_level >= 3
+					OR = {
+						AND = {
+							owner = { is_gestalt = no }
+							is_gestalt = no
+						}
+						AND = {
+							owner = { is_gestalt = yes }
+							is_gestalt = yes
+						}
+					}
+					NOR = {
+						has_leader_flag = leader_death_events_blocked
+						has_leader_flag = legendary_leader
+					}
+				}
+				save_event_target_as = traitor_leader
+			}
+		}
+		else = {
+			random_owned_leader = {
+				limit = {
+					is_ruler = no
+					is_heir = no
+					is_gestalt_node = no
+					NOT = { has_leader_flag = leader_death_events_blocked }
+				}
+				save_event_target_as = traitor_leader
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = { is_machine_empire = yes }
+			text = grand_archive.8520.a.machine
+		}
+		name = {
+			trigger = { is_hive_empire = yes }
+			text = grand_archive.8520.a.hive
+		}
+		name = {
+			trigger = {
+				is_machine_empire = no
+				is_hive_empire = no
+			}
+			text = grand_archive.8520.a.default
+		}
+		random_situation = {
+			limit = { is_situation_type = situation_sabotage }
+			add_situation_progress = 20
+		}
+		tooltip = {
+			event_target:traitor_leader = { kill_leader = { show_notification = yes } }
+		}
+		custom_tooltip = grand_archive.8520.a.tt
+		add_modifier = {
+			modifier = sabotage_mass_executions_modifier
+			days = 360
+		}
+		hidden_effect = {
+			every_owned_planet = {
+				limit = { num_pops > 1 }
+				random_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+			}
+			country_event = {
+				id = grand_archive.8525
+				days = 1
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = { is_machine_empire = yes }
+			text = grand_archive.8520.b.machine
+		}
+		name = {
+			trigger = { is_hive_empire = yes }
+			text = grand_archive.8520.b.hive
+		}
+		name = {
+			trigger = {
+				is_machine_empire = no
+				is_hive_empire = no
+			}
+			text = grand_archive.8520.b.default
+		}
+		custom_tooltip = grand_archive.8530.a.tt
+		random_situation = {
+			limit = { is_situation_type = situation_sabotage }
+			add_situation_progress = 10
+		}
+		if = {
+			limit = { is_machine_empire = yes }
+			add_modifier = {
+				modifier = sabotage_education_camps_machine_modifier
+				days = 360
+			}
+		}
+		else_if = {
+			limit = { is_hive_empire = yes }
+			add_modifier = {
+				modifier = sabotage_education_camps_hive_modifier
+				days = 360
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = sabotage_education_camps_modifier
+				days = 360
+			}
+		}
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8530
+				days = 1
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8520.c
+		trigger = { is_gestalt = no }
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 1.2
+					is_militarist = yes
+				}
+				modifier = {
+					factor = 1.2
+					is_xenophobe = yes
+					event_target:traitor_leader = {
+						NOT = { is_same_species_class = root }
+					}
+				}
+				tooltip = {
+					event_target:traitor_leader = { kill_leader = { show_notification = yes } }
+				}
+				hidden_effect = {
+					country_event = {
+						id = grand_archive.8535
+						days = 1
+					}
+				}
+			}
+			1 = {
+				modifier = {
+					factor = 1.2
+					is_pacifist = yes
+				}
+				modifier = {
+					factor = 1.2
+					is_xenophile = yes
+					event_target:traitor_leader = {
+						NOT = { is_same_species_class = root }
+					}
+				}
+				custom_tooltip = grand_archive.8536.a.tt
+				hidden_effect = {
+					country_event = {
+						id = grand_archive.8536
+						days = 1
+					}
+				}
+			}
+		}
+		add_modifier = {
+			modifier = sabotage_vigilante_justice_modifier
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8525
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:traitor_leader = {
+			exile_leader_as = traitor_leader
+		}
+		if = {
+			limit = { is_machine_empire = yes }
+			country_event = { id = grand_archive.8526 }
+		}
+		else_if = {
+			limit = { is_hive_empire = yes }
+			country_event = { id = grand_archive.8527 }
+		}
+		else = {
+			country_event = { id = grand_archive.8528 }
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8526
+	title = grand_archive.8525.name.machine
+	desc = grand_archive.8525.desc.machine
+	picture = GFX_evt_hive_mind
+	show_sound = par_notification_death
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.8525.a
+		hidden_effect = {
+			return_leader_from_exile = traitor_leader
+		}
+		event_target:traitor_leader = {
+			kill_leader = {
+				show_notification = yes
+				executed = yes
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+country_event = {
+	id = grand_archive.8527
+	base = grand_archive.8526
+	desc_clear = yes
+
+	title = grand_archive.8525.name.hive
+	desc = grand_archive.8525.desc.hive
+}
+country_event = {
+	id = grand_archive.8528
+	base = grand_archive.8526
+	desc_clear = yes
+	picture_clear = yes
+
+	title = grand_archive.8525.name.default
+	desc = grand_archive.8525.desc.default
+	picture = GFX_evt_cover_blown
+}
+
+country_event = {
+	id = grand_archive.8530
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { is_machine_empire = yes }
+			country_event = { id = grand_archive.8531 }
+		}
+		else_if = {
+			limit = { is_hive_empire = yes }
+			country_event = { id = grand_archive.8532 }
+		}
+		else = {
+			country_event = { id = grand_archive.8533 }
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8531
+	title = grand_archive.8530.name
+	desc = grand_archive.8530.desc.machine
+	picture = GFX_evt_sapient_AI
+	show_sound = event_salute
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:traitor_leader = {
+			exile_leader_as = traitor_leader
+		}
+	}
+
+	option = {
+		name = grand_archive.8525.a
+		custom_tooltip = grand_archive.8530.a.tt
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			return_leader_from_exile = traitor_leader
+			event_target:traitor_leader = {
+				random_list = {
+					1 = {
+						random_list = {
+							1 = {
+								modifier = {
+									factor = 0
+									has_trait = leader_trait_fallible_2
+								}
+								add_trait = leader_trait_fallible_2
+							}
+							1 = {
+								modifier = {
+									factor = 0
+									has_trait = leader_trait_destructive_2
+								}
+								add_trait = leader_trait_destructive_2
+							}
+							1 = {
+								modifier = {
+									factor = 0
+									has_trait = leader_trait_melancholic_2
+								}
+								add_trait = leader_trait_melancholic_2
+							}
+							1 = {
+								modifier = {
+									factor = 0
+									OR = {
+										is_gestalt = yes
+										has_trait = leader_trait_substance_abuser_2
+										has_trait_tier1or2 = { TRAIT = leader_trait_resilient }
+									}
+								}
+								add_trait = leader_trait_substance_abuser_2
+							}
+						}
+					}
+					1 = {
+						while = {
+							count = 2
+							random_list = {
+								1 = {
+									modifier = {
+										factor = 0
+										has_trait_tier1or2 = { TRAIT = leader_trait_fallible }
+									}
+									add_trait = leader_trait_fallible
+								}
+								1 = {
+									modifier = {
+										factor = 0
+										has_trait_tier1or2 = { TRAIT = leader_trait_destructive }
+									}
+									add_trait = leader_trait_destructive
+								}
+								1 = {
+									modifier = {
+										factor = 0
+										has_trait_tier1or2 = { TRAIT = leader_trait_melancholic }
+									}
+									add_trait = leader_trait_melancholic
+								}
+								1 = {
+									modifier = {
+										factor = 0
+										OR = {
+											is_gestalt = yes
+											has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser }
+											has_trait_tier1or2 = { TRAIT = leader_trait_resilient }
+										}
+									}
+									add_trait = leader_trait_substance_abuser
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+country_event = {
+	id = grand_archive.8532
+	base = grand_archive.8531
+	desc_clear = yes
+	picture_clear = yes
+
+	title = grand_archive.8530.name.hive
+	desc = grand_archive.8530.desc.hive
+	picture = GFX_evt_infiltration_failure
+}
+country_event = {
+	id = grand_archive.8533
+	base = grand_archive.8531
+	desc_clear = yes
+	picture_clear = yes
+
+	title = grand_archive.8530.name.default
+	desc = grand_archive.8530.desc.default
+	picture = GFX_evt_infiltration_failure
+}
+
+country_event = {
+	id = grand_archive.8535
+	title = grand_archive.8535.name
+	desc = grand_archive.8535.desc
+	picture = GFX_evt_open_revolt
+	show_sound = event_planetary_riot
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:traitor_leader = {
+			exile_leader_as = traitor_leader
+		}
+	}
+
+	option = {
+		name = UNFORTUNATE
+		hidden_effect = {
+			return_leader_from_exile = traitor_leader
+		}
+		event_target:traitor_leader = {
+			kill_leader = {
+				show_notification = yes
+				executed = yes
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+country_event = {
+	id = grand_archive.8536
+	title = grand_archive.8536.name
+	desc = grand_archive.8536.desc
+	picture = GFX_evt_announcement
+	show_sound = event_vote
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.8536.a
+		custom_tooltip = grand_archive.8536.a.tt
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			event_target:traitor_leader = {
+				random_list = {
+					1 = {
+						modifier = {
+							factor = 0
+							has_trait_tier1or2 = { TRAIT = leader_trait_fallible }
+						}
+						add_trait = leader_trait_fallible
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							has_trait_tier1or2 = { TRAIT = leader_trait_destructive }
+						}
+						add_trait = leader_trait_destructive
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							has_trait_tier1or2 = { TRAIT = leader_trait_melancholic }
+						}
+						add_trait = leader_trait_melancholic
+					}
+					1 = {
+						modifier = {
+							factor = 0
+							OR = {
+								has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser }
+								has_trait_tier1or2 = { TRAIT = leader_trait_resilient }
+							}
+						}
+						add_trait = leader_trait_substance_abuser
+					}
+				}
+			}
+		}
+	}
+}
+
+# Black Needle Fleet destroyed
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = grand_archive.8540
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:black_needle_country
+		from = { is_same_value = event_target:black_needle_country }
+		fromfromfrom = { has_fleet_flag = black_needle_fleet }
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+				root.fromfromfrom = {
+					has_fleet_flag = is_spawned_for@prev
+				}
+			}
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_sabotage
+					}
+				}
+				country_event = { id = grand_archive.8555 }
+			}
+			else_if = {
+				limit = { has_special_project = TREASURE_HUNTERS_BLACK_NEEDLE_PROJECT }
+				complete_special_project = {
+					type = "TREASURE_HUNTERS_BLACK_NEEDLE_PROJECT"
+					location = root.fromfromfrom
+				}
+			}
+			else = {
+				root.fromfromfrom = {
+					remove_fleet_flag = is_spawned_for@prev
+				}
+				country_event = { id = grand_archive.8560 }
+			}
+		}
+	}
+}
+
+# Situation failed
+country_event = {
+	id = grand_archive.8545
+	title = grand_archive.8545.name
+	desc = grand_archive.8545.desc
+	picture = GFX_evt_announcement
+	show_sound = ga_event_black_needle
+
+	location = event_target:black_needle_fleet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:black_needle_country
+		event_target:black_needle_country = {
+			any_owned_fleet = {
+				has_fleet_flag = black_needle_fleet
+			}
+		}
+	}
+
+	immediate = {
+		cleanup_sabotage_flags = yes
+		event_target:black_needle_country = {
+			random_owned_fleet = {
+				limit = {
+					has_fleet_flag = black_needle_fleet
+				}
+				save_event_target_as = black_needle_fleet
+				enable_special_project = {
+					name = "TREASURE_HUNTERS_BLACK_NEEDLE_PROJECT"
+					location = this
+					owner = root
+				}
+			}
+		}
+		# To avoid "event stays opened" cheese
+		add_modifier = {
+			modifier = sabotage_bad_ending_modifier
+			years = 10
+		}
+	}
+
+	option = {
+		name = grand_archive.8545.a
+		tooltip = {
+			add_modifier = {
+				modifier = sabotage_bad_ending_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Situation ended (Black Needle fleet still alive)
+country_event = {
+	id = grand_archive.8550
+	title = grand_archive.8550.name
+	desc = grand_archive.8550.desc
+	picture = GFX_evt_grand_speech
+	show_sound = event_espionage_concluded
+
+	location = event_target:black_needle_fleet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:black_needle_country
+		event_target:black_needle_country = {
+			any_owned_fleet = {
+				has_fleet_flag = black_needle_fleet
+			}
+		}
+	}
+
+	immediate = {
+		cleanup_sabotage_flags = yes
+		event_target:ness_treasure_system_for@this = {
+			save_event_target_as = hoard_system
+		}
+		event_target:black_needle_country = {
+			random_owned_fleet = {
+				limit = {
+					has_fleet_flag = black_needle_fleet
+				}
+				save_event_target_as = black_needle_fleet
+				enable_special_project = {
+					name = "TREASURE_HUNTERS_BLACK_NEEDLE_PROJECT"
+					location = this
+					owner = root
+				}
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8550.a
+		add_modifier = {
+			modifier = sabotage_good_ending_modifier
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			event_target:black_needle_fleet = {
+				add_modifier = { modifier = black_needle_downscaling }
+			}
+		}
+	}
+}
+
+# Situation ended after Black Needle fleet was defeated
+country_event = {
+	id = grand_archive.8555
+	title = grand_archive.8555.name
+	desc = grand_archive.8555.desc
+	picture = GFX_evt_grand_speech
+	show_sound = event_celebration
+	is_triggered_only = yes
+
+	immediate = {
+		cleanup_sabotage_flags = yes
+		random_situation = {
+			limit = { is_situation_type = situation_sabotage }
+			abort_situation = this
+		}
+	}
+
+	option = {
+		name = grand_archive.8555.a.lom
+		trigger = { is_privateer_empire = yes } # undercoat: moved to scripted trigger
+	}
+	option = {
+		name = grand_archive.8555.a
+		trigger = { is_privateer_empire = no } # undercoat: moved to scripted trigger
+	}
+
+	after = {
+		add_modifier = {
+			modifier = sabotage_great_ending_modifier
+		}
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8560
+				days = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8560
+	title = grand_archive.8560.name
+	diplomatic_title = grand_archive.8560.name
+	desc = grand_archive.8560.desc
+	show_sound = event_first_contact_mammalian
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	picture_event_data = {
+		portrait = event_target:cobalt_quill
+	}
+
+	immediate = {
+		set_country_flag = has_defeated_black_needle
+	}
+
+	option = {
+		name = grand_archive.8560.a.lom
+		trigger = { is_privateer_empire = yes } # undercoat: moved to scripted trigger
+	}
+	option = {
+		name = grand_archive.8560.a
+		trigger = { is_privateer_empire = no } # undercoat: moved to scripted trigger
+	}
+
+	after = {
+		give_specimen = { key = black_needle_ledger origin = "NAME_BlackNeedle" }
+		if = {
+			limit = { is_gestalt = no }
+			add_modifier = {
+				modifier = black_needle_piracy_modifier
+				years = 10
+			}
+		}
+		event_target:ness_treasure_system_for@this = {
+			random_system_ambient_object = {
+				limit = { is_ambient_object_type = NESS_GRAND_ARCHIVE }
+				enable_special_project = {
+					name = "CAPTAIN_NESS_HOARD_PROJECT"
+					location = this
+					owner = root
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8565
+	title = grand_archive.8565.name
+	desc = grand_archive.8565.desc
+	picture = GFX_evt_treasure_cave
+	show_sound = ga_event_treasure
+
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = found_captain_ness_treasure
+	}
+
+	option = {
+		name = grand_archive.8565.a.lom
+		trigger = { is_privateer_empire = yes } # undercoat: moved to scripted trigger
+	}
+	option = {
+		name = grand_archive.8565.a
+		trigger = { is_privateer_empire = no } # undercoat: moved to scripted trigger
+	}
+
+	after = {
+		country_event = {
+			id = grand_archive.8570
+			days = 1
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8570
+	title = NAME_CaptainNess
+	diplomatic_title = NAME_CaptainNess
+	desc = grand_archive.8570.desc
+	show_sound = aqu_portrait_machine
+	picture = GFX_evt_treasure_cave
+
+	event_window_type = leader_story
+	is_triggered_only = yes
+	force_open = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		create_captain_ness_leader = yes
+		random_country = {
+			limit = {
+				is_fallen_empire = yes # undercoat: moved to scripted trigger
+			}
+			save_event_target_as = fallen_empire
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:captain_ness_leader
+	}
+
+	option = {
+		name = grand_archive.8570.a
+		trigger = {
+			exists = event_target:fallen_empire
+		}
+		response_text = grand_archive.8570.a.reply_fallen_empire
+		is_dialog_only = yes
+	}
+	option = {
+		name = grand_archive.8570.a
+		trigger = {
+			NOT = { exists = event_target:fallen_empire }
+		}
+		response_text = grand_archive.8570.a.reply_curator
+		is_dialog_only = yes
+	}
+	option = {
+		name = grand_archive.8570.b
+		response_text = grand_archive.8570.b.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = grand_archive.8570.c
+		response_text = grand_archive.8570.c.reply
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8570_dialog_step_1
+	}
+
+	option = {
+		name = grand_archive.8570.d
+		trigger = {
+			has_country_flag = grand_archive_8570_dialog_step_1
+		}
+		response_text = grand_archive.8570.d.reply
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8570_dialog_step_2
+	}
+
+	option = {
+		name = grand_archive.8570.e
+		trigger = {
+			has_country_flag = grand_archive_8570_dialog_step_2
+			NOT = { has_country_flag = grand_archive_8570_dialog_step_3 }
+		}
+		response_text = grand_archive.8570.e.reply
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8570_dialog_step_3
+	}
+
+	option = {
+		name = grand_archive.8570.f
+		trigger = {
+			has_country_flag = grand_archive_8570_dialog_step_3
+			NOT = { has_country_flag = grand_archive_8570_dialog_step_4 }
+		}
+		response_text = grand_archive.8570.f.reply
+		is_dialog_only = yes
+		set_country_flag = grand_archive_8570_dialog_step_4
+	}
+
+	option = {
+		name = grand_archive.8570.g
+		trigger = {
+			has_country_flag = grand_archive_8570_dialog_step_4
+		}
+		response_text = grand_archive.8570.g.reply
+		is_dialog_only = yes
+	}
+
+	option = {
+		name = CLOSE_COMMUNICATIONS
+		country_event = {
+			id = grand_archive.8575
+			days = 1
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8575
+	title = grand_archive.8575.name
+	desc = {
+		trigger = {
+			NOR = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+				is_despoiler_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		text = grand_archive.8575.desc.default
+	}
+	desc = {
+		trigger = {
+			OR = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+				is_despoiler_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		text = grand_archive.8575.desc.lom
+	}
+	picture = GFX_evt_treasure_cave
+	show_sound = ga_event_treasure
+	is_triggered_only = yes
+
+	option = {
+		name = {
+			trigger = {
+				OR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			text = grand_archive.8575.a.lom
+		}
+		name = {
+			trigger = {
+				NOR = {
+					is_privateer_empire = yes # undercoat: moved to scripted trigger
+					is_despoiler_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			text = grand_archive.8575.a.default
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = exotic_gases
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = rare_crystals
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = volatile_motes
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+		if = {
+			limit = { country_uses_consumer_goods = yes }
+			add_monthly_resource_mult = {
+				resource = consumer_goods
+				value = @tier5materialreward
+				min = @tier5materialmin
+				max = @tier5materialmax
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier5materialreward
+				min = @tier5materialmin
+				max = @tier5materialmax
+			}
+		}
+		if = {
+			limit = { has_ancrel = yes }
+			add_monthly_resource_mult = {
+				resource = minor_artifacts
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+		give_specimen = { key = perikan_tapico_jewel }
+		give_specimen = { key = robe_of_the_golden_broker }
+		hidden_effect = {
+			set_country_flag = treasure_hunters_8580_choice_1
+		}
+	}
+
+	option = {
+		name = grand_archive.8575.b
+		trigger = {
+			NOR = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+				is_despoiler_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = exotic_gases
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = rare_crystals
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = volatile_motes
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+		custom_tooltip = opinion_return_traceable_items_tier_1_tt
+		custom_tooltip = wealth_distribute_favor_tier_1_tt
+		give_specimen = { key = perikan_tapico_jewel }
+		hidden_effect = {
+			every_playable_country = {
+				limit = {
+					NOR = {
+						is_same_value = root
+						is_at_war_with = prev
+					}
+					is_homicidal = no
+				}
+				add_opinion_modifier = {
+					who = prev
+					modifier = opinion_return_traceable_items_tier_1
+				}
+			}
+			every_playable_country = {
+				limit = { NOT = { is_same_value = root } }
+				root = {
+					add_favors = {
+						target = prev
+						value = 1
+					}
+				}
+			}
+			set_country_flag = treasure_hunters_8580_choice_2
+		}
+	}
+
+	option = {
+		name = grand_archive.8575.c
+		trigger = {
+			NOR = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+				is_despoiler_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+		custom_tooltip = opinion_return_traceable_items_tier_2_tt
+		custom_tooltip = wealth_distribute_favor_tier_2_tt
+		hidden_effect = {
+			every_playable_country = {
+				limit = {
+					NOT = { is_at_war_with = prev }
+					is_homicidal = no
+				}
+				add_opinion_modifier = {
+					who = prev
+					modifier = opinion_return_traceable_items_tier_2
+				}
+			}
+			every_playable_country = {
+				limit = { NOT = { is_same_value = root } }
+				root = {
+					add_favors = {
+						target = prev
+						value = 2
+					}
+				}
+			}
+			hidden_effect = {
+				set_country_flag = treasure_hunters_8580_choice_3
+			}
+		}
+		add_modifier = {
+			modifier = galactic_philanthropy_modifier
+			days = 18000
+		}
+	}
+
+	after = {
+		country_event = {
+			id = grand_archive.8580
+			days = 30
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8580
+	title = grand_archive.8580.name
+	diplomatic_title = NAME_CaptainNess
+	desc = {
+		trigger = {
+			if = {
+				limit = { has_country_flag = treasure_hunters_8580_choice_1 }
+				text = grand_archive.8580.desc.1
+			}
+			else_if = {
+				limit = { has_country_flag = treasure_hunters_8580_choice_2 }
+				text = grand_archive.8580.desc.2
+			}
+			else_if = {
+				limit = { has_country_flag = treasure_hunters_8580_choice_3 }
+				text = grand_archive.8580.desc.3
+			}
+			text = newline
+			if = {
+				limit = { is_gestalt = no }
+				text = grand_archive.8580.desc.default
+				if = {
+					limit = {
+						NOR = {
+							is_privateer_empire = yes # undercoat: moved to scripted trigger
+							is_despoiler_empire = yes # undercoat: moved to scripted trigger
+						}
+					}
+					text = newline
+					text = grand_archive.8580.desc.no_lom
+				}
+			}
+			else = {
+				text = grand_archive.8580.desc.gestalt
+			}
+		}
+	}
+	show_sound = aqu_portrait_machine
+	is_triggered_only = yes
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+
+	picture_event_data = {
+		portrait = event_target:captain_ness_leader
+		room = ethic_spaceship_room
+	}
+
+	option = {
+		name = grand_archive.8580.b
+		trigger = { is_gestalt = yes }
+		add_modifier = {
+			modifier = pirate_queen_modifier_gestalt
+			days = -1
+		}
+		if = {
+			limit = {
+				is_privateer_empire = no # undercoat: moved to scripted trigger
+			}
+			hidden_effect = {
+				set_country_flag = unlocked_pirate_raid_cb
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8580.c
+		trigger = { is_gestalt = no }
+		add_modifier = {
+			modifier = pirate_queen_modifier
+			days = -1
+		}
+		if = {
+			limit = {
+				is_privateer_empire = no # undercoat: moved to scripted trigger
+			}
+			hidden_effect = {
+				set_country_flag = unlocked_pirate_raid_cb
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8580.d
+		trigger = {
+			NOR = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+				is_despoiler_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		add_modifier = {
+			modifier = rule_of_law_modifier
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8590
+				days = 1
+			}
+		}
+	}
+
+	option = {
+		name = grand_archive.8580.a
+		custom_tooltip = grand_archive.8580.a.tt
+		tag = hire_leader
+		hidden_effect = {
+			clone_leader = {
+				target = event_target:captain_ness_leader
+				skip_background_generation = yes
+				effect = {
+					set_gender = female
+					change_background_job = captain
+					set_leader_flag = legendary_leader
+					set_leader_flag = immune_to_negative_traits
+					set_leader_flag = leader_death_events_blocked
+					fire_on_action = {
+						on_action = on_leader_hired
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				is_privateer_empire = no # undercoat: moved to scripted trigger
+			}
+			hidden_effect = {
+				set_country_flag = unlocked_pirate_raid_cb
+			}
+		}
+		else = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+		}
+	}
+
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8585
+				days = 1
+			}
+		}
+	}
+
+	after = {
+		give_specimen = { key = captain_ness_body }
+		country_event = {
+			id = grand_archive.8600
+			days = 30
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8585
+	title = NAME_CaptainNess
+	diplomatic_title = NAME_CaptainNess
+	desc = grand_archive.8585.desc
+	show_sound = aqu_portrait_machine
+	picture = GFX_evt_treasure_cave
+
+	event_window_type = leader_story
+	is_triggered_only = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = event_target:captain_ness_leader
+	}
+
+	option = {
+		name = grand_archive.8585.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8590
+	title = NAME_CaptainNess
+	diplomatic_title = NAME_CaptainNess
+	desc = grand_archive.8590.desc
+	show_sound = aqu_portrait_machine
+	picture = GFX_evt_treasure_cave
+
+	event_window_type = leader_story
+	is_triggered_only = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = event_target:captain_ness_leader
+	}
+
+	option = {
+		name = grand_archive.8590.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		hidden_effect = {
+			country_event = {
+				id = grand_archive.8595
+				days = 1800
+				random = 1800
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8595
+	title = grand_archive.8595.name
+	desc = grand_archive.8595.desc
+	picture = GFX_evt_space_station
+	show_sound = event_default
+	is_triggered_only = yes
+
+	option = {
+		name = grand_archive.8595.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8600
+	title = grand_archive.8600.name
+	desc = {
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+		text = grand_archive.8600.desc.lom
+	}
+	desc = {
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+		text = grand_archive.8600.desc.default
+	}
+	picture = GFX_evt_treasure_hunt_4
+	show_sound = event_celebration
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { has_event_chain = "treasure_hunters_origin_story_chain" }
+			end_event_chain = "treasure_hunters_origin_story_chain"
+		}
+	}
+
+	option = {
+		name = grand_archive.8600.a.lom
+		trigger = {
+			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = grand_archive.8600.a.default
+		trigger = {
+			is_privateer_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		if = {
+			limit = { has_astral_planes_dlc = yes }
+			add_modifier = {
+				modifier = adventure_calls_rift_modifier
+				days = -1
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = adventure_calls_modifier
+				days = -1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = grand_archive.8610
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = tech_mine_rare_crystals_culling_boost }
+		from = {
+			is_crystal_ship_size = yes
+		}
+	}
+
+	immediate = {
+		set_country_flag = tech_mine_rare_crystals_culling_boost
+	}
+}

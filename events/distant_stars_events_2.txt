@@ -217,7 +217,7 @@ event = {
 				}
 			}
 			establish_communications_no_message = event_target:ratling_pre_space_country
-			establish_contact = { who = this location = this.capital_scope }
+			establish_contact = { who = event_target:ratling_pre_space_country location = this.capital_scope } # ariphaos
 		}
 	}
 }
@@ -501,6 +501,10 @@ country_event = { #Atomic Clock follow-up: Selection
 	is_triggered_only = yes
 
 	immediate = {
+		FROMFROM.solar_system = {
+			save_event_target_as = atomic_clock_system
+		}
+
 		random_list = {
 			0 = {
 				modifier = {
@@ -614,8 +618,8 @@ country_event = { #Atomic Clock follow-up: A system planet is terraformed
 	option = {
 		trigger = {
 			event_target:atomic_clock_planet.solar_system = {
-				any_ship_in_system = {
-					owner = { is_same_value = root }
+				any_fleet_in_system = { # ariphaos
+					is_owned_by = root
 					OR = {
 						is_ship_class = shipclass_military_station
 						is_ship_class = shipclass_military
@@ -644,6 +648,8 @@ country_event = { #A system planet is terraformed
 	location = event_target:atomic_clock_planet
 
 	is_triggered_only = yes
+
+	specimen = peerless_atomic_clock
 
 	option = {
 		name = INCREDIBLE
@@ -680,6 +686,8 @@ country_event = { #A system planet is gray gooed
 
 	is_triggered_only = yes
 
+	specimen = peerless_atomic_clock
+
 	immediate = {
 		event_target:atomic_clock_planet = {
 			if = {
@@ -713,6 +721,8 @@ country_event = { #A useable Gray Goo Ship is built
 	location = event_target:nanite_ship_fleet
 
 	is_triggered_only = yes
+
+	specimen = peerless_atomic_clock
 
 	immediate = {
 		create_country = {
@@ -812,6 +822,8 @@ country_event = { #An unmanned computer network is built
 	location = FROMFROMFROM
 
 	is_triggered_only = yes
+
+	specimen = peerless_atomic_clock
 
 	immediate = {
 	}
@@ -2478,9 +2490,7 @@ ship_event = {
 					is_machine_empire = yes
 					is_synthetic_empire = yes
 					owner_species = {
-						has_trait = trait_mechanical
-						has_trait = trait_machine_unit
-						has_trait = trait_lithoid
+						NOT = { is_archetype = BIOLOGICAL }
 					}
 				}
 			}
@@ -7566,6 +7576,8 @@ country_event = { # Planetfall on planet X after being shoot into deep space. Re
 
 	is_triggered_only = yes
 
+	specimen = declaration_of_animosity
+
 	trigger = {
 		any_system = {
 			any_system_planet = {
@@ -7729,6 +7741,8 @@ country_event = { # Helpful relocation was a success
 	location = event_target:nivlac_planet
 
 	is_triggered_only = yes
+
+	specimen = declaration_of_friendship
 
 	trigger = {
 		any_system = {
@@ -7939,6 +7953,9 @@ ship_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		from = {
+			save_event_target_as = stranded_scientist_asteroid
+		}
 		save_global_event_target_as = stranded_scientist_science_ship
 
 		create_species = {
@@ -7979,17 +7996,17 @@ ship_event = {
 				class = scientist
 				species = event_target:stranded_scientist_species
 				name = random
-				skill = 6
 				event_leader = yes
 				leader_age_min = 30
 				leader_age_max = 50
-				traits = {
-					trait = "leader_trait_expertise_computing"
-					trait = "leader_trait_spark_of_genius"
-				}
+				randomize_traits = no
 			}
 		}
 		last_created_leader = {
+			add_trait = trait_ruler_eye_for_talent
+			add_trait = leader_trait_spark_of_genius_2
+			add_trait = subclass_scientist_councilor
+			add_trait = leader_trait_expertise_computing_2
 			set_gender = female
 			save_global_event_target_as = stranded_scientist_leader
 			exile_leader_as = stranded_scientist_leader
@@ -8005,7 +8022,10 @@ ship_event = {
 				clone_leader = {
 					target = event_target:stranded_scientist_leader
 					class = scientist
+					background_planet = event_target:stranded_scientist_asteroid
+					custom_description = "stranded_scientist_background"
 					effect = {
+						set_skill = 6
 						save_global_event_target_as = stranded_scientist_leader_clone
 					}
 				}
@@ -8231,6 +8251,8 @@ country_event = { # Integration into our society complete
 	location = from
 
 	is_triggered_only = yes
+
+	specimen = high_geode_of_the_molluscoids
 
 	immediate = {
 		create_species = {
@@ -8650,6 +8672,8 @@ country_event = { # Alien Box opened
 
 	is_triggered_only = yes
 
+	specimen = centrifugal_container
+
 	option = { # Use the red solution
 		name = distar.3055.a
 		custom_tooltip = distar.3055.a.tooltip
@@ -8875,12 +8899,14 @@ country_event = { # Alien Box opened
 			limit = {
 				is_gestalt = yes
 			}
-			every_owned_leader = {
-				limit = {
-					is_councilor = yes
-					is_ruler = no
+			hidden_effect = {
+				every_owned_leader = {
+					limit = {
+						is_councilor = yes
+						is_ruler = no
+					}
+					set_gestalt_node_portrait_effect = yes
 				}
-				set_gestalt_node_portrait_effect = yes
 			}
 		}
 	}

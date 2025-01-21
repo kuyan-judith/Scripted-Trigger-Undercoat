@@ -105,35 +105,28 @@ first_contact_event = {
 
 	desc = {
 		trigger = {
-			owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
-		}
-		text = story.501.desc.gesta
-	}
-	# Spiri
-	desc = {
-		trigger = {
-			owner = {
-				OR = {
-					has_ethic = ethic_spiritualist
-					has_ethic = ethic_fanatic_spiritualist
+			if = {
+				limit = {
+					owner = { is_gestalt = yes }
 				}
+				text = story.501.desc.gesta
+			}
+			else_if = {
+				limit = {
+					owner = { is_spiritualist = yes }
+				}
+				text = story.501.desc.spiri
+			}
+			else = {
+				text = first_contact_critters.15.desc
+			}
+			text = newline
+			success_text = {
+				text = first_contact_critters.15.desc.primal_calling
+				owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
 			}
 		}
-		text = story.501.desc.spiri
 	}
-	desc = {
-		trigger = {
-			owner = {
-				NOR = {
-					has_ethic = ethic_spiritualist
-					has_ethic = ethic_fanatic_spiritualist
-					is_gestalt = yes # undercoat: moved to scripted trigger
-				}
-			}
-		}
-		text = first_contact_critters.15.desc
-	}
-
 
 	immediate = {
 		set_site_progress_locked = yes
@@ -150,6 +143,17 @@ first_contact_event = {
 		# 	}
 		# 	owner = { country_event = galactic_features.387 } #Tiyanki graveyard follow-up
 		# }
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = grand_archive.200
+					scopes = {
+						from = event_target:tiyanki_country
+						fromfrom = root.solar_system
+					}
+				}
+			}
+		}
 	}
 
 	option = {
@@ -284,6 +288,16 @@ first_contact_event = {
 					progress = 0.1
 				}
 			}
+			if = {
+				limit = {
+					OR = {
+						is_xenophobe = yes
+						is_militarist = yes
+						is_homicidal = yes
+					}
+				}
+				increase_hunted_fauna_count = yes
+			}
 		}
 	}
 }
@@ -342,6 +356,10 @@ first_contact_event = {
 				text = story.101.desc.fruitful
 				hidden:owner = { is_fruitful_empire = yes } # undercoat: moved to scripted trigger
 			}
+			success_text = {
+				text = first_contact_critters.25.desc.primal_calling
+				hidden:owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
+			}
 		}
 	}
 
@@ -357,6 +375,17 @@ first_contact_event = {
 
 	after = {
 		set_site_progress_locked = no
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = grand_archive.200
+					scopes = {
+						from = event_target:amoeba_country
+						fromfrom = root.solar_system
+					}
+				}
+			}
+		}
 	}
 
 	option = {
@@ -375,6 +404,7 @@ first_contact_event = {
 				modifier = amoeba_hunting_buff
 				days = -1
 			}
+			increase_hunted_fauna_count = yes
 		}
 		custom_tooltip = story.101.aa.amoebahunt
 		finish_first_contact_effect = yes
@@ -495,6 +525,10 @@ first_contact_event = {
 				text = story.201.desc.fruitful
 				hidden:owner = { is_fruitful_empire = yes } # undercoat: moved to scripted trigger
 			}
+			success_text = {
+				text = first_contact_critters.35.desc.primal_calling
+				hidden:owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
+			}
 		}
 	}
 	picture = GFX_evt_fleet_evil
@@ -523,6 +557,7 @@ first_contact_event = {
 				modifier = crystal_hunting_buff
 				days = -1
 			}
+			increase_hunted_fauna_count = yes
 		}
 		custom_tooltip = story.201.aa.crystalhunt
 	}
@@ -547,6 +582,7 @@ first_contact_event = {
 				OR = {
 					values_others = yes
 					is_pacifist = yes
+					is_beastmasters_empire = yes
 			   }
 			}
 		}
@@ -564,9 +600,19 @@ first_contact_event = {
 	after = {
 		finish_first_contact_effect = yes
 		set_site_progress_locked = no
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = grand_archive.200
+					scopes = {
+						from = event_target:crystal_country
+						fromfrom = root.solar_system
+					}
+				}
+			}
+		}
 	}
 }
-
 
 ### Drones
 

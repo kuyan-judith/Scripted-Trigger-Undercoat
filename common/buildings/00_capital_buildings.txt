@@ -58,10 +58,9 @@ building_colony_shelter = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/enforcers_add
+		script = stu/jobs_add
+		job_type = enforcers
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { has_dystopian_society = yes }
 		"
@@ -86,12 +85,16 @@ building_colony_shelter = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:colony_shelter_roboticists_stu"
 		trigger = "
-			owner = { is_individual_machine = yes }
+			owner = {
+				OR = {
+					is_individual_machine = yes
+					has_active_tradition = tr_synthetics_prefabricated_components
+				}
+			}
 		"
 	}
 	triggered_planet_modifier = {
@@ -104,10 +107,9 @@ building_colony_shelter = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
+		script = stu/jobs_add
+		job_type = roboticists
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
 		"
@@ -230,10 +232,9 @@ building_capital = {
 
 	# Undercoat inline script
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			exists = owner.federation
 			owner.federation = { has_federation_perk = culture_workers_1 }
@@ -387,14 +388,13 @@ building_major_capital = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 1
-		desc = 1
 		trigger = "
 			exists = owner.federation
 			owner.federation = { has_federation_perk = culture_workers_1 }
 		"
-		mult_line = " "
 	}
 
 	resources = {
@@ -555,14 +555,13 @@ building_system_capital = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 2
-		desc = 1
 		trigger = "
 			exists = owner.federation
 			owner.federation = { has_federation_perk = culture_workers_1 }
 		"
-		mult_line = " "
 	}
 
 	resources = {
@@ -636,22 +635,11 @@ building_deployment_post = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = no }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_capital_replicators_stu"
 		trigger = "
 			NOT = { has_modifier = gestation_colony }
-			owner = { is_machine_assimilator = yes }
 		"
 	}
 
@@ -759,22 +747,11 @@ building_machine_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = no }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_capital_replicators_stu"
 		trigger = "
 			NOT = { has_modifier = gestation_colony }
-			owner = { is_machine_assimilator = yes }
 		"
 	}
 
@@ -895,22 +872,11 @@ building_machine_major_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = no }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_capital_replicators_stu"
 		trigger = "
 			NOT = { has_modifier = gestation_colony }
-			owner = { is_machine_assimilator = yes }
 		"
 	}
 
@@ -1039,34 +1005,11 @@ building_machine_system_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/roboticists_add
-		AMOUNT = 2
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = -1
-		desc = 0
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_system_capital_replicators_stu"
 		trigger = "
-			owner = { is_machine_assimilator = yes }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			num_sapient_pops >= 10
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			num_sapient_pops >= 40
+			NOT = { has_modifier = gestation_colony }
 		"
 	}
 
@@ -1476,7 +1419,8 @@ building_hab_capital = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/enforcers_add
+		script = stu/jobs_add
+		job_type = enforcers
 		AMOUNT = 1
 		desc = 1
 		mult_line = " "
@@ -1505,10 +1449,9 @@ building_hab_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
+		script = stu/jobs_add
+		job_type = roboticists
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { is_machine_empire = yes }
 		"
@@ -1644,7 +1587,8 @@ building_hab_major_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
+		script = stu/jobs_add
+		job_type = roboticists
 		AMOUNT = 1
 		desc = 1
 		mult_line = " "
@@ -1663,17 +1607,16 @@ building_hab_major_capital = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/politicians_add
+		script = stu/jobs_add
+		job_type = politicians
 		POLITICIAN_AMOUNT = 2
 		STEWARD_AMOUNT = 3
-		desc = 1
 		trigger = "
 			OR = {
 				NOT = { has_planet_flag = toxic_knights_habitat }
 				NOT = { owner = { is_toxic_knights_empire = yes } }
 			}
 		"
-		mult_line = " "
 	}
 	inline_script = { # undercoat: moved to inline script
 		script = jobs/triggered/civic_capital_jobs
@@ -1682,7 +1625,7 @@ building_hab_major_capital = {
 		trigger = "
 			OR = {
 				NOT = { has_planet_flag = toxic_knights_habitat }
-				NOT = { owner = { is_toxic_knights_empire = yes } }
+				NOT = { owner = { is_toxic_knights_empire = yes } } # undercoat: moved to scripted trigger
 			}
 		"
 		mult_line = " "
@@ -1704,7 +1647,8 @@ building_hab_major_capital = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/enforcers_add
+		script = stu/jobs_add
+		job_type = enforcers
 		AMOUNT = 1
 		desc = 1
 		mult_line = " "
@@ -1725,7 +1669,8 @@ building_hab_major_capital = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 1
 		desc = 1
 		trigger = "
@@ -1787,6 +1732,14 @@ building_hab_major_capital = {
 			owner = { is_machine_empire = yes }
 		}
 		text = job_evaluator_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		text = job_replicator_effect_desc
 	}
 
 	triggered_desc = {
@@ -1911,10 +1864,9 @@ building_hab_system_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
+		script = stu/jobs_add
+		job_type = roboticists
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { is_machine_empire = yes }
 		"
@@ -1930,17 +1882,16 @@ building_hab_system_capital = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/politicians_add
+		script = stu/jobs_add
+		job_type = politicians
 		POLITICIAN_AMOUNT = 3
 		STEWARD_AMOUNT = 4
-		desc = 1
 		trigger = "
 			OR = {
 				NOT = { has_planet_flag = toxic_knights_habitat }
 				NOT = { owner = { is_toxic_knights_empire = yes } }
 			}
 		"
-		mult_line = " "
 	}
 	inline_script = { # undercoat: moved to inline script
 		script = jobs/triggered/civic_capital_jobs
@@ -1949,7 +1900,7 @@ building_hab_system_capital = {
 		trigger = "
 			OR = {
 				NOT = { has_planet_flag = toxic_knights_habitat }
-				NOT = { owner = { is_toxic_knights_empire = yes } }
+				NOT = { owner = { is_toxic_knights_empire = yes } } # undercoat: moved to scripted trigger
 			}
 		"
 		mult_line = " "
@@ -1971,7 +1922,8 @@ building_hab_system_capital = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/enforcers_add
+		script = stu/jobs_add
+		job_type = enforcers
 		AMOUNT = 2
 		desc = 1
 		mult_line = " "
@@ -1992,9 +1944,9 @@ building_hab_system_capital = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 1
-		desc = 1
 		trigger = "
 			exists = owner.federation
 			owner = {
@@ -2002,7 +1954,6 @@ building_hab_system_capital = {
 				federation = { has_federation_perk = culture_workers_1 }
 			}
 		"
-		mult_line = " "
 	}
 
 	triggered_desc = {
@@ -2143,10 +2094,9 @@ building_resort_capital = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
+		script = stu/jobs_add
+		job_type = roboticists
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
 		"
@@ -2229,10 +2179,9 @@ building_resort_major_capital = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
+		script = stu/jobs_add
+		job_type = roboticists
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
 		"
@@ -2471,7 +2420,6 @@ building_imperial_capital = {
 		script = buildings/regular_empire_capital_jobs
 		PRIMARY_JOB = 3
 		SECONDARY_JOB = 3
-		TERTIARY_JOB = 0
 	}
 
 	triggered_desc = {
@@ -2600,44 +2548,9 @@ building_imperial_machine_capital = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/roboticists_add
-		AMOUNT = 4
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = -1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = yes }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = -1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			has_modifier = gestation_colony
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			num_sapient_pops >= 10
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			num_sapient_pops >= 40
-		"
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_system_capital_replicators_stu|base|4|"
 	}
 
 	inline_script = {
@@ -2897,10 +2810,9 @@ building_colony_shelter_nanotech = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/enforcers_add
+		script = stu/jobs_add
+		job_type = enforcers
 		AMOUNT = 1
-		desc = 1
-		mult_line = " "
 		trigger = "
 			owner = { has_dystopian_society = yes }
 		"
@@ -2915,32 +2827,28 @@ building_colony_shelter_nanotech = {
 
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:colony_shelter_roboticists_stu"
+		AMOUNT = 2 # double compared to normal colony shelter
 		trigger = "
-			owner = { is_individual_machine = yes }
+			owner = {
+				OR = {
+					is_individual_machine = yes
+					has_active_tradition = tr_synthetics_prefabricated_components
+				}
+			}
 		"
 	}
+
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
 			owner = { is_individual_machine = yes }
 		}
-		job_colonist_add = -1
+		job_colonist_add = 1
 	}
 
-	# Undercoat inline script
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { has_active_tradition = tr_synthetics_prefabricated_components }
-		"
-	}
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
@@ -3058,14 +2966,13 @@ building_capital_nanotech = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 2
-		desc = 1
 		trigger = "
 			exists = owner.federation
 			owner.federation = { has_federation_perk = culture_workers_1 }
 		"
-		mult_line = " "
 	}
 
 	triggered_planet_modifier = {
@@ -3214,14 +3121,13 @@ building_major_capital_nanotech = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 2
-		desc = 1
 		trigger = "
 			exists = owner.federation
 			owner.federation = { has_federation_perk = culture_workers_1 }
 		"
-		mult_line = " "
 	}
 
 	resources = {
@@ -3374,14 +3280,13 @@ building_system_capital_nanotech = {
 	}
 
 	inline_script = { # undercoat: moved to inline script
-		script = jobs/triggered/culture_workers_add
+		script = stu/jobs_add
+		job_type = culture_workers
 		AMOUNT = 2
-		desc = 1
 		trigger = "
 			exists = owner.federation
 			owner.federation = { has_federation_perk = culture_workers_1 }
 		"
-		mult_line = " "
 	}
 
 	resources = {
@@ -3455,22 +3360,11 @@ building_deployment_post_nanotech = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = no }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_capital_replicators_stu"
 		trigger = "
 			NOT = { has_modifier = gestation_colony }
-			owner = { is_machine_assimilator = yes }
 		"
 	}
 
@@ -3578,22 +3472,11 @@ building_machine_capital_nanotech = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = no }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_capital_replicators_stu"
 		trigger = "
 			NOT = { has_modifier = gestation_colony }
-			owner = { is_machine_assimilator = yes }
 		"
 	}
 
@@ -3714,22 +3597,11 @@ building_machine_major_capital_nanotech = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 2
-		desc = 1
-		mult_line = " "
-		trigger = "
-			owner = { is_machine_assimilator = no }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 1
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_capital_replicators_stu"
 		trigger = "
 			NOT = { has_modifier = gestation_colony }
-			owner = { is_machine_assimilator = yes }
 		"
 	}
 
@@ -3858,34 +3730,11 @@ building_machine_system_capital_nanotech = {
 	}
 	# Undercoat inline script
 	inline_script = {
-		script = jobs/roboticists_add
-		AMOUNT = 2
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = -1
-		desc = 0
-		mult_line = " "
+		script = stu/jobs_add
+		job_type = roboticists
+		mult_line = "mult = value:machine_system_capital_replicators_stu"
 		trigger = "
-			owner = { is_machine_assimilator = yes }
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			num_sapient_pops >= 10
-		"
-	}
-	inline_script = {
-		script = jobs/triggered/roboticists_add
-		AMOUNT = 1
-		desc = 0
-		mult_line = " "
-		trigger = "
-			num_sapient_pops >= 40
+			NOT = { has_modifier = gestation_colony }
 		"
 	}
 

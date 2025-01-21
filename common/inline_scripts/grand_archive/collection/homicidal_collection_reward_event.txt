@@ -1,0 +1,72 @@
+country_event = {
+	id = $EVENT_ID$
+	title = $EVENT_ID$.name
+	desc = {
+		trigger = {
+			has_country_flag = selecting_xeno_geology_reward
+		}
+		text = $EVENT_ID$.desc.geology
+	}
+	desc = {
+		trigger = {
+			OR = {
+				has_country_flag = selecting_aesthetic_wonder_reward
+				has_country_flag = selecting_historical_item_reward
+			}
+		}
+		text = $EVENT_ID$.desc.aesthetic
+	}
+	picture = GFX_evt_grand_archive
+	show_sound = event_default
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_valid_civic = $CIVIC$
+	}
+
+	immediate = {
+		if = {
+			limit = { is_eligible_for_homicidal_collection_stage_$STAGE$_reward = { CATEGORY  = xeno_geology } }
+			set_country_flag = selecting_xeno_geology_reward
+		}
+		else_if = {
+			limit = { is_eligible_for_homicidal_collection_stage_$STAGE$_reward = { CATEGORY  = aesthetic_wonder } }
+			set_country_flag = selecting_aesthetic_wonder_reward
+		}
+		else_if = {
+			limit = { is_eligible_for_homicidal_collection_stage_$STAGE$_reward = { CATEGORY  = historical_item } }
+			set_country_flag = selecting_historical_item_reward
+		}
+	}
+
+	option = {
+		name = $EVENT_ID$.a
+		if = {
+			limit = { has_country_flag = selecting_xeno_geology_reward }
+			give_homicidal_stage_$STAGE$_reward = { CATEGORY = xeno_geology }
+		}
+		else_if = {
+			limit = { has_country_flag = selecting_aesthetic_wonder_reward }
+			give_homicidal_stage_$STAGE$_reward = { CATEGORY = aesthetic_wonder }
+		}
+		else_if = {
+			limit = { has_country_flag = selecting_historical_item_reward }
+			give_homicidal_stage_$STAGE$_reward = { CATEGORY = historical_item }
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			remove_country_flag = pending_homicidal_collection_reward
+			country_event = {
+				id = grand_archive.4130
+				days = 1
+			}
+			# Cleanup
+			remove_country_flag = selecting_xeno_geology_reward
+			remove_country_flag = selecting_aesthetic_wonder_reward
+			remove_country_flag = selecting_historical_item_reward
+		}
+	}
+}
