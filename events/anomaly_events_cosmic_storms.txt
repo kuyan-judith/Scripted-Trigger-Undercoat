@@ -105,6 +105,22 @@ ship_event = {
 		}
 	}
 
+	option = {
+		name = cstorms.5030.evopred
+		exclusive_trigger = { controller = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		controller = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
 	after = {
 		hidden_effect = {
 			controller = {
@@ -148,7 +164,7 @@ ship_event = {
 		from = {
 			if = {
 				limit = { has_deposit_for = shipclass_mining_station }
-				clear_deposits_stu = yes # undercoat: moved to scripted effect
+				clear_deposits_stu = yes
 				hidden_effect = {
 					every_fleet_in_orbit = {
 						limit = {
@@ -180,7 +196,7 @@ ship_event = {
 			}
 			if = {
 				limit = { has_deposit_for = shipclass_research_station }
-				clear_deposits_stu = yes # undercoat: moved to scripted effect
+				clear_deposits_stu = yes
 			}
 			add_deposit = d_energy_2
 			switch = {
@@ -197,8 +213,6 @@ ship_event = {
 	after = {
 		hidden_effect = {
 			from = {
-				save_event_target_as = target_planet
-				update_habitat_orbital_effect = yes
 				remove_planet_flag = collect_exotic_gases
 				remove_planet_flag = collect_volatile_motes
 				remove_planet_flag = collect_alloys
@@ -344,7 +358,10 @@ ship_event = {
 	option = {
 		name = cstorms.5050.a
 		trigger = {
-			controller = { is_homicidal = no }
+			controller = {
+				is_homicidal = no
+				is_evolutionary_predators_empire = no # undercoat: moved to scripted trigger
+			}
 		}
 		allow = {
 			controller = {
@@ -378,6 +395,56 @@ ship_event = {
 				value = @tier2unityreward
 				min = @tier2unitymin
 				max = @tier2unitymax
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.5050.a
+		trigger = {
+			controller = {
+				is_homicidal = no
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		allow = {
+			controller = {
+				resource_stockpile_compare = {
+					resource = alloys
+					value >= 100
+				}
+			}
+		}
+		controller = {
+			add_resource = { alloys = -100 }
+			if = {
+				limit = { country_uses_consumer_goods = yes }
+				add_monthly_resource_mult = {
+					resource = consumer_goods
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			if = {
+				limit = {
+					is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				}
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium }
 			}
 		}
 	}
@@ -427,6 +494,12 @@ ship_event = {
 				min = @tier1materialmin
 				max = @tier1materialmax
 			}
+			if = {
+				limit = {
+					is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				}
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium }
+			}
 		}
 	}
 
@@ -441,6 +514,12 @@ ship_event = {
 				value = @tier3materialreward
 				min = @tier3materialmin
 				max = @tier3materialmax
+			}
+			if = {
+				limit = {
+					is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				}
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium }
 			}
 		}
 	}
@@ -816,6 +895,17 @@ ship_event = {
 
 	option = {
 		name = FASCINATING
+	}
+
+	option = {
+		name = cstorms.5085.evopred
+		exclusive_trigger = { controller = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		controller = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = large }
+		}
+	}
+
+	after = {
 		controller = {
 			inverted_switch = {
 				trigger = has_technology
@@ -885,7 +975,7 @@ ship_event = {
 				}
 			}
 			if = {
-				limit = { 
+				limit = {
 					is_regular_empire = yes
 					NOT = { has_technology = tech_alien_life_studies }
 				}
@@ -940,7 +1030,7 @@ ship_event = {
 			}
 		}
 		name = {
-			text = cstorms.5090.b.swarm
+			text = cstorms.5090.a.swarm
 			trigger = {
 				controller = { has_valid_civic = civic_hive_devouring_swarm }
 			}
@@ -1066,7 +1156,7 @@ ship_event = {
 					which = value:get_vivarium_slots_left
 					value >= 3
 				}
-				has_technology = tech_gravity_wells	
+				has_technology = tech_gravity_wells
 			}
 		}
 		custom_tooltip = cstorms.5090.c.tt

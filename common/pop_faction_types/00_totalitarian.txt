@@ -13,15 +13,45 @@ totalitarian = {
 	resources = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			unity = @faction_base_output
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			society_research = @faction_major_output
+			engineering_research = @faction_minor_output
+			mult = @crowdsourcing_multiplier
 		}
 	}
 
 	extortion_resource = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			engineering_research = @faction_base_output
 			mult = @faction_extortion_research_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			society_research = @faction_major_output
+			engineering_research = @faction_minor_output
+			mult = @faction_extortion_crowdsourcing_ratio
 		}
 	}
 
@@ -167,12 +197,6 @@ totalitarian = {
 								has_living_standard = { type = living_standard_dystopian_society country = prev }
 								has_living_standard = { type = living_standard_stratified country = prev }
 								has_living_standard = { type = living_standard_academic_privilege country = prev }
-								# Ariphaos
-								has_living_standard = { type = living_standard_none country = prev }
-								has_living_standard = { type = living_standard_psi_assimilation country = prev }
-								has_living_standard = { type = living_standard_tech_assimilation country = prev }
-								has_living_standard = { type = living_standard_deassimilation country = prev }
-								is_archetype = PRESAPIENT
 							}
 						}
 					}
@@ -183,7 +207,7 @@ totalitarian = {
 							has_citizenship_type = { type = citizenship_robot_servitude country = prev }
 						}
 					}
-					has_slaver_civic = yes # undercoat - indentured assets should also have this
+					has_civic = civic_slaver_guilds
 				}
 			}
 		}
@@ -325,6 +349,35 @@ totalitarian = {
 		}
 	}
 
+	demand = { # Unplugged: Status Quo
+		title = TOTALITARIAN_UNPLUGGED_STATUS_QUO
+		unfulfilled_title = TOTALITARIAN_UNPLUGGED_NOT_STATUS_QUO
+		desc = TOTALITARIAN_UNPLUGGED_STATUS_QUO_DESC
+
+		unfulfilled_effect = -20
+		fulfilled_effect = 0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+					current_stage = stage_2
+					current_situation_approach = situation_unplugged_identity_discourage_change
+				}
+			}
+		}
+	}
+
 	# Faction Demands for Ruler and Council positions.
 	inline_script = {
 		script = "paragon/global_faction_demands"
@@ -334,7 +387,7 @@ totalitarian = {
 	}
 
 	on_create = {
-		pop_faction_event = { id = factions.1 }
+		pop_faction_event = { id = factions.0 }
 	}
 
 	on_destroy = {
@@ -360,5 +413,6 @@ totalitarian = {
 		opposite = egalitarian
 		apply_to_other_factions = "always = no"
 		extortion_resource = engineering_research
+		crowdsourced_extortion_tooltip = "crowdsourced_extortion_tt"
 	}
 }

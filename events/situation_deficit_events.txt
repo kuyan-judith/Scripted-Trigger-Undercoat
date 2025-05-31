@@ -31,16 +31,16 @@ situation_event = {
 					is_owner_ethic_pop_faction = yes
 					NOT = { has_modifier = faction_loan_taken }
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = ruler_pop_faction
 			}
 			ordered_owned_planet = {
-				limit = { 
+				limit = {
 					is_capital = no
 					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = looted_planet
 			}
@@ -62,8 +62,8 @@ situation_event = {
 		}
 		owner = {
 			add_resource = {
-				energy = 50
-				mult = event_target:ruler_pop_faction.trigger:num_pops
+				energy = 0.5
+				mult = event_target:ruler_pop_faction.trigger:pop_amount
 			}
 			event_target:ruler_pop_faction = {
 				add_modifier = {
@@ -77,8 +77,8 @@ situation_event = {
 		name = deficit.100.B
 		owner = {
 			add_resource = {
-				energy = 100
-				mult = event_target:looted_planet.trigger:num_pops
+				energy = 1
+				mult = event_target:looted_planet.trigger:pop_amount
 			}
 			event_target:looted_planet = {
 				add_planet_devastation = 50
@@ -159,16 +159,16 @@ situation_event = {
 					is_owner_ethic_pop_faction = yes
 					NOT = { has_modifier = faction_loan_taken }
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = ruler_pop_faction
 			}
 			ordered_owned_planet = {
-				limit = { 
+				limit = {
 					is_capital = no
 					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = looted_planet
 			}
@@ -216,8 +216,8 @@ situation_event = {
 		}
 		owner = {
 			add_resource = {
-				minerals = 50
-				mult = event_target:ruler_pop_faction.trigger:num_pops
+				minerals = 0.5
+				mult = event_target:ruler_pop_faction.trigger:pop_amount
 			}
 			event_target:ruler_pop_faction = {
 				add_modifier = {
@@ -231,8 +231,8 @@ situation_event = {
 		name = deficit.100.B
 		owner = {
 			add_resource = {
-				minerals = 100
-				mult = event_target:looted_planet.trigger:num_pops
+				minerals = 1
+				mult = event_target:looted_planet.trigger:pop_amount
 			}
 			event_target:looted_planet = {
 				add_planet_devastation = 50
@@ -411,7 +411,16 @@ situation_event = {
 	desc = {
 		text = deficit.145.desc.gestalt
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = {
+				is_gestalt = yes
+				is_wilderness_empire = no
+			}
+		}
+	}
+	desc = {
+		text = deficit.145.desc.wilderness
+		trigger = {
+			owner = { is_wilderness_empire = yes }
 		}
 	}
 	picture = GFX_evt_deficit
@@ -470,7 +479,7 @@ situation_event = {
 					is_owner_ethic_pop_faction = yes
 					NOT = { has_modifier = faction_loan_taken }
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = ruler_pop_faction
 			}
@@ -484,8 +493,8 @@ situation_event = {
 		}
 		owner = {
 			add_resource = {
-				consumer_goods = 25
-				mult = event_target:ruler_pop_faction.trigger:num_pops
+				consumer_goods = 0.25
+				mult = event_target:ruler_pop_faction.trigger:pop_amount
 			}
 			event_target:ruler_pop_faction = {
 				add_modifier = {
@@ -568,7 +577,7 @@ situation_event = {
 				}
 				ordered_owned_planet = {
 					limit = {
-						any_owned_pop = {
+						any_owned_pop_group = {
 							OR = {
 								is_shackled_robot = yes
 								is_non_sapient_robot = yes
@@ -587,11 +596,11 @@ situation_event = {
 			else = {
 				ordered_owned_planet = {
 					limit = {
-						any_owned_pop = {
-							is_robot_pop = yes
+						any_owned_pop_group = {
+							is_robot_pop_group = yes
 						}
 					}
-					order_by = trigger:num_pops
+					order_by = trigger:pop_amount
 					position = 0
 					save_event_target_as = robots_planet
 					event_target:robots_planet = {
@@ -616,14 +625,14 @@ situation_event = {
 		}
 		hidden_effect = {
 			event_target:robots_planet = {
-				every_owned_pop = {
+				every_owned_pop_group = {
 					limit = {
 						OR = {
 							is_shackled_robot = yes
 							is_non_sapient_robot = yes
 						}
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			owner = {
@@ -647,12 +656,12 @@ situation_event = {
 		hidden_effect = {
 			event_target:robots_planet = {
 				while = {
-					count = recycled_robots
-					random_owned_pop = {
+					count = recycled_robots_100
+					random_owned_pop_group = {
 						limit = {
-							is_robot_pop = yes
+							is_robot_pop_group = yes
 						}
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						kill_single_pop = yes
 					}
 				}
 			}
@@ -716,11 +725,11 @@ situation_event = {
 	immediate = {
 		owner = {
 			ordered_owned_planet = {
-				limit = { 
+				limit = {
 					is_capital = no
 					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = looted_planet
 			}
@@ -806,8 +815,8 @@ situation_event = {
 
 		owner = {
 			add_resource = {
-				rare_crystals = 10
-				mult = event_target:looted_planet.trigger:num_pops
+				rare_crystals = 0.1
+				mult = event_target:looted_planet.trigger:pop_amount
 			}
 		}
 		event_target:looted_planet = {
@@ -859,7 +868,7 @@ situation_event = {
 					}
 				}
 			}
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes
 			hidden_effect = { orbital_station = { dismantle = yes } }
 		}
 		ai_chance = {
@@ -874,7 +883,18 @@ situation_event = {
 situation_event = {
 	id = deficit.190
 	title = BANKRUPTCY
-	desc = deficit.190.desc
+	desc = {
+		trigger = {
+			owner = { is_wilderness_empire = no }
+		}
+		text = deficit.190.desc
+	}
+	desc = {
+		trigger = {
+			owner = { is_wilderness_empire = yes }
+		}
+		text = deficit.190.desc.wilderness
+	}
 	picture = GFX_evt_deficit
 	show_sound = event_life_support_fail
 	is_triggered_only = yes
@@ -916,11 +936,11 @@ situation_event = {
 	immediate = {
 		owner = {
 			ordered_owned_planet = {
-				limit = { 
+				limit = {
 					is_capital = no
 					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = looted_planet
 			}
@@ -1006,8 +1026,8 @@ situation_event = {
 
 		owner = {
 			add_resource = {
-				volatile_motes = 10
-				mult = event_target:looted_planet.trigger:num_pops
+				volatile_motes = 0.1
+				mult = event_target:looted_planet.trigger:pop_amount
 			}
 		}
 		event_target:looted_planet = {
@@ -1059,7 +1079,7 @@ situation_event = {
 					}
 				}
 			}
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes
 			hidden_effect = { orbital_station = { dismantle = yes } }
 		}
 		ai_chance = {
@@ -1083,7 +1103,16 @@ situation_event = {
 	desc = {
 		text = deficit.205.desc.gestalt
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = {
+				is_gestalt = yes
+				is_wilderness_empire = no
+			}
+		}
+	}
+	desc = {
+		text = deficit.205.desc.wilderness
+		trigger = {
+			owner = { is_wilderness_empire = yes }
 		}
 	}
 	picture = GFX_evt_deficit
@@ -1127,11 +1156,11 @@ situation_event = {
 	immediate = {
 		owner = {
 			ordered_owned_planet = {
-				limit = { 
+				limit = {
 					is_capital = no
 					is_cosmogenesis_world = no # undercoat: moved to scripted trigger
 				}
-				order_by = trigger:num_pops
+				order_by = trigger:pop_amount
 				position = 0
 				save_event_target_as = looted_planet
 			}
@@ -1217,8 +1246,8 @@ situation_event = {
 
 		owner = {
 			add_resource = {
-				exotic_gases = 10
-				mult = event_target:looted_planet.trigger:num_pops
+				exotic_gases = 0.1
+				mult = event_target:looted_planet.trigger:pop_amount
 			}
 		}
 		event_target:looted_planet = {
@@ -1270,7 +1299,7 @@ situation_event = {
 					}
 				}
 			}
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes
 			hidden_effect = { orbital_station = { dismantle = yes } }
 		}
 		ai_chance = {

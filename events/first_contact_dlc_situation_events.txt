@@ -20,10 +20,6 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		# Undercoat
-		fire_on_action = {
-			on_action = on_pre_ftl_pre_advance
-		}
 		switch = {
 			trigger = has_pre_ftl_age
 			stone_age = {
@@ -77,9 +73,8 @@ country_event = {
 				}
 			}
 		}
-		# Undercoat
 		fire_on_action = {
-			on_action = on_pre_ftl_post_advance
+			on_action = on_ftl_society_enters_new_age
 		}
 	}
 }
@@ -205,7 +200,7 @@ situation_event = {
 				has_country_flag = preftl_espionage_operation_recent_shift_ethic_target
 			}
 			capital_scope = {
-				any_owned_pop = {
+				any_owned_pop_group = {
 					NOT = {
 						has_same_ethos = prevprev
 					}
@@ -1235,17 +1230,18 @@ situation_event = {
 	trigger = {
 		host_has_dlc = "Synthetic Dawn Story Pack"
 		situation_progress >= 960
-		NOT = {
-			has_situation_flag = has_ongoing_observation_event_chain
-		}
+		NOT = { has_situation_flag = has_ongoing_observation_event_chain }
 		owner = {
 			has_country_flag = early_space_age
 			capital_scope = {
 				is_artificial = no
 			}
-			is_mechanist_empire = no # undercoat: moved to scripted trigger
+			NOR = {
+				is_mechanist_empire = yes # undercoat: moved to scripted trigger
+				has_country_flag = had_pre_ftl_uprising
+				has_country_flag = unplugged_pre_ftl_empire_flag
+			}
 		}
-		NOT = { owner = { has_country_flag = had_pre_ftl_uprising } }
 	}
 
 	immediate = {
@@ -1518,7 +1514,7 @@ country_event = {
 			set_capital = yes
 			while = {
 				count = 18
-				create_pop = {
+				create_pop_group = {
 					species = last_created_species
 				}
 			}
@@ -1537,18 +1533,18 @@ country_event = {
 			# Kill some of the original organic pops
 			while = {
 				limit = {
-					count_owned_pop = {
+					count_owned_pop_amount = {
 						limit = {
 							NOT = { is_same_species = owner }
 						}
-						count > 10
+						count >= 1100
 					}
 				}
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						NOT = { is_same_species = owner }
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 
@@ -1582,7 +1578,7 @@ country_event = {
 					# Prevent bankruptcy from minerals.
 					else_if = {
 						limit = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								species = {
 									is_archetype = LITHOID
 								}
@@ -2878,12 +2874,40 @@ country_event = {
 	}
 
 	option = {
-		inline_script = {
-			script = events/homicidal_option_text
-			who = this
-		}
+		name = EXTERMINATE
 		trigger = {
-			is_homicidal = yes
+			has_valid_civic = civic_machine_terminator
+		}
+		from.capital_scope = {
+			set_owner = root
+			add_modifier = {
+				modifier = culture_shock_early_space_age
+				days = 3600
+			}
+		}
+	}
+
+	option = {
+		name = TASTY
+		trigger = {
+			OR = {
+				has_valid_civic = civic_hive_devouring_swarm
+				has_menace_perk = menp_behemoth_ever_hungry
+			}
+		}
+		from.capital_scope = {
+			set_owner = root
+			add_modifier = {
+				modifier = culture_shock_early_space_age
+				days = 3600
+			}
+		}
+	}
+
+	option = {
+		name = SCUM # Xeno Scum
+		trigger = {
+			has_valid_civic = civic_fanatic_purifiers
 		}
 		from.capital_scope = {
 			set_owner = root
@@ -3562,11 +3586,11 @@ situation_event = {
 		target.owner = {
 			while = {
 				count = 2
-					random_owned_pop = {
+					random_owned_pop_group = {
 						limit = {
 							is_robotic_species = no
 						}
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						kill_single_pop = yes
 					}
 				}
 			capital_scope = {
@@ -3587,11 +3611,11 @@ situation_event = {
 		}
 		custom_tooltip = tt_end_the_suffering
 		target.owner = {
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						is_robotic_species = no
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			capital_scope = {
 				add_blocker = {
@@ -3650,11 +3674,11 @@ situation_event = {
 					add_trait = trait_extremely_adaptive
 				}
 			}
-			random_owned_pop = {
+			random_owned_pop_group = {
 				limit = {
 					is_robotic_species = no
 				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				kill_single_pop = yes
 			}
 			add_awareness = 15
 		}
@@ -3789,13 +3813,15 @@ situation_event = {
 		}
 		target.owner = {
 			hidden_effect = {
-				while = {
-					count = value:ten_percent_species
-					random_owned_pop = {
-						limit = {
-							NOT = { has_ethic = "ethic_spiritualist" }
-						}
-						pop_change_ethic = "ethic_spiritualist"
+				every_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_spiritualist }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_spiritualist
+						PERCENTAGE = 0.1
 					}
 				}
 			}
@@ -3862,7 +3888,17 @@ situation_event = {
 		}
 		target.owner = {
 			shift_ethic = ethic_spiritualist
-			random_owned_pop = { pop_change_ethic = "ethic_fanatic_spiritualist" }
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_any_ethic = yes
+					NOT = { has_ethic = ethic_spiritualist }
+				}
+				pop_group_transfer_ethic = {
+					POP_GROUP = this
+					ETHOS = ethic_spiritualist
+					AMOUNT = 100
+				}
+			}
 		}
 	}
 
@@ -4147,8 +4183,8 @@ situation_event = {
 				remove_country_flag = apocalypse_now
 			}
 			target = {
-				every_owned_pop = {
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				every_owned_pop_group = {
+					kill_single_pop = yes
 				}
 				remove_planet_flag = has_on_going_observation_situation
 				destroy_colony = yes
@@ -4182,15 +4218,15 @@ situation_event = {
 		if = {
 			limit = {
 				target.owner = {
-					num_pops > 2
+					pop_amount > 200
 				}
 			}
 			target.owner = {
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						is_robotic_species = no
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			situation_event = {
@@ -4201,15 +4237,15 @@ situation_event = {
 		if = {
 			limit = {
 				target.owner = {
-					num_pops = 2
+					pop_amount = 200
 				}
 			}
 			target.owner = {
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						is_robotic_species = no
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			situation_event = {
@@ -4249,11 +4285,11 @@ situation_event = {
 		name = UNDERSTOOD
 		tooltip = {
 			target.owner = {
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						is_robotic_species = no
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 		}
@@ -4276,11 +4312,11 @@ situation_event = {
 			observation_outpost = {
 				set_event_locked = no
 			}
-			random_owned_pop = {
+			random_owned_pop_group = {
 				limit = {
 					is_robotic_species = no
 				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				kill_single_pop = yes
 			}
 		}
 		owner = {
@@ -4418,7 +4454,17 @@ situation_event = {
 		}
 		target.owner = {
 			shift_ethic = ethic_spiritualist
-			random_owned_pop = { pop_change_ethic = "ethic_fanatic_spiritualist" }
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_any_ethic = yes
+					NOT = { has_ethic = ethic_spiritualist }
+				}
+				pop_group_transfer_ethic = {
+					POP_GROUP = this
+					ETHOS = ethic_spiritualist
+					AMOUNT = 100
+				}
+			}
 		}
 	}
 	option = {
@@ -4440,7 +4486,17 @@ situation_event = {
 		}
 		target.owner = {
 			shift_ethic = ethic_spiritualist
-			random_owned_pop = { pop_change_ethic = "ethic_fanatic_spiritualist" }
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_any_ethic = yes
+					NOT = { has_ethic = ethic_spiritualist }
+				}
+				pop_group_transfer_ethic = {
+					POP_GROUP = this
+					ETHOS = ethic_spiritualist
+					AMOUNT = 100
+				}
+			}
 		}
 	}
 
@@ -4511,22 +4567,49 @@ situation_event = {
 					}
 				}
 				shift_ethic = ethic_militarist
-				random_owned_pop = { pop_change_ethic = "ethic_fanatic_militarist" }
+				weighted_random_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_militarist }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						AMOUNT = 100
+					}
+				}
 			}
 			if = {
 				limit = {
 					has_ethic = ethic_militarist
 				}
 				shift_ethic = ethic_fanatic_militarist
-				random_owned_pop = { pop_change_ethic = "ethic_fanatic_militarist" }
+				weighted_random_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_militarist }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						AMOUNT = 100
+					}
+				}
 			}
 			if = {
 				limit = {
 					has_ethic = ethic_fanatic_militarist
+				}
+				every_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_militarist }
 					}
-				while = {
-					count = value:ten_percent_species
-					random_owned_pop = { pop_change_ethic = "ethic_fanatic_militarist" }
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						PERCENTAGE = 0.1
+					}
 				}
 			}
 		}
@@ -4563,22 +4646,49 @@ situation_event = {
 					}
 				}
 				shift_ethic = ethic_militarist
-				random_owned_pop = { pop_change_ethic = "ethic_fanatic_militarist" }
+				weighted_random_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_militarist }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						AMOUNT = 100
+					}
+				}
 			}
 			if = {
 				limit = {
 					has_ethic = ethic_militarist
 				}
 				shift_ethic = ethic_fanatic_militarist
-				random_owned_pop = { pop_change_ethic = "ethic_fanatic_militarist" }
+				weighted_random_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_militarist }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						AMOUNT = 100
+					}
+				}
 			}
 			if = {
 				limit = {
 					has_ethic = ethic_fanatic_militarist
+				}
+				every_owned_pop_group = {
+					limit = {
+						has_any_ethic = yes
+						NOT = { has_ethic = ethic_militarist }
 					}
-				while = {
-					count = value:ten_percent_species
-					random_owned_pop = { pop_change_ethic = "ethic_fanatic_militarist" }
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						PERCENTAGE = 0.1
+					}
 				}
 			}
 		}
@@ -4703,8 +4813,28 @@ situation_event = {
 		}
 		target.owner = {
 			shift_ethic = ethic_xenophobe
-			random_owned_pop = { pop_change_ethic = "ethic_spiritualist" }
-			random_owned_pop = { pop_change_ethic = "ethic_xenophobe" }
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_any_ethic = yes
+					NOT = { has_ethic = ethic_spiritualist }
+				}
+				pop_group_transfer_ethic = {
+					POP_GROUP = this
+					ETHOS = ethic_spiritualist
+					AMOUNT = 100
+				}
+			}
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_any_ethic = yes
+					NOT = { has_ethic = ethic_xenophobe }
+				}
+				pop_group_transfer_ethic = {
+					POP_GROUP = this
+					ETHOS = ethic_xenophobe
+					AMOUNT = 100
+				}
+			}
 			add_opinion_modifier = {
 				who = root.owner
 				modifier = opinion_plague_situation_03
@@ -6161,7 +6291,7 @@ situation_event = {
 				}
 				set_country_flag = organic_singularity_communion # To identify this country in 'abort' blocks, such as for Espionage Operations
 
-				every_owned_pop = {
+				every_owned_pop_group = {
 					limit = {
 						is_robotic_species = no
 					}
@@ -6364,7 +6494,7 @@ country_event = {
 		}
 		from.owner = {
 			create_leader = {
-				class = official
+				class = commander
 				species = from.owner.species
 				name = random
 				skill = 4
@@ -7270,25 +7400,6 @@ situation_event = {
 			current_situation_approach = approach_watch_nwo
 		}
 		name = UNDERSTOOD
-		target.owner = {
-			shift_ethic = ethic_fanatic_authoritarian
-			random_owned_pop = {
-				limit = {
-					NOT = {
-						pop_has_ethic = ethic_fanatic_authoritarian
-					}
-				}
-				pop_change_ethic = "ethic_fanatic_authoritarian"
-			}
-		}
-		owner = {
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = @tier3researchreward
-				min = @tier3researchmin
-				max = @tier3researchmax
-			}
-		}
 		if = {
 			limit = {
 				target.owner = {
@@ -7316,12 +7427,6 @@ situation_event = {
 				modifier = nwo_situation_01
 				days = 3600
 			}
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = @tier3researchreward
-				min = @tier3researchmin
-				max = @tier3researchmax
-			}
 		}
 		if = {
 			limit = {
@@ -7338,17 +7443,6 @@ situation_event = {
 				}
 			}
 		}
-		target.owner = {
-			shift_ethic = ethic_fanatic_authoritarian
-			random_owned_pop = {
-				limit = {
-					NOT = {
-						pop_has_ethic = ethic_fanatic_authoritarian
-					}
-				}
-				pop_change_ethic = "ethic_fanatic_authoritarian"
-			}
-		}
 	}
 
 	option = {
@@ -7356,25 +7450,6 @@ situation_event = {
 			current_situation_approach = approach_aid_rebels
 		}
 		name = preftl.2200.a
-		target.owner = {
-			shift_ethic = ethic_fanatic_authoritarian
-			random_owned_pop = {
-				limit = {
-					NOT = {
-						pop_has_ethic = ethic_fanatic_authoritarian
-					}
-				}
-				pop_change_ethic = "ethic_fanatic_authoritarian"
-			}
-		}
-		owner = {
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = @tier3researchreward
-				min = @tier3researchmin
-				max = @tier3researchmax
-			}
-		}
 		if = {
 			limit = {
 				target.owner = {
@@ -7393,6 +7468,21 @@ situation_event = {
 	}
 
 	after = {
+		target.owner = {
+			shift_ethic = ethic_fanatic_authoritarian
+			pop_group_transfer_ethic = {
+				ETHOS = ethic_authoritarian
+				AMOUNT = 100
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
 		destroy_situation = this
 		remove_global_flag = ongoing_nwo_situation
 		target = {
@@ -7454,25 +7544,6 @@ situation_event = {
 			current_situation_approach = approach_watch_nwo
 			}
 		name = UNDERSTOOD
-		target.owner = {
-			shift_ethic = ethic_egalitarian
-			random_owned_pop = {
-				limit = {
-					NOT = {
-						pop_has_ethic = ethic_fanatic_egalitarian
-					}
-				}
-				pop_change_ethic = "ethic_fanatic_egalitarian"
-			}
-		}
-		owner = {
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = @tier3researchreward
-				min = @tier3researchmin
-				max = @tier3researchmax
-			}
-		}
 		if = {
 			limit = {
 				target.owner = {
@@ -7500,12 +7571,6 @@ situation_event = {
 				modifier = nwo_situation_02
 				days = 3600
 			}
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = @tier3researchreward
-				min = @tier3researchmin
-				max = @tier3researchmax
-			}
 		}
 		if = {
 			limit = {
@@ -7522,17 +7587,6 @@ situation_event = {
 				}
 			}
 		}
-		target.owner = {
-			shift_ethic = ethic_egalitarian
-			random_owned_pop = {
-				limit = {
-					NOT = {
-						pop_has_ethic = ethic_fanatic_egalitarian
-					}
-				}
-				pop_change_ethic = "ethic_fanatic_egalitarian"
-			}
-		}
 	}
 
 	option = {
@@ -7540,29 +7594,6 @@ situation_event = {
 			current_situation_approach = approach_aid_leader
 		}
 		name = preftl.2205.a
-		target.owner = {
-			shift_ethic = ethic_egalitarian
-			random_owned_pop = {
-				limit = {
-					NOT = {
-						pop_has_ethic = ethic_fanatic_egalitarian
-					}
-				}
-				if = {
-					limit = { pop_has_ethic = ethic_authoritarian }
-					pop_remove_ethic = ethic_authoritarian
-				}
-				pop_change_ethic = "ethic_fanatic_egalitarian"
-			}
-		}
-		owner = {
-			add_monthly_resource_mult = {
-				resource = society_research
-				value = @tier3researchreward
-				min = @tier3researchmin
-				max = @tier3researchmax
-			}
-		}
 		if = {
 			limit = {
 				target.owner = {
@@ -7581,6 +7612,22 @@ situation_event = {
 	}
 
 	after = {
+		target.owner = {
+			shift_ethic = ethic_egalitarian
+			pop_group_transfer_ethic = {
+				ETHOS = ethic_egalitarian
+				AMOUNT = 100
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+
 		destroy_situation = this
 		remove_global_flag = ongoing_nwo_situation
 		target = {

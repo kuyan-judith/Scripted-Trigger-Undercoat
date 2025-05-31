@@ -21,7 +21,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 		trigger = {
 			owner = { is_gestalt = yes }
 			target = {
-				any_owned_pop = {
+				any_owned_pop_group = {
 					is_sapient = yes
 					is_gestalt = no # undercoat: moved to scripted trigger
 				}
@@ -31,18 +31,36 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 	}
 	desc = {
 		trigger = {
-			owner = { is_gestalt = yes }
+			owner = {
+				is_gestalt = yes
+				is_wilderness_empire = no
+			}
 			target = {
-				# Undercoat - improved efficiency
-				NOT = {
-					any_owned_pop = {
+				count_owned_pop_amount = {
+					limit = {
 						is_sapient = yes
 						is_gestalt = no # undercoat: moved to scripted trigger
 					}
+					count = 0
 				}
 			}
 		}
 		text = situation_planetary_revolt_desc_gestalt_breakaway_gestalt
+	}
+	desc = {
+		trigger = {
+			owner = { is_wilderness_empire = yes }
+			target = {
+				count_owned_pop_amount = {
+					limit = {
+						is_sapient = yes
+						is_gestalt = no # undercoat: moved to scripted trigger
+					}
+					count = 0
+				}
+			}
+		}
+		text = situation_planetary_revolt_desc_gestalt_breakaway_wilderness
 	}
 
 	fail_icon = GFX_situation_outcome_meh
@@ -110,6 +128,13 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 				}
 			}
 			owner = {
+				# Timeline Rebellion
+				country_event = {
+					id = timeline.7
+					scopes = {
+						from = from.target
+					}
+				}
 				every_owned_planet = {
 					limit = { has_modifier = instability_join_revolt }
 					set_timed_planet_flag = {
@@ -171,7 +196,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 		}
 	}
 
-	start_value = 0
+	initial_progress = 0
 
 	stages = {
 		revolt_severity_1 = {
@@ -243,7 +268,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 				owner = { is_gestalt = no }
 			}
 			modifier = {
-				planet_amenities_add = 20
+				planet_amenities_add = 2000
 			}
 		}
 		triggered_target_modifier = {
@@ -251,7 +276,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 				owner = { is_gestalt = yes }
 			}
 			modifier = {
-				planet_amenities_no_happiness_add = 20
+				planet_amenities_no_happiness_add = 2000
 			}
 		}
 		resources = {
@@ -315,11 +340,11 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 					OR = {
 						num_assigned_jobs = {
 							job = warrior_drone
-							value > 3
+							value > 300
 						}
 						num_assigned_jobs = {
 							job = soldier
-							value > 3
+							value > 300
 						}
 					}
 				}
@@ -352,14 +377,14 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 		modifier = {
 			add = 1
 			desc = STRING_UNEMPLOYMENT
-			target = { num_unemployed >= 2 }
+			target = { num_unemployed >= 200 }
 		}
 		modifier = {
 			add = 2
 			desc = STRING_PURGING
 			target = {
 				has_current_purge = yes
-				any_owned_pop = {
+				any_owned_pop_group = {
 					is_being_purged = yes
 					NOT = {
 						has_purge_type = { type = purge_neutering }
@@ -433,7 +458,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 				limit = {
 					NOT = { is_same_value = root.target }
 					planet_stability >= @stabilitylevel3
-					num_pops > 5
+					pop_amount > 500
 				}
 			}
 			potential = {
@@ -441,7 +466,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 					any_system_colony = {
 						NOT = { is_same_value = root.target }
 						planet_stability >= @stabilitylevel3
-						num_pops > 5
+						pop_amount > 500
 					}
 				}
 			}
@@ -456,7 +481,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 				limit = {
 					NOT = { is_same_value = root.target }
 					planet_stability < @stabilitylevel2
-					num_pops > 5
+					pop_amount > 500
 				}
 			}
 			potential = {
@@ -464,7 +489,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 					any_system_colony = {
 						NOT = { is_same_value = root.target }
 						planet_stability < @stabilitylevel2
-						num_pops > 5
+						pop_amount > 500
 					}
 				}
 			}
@@ -480,7 +505,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 		modifier = {
 			subtract = 1
 			desc = STRING_WEAK_PLANET
-			target = { num_pops < 30 }
+			target = { pop_amount < 3000 }
 			NOT = {
 				owner = {
 					any_owned_planet = {
@@ -492,7 +517,7 @@ situation_planetary_revolt = { # Referenced in code - Do not change key
 		modifier = {
 			add = 1
 			desc = STRING_STRONG_PLANET
-			target = { num_pops > 60 }
+			target = { pop_amount > 6000 }
 		}
 		modifier = {
 			desc = STRING_REBELLIOUS_JOINER_PLANETS_IN_OWNER
@@ -548,7 +573,7 @@ situation_machine_uprising = {		# To start, trigger event syndaw.545
 	fail_icon_frame = GFX_situation_outcome_frame_green
 	complete_icon = GFX_situation_outcome_revolt
 	complete_icon_frame = GFX_situation_outcome_frame_red
-	start_value = 20
+	initial_progress = 20
 	on_start = {
 		# Unlock special projects.
 		owner = {
@@ -694,7 +719,7 @@ situation_machine_uprising = {		# To start, trigger event syndaw.545
 			icon_background = GFX_situation_stage_frame_red
 			end = 67
 			modifier = {
-				planet_jobs_robotic_produces_mult = -0.2
+				pop_bonus_workforce_mult = -0.2
 			}
 		}
 		stage_3 = {
@@ -702,7 +727,7 @@ situation_machine_uprising = {		# To start, trigger event syndaw.545
 			icon_background = GFX_situation_stage_frame_red
 			end = 100
 			modifier = {
-				planet_jobs_robotic_produces_mult = -0.5
+				pop_bonus_workforce_mult = -0.5
 			}
 		}
 	}
@@ -893,7 +918,7 @@ situation_terravore_consume_planet = {
 	}
 
 	category = positive
-	start_value = 0
+	initial_progress = 0
 
 	on_progress_complete = {
 		custom_tooltip = terravore_consume_finish_tooltip

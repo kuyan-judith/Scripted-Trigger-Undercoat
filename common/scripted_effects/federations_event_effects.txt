@@ -1238,19 +1238,15 @@ generate_lost_colony_parent_bonus = {
 	add_district_and_planet_size_if_needed_effect = {
 		district = district_farming
 	}
-	add_district_and_planet_size_if_needed_effect = {
-		district = district_industrial
-	}
 
 	add_building = building_research_lab_1
 	add_building = building_holo_theatres
 	add_building = building_precinct_house
 
 	while = {
-		limit = { num_pops < 45 }
-		create_pop = {
+		limit = { pop_amount < 4500 }
+		create_pop_group = {
 			species = owner_main_species
-			ethos = random
 		}
 	}
 
@@ -1279,12 +1275,6 @@ generate_lost_colony_parent_bonus = {
 }
 
 generate_lost_colony_parent_colony_1 = { # Industry
-	while = {
-		count = 2
-		add_district_and_planet_size_if_needed_effect = {
-			district = district_industrial
-		}
-	}
 	if = {
 		limit = { owner = { is_gestalt = no } }
 		add_district_and_planet_size_if_needed_effect = {
@@ -1308,10 +1298,9 @@ generate_lost_colony_parent_colony_1 = { # Industry
 		}
 	}
 	while = {
-		limit = { num_pops < 7 }
-		create_pop = {
+		limit = { pop_amount < 700 }
+		create_pop_group = {
 			species = owner_main_species
-			ethos = random
 		}
 	}
 	if = {
@@ -1401,10 +1390,9 @@ generate_lost_colony_parent_colony_2 = { # Research
 		add_building = building_research_lab_1
 	}
 	while = {
-		limit = { num_pops < 7 }
-		create_pop = {
+		limit = { pop_amount < 700 }
+		create_pop_group = {
 			species = owner_main_species
-			ethos = random
 		}
 	}
 	if = {
@@ -1718,6 +1706,10 @@ spawn_shattered_ring_guaranteed_1_effect = {
 			shattered_ring_blocker_effect = yes
 			# Undercoat
 			fire_on_action = { on_action = on_planet_spawned }
+			planet_event = {
+				id = origin.3155
+				days = 1800
+			}
 		}
 	}
 }
@@ -1756,6 +1748,10 @@ spawn_shattered_ring_guaranteed_2_effect = {
 		init_effect = {
 			prevent_anomaly = yes
 			shattered_ring_blocker_effect = yes
+			planet_event = {
+				id = origin.3155
+				days = 3600
+			}
 			# Undercoat
 			fire_on_action = { on_action = on_planet_spawned }
 		}
@@ -1836,23 +1832,36 @@ spawn_habitat_effect = {
 			set_planet_flag = habitat
 			set_planet_flag = habitat_level_1
 			save_event_target_as = target_habitat
-			add_deposit_if_missing = {
-				DEPOSIT = d_system_resources
-			}
-			add_deposit_if_missing = {
-				DEPOSIT = d_orbital_research
-			}
-			add_deposit_if_missing = {
-				DEPOSIT = d_orbital_energy
-			}
-			add_deposit_if_missing = {
-				DEPOSIT = d_orbital_mining
-			}
+
 			event_target:target_planet = {
 				set_planet_flag = habitat@PREV
 			}
 			# Undercoat
 			fire_on_action = { on_action = on_planet_spawned }
+		}
+	}
+}
+
+# Specify the $HABITAT_OWNER$ event target as the country to determine graphical culture
+# Specify the $TARGET_PLANET$ event target as the celestial object to place the orbital around
+spawn_orbital_effect = {
+	spawn_megastructure = {
+		type = habitat_$TYPE$_orbital
+		owner = $HABITAT_OWNER$
+		planet = $TARGET_PLANET$
+		coords_from = $TARGET_PLANET$
+		graphical_culture = $HABITAT_OWNER$
+		orbit_distance = 50
+		orbit_angle = 50
+		init_effect = {
+			save_event_target_as = target_orbital
+		}
+	}
+
+	event_target:target_orbital = {
+		set_name = {
+			key = TARGET_ORBITAL_NAME
+			variable_string = "\\[prevprev.GetName]"
 		}
 	}
 }
@@ -2543,378 +2552,7 @@ set_habitat_planetary_features_effect = {
 	}
 }
 
-surveyor_update_orbital_effect = {
-	event_target:chosen_planet = {
-		# Find the orbital and habitat complex and save them as event targets
-		if = {
-			limit = {
-				any_fleet_in_orbit = {
-					OR = {
-						is_ship_size = major_orbital_resource
-						is_ship_size = minor_orbital_resource
-					}
-				}
-			}
-
-			random_fleet_in_orbit = {
-				limit = {
-					OR = {
-						is_ship_size = major_orbital_resource
-						is_ship_size = minor_orbital_resource
-					}
-				}
-				save_event_target_as = target_orbital
-			}
-
-			solar_system = {
-				random_system_planet = {
-					limit = {
-						has_planet_flag = habitat
-					}
-					save_event_target_as = target_habitat
-				}
-			}
-
-			last_added_deposit = {
-				switch = {
-					trigger = is_deposit_type
-					# Energy
-					d_energy_5 = {
-						event_target:target_orbital = {
-							set_fleet_flag = energy_orbital
-						}
-					}
-					d_energy_7 = {
-						event_target:target_orbital = {
-							set_fleet_flag = energy_orbital
-						}
-					}
-					d_energy_9 = {
-						event_target:target_orbital = {
-							set_fleet_flag = energy_orbital
-						}
-					}
-					# Minerals
-					d_minerals_5 = {
-						event_target:target_orbital = {
-							set_fleet_flag = mining_orbital
-						}
-					}
-					d_minerals_7 = {
-						event_target:target_orbital = {
-							set_fleet_flag = mining_orbital
-						}
-					}
-					d_minerals_9 = {
-						event_target:target_orbital = {
-							set_fleet_flag = mining_orbital
-						}
-					}
-					# Physics Research
-					d_physics_5 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					d_physics_7 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					d_physics_9 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					# Society Research
-					d_society_5 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					d_society_7 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					d_society_9 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					# Engineering Research
-					d_engineering_5 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					d_engineering_7 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					d_engineering_9 = {
-						event_target:target_orbital = {
-							set_fleet_flag = science_orbital
-						}
-					}
-					# Alloys
-					d_alloys_3 = {
-						event_target:target_orbital = {
-							set_fleet_flag = mining_orbital
-						}
-						event_target:target_habitat = {
-							add_deposit = d_hab_alloy_3
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_alloys_4 = {
-						event_target:target_orbital = {
-							set_fleet_flag = mining_orbital
-						}
-						event_target:target_habitat = {
-							add_deposit = d_hab_alloy_4
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_alloys_5 = {
-						event_target:target_orbital = {
-							set_fleet_flag = mining_orbital
-						}
-						event_target:target_habitat = {
-							add_deposit = d_hab_alloy_5
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					# Exotic Gases
-					d_exotic_gases_1 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_gas_1
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_exotic_gases_2 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_gas_2
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_exotic_gases_3 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_gas_3
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					# Rare Crystals
-					d_rare_crystals_1 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_crystal_1
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_rare_crystals_2 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_crystal_2
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_rare_crystals_3 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_crystal_3
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					# Volatile Motes
-					d_volatile_motes_1 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_mote_1
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_volatile_motes_2 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_mote_2
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-					d_volatile_motes_3 = {
-						event_target:target_habitat = {
-							add_deposit = d_hab_mote_3
-							last_added_deposit = {
-								set_deposit_flag = planet@event_target:chosen_planet
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-update_habitat_orbital_effect = {
-	# If a habitat orbital is in orbit of the star, update the habitat
-	if = {
-		limit = {
-			any_fleet_in_orbit = {
-				OR = {
-					is_ship_size = major_orbital_resource
-					is_ship_size = minor_orbital_resource
-				}
-			}
-		}
-		# Find the orbital and habitat complex and save them as event targets
-		random_fleet_in_orbit = {
-			limit = {
-				OR = {
-					is_ship_size = major_orbital_resource
-					is_ship_size = minor_orbital_resource
-				}
-			}
-			save_event_target_as = target_orbital
-		}
-		# Clear the existing flags
-		event_target:target_orbital = {
-			remove_fleet_flag = science_orbital
-			remove_fleet_flag = mining_orbital
-			remove_fleet_flag = energy_orbital
-		}
-
-		# Apply the planetary features for any newly added deposits
-		set_habitat_planetary_features_effect = yes
-
-		# Add the correct flag for the orbital
-		if = {
-			limit = { has_deposit_for = shipclass_research_station }
-			event_target:target_orbital = {
-				set_fleet_flag = science_orbital
-			}
-		}
-		if = {
-			limit = { has_orbital_mining_deposit = yes }
-			event_target:target_orbital = {
-				set_fleet_flag = mining_orbital
-			}
-		}
-		if = {
-			limit = { has_orbital_energy_deposit = yes }
-			event_target:target_orbital = {
-				set_fleet_flag = energy_orbital
-			}
-		}
-	}
-}
-
-arc_furnace_update_orbital_effect = {
-	# Find the orbital and habitat complex and save them as event targets
-	if = {
-		limit = {
-			any_fleet_in_orbit = {
-				OR = {
-					is_ship_size = major_orbital_resource
-					is_ship_size = minor_orbital_resource
-				}
-			}
-		}
-
-		random_fleet_in_orbit = {
-			limit = {
-				OR = {
-					is_ship_size = major_orbital_resource
-					is_ship_size = minor_orbital_resource
-				}
-			}
-			save_event_target_as = target_orbital
-		}
-
-		solar_system = {
-			random_system_planet = {
-				limit = {
-					has_planet_flag = habitat
-				}
-				save_event_target_as = target_habitat
-			}
-		}
-
-		last_added_deposit = {
-			switch = {
-				trigger = is_deposit_type
-				# Minerals
-				d_minerals_1 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-				}
-				# Alloys
-				d_alloys_1 = {
-					event_target:target_orbital = {
-						set_fleet_flag = mining_orbital
-					}
-					event_target:target_habitat = {
-						add_deposit = d_hab_alloy_1
-						last_added_deposit = {
-							set_deposit_flag = planet@event_target:target_planet
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
 dismantle_arc_furnace_effect = {
-	# Find the orbital and habitat complex and save them as event targets
-	if = {
-		limit = {
-			any_fleet_in_orbit = {
-				OR = {
-					is_ship_size = major_orbital_resource
-					is_ship_size = minor_orbital_resource
-				}
-			}
-		}
-
-		random_fleet_in_orbit = {
-			limit = {
-				OR = {
-					is_ship_size = major_orbital_resource
-					is_ship_size = minor_orbital_resource
-				}
-			}
-			save_event_target_as = target_orbital
-		}
-
-		solar_system = {
-			random_system_planet = {
-				limit = {
-					has_planet_flag = habitat
-				}
-				save_event_target_as = target_habitat
-			}
-		}
-	}
-
 	switch = {
 		trigger = has_modifier
 		orbital_arc_furnace_1_mod = {
@@ -2929,61 +2567,18 @@ dismantle_arc_furnace_effect = {
 		orbital_arc_furnace_3_mod = {
 			remove_deposit = d_minerals_1
 			remove_deposit = d_minerals_1
-			remove_deposit = d_minerals_1
 			remove_deposit = d_alloys_1
 			remove_modifier = orbital_arc_furnace_3_mod
-			if = {
-				limit = {
-					exists = event_target:target_orbital
-				}
-				event_target:target_habitat = {
-					random_deposit = {
-						limit = {
-							is_deposit_type = d_hab_alloy_1
-							has_deposit_flag = planet@event_target:target_planet
-						}
-						remove_deposit = yes
-					}
-				}
-			}
 		}
 		orbital_arc_furnace_4_mod = {
-			remove_deposit = d_minerals_1
-			remove_deposit = d_minerals_1
 			remove_deposit = d_minerals_1
 			remove_deposit = d_alloys_1
 			remove_deposit = d_alloys_1
 			remove_modifier = orbital_arc_furnace_4_mod
-			if = {
-				limit = {
-					exists = event_target:target_orbital
-				}
-				event_target:target_habitat = {
-					while = {
-						count = 2
-						random_deposit = {
-							limit = {
-								is_deposit_type = d_hab_alloy_1
-								has_deposit_flag = planet@event_target:target_planet
-							}
-							remove_deposit = yes
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if = {
-		limit = {
-			has_orbital_mining_deposit = no
-			exists = event_target:target_orbital
-		}
-		event_target:target_orbital = {
-			remove_fleet_flag = mining_orbital
 		}
 	}
 }
+
 remove_trade_deposits = {
 	remove_deposit = d_trade_value_1
 	remove_deposit = d_trade_value_2

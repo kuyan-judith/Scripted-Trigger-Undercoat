@@ -219,7 +219,7 @@ country_event = { # SUBJECT - Veterans approach the subject
 	option = { # Veterans sent home
 		name = subject.3.a
 		capital_scope = {
-			create_pop = {
+			create_pop_group = {
 				species = event_target:overlord_empire.species
 			}
 		}
@@ -516,7 +516,12 @@ country_event = { # SUBJECT - Subject is given the chance to ask the overlord fo
 	id = subject.55
 	title = subject.55.title
 	desc = subject.55.desc
-	picture = GFX_evt_space_station
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_space_station
+		BIOSHIP_PICTURE = GFX_evt_bioship_hangar
+	}
 
 	is_triggered_only = yes
 
@@ -608,7 +613,12 @@ country_event = { # OVERLORD - Overlord gets the request for an upgrade
 	id = subject.60
 	title = subject.60.title
 	desc = subject.60.desc
-	picture = GFX_evt_space_station
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = event_target:subject_empire
+		REGULAR_PICTURE = GFX_evt_space_station
+		BIOSHIP_PICTURE = GFX_evt_bioship_hangar
+	}
 
 	is_triggered_only = yes
 
@@ -2976,6 +2986,7 @@ country_event = { # HIDDEN - Find a relevant subject for the event chain
 		NOT = { has_country_flag = cooldown_scholarium_event_chain_3_overlord }
 		is_overlord = yes
 		any_subject = {
+			is_wilderness_empire = no
 			NOT = { has_country_flag = cooldown_scholarium_event_chain_3_subject }
 			is_specialist_subject_type = { TYPE = scholarium }
 			OR = {
@@ -3250,13 +3261,13 @@ country_event = { # SUBJECT - Green light for continued experiments
 						random = 100
 					}
 				}
-				10 = { # Mixing species
-					country_event = {
-						id = subject.2145
-						days = 100
-						random = 100
-					}
-				}
+				#10 = { # Mixing species
+				#	country_event = {
+				#		id = subject.2145
+				#		days = 100
+				#		random = 100
+				#	}
+				#}
 				10 = { # Failure
 					country_event = {
 						id = subject.2150
@@ -3426,74 +3437,74 @@ country_event = { # Ping Event - SUBJECT - Mutate species
 	}
 }
 
-country_event = { # Ping Event - SUBJECT - Mix species
-	id = subject.2145
-	title = subject.2145.title
-	desc = subject.2145.desc
-	picture = GFX_evt_scientific_experiments
-	show_sound = evn_ove_scientific_experiments
-
-	is_triggered_only = yes
-
-	trigger = {
-		#overlord_subject_event_trigger = yes
-		capital_scope = {
-			count_owned_pop = {
-				count > 1
-				limit = {
-					NOT = { is_same_species = root.species }
-				}
-			}
-			count_owned_pop = {
-				count > 1
-				limit = {
-					is_same_species = root.species
-				}
-			}
-		}
-	}
-
-	immediate = {
-		experiments_scientist_replacement_effect = yes
-		capital_scope = {
-			random_owned_pop = {
-				limit = {
-					NOT = { is_same_species = root.species }
-				}
-				save_event_target_as = targeted_species
-			}
-			create_half_species = {
-				species_one = root.species
-				species_two = event_target:targeted_species
-				country = root
-			}
-			random_owned_pop = {
-				limit = {
-					is_same_species = root.species
-				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
-			}
-			random_owned_pop = {
-				limit = {
-					is_same_species = event_target:targeted_species
-				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
-			}
-			create_pop = {
-				species = last_created_species
-			}
-			last_created_species = {
-				save_event_target_as = new_species
-			}
-		}
-	}
-
-	option = {
-		name = subject.2145.a
-		custom_tooltip = subject.2145.a.tt
-		experiments_scientist_skill_effect = yes
-	}
-}
+#country_event = { # Ping Event - SUBJECT - Mix species
+#	id = subject.2145
+#	title = subject.2145.title
+#	desc = subject.2145.desc
+#	picture = GFX_evt_scientific_experiments
+#	show_sound = evn_ove_scientific_experiments
+#
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		#overlord_subject_event_trigger = yes
+#		capital_scope = {
+#			count_owned_pop_amount = {
+#				count >= 200
+#				limit = {
+#					NOT = { is_same_species = root.species }
+#				}
+#			}
+#			count_owned_pop_amount = {
+#				count >= 200
+#				limit = {
+#					is_same_species = root.species
+#				}
+#			}
+#		}
+#	}
+#
+#	immediate = {
+#		experiments_scientist_replacement_effect = yes
+#		capital_scope = {
+#			random_owned_pop_group = {
+#				limit = {
+#					NOT = { is_same_species = root.species }
+#				}
+#				save_event_target_as = targeted_species
+#			}
+#			#create_half_species = {
+#			#	species_one = root.species
+#			#	species_two = event_target:targeted_species
+#			#	country = root
+#			#}
+#			random_owned_pop_group = {
+#				limit = {
+#					is_same_species = root.species
+#				}
+#				kill_single_pop = yes
+#			}
+#			random_owned_pop_group = {
+#				limit = {
+#					is_same_species = event_target:targeted_species
+#				}
+#				kill_single_pop = yes
+#			}
+#			create_pop_group = {
+#				species = last_created_species
+#			}
+#			last_created_species = {
+#				save_event_target_as = new_species
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = subject.2145.a
+#		custom_tooltip = subject.2145.a.tt
+#		experiments_scientist_skill_effect = yes
+#	}
+#}
 
 country_event = { # Ping Event - SUBJECT - Experimental failure
 	id = subject.2150
@@ -3961,21 +3972,20 @@ planet_event = {
 					modifier = {
 						factor = 0
 						NOT = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								has_citizenship_type = { type = citizenship_full country = root.owner.overlord }
-								has_job = overlord_recruiter
 							}
 						}
 					}
-					random_owned_pop = {
+					random_owned_pop_group = {
 						limit = {
-							has_job = overlord_recruiter
 							has_citizenship_type = { type = citizenship_full country = root.owner.overlord }
 						}
 						save_event_target_as = moving_pop
-						resettle_pop = {
-							pop = this
-							planet = root.owner.overlord.capital_scope
+						resettle_pop_group = {
+							POP_GROUP = this
+							PLANET = root.owner.overlord.capital_scope
+							PERCENTAGE = 1
 						}
 					}
 					owner = {

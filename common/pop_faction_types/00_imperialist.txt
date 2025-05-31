@@ -13,15 +13,45 @@ imperialist = {
 	resources = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			unity = @faction_base_output
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			engineering_research = @faction_major_output
+			society_research = @faction_minor_output
+			mult = @crowdsourcing_multiplier
 		}
 	}
 
 	extortion_resource = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			alloys = @faction_base_output
 			mult = @faction_extortion_alloys_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			engineering_research = @faction_major_output
+			society_research = @faction_minor_output
+			mult = @faction_extortion_crowdsourcing_ratio
 		}
 	}
 
@@ -136,14 +166,10 @@ imperialist = {
 		potential = {
 			exists = owner
 			owner = {
-				OR = {
-					# from Ariphaos
-					has_country_flag = imperialist_conquest_timed_flag
-					any_relation = {
-						has_communications = root.owner
-						is_playable = yes # undercoat: moved to scripted trigger
-						NOT = { exists = overlord }
-					}
+				any_relation = {
+					has_communications = root.owner
+					is_playable = yes # undercoat: moved to scripted trigger
+					NOT = { exists = overlord }
 				}
 			}
 		}
@@ -191,16 +217,6 @@ imperialist = {
 				num_communications > 2
 				NOT = { has_valid_civic = civic_fanatic_purifiers }
 				num_rivals < 2
-				# from Ariphaos
-				any_relation = {
-					has_communications = root.owner
-					is_empire = yes
-					relative_power = {
-						who = root
-						category = all # fleet/economy/technology/all
-						value > pathetic # pathetic/inferior/equivalent/superior/overwhelming
-					}
-				}
 			}
 		}
 
@@ -595,6 +611,46 @@ imperialist = {
 		}
 	}
 
+	demand = { # Unplugged: Cyberize
+		title = IMPERIALIST_UNPLUGGED_CYBERIZE
+		unfulfilled_title = IMPERIALIST_UNPLUGGED_NOT_CYBERIZE
+		desc = IMPERIALIST_UNPLUGGED_CYBERIZE_DESC
+
+		unfulfilled_effect = -10
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+					OR = {
+						AND = { # safely in the Cyberize stage
+							current_stage = unplugged_identity_stage_3
+							situation_monthly_progress > 0
+						}
+						AND = { # trending towards Cyberization and our Approach is aligned
+							situation_monthly_progress > 0.05
+							OR = {
+								current_situation_approach = situation_unplugged_identity_discourage_change
+								current_situation_approach = situation_unplugged_identity_embrace_opinion
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	# Faction Demands for Ruler and Council positions.
 	inline_script = {
 		script = "paragon/global_faction_demands"
@@ -604,7 +660,7 @@ imperialist = {
 	}
 
 	on_create = {
-		pop_faction_event = { id = factions.1 }
+		pop_faction_event = { id = factions.0 }
 	}
 
 	on_destroy = {
@@ -630,5 +686,6 @@ imperialist = {
 		opposite = pacifist
 		apply_to_other_factions = "always = no"
 		extortion_resource = alloys
+		crowdsourced_extortion_tooltip = "crowdsourced_extortion_tt"
 	}
 }

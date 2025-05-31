@@ -1,0 +1,100 @@
+
+grow_up_button_effect = {
+	potential = {
+		exists = solar_system
+	}
+	allow = {
+		exists = owner
+		owner = {
+			has_menace_perk = menp_behemoth_hatchling_2
+		}
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			solar_system = { is_inside_border = root.owner }
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_black_hole_chrysalis"
+			solar_system = {
+				NOT = {
+					any_system_planet = {
+						planet_is_black_hole = yes # undercoat: moved to scripted trigger
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_other_chrysalis"
+			solar_system = {
+				NOT = {
+					any_system_megastructure = {
+						OR ={
+							is_megastructure_type = behemoth_chrysalis
+							is_megastructure_type = behemoth_chrysalis_big
+						}
+					}
+				}
+			}
+		}
+	}
+
+	effect = {
+		solar_system = {
+			if = {
+				limit = {
+					any_system_megastructure = {
+						OR = {
+							is_megastructure_type = behemoth_egg_ruined
+							is_megastructure_type = behemoth_big_egg_ruined
+						}
+					}
+				}
+				every_system_megastructure = {
+					limit = {
+						OR = {
+							is_megastructure_type = behemoth_egg_ruined
+							is_megastructure_type = behemoth_big_egg_ruined
+						}
+					}
+					remove_megastructure = this
+				}
+			}
+		}
+		if = { #add cocoon megastructure
+			limit = {
+				root = {
+					any_owned_ship = {
+						is_ship_size = behemoth_02
+					}
+				}
+			}
+			solar_system = {
+				spawn_megastructure = {
+					type = behemoth_chrysalis_big
+					owner = root.owner
+					planet = solar_system.star
+					coords_from = this
+				}
+			}
+		}
+		else = {
+			solar_system = {
+				spawn_megastructure = {
+					type = behemoth_chrysalis
+					owner = root.owner
+					planet = solar_system.star
+					coords_from = this
+				}
+			}
+		}
+		#delete behemoth
+		random_owned_ship = {
+			limit = {
+				OR = {
+					is_ship_size = behemoth_01
+					is_ship_size = behemoth_02
+				}
+			}
+			delete_ship = this
+		}
+	}
+}

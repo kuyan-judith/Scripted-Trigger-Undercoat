@@ -1,0 +1,77 @@
+decision_wilderness_expand = {
+	owned_planets_only = yes
+	enactment_time = 360
+
+	icon = wilderness_planet_expand
+
+	potential = {
+		exists = owner
+		owner = { is_wilderness_empire = yes }
+		OR = {
+			planet_size < @habitable_planet_max_size
+			AND = {
+				owner = { has_tradition = tr_purity_stage_3_swap }
+				planet_size < 30
+			}
+		}
+	}
+
+	resources = {
+		category = decisions
+		cost = {
+			biomass = 2
+			mult = value:wilderness_planet_size_mod
+		}
+		cost = {
+			influence = 50
+		}
+	}
+
+	effect = {
+		change_planet_size = 1
+	}
+
+	on_queued = {
+		if = { # kill on the same planet
+			limit = {
+				is_variable_set = local_spent_biomass
+				any_owned_pop_group = {
+					has_trait = trait_wilderness
+					pop_group_size > local_spent_biomass
+				}
+			}
+			random_owned_pop_group = {
+				limit = {
+					has_trait = trait_wilderness
+					pop_group_size > local_spent_biomass
+				}
+				kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+					pop_group = this
+					amount = local_spent_biomass
+				}
+			}
+		}
+		else_if = {
+			limit = { is_variable_set = local_spent_biomass }
+			owner = {
+				global_biomass_spender = yes
+			}
+		}
+	}
+
+	on_unqueued = { #This way you can only mass produce you main species and not other ones for bodysnatcher shenanigans
+		unqueue_biomass_effect = yes
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			free_district_slots = 0
+			mult = 100
+		}
+		modifier = {
+			free_building_slots = 0
+			mult = 10
+		}
+	}
+}

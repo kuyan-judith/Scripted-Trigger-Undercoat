@@ -462,7 +462,7 @@ country_event = { # militarist 2
 			add_trait = subclass_commander_general
 			add_trait = leader_trait_tzrynn_tithe
 			add_trait = leader_trait_disorganized
-			add_trait = leader_trait_butcher_2
+			add_trait = leader_trait_butcher
 			add_trait = leader_trait_interrogator
 			set_age = 28
 		}
@@ -1014,7 +1014,7 @@ country_event = { # pacifist 1
 			add_trait = subclass_commander_councilor
 			add_trait = leader_trait_peacekeeper
 			add_trait = leader_trait_lethargic
-			add_trait = leader_trait_resilient_2
+			add_trait = leader_trait_resilient
 			add_trait = leader_trait_martinet
 			set_age = 65
 			save_event_target_as = par_renown_09
@@ -1407,7 +1407,7 @@ country_event = { # spiritualist 2
 			add_trait = leader_trait_opinionated
 			add_trait = leader_trait_archaeologist_2
 			add_trait = leader_trait_academic_dig_site_expert
-			add_trait = leader_trait_resilient_2
+			add_trait = leader_trait_resilient
 			set_age = 80
 		}
 	}
@@ -1735,19 +1735,20 @@ leader_event = {
 	option = {
 		name = paragon.40120.a
 		owner.capital_scope = {
-			create_pop = {
+			# TODO [AA]: [AUG-50297] Modifiers should apply to the pop group
+			create_pop_group = {
 				species = event_target:random_species_1
 				effect = { add_modifier = { modifier = pop_outcast_happy years = 10 } }
 			}
-			create_pop = {
+			create_pop_group = {
 				species = event_target:random_species_2
 				effect = { add_modifier = { modifier = pop_outcast_unhappy years = 10 } }
 			}
-			create_pop = {
+			create_pop_group = {
 				species = event_target:random_species_3
 				effect = { add_modifier = { modifier = pop_outcast_crime years = 10 } }
 			}
-			create_pop = {
+			create_pop_group = {
 				species = event_target:random_species_4
 			}
 		}
@@ -1842,7 +1843,12 @@ leader_event = {
 	id = paragon.40220
 	title = paragon.40220.name
 	desc = paragon.40220.desc
-	picture = GFX_evt_ship_in_orbit
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_ship_in_orbit
+		BIOSHIP_PICTURE = GFX_evt_bio_ships_orbiting
+	}
 	show_sound = event_default
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -2024,7 +2030,7 @@ leader_event = {
 				}
 				event_target:hask_guttra = {
 					add_trait_no_notify = subclass_commander_admiral
-					add_trait_no_notify = leader_trait_aggressive_2
+					add_trait_no_notify = leader_trait_aggressive
 					add_trait_no_notify = leader_trait_demolisher_2
 					add_trait_no_notify = leader_trait_tyrannical
 					add_trait_no_notify = leader_trait_reckless
@@ -2100,18 +2106,18 @@ leader_event = {
 					add_modifier = { modifier = gia_zumon_arena_opened years = 10 }
 					if = {
 						limit = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								is_pop_category = criminal
 							}
 						}
-						every_owned_pop = {
+						every_owned_pop_group = {
 							limit = { is_pop_category = criminal }
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+							kill_single_pop = yes
 						}
 					}
 					else = {
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						weighted_random_owned_pop_group = {
+							kill_single_pop = yes
 						}
 					}
 				}
@@ -2204,7 +2210,7 @@ leader_event = {
 	option = {
 		name = paragon.40520.a
 		event_target:planet_governed = {
-			random_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = { kill_single_pop = yes }
 			add_modifier = { modifier = factorator_inhumane_work_experiments years = 5 }
 		}
 		owner = {
@@ -2261,7 +2267,12 @@ leader_event = {
 	id = paragon.40620
 	title = paragon.40620.name
 	desc = paragon.40620.desc
-	picture = GFX_evt_space_hangar
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_space_hangar
+		BIOSHIP_PICTURE = GFX_evt_bioship_hangar
+	}
 	show_sound = event_default
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -2279,10 +2290,10 @@ leader_event = {
 			add_modifier = { modifier = aturion_forced_rehabilitation_programs years = 20 }
 			every_owned_planet = {
 				limit = { planet_crime > 0 }
-				every_owned_pop = {
+				every_owned_pop_group = {
 					limit = { is_pop_category = criminal }
 					random_list = {
-						17 = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+						17 = { kill_single_pop = yes }
 						83 = {}
 					}
 				}
@@ -3078,12 +3089,6 @@ leader_event = {
 			limit = {
 				has_trait = leader_trait_shadow_broker_2
 			}
-			add_trait = leader_trait_shadow_broker_3
-		}
-		else_if = {
-			limit = {
-				has_trait = leader_trait_shadow_broker_3
-			}
 			custom_tooltip = paragon.41320.a.intel.custom_tooltip
 			hidden_effect = {
 				owner = {
@@ -3199,7 +3204,7 @@ leader_event = {
 
 	trigger = {
 		exists = planet
-		planet = { num_pops <= 60 }
+		planet = { pop_amount <= 6000 }
 	}
 
 	option = {
@@ -3240,23 +3245,24 @@ leader_event = {
 		name = paragon.41520.a
 		custom_tooltip = paragon.41520.a.custom_tooltip
 		hidden_effect = {
-			planet = {
-				while = {
-					count = 3
+			while = {
+				count = 3
+				planet = {
 					create_species = {
 						name = random
 						class = random_non_machine
 						portrait = random
 						traits = random
-						effect = {
-							modify_species = {
-								add_trait = trait_psionic
-							}
+					}
+					last_created_species = {
+						change_species_characteristics = {
+							add_trait = trait_psionic
 						}
 					}
-					create_pop = {
+					create_pop_group = {
 						species = last_created_species
 						ethos = { ethic = ethic_spiritualist }
+						size = 100
 					}
 				}
 			}

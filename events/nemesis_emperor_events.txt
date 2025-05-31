@@ -100,10 +100,6 @@ country_event = {
 		set_global_flag = imperial_charter_granted
 		add_modifier = { modifier = imperial_charter }
 		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-		random_playable_country = {
 			limit = { has_modifier = imperial_charter }
 			save_event_target_as = charter_corp
 		}
@@ -176,8 +172,15 @@ country_event = {
 		text = "emperor.2.machine.desc"
 	}
 	desc = {
-		trigger = { is_hive_empire = yes }
+		trigger = {
+			is_hive_empire = yes
+			is_wilderness_empire = no
+		}
 		text = "emperor.2.hive.desc"
+	}
+	desc = {
+		trigger = { is_wilderness_empire = yes }
+		text = "emperor.2.wilderness.desc"
 	}
 	picture = GFX_evt_coronation
 	show_sound = event_coronation
@@ -191,6 +194,7 @@ country_event = {
 			leave_alliance = { override_requirements = yes }
 		}
 		set_galactic_emperor = yes
+		save_global_event_target_as = gal_emperor
 		if = {
 			limit = { has_country_flag = united_front_active }
 			pass_resolution_no_cooldown = resolution_emperor_united_front
@@ -253,22 +257,45 @@ country_event = {
 			}
 		}
 		set_government_cooldown = no
-		set_name = random
-		room_name_override = ""
-		change_country_flag = {
-			icon = {
-				category = "special"
-				file = "the_empire.dds"
+		if = {
+			limit = {
+				NOT = { is_country_type = awakened_fallen_empire }
 			}
-			background= {
-				category = "backgrounds"
-				file = "00_solid.dds"
+			set_name = random
+			room_name_override = ""
+			change_country_flag = {
+				icon = {
+					category = "special"
+					file = "the_empire.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "00_solid.dds"
+				}
+				colors={
+					"red"
+					"red"
+					"null"
+					"null"
+				}
 			}
-			colors={
-				"red"
-				"red"
-				"null"
-				"null"
+		}
+		else = {
+			change_country_flag = {
+				icon = {
+					category = "special"
+					file = "hive_fe_flag_restored.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "00_solid.dds"
+				}
+				colors={
+					"red"
+					"red"
+					"null"
+					"null"
+				}
 			}
 		}
 		every_playable_country = {
@@ -301,6 +328,14 @@ country_event = {
 			custom_tooltip = emperor.2.a.tooltip
 		}
 	}
+	after = {
+		if = {
+			limit = {
+				is_galactic_emperor = yes
+			}
+			country_event = { id = timeline.17 } # Milestone First Emperor Appointment
+		}
+	}
 }
 
 # Rise of the Galactic Empire (Others)
@@ -321,10 +356,23 @@ country_event = {
 	}
 	desc = {
 		trigger = {
-			event_target:gal_emperor = { is_hive_empire = yes }
+			event_target:gal_emperor = {
+				is_hive_empire = yes
+				NOT = { is_country_type = awakened_fallen_empire }
+			}
 		}
 		text = "emperor.3.hive.desc"
 	}
+	desc = {
+		trigger = {
+			event_target:gal_emperor = {
+				is_hive_empire = yes
+				is_country_type = awakened_fallen_empire
+			}
+		}
+		text = "emperor.3.awakenedhive.desc"
+	}
+
 	picture = GFX_evt_coronation
 	show_sound = event_coronation
 
@@ -496,13 +544,6 @@ country_event = {
 		NOT = { has_country_flag = gdf_turned_into_armada }
 	}
 
-	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-	}
-
 	option = {
 		name = emperor.50.a
 		trigger = {
@@ -533,10 +574,6 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
 		if = {
 			limit = {
 				 NOT = { is_active_resolution = resolution_custodian_expand_gdf }
@@ -566,13 +603,6 @@ country_event = {
 	show_sound = event_salute
 
 	is_triggered_only = yes
-
-	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-	}
 
 	option = {
 		name = emperor.50.a
@@ -605,13 +635,6 @@ country_event = {
 	show_sound = event_salute
 
 	is_triggered_only = yes
-
-	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-	}
 
 	option = {
 		name = emperor.55.a
@@ -647,10 +670,6 @@ country_event = {
 
 	immediate = {
 		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-		random_playable_country = {
 			limit = { has_modifier = imperial_charter }
 			save_event_target_as = charter_corp
 		}
@@ -676,8 +695,7 @@ planet_event = {
 
 	immediate = {
 		set_planet_flag = imp_concession_port
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
+		event_target:gal_emperor = {
 			change_variable = {
 				which = imp_concession_ports
 				value = 1
@@ -706,8 +724,7 @@ planet_event = {
 
 	immediate = {
 		remove_planet_flag = imp_concession_port
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
+		event_target:gal_emperor = {
 			change_variable = {
 				which = imp_concession_ports
 				value = -1
@@ -734,8 +751,7 @@ country_event = {
 			limit = { has_planet_flag = imp_concession_port }
 			remove_planet_flag = imp_concession_port
 		}
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
+		event_target:gal_emperor = {
 			set_variable = {
 				which = "imp_concession_ports"
 				value = 0
@@ -905,13 +921,6 @@ country_event = {
 		NOT = { has_country_flag = galpol_turned_into_isd }
 	}
 
-	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-	}
-
 	option = {
 		name = emperor.70.a
 		trigger = { is_galactic_emperor = yes }
@@ -930,10 +939,6 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
 		pass_resolution_no_cooldown = resolution_emperor_isd
 		cancel_resolution = "resolution_custodian_galpol"
 		every_playable_country = {
@@ -952,13 +957,6 @@ country_event = {
 	show_sound = event_spymaster
 
 	is_triggered_only = yes
-
-	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
-	}
 
 	option = {
 		name = emperor.70.a
@@ -1103,10 +1101,6 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
-			save_event_target_as = gal_emperor
-		}
 		# Remove from ongoing wars except War in Heaven and Crisis
 		rebellion_remove_from_wars = yes
 	}
@@ -2123,8 +2117,7 @@ country_event = {
 				save_event_target_as = victim_country
 			}
 		}
-		random_playable_country = {
-			limit = { is_galactic_emperor = yes }
+		event_target:gal_emperor = {
 			country_event = { id = emperor.371 days = 10 }
 		}
 	}
@@ -2300,6 +2293,7 @@ country_event = {
 			country_event = { id = emperor.401 }
 		}
 		set_galactic_emperor = no
+		clear_global_event_target = gal_emperor
 		set_council_size = 0
 	}
 }

@@ -12,6 +12,11 @@ building_junkheap = {
 
 	category = amenity
 
+	building_sets = {
+		government
+		urban
+	}
+
 	potential = {
 		exists = owner
 		owner = { is_country_type = ratlings }
@@ -25,9 +30,9 @@ building_junkheap = {
 	}
 
 	planet_modifier = {
-		planet_housing_add = 15
-		planet_amenities_add = 20
-		job_ratling_scavenger_add = 10
+		planet_housing_add = 1500
+		planet_amenities_add = 2000
+		job_ratling_scavenger_add = 1000
 	}
 
 	upgrades = {
@@ -36,16 +41,23 @@ building_junkheap = {
 
 building_akx_worm_3 = {
 	base_buildtime = 900
-	base_cap_amount = 1
+	planet_limit = 1
 	can_demolish = no
 	can_be_ruined = no
 	can_be_disabled = no
 
 	category = research
 
+	building_sets = {
+		government
+		research
+		physics
+	}
+
 	potential = {
 		exists = planet
 		planet = { is_capital = yes }
+		exists = owner
 		NOT = { has_modifier = slave_colony }
 	}
 
@@ -76,8 +88,14 @@ building_great_pyramid = {
 
 	category = government
 
+	building_sets = {
+		pre_ftl
+	}
+
 	potential = {
 		NOT = { has_modifier = slave_colony }
+		exists = owner
+		owner = { is_wilderness_empire = no }
 	}
 
 	planet_modifier = {
@@ -99,6 +117,12 @@ building_artist_patron = {
 
 	category = unity
 
+	building_sets = {
+		government
+		urban
+		unity
+	}
+
 	potential = {
 		custom_tooltip = {
 			text = EMPIRE_UNIQUE_BUILDING
@@ -113,9 +137,15 @@ building_artist_patron = {
 		planet_jobs_unity_produces_mult = 0.15
 	}
 
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/culture_workers_add
-		AMOUNT = 3
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+			}
+		}
+		planet_civilians_unity_produces_add = 0.5
+		planet_civilians_consumer_goods_upkeep_add = 0.25
 	}
 
 	resources = {
@@ -123,6 +153,22 @@ building_artist_patron = {
 		upkeep = {
 			energy = 2
 		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = bureaucrat_is_culture_worker_tt
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_civilian_ethics_effect
 	}
 
 	desc = {
@@ -145,14 +191,22 @@ building_artist_patron = {
 building_waste_reprocessing_center = {
 	icon = building_waste_reprocessing_center
 	base_buildtime = @b2_time
-	base_cap_amount = 1
+	planet_limit = 1
 	can_build = yes
 	can_demolish = yes
 
 	category = resource
 
+	building_sets = {
+		urban
+		generator
+	}
+
 	potential = {
-		owner = { has_country_flag = bought_waste_reprocessing_center }
+		exists = owner
+		owner = {
+			has_country_flag = bought_waste_reprocessing_center
+		}
 		NOT = { has_modifier = slave_colony }
 	}
 
@@ -164,8 +218,12 @@ building_waste_reprocessing_center = {
 	}
 
 	planet_modifier = {
-		planet_amenities_add = 5
-		job_technician_drone_add = 2
+		planet_amenities_add = 500
+	}
+	# undercoat
+	inline_script = {
+		script = jobs/technicians_add
+		AMOUNT = 200
 	}
 
 	resources = {
@@ -177,22 +235,36 @@ building_waste_reprocessing_center = {
 			minerals = 10
 			energy = 10
 		}
+		cost = {
+			trigger = {
+				owner = { is_wilderness_empire = yes }
+			}
+			biomass = @b2_biomass
+		}
 	}
 
-	triggered_desc = {
-		text = job_technician_drone_effect_desc
+	inline_script = {
+		script = buildings/on_all_wilderness_buildings_districts
 	}
 }
 
 building_nuumismatic_shrine = {
 	base_buildtime = 180
 	can_demolish = yes
-	base_cap_amount = 1
+	planet_limit = 1
 
 	category = unity
 
+	building_sets = {
+		government
+		urban
+		unity
+	}
+
 	potential = {
-		owner = { has_country_flag = nuumismatic_shrine }
+		owner = {
+			has_country_flag = nuumismatic_shrine
+		}
 		NOT = { has_modifier = slave_colony }
 	}
 
@@ -203,8 +275,9 @@ building_nuumismatic_shrine = {
 		}
 	}
 
-	planet_modifier = {
-		job_numistic_priest_add = 4
+	inline_script = {
+		script = jobs/unity_jobs_add
+		AMOUNT = @building_static_jobs
 	}
 
 	resources = {
@@ -212,10 +285,6 @@ building_nuumismatic_shrine = {
 			minerals = 1000
 		}
 		category = planet_buildings
-	}
-
-	triggered_desc = {
-		text = job_numistic_priest_effect_desc
 	}
 }
 
@@ -225,8 +294,16 @@ building_crystal_plant_2 = {
 
 	category = manufacturing
 
+	building_sets = {
+		industrial
+		factory
+		foundry
+	}
+
 	potential = {
-		owner = { has_country_flag = lithoid_crystal_plant }
+		owner = {
+			has_country_flag = lithoid_crystal_plant
+		}
 		NOR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
@@ -239,7 +316,7 @@ building_crystal_plant_2 = {
 
 	inline_script = {
 		script = jobs/translucer_add
-		AMOUNT = 3
+		AMOUNT = 300
 	}
 
 	resources = {
@@ -266,13 +343,20 @@ building_composer_sanctum = {
 
 	category = government
 
+	building_sets = {
+		government
+		unity
+	}
+
 	empire_limit = {
 		base = 1
 	}
 
 	potential = {
 		host_has_dlc = "Utopia"
-		owner = { has_country_flag = composer_covenant_rank_1 }
+		owner = {
+			has_country_flag = composer_covenant_rank_1
+		}
 		NOR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
@@ -292,7 +376,7 @@ building_composer_sanctum = {
 	}
 
 	planet_modifier = {
-		job_telepath_add = 3
+		job_telepath_add = 300
 	}
 
 	country_modifier = {
@@ -322,13 +406,20 @@ building_eater_sanctum = {
 
 	category = government
 
+	building_sets = {
+		government
+		unity
+	}
+
 	empire_limit = {
 		base = 1
 	}
 
 	potential = {
 		host_has_dlc = "Utopia"
-		owner = { has_country_flag = eater_covenant_rank_1 }
+		owner = {
+			has_country_flag = eater_covenant_rank_1
+		}
 		NOR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
@@ -348,7 +439,7 @@ building_eater_sanctum = {
 	}
 
 	planet_modifier = {
-		job_telepath_add = 3
+		job_telepath_add = 300
 	}
 
 	country_modifier = {
@@ -378,13 +469,20 @@ building_instrument_sanctum = {
 
 	category = government
 
+	building_sets = {
+		government
+		unity
+	}
+
 	empire_limit = {
 		base = 1
 	}
 
 	potential = {
 		host_has_dlc = "Utopia"
-		owner = { has_country_flag = instrument_covenant_rank_1 }
+		owner = {
+			has_country_flag = instrument_covenant_rank_1
+		}
 		NOR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
@@ -404,12 +502,12 @@ building_instrument_sanctum = {
 	}
 
 	planet_modifier = {
-		job_telepath_add = 3
+		job_telepath_add = 300
 	}
 
 	country_modifier = {
 		pop_happiness = 0.05
-		trade_value_mult = 0.1
+		planet_jobs_trade_produces_mult = 0.1
 	}
 
 	resources = {
@@ -434,13 +532,20 @@ building_whisperers_sanctum = {
 
 	category = government
 
+	building_sets = {
+		government
+		unity
+	}
+
 	empire_limit = {
 		base = 1
 	}
 
 	potential = {
 		host_has_dlc = "Utopia"
-		owner = { has_country_flag = whisperers_covenant_rank_1 }
+		owner = {
+			has_country_flag = whisperers_covenant_rank_1
+		}
 		NOR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
@@ -459,7 +564,7 @@ building_whisperers_sanctum = {
 	}
 
 	planet_modifier = {
-		job_telepath_add = 3
+		job_telepath_add = 300
 	}
 
 	country_modifier = {

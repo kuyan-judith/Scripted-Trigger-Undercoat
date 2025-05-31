@@ -1,0 +1,726 @@
+#######################################
+# STRANGE WORLDS Terraforming Events #
+#######################################
+
+namespace = strange_worlds
+
+country_event = {
+	id = strange_worlds.1000
+	title = strange_worlds.1000.name
+	desc = strange_worlds.1000.desc
+	picture = GFX_evt_mineralized_lava_tube
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_mineralized_lava_tubes
+	}
+
+	option = {
+		name = EXCELLENT
+		from = {
+			add_deposit = d_lava_tubes
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1005
+	title = strange_worlds.1005.name
+	desc = strange_worlds.1005.desc
+	picture = GFX_evt_animal_wildlife
+	show_sound = sw_evn_eggs_hatching
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_hydroactive_eggs
+	}
+
+	option = {
+		name = GOOD
+		from = {
+			add_deposit = d_hydroactive_eggs
+		}
+	}
+
+	option = {
+		exclusive_trigger = {
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		}
+		name = strange_worlds.1005.evopred
+		give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small }
+		from = {
+			add_deposit = d_hydroactive_eggs
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1010
+	title = strange_worlds.1010.name
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							is_machine_empire = yes
+							is_individual_machine = no
+						}
+						has_policy_flag = pre_sapients_purge
+					}
+				}
+				text = strange_worlds.1010.desc_exterminate
+			}
+			else = {
+				if = {
+					limit = {
+						OR = {
+							is_machine_empire = yes
+							is_individual_machine = yes
+						}
+						has_policy_flag = pre_sapients_eat
+					}
+					text = strange_worlds.1010.desc_hunted
+				}
+				else_if = {
+					limit = {
+						OR = {
+							is_machine_empire = no
+							is_individual_machine = yes
+						}
+						OR = {
+							has_policy_flag = pre_sapients_allow
+							NOR = {
+								has_policy_flag = pre_sapients_allow
+								has_policy_flag = pre_sapients_eat
+								has_policy_flag = pre_sapients_protect
+								has_policy_flag = pre_sapients_purge
+							}
+						}
+					}
+					text = strange_worlds.1010.desc_tolerated
+				}
+				else_if = {
+					limit = {
+						OR = {
+							is_machine_empire = no
+							is_individual_machine = yes
+						}
+						has_policy_flag = pre_sapients_protect
+					}
+					text = strange_worlds.1010.desc_protected
+				}
+			}
+		}
+	}
+	picture = GFX_evt_suspended_in_ice
+	show_sound = sw_evn_ice_cracking
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_suspended_in_ice
+		from = {
+			save_event_target_as = hibernator_planet
+		}
+	}
+
+	option = {
+		trigger = {
+			OR = {
+				AND = {
+					is_machine_empire = yes
+					is_individual_machine = no
+				}
+				has_policy_flag = pre_sapients_purge
+			}
+		}
+		name = strange_worlds.1010.a.purge
+		add_monthly_resource_mult = {
+			resource = food
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		if = {
+			limit = {
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			}
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small }
+		}
+	}
+
+	option = {
+		trigger = {
+			OR = {
+				is_machine_empire = no
+				is_individual_machine = yes
+			}
+			has_policy_flag = pre_sapients_eat
+		}
+		name = strange_worlds.1010.b.hunted
+		add_monthly_resource_mult = {
+			resource = food
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_tech_progress = {
+			tech = tech_epigenetic_triggers
+			progress = 0.25
+		}
+		from = {
+			create_hibernators_pops = yes
+		}
+		hidden_effect = {
+			country_event = {
+				id = strange_worlds.1035
+				days = 3600
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			OR = {
+				is_machine_empire = no
+				is_individual_machine = yes
+			}
+			OR = {
+				has_policy_flag = pre_sapients_allow
+				NOR = {
+					has_policy_flag = pre_sapients_allow
+					has_policy_flag = pre_sapients_eat
+					has_policy_flag = pre_sapients_protect
+					has_policy_flag = pre_sapients_purge
+				}
+			}
+		}
+		name = strange_worlds.1010.c.study
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_tech_progress = {
+			tech = tech_epigenetic_triggers
+			progress = 0.25
+		}
+		from = {
+			create_hibernators_pops = yes
+		}
+		hidden_effect = {
+			country_event = {
+				id = strange_worlds.1035
+				days = 3600
+			}
+		}
+	}
+
+	option = {
+		trigger = {
+			OR = {
+				is_machine_empire = no
+				is_individual_machine = yes
+			}
+			OR = {
+				has_policy_flag = pre_sapients_allow
+				NOR = {
+					has_policy_flag = pre_sapients_allow
+					has_policy_flag = pre_sapients_eat
+					has_policy_flag = pre_sapients_protect
+					has_policy_flag = pre_sapients_purge
+				}
+			}
+		}
+		name = strange_worlds.1010.d.purge
+		add_monthly_resource_mult = {
+			resource = food
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+	}
+
+	option = {
+		trigger = {
+			OR = {
+				is_machine_empire = no
+				is_individual_machine = yes
+			}
+			has_policy_flag = pre_sapients_protect
+		}
+		name = strange_worlds.1010.e.protect
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_tech_progress = {
+			tech = tech_epigenetic_triggers
+			progress = 0.25
+		}
+		from = {
+			create_hibernators_pops = yes
+		}
+		hidden_effect = {
+			country_event = {
+				id = strange_worlds.1035
+				days = 3600
+			}
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1015
+	title = strange_worlds.1015.name
+	desc = strange_worlds.1015.desc
+	picture = GFX_evt_frozen
+	show_sound = sw_evn_mountain_forging
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_mountains_of_steel
+	}
+
+	option = {
+		name = strange_worlds.1015.a
+		add_monthly_resource_mult = {
+			resource = minerals
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+	}
+	option = {
+		name = strange_worlds.1015.b
+		from = {
+			add_deposit = d_mountains_of_steel
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1020
+	title = strange_worlds.1020.name
+	desc = strange_worlds.1020.desc
+	picture = {
+		trigger = {
+			from = {
+				is_desert_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_desert
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_tropical_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_tropical
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_arid_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_arid
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_continental_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_continental
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_alpine_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_alpine_city
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_savannah_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_savannah
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_ocean_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_ocean
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_tundra_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_tundra
+	}
+	picture = {
+		trigger = {
+			from = {
+				is_arctic_world = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_arctic
+	}
+	show_sound = sw_evn_small_explosions
+	location = from
+	is_triggered_only = yes
+
+	trigger = { has_biogenesis_dlc = yes }
+
+	immediate = {
+		set_country_flag = triggered_combustible_atmosphere
+	}
+
+	option = {
+		name = FASCINATING
+		from = {
+			add_deposit = d_volatile_motes_1
+			add_deposit = d_explosive_atmosphere
+		}
+		add_tech_progress = {
+			tech = tech_mine_volatile_motes
+			progress = 0.25
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1025
+	title = strange_worlds.1025.name
+	desc = strange_worlds.1025.desc
+	picture = GFX_evt_blue_lava
+	show_sound = sw_evn_blue_lava
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_blue_lava
+	}
+
+	option = {
+		name = FASCINATING
+		from = {
+			add_deposit = d_blue_lava
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1030
+	title = strange_worlds.1030.name
+	desc = strange_worlds.1030.desc
+	picture = GFX_evt_perpetual_lightning
+	show_sound = sw_evn_thunderstorm
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_perpetual_lightning
+	}
+
+	option = {
+		name = strange_worlds.1030.a
+		from = {
+			add_modifier = {
+				modifier = pm_perpetual_lightning
+			}
+		}
+	}
+
+	option = {
+		name = strange_worlds.1030.b
+		from = {
+			add_deposit = d_crystaline_growths
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1035
+	title = strange_worlds.1035.name
+	desc = strange_worlds.1035.desc
+	picture = GFX_evt_alien_cavemen
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:hibernator_planet = {
+			any_owned_pop_group = {
+				is_sapient = no
+				has_trait = trait_seasonal_dormancy
+				NOT = { has_trait = trait_presapient_stage }
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_tech_progress = {
+				tech = tech_enhanced_cryosleep_sedatives
+				progress = 0.25
+			}
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1040
+	title = strange_worlds.1040.name
+	desc = strange_worlds.1040.desc
+	picture = GFX_evt_sky_burials
+	show_sound = sw_evn_falling_bodies
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = triggered_sky_burials
+	}
+
+	option = {
+		name = strange_worlds.1040.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_modifier = {
+					modifier = pm_raining_corpses
+					years = 5
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = pm_raining_corpses_no_ancrel
+					years = 5
+				}
+			}
+		}
+	}
+	option = {
+		name = strange_worlds.1040.b
+		owner = {
+			add_resource = { energy = -1000 }
+			if = {
+				limit = {
+					has_ancrel = yes
+				}
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = trade
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+		}
+		if = {
+			limit = {
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			}
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small }
+		}
+	}
+}
+
+planet_event = {
+	id = strange_worlds.1045
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		solar_system = {
+			has_ruined_megastructure = yes
+		}
+		has_planet_flag = has_terraformflag
+		NOR = {
+			has_planet_flag = terraformed_once
+			has_planet_flag = no_terraform_event
+		}
+		space_owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_junk_moon }
+		}
+	}
+
+	immediate = {
+		set_planet_flag = terraformed_once
+		save_global_event_target_as = junk_moon_planet@space_owner
+		space_owner = {
+			set_country_flag = triggered_junk_moon
+			country_event = {
+				id = strange_worlds.1050
+				days = 30
+				random = 150
+			}
+		}
+	}
+}
+
+country_event = {
+	id = strange_worlds.1050
+	title = strange_worlds.1050.name
+	desc = strange_worlds.1050.desc
+	picture = GFX_evt_space_debris
+	show_sound = event_metal_fatigue
+	location = event_target:junk_moon_planet@owner
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:junk_moon_planet@owner = {
+			save_event_target_as = junk_moon_planet
+		}
+	}
+
+	option = {
+		name = strange_worlds.1050.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		event_target:junk_moon_planet = {
+			add_terraformation_total_time_mult = 0.25
+			set_planet_flag = spawn_junk_moon
+		}
+	}
+
+	option = {
+		name = strange_worlds.1050.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		event_target:junk_moon_planet@owner = {
+			add_deposit = d_space_junk_hazards
+		}
+	}
+}
+
+planet_event = {
+	id = strange_worlds.1055
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_planet_flag = spawn_junk_moon
+	}
+
+	immediate = {
+		space_owner = {
+			country_event = {
+				id = strange_worlds.1060
+			}
+		}
+		remove_planet_flag = spawn_junk_moon
+
+	}
+}
+
+country_event = {
+	id = strange_worlds.1060
+	title = strange_worlds.1060.name
+	desc = strange_worlds.1060.desc
+	picture = GFX_evt_junk_moon
+	show_sound = sw_evn_magnetic_metal
+	location = event_target:junk_moon_planet@owner
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:junk_moon_planet@owner = {
+			save_event_target_as = junk_moon_planet
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		space_owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		custom_tooltip = strange_worlds.1060.create_moon_ct
+		hidden_effect = {
+			event_target:junk_moon_planet@owner = {
+				solar_system = {
+					spawn_planet = {
+						class = pc_junk
+						name = "NAME_JUNK_MOON"
+						orbit_angle = 180
+						orbit_distance = 110
+						size = 2
+						location = event_target:junk_moon_planet@owner
+						orbit_location = yes
+						orbit_angle_offset = 45
+						orbit_distance_offset = 9.899
+						has_ring = no
+						init_effect = {
+							add_deposit = d_minerals_3
+							add_deposit = d_alloys_10
+							# Undercoat on_action
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+		}
+	}
+}

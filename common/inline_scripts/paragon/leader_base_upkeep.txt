@@ -6,7 +6,7 @@ upkeep = {
 		}
 	}
 	unity = 2
-	mult = trigger:has_skill
+	mult = trigger:has_base_skill
 }
 # Default Unity upkeep
 upkeep = {
@@ -14,14 +14,59 @@ upkeep = {
 		exists = owner
 		owner = {
 			NOR = {
+				AND = {
+					prev.species = {
+						is_robotic_species = no
+					}
+					is_megacorp = yes
+					OR = {
+						is_purity_authority = yes
+						is_cloning_authority = yes
+						is_mutation_authority = yes
+					}
+				}
 				has_valid_civic = civic_machine_upkeep_twister
 				has_valid_civic = civic_hive_upkeep_twister
-				root = { has_trait = trait_imperial_heir }
+				root = {
+					has_trait = trait_imperial_heir
+					OR = {
+						is_ruler = yes
+						is_heir = yes
+					}
+				}
 			}
 		}
 	}
 	unity = 2
-	mult = trigger:has_skill
+	mult = trigger:has_base_skill
+}
+# Trade Upkeep for Genetic Corporate Empires
+upkeep = {
+	trigger = {
+		species = {
+			is_robotic_species = no
+		}
+		exists = owner
+		owner = {
+			is_megacorp = yes
+			OR = {
+				is_purity_authority = yes
+				is_cloning_authority = yes
+				is_mutation_authority = yes
+			}
+			NOR = {
+				root = {
+					has_trait = trait_imperial_heir
+					OR = {
+						is_ruler = yes
+						is_heir = yes
+					}
+				}
+			}
+		}
+	}
+	trade = 2
+	mult = trigger:has_base_skill
 }
 # Reduced Unity upkeep for Galactic Paragons gestalt civics.
 upkeep = {
@@ -35,7 +80,7 @@ upkeep = {
 		}
 	}
 	unity = 1
-	mult = trigger:has_skill
+	mult = trigger:has_base_skill
 }
 # Food upkeep for Autonomous Drones
 upkeep = {
@@ -49,7 +94,7 @@ upkeep = {
 		}
 	}
 	food = 2
-	mult = trigger:has_skill
+	mult = trigger:has_base_skill
 }
 # Mineral upkeep for Autonomous Drones
 upkeep = {
@@ -63,7 +108,7 @@ upkeep = {
 		}
 	}
 	minerals = 2
-	mult = trigger:has_skill
+	mult = trigger:has_base_skill
 }
 # Energy upkeep for Sovereign Circuits
 upkeep = {
@@ -74,5 +119,54 @@ upkeep = {
 		}
 	}
 	energy = 2
-	mult = trigger:has_skill
+	mult = trigger:has_base_skill
+}
+# Energy upkeep for Replicatory Association
+upkeep = {
+	trigger = {
+		exists = owner
+		OR = {
+			owner = { has_policy_flag = replicatory_association_insurance_stellar }
+			AND = {
+				OR = {
+					is_ruler = yes
+					is_councilor = yes
+				}
+				owner = { has_policy_flag = replicatory_association_insurance_platinium }
+			}
+			AND = {
+				is_ruler = yes
+				owner = { has_policy_flag = replicatory_association_insurance_basic }
+			}
+		}
+	}
+	energy = @replicatory_association_insurance_upkeep
+	mult = trigger:has_base_skill
+}
+# Society upkeep for Homogenous Submission
+upkeep = {
+	trigger = {
+		exists = owner
+		owner = {
+			is_dictatorial_authority = yes
+		}
+		has_trait_tier1or2or3 = {
+			TRAIT = leader_trait_backup_clone
+		}
+		OR = {
+			AND = {
+				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+				owner = { has_policy_flag = homogenous_class_scientists }
+			}
+			AND = {
+				leader_is_official_stu = yes # undercoat: moved to scripted trigger
+				owner = { has_policy_flag = homogenous_class_officials }
+			}
+			AND = {
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				owner = { has_policy_flag = homogenous_class_commanders }
+			}
+		}
+	}
+	society_research = @homogenous_clone_upkeep
 }

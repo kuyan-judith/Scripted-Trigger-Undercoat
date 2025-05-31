@@ -69,10 +69,7 @@ ship_event = {
 				0 = { # ALL
 					modifier = {
 						add = 50
-						NOR = {
-							has_trait = leader_trait_engineer
-							has_trait = leader_trait_engineer_2
-						}
+						NOT = { has_trait = leader_trait_engineer }
 					}
 					add_trait = leader_trait_engineer
 				}
@@ -82,8 +79,6 @@ ship_event = {
 						NOR = {
 							has_trait = leader_trait_cautious
 							has_trait = leader_trait_aggressive
-							has_trait = leader_trait_cautious_2
-							has_trait = leader_trait_aggressive_2
 						}
 					}
 					add_trait = leader_trait_cautious
@@ -92,7 +87,7 @@ ship_event = {
 					modifier = {
 						add = 25
 						NOR = {
-							has_trait_tier1or2 = { TRAIT = leader_trait_adaptable }
+							has_trait = leader_trait_adaptable
 							has_trait_tier1or2 = { TRAIT = leader_trait_stubborn }
 							owner = { is_gestalt = yes } # undercoat: moved to scripted trigger
 						}
@@ -103,9 +98,9 @@ ship_event = {
 					modifier = {
 						add = 50
 						NOR = {
-							has_trait_tier1or2 = { TRAIT = leader_trait_eager }
+							has_trait = leader_trait_eager
 						}
-						owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+						owner = {  is_machine_empire = yes }
 					}
 					add_trait = leader_trait_eager
 				}
@@ -113,10 +108,10 @@ ship_event = {
 					modifier = {
 						add = 25
 						NOR = {
-							has_trait_tier1or2 = { TRAIT = leader_trait_adaptable }
+							has_trait = leader_trait_adaptable
 							has_trait_tier1or2 = { TRAIT = leader_trait_stubborn }
 						}
-						owner = { is_machine_empire = yes } # undercoat: moved to scripted trigger
+						owner = { is_machine_empire = yes }
 					}
 					add_trait = leader_trait_adaptable
 				}
@@ -133,7 +128,12 @@ ship_event = {
 	id = anomaly_failure.4011
 	title = PROJECT_FAILURE
 	desc = "anomaly_failure.4011.desc"
-	picture = GFX_evt_ship_in_orbit
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_ship_in_orbit
+		BIOSHIP_PICTURE = GFX_evt_bio_ships_orbiting
+	}
 	location = FROMFROM
 
 	is_triggered_only = yes
@@ -448,7 +448,12 @@ ship_event = {
 	id = anomaly_failure.4037
 	title = "anomaly.4035.name"
 	desc = "anomaly_failure.4037.desc"
-	picture = GFX_evt_ship_in_orbit
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_ship_in_orbit
+		BIOSHIP_PICTURE = GFX_evt_bio_ships_orbiting
+	}
 	location = root
 
 	is_triggered_only = yes
@@ -494,44 +499,41 @@ planet_event = {
 		hidden_effect = {
 			from = {
 				if = {
-					limit = { num_pops > 4 }
-					random_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					limit = { pop_amount > 400 }
+					random_owned_pop_group = {
+						kill_single_pop = yes
 					}
-					random_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					random_owned_pop_group = {
+						kill_single_pop = yes
 					}
-					random_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					random_owned_pop_group = {
+						kill_single_pop = yes
 					}
 					owner = { set_country_flag = gas_explosion_deaths_3 }
 					break = yes
 				}
 				if = {
-					limit = { num_pops > 3 }
-					random_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					limit = { pop_amount > 300 }
+					random_owned_pop_group = {
+						kill_single_pop = yes
 					}
-					random_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					random_owned_pop_group = {
+						kill_single_pop = yes
 					}
 					owner = { set_country_flag = gas_explosion_deaths_2 }
 					break = yes
 				}
 				if = {
-					limit = { num_pops > 2 }
-					random_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					limit = { pop_amount > 200 }
+					random_owned_pop_group = {
+						kill_single_pop = yes
 					}
 					owner = { set_country_flag = gas_explosion_deaths_1 }
 					break = yes
 				}
 				if = {
 					limit = {
-						OR = {
-							num_pops = 2
-							num_pops < 2
-						}
+						pop_amount <= 200
 					}
 					owner = { set_country_flag = gas_explosion_deaths_0 }
 					break = yes

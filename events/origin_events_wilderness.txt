@@ -1,0 +1,872 @@
+namespace = wilderness
+
+# Contents / ID reservations:
+# wilderness.1-999		Origin utility
+#	wilderness.1xx		 1 time setup
+#	wilderness.2xx		 Job and production upkeep
+#	wilderness.3xx		 Conquring/warfare utility
+#	wilderness.4xx		 Mechanical events from player actions (from plantary decisions etc...)
+#	wilderness.5xx		 Misc
+# wilderness.1xxx		Survey & Colony (early game) events
+# wilderness.2xxx		Unique content (e.g. Special Projects)
+# wilderness.4xxx		Espionage
+
+# Planet has been terraformed
+# This = Planet
+# From = Terraforming country
+planet_event = {
+	id = wilderness.5
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { exists = owner }
+		from = {
+			is_wilderness_empire = yes
+		}
+	}
+
+	immediate = {
+		set_owner = from
+		planet_event = {
+			id = wilderness.500
+		}
+	}
+}
+
+country_event = {
+	id = wilderness.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_resource = {
+			resource = biomass
+			value = root.local_country_biomass
+		}
+	}
+}
+
+########################
+# UTILITY & TEST EVENTS
+########################
+
+# Wilderness game_start setup
+country_event = {
+	id = wilderness.100
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_wilderness_empire = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { has_valid_civic = civic_hive_devouring_swarm }
+			}
+			set_country_flag = benevolent_terms_preference
+		}
+
+		capital_scope = {
+			if = {# Tracking what your starting home world was for colonization purposes.
+				limit = {
+					is_wet = yes
+				}
+				root = { set_country_flag = started_wet }
+			}
+			else_if = {
+				limit = {
+					is_dry = yes
+				}
+				root = { set_country_flag = started_dry }
+			}
+			else = {
+				root = { set_country_flag = started_cold }
+			}
+			remove_deposit = d_decrepit_dwellings
+			add_district = district_photosynthesis_fields
+		}
+	}
+}
+
+# Stellar flare effect
+# via 'game_start.1' | every_playable_country (with this Origin)
+country_event = {
+	id = wilderness.150
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		capital_star = {
+			create_ambient_object = {
+				type = solar_storm
+				location = this
+				scale = 0.25
+				duration = 360
+			}
+			while = {
+				count = 3
+				create_ambient_object = {
+					type = "small_debris_object"
+					use_3d_location = yes
+					entity_offset = { min = 25 max = 30 }
+					entity_offset_angle = { min = 0 max = 360 }
+					location = this
+				}
+				create_ambient_object = {
+					type = "ancient_battlefield_02_object"
+					use_3d_location = yes
+					entity_offset = { min = 2 max = 4 }
+					entity_offset_angle = { min = 0 max = 360 }
+					location = last_created_ambient_object
+				}
+				create_ambient_object = {
+					type = "abandoned_ship_2_object"
+					use_3d_location = yes
+					entity_offset = { min = 2 max = 4 }
+					entity_offset_angle = { min = 0 max = 360 }
+					location = last_created_ambient_object
+				}
+			}
+			create_ambient_object = {
+				type = "abandoned_starbase_01_object"
+				use_3d_location = yes
+				entity_offset = { min = 25 max = 25 }
+				entity_offset_angle = { min = 0 max = 360 }
+				entity_offset_height = 10
+				location = this
+			}
+		}
+	}
+}
+
+# Convert wilderness districts when a planet is conquered
+planet_event = {
+	id = wilderness.300
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = fromfrom
+		fromfrom = { is_wilderness_empire = yes }
+		from = { is_wilderness_empire = no	}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				num_districts = {
+					type = district_craglands
+					value >= 4
+				}
+			}
+			add_deposit = d_wilderness_city_2
+		}
+		else_if = {
+			limit = {
+				num_districts = {
+					type = district_craglands
+					value < 4
+				}
+			}
+			add_deposit = d_wilderness_city
+		}
+
+		if = {
+			limit = {
+				OR = {
+					num_districts = {
+						type = district_hollow_mountains
+						value >= 4
+					}
+					num_districts = {
+						type = district_hollow_mountains_uncapped
+						value >= 4
+					}
+				}
+			}
+			add_deposit = d_wilderness_mining_2
+		}
+		else_if = {
+			limit = {
+				OR = {
+					num_districts = {
+						type = district_hollow_mountains
+						value > 0
+					}
+					num_districts = {
+						type = district_hollow_mountains_uncapped
+						value > 0
+					}
+				}
+			}
+			add_deposit = d_wilderness_mining
+		}
+
+		if = {
+			limit = {
+				OR = {
+					num_districts = {
+						type = district_orchard_forests
+						value >= 4
+					}
+					num_districts = {
+						type = district_orchard_forests_uncapped
+						value >= 4
+					}
+				}
+			}
+			add_deposit = d_wilderness_farming_2
+		}
+		else_if = {
+			limit = {
+				OR = {
+					num_districts = {
+						type = district_orchard_forests
+						value > 0
+					}
+					num_districts = {
+						type = district_orchard_forests_uncapped
+						value > 0
+					}
+				}
+			}
+			add_deposit = d_wilderness_farming
+		}
+
+		#if = {
+		#	limit = {
+		#		num_districts = {
+		#			type = district_metallic_dew_plains
+		#			value >= 4
+		#		}
+		#	}
+		#	add_deposit = d_wilderness_industrial_2
+		#}
+		#else_if = {
+		#	limit = {
+		#		num_districts = {
+		#			type = district_metallic_dew_plains
+		#			value < 4
+		#		}
+		#	}
+		#	add_deposit = d_wilderness_industrial
+		#}
+
+		if = {
+			limit = {
+				OR = {
+					num_districts = {
+						type = district_photosynthesis_fields
+						value >= 4
+					}
+					num_districts = {
+						type = district_photosynthesis_fields_uncapped
+						value >= 4
+					}
+				}
+			}
+			add_deposit = d_wilderness_generator_2
+		}
+		else_if = {
+			limit = {
+				OR = {
+					num_districts = {
+						type = district_photosynthesis_fields
+						value > 0
+					}
+					num_districts = {
+						type = district_photosynthesis_fields_uncapped
+						value > 0
+					}
+				}
+			}
+			add_deposit = d_wilderness_generator
+		}
+		remove_all_districts = yes
+		add_district = district_city
+	}
+}
+
+# Convert to wilderness planet when transfered to wilderness
+planet_event = {
+	id = wilderness.310
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	pre_triggers = {
+		is_capital = no
+	}
+
+	trigger = {
+		from = {
+			is_wilderness_empire = yes
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = {
+					any_owned_pop_group = {
+						is_same_species = prev.from.owner_main_species
+					}
+				}
+			}
+			create_pop_group = {
+				species = from.owner_main_species
+			}
+		}
+	}
+}
+
+# On planet colonised by wilderness
+planet_event = {
+	id = wilderness.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_wilderness_empire = yes
+		}
+	}
+
+	immediate = {
+		add_building = building_capital_wilderness
+		# NOTE: effect should run twice if the empire has both 'Mind of Many Worlds' and the Yuht Cryo Core
+		if = {
+			limit = {
+				owner = { has_tradition = tr_expansion_colonization_fever }
+			}
+			wilderness_add_bonus_district = yes
+		}
+		if = {
+			limit = {
+				owner = { has_relic = r_cryo_core }
+			}
+			wilderness_add_bonus_district = yes
+		}
+
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_country_flag = first_colony_finished }
+				}
+			}
+			owner = {
+				set_country_flag = first_colony_finished
+			}
+		}
+	}
+}
+
+#########################
+# SURVEY & COLONY EVENTS
+#########################
+
+namespace = wilderness
+
+planet_event = {
+	id = wilderness.1005
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		habitable_planet_not_urban = yes
+		space_owner = {
+			is_wilderness_empire = yes
+			is_ai = no
+			NOT = { has_country_flag = first_colony }
+		}
+	}
+
+	immediate = {
+		space_owner = {
+			set_country_flag = first_colony
+			country_event = { id = wilderness.1010 }
+		}
+	}
+}
+
+country_event = {
+	id = wilderness.1010
+	title = wilderness.1010.name
+	picture = GFX_evt_wilderness_colonizer
+	desc = {
+		trigger = {
+			text = wilderness.1010.desc.intro
+			text = newline
+			# Same planet class as homeworld
+			success_text = {
+				text = wilderness.1010.desc.same
+				from = {
+					is_ideal_planet_class = {
+						who = root
+						status = yes
+					}
+				}
+			}
+			# Similar planet class to homeworld
+			success_text = {
+				text = wilderness.1010.desc.similar_cold
+				from = {
+					is_cold = yes
+					is_ideal_planet_class = {
+						who = root
+						status = no
+					}
+				}
+				species = {
+					ideal_planet_is_cold = yes
+				}
+			}
+			success_text = {
+				text = wilderness.1010.desc.similar_dry
+				from = {
+					is_dry = yes
+					is_ideal_planet_class = {
+						who = root
+						status = no
+					}
+				}
+				species = {
+					ideal_planet_is_dry = yes
+				}
+
+			}
+			success_text = {
+				text = wilderness.1010.desc.similar_wet
+				from = {
+					is_wet = yes
+					is_ideal_planet_class = {
+						who = root
+						status = no
+					}
+				}
+				species = {
+					ideal_planet_is_wet = yes
+				}
+			}
+			# Different planet class to homeworld
+			success_text = {
+				text = wilderness.1010.desc.diff_cold
+				from = {
+					is_cold = yes
+					is_ideal_planet_class = {
+						who = root
+						status = no
+					}
+				}
+				species = {
+					ideal_planet_is_cold = no
+				}
+			}
+			success_text = {
+				text = wilderness.1010.desc.diff_dry
+				from = {
+					is_dry = yes
+					is_ideal_planet_class = {
+						who = root
+						status = no
+					}
+				}
+				species = {
+					ideal_planet_is_dry = no
+				}
+			}
+			success_text = {
+				text = wilderness.1010.desc.diff_wet
+				from = {
+					is_wet = yes
+					is_ideal_planet_class = {
+						who = root
+						status = no
+					}
+				}
+				species = {
+					ideal_planet_is_wet = no
+				}
+			}
+			# Other planet class
+			success_text = {
+				text = wilderness.1010.desc.same
+				from = {
+					NOR = {
+						is_cold = yes
+						is_dry = yes
+						is_wet = yes
+					}
+				}
+			}
+			text = newline
+			text = wilderness.1010.desc.outro
+		}
+	}
+	show_sound = event_alien_nature
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = wilderness.1010.a
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+	}
+}
+
+#############################################
+# Unique Content
+#############################################
+
+# Terraforming Candidate Event
+
+# Planets starts being terraformed
+# This = Planet
+# From = Terraforming country
+planet_event = {
+	id = wilderness.1999
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_ai = no
+			is_wilderness_empire = yes
+			NOT = {
+				has_country_flag = wilderness_event_2000
+			}
+		}
+		OR = {
+			is_terraforming_candidate = yes
+			is_hive_world = yes # undercoat: moved to scripted trigger
+			is_machine_world = yes # undercoat: moved to scripted trigger
+			is_toxic_world = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		from = {
+			set_country_flag = wilderness_event_2000
+			country_event = { id = wilderness.2000 }
+		}
+	}
+}
+
+country_event = {
+	id = wilderness.2000
+	title = wilderness.2000.name
+	picture = GFX_evt_wilderness_colonizer
+	desc = {
+		text = wilderness.2000.desc.barren
+		exclusive_trigger = {
+			from = {
+				OR = {
+					is_barren_dry_world = yes # undercoat: moved to scripted trigger
+					is_barren_cold_world = yes # undercoat: moved to scripted trigger
+					is_nanotech_world = yes # undercoat: moved to scripted trigger
+				}
+			}
+			NOT = {
+				has_ascension_perk = ap_world_shaper
+			}
+		}
+	}
+	desc = {
+		text = wilderness.2000.desc.tomb_detox
+		exclusive_trigger = {
+			from = {
+				OR = {
+					is_nuked_world = yes # undercoat: moved to scripted trigger
+					is_hive_world = yes # undercoat: moved to scripted trigger
+					is_machine_world = yes # undercoat: moved to scripted trigger
+					is_toxic_world = yes # undercoat: moved to scripted trigger
+				}
+			}
+			NOT = {
+				has_ascension_perk = ap_world_shaper
+			}
+		}
+	}
+	desc = {
+		text = wilderness.2000.desc.gaia
+		exclusive_trigger = {
+			has_ascension_perk = ap_world_shaper
+		}
+	}
+	show_sound = event_alien_nature
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = wilderness.2000.a
+	}
+}
+
+#planet_event = {
+#	id = wilderness.2010
+#	title = wilderness.2010.name
+#	picture = GFX_evt_wilderness_colonizer
+#	desc = wilderness.2010.desc.reg
+#
+#	desc = {
+#		text = wilderness.2010.desc.barren
+#		exclusive_trigger = {
+#			OR = {
+#				has_planet_flag = barren_terraform
+#				has_planet_flag = barren_cold_terraform
+#				has_planet_flag = nanotech_terraform
+#			}
+#			NOT = {
+#				is_gaia_world = yes # undercoat: moved to scripted trigger
+#			}
+#		}
+#	}
+#
+#	desc = {
+#		text = wilderness.2010.desc.hive_mach
+#		exclusive_trigger = {
+#			OR = {
+#				has_planet_flag = hive_terraform
+#				has_planet_flag = machine_terraform
+#			}
+#			NOT = {
+#				is_gaia_world = yes # undercoat: moved to scripted trigger
+#			}
+#		}
+#	}
+#
+#	desc = {
+#		text = wilderness.2010.desc.tomb_detox
+#		exclusive_trigger = {
+#			is_gaia_world = yes # undercoat: moved to scripted trigger
+#		}
+#	}
+#
+#	desc = {
+#		text = wilderness.2010.desc.gaia
+#	}
+#
+#	show_sound = event_default
+#	location = from
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		from = {
+#			is_ai = no
+#			is_wilderness_empire = yes
+#			NOT = {
+#				has_country_flag = wilderness_event_2010
+#			}
+#		}
+#	}
+#
+#	immediate = {
+#		from = {
+#			set_country_flag = wilderness_event_2010
+#		}
+#	}
+#
+#	option = {
+#		name = EXCELLENT
+#	}
+#
+#	option = {
+#		name = GOOD
+#		exclusive_trigger = {
+#			OR = {
+#				has_planet_flag = hive_terraform
+#				has_planet_flag = machine_terraform
+#			}
+#			NOT = {
+#				is_gaia_world = yes # undercoat: moved to scripted trigger
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = MARVELOUS
+#		exclusive_trigger = {
+#			is_gaia_world = yes # undercoat: moved to scripted trigger
+#		}
+#	}
+#}
+
+#############################################
+# ESPIONAGE OPERATION: EMBED PLANETARY ROOTS
+#############################################
+
+espionage_operation_event = {
+	id = wilderness.4500
+	title = wilderness.4500.name
+	desc = wilderness.4500.desc
+	picture = GFX_evt_alien_nature
+	show_sound = event_default
+	espionage_operation = yes
+	is_triggered_only = yes
+
+	option = { name = ACKNOWLEDGED }
+}
+
+# Launch Operation
+espionage_operation_event = {
+	id = wilderness.4505
+	title = wilderness.4505.name
+	desc = wilderness.4505.desc
+	picture = GFX_evt_alien_nature
+	show_sound = event_default
+	location = event_target:roots_planet
+	espionage_operation = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_espionage_operation_progress_locked = yes
+		target = {
+			# Choose their most Blocker-rich world
+			ordered_owned_planet = {
+				limit = {
+					is_colony = yes
+				}
+				position = 0
+				order_by = value:natural_blocker_count
+				inverse = no
+				save_event_target_as = roots_planet
+			}
+		}
+		# TODO have desc respond to the type of Blocker chosen
+	}
+
+	option = {
+		name = LAUNCH_OPERATION
+		hidden_effect = {
+			espionage_operation_event = { id = wilderness.4510 days = 15 }
+		}
+	}
+
+	after = {
+		set_espionage_operation_progress_locked = no
+	}
+}
+
+# Finalé
+espionage_operation_event = {
+	id = wilderness.4510
+	title = wilderness.4510.name
+	desc = wilderness.4510.desc
+	picture = GFX_evt_aggressive_flora
+	location = event_target:roots_planet
+	show_sound = event_espionage_concluded
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:roots_planet = {
+			if = {
+				limit = {
+					has_natural_blocker = yes
+				}
+				random_deposit = {
+					limit = {
+						has_deposit_category = deposit_cat_blockers_natural
+					}
+					wilderness_get_natural_blocker_name = yes # not mechanically relevant, but flavorful
+				}
+			}
+			# ... else 'GetRootsBlockerName' will call a valid default entry
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		spynetwork = {
+			add_modifier = {
+				modifier = espionage_planetary_roots
+				years = 15
+			}
+			hidden_effect = {
+				set_saved_date = {
+					key = planet_roots_success
+					days_from_present = 5400
+					expires = 5400
+				}
+			}
+		}
+	}
+
+	option = { # Expend an Asset (extend modifier)
+		name = wilderness.4510.a
+		icon = {
+			icon = GFX_espionage_asset_icon
+			text = ESPIONAGE_OPERATION_ASSET_EVENT_OPTION
+		}
+		trigger = {
+			has_espionage_asset_subterfuge = yes
+		}
+		spynetwork = {
+			add_modifier = {
+				modifier = espionage_planetary_roots
+				years = 30
+			}
+			set_saved_date = {
+				key = planet_roots_success
+				days_from_present = 10800
+				expires = 10800
+			}
+		}
+		destroy_espionage_asset_subterfuge = yes
+	}
+	option = { # Expend an Asset (disrupt resource production)
+		name = wilderness.4510.b
+		icon = {
+			icon = GFX_espionage_asset_icon
+			text = ESPIONAGE_OPERATION_ASSET_EVENT_OPTION
+		}
+		trigger = {
+			has_espionage_asset_military = yes
+		}
+		event_target:roots_planet = {
+			add_deposit = d_wilderness_root_blocker
+		}
+		spynetwork = {
+			add_modifier = {
+				modifier = espionage_planetary_roots
+				years = 15
+			}
+			set_saved_date = {
+				key = planet_roots_success
+				days_from_present = 5400
+				expires = 5400
+			}
+		}
+		destroy_espionage_asset_subterfuge = yes
+	}
+
+	after = {
+		destroy_espionage_operation = this
+		# 'Tinker, Tailor, Soldier, Blorg' Achievement
+		hidden_effect = {
+			if = {
+				limit = {
+					owner = {
+						NOT = { has_country_flag = operation_complete_planetary_roots }
+					}
+				}
+				owner = {
+					change_variable = {
+						which = tinker_tailor_soldier_blorg_achievement_count
+						value = 1
+					}
+					set_country_flag = operation_complete_planetary_roots
+				}
+			}
+		}
+	}
+}

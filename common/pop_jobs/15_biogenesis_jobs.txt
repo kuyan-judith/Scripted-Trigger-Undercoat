@@ -1,0 +1,486 @@
+disconnected_drone = {
+	category = simple_drone
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_mineral_purification_plant
+			icon = synapse_drone
+		}
+	}
+
+	tags = { }
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		has_disconnected_drone_citizenship_type = yes
+		is_livestock = no
+	}
+
+	resources = {
+		category = planet_disconnected_drones
+	}
+
+	weight = {
+		weight = @special_job_weight
+		modifier = {
+			add = -5 # Reduce the stickiness factor
+			exists = planet
+			OR = {
+				planet = {
+					free_jobs_of_type = {
+						job = livestock_zoo_animal
+						value >= 100
+					}
+				}
+				planet = {
+					free_jobs_of_type = {
+						job = livestock_zoo_beast
+						value >= 100
+					}
+				}
+				AND = {
+					disconnected_drone_can_be_worker = yes
+					planet = {
+						free_jobs_of_type = {
+							category = worker
+							value >= 100
+						}
+					}
+				}
+			}
+		}
+	}
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = simple_drone
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+}
+
+skywatcher = {
+	category = specialist
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_citadel_uplink
+		}
+	}
+
+	possible_precalc = can_fill_specialist_job
+
+	tags = { soldier }
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		soldier_job_check_trigger = yes
+		owner = { is_gestalt = no }
+	}
+
+	resources = {
+		category = planet_soldiers
+		upkeep = {
+			alloys = 1
+		}
+		inline_script = "output/soldier_output"
+	}
+
+	inline_script = "output/soldier_triggered_modifiers"
+
+	country_modifier = {
+		country_naval_cap_add = 6
+	}
+
+	system_modifier = {
+		defensive_stations_tracking_add = 5
+		defensive_stations_weapon_range_mult = 0.10
+	}
+
+	planet_modifier = {
+		planet_stability_add = 2.5
+	}
+
+	weight = {
+		# Copied from soldier jobs
+		weight = @soldier_job_weight
+		modifier = {
+			factor = 10
+			exists = planet
+			planet = {
+				exists = leader
+				leader = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 0.5
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			NOT = { has_slavery_type = { type = slavery_military } }
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_military }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_presapient_earthbound
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_limited_regeneration
+		}
+		modifier = {
+			factor = 0
+			species = { can_be_soldier = no }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+		modifier = {
+			factor = 5
+			has_trait = trait_cyborg_creed_of_war
+		}
+	}
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = specialist
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+}
+
+skywatcher_drone = {
+	category = complex_drone
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_citadel_uplink
+			icon = skywatcher
+		}
+	}
+
+	tags = { soldier }
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_soldiers
+		upkeep = {
+			alloys = 1
+		}
+		inline_script = "output/soldier_output"
+	}
+
+	inline_script = "output/soldier_triggered_modifiers"
+
+	country_modifier = {
+		country_naval_cap_add = 6
+	}
+
+	system_modifier = {
+		defensive_stations_tracking_add = 5
+		defensive_stations_weapon_range_mult = 0.10
+	}
+
+	planet_modifier = {
+		planet_stability_add = 2.5
+	}
+
+	weight = {
+		weight = @soldier_job_weight
+		# Copied from warrior drone jobs
+		modifier = {
+			factor = 10
+			planet = {
+				exists = leader
+				leader = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				}
+			}
+		}
+		modifier = {
+			factor = 4
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 4
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 3
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 0.5
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 0
+			planet = { pop_amount < 1200 }
+			owner = { is_ai = yes }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+		modifier = {
+			factor = 1.2
+			has_trait = trait_cybernetic
+		}
+	}
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = complex_drone
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+}
+
+genomic_researcher = { # Normal empire
+	category = specialist
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_genomic_facility
+		}
+	}
+	possible = { always = no }
+}
+
+genomic_drone = { # Hive empire
+	category = complex_drone
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_genomic_facility
+		}
+	}
+	possible = { always = no }
+}
+
+transference_volunteer = {
+	category = specialist
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_hive_confluence
+		}
+	}
+	can_be_automated = no
+
+	tags = { telepath unity }
+
+	possible_precalc = can_fill_specialist_job
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_transference_volunteers
+		upkeep = {
+			food = 5
+		}
+		produces = {
+			unity = 3
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = 2
+	}
+
+	country_modifier = {
+		ship_fire_rate_mult = 0.01
+		ship_armor_mult = 0.01
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = 2
+		mult = value:job_weights_modifier|JOB|transference_volunteer|RESOURCE|unity|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+
+	inline_script = "jobs/automodding_priority_unity"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = specialist
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+}
+
+transference_drone = {
+	category = complex_drone
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_hive_confluence
+		}
+		swap_type = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_wilderness_empire = yes
+				}
+			}
+			name = neurosymbiont
+			desc = neurosymbiont
+			building_icon = bio_electric_stimulator_3
+			condition_string = DRONE_JOB_TRIGGER
+			weight = 10
+		}
+	}
+	can_be_automated = no
+
+	tags = { telepath unity }
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	resources = {
+		category = planet_transference_volunteers
+		upkeep = {
+			food = 5
+		}
+		produces = {
+			unity = 3
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = 2
+	}
+
+	country_modifier = {
+		ship_fire_rate_mult = 0.01
+		ship_armor_mult = 0.01
+	}
+
+	weight = {
+		mult = 2
+		mult = value:job_weights_modifier|JOB|transference_drone|RESOURCE|unity|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+	}
+	inline_script = "jobs/automodding_priority_unity"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = complex_drone
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+}

@@ -102,7 +102,7 @@ decision_psi_inoculate_pops = {
 	allow = {
 		custom_tooltip = {
 			fail_text = no_organic_pops_on_planet
-			any_owned_pop = {
+			any_owned_pop_group = {
 				is_organic_species = yes
 				is_being_assimilated = no
 				is_being_purged = no
@@ -222,7 +222,7 @@ decision_paragon_origin_subdue_reformists = {
 	resources = {
 		category = decisions
 		cost = {
-			unity = 100
+			unity = 1
 			multiplier = value:paragon_origin_count_egalitarians
 		}
 	}
@@ -244,13 +244,21 @@ decision_paragon_origin_subdue_reformists = {
 			}
 		}
 		hidden_effect = {
-			random_owned_pop = {
-				limit = { pop_has_ethic = ethic_egalitarian }
-				pop_change_ethic = ethic_authoritarian
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_ethic = ethic_egalitarian
+				}
+				from = {
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_authoritarian
+						AMOUNT = 100
+					}
+				}
 			}
-			random_owned_pop = {
-				limit = { pop_has_ethic = ethic_egalitarian }
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			weighted_random_owned_pop_group = {
+				limit = { has_ethic = ethic_egalitarian }
+				kill_single_pop = yes
 			}
 			owner = {
 				ruler = { paragon_origin_gain_delusion = yes }
@@ -258,8 +266,8 @@ decision_paragon_origin_subdue_reformists = {
 			if = {
 				limit = {
 					NOT = {
-						any_owned_pop = {
-							pop_has_ethic = ethic_egalitarian
+						any_owned_pop_group = {
+							has_ethic = ethic_egalitarian
 						}
 					}
 				}

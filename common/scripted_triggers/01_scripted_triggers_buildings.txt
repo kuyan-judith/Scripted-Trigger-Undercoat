@@ -1,4 +1,5 @@
 has_upgraded_capital = {
+	hidden_trigger = { exists = owner }
 	if = {
 		limit = { has_modifier = resort_colony }
 		custom_tooltip = {
@@ -34,7 +35,19 @@ has_upgraded_capital = {
 		}
 	}
 	else_if = {
-		limit = { owner = { is_hive_empire = yes } }
+		limit = { owner = { is_wilderness_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_wilderness_capital"
+			OR = {
+				has_building = building_capital_wilderness
+				has_building = building_major_capital_wilderness
+				has_building = building_system_capital_wilderness
+				has_building = building_imperial_capital_wilderness
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { is_hive_empire = yes } } # excludes Wilderness, above
 		custom_tooltip = {
 			fail_text = "requires_building_hive_capital"
 			OR = {
@@ -70,6 +83,7 @@ has_upgraded_capital = {
 }
 
 has_major_upgraded_capital = {
+	hidden_trigger = { exists = owner }
 	if = {
 		limit = { has_modifier = resort_colony }
 		custom_tooltip = {
@@ -98,7 +112,18 @@ has_major_upgraded_capital = {
 		}
 	}
 	else_if = {
-		limit = { owner = { is_hive_empire = yes } }
+		limit = { owner = { is_wilderness_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_wilderness_major_capital"
+			OR = {
+				has_building = building_major_capital_wilderness
+				has_building = building_system_capital_wilderness
+				has_building = building_imperial_capital_wilderness
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { is_hive_empire = yes } } # excludes Wilderness, above
 		custom_tooltip = {
 			fail_text = "requires_building_major_hive_capital"
 			OR = {
@@ -131,6 +156,7 @@ has_major_upgraded_capital = {
 }
 
 has_fully_upgraded_capital = {
+	hidden_trigger = { exists = owner }
 	if = {
 		limit = { has_modifier = resort_colony }
 		custom_tooltip = {
@@ -158,7 +184,17 @@ has_fully_upgraded_capital = {
 		}
 	}
 	else_if = {
-		limit = { owner = { is_hive_empire = yes } }
+		limit = { owner = { is_wilderness_empire = yes } }
+		custom_tooltip = {
+			fail_text = "requires_building_wilderness_system_capital"
+			OR = {
+				has_building = building_system_capital_wilderness
+				has_building = building_imperial_capital_wilderness
+			}
+		}
+	}
+	else_if = {
+		limit = { owner = { is_hive_empire = yes } } # excludes Wilderness, above
 		custom_tooltip = {
 			fail_text = "requires_building_major_hive_capital"
 			OR = {
@@ -238,11 +274,17 @@ ideal_planet_is_special = {
 
 can_build_gaiaseeder = {
 	# Can always build on ideal worlds
+	# Or if you have Mutagenic Habitability
 	if = {
 		limit = {
-			is_ideal_planet_class = {
-				who = owner
-				status = yes
+			OR = {
+				is_ideal_planet_class = {
+					who = owner
+					status = yes
+				}
+				owner_species = {
+					has_trait = trait_auto_hab_preference
+				}
 			}
 		}
 		always = yes
@@ -394,11 +436,17 @@ can_build_gaiaseeder = {
 
 can_build_overlord_gaiaseeder = {
 	# Can always build on ideal worlds
+	# Or if you have Mutagenic Habitability
 	if = {
 		limit = {
-			is_ideal_planet_class = {
-				who = owner.overlord
-				status = yes
+			OR = {
+				is_ideal_planet_class = {
+					who = owner.overlord
+					status = yes
+				}
+				owner.overlord.species = {
+					has_trait = trait_auto_hab_preference
+				}
 			}
 		}
 		always = yes
@@ -545,5 +593,147 @@ can_build_overlord_gaiaseeder = {
 			fail_text = gaiaseeders_special_habitability_preference
 			owner.overlord = { has_technology = tech_ecological_adaptation }
 		}
+	}
+}
+
+has_no_research_specialization = {
+	NOR = {
+		num_zones = {
+			type = zone_research_physics
+			value < 1
+		}
+		num_zones = {
+			type = zone_research_engineering
+			value < 1
+		}
+		num_zones = {
+			type = zone_research_society
+			value < 1
+		}
+	}
+}
+
+has_any_unspecialized_research_zone = {
+	OR  = {
+		has_zone = {
+			zone = zone_research
+		}
+		has_zone = {
+			zone = zone_research_wilderness
+		}
+		has_zone = {
+			zone = zone_research_unity
+		}
+		has_zone = {
+			zone = zone_research_unity_wilderness
+		}
+		has_zone = {
+			zone = zone_habitat_research
+		}
+		has_zone = {
+			zone = zone_habitat_research_unity
+		}
+	}
+}
+
+has_any_specialized_research_zone = {
+	OR = {
+		has_zone = {
+			zone = zone_research_physics
+		}
+		has_zone = {
+			zone = zone_research_society
+		}
+		has_zone = {
+			zone = zone_research_engineering
+		}
+	}
+}
+
+has_any_research_zone = {
+	OR = {
+		has_any_unspecialized_research_zone = yes
+		has_any_specialized_research_zone = yes
+	}
+}
+
+has_any_agriculture_zone = {
+	OR = {
+		has_zone = {
+			zone = zone_food
+		}
+		has_zone = {
+			zone = zone_anglers
+		}
+		has_zone = {
+			zone = zone_food_wilderness
+		}
+		has_zone = {
+			zone = zone_habitat_hydroponics
+		}
+		has_zone = {
+			zone = zone_rw_food
+		}
+	}
+}
+
+has_any_generator_zone = {
+	OR = {
+		has_zone = {
+			zone = zone_energy
+		}
+		has_zone = {
+			zone = zone_energy_wilderness
+		}
+		has_zone = {
+			zone = zone_habitat_hydroponics
+		}
+		has_zone = {
+			zone = zone_rw_energy
+		}
+	}
+}
+
+has_any_mining_zone = {
+	OR = {
+		has_zone = {
+			zone = zone_minerals
+		}
+		has_zone = {
+			zone = zone_minerals_wilderness
+		}
+	}
+}
+
+has_any_factory_zone = {
+	hidden_trigger = { exists = owner }
+	owner = {
+		country_uses_consumer_goods = yes
+	}
+	OR = {
+		has_zone = {
+			zone = zone_factory
+		}
+		has_zone = {
+			zone = zone_industrial
+		}
+	}
+}
+
+has_any_foundry_zone = {
+	OR = {
+		has_zone = {
+			zone = zone_foundry
+		}
+		has_zone = {
+			zone = zone_industrial
+		}
+	}
+}
+
+has_any_industrial_zone = {
+	OR = {
+		has_any_foundry_zone = yes
+		has_any_factory_zone = yes
 	}
 }

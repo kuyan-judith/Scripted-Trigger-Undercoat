@@ -5,6 +5,11 @@ trait_auto_mod_cyborg = {
 	category = cyborg
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive automod cybernetic }
 	initial = no
 	randomized = no
 	species_potential_add = {
@@ -22,6 +27,30 @@ trait_auto_mod_cyborg = {
 	assembly_score = {
 		base = 2
 	}
+
+	resources = {
+		category = planet_pops
+		produces = {
+			trigger = {
+				exists = owner
+				owner = {
+					has_modifier = worse_parts
+				}
+			}
+			trade = 0.5
+		}
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = { has_modifier = optimized_parts }
+			}
+			energy = 0.1
+		}
+	}
+
 	custom_tooltip_with_modifiers = automodding_trait_cyborg_tooltip
 }
 
@@ -35,6 +64,11 @@ trait_cyborg_power_drills = {
 	}
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive pop_output mineral cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -45,7 +79,7 @@ trait_cyborg_power_drills = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		planet_jobs_minerals_produces_mult = 0.1
+		miner_jobs_bonus_workforce_mult = 0.1
 	}
 
 	slave_cost = {
@@ -73,6 +107,11 @@ trait_cyborg_harvesters = {
 	}
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive pop_output food cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -83,7 +122,7 @@ trait_cyborg_harvesters = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		planet_jobs_food_produces_mult = 0.1
+		farmer_jobs_bonus_workforce_mult = 0.1
 	}
 
 	slave_cost = {
@@ -111,6 +150,11 @@ trait_cyborg_superconductive = {
 	}
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive pop_output energy cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -121,7 +165,7 @@ trait_cyborg_superconductive = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		planet_jobs_energy_produces_mult = 0.1
+		technician_jobs_bonus_workforce_mult = 0.1
 	}
 
 	slave_cost = {
@@ -143,6 +187,10 @@ trait_cyborg_efficient_processors = {
 	cost = 2
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive pop_output cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -154,7 +202,14 @@ trait_cyborg_efficient_processors = {
 	category = cyborg
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 	modifier = {
-		planet_jobs_produces_mult = 0.05
+		pop_bonus_workforce_mult = 0.05
+	}
+
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
 	}
 
 	slave_cost = {
@@ -166,6 +221,11 @@ trait_cyborg_logic_engines = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive pop_output research cybernetic }
 	initial = no
 
 	species_potential_add = {
@@ -178,14 +238,20 @@ trait_cyborg_logic_engines = {
 	category = cyborg
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 	modifier = {
-		planet_jobs_physics_research_produces_mult = 0.10
-		planet_jobs_society_research_produces_mult = 0.10
-		planet_jobs_engineering_research_produces_mult = 0.10
+		researcher_jobs_bonus_workforce_mult = 0.10
+	}
+
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
 	}
 
 	slave_cost = {
 		energy = 750
 	}
+	custom_tooltip = TRAIT_CYBORG_LOGIC_ENGINES_EFFECT
 	assembly_score = {
 		modifier = {
 			add = 1.5
@@ -198,14 +264,25 @@ trait_cyborg_loyalty_circuits = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive happiness cybernetic individual }
+	initial = yes
 	opposites = { "trait_cyborg_apathy_loops" }
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 		NOT = { has_trait = trait_hive_mind }
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -214,8 +291,18 @@ trait_cyborg_loyalty_circuits = {
 		pop_happiness = 0.1
 	}
 
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
+
 	slave_cost = {
 		energy = 500
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -224,6 +311,10 @@ trait_cyborg_double_jointed = {
 	opposites = { "trait_cyborg_bulky" }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive housing migration cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -236,8 +327,14 @@ trait_cyborg_double_jointed = {
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 	modifier = {
 		pop_housing_usage_mult = -0.1
-		pop_growth_from_immigration = 0.15
-		pop_resettlement_cost_mult = -0.25
+		pop_resettlement_cost_mult = -0.35
+	}
+
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
 	}
 
 	slave_cost = {
@@ -250,6 +347,10 @@ trait_cyborg_bulky = {
 	opposites = { "trait_cyborg_double_jointed" }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative housing migration cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -261,8 +362,7 @@ trait_cyborg_bulky = {
 	category = cyborg
 	modifier = {
 		pop_housing_usage_mult = 0.1
-		pop_growth_from_immigration = -0.15
-		pop_resettlement_cost_mult = 0.25
+		pop_resettlement_cost_mult = 0.35
 	}
 
 	ai_weight = {
@@ -277,13 +377,23 @@ trait_cyborg_enhanced_memory = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive leader cybernetic }
+	initial = yes
 	opposites = { "trait_cyborg_limited_memory" }
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -293,11 +403,21 @@ trait_cyborg_enhanced_memory = {
 		leaders_upkeep_mult = -0.25
 	}
 
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
+
 	ai_weight = {
 		factor = 0
 	}
 	slave_cost = {
 		energy = 750
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -306,12 +426,22 @@ trait_cyborg_durable = {
 	opposites = { "trait_cyborg_high_maintenance" }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive amenities cybernetic }
+	initial = yes
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -319,8 +449,17 @@ trait_cyborg_durable = {
 	modifier = {
 		pop_amenities_usage_add = -0.5
 	}
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 750
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -329,12 +468,22 @@ trait_cyborg_high_maintenance = {
 	opposites = { "trait_cyborg_durable" }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative amenities cybernetic }
+	initial = yes
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -347,6 +496,9 @@ trait_cyborg_high_maintenance = {
 	slave_cost = {
 		energy = -150
 	}
+	allowed_origins = {
+		origin_unplugged
+	}
 }
 
 trait_cyborg_learning_algorithms = {
@@ -354,12 +506,22 @@ trait_cyborg_learning_algorithms = {
 	opposites = { "trait_cyborg_neural_limiters" }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive leader cybernetic }
+	initial = yes
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -369,9 +531,17 @@ trait_cyborg_learning_algorithms = {
 		negative_leader_traits_species = -1
 		leaders_upkeep_mult = -0.1
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 1500
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -380,6 +550,10 @@ trait_cyborg_power_intensive = {
 	opposites = { }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative upkeep cybernetic }
 	initial = no
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -402,12 +576,22 @@ trait_cyborg_neural_limiters = {
 	opposites = { "trait_cyborg_learning_algorithms" }
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative leader cybernetic }
+	initial = yes
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -427,18 +611,31 @@ trait_cyborg_neural_limiters = {
 	slave_cost = {
 		energy = -500
 	}
+	allowed_origins = {
+		origin_unplugged
+	}
 }
 
 trait_cyborg_streamlined_protocols = {
 	cost = 1
 	opposites = { "trait_cyborg_high_bandwidth" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive empire_size cybernetic }
+	initial = yes
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -446,8 +643,17 @@ trait_cyborg_streamlined_protocols = {
 	modifier = {
 		species_empire_size_mult = -0.10
 	}
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 750
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -455,12 +661,22 @@ trait_cyborg_high_bandwidth = {
 	cost = -2
 	opposites = { "trait_cyborg_streamlined_protocols" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative empire_size cybernetic }
+	initial = yes
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -470,18 +686,24 @@ trait_cyborg_high_bandwidth = {
 	slave_cost = {
 		energy = -150
 	}
+	allowed_origins = {
+		origin_unplugged
+	}
 }
 
 trait_cyborg_trading_algorithms = {
 	cost = 1
+
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive pop_output trade cybernetic }
 	initial = no
-	opposites = { "trait_cyborg_scarcity_algorithms" "trait_hive_mind" }
-	forbidden_ethics = { ethic_gestalt_consciousness }
+	opposites = { "trait_cyborg_scarcity_algorithms" }
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
-		owner_is_machine_intelligence = no
-		owner_is_hive_empire = no
 	}
 	species_possible_remove = {
 		can_remove_cybernetic_traits = yes
@@ -490,7 +712,13 @@ trait_cyborg_trading_algorithms = {
 	category = cyborg
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 	modifier = {
-		pop_job_trade_mult = 0.25
+		trader_jobs_bonus_workforce_mult = 0.25
+	}
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
 	}
 	slave_cost = {
 		energy = 500
@@ -502,6 +730,11 @@ trait_cyborg_stainless_steel_smile = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+		SPECIES_TRAIT_UNIVERSAL_AUGMENTATIONS
+	}
+	tags = { organic positive pop_output amenities cybernetic }
 	initial = no
 	opposites = { "trait_cyborg_welded_countenance" }
 	species_potential_add = {
@@ -514,9 +747,14 @@ trait_cyborg_stainless_steel_smile = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		pop_job_amenities_mult = 0.20
+		entertainer_jobs_bonus_workforce_mult = 0.20
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 750
 	}
@@ -527,6 +765,10 @@ trait_cyborg_welded_countenance = {
 	cost = -2
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive leader cybernetic }
 	initial = no
 	opposites = { "trait_cyborg_stainless_steel_smile" }
 	species_potential_add = {
@@ -538,7 +780,7 @@ trait_cyborg_welded_countenance = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		pop_job_amenities_mult = -0.20
+		entertainer_jobs_bonus_workforce_mult = -0.20
 	}
 
 	slave_cost = {
@@ -551,6 +793,10 @@ trait_cyborg_apathy_loops = {
 	cost = -1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative happiness cybernetic individual }
 	initial = no
 	opposites = { "trait_cyborg_loyalty_circuits" }
 	species_potential_add = {
@@ -576,25 +822,38 @@ trait_cyborg_bionic_engineers = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive pop_output research cybernetic }
+	initial = yes
 	opposites = {
 		"trait_cyborg_bionic_physicists"
 		"trait_cyborg_bionic_sociologists"
 	}
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
 	modifier = {
-		planet_jobs_engineering_research_produces_mult = 0.15
+		engineer_jobs_bonus_workforce_mult = 0.15
 	}
 
 	slave_cost = {
 		energy = 750
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -603,6 +862,10 @@ trait_cyborg_bionic_physicists = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive pop_output research cybernetic }
 	initial = no
 	opposites = {
 		"trait_cyborg_bionic_engineers"
@@ -617,7 +880,7 @@ trait_cyborg_bionic_physicists = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		planet_jobs_physics_research_produces_mult = 0.15
+		physicist_jobs_bonus_workforce_mult = 0.15
 	}
 
 	slave_cost = {
@@ -630,6 +893,10 @@ trait_cyborg_bionic_sociologists = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive pop_output research cybernetic }
 	initial = no
 	opposites = {
 		"trait_cyborg_bionic_physicists"
@@ -644,7 +911,7 @@ trait_cyborg_bionic_sociologists = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		planet_jobs_society_research_produces_mult = 0.15
+		biologist_jobs_bonus_workforce_mult = 0.15
 	}
 
 	slave_cost = {
@@ -657,23 +924,42 @@ trait_cyborg_integrated_weaponry = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive army cybernetic }
+	initial = yes
 	opposites = { "trait_cyborg_delicate_frames" }
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
-	custom_tooltip = INTEGRATED_WEAPONRY_CYBORG_TT
+	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 	randomized = no
 	category = cyborg
 	modifier = {
 		army_damage_mult = 1.0
+		enforcer_jobs_bonus_workforce_mult = 0.20
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 1000
+	}
+	allowed_origins = {
+		origin_unplugged
 	}
 }
 
@@ -682,6 +968,10 @@ trait_cyborg_delicate_frames = {
 	cost = -1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative army pop_output cybernetic }
 	initial = no
 	opposites = { "trait_cyborg_integrated_weaponry" }
 	species_potential_add = {
@@ -694,7 +984,7 @@ trait_cyborg_delicate_frames = {
 	category = cyborg
 	modifier = {
 		army_damage_mult = -0.5
-		planet_jobs_worker_produces_mult = -0.05
+		worker_and_simple_drone_cat_bonus_workforce_mult = -0.05
 	}
 
 	slave_cost = {
@@ -707,13 +997,23 @@ trait_cyborg_limited_memory = {
 	cost = -2
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	initial = no
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative leader cybernetic }
+	initial = yes
 	opposites = { "trait_cyborg_enhanced_memory" }
 	species_potential_add = {
-		can_add_cybernetic_traits = yes
+		OR = {
+			can_add_cybernetic_traits = yes
+			can_add_unplugged_traits = yes
+		}
 	}
 	species_possible_remove = {
-		can_remove_cybernetic_traits = yes
+		OR = {
+			can_remove_cybernetic_traits = yes
+			can_remove_unplugged_traits = yes
+		}
 	}
 	randomized = no
 	category = cyborg
@@ -724,6 +1024,9 @@ trait_cyborg_limited_memory = {
 	slave_cost = {
 		energy = -150
 	}
+	allowed_origins = {
+		origin_unplugged
+	}
 }
 
 trait_cyborg_scarcity_algorithms = {
@@ -731,13 +1034,14 @@ trait_cyborg_scarcity_algorithms = {
 	cost = -1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic negative pop_output trade cybernetic }
 	initial = no
-	opposites = { "trait_cyborg_trading_algorithms" "trait_thrifty" "trait_hive_mind" }
-	forbidden_ethics = { ethic_gestalt_consciousness }
+	opposites = { "trait_cyborg_trading_algorithms" "trait_thrifty" }
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
-		owner_is_machine_intelligence = no
-		owner_is_hive_empire = no
 	}
 	species_possible_remove = {
 		can_remove_cybernetic_traits = yes
@@ -745,7 +1049,7 @@ trait_cyborg_scarcity_algorithms = {
 	randomized = no
 	category = cyborg
 	modifier = {
-		pop_job_trade_mult = -0.25
+		trader_jobs_bonus_workforce_mult = -0.25
 	}
 
 	slave_cost = {
@@ -758,10 +1062,14 @@ trait_cyborg_climate_adjustment_dry = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive habitability cybernetic }
 	initial = no
 	opposites = {
 		"trait_cyborg_climate_adjustment_wet"
-		"trait_cyborg_climate_adjustment_frozen"
+		"trait_cyborg_climate_adjustment_cold"
 	}
 	species_potential_add = {
 		can_add_cybernetic_traits = yes
@@ -777,7 +1085,12 @@ trait_cyborg_climate_adjustment_dry = {
 		wet_habitability = -0.1 # undercoat: moved to static modifier
 		cold_habitability = -0.1 # undercoat: moved to static modifier
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 500
 	}
@@ -788,9 +1101,13 @@ trait_cyborg_climate_adjustment_wet = {
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive habitability cybernetic }
 	initial = no
 	opposites = {
-		"trait_cyborg_climate_adjustment_frozen"
+		"trait_cyborg_climate_adjustment_cold"
 		"trait_cyborg_climate_adjustment_dry"
 	}
 	species_potential_add = {
@@ -807,17 +1124,26 @@ trait_cyborg_climate_adjustment_wet = {
 		dry_habitability = -0.1 # undercoat: moved to static modifier
 		cold_habitability = -0.1 # undercoat: moved to static modifier
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 500
 	}
 }
 
-trait_cyborg_climate_adjustment_frozen = {
+trait_cyborg_climate_adjustment_cold = {
 	host_has_dlc = "The Machine Age"
 	cost = 1
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive habitability cybernetic }
 	initial = no
 	opposites = {
 		"trait_cyborg_climate_adjustment_wet"
@@ -837,7 +1163,12 @@ trait_cyborg_climate_adjustment_frozen = {
 		dry_habitability = -0.1 # undercoat: moved to static modifier
 		wet_habitability = -0.1 # undercoat: moved to static modifier
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 500
 	}
@@ -854,20 +1185,27 @@ trait_cyborg_ancient_dreadnought = {
 		}
 		can_add_cybernetic_traits = yes
 	}
-	potential_crossbreeding_chance = 1.0
 	initial = no
 	randomized = no
 	category = cyborg
-	opposites = { "trait_lithoid_gaseous_byproducts" "trait_lithoid_scintillating" "trait_lithoid_volatile_excretions" "trait_advanced_gaseous_byproducts" "trait_advanced_scintillating" "trait_advanced_volatile_excretions" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive army pop_output alloys leviathan cybernetic }
 
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 
 	modifier = {
 		army_damage_mult = 5
-		planet_metallurgists_produces_mult = 0.15
+		foundry_jobs_bonus_workforce_mult = 0.15
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 1500
 	}
@@ -884,19 +1222,26 @@ trait_cyborg_enigmatic_fortress = {
 		}
 		can_add_cybernetic_traits = yes
 	}
-	potential_crossbreeding_chance = 1.0
 	initial = no
 	randomized = no
 	category = cyborg
-	opposites = { "trait_lithoid_gaseous_byproducts" "trait_lithoid_scintillating" "trait_lithoid_volatile_excretions" "trait_advanced_gaseous_byproducts" "trait_advanced_scintillating" "trait_advanced_volatile_excretions" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive amenities leviathan cybernetic }
 
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 
 	modifier = {
 		pop_amenities_usage_mult = -0.5
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 1500
 	}
@@ -913,19 +1258,26 @@ trait_cyborg_infinity_sphere = {
 		}
 		can_add_cybernetic_traits = yes
 	}
-	potential_crossbreeding_chance = 1.0
 	initial = no
 	randomized = no
 	category = cyborg
-	opposites = { "trait_lithoid_gaseous_byproducts" "trait_lithoid_scintillating" "trait_lithoid_volatile_excretions" "trait_advanced_gaseous_byproducts" "trait_advanced_scintillating" "trait_advanced_volatile_excretions" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive upkeep research cybernetic }
 
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 
 	modifier = {
 		planet_researchers_upkeep_mult = -0.5
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 1500
 	}
@@ -942,19 +1294,26 @@ trait_cyborg_scavenger_bot = {
 		}
 		can_add_cybernetic_traits = yes
 	}
-	potential_crossbreeding_chance = 1.0
 	initial = no
 	randomized = no
 	category = cyborg
-	opposites = { "trait_lithoid_gaseous_byproducts" "trait_lithoid_scintillating" "trait_lithoid_volatile_excretions" "trait_advanced_gaseous_byproducts" "trait_advanced_scintillating" "trait_advanced_volatile_excretions" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	localized_tags = {
+		SPECIES_TRAIT_CYBORG
+	}
+	tags = { organic positive pop_growth leviathan cybernetic }
 
 	custom_tooltip_with_modifiers = CYBORG_ENERGY_UPKEEP_EFFECT
 
 	modifier = {
-		pop_growth_speed = 1
+		logistic_growth_mult = 1
 	}
-
+	resources = {
+		category = planet_pops
+		upkeep = {
+			energy = @cyborg_energy_upkeep
+		}
+	}
 	slave_cost = {
 		energy = 1500
 	}
@@ -963,7 +1322,6 @@ trait_cyborg_scavenger_bot = {
 #Cybernetic Creed Traits
 trait_cyborg_creed_of_construction = {
 	cost = 0
-	potential_crossbreeding_chance = 0
 	initial = no
 	randomized = no
 	category = cyborg
@@ -980,10 +1338,11 @@ trait_cyborg_creed_of_construction = {
 	infertile = no
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	tags = { organic positive pop_output alloys consumer_goods unity cybernetic special }
 	modifier = {
-		planet_jobs_alloys_produces_mult = 0.2
-		planet_jobs_consumer_goods_produces_mult = 0.2
-		planet_jobs_unity_produces_mult = 0.1
+		foundry_jobs_bonus_workforce_mult = 0.2
+		artisan_jobs_bonus_workforce_mult = 0.2
+		bureaucrat_jobs_bonus_workforce_mult = 0.1
 	}
 
 	icon = "gfx/interface/icons/traits/trait_cyborg_creed_of_construction.dds"
@@ -994,7 +1353,6 @@ trait_cyborg_creed_of_construction = {
 
 trait_cyborg_creed_of_war = {
 	cost = 0
-	potential_crossbreeding_chance = 0
 	initial = no
 	randomized = no
 	category = cyborg
@@ -1011,10 +1369,11 @@ trait_cyborg_creed_of_war = {
 	infertile = no
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	tags = { organic positive army pop_output unity cybernetic special }
 	modifier = {
 		army_health = 0.25
 		army_defense_damage_mult = 0.25
-		planet_jobs_unity_produces_mult = 0.10
+		bureaucrat_jobs_bonus_workforce_mult = 0.1
 	}
 
 	icon = "gfx/interface/icons/traits/trait_cyborg_creed_of_war.dds"
@@ -1025,7 +1384,6 @@ trait_cyborg_creed_of_war = {
 
 trait_cyborg_creed_of_research = {
 	cost = 0
-	potential_crossbreeding_chance = 0
 	initial = no
 	randomized = no
 	category = cyborg
@@ -1042,11 +1400,10 @@ trait_cyborg_creed_of_research = {
 	infertile = no
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	tags = { organic positive pop_output research unity cybernetic special }
 	modifier = {
-		planet_jobs_engineering_research_produces_mult = 0.2
-		planet_jobs_physics_research_produces_mult = 0.2
-		planet_jobs_society_research_produces_mult = 0.2
-		planet_jobs_unity_produces_mult = 0.10
+		researcher_jobs_bonus_workforce_mult = 0.2
+		bureaucrat_jobs_bonus_workforce_mult = 0.10
 	}
 
 	icon = "gfx/interface/icons/traits/trait_cyborg_creed_of_research.dds"
@@ -1057,7 +1414,6 @@ trait_cyborg_creed_of_research = {
 
 trait_cyborg_creed_of_labor = {
 	cost = 0
-	potential_crossbreeding_chance = 0
 	initial = no
 	randomized = no
 	category = cyborg
@@ -1074,9 +1430,10 @@ trait_cyborg_creed_of_labor = {
 	infertile = no
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	tags = { organic positive happiness pop_output unity cybernetic special }
 	modifier = {
-		planet_jobs_worker_produces_mult = 0.2
-		planet_jobs_unity_produces_mult = 0.10
+		pop_cat_worker_bonus_workforce_mult = 0.2
+		bureaucrat_jobs_bonus_workforce_mult = 0.10
 	}
 
 	icon = "gfx/interface/icons/traits/trait_cyborg_creed_of_labor.dds"
@@ -1087,7 +1444,6 @@ trait_cyborg_creed_of_labor = {
 
 trait_cyborg_ritualistic_implants = {
 	cost = 0
-	potential_crossbreeding_chance = 0
 	initial = no
 	randomized = no
 	category = cyborg
@@ -1106,11 +1462,12 @@ trait_cyborg_ritualistic_implants = {
 	improves_leaders = yes
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	tags = { organic positive army pop_output alloys consumer_goods research unity cybernetic special }
 	modifier = {
-		planet_jobs_alloys_produces_mult = 0.05
-		planet_jobs_engineering_research_produces_mult = 0.05
-		planet_jobs_unity_produces_mult = 0.1
-		planet_jobs_worker_produces_mult = 0.05
+		foundry_jobs_bonus_workforce_mult = 0.05
+		engineer_jobs_bonus_workforce_mult = 0.05
+		bureaucrat_jobs_bonus_workforce_mult = 0.1
+		pop_cat_worker_bonus_workforce_mult = 0.05
 		army_damage_mult = 0.05
 		# concept_cybernetic_creed_traits_desc should be updated if trait effects are changed
 	}

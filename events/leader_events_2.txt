@@ -34,6 +34,18 @@ country_event = {
 			}
 		}
 
+		# Optimized Neurology
+		# Adds a random common trait
+		if = {
+			limit = {
+				has_country_flag = genetic_ascension_stage_1_purity
+				has_genetic_stage_1_tradition = yes
+			}
+			from = {
+				add_trait_no_notify = "random_common"
+			}
+		}
+
 		# Aristocratic Elite
 		# 20% Chance for a random positive trait and a random negative trait
 		if = {
@@ -73,7 +85,9 @@ country_event = {
 				from = { leader_is_commander_stu = yes } # undercoat: moved to scripted trigger
 			}
 			from = {
-				add_trait_no_notify = leader_trait_crusader
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_crusader
+				}
 			}
 		}
 
@@ -85,7 +99,9 @@ country_event = {
 				from = { leader_is_commander_stu = yes } # undercoat: moved to scripted trigger
 			}
 			from = {
-				add_trait_no_notify = leader_trait_corsair
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_corsair
+				}
 			}
 		}
 
@@ -130,9 +146,102 @@ country_event = {
 				is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
 			}
 			from = {
-				set_leader_flag = ignore_autocracy_ruler_trait_restriction
-				add_trait_no_notify = leader_trait_adventurous_spirit_3
-				remove_leader_flag = ignore_autocracy_ruler_trait_restriction
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_adventurous_spirit_3
+				}
+			}
+		}
+
+		# Biochemical Composure/Cloning Authorities
+		if = {
+			limit = {
+				from = {
+					leader_can_have_backup_clone = yes
+				}
+			}
+			from = {
+				random_list = {
+					75 = {
+						# Base 75% chance of nothing
+						modifier = {
+							factor = 0
+							root = {
+								is_cloning_authority = yes
+								has_cloning_biochemical_composure_tradition = yes
+							}
+						}
+					}
+					25 = {
+						add_trait_no_notify = leader_trait_has_backup_clone
+					}
+				}
+			}
+		}
+
+		# Genetic Purity Authorities
+		if = {
+			limit = {
+				is_purity_authority = yes
+				is_imperial_authority = no
+				is_hive_empire = no
+				is_megacorp = no
+				from = {
+					species = {
+						is_robotic_species = no
+					}
+				}
+			}
+			from = {
+				add_trait = trait_leader_genetic_purist
+			}
+		}
+
+		# Biotic Dominion
+		if = {
+			limit = {
+				is_purity_authority = yes
+				is_imperial_authority = yes
+				from = {
+					is_same_species = root.ruler
+				}
+			}
+			from = {
+				add_trait_no_notify = trait_imperial_heir
+			}
+		}
+
+		# Unplugged
+		# Adds Cybernetic Benefits Trait
+		if = {
+			limit = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				from = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+					species = {
+						is_same_value = prevprev.owner_main_species
+					}
+				}
+			}
+
+			owner_main_species = {
+				switch = {
+					trigger = has_trait
+					trait_unplugged_cybernetic_positives_3 = {
+						prev.from = {
+							add_trait_no_notify = leader_trait_unplugged_cybernetic_positives_3
+						}
+					}
+					trait_unplugged_cybernetic_positives_2 = {
+						prev.from = {
+							add_trait_no_notify = leader_trait_unplugged_cybernetic_positives_2
+						}
+					}
+					trait_unplugged_cybernetic_positives_1 = {
+						prev.from = {
+							add_trait_no_notify = leader_trait_unplugged_cybernetic_positives_1
+						}
+					}
+				}
 			}
 		}
 	}
@@ -225,7 +334,9 @@ country_event = {
 				limit = {
 					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 				}
-				add_trait_no_notify = leader_trait_crusader
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_crusader
+				}
 			}
 		}
 
@@ -237,7 +348,9 @@ country_event = {
 				limit = {
 					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 				}
-				add_trait_no_notify = leader_trait_corsair
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_corsair
+				}
 			}
 		}
 
@@ -284,9 +397,9 @@ country_event = {
 				is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
 			}
 			every_owned_leader = {
-				set_leader_flag = ignore_autocracy_ruler_trait_restriction
-				add_trait_no_notify = leader_trait_adventurous_spirit_3
-				remove_leader_flag = ignore_autocracy_ruler_trait_restriction
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_adventurous_spirit_3
+				}
 			}
 		}
 	}
@@ -353,7 +466,7 @@ leader_event = {
 					modifier = {
 						add = value:heir_class_weight_commander
 					}
-					change_leader_class = commander # undercoat: moved to scripted trigger
+					change_leader_class = commander
 					add_skill_without_trait_selection = owner.modifier:commander_initial_skill
 				}
 				# Official
@@ -361,7 +474,7 @@ leader_event = {
 					modifier = {
 						add = value:heir_class_weight_official
 					}
-					change_leader_class = official # undercoat: moved to scripted trigger
+					change_leader_class = official
 					add_skill_without_trait_selection = owner.modifier:official_initial_skill
 				}
 				# Scientist
@@ -369,7 +482,7 @@ leader_event = {
 					modifier = {
 						add = value:heir_class_weight_scientist
 					}
-					change_leader_class = scientist # undercoat: moved to scripted trigger
+					change_leader_class = scientist
 					add_skill_without_trait_selection = owner.modifier:scientist_initial_skill
 				}
 			}
@@ -395,6 +508,29 @@ leader_event = {
 					owner = { has_philosopher_king = yes } # undercoat: moved to scripted trigger
 				}
 			}
+		}
+
+		# Champions of the Empire
+		# Adds a random common trait
+		if = {
+			limit = {
+				owner = {
+					has_tradition = tr_aptitude_champions_of_the_empire
+				}
+			}
+			add_trait_no_notify = "random_common"
+		}
+
+		# Optimized Neurology
+		# Adds a random common trait
+		if = {
+			limit = {
+				owner = {
+					has_country_flag = genetic_ascension_stage_1_purity
+					has_genetic_stage_1_tradition = yes
+				}
+			}
+			add_trait = "random_common"
 		}
 
 		# Under One Rule
@@ -429,7 +565,9 @@ leader_event = {
 				}
 				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 			}
-			add_trait_no_notify = leader_trait_crusader
+			give_trait_no_notify_ignore_autocracy_restriction = {
+				TRAIT = leader_trait_crusader
+			}
 		}
 
 		# Letters of Marque
@@ -440,7 +578,9 @@ leader_event = {
 				}
 				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 			}
-			add_trait_no_notify = leader_trait_corsair
+			give_trait_no_notify_ignore_autocracy_restriction = {
+				TRAIT = leader_trait_corsair
+			}
 		}
 
 		# Storm Chasers
@@ -472,9 +612,31 @@ leader_event = {
 					is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
-			set_leader_flag = ignore_autocracy_ruler_trait_restriction
-			add_trait_no_notify = leader_trait_adventurous_spirit_3
-			remove_leader_flag = ignore_autocracy_ruler_trait_restriction
+			give_trait_no_notify_ignore_autocracy_restriction = {
+				TRAIT = leader_trait_adventurous_spirit_3
+			}
+		}
+
+		# Biochemical Composure/Cloning Authorities
+		if = {
+			limit = {
+				leader_can_have_backup_clone = yes
+			}
+			random_list = {
+				75 = {
+					# Base 75% chance of nothing
+					modifier = {
+						factor = 0
+						root = {
+							is_cloning_authority = yes
+							has_cloning_biochemical_composure_tradition = yes
+						}
+					}
+				}
+				25 = {
+					add_trait_no_notify = leader_trait_has_backup_clone
+				}
+			}
 		}
 	}
 }

@@ -1,0 +1,187 @@
+# This script added a number of rural districts of each type set by a variable
+# Flags are used to determine if the district type is uncapped or not.
+# Otherwise planet class is used in some special cases.
+# Finally the variables and flags are cleared.
+
+# Generators
+if = {
+	limit = {
+		check_variable = {
+			which = energy_districts
+			value >= 1
+		}
+	}
+	if = {
+		limit = {
+			has_planet_flag = wilderness_planet
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = energy_districts
+			district = district_photosynthesis_fields
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = uncapped_energy
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = energy_districts
+			district = district_generator_uncapped
+		}
+	}
+	else_if = {
+		limit = {
+			is_machine_world = yes # undercoat: moved to scripted trigger
+		}
+		while = {
+			count = energy_districts
+			add_district = district_nexus_1
+		}
+		add_zone = {
+			district = district_nexus_1
+			zone = zone_energy
+		}
+	}
+	else_if = {
+		limit = {
+			is_habitat = yes # undercoat: moved to scripted trigger
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = energy_districts
+			district = district_hab_energy
+		}
+	}
+	else = {
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = energy_districts
+			district = district_generator
+		}
+	}
+}
+
+# Mining
+if = {
+	limit = {
+		check_variable = {
+			which = mining_districts
+			value >= 1
+		}
+	}
+	if = {
+		limit = {
+			has_planet_flag = wilderness_planet
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = mining_districts
+			district = district_hollow_mountains
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = uncapped_mining
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = mining_districts
+			district = district_mining_uncapped
+		}
+	}
+	else_if = {
+		limit = {
+			is_machine_world = yes # undercoat: moved to scripted trigger
+		}
+		while = {
+			count = mining_districts
+			add_district = district_nexus_2
+		}
+		add_zone = {
+			district = district_nexus_2
+			zone = zone_minerals
+		}
+	}
+	else_if = {
+		limit = {
+			is_habitat = yes # undercoat: moved to scripted trigger
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = mining_districts
+			district = district_hab_mining
+		}
+	}
+	else = {
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = mining_districts
+			district = district_mining
+		}
+	}
+}
+
+# Agriculture
+if = {
+	limit = {
+		check_variable = {
+			which = farming_districts
+			value >= 1
+		}
+	}
+	if = {
+		limit = {
+			has_planet_flag = wilderness_planet
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = farming_districts
+			district = district_orchard_forests
+		}
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = uncapped_farming
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = farming_districts
+			district = district_farming_uncapped
+		}
+	}
+	else_if = {
+		limit = {
+			is_machine_world = yes # undercoat: moved to scripted trigger
+		}
+		# Do nothing
+		# Included to prevent the final else statement from trying to add districts
+	}
+	else_if = {
+		limit = {
+			is_habitat = yes # undercoat: moved to scripted trigger
+		}
+		add_zone = {
+			district = district_hab_energy
+			zone = zone_habitat_hydroponics
+		}
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = farming_districts
+			district = district_hab_energy
+		}
+		while = {
+			count = 2
+			remove_district = district_hab_energy
+		}
+		add_building = {
+			zone = zone_habitat_hydroponics
+			building = building_hydroponics_farm
+		}
+	}
+	else = {
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = farming_districts
+			district = district_farming
+		}
+	}
+}
+
+# Clear variables and flags
+clear_variable = energy_districts
+clear_variable = mining_districts
+clear_variable = farming_districts
+remove_planet_flag = uncapped_energy
+remove_planet_flag = uncapped_mining
+remove_planet_flag = uncapped_farming
+remove_planet_flag = wilderness_planet

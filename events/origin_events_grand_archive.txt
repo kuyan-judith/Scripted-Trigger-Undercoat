@@ -486,7 +486,7 @@ planet_event = {
 		has_modifier = "titanic_life"
 		owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
 		NOT = { has_planet_flag = titanic_life_colony_flag }
-		num_pops > 0
+		pop_amount > 0
 	}
 
 	immediate = {
@@ -2199,6 +2199,11 @@ country_event = {
 		set_country_flag = Story3
 		set_country_flag = Story5
 		set_country_flag = Story7
+
+		if = {
+			limit = { is_ai = yes }
+			set_country_flag = grand_archive_8025_end_dialog
+		}
 	}
 
 	option = {
@@ -2260,21 +2265,19 @@ country_event = {
 	}
 
 	option = {
-		name = CLOSE_COMMUNICATIONS
-		trigger = {
-			has_country_flag = grand_archive_8025_end_dialog
-			is_privateer_empire = no # undercoat: moved to scripted trigger
+		trigger = { has_country_flag = grand_archive_8025_end_dialog }
+		name = {
+			text = CLOSE_COMMUNICATIONS
+			trigger = {
+				is_privateer_empire = no # undercoat: moved to scripted trigger
+			}
 		}
-	}
-	option = {
-		name = grand_archive.8025.f.lom
-		trigger = {
-			has_country_flag = grand_archive_8025_end_dialog
-			is_privateer_empire = yes # undercoat: moved to scripted trigger
+		name = {
+			text = grand_archive.8025.f.lom
+			trigger = {
+				is_privateer_empire = yes # undercoat: moved to scripted trigger
+			}
 		}
-	}
-
-	after = {
 		hidden_effect = {
 			remove_country_flag = grand_archive_8025_end_dialog
 			country_event = {
@@ -3253,7 +3256,7 @@ ship_event = {
 		trigger = {
 			leader = {
 				NOR = {
-					has_trait_tier1or2or3 = { TRAIT = leader_trait_slippery }
+					has_trait_tier1or2 = { TRAIT = leader_trait_slippery }
 					has_trait_tier1or2 = { TRAIT = trait_ruler_charismatic }
 					has_trait = leader_trait_psionic
 				}
@@ -3264,7 +3267,7 @@ ship_event = {
 	desc = {
 		trigger = {
 			leader = {
-				has_trait_tier1or2or3 = { TRAIT = leader_trait_slippery }
+				has_trait_tier1or2 = { TRAIT = leader_trait_slippery }
 			}
 		}
 		text = grand_archive.8115.desc.slippery
@@ -4156,6 +4159,11 @@ country_event = {
 				limit = { has_deposit = d_black_needle_base }
 				save_event_target_as = black_needle_base
 			}
+		}
+
+		if = {
+			limit = { is_ai = yes }
+			set_country_flag = grand_archive_8245_end_dialog
 		}
 	}
 
@@ -5497,7 +5505,7 @@ situation_event = {
 							any_system_planet = {
 								is_owned_by = root.owner
 								is_colony = yes
-								num_pops >= 10
+								pop_amount >= 1000
 							}
 						}
 					}
@@ -5525,7 +5533,7 @@ situation_event = {
 							any_system_planet = {
 								is_owned_by = root.owner
 								is_colony = yes
-								num_pops >= 10
+								pop_amount >= 1000
 							}
 						}
 						set_star_flag = available_for_sabotage
@@ -5684,7 +5692,7 @@ country_event = {
 		if = {
 			limit = {
 				any_owned_leader = {
-					has_level >= 3
+					has_base_skill >= 3
 					OR = {
 						AND = {
 							owner = { is_gestalt = no }
@@ -5706,7 +5714,7 @@ country_event = {
 					is_ruler = no
 					is_heir = no
 					is_gestalt_node = no
-					has_level >= 3
+					has_base_skill >= 3
 					OR = {
 						AND = {
 							owner = { is_gestalt = no }
@@ -5768,8 +5776,12 @@ country_event = {
 		}
 		hidden_effect = {
 			every_owned_planet = {
-				limit = { num_pops > 1 }
-				random_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+				limit = {
+					pop_amount > 100
+				}
+				random_owned_pop_group = {
+					kill_single_pop = yes
+				}
 			}
 			country_event = {
 				id = grand_archive.8525
@@ -6028,7 +6040,7 @@ country_event = {
 									OR = {
 										is_gestalt = yes
 										has_trait = leader_trait_substance_abuser_2
-										has_trait_tier1or2 = { TRAIT = leader_trait_resilient }
+										has_trait = leader_trait_resilient
 									}
 								}
 								add_trait = leader_trait_substance_abuser_2
@@ -6066,7 +6078,7 @@ country_event = {
 										OR = {
 											is_gestalt = yes
 											has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser }
-											has_trait_tier1or2 = { TRAIT = leader_trait_resilient }
+											has_trait = leader_trait_resilient
 										}
 									}
 									add_trait = leader_trait_substance_abuser
@@ -6182,7 +6194,7 @@ country_event = {
 							factor = 0
 							OR = {
 								has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser }
-								has_trait_tier1or2 = { TRAIT = leader_trait_resilient }
+								has_trait = leader_trait_resilient
 							}
 						}
 						add_trait = leader_trait_substance_abuser

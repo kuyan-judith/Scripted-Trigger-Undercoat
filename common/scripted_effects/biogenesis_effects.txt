@@ -1,0 +1,2748 @@
+#################################
+# Scripted Effects - BioGenesis #
+#################################
+
+# Evolutionary Predators Effects
+
+give_evolutionary_predator_situation_progress = {
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		owner = {
+			random_situation = {
+				limit = {
+					is_situation_type = evolutionary_predators_situation
+				}
+				add_situation_progress = $PROGRESS$
+			}
+		}
+	}
+}
+
+#expects a TAG in the country scope. If SPECIES is present at all it will attempt to add a species trait instead.
+add_random_trait_evopred = {
+	[[SPECIES]
+		modify_species = {
+			species = species
+			add_random_species_trait = {
+				trait_has_all_tags = { $TAG$ organic positive }
+				NOT = { trait_has_any_tag = { special cybernetic psionic presapient drawbacks } }
+				OR = {
+					NOT = { trait_has_any_tag = { genetic_ascension } }
+					root = {
+						owner_can_do_advanced_gene_modding = yes
+					}
+				}
+				OR = {
+					NOT = { trait_has_any_tag = { individual } }
+					root.owner = { is_gestalt = no }
+				}
+			}
+			effect = { save_event_target_as = target_species }
+			on_random_trait_added = { # Trait is the current scope, species is From, prev is owner
+				prev = {
+					create_message = {
+						type = RANDOM_TRAIT_ADDED
+						localization = MESSAGE_RANDOM_TRAIT_ADDED
+						days = 30
+						variable = {
+							type = name
+							localization = TRAIT
+							scope = prev
+						}
+						variable = {
+							type = name
+							localization = SPECIES
+							scope = species
+						}
+					}
+				}
+			}
+		}
+		remove_country_flag = consumed_$TAG$_dna
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = smorgasblorg_$TAG$
+				}
+			}
+			set_country_flag = smorgasblorg_$TAG$
+			change_variable = {
+				which = smorgasblorg_phenotypes
+				value = 1
+			}
+		}
+	]
+	[[!SPECIES]
+		modify_species = {
+			species = species
+			add_random_species_trait = {
+				trait_has_all_tags = { $TAG$ organic positive }
+				NOT = { trait_has_any_tag = { special species cybernetic psionic presapient drawbacks } }
+				OR = {
+					NOT = { trait_has_any_tag = { genetic_ascension } }
+					root = {
+						owner_can_do_advanced_gene_modding = yes
+					}
+				}
+				OR = {
+					NOT = { trait_has_any_tag = { individual } }
+					root.owner = { is_gestalt = no }
+				}
+			}
+			effect = { save_event_target_as = target_species }
+			on_random_trait_added = { # Trait is the current scope, species is From, prev is owner
+				prev = {
+					create_message = {
+						type = RANDOM_TRAIT_ADDED
+						localization = MESSAGE_RANDOM_TRAIT_ADDED
+						days = 30
+						variable = {
+							type = name
+							localization = TRAIT
+							scope = prev
+						}
+						variable = {
+							type = name
+							localization = SPECIES
+							scope = species
+						}
+					}
+				}
+			}
+		}
+	]
+}
+
+#Expected Scope: Country
+#Expected Values: AMOUNT & TYPE
+give_evolutionary_predator_situation_progress_and_dna = {
+	random_situation = {
+		limit = {
+			is_situation_type = evolutionary_predators_situation
+		}
+		add_situation_progress = @evopred_$AMOUNT$_progress
+	}
+	#If the TYPE is set this will set a country flag, if it's not set it will do nothing
+	[[TYPE]
+		set_country_flag = consumed_$TYPE$_dna
+		custom_tooltip = evopred_$TYPE$_extracted
+	]
+}
+
+set_evopred_flags = {
+	set_evopred_flag_check = { TYPE = humanoid TYPE_ABR = HUM }
+	set_evopred_flag_check = { TYPE = mammalian TYPE_ABR = MAM }
+	set_evopred_flag_check = { TYPE = reptilian TYPE_ABR = REP }
+	set_evopred_flag_check = { TYPE = avian TYPE_ABR = AVI }
+	set_evopred_flag_check = { TYPE = arthropoid TYPE_ABR = ART }
+	set_evopred_flag_check = { TYPE = molluscoid TYPE_ABR = MOL }
+	set_evopred_flag_check = { TYPE = fungoid TYPE_ABR = FUN }
+	set_evopred_flag_check = { TYPE = plantoid TYPE_ABR = PLANT }
+	set_evopred_flag_check = { TYPE = lithoid TYPE_ABR = LITHOID }
+	set_evopred_flag_check = { TYPE = necroid TYPE_ABR = NECROID }
+	set_evopred_flag_check = { TYPE = aquatic TYPE_ABR = AQUATIC }
+	set_evopred_flag_check = { TYPE = toxoid TYPE_ABR = TOX }
+}
+
+set_evopred_flag_check = {
+	if = {
+		limit = {
+			OR = {
+				any_owned_leader = {
+					is_councilor = yes
+					species = { is_species_class = $TYPE_ABR$ }
+				}
+				any_owned_pop_group = {
+					is_species_class = $TYPE_ABR$
+				}
+				any_subject = {
+					any_agreement = {
+						has_term_value = {
+							term = subject_dna
+							value = subject_gives_evopred_dna
+						}
+					}
+					species = { is_species_class = $TYPE_ABR$ }
+				}
+				AND = {
+					is_megacorp = yes
+					any_relation = {
+						has_commercial_pact = root
+						species = { is_species_class = $TYPE_ABR$ }
+					}
+				}
+			}
+		}
+		set_country_flag = consumed_$TYPE$_dna
+	}
+}
+
+set_evopred_flag = {
+	set_country_flag = consumed_$TYPE$_dna
+}
+
+generate_evolutionary_predator_choices = {
+	random_list = {
+		20 = {
+			modifier = {
+				factor = 0
+				has_country_flag = pop_growth_evopred
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = pop_growth
+					}
+				}
+			}
+			set_country_flag = pop_growth_evopred
+		}
+		20 = {
+			modifier = {
+				factor = 0
+				has_country_flag = pop_output_evopred
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = pop_output
+					}
+				}
+			}
+			set_country_flag = pop_output_evopred
+		}
+		20 = {
+			modifier = {
+				factor = 0
+				has_country_flag = leader_evopred
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = leader
+					}
+				}
+			}
+			set_country_flag = leader_evopred
+		}
+		20 = {
+			modifier = {
+				factor = 0
+				has_country_flag = habitability_evopred
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = habitability
+					}
+				}
+			}
+			set_country_flag = habitability_evopred
+		}
+		20 = {
+			modifier = {
+				factor = 0
+				has_country_flag = upkeep_evopred
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = upkeep
+					}
+				}
+			}
+			set_country_flag = upkeep_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_humanoid_dna
+				NOT = { has_country_flag = humanoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = humanoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = humanoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_mammalian_dna
+				NOT = { has_country_flag = mammalian_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = mammalian
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = mammalian_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_reptilian_dna
+				NOT = { has_country_flag = reptilian_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = reptilian
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = reptilian_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_avian_dna
+				NOT = { has_country_flag = avian_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = avian
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = avian_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_arthropoid_dna
+				NOT = { has_country_flag = arthropoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = arthropoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = arthropoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_molluscoid_dna
+				NOT = { has_country_flag = molluscoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = molluscoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = molluscoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_fungoid_dna
+				NOT = { has_country_flag = fungoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = fungoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = fungoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_plantoid_dna
+				NOT = { has_country_flag = plantoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = plantoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = plantoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_lithoid_dna
+				NOT = { has_country_flag = lithoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = lithoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = lithoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_necroid_dna
+				NOT = { has_country_flag = necroid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = necroid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = necroid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_aquatic_dna
+				NOT = { has_country_flag = aquatic_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = aquatic
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = aquatic_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_toxoid_dna
+				NOT = { has_country_flag = toxoid_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = toxoid
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = toxoid_evopred
+		}
+		0 = {
+			modifier = {
+				add = 60
+				has_country_flag = consumed_plasmic_dna
+				NOR = {
+					has_country_flag = plasmic_evopred
+					has_country_flag = gained_plasmic_trait
+				}
+			}
+			set_country_flag = plasmic_evopred
+		}
+		0 = {
+			modifier = {
+				add = 60
+				has_mutation_nucleotide_isolation_tradition = yes
+				OR = {
+					AND = {
+						has_country_flag = harvested_dragon_dna
+						NOT = { has_country_flag = gained_dragon_trait }
+					}
+					AND = {
+						has_country_flag = harvested_voidspawn_dna
+						NOT = { has_country_flag = gained_voidspawn_trait }
+					}
+					AND = {
+						has_country_flag = harvested_tiyanki_dna
+						NOT = { has_country_flag = gained_tiyanki_trait }
+					}
+				}
+				NOT = {
+					has_country_flag = leviathan_evo_pred
+				}
+			}
+			set_country_flag = leviathan_evo_pred
+		}
+	}
+}
+
+unify_evopred_species = { #This should be called in the owner scope
+	every_owned_pop_group = {
+		limit = {
+			is_same_species = prev.species
+			NOT = { is_exact_same_species = prev.species }
+			is_sapient = yes # To avoid Nascent Stage weirdness
+		}
+		change_species = prev.species
+	}
+}
+
+add_trait_to_evopred = { #This should be called in the owner scope
+	modify_species = {
+		species = species
+		add_trait = $TRAIT$
+		effect = { save_event_target_as = target_species }
+	}
+	change_dominant_species = { species = event_target:target_species change_all = yes }
+}
+
+add_random_trait_by_tag = { #Called inside the owner scope
+	modify_species = {
+		species = $SPECIES$
+		add_random_species_trait = {
+			trait_has_all_tags = { $TAG$ }
+			NOT = { trait_has_any_tag = { $NOTTAG$ } }
+			OR = {
+				NOT = { trait_has_any_tag = { individual } }
+				root.owner = { is_gestalt = no }
+			}
+		}
+		effect = { save_event_target_as = target_species }
+		on_random_trait_added = { # Trait is the current scope, species is From, prev is owner
+			prev = {
+				create_message = {
+					type = RANDOM_TRAIT_ADDED
+					localization = MESSAGE_RANDOM_TRAIT_ADDED
+					days = 30
+					variable = {
+						type = name
+						localization = TRAIT
+						scope = prev
+					}
+					variable = {
+						type = name
+						localization = SPECIES
+						scope = species
+					}
+				}
+			}
+		}
+	}
+}
+
+update_evopred_vassal_dna = {
+	if = {
+		limit = {
+			is_variable_set = vassal_dna
+		}
+		change_variable = {
+			which = vassal_dna
+			value = $CHANGE$
+		}
+	}
+	else = {
+		set_variable = {
+			which = vassal_dna
+			value = 1
+		}
+	}
+}
+
+#Call this inside the defeated species scope
+apex_predator_switch = {
+	switch = {
+		trigger = is_species_class
+		HUM = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = humanoid
+				}
+			}
+		}
+		MAM = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = mammalian
+				}
+			}
+		}
+		REP = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = reptilian
+				}
+			}
+		}
+		AVI = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = avian
+				}
+			}
+		}
+		ART = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = arthropoid
+				}
+			}
+		}
+		MOL = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = molluscoid
+				}
+			}
+		}
+		FUN = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = fungoid
+				}
+			}
+		}
+		PLANT = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = plantoid
+				}
+			}
+		}
+		LITHOID = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = lithoid
+				}
+			}
+		}
+		NECROID = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = necroid
+				}
+			}
+		}
+		AQUATIC = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = aquatic
+				}
+			}
+		}
+		TOX = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = toxoid
+				}
+			}
+		}
+		MACHINE = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = machine
+				}
+			}
+		}
+		ROBOT = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = machine
+				}
+			}
+		}
+	}
+}
+
+set_apex_predator_flag = {
+	if = {
+		limit = {
+			ruler = {
+				NOT = { has_leader_flag = defeated_$SPECIES$_evopred }
+			}
+		}
+		set_timed_country_flag = {
+			flag = apex_$SPECIES$
+			days = 10
+		}
+		create_message = {
+			type = APEX_PREDATOR_GAINED
+			localization = MESSAGE_APEX_PREDATOR_GAINED
+			days = 30
+			target = this
+			variable = {
+				type = name
+				localization = LEADER
+				scope = ruler
+			}
+		}
+		ruler = {
+			set_leader_flag = defeated_$SPECIES$_evopred
+		}
+	}
+}
+
+# Starlit Citadel Effects
+
+starlit_citadel_start_effect = {
+	save_event_target_as = starlit_citadel_empire
+	set_country_flag = encountered_first_wormhole
+	add_seen_bypass_type = wormhole
+	# Citadelers are aware of alien life
+	set_country_flag = first_alien_life
+	set_country_flag = Story1
+	set_country_flag = Story2
+	set_country_flag = Story3
+	set_country_flag = Story5
+
+	# Number of times hatchery fleets visited you
+	set_variable = {
+		which = hatchery_fleet_visits
+		value = 3
+	}
+	# Number of times you defeated them
+	set_variable = {
+		which = hatchery_fleet_defeats
+		value = 0
+	}
+
+	give_technology = {
+		tech = tech_deep_space_citadel
+		message = no
+	}
+
+	capital_scope.solar_system = {
+		save_event_target_as = starlit_citadel_system
+		spawn_megastructure = {
+			type = deep_space_citadel_0
+			owner = event_target:starlit_citadel_empire
+			planet = star
+			graphical_culture = event_target:starlit_citadel_empire
+			orbit_distance = trigger:inner_radius
+			orbit_angle = 120
+		}
+	}
+
+	random_owned_fleet = {
+		limit = {
+			is_ship_size = starbase_deep_space_citadel_1
+		}
+		set_name = NAME_Starlit_Citadel
+		every_owned_ship = {
+			set_name = NAME_Starlit_Citadel
+		}
+	}
+
+	#Spawn Bioship system wormhole and link with player home system
+	if = {
+		limit = {
+			NOT = {
+				exists = event_target:bioship_hatchery
+			}
+		}
+		spawn_starlit_wormhole_system = yes
+	}
+
+	capital_scope.solar_system = {
+		set_star_flag = starlit_nexus_system
+		spawn_natural_wormhole = {
+			bypass_type = starlit_wormhole
+			orbit_angle = 120
+			orbit_distance = 100
+		}
+	}
+
+	add_seen_bypass_type = starlit_wormhole
+	add_seen_bypass_type = wormhole
+
+	#Start Event Chain
+	country_event = {
+		id = bio.2005
+		days = 360
+		random = 90
+	}
+
+	capital_scope = {
+		add_building = building_citadel_uplink
+		add_deposit = d_bioship_remains
+		add_deposit = d_invasion_site
+		add_deposit = d_invasion_site
+		every_deposit = {
+			limit = {
+				OR = {
+					is_deposit_type = d_decrepit_dwellings
+					is_deposit_type = d_failing_infrastructure
+				}
+			}
+			remove_deposit = yes
+		}
+	}
+}
+
+spawn_starlit_wormhole_system = {
+    set_spawn_system_batch = begin
+	no_scope = {
+		#Spawn Sealed System Entry System
+		random_system = {
+			limit = {
+				AND = {
+					is_fe_cluster = no
+					NOT = { has_star_flag = empire_cluster }
+				}
+			}
+			spawn_system = {
+				min_distance >= 20
+				max_distance <= 50
+				initializer = "starlit_sealed_1"
+				effect = {
+					set_star_flag = starlit_sealed_system_flag
+					save_event_target_as = starlit_sealed_system
+				}
+			}
+		}
+		#Isolate Sealed System
+		if = {
+			limit = { exists = event_target:starlit_sealed_system }
+			event_target:starlit_sealed_system = {
+				isolate_system = yes
+				#Create Bioship Country
+				create_country = {
+					name = "NAME_Abandoned_Hatchery_Country"
+					type = abandoned_hatchery
+					graphical_culture = biogenesis_01
+					ignore_initial_colony_error = yes
+					flag = {
+						icon = {
+							category="corporate"
+							file="corporate_06.dds"
+						}
+						background = {
+							category="backgrounds"
+							file="flag_BG_19.dds"
+						}
+						colors = {
+							"dark_steel"
+							"white"
+							"dark_green"
+							"null"
+						}
+					}
+				}
+				last_created_country = {
+					save_global_event_target_as = bioship_hatchery
+					set_country_flag = abandoned_hatchery_country_flag
+					create_ship_design = { design = "NAME_Starlit_Starbase" }
+					add_ship_design = last_created_design
+				}
+				random_system_planet = {
+					limit = {
+						has_planet_flag = biomechanical_world
+					}
+					save_event_target_as = biomechanical_world
+					set_owner = event_target:bioship_hatchery
+					set_capital = yes
+				}
+				#Create BioShip Hatchery
+				create_starbase = {
+					owner = event_target:bioship_hatchery
+					size = starbase_hatchery
+					effect = {
+						set_starbase_flag = abandoned_hatchery_base
+						save_global_event_target_as = abandoned_hatchery_base
+					}
+				}
+				create_fleet = {
+					effect = {
+						set_owner = event_target:bioship_hatchery
+						set_fleet_flag = abandoned_hatchery_fleet
+						create_ship_design = { design = "NAME_CHARGER_1" }
+						while = {
+							count = 15
+							create_ship = {
+								name = random
+								design = last_created_design
+								graphical_culture = "biogenesis_01"
+								prefix = no
+							}
+						}
+						create_ship_design = { design = "NAME_MOTH_1" }
+						while = {
+							count = 5
+							create_ship = {
+								name = random
+								design = last_created_design
+								graphical_culture = "biogenesis_01"
+								prefix = no
+							}
+						}
+						set_location = {
+							target = event_target:biomechanical_world
+							distance = 5
+							angle = random
+						}
+						set_fleet_stance = aggressive
+						set_aggro_range = 1000
+						set_aggro_range_measure_from = self
+						set_fleet_bombardment_stance = selective
+					}
+				}
+				spawn_natural_wormhole = {
+					bypass_type = starlit_wormhole
+					in_place_of = star
+					init_effect = {
+						save_global_event_target_as = starlit_central_wormhole
+						create_ambient_object = {
+							type = "starlit_portal"
+							location = this
+						}
+					}
+				}
+				add_modifier = { modifier = starlit_wormhole_modifier }
+			}
+		}
+
+		# #Spawn random connections...
+		while = {
+			count = value:starlit_links_count
+			random_system = {
+				limit = {
+					has_natural_wormhole = no
+					is_fe_cluster = no
+					NOR = {
+						has_star_flag = empire_cluster
+						has_star_flag = starlit_nexus_system
+					}
+				}
+				set_star_flag = starlit_nexus_system
+				spawn_natural_wormhole = {
+					bypass_type = starlit_wormhole
+					random_pos = yes
+				}
+			}
+		}
+    }
+    set_spawn_system_batch = end
+}
+
+###########################
+# BIOLOGICAL SHIP EFFECTS #
+###########################
+
+give_all_biogenesis_tech_option_effect = {
+	# Maulers
+	add_research_option = tech_maulers
+	add_research_option = tech_mauler_build_speed
+	add_research_option = tech_mauler_growth_1
+	add_research_option = tech_mauler_growth_2
+
+	# Weavers
+	add_research_option = tech_weavers
+	add_research_option = tech_weaver_build_speed
+	add_research_option = tech_weaver_growth_1
+	add_research_option = tech_weaver_growth_2
+
+	# Harbingers
+	add_research_option = tech_harbingers
+	add_research_option = tech_harbinger_build_speed
+	add_research_option = tech_harbinger_growth_1
+	add_research_option = tech_harbinger_growth_2
+
+	# Stingers
+	add_research_option = tech_stingers
+	add_research_option = tech_stinger_build_speed
+	add_research_option = tech_stinger_growth_1
+	add_research_option = tech_stinger_growth_2
+
+	# Starbase Buildings
+	add_research_option = tech_growth_chamber_1
+	add_research_option = tech_growth_chamber_2
+
+	# Weapons
+	add_research_option = tech_mandibles_2
+	add_research_option = tech_mandibles_3
+	add_research_option = tech_weaver_bio_healing_1
+	add_research_option = tech_weaver_bio_healing_2
+	add_research_option = tech_weaver_bio_healing_3
+	add_research_option = tech_weaver_bio_healing_4
+	add_research_option = tech_weaver_bio_healing_5
+	add_research_option = tech_weaver_bio_healing_6
+	add_research_option = tech_weaver_bio_evasion_1
+	add_research_option = tech_weaver_bio_evasion_2
+	add_research_option = tech_weaver_bio_evasion_3
+	add_research_option = tech_weaver_bio_evasion_4
+	add_research_option = tech_weaver_bio_evasion_5
+	add_research_option = tech_weaver_bio_evasion_6
+	add_research_option = tech_weaver_bio_fire_rate_1
+	add_research_option = tech_weaver_bio_fire_rate_2
+	add_research_option = tech_weaver_bio_fire_rate_3
+	add_research_option = tech_weaver_bio_fire_rate_4
+	add_research_option = tech_weaver_bio_fire_rate_5
+	add_research_option = tech_weaver_bio_fire_rate_6
+	add_research_option = tech_weaver_bio_confuser_1
+	add_research_option = tech_weaver_bio_confuser_2
+	add_research_option = tech_weaver_bio_confuser_3
+	add_research_option = tech_weaver_bio_confuser_4
+	add_research_option = tech_weaver_bio_confuser_5
+	add_research_option = tech_weaver_bio_confuser_6
+	add_research_option = tech_weaver_bio_anti_evasion_1
+	add_research_option = tech_weaver_bio_anti_evasion_2
+	add_research_option = tech_weaver_bio_anti_evasion_3
+	add_research_option = tech_weaver_bio_anti_evasion_4
+	add_research_option = tech_weaver_bio_anti_evasion_5
+	add_research_option = tech_weaver_bio_anti_evasion_6
+	add_research_option = tech_weaver_bio_anti_fire_rate_1
+	add_research_option = tech_weaver_bio_anti_fire_rate_2
+	add_research_option = tech_weaver_bio_anti_fire_rate_3
+	add_research_option = tech_weaver_bio_anti_fire_rate_4
+	add_research_option = tech_weaver_bio_anti_fire_rate_5
+	add_research_option = tech_weaver_bio_anti_fire_rate_6
+}
+
+give_all_biogenesis_techs_effect = {
+	# Maulers
+	give_technology = { tech = tech_maulers message = no }
+	give_technology = { tech = tech_mauler_build_speed message = no }
+	give_technology = { tech = tech_mauler_growth_1 message = no }
+	give_technology = { tech = tech_mauler_growth_2 message = no }
+
+	# Weavers
+	give_technology = { tech = tech_weavers message = no }
+	give_technology = { tech = tech_weaver_build_speed message = no }
+	give_technology = { tech = tech_weaver_growth_1 message = no }
+	give_technology = { tech = tech_weaver_growth_2 message = no }
+
+	# Harbingers
+	give_technology = { tech = tech_harbingers message = no }
+	give_technology = { tech = tech_harbinger_build_speed message = no }
+	give_technology = { tech = tech_harbinger_growth_1 message = no }
+	give_technology = { tech = tech_harbinger_growth_2 message = no }
+
+	# Stingers
+	give_technology = { tech = tech_stingers message = no }
+	give_technology = { tech = tech_stinger_build_speed message = no }
+	give_technology = { tech = tech_stinger_growth_1 message = no }
+	give_technology = { tech = tech_stinger_growth_2 message = no }
+
+	# Starbase Buildings
+	give_technology = { tech = tech_growth_chamber_1 message = no }
+	give_technology = { tech = tech_growth_chamber_2 message = no }
+
+	# Weapons
+	give_technology = { tech = tech_mandibles_2 message = no }
+	give_technology = { tech = tech_mandibles_3 message = no }
+	give_technology = { tech = tech_weaver_bio_healing_1 message = no }
+	give_technology = { tech = tech_weaver_bio_healing_2 message = no }
+	give_technology = { tech = tech_weaver_bio_healing_3 message = no }
+	give_technology = { tech = tech_weaver_bio_healing_4 message = no }
+	give_technology = { tech = tech_weaver_bio_healing_5 message = no }
+	give_technology = { tech = tech_weaver_bio_healing_6 message = no }
+	give_technology = { tech = tech_weaver_bio_evasion_1 message = no }
+	give_technology = { tech = tech_weaver_bio_evasion_2 message = no }
+	give_technology = { tech = tech_weaver_bio_evasion_3 message = no }
+	give_technology = { tech = tech_weaver_bio_evasion_4 message = no }
+	give_technology = { tech = tech_weaver_bio_evasion_5 message = no }
+	give_technology = { tech = tech_weaver_bio_evasion_6 message = no }
+	give_technology = { tech = tech_weaver_bio_fire_rate_1 message = no }
+	give_technology = { tech = tech_weaver_bio_fire_rate_2 message = no }
+	give_technology = { tech = tech_weaver_bio_fire_rate_3 message = no }
+	give_technology = { tech = tech_weaver_bio_fire_rate_4 message = no }
+	give_technology = { tech = tech_weaver_bio_fire_rate_5 message = no }
+	give_technology = { tech = tech_weaver_bio_fire_rate_6 message = no }
+	give_technology = { tech = tech_weaver_bio_confuser_1 message = no }
+	give_technology = { tech = tech_weaver_bio_confuser_2 message = no }
+	give_technology = { tech = tech_weaver_bio_confuser_3 message = no }
+	give_technology = { tech = tech_weaver_bio_confuser_4 message = no }
+	give_technology = { tech = tech_weaver_bio_confuser_5 message = no }
+	give_technology = { tech = tech_weaver_bio_confuser_6 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_evasion_1 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_evasion_2 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_evasion_3 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_evasion_4 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_evasion_5 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_evasion_6 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_fire_rate_1 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_fire_rate_2 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_fire_rate_3 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_fire_rate_4 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_fire_rate_5 message = no }
+	give_technology = { tech = tech_weaver_bio_anti_fire_rate_6 message = no }
+}
+
+# For example, if you want to give an empire 10% progress in next tier of Harbinger tech, you could use
+# give_next_bioship_tech_effect = {
+#	BIOSHIP = harbinger
+#	PROGRESS = 0.10
+# }
+give_next_bioship_tech_effect = {
+	inverted_switch = {
+		trigger = has_technology
+		tech_$BIOSHIP$s = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_$BIOSHIP$s
+				PROGRESS = $PROGRESS$
+				CATEGORY = society_research
+			}
+		}
+		tech_$BIOSHIP$_build_speed = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_$BIOSHIP$_build_speed
+				PROGRESS = $PROGRESS$
+				CATEGORY = society_research
+			}
+		}
+		tech_$BIOSHIP$_growth_1 = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_$BIOSHIP$_growth_1
+				PROGRESS = $PROGRESS$
+				CATEGORY = society_research
+			}
+		}
+		tech_$BIOSHIP$_growth_2 = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_$BIOSHIP$_growth_2
+				PROGRESS = $PROGRESS$
+				CATEGORY = society_research
+			}
+		}
+		default = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}
+
+give_next_regular_ship_tech_effect = {
+	inverted_switch = {
+		trigger = has_technology
+		tech_destroyers = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_destroyers
+				PROGRESS = $PROGRESS$
+				CATEGORY = engineering_research
+			}
+		}
+		tech_cruisers = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_cruisers
+				PROGRESS = $PROGRESS$
+				CATEGORY = engineering_research
+			}
+		}
+		tech_battleships = {
+			add_tech_option_or_research_effect = {
+				TECH = tech_battleships
+				PROGRESS = $PROGRESS$
+				CATEGORY = engineering_research
+			}
+		}
+		default = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}
+
+give_purity_unlocks_effect = {
+	switch = {
+		trigger = has_country_flag
+		purity_unlock_level_2 = {
+			set_country_flag = purity_unlock_level_3
+			if = {
+				limit = {
+					OR = {
+						has_technology = tech_gene_seed_purification
+						NOT = { can_research_technology = tech_gene_seed_purification }
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier4unityreward
+					min = @tier4unitymin
+					max = @tier4unitymax
+				}
+			}
+			else = {
+				add_tech_progress = {
+					tech = tech_gene_seed_purification
+					progress = @genomic_tech_progress
+				}
+			}
+		}
+		purity_unlock_level_1 = {
+			set_country_flag = purity_unlock_level_2
+			remove_modifier = purity_unlock_level_1
+			add_modifier = {
+				modifier = purity_unlock_level_2
+			}
+		}
+		default = {
+			custom_tooltip = purity_traditions_unlocked_tt
+			set_country_flag = purity_unlock_level_1
+			add_modifier = {
+				modifier = purity_unlock_level_1
+			}
+		}
+	}
+}
+
+give_cloning_unlocks_effect = {
+	switch = {
+		trigger = has_country_flag
+		cloning_unlock_level_2 = {
+			set_country_flag = cloning_unlock_level_3
+			if = {
+				limit = {
+					OR = {
+						has_technology = tech_gene_banks
+						NOT = { can_research_technology = tech_gene_banks }
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier4unityreward
+					min = @tier4unitymin
+					max = @tier4unitymax
+				}
+			}
+			else = {
+				add_tech_progress = {
+					tech = tech_gene_banks
+					progress = @genomic_tech_progress
+				}
+			}
+		}
+		cloning_unlock_level_1 = {
+			set_country_flag = cloning_unlock_level_2
+			remove_modifier = cloning_unlock_level_1
+			add_modifier = {
+				modifier = cloning_unlock_level_2
+			}
+		}
+		default = {
+			custom_tooltip = cloning_traditions_unlocked_tt
+			set_country_flag = cloning_unlock_level_1
+			add_modifier = {
+				modifier = cloning_unlock_level_1
+			}
+		}
+	}
+}
+
+give_mutation_unlocks_effect = {
+	switch = {
+		trigger = has_country_flag
+		mutation_unlock_level_2 = {
+			set_country_flag = mutation_unlock_level_3
+			if = {
+				limit = {
+					OR = {
+						has_technology = tech_gene_expressions
+						NOT = { can_research_technology = tech_gene_expressions }
+					}
+				}
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier4unityreward
+					min = @tier4unitymin
+					max = @tier4unitymax
+				}
+			}
+			else = {
+				add_tech_progress = {
+					tech = tech_gene_expressions
+					progress = @genomic_tech_progress
+				}
+			}
+		}
+		mutation_unlock_level_1 = {
+			set_country_flag = mutation_unlock_level_2
+			remove_modifier = mutation_unlock_level_1
+			add_modifier = {
+				modifier = mutation_unlock_level_2
+			}
+		}
+		default = {
+			custom_tooltip = mutation_traditions_unlocked_tt
+			set_country_flag = mutation_unlock_level_1
+			add_modifier = {
+				modifier = mutation_unlock_level_1
+			}
+		}
+	}
+	if = {
+		limit = {
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		}
+		hidden_effect = {
+			every_owned_species = {
+				limit = {
+					OR = {
+						is_archetype = PRESAPIENT
+						is_archetype = BIOLOGICAL
+						is_archetype = LITHOID
+					}
+				}
+				set_species_traits_evopred_count_variable = yes
+			}
+		}
+	}
+}
+
+set_species_traits_purity_count_variable = {
+	set_variable = {
+		which = species_traits_purity_count
+		value = value:species_traits_purity_count_value
+	}
+}
+
+set_species_traits_evopred_count_variable = {
+	set_variable = {
+		which = species_traits_evopred_count
+		value = value:species_traits_evopred_count_value
+	}
+}
+
+# Misc Effects
+
+# Call this on planet scope after spawning the pops
+make_nascent_starting_pops = {
+	if = { # Setting 200 pops to be presapient if you have the trait
+		limit = {
+			last_created_species = {
+				has_trait = trait_nascent_stage
+			}
+			NOT = { owner = { has_country_flag = generated_starting_nascent_stage_pops } }
+		}
+		weighted_random_owned_pop_group = {
+			limit = {
+				has_trait = trait_nascent_stage
+				is_sapient = yes
+			}
+			species = {
+				save_event_target_as = nascent_stage_source_species
+			}
+			save_event_target_as = nascent_stage_source_pop_group
+			modify_species = {
+				species = species
+				add_trait = trait_presapient_stage
+				inherit_parent_rights = yes
+				sapient = no
+				change_scoped_species = no
+				effect = {
+					save_event_target_as = nascent_stage_species@event_target:nascent_stage_source_species
+				}
+			}
+		}
+		create_pop_group = {
+			pop_group = event_target:nascent_stage_source_pop_group
+			species = event_target:nascent_stage_species@event_target:nascent_stage_source_species
+			size = 0
+			effect = {
+				transfer_pop_amount = {
+					source = event_target:nascent_stage_source_pop_group
+					target = this
+					amount = 200
+				}
+			}
+		}
+		owner = { set_country_flag = generated_starting_nascent_stage_pops }
+	}
+}
+
+ascend_nascent_stage = {
+	modify_species = {
+		species = species
+		change_scoped_species = no
+		remove_trait = trait_presapient_stage
+		sapient = yes
+		effect = {
+			save_event_target_as = nasceant_stage_return
+		}
+	}
+	planet = {
+		create_pop_group = {
+			pop_group = root
+			species = event_target:nasceant_stage_return
+			size = 0
+			effect = {
+				transfer_pop_amount = {
+					source = root
+					target = this
+					amount = root.local_pop_amount
+				}
+			}
+		}
+	}
+}
+
+give_backup_clones_effect = {
+	every_owned_leader = {
+		limit = {
+			NOR = {
+				is_gestalt_node = yes
+				is_robotic_species = yes
+				has_trait = leader_trait_ruler_hive_mind
+				has_trait = leader_trait_has_backup_clone
+			}
+		}
+		give_trait_no_notify_ignore_autocracy_restriction = {
+			TRAIT = leader_trait_has_backup_clone
+		}
+	}
+	every_pool_leader = {
+		limit = {
+			is_robotic_species = no
+			NOT = {
+				has_trait = leader_trait_has_backup_clone
+			}
+		}
+		random_list = {
+			75 = {
+				# Base 75% chance of nothing
+				modifier = {
+					factor = 0
+					root = {
+						is_cloning_authority = yes
+						has_cloning_biochemical_composure_tradition = yes
+					}
+				}
+			}
+			25 = {
+				add_trait_no_notify = leader_trait_has_backup_clone
+			}
+		}
+	}
+	create_message = {
+		type = MESSAGE_ALL_GAINED_TRAIT
+		localization = MESSAGE_ALL_GAINED_TRAIT_DESC
+		days = @toast_message_days
+		variable = {
+			type = key
+			value = leader_trait_has_backup_clone
+			localization = TRAIT
+		}
+		variable = {
+			key = TRAIT_KEY
+			value = leader_trait_has_backup_clone
+		}
+		variable = {
+			key = "border"
+			value = "GFX_invisible"
+		}
+	}
+}
+
+create_backup_clone = {
+	clone_leader = {
+		target = from
+		background_planet = event_target:clone_background_planet
+		skip_background_generation = yes
+		custom_description = backup_clone_background
+		leader_age_min = 2
+		leader_age_max = 5
+		effect = {
+			if = {
+				limit = {
+					NAND = {
+						root = {
+							is_cloning_authority = yes
+							is_imperial_authority = yes
+						}
+						from = {
+							is_ruler = yes
+						}
+					}
+				}
+				remove_trait = leader_trait_has_backup_clone
+				switch = {
+					trigger = has_trait
+					leader_trait_backup_clone = {
+						give_trait_no_notify_ignore_autocracy_restriction = {
+							TRAIT = leader_trait_backup_clone_2
+						}
+					}
+					leader_trait_backup_clone_2 = {
+						give_trait_no_notify_ignore_autocracy_restriction = {
+							TRAIT = leader_trait_backup_clone_3
+						}
+					}
+					default = {
+						give_trait_no_notify_ignore_autocracy_restriction = {
+							TRAIT = leader_trait_backup_clone
+						}
+					}
+				}
+			}
+			else = {
+				give_trait_no_notify_ignore_autocracy_restriction = {
+					TRAIT = leader_trait_backup_clone
+				}
+				root = {
+					assign_leader = prev
+				}
+			}
+			set_years_served = from
+			restore_leader_location = yes
+			# Regulated Acadia prevents excessive cloning
+			if = {
+				limit = {
+					root = {
+						is_cloning_authority = yes
+						is_democratic_authority = yes
+					}
+					has_trait_tier1or2or3 = { TRAIT = leader_trait_backup_clone }
+				}
+				set_leader_flag = ignore_country_clone_pulse
+			}
+			# If the Regenerative Cloning tradition is taken, clones can have clones
+			if = {
+				limit = {
+					NOT = {
+						has_leader_flag = ignore_country_clone_pulse
+					}
+					root = {
+						has_country_flag = genetic_ascension_stage_3_cloning
+						is_cloning_authority = yes
+					}
+				}
+				set_leader_flag = ignore_country_clone_pulse
+				leader_event = {
+					id = bio.5002
+					days = 1080
+					random = 720
+				}
+			}
+		}
+	}
+}
+
+restore_leader_location = {
+	if = {
+		limit = {
+			exists = from.planet
+		}
+		from.planet = {
+			assign_leader = prev
+		}
+	}
+	else_if = {
+		limit = {
+			exists = from.fleet
+		}
+		from.fleet = {
+			assign_leader = prev
+		}
+	}
+}
+
+# For debug purposes, checking the ship loadout and model
+spawn_behemoth_in_orbit_effect = {
+	create_fleet = {
+		name = "NAME_Behemoth_fleet"
+		settings = {
+			spawn_debris = no
+		}
+		effect = {
+			set_owner = root.owner
+			create_ship_design = {
+				design = NAME_Behemoth_0$TIER$
+			}
+			create_ship = {
+				name = "NAME_Behemoth_ship"
+				design = last_created_design
+			}
+			set_location = {
+				target = root
+			}
+		}
+	}
+}
+
+spawn_fast_egg_fleet_effect = {
+	event_target:behemoth_parent_country = {
+		random_owned_design = {
+			limit = { is_ship_size = mauler_stage_1 }
+			save_event_target_as = fast_egg_mauler
+		}
+		random_owned_design = {
+			limit = { is_ship_size = weaver_stage_1 }
+			save_event_target_as = fast_egg_weaver
+		}
+		if = {
+			limit = {
+				has_technology = tech_harbingers
+			}
+			random_owned_design = {
+				limit = { is_ship_size = harbinger_stage_1 }
+				save_event_target_as = fast_egg_harbinger
+			}
+		}
+		if = {
+			limit = {
+				has_technology = tech_stingers
+			}
+			random_owned_design = {
+				limit = { is_ship_size = stinger_stage_1 }
+				save_event_target_as = fast_egg_stinger
+			}
+		}
+		# Small fleet, so 32 command limit
+		switch = {
+			trigger = has_policy_flag
+			behemoth_egg_policy_mixed = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 8
+								create_ship = {
+									name = random
+									design = event_target:fast_egg_mauler
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							while = {
+								count = 4
+								create_ship = {
+									name = random
+									design = event_target:fast_egg_weaver
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							if = {
+								limit = {
+									event_target:behemoth_parent_country = {
+										has_technology = tech_harbingers
+									}
+								}
+								while = {
+									count = 2
+									create_ship = {
+										name = random
+										design = event_target:fast_egg_harbinger
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							else = {
+								while = {
+									count = 8
+									create_ship = {
+										name = random
+										design = event_target:fast_egg_mauler
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							if = {
+								limit = {
+									event_target:behemoth_parent_country = {
+										has_technology = tech_stingers
+									}
+								}
+								while = {
+									count = 1
+									create_ship = {
+										name = random
+										design = event_target:fast_egg_stinger
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							else = {
+								while = {
+									count = 4
+									create_ship = {
+										name = random
+										design = event_target:fast_egg_weaver
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_maulers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 32
+								create_ship = {
+									name = random
+									design = event_target:fast_egg_mauler
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_weavers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 16
+								create_ship = {
+									name = random
+									design = event_target:fast_egg_weaver
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_harbingers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 8
+								create_ship = {
+									name = random
+									design = event_target:fast_egg_harbinger
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_stingers = {
+				prev = {
+					create_fleet = {
+						name = random
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 4
+								create_ship = {
+									name = random
+									design = event_target:fast_egg_harbinger
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+spawn_slow_egg_fleet_effect = {
+	event_target:behemoth_parent_country = {
+		random_owned_design = {
+			limit = { is_ship_size = mauler_stage_1 }
+			save_event_target_as = slow_egg_mauler
+		}
+		random_owned_design = {
+			limit = { is_ship_size = weaver_stage_1 }
+			save_event_target_as = slow_egg_weaver
+		}
+		if = {
+			limit = {
+				has_technology = tech_harbingers
+			}
+			random_owned_design = {
+				limit = { is_ship_size = harbinger_stage_1 }
+				save_event_target_as = slow_egg_harbinger
+			}
+		}
+		if = {
+			limit = {
+				has_technology = tech_stingers
+			}
+			random_owned_design = {
+				limit = { is_ship_size = stinger_stage_1 }
+				save_event_target_as = slow_egg_stinger
+			}
+		}
+		# large fleet, so 96 command limit
+		switch = {
+			trigger = has_policy_flag
+			behemoth_egg_policy_mixed = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 24
+								create_ship = {
+									name = random
+									design = event_target:slow_egg_mauler
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							while = {
+								count = 12
+								create_ship = {
+									name = random
+									design = event_target:slow_egg_weaver
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							if = {
+								limit = {
+									event_target:behemoth_parent_country = {
+										has_technology = tech_harbingers
+									}
+								}
+								while = {
+									count = 6
+									create_ship = {
+										name = random
+										design = event_target:slow_egg_harbinger
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							else = {
+								while = {
+									count = 24
+									create_ship = {
+										name = random
+										design = event_target:slow_egg_mauler
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							if = {
+								limit = {
+									event_target:behemoth_parent_country = {
+										has_technology = tech_stingers
+									}
+								}
+								while = {
+									count = 3
+									create_ship = {
+										name = random
+										design = event_target:slow_egg_stinger
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							else = {
+								while = {
+									count = 12
+									create_ship = {
+										name = random
+										design = event_target:slow_egg_weaver
+										graphical_culture = event_target:behemoth_parent_country
+									}
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_maulers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 96
+								create_ship = {
+									name = random
+									design = event_target:slow_egg_mauler
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_weavers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 48
+								create_ship = {
+									name = random
+									design = event_target:slow_egg_weaver
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_harbingers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 24
+								create_ship = {
+									name = random
+									design = event_target:slow_egg_harbinger
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+			behemoth_egg_policy_stingers = {
+				prev = {
+					create_fleet = {
+						effect = {
+							set_owner = event_target:behemoth_parent_country
+							while = {
+								count = 12
+								create_ship = {
+									name = random
+									design = event_target:slow_egg_harbinger
+									graphical_culture = event_target:behemoth_parent_country
+								}
+							}
+							set_location = {
+								target = event_target:target_planet
+								distance = 0
+								angle = 90
+								direction = in_system
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+spawn_behemoth_hatchling_effect = {
+	create_fleet = {
+		name = "NAME_Behemoth_fleet"
+		settings = {
+			spawn_debris = no
+		}
+		effect = {
+			set_owner = event_target:behemoth_parent_country
+			fleet_event = { id = biocrisis.75 days = 450 random = 450 }
+			create_ship = {
+				name = "NAME_Behemoth_ship"
+				design = "NAME_Behemoth_01"
+				effect = {
+					set_ship_flag = behemoth_hatchling_ship
+					event_target:behemoth_parent_country = {
+						set_country_flag = hatched@prev
+					}
+					set_disable_at_health = 0.01
+				}
+			}
+			set_location = {
+				target = event_target:target_planet
+				distance = 0
+				angle = 0
+				direction = in_system
+			}
+			set_fleet_stance = aggressive
+			set_aggro_range_measure_from = self #or return_point
+			set_aggro_range = 30000
+			set_fleet_bombardment_stance = behemoth_invasion
+		}
+	}
+}
+
+spawn_behemoth_summon_fleet = {
+	owner = {
+		save_event_target_as = behemoth_parent_country
+		random_owned_design = {
+			limit = { is_ship_size = mauler_stage_1 }
+			save_event_target_as = summoned_mauler
+		}
+		random_owned_design = {
+			limit = { is_ship_size = weaver_stage_1 }
+			save_event_target_as = summoned_weaver
+		}
+		if = {
+			limit = {
+				has_technology = tech_harbingers
+			}
+			random_owned_design = {
+				limit = { is_ship_size = harbinger_stage_1 }
+				save_event_target_as = summoned_harbinger
+			}
+		}
+		if = {
+			limit = {
+				has_technology = tech_stingers
+			}
+			random_owned_design = {
+				limit = { is_ship_size = stinger_stage_1 }
+				save_event_target_as = summoned_stinger
+			}
+		}
+	}
+	create_fleet = {
+		settings = {
+			can_upgrade = no
+			can_change_composition = no
+			uses_naval_capacity = no
+			spawn_debris = no
+		}
+		# Medium fleet, so 64 command limit
+		effect = {
+			set_owner = event_target:behemoth_parent_country
+			while = {
+				count = 16
+				create_ship = {
+					name = random
+					design = event_target:summoned_mauler
+					graphical_culture = event_target:behemoth_parent_country
+				}
+			}
+			while = {
+				count = 8
+				create_ship = {
+					name = random
+					design = event_target:summoned_weaver
+					graphical_culture = event_target:behemoth_parent_country
+				}
+			}
+			if = {
+				limit = {
+					event_target:behemoth_parent_country = {
+						has_technology = tech_harbingers
+					}
+				}
+				while = {
+					count = 4
+					create_ship = {
+						name = random
+						design = event_target:summoned_harbinger
+						graphical_culture = event_target:behemoth_parent_country
+					}
+				}
+			}
+			else = {
+				while = {
+					count = 16
+					create_ship = {
+						name = random
+						design = event_target:summoned_mauler
+						graphical_culture = event_target:behemoth_parent_country
+					}
+				}
+			}
+			if = {
+				limit = {
+					event_target:behemoth_parent_country = {
+						has_technology = tech_stingers
+					}
+				}
+				while = {
+					count = 2
+					create_ship = {
+						name = random
+						design = event_target:summoned_stinger
+						graphical_culture = event_target:behemoth_parent_country
+					}
+				}
+			}
+			else = {
+				while = {
+					count = 8
+					create_ship = {
+						name = random
+						design = event_target:summoned_weaver
+						graphical_culture = event_target:behemoth_parent_country
+					}
+				}
+			}
+			set_location = {
+				target = root
+				distance = 0
+				angle = 90
+				direction = in_system
+			}
+		}
+	}
+	hidden_effect = {
+		last_created_fleet = {
+			fleet_event = {
+				id = biocrisis.365
+				days = @behemoth_summon_duration
+			}
+		}
+	}
+}
+
+activate_behemoth_superweapon = {
+	# Blow up all mining/research stations
+	every_system_planet = {
+		limit = {
+			exists = orbital_station
+		}
+		orbital_station = { dismantle = yes }
+	}
+	# Reset all habitable planets into tomb worlds
+	every_system_planet = {
+		limit = {
+			habitable_planet_not_urban = yes
+		}
+		change_pc = pc_nuked
+		set_planet_flag = nuked_planet_anomalies_disabled
+		reroll_deposits = yes
+		tomb_world_modifier_cleanup = yes
+		validate_planet_buildings_and_districts = yes
+	}
+	# Reset all ecus into relic worlds
+	every_system_planet = {
+		limit = {
+			is_city_world = yes # undercoat: moved to scripted trigger
+		}
+		relic_world_deposits = yes
+		validate_planet_buildings_and_districts = yes
+	}
+	# Destroy habitats
+	every_system_planet = {
+		limit = {
+			is_habitat = yes # undercoat: moved to scripted trigger
+			is_colony = no
+		}
+		spawn_habitat_cracker_effect = yes
+	}
+	every_system_planet = {
+		limit = {
+			is_habitat = yes # undercoat: moved to scripted trigger
+			is_colony = yes
+		}
+		remove_all_buildings = yes
+		destroy_colony = yes
+		spawn_habitat_cracker_effect = yes
+	}
+	# Add 100 devastation to all remaining colonies
+	# and kill pops
+	every_system_planet = {
+		limit = {
+			is_colony = yes
+		}
+		add_planet_devastation = 100
+		random_list = {
+			5 = {
+				every_owned_pop_group = {
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						amount = 5%
+					}
+				}
+			}
+			45 = {
+				every_owned_pop_group = {
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						percentage = 0.10
+					}
+				}
+			}
+			45 = {
+				every_owned_pop_group = {
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						percentage = 0.20
+					}
+				}
+			}
+			5 = {
+				every_owned_pop_group = {
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						percentage = 0.50
+					}
+				}
+			}
+		}
+	}
+	# Destroy all fleets in the system
+	every_fleet_in_system = {
+		limit = {
+			NOR = {
+				is_same_value = root
+				# except Extradimensionals
+				AND = {
+					exists = owner
+					owner = {
+						OR = {
+							is_country_type = portal_holder
+							is_country_type = extradimensional
+							is_country_type = extradimensional_2
+							is_country_type = extradimensional_3
+						}
+					}
+				}
+				# except biggest monsters
+				any_owned_ship = {
+					OR = {
+						is_ship_size = behemoth_04
+						is_ship_size = voidspawn_boss
+					}
+				}
+			}
+		}
+		destroy_fleet = this
+	}
+	# Deal massive damage to the Elder Voidspawn
+	# and disable regen for 1 year
+	every_fleet_in_system = {
+		limit = {
+			is_ship_size = voidspawn_boss
+		}
+		every_owned_ship = {
+			damage_ship = @behemoth_superweapon_damage
+		}
+		add_modifier = {
+			modifier = behemoth_superweapon_modifier
+			days = @behemoth_superweapon_duration
+			multiplier = 11
+		}
+	}
+}
+
+enrage_behemoth = {
+	owner = {
+		save_global_event_target_as = behemoth_parent_country@root
+		save_event_target_as = behemoth_parent_country
+	}
+	create_country = {
+		name = {
+			key = NAME_Raging_Behemoth
+		}
+		contact_rule = on_action_only
+		type = behemoth_hatchling
+		flag = {
+			icon = {
+				category="domination"
+				file="domination_16.dds"
+			}
+			background = {
+				category="backgrounds"
+				file="circle.dds"
+			}
+			colors = {
+				"dark_red"
+				"intense_purple"
+				"black"
+				"null"
+			}
+		}
+		effect = {
+			add_modifier = {
+				modifier = let_them_fight_modifier
+				days = -1
+			}
+			if = {
+				limit = {
+					event_target:behemoth_parent_country = {
+						has_country_flag = behemoth_mutation_cyber
+					}
+				}
+				add_modifier = {
+					modifier = behemoth_cyber_rage
+					days = -1
+				}
+			}
+			every_country = {
+				establish_communications_no_message = prev
+			}
+			root = {
+				random_owned_ship = {
+					set_ship_flag = raging
+					add_modifier = {
+						modifier = behemoth_rage_buffs
+						days = -1
+					}
+				}
+				set_owner = prev
+				clear_orders = yes
+				set_fleet_bombardment_stance = behemoth_invasion
+
+				find_raging_behemoth_target = yes
+
+				# notification
+				event_target:behemoth_parent_country = {
+					create_message = {
+						type = MESSAGE_BEHEMOTH_RAGE
+						localization = MESSAGE_BEHEMOTH_RAGE_DESC
+						days = 30
+						target = root
+					}
+				}
+				# calm down after six months
+				random_owned_ship = {
+					ship_event = { id = biocrisis.100 days = 180 }
+				}
+
+				# opinion loss if it rages in somebody else's borderes
+				fleet_event = { id = biocrisis.270 }
+			}
+		}
+	}
+}
+
+find_raging_behemoth_target = {
+	# Target Seeking - Nearest Egg or Colony
+	if = {
+		limit = {
+			is_in_combat = no
+		exists = solar_system
+		solar_system = {
+				OR = {
+					any_system_planet = {
+						is_colony = yes
+					}
+					any_system_megastructure = {
+						is_megastructure_type = behemoth_egg
+					}
+				}
+			}
+		}
+		solar_system = {
+			if = {
+				limit = {
+					any_system_planet = {
+						is_colony = yes
+					}
+				}
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+					}
+					save_event_target_as = behemoth_rage_target
+				}
+			}
+			else_if = {
+				limit = {
+					any_system_megastructure = {
+						is_megastructure_type = behemoth_egg
+					}
+				}
+				random_system_megastructure = {
+					limit = {
+						is_megastructure_type = behemoth_egg
+					}
+					save_event_target_as = behemoth_rage_target
+				}
+			}
+		}
+	}
+	else = {
+		closest_system = {
+			limit = {
+				OR = {
+					any_system_planet = {
+						is_colony = yes
+					}
+					any_system_megastructure = {
+						is_megastructure_type = behemoth_egg
+					}
+				}
+			}
+			use_bypasses = no
+			if = {
+				limit = {
+					any_system_planet = {
+						is_colony = yes
+					}
+				}
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+					}
+					save_event_target_as = behemoth_rage_target
+				}
+			}
+			else_if = {
+				limit = {
+					any_system_megastructure = {
+						is_megastructure_type = behemoth_egg
+					}
+				}
+				random_system_megastructure = {
+					limit = {
+						is_megastructure_type = behemoth_egg
+					}
+					save_event_target_as = behemoth_rage_target
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			solar_system = {
+				any_fleet_in_system = {
+					NOT = { is_same_value = root.fleet }
+					any_owned_ship = {
+						has_ship_flag = behemoth_hatchling
+					}
+				}
+			}
+		}
+		solar_system = {
+			random_fleet_in_system = {
+				limit = {
+					NOT = { is_same_value = root.fleet }
+					any_owned_ship = {
+						has_ship_flag = behemoth_hatchling
+					}
+				}
+				save_event_target_as = behemoth_rage_target
+			}
+		}
+		auto_follow_fleet = event_target:behemoth_rage_target
+	}
+	else_if = {
+		limit = {
+			is_in_combat = no
+		}
+		auto_move_to_planet = {
+			target = event_target:behemoth_rage_target
+			clear_auto_move_on_arrival = no
+		}
+	}
+}
+
+set_bodysnatcher_flags = {
+	event_target:closest_system = {
+		set_star_flag = bodysnatched_by@root
+		if = {
+			limit = {
+				any_neighbor_system = {
+					exists = starbase
+					starbase.owner = {
+						is_same_value = event_target:snatched_country
+					}
+					NOT = { has_star_flag = bodysnatched_by@root }
+				}
+			}
+			random_neighbor_system = {
+				limit = {
+					exists = starbase
+					starbase.owner = {
+						is_same_value = event_target:snatched_country
+					}
+					NOT = { has_star_flag = bodysnatched_by@root }
+				}
+				save_event_target_as = closest_system
+			}
+		}
+		else = {
+			closest_system = {
+				limit = {
+					exists = starbase
+					starbase.owner = {
+						is_same_value = event_target:snatched_country
+					}
+					NOT = { has_star_flag = bodysnatched_by@root }
+				}
+				save_event_target_as = closest_system
+			}
+		}
+	}
+}
+
+# This = planet scope
+recalculate_aeronautic_adaptation_planet_modifier = {
+	remove_modifier = aa_ship_planet_support_1
+	remove_modifier = aa_ship_planet_support_2
+	remove_modifier = aa_ship_planet_support_3
+	remove_modifier = aa_ship_planet_support_4
+	set_variable = {
+		which = aa_bio_ships_in_orbit
+		value = 0
+	}
+	every_fleet_in_orbit = {
+		limit = {
+			controller = {
+				NOT = { is_hostile = prevprev.controller }
+			}
+		}
+		prev = {
+			change_variable = {
+				which = aa_bio_ships_in_orbit
+				value = prev.value:bio_ship_naval_cap_usage
+			}
+		}
+	}
+	if = { #lots of ship, big modifier
+		limit = {
+			check_variable = {
+				which = aa_bio_ships_in_orbit
+				value >= 100
+			}
+		}
+		add_modifier = {
+			modifier = aa_ship_planet_support_4
+			days = -1
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				which = aa_bio_ships_in_orbit
+				value >= 75
+			}
+		}
+		add_modifier = {
+			modifier = aa_ship_planet_support_3
+			days = -1
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				which = aa_bio_ships_in_orbit
+				value >= 50
+			}
+		}
+		add_modifier = {
+			modifier = aa_ship_planet_support_2
+			days = -1
+		}
+	}
+	else_if = { #not a lot of ships, smol modifier
+		limit = {
+			check_variable = {
+				which = aa_bio_ships_in_orbit
+				value >= 1
+			}
+		}
+		add_modifier = {
+			modifier = aa_ship_planet_support_1
+			days = -1
+		}
+	}
+}
+
+global_biomass_spender = { #Called in the owner scope if you want to spend biomass on an empire scale
+	if = {
+		limit = {
+			any_owned_pop_group = {
+				has_trait = trait_wilderness
+				pop_group_size > local_spent_biomass
+			}
+		}
+		random_owned_pop_group = {
+			limit = {
+				has_trait = trait_wilderness
+				pop_group_size > local_spent_biomass
+			}
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+				pop_group = this
+				amount = local_spent_biomass
+			}
+		}
+	}
+	else = {
+		set_variable = { # Set a global value to iterate through all available pop groups instead
+			which = global_spent_biomass
+			value = local_spent_biomass
+		}
+		while = {
+			count = global_spent_biomass
+			if = { #At the start oi the loop we check if there is any one group big enough to end this now
+				limit = {
+					any_owned_pop_group = {
+						has_trait = trait_wilderness
+						pop_group_size > prev.global_spent_biomass
+					}
+				}
+				random_owned_pop_group = {
+					limit = {
+						has_trait = trait_wilderness
+						pop_group_size > prev.global_spent_biomass
+					}
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						amount = prev.global_spent_biomass
+					}
+				}
+				set_variable = {
+					which = global_spent_biomass
+					value = 0
+				}
+			}
+			else = { #Else we find the biggest pop group out there to kill
+				ordered_owned_pop_group = {
+					limit = {
+						has_trait = trait_wilderness
+					}
+					position = 0
+					order_by = trigger:pop_group_size
+					export_trigger_value_to_variable = {
+						trigger = pop_group_size
+						variable = killed_biomass
+					}
+					change_variable = { #Leave one alive so that you don't lose a colony
+						which = killed_biomass
+						value = -1
+					}
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						amount = killed_biomass
+					}
+					multiply_variable = {
+						which = killed_biomass
+						value = -1
+					}
+					prev = {
+						change_variable = {
+							which = global_spent_biomass
+							value = prev.killed_biomass
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = global_spent_biomass
+						value <= 0
+					}
+				}
+				break = yes
+			}
+		}
+	}
+}
+
+unqueue_biomass_effect = { #Used on the planet scope
+	if = {
+		limit = { is_variable_set = local_spent_biomass }
+		if = {
+			limit = {
+				owner = {
+					OR = { #If you have not bloomed, or have bloomed and are not on a Gaia world make the default pops
+						NOT = { has_country_flag = has_bloomed_pops }
+						AND = {
+							has_country_flag = has_bloomed_pops
+							prev = {
+								is_gaia_world = no # undercoat - moved to scripted trigger
+							}
+						}
+					}
+				}
+			}
+			create_pop_group = {
+				species = owner
+				size = local_spent_biomass
+			}
+		}
+		else = { #Else, make the bloomed pops
+			owner = {
+				random_owned_species = {
+					limit = {
+						is_same_species = prev
+						has_trait = trait_plantoid_bloomed
+					}
+					save_event_target_as = bloomed_biomass
+				}
+			}
+			create_pop_group = {
+				species = event_target:bloomed_biomass
+				size = local_spent_biomass
+			}
+		}
+	}
+}

@@ -1,0 +1,4436 @@
+#################################
+# "UNPLUGGED" ORIGIN EVENTS
+# By Gemma Thomson & Emil Nygren
+#################################
+
+namespace = unplugged
+
+# unplugged.1XX		Setup & 'Civil War'
+# unplugged.2XXX	'Machine Legacy'
+# 	unplugged.20XX	System 1: 'The Makers'
+# 	unplugged.21XX	System 2: 'The Taken'
+# 	unplugged.22XX	System 3: 'The Creators'
+# 	unplugged.23XX	System 4: 'The Unplugged'
+# 	unplugged.24XX	System 5: 'The Machine'
+# unplugged.3XXX	'Cybernetic Reckoning'
+#	unplugged.30XX	'Embodied Identity' setup & Situation
+#	unplugged.31XX	De-Cyberization content
+#	unplugged.32XX	Diplomacy content
+# unplugged.4XXX	'Political Discourse'
+
+########
+# SETUP
+########
+
+country_event = {
+	id = unplugged.199
+	is_triggered_only = yes
+	hide_window = yes
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+	}
+	immediate = {
+		set_variable = {
+			which = var_unplugged_cybernetic_benefits
+			value = 3
+		}
+		set_variable = {
+			which = var_unplugged_cybernetic_negatives
+			value = 3
+		}
+
+		every_owned_leader = {
+			limit = {
+				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				is_ruler = no
+			}
+			add_trait_no_notify = leader_trait_unplugged_cybernetic_positives_3
+		}
+
+		species = {
+			set_species_flag = unplugged_species
+		}
+
+		capital_star = {
+			event_target:origin_unplugged_assimilator_empire = {
+				create_fleet = {
+					name = NAME_Exigency_Fleet
+					effect = {
+						set_owner = event_target:origin_unplugged_assimilator_empire
+						while = {
+							count = 3
+							create_ship = {
+								name = random
+								design = "NAME_Unplugged_Machine_Legacy_Corvette"
+								prefix = no
+							}
+						}
+						set_location = PREVPREV
+						set_fleet_stance = aggressive
+						set_aggro_range_measure_from = self
+						set_aggro_range = 400
+						set_fleet_flag = unplugged_starting_civilwar_fleet_flag
+					}
+				}
+			}
+			create_ambient_object = {
+				type = medium_debris_02_object
+			}
+			create_ambient_object = {
+				type = abandoned_ship_2_object
+			}
+			solar_system = {
+				every_system_planet = {
+					limit = {
+						has_planet_flag = unplugged_homeworld
+					}
+					while = {
+						count = 10
+						create_army = {
+							name = random
+							owner = root
+							species = root
+							type = "assault_army"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# unplugged.198 on_survey_planet Hidden event for surveying in the machine legacy systems
+ship_event = {
+	id = unplugged.198
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				exists = event_target:origin_unplugged_maker_planet
+				from = { is_same_value = event_target:origin_unplugged_maker_planet }
+			}
+			AND = {
+				exists = event_target:origin_unplugged_taken_planet
+				from = { is_same_value = event_target:origin_unplugged_taken_planet }
+			}
+			AND = {
+				exists = event_target:origin_unplugged_creators_planet
+				from = { is_same_value = event_target:origin_unplugged_creators_planet }
+			}
+			AND = {
+				exists = event_target:origin_unplugged_machine_legacy_core_planet
+				from = { is_same_value = event_target:origin_unplugged_machine_legacy_core_planet }
+			}
+		}
+	}
+
+	immediate = {
+		# planet scope
+		from = {
+			unplugged_origin_check_remove_poi_effect = {
+				POI = unplugged_machine_legacy_makers_poi
+			}
+			if = {
+				limit = {
+					is_same_value = event_target:origin_unplugged_maker_planet
+				}
+				if = {
+					limit = {
+						root.controller = {
+							is_unplugged_empire = yes # undercoat: moved to scripted trigger
+						}
+					}
+					add_anomaly = {
+						category = MACHINE_LEGACY_MAKERS_UNPLUGGED_CAT
+						target = root.controller
+					}
+				}
+				else = {
+					add_anomaly = {
+						category = MACHINE_LEGACY_MAKERS_CAT
+						target = root.controller
+					}
+				}
+			}
+			unplugged_origin_check_remove_poi_effect = {
+				POI = unplugged_machine_legacy_taken_poi
+			}
+			if = {
+				limit = {
+					is_same_value = event_target:origin_unplugged_taken_planet
+				}
+				if = {
+					limit = {
+						root.controller = {
+							is_unplugged_empire = yes # undercoat: moved to scripted trigger
+						}
+					}
+					enable_special_project = {
+						name = MACHINE_LEGACY_TAKEN_UNPLUGGED
+						location = this
+						owner = root.controller
+					}
+				}
+				else = {
+					add_anomaly = {
+						category = MACHINE_LEGACY_TAKEN_CAT
+						target = root.controller
+					}
+				}
+			}
+			unplugged_origin_check_remove_poi_effect = {
+				POI = unplugged_machine_legacy_creators_poi
+			}
+			if = {
+				limit = {
+					is_same_value = event_target:origin_unplugged_creators_planet
+				}
+				if = {
+					limit = {
+						root.controller = {
+							is_unplugged_empire = yes # undercoat: moved to scripted trigger
+						}
+					}
+					enable_special_project = {
+						name = MACHINE_LEGACY_CREATORS_UNPLUGGED
+						location = this
+						owner = root.controller
+					}
+				}
+				else = {
+					add_anomaly = {
+						category = MACHINE_LEGACY_CREATORS_CAT
+						target = root.controller
+					}
+				}
+			}
+			unplugged_origin_check_remove_poi_effect = {
+				POI = unplugged_machine_legacy_core_poi
+			}
+		}
+	}
+}
+
+# unplugged.197 utility event for cleaning up after accumulator fleets are destroyed
+country_event = {
+	id = unplugged.197
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		exists = event_target:origin_unplugged_assimilator_empire
+		is_same_value = event_target:origin_unplugged_assimilator_empire
+		fromfrom = {
+			solar_system = {
+				has_star_flag = hostile_system
+			}
+		}
+	}
+
+	immediate = {
+		fromfrom = {
+			solar_system = {
+				remove_star_flag = hostile_system
+			}
+		}
+	}
+}
+
+############
+# CIVIL WAR
+############
+
+# unplugged.100 "Victory is Ours"
+country_event = {
+	id = unplugged.100
+	is_triggered_only = yes
+	picture = GFX_evt_small_space_battle
+	title = unplugged.100.name
+	desc = unplugged.100.desc
+
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		fromfromfrom = {
+			has_fleet_flag = unplugged_starting_civilwar_fleet_flag
+			solar_system.star = {
+				is_same_value = prevprev.capital_star
+			}
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			solar_system = {
+				every_system_planet = {
+					limit = {
+						has_planet_flag = unplugged_pre_ftl_planet_flag
+					}
+					save_global_event_target_as = origin_unplugged_pre_ftl_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.100.a
+	}
+	option = {
+		name = unplugged.100.b
+		exclusive_trigger = {
+			is_despoiler_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	option = {
+		name = unplugged.100.c
+		exclusive_trigger = {
+			OR = {
+				has_civic = civic_private_military_companies
+				is_scavenger = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+	option = {
+		name = unplugged.100.d
+		exclusive_trigger = {
+			OR = {
+				has_ethic = ethic_spiritualist
+				has_ethic = ethic_fanatic_spiritualist
+			}
+		}
+	}
+	after = {
+		hidden_effect = {
+			event_target:origin_unplugged_pre_ftl_planet = {
+				create_archaeological_site = pre_ftl_remains_site
+			}
+			owner = {
+				country_event = {
+					days = 100
+					random = 20
+					id = unplugged.2000
+				}
+			}
+		}
+	}
+}
+
+#################
+# MACHINE LEGACY
+#################
+
+# SYSTEM 1: 'THE MAKERS'
+
+# Breadcrumb event: calming, familiar signal from Machine Legacy stage 1
+# via 'unplugged.115' (during dialog with 'The Injured')
+country_event = {
+	id = unplugged.2000
+	title = unplugged.2000.name
+	desc = unplugged.2000.desc
+	picture = GFX_evt_worrying_signal
+	show_sound = event_default
+	location = event_target:origin_unplugged_maker_planet
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = unplugged_origin_machine_legacy_chain
+			target = this
+		}
+		set_visited = event_target:origin_unplugged_maker_planet.solar_system
+		event_target:origin_unplugged_maker_planet = {
+			if = {
+				limit = {
+					is_surveyed = {
+						who = root
+						status = yes
+					}
+				}
+				add_anomaly = {
+					category = MACHINE_LEGACY_MAKERS_UNPLUGGED_CAT
+					target = root
+				}
+			}
+			else = {
+				root = {
+					create_point_of_interest = {
+						id = unplugged_machine_legacy_makers_poi
+						name = unplugged_machine_legacy_makers_poi
+						desc = unplugged_machine_legacy_makers_poi_desc
+						event_chain = unplugged_origin_machine_legacy_chain
+						location = prev
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2000.a
+		tooltip = {
+			begin_event_chain = {
+				event_chain = unplugged_origin_machine_legacy_chain
+				target = this
+			}
+		}
+	}
+}
+
+# "Machine Legacy" firmware update Anomaly researched (Unplugged version)
+ship_event = {
+	id = unplugged.2005
+	title = unplugged.2005.name
+	desc = unplugged.2005.desc
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		controller = {
+			add_event_chain_counter = {
+				event_chain = unplugged_origin_machine_legacy_chain
+				counter = signals_followed
+				amount = 1
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2005.a
+
+		hidden_effect = {
+			controller = {
+				set_country_flag = unplugged_visible_site_@prev.from
+			}
+		}
+		from = {
+			create_archaeological_site = machine_legacy_makers_site
+		}
+
+	}
+}
+
+# "Machine Legacy" discarded tech-world Anomaly researched (non-Unplugged version)
+ship_event = {
+	id = unplugged.2006
+	is_triggered_only = yes
+	picture = GFX_evt_dead_city
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2006.name
+	desc = unplugged.2006.desc
+
+	option = {
+		name = CURIOUS
+	}
+}
+
+# 'The Makers' stage 1: factory floor
+fleet_event = {
+	id = unplugged.2010
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2010.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.2010.desc.unplugged
+
+	option = {
+		trigger = {
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		name = unplugged.2010.a
+	}
+	option = {
+		trigger = {
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		name = unplugged.2010.b
+		trigger = {
+			NOT = { controller = { has_country_flag = unplugged_has_started_identity_situation_flag } }
+		}
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = unplugged.3000
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			controller = {
+				is_unplugged_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		name = DIG
+	}
+}
+
+# 'The Makers' stage 2: arsenal fitted for us
+fleet_event = {
+	id = unplugged.2015
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_society_research
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2015.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.2015.desc.unplugged
+
+	option = {
+		name = unplugged.2015.a
+		controller = {
+			set_country_flag = machine_legacy_makers_tech
+		}
+	}
+	option = {
+		name = unplugged.2015.b
+	}
+}
+
+# 'The Makers' stage 3 gatekeeper
+fleet_event = {
+	id = unplugged.2020
+	hide_window = yes
+	is_triggered_only = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+
+	immediate = {
+		if = {
+			limit = {
+				controller = { has_country_flag = machine_legacy_makers_tech }
+			}
+			fleet_event = {
+				id = unplugged.2021
+				scopes = { from = from }
+			}
+		}
+		else = {
+			fleet_event = {
+				id = unplugged.2022
+				scopes = { from = from }
+			}
+		}
+	}
+
+	after = {
+		from = { expire_site_event = unplugged.2020 }
+		controller = {
+			set_country_flag = machine_legacy_makers_arc_site_complete
+			country_event = {
+				id = unplugged.2030
+				days = 15
+			}
+		}
+	}
+}
+
+# 'The Makers' stage 3A: assimilated designers
+fleet_event = {
+	id = unplugged.2021
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_scientific_experiments
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2021.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.2021.desc
+
+	option = {
+		name = EXCELLENT
+		controller = {
+			if = {
+				limit = {
+					NOT = { has_tech_option = tech_autocannons_1 }
+				}
+				add_tech_progress = {
+					tech = tech_autocannons_1
+					progress = 0.4
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech_option = tech_autocannons_2 }
+				}
+				add_tech_progress = {
+					tech = tech_autocannons_2
+					progress = 0.4
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+		if = {
+			limit = {
+				controller = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+			}
+			custom_tooltip = situation_unplugged_identity_shift_cyberize_tt
+		}
+		hidden_effect = {
+			controller = {
+				every_situation = {
+					limit = {
+						is_situation_type = situation_unplugged_identity
+					}
+					change_variable = {
+						which = var_unplugged_identity_situation_recent_events_value
+						value = 4
+					}
+				}
+			}
+		}
+	}
+}
+
+# 'The Makers' stage 3B: pre-assimilated planet ruins
+fleet_event = {
+	id = unplugged.2022
+	title = unplugged.2022.name
+	desc = unplugged.2022.desc.unplugged
+	picture = GFX_evt_derelict_interior
+	show_sound = archeology_log_entry_neutral
+	location = from
+	event_chain = unplugged_origin_machine_legacy_chain
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = UNFORTUNATE
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# 'The Makers' epilogue: hostile fleet spawns
+country_event = {
+	id = unplugged.2030
+	title = unplugged.2030.name
+	desc = unplugged.2030.desc
+	picture = GFX_evt_fleet_evil
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = event_target:origin_unplugged_machine_legacy_core
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = {
+			which = difficulty_level
+			value = 10
+		}
+		set_visited = event_target:origin_unplugged_machine_legacy_core
+		unplugged_origin_spawn_machine_fleet_effect = {
+			DIFFICULTY_LEVEL = difficulty_level
+			LOCATION = event_target:origin_unplugged_machine_legacy_core
+		}
+		last_created_fleet = {
+			set_fleet_flag = machine_legacy_makers_fleet
+			auto_move_to_planet = {
+				target = fromfrom
+				clear_auto_move_on_arrival = yes
+			}
+		}
+		# Fire a 'hostile fleet still extant' epilogue, as a failsafe for progress
+		country_event = {
+			id = unplugged.2038
+			years = 4
+		}
+	}
+
+	option = {
+		name = BATTLESTATIONS
+	}
+}
+
+# 'The Makers' epilogue: hostile fleet is destroyed [HIDDEN]
+country_event = {
+	id = unplugged.2035
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		fromfrom = {
+			has_fleet_flag = machine_legacy_makers_fleet
+		}
+	}
+
+	immediate = {
+		every_country = {
+			limit = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			set_country_flag = origin_unplugged_maker_fleet_defeated
+			if = {
+				limit = {
+					is_same_value = from
+				}
+				country_event = { id = unplugged.2036 }
+			}
+			else = {
+				country_event = { id = unplugged.2037 }
+			}
+		}
+	}
+}
+
+# 'The Makers' epilogue: next signal (this Unplugged empire defeated the hostile fleet)
+country_event = {
+	id = unplugged.2036
+	title = unplugged.2036.name
+	desc = unplugged.2036.desc
+	picture = GFX_evt_decryption
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = event_target:origin_unplugged_taken_planet
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = machine_legacy_makers_arc_site_complete
+		event_target:origin_unplugged_taken_planet = {
+			NOT = {
+				is_point_of_interest = {
+					id = unplugged_machine_legacy_taken_poi
+					event_chain = unplugged_origin_machine_legacy_chain
+					owner = root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		set_visited = event_target:origin_unplugged_taken_planet.solar_system
+		create_point_of_interest = {
+			id = unplugged_machine_legacy_taken_poi
+			name = unplugged_machine_legacy_taken_poi
+			desc = unplugged_machine_legacy_taken_poi_desc
+			event_chain = unplugged_origin_machine_legacy_chain
+			location = event_target:origin_unplugged_taken_planet
+		}
+	}
+
+	option = {
+		name = unplugged.2036.a
+		tooltip = {
+			create_point_of_interest = {
+				id = unplugged_machine_legacy_taken_poi
+				name = unplugged_machine_legacy_taken_poi
+				desc = unplugged_machine_legacy_taken_poi_desc
+				event_chain = unplugged_origin_machine_legacy_chain
+				location = event_target:origin_unplugged_taken_planet
+			}
+		}
+	}
+}
+
+# 'The Makers' epilogue: next signal (another empire defeated the hostile fleet)
+country_event = {
+	id = unplugged.2037
+	base = unplugged.2036
+	desc_clear = yes
+	desc = unplugged.2037.desc
+}
+
+# 'The Makers' epilogue: next signal (hostile fleet remains active)
+country_event = {
+	id = unplugged.2038
+	title = unplugged.2036.name
+	desc = unplugged.2038.desc
+	picture = GFX_evt_decryption
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = event_target:origin_unplugged_taken_planet
+	is_triggered_only = yes
+
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		has_country_flag = machine_legacy_makers_arc_site_complete
+		NOT = { has_country_flag = origin_unplugged_maker_fleet_defeated }
+		event_target:origin_unplugged_taken_planet = {
+			NOT = {
+				is_point_of_interest = {
+					id = unplugged_machine_legacy_taken_poi
+					event_chain = unplugged_origin_machine_legacy_chain
+					owner = root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		set_visited = event_target:origin_unplugged_taken_planet.solar_system
+		create_point_of_interest = {
+			id = unplugged_machine_legacy_taken_poi
+			name = unplugged_machine_legacy_taken_poi
+			desc = unplugged_machine_legacy_taken_poi_desc
+			event_chain = unplugged_origin_machine_legacy_chain
+			location = event_target:origin_unplugged_taken_planet
+		}
+	}
+
+	option = {
+		name = UNDERSTOOD
+		tooltip = {
+			create_point_of_interest = {
+				id = unplugged_machine_legacy_taken_poi
+				name = unplugged_machine_legacy_taken_poi
+				desc = unplugged_machine_legacy_taken_poi_desc
+				event_chain = unplugged_origin_machine_legacy_chain
+				location = event_target:origin_unplugged_taken_planet
+			}
+		}
+	}
+}
+
+# SYSTEM 2: 'THE TAKEN'
+
+# "Embodied Anacronisms" Machine presence Anomaly researched (Unplugged version)
+ship_event = {
+	id = unplugged.2100
+	title = unplugged.2100.name
+	desc = unplugged.2100.desc
+	picture = GFX_evt_medieval_alien_civilization
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = fromfrom
+	is_triggered_only = yes
+
+	immediate = {
+		controller = {
+			set_country_flag = unplugged_visible_site_@event_target:origin_unplugged_taken_planet
+		}
+	}
+
+	option = {
+		name = unplugged.2100.a
+		event_target:origin_unplugged_taken_planet = {
+			create_archaeological_site = machine_legacy_taken_site
+		}
+	}
+}
+
+# "Embodied Anacronisms" battlefield uplift Anomaly researched (non-Unplugged version)
+ship_event = {
+	id = unplugged.2105
+	title = unplugged.2105.name
+	desc = unplugged.2105.desc
+	picture = GFX_evt_medieval_alien_civilization
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = this
+	is_triggered_only = yes
+
+	immediate = {
+		from = {
+			if = {
+				limit = {
+					NOT = { has_deposit_for = shipclass_research_station }
+				}
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			}
+		}
+	}
+
+	option = {
+		name = INTERESTING
+		from = {
+			add_deposit = d_society_4
+		}
+	}
+}
+
+# 'The Taken' stage 1: battlefield
+fleet_event = {
+	id = unplugged.2110
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_organic_oppression
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2110.name
+	desc = unplugged.2110.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		# "A Legacy of Terror" (other empires fear us, if not already seen)
+		owner = {
+			country_event = {
+				id = unplugged.3206
+				days = 30
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2110.a
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# 'The Taken' stage 2: hospital
+fleet_event = {
+	id = unplugged.2115
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_vivisection
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2115.name
+	desc = unplugged.2115.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unplugged.2115.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2115.b
+		controller = {
+			set_country_flag = machine_legacy_taken_regret
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+# 'The Taken' stage 3 gatekeeper
+fleet_event = {
+	id = unplugged.2120
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		if = {
+			limit = {
+				controller = { has_country_flag = machine_legacy_taken_regret }
+			}
+			fleet_event = {
+				id = unplugged.2125
+				scopes = { from = from }
+			}
+		}
+		else = {
+			fleet_event = {
+				id = unplugged.2121
+				scopes = { from = from }
+			}
+		}
+	}
+
+	after = {
+		from = { expire_site_event = unplugged.2120 }
+	}
+}
+
+# 'The Taken' stage 3A: assimilation equipment
+fleet_event = {
+	id = unplugged.2121
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_hive_cyberization
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2121.name
+	desc = unplugged.2121.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = EXCELLENT
+		controller = {
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+				custom_tooltip = situation_unplugged_identity_shift_cyberize_tt
+			}
+			hidden_effect = {
+				every_situation = {
+					limit = {
+						is_situation_type = situation_unplugged_identity
+					}
+					change_variable = {
+						which = var_unplugged_identity_situation_recent_events_value
+						value = 4
+					}
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# 'The Taken' stage 3B: burial grounds
+fleet_event = {
+	id = unplugged.2125
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_scanning_remains
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2125.name
+	desc = unplugged.2125.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = INTERESTING
+		controller = {
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+				custom_tooltip = situation_unplugged_identity_shift_decyberize_tt
+			}
+			hidden_effect = {
+				every_situation = {
+					limit = {
+						is_situation_type = situation_unplugged_identity
+					}
+					change_variable = {
+						which = var_unplugged_identity_situation_recent_events_value
+						value = -4
+					}
+				}
+			}
+			country_event = { id = unplugged.3100 } # "Grounds for Removal" (if not already seen)
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2125.a
+		custom_tooltip = unplugged.2125.a.tt
+		controller = {
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+				custom_tooltip = situation_unplugged_identity_shift_decyberize_tt
+			}
+			hidden_effect = {
+				every_situation = {
+					limit = {
+						is_situation_type = situation_unplugged_identity
+					}
+					change_variable = {
+						which = var_unplugged_identity_situation_recent_events_value
+						value = -4
+					}
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# 'The Taken' stage 4: machine substrate
+fleet_event = {
+	id = unplugged.2130
+	title = unplugged.2130.name
+	desc = unplugged.2130.desc
+	picture = GFX_evt_generator_powerup
+	show_sound = archeology_log_entry_neutral
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = from
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		controller = {
+			set_visited = event_target:origin_unplugged_creators_planet.solar_system
+			create_point_of_interest = {
+				id = unplugged_machine_legacy_creators_poi
+				name = unplugged_machine_legacy_creators_poi
+				desc = unplugged_machine_legacy_creators_poi_desc
+				event_chain = unplugged_origin_machine_legacy_chain
+				location = event_target:origin_unplugged_creators_planet
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2205.a
+		tooltip = {
+			controller = {
+				create_point_of_interest = {
+					id = unplugged_machine_legacy_creators_poi
+					name = unplugged_machine_legacy_creators_poi
+					desc = unplugged_machine_legacy_creators_poi_desc
+					event_chain = unplugged_origin_machine_legacy_chain
+					location = event_target:origin_unplugged_creators_planet
+				}
+			}
+		}
+		controller = {
+			set_country_flag = machine_legacy_taken_arc_site_complete
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		hidden_effect = {
+			from = { set_site_progress_locked = no }
+		}
+	}
+	after = {
+		hidden_effect = {
+			controller = {
+				remove_point_of_interest = unplugged_machine_legacy_taken_poi
+			}
+		}
+	}
+}
+
+# SYSTEM 3: 'THE CREATORS'
+
+# "Dust Monitor" Anomaly researched (all versions)
+ship_event = {
+	id = unplugged.2200
+	title = unplugged.2200.name
+	desc = unplugged.2200.desc.others # standard
+	desc = { # Unplugged, with the Monitor intact
+		text = unplugged.2200.desc
+		exclusive_trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			fromfrom = {
+				NOT = { has_planet_flag = creators_planet_monitor_scrapped }
+			}
+		}
+	}
+	desc = { # Unplugged, with the Monitor scrapped
+		text = unplugged.2200.desc.scrapped
+		exclusive_trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			fromfrom = {
+				has_planet_flag = creators_planet_monitor_scrapped
+			}
+		}
+	}
+	picture = GFX_evt_satellite_in_orbit
+	show_sound = event_default
+	location = fromfrom
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		controller = {
+			if = {
+				limit = {
+					is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				}
+				set_country_flag = unplugged_visible_site_@fromfrom
+			}
+		}
+	}
+
+	option = { # Unplugged, with the Monitor intact: proceed
+		name = unplugged.2200.a
+		trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			fromfrom = {
+				NOT = { has_planet_flag = creators_planet_monitor_scrapped }
+			}
+		}
+		fromfrom = {
+			create_archaeological_site = machine_legacy_creators_site
+		}
+	}
+	option = { # Unplugged, with the Monitor intact: don't bother digging
+		name = unplugged.2200.b
+		trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			fromfrom = {
+				NOT = { has_planet_flag = creators_planet_monitor_scrapped }
+			}
+		}
+	}
+	option = { # Unplugged, with the Monitor scrapped
+		name = CURSES
+		trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			fromfrom = {
+				has_planet_flag = creators_planet_monitor_scrapped
+			}
+		}
+	}
+	option = { # non-Unplugged
+		name = CURIOUS
+		trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+	option = { # non-Unplugged: scrap the monitor
+		name = unplugged.2200.c
+		trigger = {
+			exists = controller
+			controller = {
+				is_unplugged_empire = no # undercoat: moved to scripted trigger
+			}
+			fromfrom = {
+				NOT = { has_planet_flag = creators_planet_monitor_scrapped }
+			}
+		}
+		fromfrom = {
+			set_planet_flag = creators_planet_monitor_scrapped
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			controller = {
+				remove_point_of_interest = unplugged_machine_legacy_creators_poi
+			}
+		}
+	}
+
+}
+
+# 'The Creators' breadcrumb event: upon entering this system, set timer to reveal 'The Unplugged' system [HIDDEN]
+ship_event = {
+	id = unplugged.2204
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		fromfrom = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = unplugged_has_found_homeworld_flag }
+		}
+		from = {
+			has_star_flag = unplugged_machine_legacy_flag
+			any_system_planet = {
+				is_same_value = event_target:origin_unplugged_creators_planet
+			}
+		}
+		exists = event_target:origin_unplugged_unplugged_planet_@fromfrom
+	}
+
+	immediate = {
+		fromfrom = {
+			country_event = {
+				id = unplugged.2205
+				days = 360
+			}
+		}
+	}
+}
+
+# 'The Unplugged' prologue: data vault found in next system
+country_event = {
+	id = unplugged.2205
+	title = unplugged.2205.name
+	desc = unplugged.2205.desc
+	picture = GFX_evt_ancient_databank
+	event_chain = unplugged_origin_machine_legacy_chain
+	location = event_target:origin_unplugged_unplugged_planet_@root
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_has_found_homeworld_flag }
+		exists = event_target:origin_unplugged_unplugged_planet_@root
+	}
+
+	immediate = {
+		set_visited = event_target:origin_unplugged_unplugged_planet_@root.solar_system
+		create_point_of_interest = {
+			id = unplugged_machine_legacy_unplugged_poi
+			name = unplugged_machine_legacy_unplugged_poi
+			desc = unplugged_machine_legacy_unplugged_poi_desc
+			event_chain = unplugged_origin_machine_legacy_chain
+			location = event_target:origin_unplugged_unplugged_planet_@root
+		}
+	}
+
+	option = {
+		name = unplugged.2205.a
+		tooltip = {
+			create_point_of_interest = {
+				id = unplugged_machine_legacy_unplugged_poi
+				name = unplugged_machine_legacy_unplugged_poi
+				desc = unplugged_machine_legacy_unplugged_poi_desc
+				event_chain = unplugged_origin_machine_legacy_chain
+				location = event_target:origin_unplugged_unplugged_planet_@root
+			}
+		}
+	}
+}
+
+# 'The Creators' stage 1: dustbowl
+fleet_event = {
+	id = unplugged.2210
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_relic_world_street
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2210.name
+	desc = unplugged.2210.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = DIG
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}
+
+# 'The Creators' stage 2: crater
+fleet_event = {
+	id = unplugged.2215
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_tomb_world
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2215.name
+	desc = unplugged.2215.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = DISTURBING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			set_country_flag = machine_legacy_creators_arc_site_complete
+		}
+	}
+}
+
+# SYSTEM 4: 'THE UNPLUGGED'
+
+# 'The Unplugged' prologue: upon entering the system
+fleet_event = {
+	id = unplugged.2300
+	is_triggered_only = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+	picture = GFX_evt_ancient_databank
+	title = unplugged.2300.name
+	desc = unplugged.2300.desc
+
+	option = {
+		name = unplugged.2300.a
+
+		custom_tooltip = unplugged.2300.a.tt
+
+	}
+
+	trigger = {
+		controller = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		}
+		from = {
+			has_star_flag = unplugged_machine_legacy_flag
+			any_system_planet = {
+				is_point_of_interest = {
+					id = unplugged_machine_legacy_unplugged_poi
+					event_chain = unplugged_origin_machine_legacy_chain
+					owner = root.controller
+				}
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			every_system_planet = {
+				limit = {
+					is_point_of_interest = {
+						id = unplugged_machine_legacy_unplugged_poi
+						event_chain = unplugged_origin_machine_legacy_chain
+						owner = root.controller
+					}
+				}
+				enable_special_project = {
+					name = MACHINE_LEGACY_UNPLUGGED_VAULT_BEACON
+					owner = root.controller
+					location = this
+				}
+			}
+		}
+		controller = {
+			remove_point_of_interest = unplugged_machine_legacy_unplugged_poi
+			set_country_flag = unplugged_has_found_homeworld_flag
+		}
+	}
+}
+
+# 'Point of Origin': special project complete
+ship_event = {
+	id = unplugged.2305
+	title = unplugged.2305.name
+	desc = unplugged.2305.desc
+	picture = GFX_evt_unplugged
+	show_sound = event_default
+	location = event_target:origin_unplugged_machine_legacy_core
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				exists = event_target:origin_unplugged_unplugged_planet_@controller
+			}
+			controller = {
+				set_country_flag = unplugged_visible_site_@event_target:origin_unplugged_unplugged_planet_@this
+			}
+			event_target:origin_unplugged_unplugged_planet_@controller = {
+				create_archaeological_site = machine_legacy_unplugged_site
+				set_variable = {
+					which = difficulty_value
+					value = 20
+				}
+				unplugged_origin_spawn_machine_fleet_effect = {
+					DIFFICULTY_LEVEL = difficulty_value
+					LOCATION = event_target:origin_unplugged_machine_legacy_core
+				}
+				last_created_fleet = {
+					auto_move_to_planet = {
+						target = prev
+						clear_auto_move_on_arrival = yes
+					}
+					set_fleet_flag = unplugged_homeworld_intercept_fleet
+				}
+			}
+		}
+		else = {
+			unplugged_origin_find_available_machine_legacy_world_effect = {
+				LOCAL_EVENT_TARGET = unplugged_homeworld
+			}
+			event_target:unplugged_homeworld = {
+				save_global_event_target_as = origin_unplugged_unplugged_planet_@controller
+			}
+		}
+	}
+
+	option = {
+		name = BATTLESTATIONS
+	}
+}
+
+# 'The Unplugged' stage 1: food storage
+fleet_event = {
+	id = unplugged.2310
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_resource_cache
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2310.name
+
+	show_sound = archeology_log_entry_neutral
+
+	desc = {
+		text = unplugged.2310.desc.lith
+		exclusive_trigger = {
+			owner_main_species = {
+				is_species_class = LITHOID
+			}
+		}
+	}
+
+	desc = {
+		text = unplugged.2310.desc.omni
+		trigger = {
+			controller = {
+				has_country_flag = unplugged2310_omni
+			}
+		}
+	}
+	desc = {
+		text = unplugged.2310.desc.carn
+		trigger = {
+			controller = {
+				has_country_flag = unplugged2310_carn
+			}
+		}
+	}
+	desc = {
+		text = unplugged.2310.desc.herb
+		trigger = {
+			controller = {
+				has_country_flag = unplugged2310_herb
+			}
+		}
+	}
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+
+		controller = {
+			random_list = {
+				10 = { set_country_flag = unplugged2310_omni }
+				10 = { set_country_flag = unplugged2310_carn }
+				10 = { set_country_flag = unplugged2310_herb }
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = OK
+		controller = {
+			add_modifier = {
+				modifier = unplugged_home_cooking
+			}
+		}
+	}
+
+	option = {
+		name = OK
+		exclusive_trigger = {
+			owner_main_species = {
+				is_species_class = LITHOID
+			}
+		}
+		controller = {
+			add_modifier = {
+				modifier = unplugged_home_cooking_lithoid
+			}
+		}
+	}
+}
+
+# 'The Unplugged' stage 2: museum
+fleet_event = {
+	id = unplugged.2315
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_ancient_records
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2315.name
+	desc = unplugged.2315.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+
+		controller = {
+			add_modifier = {
+				modifier = unplugged_historical_record
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2315.a
+		controller = {
+			set_country_flag = unplugged2315_a_picked
+		}
+	}
+
+	option = {
+		name = unplugged.2315.b
+	}
+}
+
+# 'The Unplugged' stage 3 gatekeeper
+fleet_event = {
+	id = unplugged.2320
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		if = {
+			limit = {
+				controller = { has_country_flag = unplugged2315_a_picked }
+			}
+			fleet_event = {
+				id = unplugged.2321
+				scopes = { from = from }
+			}
+		}
+		else = {
+			fleet_event = {
+				id = unplugged.2325
+				scopes = { from = from }
+			}
+		}
+	}
+
+	after = {
+		from = { expire_site_event = unplugged.2320 }
+	}
+}
+
+# 'The Unplugged' stage 3a: amusement park
+fleet_event = {
+	id = unplugged.2321
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_happy_reunion
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2321.name
+	desc = unplugged.2321.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = unplugged.2321.a
+		controller = {
+			add_modifier = {
+				modifier = unplugged_cultural_reconstruction
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2321.b
+		controller = {
+			add_modifier = {
+				modifier = unplugged_cultural_maturity
+			}
+		}
+	}
+}
+
+# 'The Unplugged' stage 3b: university
+fleet_event = {
+	id = unplugged.2325
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_scientific_experiments
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2325.name
+	desc = unplugged.2325.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+
+		controller = {
+			add_modifier = {
+				modifier = unplugged_cultural_maturity
+			}
+		}
+	}
+
+	option = {
+		name = DISTURBING
+	}
+
+	option = {
+		name = CURIOUS
+	}
+}
+
+# 'The Unplugged' stage 4: former capitol
+fleet_event = {
+	id = unplugged.2330
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_synth_organic_relations
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.2330.name
+	desc = unplugged.2330.desc
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	option = {
+		name = DOTDOTDOT
+
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+}
+
+# 'The Unplugged' epilogue: hostile fleet destroyed; Opus Sentinel (or else the Nexus) sends taunt
+country_event = {
+	id = unplugged.2390
+	title = unplugged.2390.name
+	desc = unplugged.2390.desc
+	picture = GFX_evt_small_space_battle
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		fromfromfrom = {
+			has_fleet_flag = unplugged_homeworld_intercept_fleet
+		}
+	}
+
+	immediate = {
+		set_visited = event_target:origin_unplugged_machine_legacy_core
+		create_point_of_interest = {
+			id = unplugged_machine_legacy_core_poi
+			name = unplugged_machine_legacy_core_poi
+			desc = unplugged_machine_legacy_core_poi_desc
+			event_chain = unplugged_origin_machine_legacy_chain
+			location = event_target:origin_unplugged_machine_legacy_core
+		}
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+
+		tooltip = {
+			create_point_of_interest = {
+				id = unplugged_machine_legacy_core_poi
+				name = unplugged_machine_legacy_core_poi
+				desc = unplugged_machine_legacy_core_poi_desc
+				event_chain = unplugged_origin_machine_legacy_chain
+				location = event_target:origin_unplugged_machine_legacy_core
+			}
+		}
+
+	}
+}
+
+# SYSTEM 5: 'THE MACHINE'
+
+# 'The Machine' prologue: Opus Sentinel destroyed [HIDDEN]
+country_event = {
+	id = unplugged.2400
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		fromfromfrom = {
+			has_fleet_flag = machine_legacy_machine_core_fleet
+		}
+	}
+
+	immediate = {
+		set_country_flag = machine_legacy_destroyed_boss
+		if = {
+			limit = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+			country_event = {
+				id = unplugged.2401
+			}
+		}
+		else = {
+			country_event = {
+				id = unplugged.2403
+			}
+		}
+		every_country = {
+			limit = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				NOT = { is_same_value = root }
+			}
+			country_event = {
+				id = unplugged.2402
+			}
+		}
+	}
+}
+
+# 'The Machine': Opus Sentinel destroyed by us (Unplugged version)
+country_event = {
+	id = unplugged.2401
+	title = TRANSMISSION
+	desc = unplugged.2401.desc
+	picture = GFX_evt_unplugged_opus_nexus
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		remove_point_of_interest = unplugged_machine_legacy_core_poi
+	}
+
+	option = {
+		name = ONSCREEN
+		hidden_effect = {
+			country_event = {
+				id = unplugged.2405
+			}
+		}
+	}
+}
+
+# 'The Machine': Opus Sentinel destroyed by someone else (Unplugged version)
+country_event = {
+	id = unplugged.2402
+	title = TRANSMISSION
+	desc = unplugged.2402.desc
+	picture = GFX_evt_unplugged_opus_nexus
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		remove_point_of_interest = unplugged_machine_legacy_core_poi
+	}
+
+	option = {
+		name = ONSCREEN
+		hidden_effect = {
+			country_event = {
+				id = unplugged.2405
+			}
+		}
+	}
+}
+
+# 'The Machine': Opus Sentinel destroyed by us (non-Unplugged version)
+country_event = {
+	id = unplugged.2403
+	title = TRANSMISSION
+	desc = unplugged.2403.desc
+	picture = GFX_evt_unplugged_opus_nexus
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		remove_point_of_interest = unplugged_machine_legacy_core_poi
+	}
+
+	option = {
+		name = ONSCREEN
+		hidden_effect = {
+			country_event = {
+				id = unplugged.2405
+			}
+		}
+	}
+}
+
+# 'The Machine': opening dialog with the Nexus (all versions)
+country_event = {
+	id = unplugged.2405
+	is_triggered_only = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = TRANSMISSION
+	diplomatic = yes
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+
+	desc = {
+		text = unplugged.2405.desc.unplugged
+		trigger = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			is_synthetic_empire = no
+			has_country_flag = machine_legacy_destroyed_boss
+		}
+	}
+
+	desc = {
+		text = unplugged.2405.desc.unplugged_remote
+		trigger = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			is_synthetic_empire = no
+			NOT = { has_country_flag = machine_legacy_destroyed_boss }
+		}
+	}
+
+	desc = {
+		text = unplugged.2405.desc.unplugged_synth
+		trigger = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			is_synthetic_empire = yes
+		}
+	}
+
+	desc = {
+		text = unplugged.2405.desc.other
+		trigger = {
+			is_unplugged_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		hidden_effect = {
+			if = {
+				limit = {
+					is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				}
+				country_event = {
+					id = unplugged.2410
+				}
+			}
+			else = {
+				country_event = {
+					id = unplugged.2411
+				}
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2405.a
+		trigger = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			NOT = { has_ascension_perk = ap_synthetic_evolution }
+		}
+		is_dialog_only = yes
+		response_text = unplugged.2405.response_text.unplugged1
+	}
+
+	option = {
+		name = unplugged.2405.b
+		trigger = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			has_ascension_perk = ap_synthetic_evolution
+		}
+		is_dialog_only = yes
+		response_text = unplugged.2405.response_text.unplugged1
+	}
+
+	option = {
+		name = unplugged.2405.c
+		trigger = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		}
+		is_dialog_only = yes
+		response_text = unplugged.2405.response_text.unplugged2
+	}
+
+	option = {
+		name = unplugged.2405.d
+		trigger = {
+			is_unplugged_empire = no # undercoat: moved to scripted trigger
+		}
+		is_dialog_only = yes
+		response_text = unplugged.2405.response_text.other
+	}
+}
+
+# 'The Machine': dialog with the Nexus (Unplugged version)
+country_event = {
+	id = unplugged.2410
+	is_triggered_only = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = TRANSMISSION
+	diplomatic = yes
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+	desc = unplugged.2410.desc
+
+	option = {
+		name = unplugged.2410.a
+		set_country_flag = unplugged2410_a_picked
+		country_event = {
+			id = unplugged.2415
+		}
+	}
+
+	option = {
+		name = unplugged.2410.b
+		country_event = {
+			id = unplugged.2415
+		}
+	}
+}
+
+# 'The Machine': dialog with the Nexus (non-Unplugged version)
+country_event = {
+	id = unplugged.2411
+	is_triggered_only = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = TRANSMISSION
+	diplomatic = yes
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+	desc = unplugged.2411.desc
+
+	immediate = {
+		if = { # pick an Unplugged empire to implicate, if they still exist
+			limit = {
+				any_playable_country = {
+					is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			random_playable_country = {
+				limit = {
+					is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				}
+				save_event_target_as = unplugged_empire
+				establish_communications_no_message = root
+			}
+		}
+		else = { # target the Opus as an even more delusional fallback
+			event_target:origin_unplugged_assimilator_empire = {
+				save_event_target_as = unplugged_empire
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.2411.a
+	}
+
+	option = {
+		name = unplugged.2411.b
+		add_opinion_modifier = {
+			modifier = opinion_implicated_by_unplugged_assimilator
+			who = event_target:unplugged_empire
+		}
+		trigger = {
+			event_target:unplugged_empire = {
+				NOT = { is_same_value = event_target:origin_unplugged_assimilator_empire }
+			}
+		}
+	}
+
+	after = {
+		event_target:origin_unplugged_machine_legacy_core_planet = {
+			if = {
+				limit = {
+					NOT = { has_deposit = d_unplugged_assimilator_hulk }
+				}
+				add_deposit = d_unplugged_assimilator_hulk
+			}
+		}
+	}
+}
+
+# 'The Machine': Nexus dies (Unplugged version)
+country_event = {
+	id = unplugged.2415
+	is_triggered_only = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = TRANSMISSION
+	diplomatic = yes
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+	desc = unplugged.2415.desc.combat
+	desc = {
+		text = unplugged.2415.desc.memory
+		exclusive_trigger = {
+			has_country_flag = unplugged2410_a_picked
+		}
+	}
+	option = {
+		name = unplugged.2415.a
+	}
+	option = {
+		name = unplugged.2415.b
+	}
+	after = {
+		country_event = {
+			id = unplugged.2420
+		}
+	}
+}
+
+# 'The Machine' epilogue: study the Machine Husk
+country_event = {
+	id = unplugged.2420
+	title = unplugged.2420.name
+	desc = unplugged.2420.desc
+	picture = GFX_evt_sapient_AI
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	option = {
+		name = unplugged.2420.a
+		enable_special_project = {
+			name = UNPLUGGED_MACHINE_ARCHIVE
+			location = event_target:origin_unplugged_machine_legacy_core
+			owner = root
+		}
+		event_target:origin_unplugged_machine_legacy_core_planet = {
+			if = {
+				limit = {
+					NOT = { has_deposit = d_unplugged_assimilator_hulk }
+				}
+				add_deposit = d_unplugged_assimilator_hulk
+			}
+		}
+	}
+}
+
+# 'The Machine' epilogue: 'The Makers' archive
+# via 'UNPLUGGED_MACHINE_ARCHIVE on_progress_25' or 'unplugged.2021-22'
+ship_event = {
+	id = unplugged.2425
+	title = unplugged.2425.name
+	desc = unplugged.2425.desc
+	picture = GFX_evt_synth_sabotage
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	trigger = {
+		controller = {
+			has_country_flag = machine_legacy_makers_arc_site_complete
+		}
+	}
+
+	option = {
+		name = unplugged.2425.a
+	}
+}
+
+# 'The Machine' epilogue: 'The Taken' archive
+# via 'UNPLUGGED_MACHINE_ARCHIVE on_progress_50' or 'unplugged.2130'
+ship_event = {
+	id = unplugged.2430
+	title = unplugged.2430.name
+	desc = unplugged.2430.desc
+	picture = GFX_evt_ground_combat
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	trigger = {
+		controller = {
+			has_country_flag = machine_legacy_taken_arc_site_complete
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = DISTURBING
+	}
+}
+
+# 'The Machine' epilogue: 'The Creators' archive
+# via 'UNPLUGGED_MACHINE_ARCHIVE on_progress_75' or 'unplugged.2215'
+ship_event = {
+	id = unplugged.2435
+	title = unplugged.2435.name
+	desc = unplugged.2435.desc
+	picture = GFX_evt_communication_event
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	trigger = {
+		controller = {
+			has_country_flag = machine_legacy_creators_arc_site_complete
+		}
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+# 'The Machine' epilogue: 'The Creators' archive
+# via 'UNPLUGGED_MACHINE_ARCHIVE on_success'
+ship_event = {
+	id = unplugged.2440
+	title = unplugged.2440.name
+	desc = unplugged.2440.desc
+	picture = GFX_evt_sapient_AI
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		# Establish a Creator species for loc. purposes
+		create_species = {
+			name = random
+			class = random_non_machine
+			portrait = random
+			name_list = random_class
+			effect = {
+				save_event_target_as = creator_species
+			}
+		}
+	}
+
+	option = {
+		name = ONSCREEN
+		hidden_effect = {
+			controller = {
+				country_event = {
+					id = unplugged.2445
+				}
+			}
+		}
+	}
+}
+
+# 'The Machine' epilogue: 'The Creators' intro
+country_event = {
+	id = unplugged.2445
+	title = unplugged.2445.name
+	desc = unplugged.2445.desc
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+	diplomatic = yes
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	option = {
+		name = unplugged.2445.a
+		is_dialog_only = yes
+		response_text = unplugged.2445.response_text.notmachine
+	}
+
+	option = {
+		name = unplugged.2445.b
+		trigger = {
+			OR = {
+				has_ascension_perk = ap_synthetic_evolution
+				AND = {
+					has_country_flag = unplugged_has_finished_identity_situation_flag
+					owner_main_species = {
+						has_trait = trait_unplugged_cybernetic_positives_3
+					}
+				}
+			}
+		}
+		country_event = {
+			id = unplugged.2446
+		}
+	}
+
+	option = {
+		name = unplugged.2445.c
+		country_event = {
+			id = unplugged.2446
+		}
+	}
+
+	option = {
+		name = unplugged.2445.d
+		country_event = {
+			id = unplugged.2455
+		}
+	}
+}
+
+# 'The Machine' epilogue: 'The Creators' beg you not to destroy the device
+country_event = {
+	id = unplugged.2446
+	base = unplugged.2445
+	desc_clear = yes
+	option_clear = yes
+
+	desc = unplugged.2446.desc
+
+	option = {
+		name = unplugged.2446.a
+		country_event = {
+			id = unplugged.2450
+		}
+	}
+}
+
+# 'The Machine' finale: inheriting the Machine throne
+country_event = {
+	id = unplugged.2450
+	title = unplugged.2450.name
+	desc = unplugged.2450.desc
+	picture = GFX_evt_unplugged_opus_nexus
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		end_event_chain = unplugged_origin_machine_legacy_chain
+	}
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+# 'The Machine' finale: terraforming the machine world
+country_event = {
+	id = unplugged.2455
+	title = unplugged.2455.name
+	desc = unplugged.2455.desc
+	picture = GFX_evt_planet_beam
+	event_chain = unplugged_origin_machine_legacy_chain
+	is_triggered_only = yes
+
+	immediate = {
+		end_event_chain = unplugged_origin_machine_legacy_chain
+	}
+
+	option = {
+		name = EXCELLENT
+		event_target:origin_unplugged_machine_legacy_core_planet = {
+			change_pc = pc_gaia
+
+			hidden_effect = {
+				add_deposit = d_dust_desert
+				add_deposit = d_crystalline_caverns
+				add_deposit = d_bubbling_swamp
+				random_list = {
+					1 = { # Agri districts: 7, generator districts: 13, mining districts: 16 (+9 from rare deposits), total: 45
+						add_deposit = d_black_soil
+						add_deposit = d_black_soil
+						add_deposit = d_boggy_fens
+
+
+						add_deposit = d_tempestous_mountain
+						add_deposit = d_tempestous_mountain
+						add_deposit = d_tempestous_mountain
+						add_deposit = d_searing_desert
+						add_deposit = d_searing_desert
+
+						add_deposit = d_rich_mountain
+						add_deposit = d_rich_mountain
+						add_deposit = d_rich_mountain
+						add_deposit = d_ore_rich_caverns
+						add_deposit = d_ore_rich_caverns
+						add_deposit = d_mineral_fields
+						add_deposit = d_mineral_fields
+						add_deposit = d_mineral_fields
+					}
+					1 = { # Agri districts: 14, generator districts: 10, mining districts: 8 (+9 from rare deposits), total: 41
+						add_deposit = d_black_soil
+						add_deposit = d_black_soil
+						add_deposit = d_fertile_lands
+						add_deposit = d_great_river
+						add_deposit = d_boggy_fens
+						add_deposit = d_boggy_fens
+						add_deposit = d_nutritious_mudland
+						add_deposit = d_nutritious_mudland
+
+						add_deposit = d_tempestous_mountain
+						add_deposit = d_geothermal_vent
+						add_deposit = d_searing_desert
+						add_deposit = d_searing_desert
+						add_deposit = d_arid_highlands
+
+						add_deposit = d_rich_mountain
+						add_deposit = d_rich_mountain
+						add_deposit = d_mineral_fields
+					}
+					1 = { # Agri districts: 10, generator districts: 16, mining districts: 9 (+9 from rare deposits), total: 44
+						add_deposit = d_black_soil
+						add_deposit = d_fertile_lands
+						add_deposit = d_great_river
+						add_deposit = d_boggy_fens
+						add_deposit = d_nutritious_mudland
+						add_deposit = d_nutritious_mudland
+
+						add_deposit = d_tempestous_mountain
+						add_deposit = d_tempestous_mountain
+						add_deposit = d_geothermal_vent
+						add_deposit = d_searing_desert
+						add_deposit = d_searing_desert
+						add_deposit = d_searing_desert
+						add_deposit = d_arid_highlands
+						add_deposit = d_arid_highlands
+
+						add_deposit = d_rich_mountain
+						add_deposit = d_ore_rich_caverns
+						add_deposit = d_ore_rich_caverns
+						add_deposit = d_mineral_fields
+						add_deposit = d_mineral_fields
+					}
+				}
+			}
+		}
+	}
+}
+
+# Encounter with the Opus Sentinel
+# via on_entering_system_fleet | this = player fleet; from = system
+fleet_event = {
+	id = unplugged.2495
+	title = unplugged.2495.name
+	desc = {
+		text = unplugged.2495.desc.other
+		trigger = {
+			controller = {
+				is_unplugged_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+	}
+	desc = {
+		text = unplugged.2495.desc.unplugged
+		trigger = {
+			controller = { is_unplugged_empire = yes } # undercoat: moved to scripted trigger
+		}
+	}
+	picture = GFX_evt_unplugged_opus_nexus
+	location = from
+	show_sound = event_yellow_alert
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = unplugged_machine_legacy_core_flag
+			any_fleet_in_system = { has_fleet_flag = machine_legacy_machine_core_fleet }
+		}
+		controller = {
+			NOT = {
+				has_country_flag = opus_sentinel_encounter
+			}
+			is_playable = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		controller = {
+			set_country_flag = opus_sentinel_encounter
+		}
+	}
+
+	option = {
+		name = unplugged.2495.a
+	}
+}
+
+#######################
+# CYBERNETIC RECKONING
+#######################
+
+# Our Embodiment - Situation Start Event
+country_event = {
+	id = unplugged.3000
+	title = unplugged.3000.name
+	desc = unplugged.3000.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		any_pop_faction = {
+			exists = this
+		}
+		NOT = { has_country_flag = unplugged_has_started_identity_situation_flag }
+	}
+
+	immediate = {
+		start_situation = {
+			type = situation_unplugged_identity
+			target = root
+		}
+		hidden_effect = {
+			set_country_flag = unplugged_has_started_identity_situation_flag
+		}
+	}
+
+	option = { # Status Quo
+		name = unplugged.3000.a
+		random_situation = {
+			limit = { is_situation_type = situation_unplugged_identity }
+			set_situation_approach = situation_unplugged_identity_discourage_change
+		}
+	}
+	option = { # Embrace Opinion
+		name = unplugged.3000.b
+		random_situation = {
+			limit = { is_situation_type = situation_unplugged_identity }
+			set_situation_approach = situation_unplugged_identity_embrace_opinion
+		}
+	}
+	option = { # Allow Debate
+		name = unplugged.3000.c
+		random_situation = {
+			limit = { is_situation_type = situation_unplugged_identity }
+			set_situation_approach = situation_unplugged_identity_open_conversations
+		}
+	}
+
+	after = {
+		tooltip = {
+			start_situation = {
+				type = situation_unplugged_identity
+				target = root
+			}
+		}
+	}
+}
+
+# Of One Mind - Intermediate event, leaning in one direction
+situation_event = {
+	id = unplugged.3005
+	title = unplugged.3005.name
+	desc = unplugged.3005.desc
+	picture = GFX_evt_unplugged
+	show_sound = event_conversation
+	is_triggered_only = yes
+	situation = this
+
+	# Introduce politics (if not yet an option)
+	option = {
+		name = unplugged.3005.a
+		trigger = {
+			owner = {
+				NOR = {
+					has_country_flag = first_faction
+					has_country_flag = unplugged_faction_allowed
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				unplugged_spawn_factions_check = yes
+			}
+		}
+	}
+	# Flavor responses
+	option = {
+		name = unplugged.3005.b
+		switch = {
+			trigger = current_stage
+			unplugged_identity_stage_1 = {
+				owner.home_planet = {
+					add_modifier = {
+						modifier = planet_new_colony_egalitarian_attraction
+						years = 10
+					}
+				}
+			}
+			unplugged_identity_stage_2 = {
+				owner.home_planet = {
+					add_modifier = {
+						modifier = unplugged_playing_it_safe
+						years = 10
+					}
+				}
+			}
+			unplugged_identity_stage_3 = {
+				owner.home_planet = {
+					add_modifier = {
+						modifier = planet_new_colony_authoritarian_attraction
+						years = 5
+					}
+					add_modifier = {
+						modifier = planet_new_colony_militarist_attraction
+						years = 5
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = unplugged.3005.c
+		allow = {
+			owner = {
+				has_resource = { type = influence amount >= 25 }
+			}
+		}
+		owner = {
+			add_resource = {
+				influence = -25
+			}
+		}
+	}
+}
+
+# Divided Opinions - Intermediate event, indecisive outcome
+situation_event = {
+	id = unplugged.3010
+	title = unplugged.3010.name
+	desc = unplugged.3010.desc
+	picture = GFX_evt_unplugged
+	show_sound = event_conversation
+	is_triggered_only = yes
+	situation = this
+
+	# Introduce politics (if not yet an option)
+	option = {
+		name = unplugged.3010.a
+		trigger = {
+			owner = {
+				NOR = {
+					has_country_flag = first_faction
+					has_country_flag = unplugged_faction_allowed
+				}
+			}
+		}
+		hidden_effect = {
+			owner = {
+				unplugged_spawn_factions_check = yes
+			}
+		}
+	}
+	# Flavor responses
+	option = {
+		name = WORRYING
+	}
+	option = {
+		name = GOOD
+	}
+}
+
+# We, the <Species> - End event
+situation_event = {
+	id = unplugged.3090
+	title = unplugged.3090.name
+	desc = unplugged.3090.desc
+	picture = GFX_evt_unplugged
+	show_sound = event_celebration
+	is_triggered_only = yes
+	situation = this
+
+	immediate = {
+		owner = {
+			set_country_flag = unplugged_has_finished_identity_situation_flag
+		}
+		if = {
+			limit = {
+				target = {
+					check_variable = {
+						which = var_unplugged_cybernetic_benefits
+						value = 0
+					}
+					has_modifier = unplugged_they_fear_us
+				}
+			}
+			target = {
+				remove_modifier = unplugged_they_fear_us
+			}
+		}
+		else_if = {
+			limit = {
+				target = {
+					check_variable = {
+						which = var_unplugged_cybernetic_benefits
+						value = 0
+					}
+				}
+			}
+			target = {
+				set_country_flag = unplugged_no_they_fear_us
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		destroy_situation = this
+	}
+}
+
+# "Grounds for Removal": Prologue to Embodied Identity Crisis / first time encountering the idea of de-cyberization
+# via 'situation_unplugged_identity' (trending De-Cyberize) OR 'unplugged.2125' (Machine Legacy: The Taken)
+country_event = {
+	id = unplugged.3100
+	title = unplugged.3100.name
+	desc = unplugged.3100.desc
+	picture = GFX_evt_unplugged
+	show_sound = event_default
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_country_flag = unplugged_has_considered_decyberization
+			has_country_flag = unplugged_has_finished_identity_situation_flag
+		}
+	}
+
+	immediate = {
+		set_country_flag = unplugged_has_considered_decyberization
+		# Start the "Embodied Identity" Situation if it's not already in progress
+		if = {
+			limit = {
+				NOT = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+			}
+			country_event = {
+				id = unplugged.3000
+				days = 90
+			}
+		}
+	}
+
+	option = { # attempt to block De-Cyberization
+		name = unplugged.3100.a
+		if = {
+			limit = {
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+				}
+			}
+			custom_tooltip = situation_unplugged_change_trend_tt
+		}
+		add_monthly_resource_mult = {
+			resource = influence
+			value = @tier1influencereward
+			min = @tier1influencemin
+			max = @tier1influencemax
+		}
+	}
+	option = { # champion De-Cyberization
+		name = unplugged.3100.b
+		if = {
+			limit = {
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+				}
+			}
+			custom_tooltip = situation_unplugged_keep_trend_tt
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			country_event = { id = unplugged.4005 } # Pop Factions nudge (includes relevant trigger checks)
+		}
+	}
+}
+
+# Decyberization Events
+
+situation_event = {
+	id = unplugged.3105
+	title = unplugged.3105.name
+	desc = unplugged.3105.desc
+	picture = GFX_evt_unplugged_decyberization
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = situation_unplugged_decyberize_tt
+		hidden_effect = {
+			target = {
+				subtract_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 1
+				}
+				subtract_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			unplugged_identity_situation_update_traits_effect = yes
+			unplugged_identity_situation_spawn_decyberization_notification_effect = yes
+		}
+	}
+
+	option = {
+		name = unplugged.3105.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+		allow = {
+			target = {
+				resource_stockpile_compare = { resource = influence value >= 25 }
+			}
+		}
+		target = {
+			add_resource = {
+				influence = -25
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+situation_event = {
+	id = unplugged.3106
+	title = unplugged.3105.name
+	desc = unplugged.3106.desc
+	picture = GFX_evt_unplugged_decyberization
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = situation_unplugged_decyberize_tt
+		hidden_effect = {
+			target = {
+				subtract_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 1
+				}
+				subtract_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			unplugged_identity_situation_update_traits_effect = yes
+			unplugged_identity_situation_spawn_decyberization_notification_effect = yes
+		}
+	}
+
+	option = {
+		name = unplugged.3106.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+		allow = {
+			target = {
+				resource_stockpile_compare = { resource = influence value >= 25 }
+			}
+		}
+		target = {
+			add_resource = {
+				influence = -25
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+situation_event = {
+	id = unplugged.3107
+	title = unplugged.3105.name
+	desc = unplugged.3107.desc
+	picture = GFX_evt_unplugged_decyberization
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = situation_unplugged_decyberize_tt
+		hidden_effect = {
+			target = {
+				set_country_flag = is_decyberized
+				subtract_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 1
+				}
+				subtract_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			unplugged_identity_situation_update_traits_effect = yes
+			unplugged_identity_situation_spawn_decyberization_notification_effect = yes
+		}
+		situation_event = {
+			id = unplugged.3090
+		}
+	}
+
+	option = {
+		name = unplugged.3107.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+		allow = {
+			target = {
+				resource_stockpile_compare = { resource = influence value >= 25 }
+			}
+		}
+		target = {
+			add_resource = {
+				influence = -25
+			}
+		}
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+# Cyberization Events
+
+situation_event = {
+	id = unplugged.3110
+	title = unplugged.3110.name
+	desc = unplugged.3110.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = situation_unplugged_cyberize_tt
+		hidden_effect = {
+			target = {
+				subtract_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			unplugged_identity_situation_update_traits_effect = yes
+			unplugged_identity_situation_spawn_cyberization_notification_effect = yes
+		}
+	}
+
+	option = {
+		name = unplugged.3110.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+		allow = {
+			target = {
+				resource_stockpile_compare = { resource = influence value >= 25 }
+			}
+		}
+		target = {
+			add_resource = {
+				influence = -25
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+situation_event = {
+	id = unplugged.3111
+	title = unplugged.3110.name
+	desc = unplugged.3111.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = situation_unplugged_cyberize_tt
+		hidden_effect = {
+			target = {
+				subtract_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			unplugged_identity_situation_update_traits_effect = yes
+			unplugged_identity_situation_spawn_cyberization_notification_effect = yes
+		}
+	}
+
+	option = {
+		name = unplugged.3111.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+		allow = {
+			target = {
+				resource_stockpile_compare = { resource = influence value >= 25 }
+			}
+		}
+		target = {
+			add_resource = {
+				influence = -25
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+situation_event = {
+	id = unplugged.3112
+	title = unplugged.3110.name
+	desc = unplugged.3112.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = situation_unplugged_cyberize_tt
+		hidden_effect = {
+			target = {
+				subtract_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+				set_country_flag = is_cyberized
+			}
+			unplugged_identity_situation_update_traits_effect = yes
+			unplugged_identity_situation_spawn_cyberization_notification_effect = yes
+		}
+
+		situation_event = {
+			id = unplugged.3090
+		}
+	}
+
+	option = {
+		name = unplugged.3112.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+		allow = {
+			target = {
+				resource_stockpile_compare = { resource = influence value >= 25 }
+			}
+		}
+		target = {
+			add_resource = {
+				influence = -25
+			}
+		}
+
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+# Status Quo Events
+
+situation_event = {
+	id = unplugged.3115
+	title = unplugged.3115.name
+	desc = unplugged.3115.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = unplugged.3115.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+	}
+
+	after = {
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+situation_event = {
+	id = unplugged.3116
+	title = unplugged.3116.name
+	desc = unplugged.3116.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = unplugged.3116.a
+		custom_tooltip = situation_unplugged_change_trend_tt
+	}
+
+	after = {
+		hidden_effect = {
+			unplugged_origin_queue_identity_situation_event_effect = yes
+		}
+	}
+}
+
+situation_event = {
+	id = unplugged.3117
+	title = unplugged.3117.name
+	desc = unplugged.3117.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+	situation = this
+
+	option = {
+		name = unplugged.3117.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+
+		hidden_effect = {
+			owner = {
+				if = {
+					limit = {
+						any_owned_pop_group = {
+							has_unplugged_positive_trait = yes
+							has_unplugged_negative_trait = yes
+						}
+					}
+					country_event = {
+						id = unplugged.5005 days = 365 random = 100
+					}
+				}
+			}
+		}
+
+	}
+
+	after = {
+		situation_event = {
+			id = unplugged.3090
+		}
+	}
+}
+
+# Other Empires Seem to Fear Us: "A Legacy of Terror" (Established Communications version)
+# via 'on_post_communications_established' | from = contacted country
+country_event = {
+	id = unplugged.3200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = unplugged_legacyofterror }
+		OR = {
+			has_country_flag = unplugged_fearofthemachine
+			from = {
+				NOT = { is_machine_empire = yes }
+			}
+		}
+		from = {
+			fears_unplugged_empire = yes
+		}
+	}
+
+	immediate = {
+		owner = {
+			country_event = {
+				id = unplugged.3205
+				days = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = unplugged.3205
+	title = unplugged.3205.name
+	desc = unplugged.3205.desc
+	picture = GFX_evt_unplugged_they_fear_us
+	show_sound = event_screams
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_country_flag = unplugged_legacyofterror
+			has_country_flag = unplugged_no_they_fear_us
+		}
+	}
+
+	immediate = {
+		set_country_flag = unplugged_legacyofterror
+	}
+
+	option = { # good that they fear us
+		name = unplugged.3205.a
+		add_monthly_resource_mult = {
+			resource = influence
+			value = @tier1influencereward
+			min = @tier1influencemin
+			max = @tier1influencemax
+		}
+		# leave formation of Pop Factions to chance
+	}
+	option = { # bad that they fear us
+		name = unplugged.3205.b
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = @tier1unitymin
+			max = @tier1unitymax
+		}
+		hidden_effect = {
+			country_event = { id = unplugged.4000 } # nudge to see if we can form Pop Factions
+		}
+	}
+
+	after = {
+		add_modifier = {
+			modifier = unplugged_they_fear_us
+		}
+	}
+}
+# Other Empires Seem to Fear Us: "A Legacy of Terror" (Machine Legacy version)
+country_event = {
+	id = unplugged.3206
+	base = unplugged.3205
+	desc_clear = yes
+	desc = unplugged.3206.desc
+}
+
+# Gatekeeper for unplugged.3250 & unplugged.3255
+# via 'on_post_communications_established' | from = contacted country
+country_event = {
+	id = unplugged.3249
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			is_machine_empire = yes
+		}
+	}
+
+	immediate = {
+		owner = {
+			country_event = {
+				id = unplugged.3250
+				days = 1
+			}
+			country_event = {
+				id = unplugged.3255
+				days = 1
+			}
+		}
+	}
+}
+
+# First Communications with a machine empire that is not a driven assimilator
+country_event = {
+	id = unplugged.3250
+	title = unplugged.3250.name
+	desc = unplugged.3250.desc
+	picture = GFX_evt_unplugged_they_fear_us
+	show_sound = event_screams
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_fearofthemachine }
+		fromfrom = {
+			is_machine_assimilator = no # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		set_country_flag = unplugged_fearofthemachine
+	}
+
+	option = {
+		name = WORRYING
+	}
+}
+
+# First Communications with a machine empire that is a driven assimilator
+country_event = {
+	id = unplugged.3255
+	title = unplugged.3255.name
+	desc = unplugged.3255.desc
+	picture = GFX_evt_unplugged_they_fear_us
+	show_sound = event_screams
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_fearofthepast }
+		fromfrom = {
+			is_machine_assimilator = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = unplugged_fearofthepast
+		}
+	}
+
+	option = {
+		name = WORRYING
+	}
+}
+
+# 'The Ruined Cradle' stage 1: Signs of Struggle
+fleet_event = {
+	id = unplugged.3300
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.3300.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.3300.desc.unplugged
+
+	option = {
+		name = unplugged.3300.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+
+	}
+}
+
+# 'The Ruined Cradle' stage 2: Machine Remnants
+fleet_event = {
+	id = unplugged.3305
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.3305.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.3305.desc.unplugged
+
+	option = {
+		name = unplugged.3305.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+
+	}
+}
+
+# 'The Ruined Cradle' stage 3: Silent Signals
+fleet_event = {
+	id = unplugged.3310
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.3310.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.3310.desc.unplugged
+
+	option = {
+		name = unplugged.3310.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+
+	}
+}
+
+# 'The Ruined Cradle' stage 4: Changing Priorities
+fleet_event = {
+	id = unplugged.3315
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.3315.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.3315.desc.unplugged
+
+	option = {
+		name = unplugged.3315.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+
+	}
+}
+
+# 'The Ruined Cradle' stage 5: An Unwelcome Truth
+fleet_event = {
+	id = unplugged.3320
+	is_triggered_only = yes
+	location = from
+	archaeology = yes
+	picture = GFX_evt_archaeology_camp
+	event_chain = unplugged_origin_machine_legacy_chain
+	title = unplugged.3320.name
+
+	show_sound = archeology_log_entry_neutral
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+
+	desc = unplugged.3320.desc.unplugged
+
+	option = {
+		name = unplugged.3320.a
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			set_country_flag = unplugged_ruined_cradle_sympathy
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+				random_situation = {
+					limit = {
+						is_situation_type = situation_unplugged_identity
+					}
+					hidden_effect = {
+						add_situation_progress = -20
+					}
+				}
+				custom_tooltip = situation_unplugged_identity_shift_decyberize_tt
+			}
+		}
+	}
+
+	option = {
+		name = unplugged.3320.b
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			set_country_flag = unplugged_ruined_cradle_no_sympathy
+			if = {
+				limit = {
+					any_situation = {
+						is_situation_type = situation_unplugged_identity
+					}
+				}
+				random_situation = {
+					limit = {
+						is_situation_type = situation_unplugged_identity
+					}
+					hidden_effect = {
+						add_situation_progress = 20
+					}
+				}
+				custom_tooltip = situation_unplugged_identity_shift_cyberize_tt
+			}
+		}
+	}
+}
+
+# Recalculate pop faction support and recent events values | via situation 'on_monthly'
+situation_event = {
+	id = unplugged.3900
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		set_variable = {
+			which = var_unplugged_identity_situation_faction_value
+			value = 0
+		}
+		target = {
+			every_pop_faction = {
+				root = {
+					change_variable = {
+						which = var_unplugged_identity_situation_faction_value
+						value = prev.value:unplugged_faction_identity_situation_modifer
+					}
+				}
+			}
+		}
+
+		create_variable_if_not_exists = {
+			VARIABLE = var_unplugged_identity_situation_recent_events_value
+			VALUE_IF_CREATED = 0
+		}
+		multiply_variable = {
+			which = var_unplugged_identity_situation_recent_events_value
+			value = 0.9
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_identity_situation_recent_events_value
+					value < 0.2
+				}
+				check_variable = {
+					which = var_unplugged_identity_situation_recent_events_value
+					value > -0.2
+				}
+			}
+			set_variable = {
+				which = var_unplugged_identity_situation_recent_events_value
+				value = 0
+			}
+		}
+	}
+}
+
+# Select current stage
+situation_event = {
+	id = unplugged.3901
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		create_variable_if_not_exists = {
+			VARIABLE = times_selected_neutral
+			VALUE_IF_CREATED = 0
+		}
+		create_variable_if_not_exists = {
+			VARIABLE = times_selected_extreme
+			VALUE_IF_CREATED = 0
+		}
+		switch = {
+			trigger = current_stage
+			unplugged_identity_stage_1 = {
+				change_variable = {
+					which = times_selected_extreme
+					value = 1
+				}
+				if = {
+					limit = {
+						target = {
+							check_variable = {
+								which = var_unplugged_cybernetic_benefits
+								value = 3
+							}
+						}
+					}
+					situation_event = {
+						id = unplugged.3105
+					}
+				}
+				else_if = {
+					limit = {
+						target = {
+							check_variable = {
+								which = var_unplugged_cybernetic_benefits
+								value = 2
+							}
+						}
+					}
+					situation_event = {
+						id = unplugged.3106
+					}
+				}
+				else = {
+					situation_event = {
+						id = unplugged.3107
+					}
+				}
+			}
+			unplugged_identity_stage_2 = {
+				change_variable = {
+					which = times_selected_neutral
+					value = 1
+				}
+				if = {
+					limit = {
+						check_variable = {
+							which = times_selected_neutral
+							value = 1
+						}
+					}
+					situation_event = {
+						id = unplugged.3115
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = times_selected_neutral
+							value = 2
+						}
+					}
+					situation_event = {
+						id = unplugged.3116
+					}
+				}
+				else = {
+					situation_event = {
+						id = unplugged.3117
+					}
+				}
+			}
+			unplugged_identity_stage_3 = {
+				change_variable = {
+					which = times_selected_extreme
+					value = 1
+				}
+				if = {
+					limit = {
+						target = {
+							check_variable = {
+								which = var_unplugged_cybernetic_negatives
+								value = 3
+							}
+						}
+					}
+					situation_event = {
+						id = unplugged.3110
+					}
+				}
+				else_if = {
+					limit = {
+						target = {
+							check_variable = {
+								which = var_unplugged_cybernetic_negatives
+								value = 2
+							}
+						}
+					}
+					situation_event = {
+						id = unplugged.3111
+					}
+				}
+				else = {
+					situation_event = {
+						id = unplugged.3112
+					}
+				}
+			}
+		}
+	}
+}
+
+# Check for triggers of unplugged.3005 & 3010
+situation_event = {
+	id = unplugged.3902
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		create_variable_if_not_exists = {
+			VARIABLE = same_stage
+			VALUE_IF_CREATED = 0
+		}
+		create_variable_if_not_exists = {
+			VARIABLE = different_stage
+			VALUE_IF_CREATED = 0
+		}
+		create_variable_if_not_exists = {
+			VARIABLE = last_stage
+			VALUE_IF_CREATED = 2
+		}
+		switch = {
+			trigger = current_stage
+			unplugged_identity_stage_1 = {
+				if = {
+					limit = {
+						check_variable = {
+							which = last_stage
+							value = 1
+						}
+					}
+					change_variable = {
+						which = same_stage
+						value = 1
+					}
+				}
+				else = {
+					change_variable = {
+						which = different_stage
+						value = 1
+					}
+					set_variable = {
+						which = same_stage
+						value = 0
+					}
+				}
+				set_variable = {
+					which = last_stage
+					value = 1
+				}
+			}
+			unplugged_identity_stage_2 = {
+				if = {
+					limit = {
+						check_variable = {
+							which = last_stage
+							value = 2
+						}
+					}
+					change_variable = {
+						which = same_stage
+						value = 1
+					}
+				}
+				else = {
+					change_variable = {
+						which = different_stage
+						value = 1
+					}
+					set_variable = {
+						which = same_stage
+						value = 0
+					}
+				}
+				set_variable = {
+					which = last_stage
+					value = 2
+				}
+			}
+			unplugged_identity_stage_3 = {
+				if = {
+					limit = {
+						check_variable = {
+							which = last_stage
+							value = 3
+						}
+					}
+					change_variable = {
+						which = same_stage
+						value = 1
+					}
+				}
+				else = {
+					change_variable = {
+						which = different_stage
+						value = 1
+					}
+					set_variable = {
+						which = same_stage
+						value = 0
+					}
+				}
+				set_variable = {
+					which = last_stage
+					value = 3
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = same_stage
+					value = 48 # We have been in the same stage for more than 4 years
+				}
+			}
+			set_variable = {
+				which = different_stage
+				value = 0
+			}
+			situation_event = {
+				id = unplugged.3005
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = different_stage
+					value > 2 # We have switched stages at least 3 times which means we have been switching directions
+				}
+			}
+			set_variable = {
+				which = different_stage
+				value = 0
+			}
+			situation_event = {
+				id = unplugged.3010
+			}
+		}
+	}
+}
+
+######################
+# POLITICAL DISCOURSE
+######################
+
+# Gatekeeper event (hidden, chance of a nudge to spawn Pop Factions)
+# via 'on_yearly_pulse_country', plus assorted nudges from Unplugged events
+country_event = {
+	id = unplugged.4000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_country_flag = first_faction
+			has_country_flag = unplugged_faction_allowed
+		}
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		unplugged_spawn_factions_check = yes
+	}
+}
+
+# Emerging political issues & structures (visible, guaranteed nudge to spawn Pop Factions)
+# via 'unplugged_spawn_factions_check'
+country_event = {
+	id = unplugged.4005
+	title = unplugged.4005.name
+	desc = unplugged.4005.desc
+	picture = GFX_evt_civil_action
+	show_sound = event_factions
+	location = capital_scope
+	is_triggered_only = yes
+
+	trigger = {
+		NOR = {
+			has_country_flag = first_faction
+			has_country_flag = unplugged_faction_allowed
+		}
+		is_unplugged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		set_country_flag = unplugged_faction_allowed # see 'is_faction_allowed'
+	}
+
+	option = { # not the time!
+		name = unplugged.4005.a
+		custom_tooltip = "unplugged.4005.tt"
+	}
+}
+
+#######################################################
+# Random events following decyberization breakthrough #
+#######################################################
+
+#Failsafe Triggered
+country_event = {
+	id = unplugged.5001
+	title = unplugged.5001.name
+	desc = unplugged.5001.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_5001_triggered }
+	}
+
+	immediate = {
+		set_country_flag = unplugged_5001_triggered
+	}
+
+	option = { # Attempt to remove the failsafes
+		name = unplugged.5001.a
+
+		add_modifier = {
+			modifier = unplugged_rerouted_medical_resources
+			years = 3
+		}
+
+		random_list = {
+			1 = {
+				weighted_random_owned_pop_group = {
+					limit = { has_unplugged_positive_trait = yes }
+					kill_single_pop = yes
+				}
+				custom_tooltip = "unplugged.5001.a.tt1"
+			}
+			2 = {
+				custom_tooltip = "unplugged.5001.a.tt2"
+			}
+		}
+
+	}
+	option = { # Stabilize and provide palliative care
+		name = unplugged.5001.b
+		allow = {
+			has_resource = { type = nanites amount >= 100 }
+		}
+
+		owner.home_planet = {
+			add_modifier = {
+				modifier = planet_new_colony_egalitarian_attraction
+				years = 3
+			}
+		}
+
+	}
+	option = { # Pull the plug
+		name = unplugged.5001.c
+
+		custom_tooltip = "unplugged.5001.c.tt"
+		hidden_effect = {
+			while = {
+				count = 3
+				weighted_random_owned_pop_group = {
+					limit = { has_unplugged_positive_trait = yes }
+					kill_single_pop = yes
+				}
+			}
+		}
+
+	}
+}
+
+#Neural Blocker Removed
+country_event = {
+	id = unplugged.5002
+	title = unplugged.5002.name
+	desc = unplugged.5002.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_5002_triggered }
+	}
+
+	immediate = {
+		set_country_flag = unplugged_5002_triggered
+	}
+
+	option = { # They must be incarcerated
+		name = unplugged.5002.a
+		allow = {
+			has_resource = { type = alloys amount >= 100 }
+			has_resource = { type = minerals amount >= 500 }
+		}
+
+		add_resource = { alloys = -100 }
+		add_resource = { minerals = -500 }
+
+		custom_tooltip = "unplugged.5002.a.tt"
+
+	}
+	option = { # Force must be met by force
+		name = unplugged.5002.b
+
+		owner.home_planet = {
+			add_planet_devastation = 25
+		}
+
+		while = {
+			count = 1
+			random_owned_pop_job = {
+				limit = {
+					has_job_type = enforcer
+				}
+				kill_assigned_pop_amount = {
+					amount = 1
+				}
+			}
+		}
+		while = {
+			count = 1
+			weighted_random_owned_pop_group = {
+				limit = {
+					has_unplugged_positive_trait = yes
+				}
+				kill_single_pop = yes
+			}
+		}
+
+		custom_tooltip = "unplugged.5002.b.tt"
+
+	}
+	option = { # A minor disturbance
+		name = unplugged.5002.c
+
+		owner.home_planet = {
+			add_modifier = {
+				modifier = unplugged_widespread_riots
+				years = 5
+			}
+		}
+
+		custom_tooltip = "unplugged.5002.c.tt"
+
+	}
+}
+
+# Critical Systems Access Lost
+country_event = {
+	id = unplugged.5003
+	title = unplugged.5003.name
+	desc = unplugged.5003.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_5003_triggered }
+	}
+
+	immediate = {
+		set_country_flag = unplugged_5003_triggered
+	}
+
+	option = { #Create a new interface
+		name = unplugged.5003.a
+
+		owner.home_planet = {
+			add_modifier = {
+				modifier = unplugged_building_new_planetary_interface
+				years = 3
+			}
+		}
+
+		custom_tooltip = "unplugged.5003.a.tt"
+
+	}
+	option = { # Attempt to hack the affected systems
+		name = unplugged.5003.b
+		allow = {
+			has_resource = { type = energy amount >= 2500 }
+		}
+
+		add_resource = { energy = -2500 }
+
+		custom_tooltip = "unplugged.5003.b.tt"
+
+	}
+	option = { # Initiate a reboot
+		name = unplugged.5003.c
+		trigger = {
+			owner.home_planet = {
+				solar_system = {
+					any_fleet_in_system = {
+						is_ship_size = research_station
+						exists = owner
+						owner = {
+							is_same_value = from.owner
+						}
+					}
+				}
+			}
+		}
+		allow = {
+			has_resource = { type = influence amount >= 50 }
+		}
+
+		owner.home_planet = {
+			solar_system = {
+				every_fleet_in_system = {
+					limit = {
+						is_ship_size = research_station
+					}
+					destroy_fleet = this
+				}
+			}
+		}
+
+		add_resource = { influence = -50 }
+
+		custom_tooltip = "unplugged.5003.c.tt"
+
+	}
+	option = { # Leave it be
+		name = unplugged.5003.d
+
+		add_modifier = {
+			modifier = unplugged_partial_system_access
+			years = 5
+		}
+
+		custom_tooltip = "unplugged.5003.d.tt"
+
+	}
+}
+
+# Pro-Cyberization Faction Resists Change
+country_event = {
+	id = unplugged.5004
+	title = unplugged.5004.name
+	desc = unplugged.5004.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = unplugged_5004_triggered }
+	}
+
+	immediate = {
+		set_country_flag = unplugged_5004_triggered
+		hidden_effect = {
+			while = {
+				count = 10
+				weighted_random_owned_pop_group = {
+					limit = {
+						is_same_species = owner.species
+						NOT = { has_ethic = "ethic_militarist" }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_militarist
+						AMOUNT = 100
+					}
+				}
+			}
+		}
+	}
+
+	option = { #Fund an intensive campaign
+		name = unplugged.5004.a
+		allow = {
+			has_resource = { type = unity amount >= 50 }
+		}
+
+		add_resource = { unity = -50 }
+
+		hidden_effect = {
+			while = {
+				count = 5
+				weighted_random_owned_pop_group = {
+					limit = {
+						is_same_species = owner.species
+						NOT = { has_ethic = "ethic_egalitarian" }
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_egalitarian
+						AMOUNT = 100
+					}
+				}
+			}
+		}
+
+		custom_tooltip = "unplugged.5004.a.tt"
+
+	}
+	option = { # Intern and persuade faction leaders
+		name = unplugged.5004.b
+
+		hidden_effect = {
+			while = {
+				count = 5
+				weighted_random_owned_pop_group = {
+					limit = {
+						is_same_species = owner.species
+						has_ethic = "ethic_militarist"
+					}
+					pop_group_transfer_ethic = {
+						POP_GROUP = this
+						ETHOS = ethic_authoritarian
+						AMOUNT = 100
+					}
+				}
+			}
+		}
+
+		custom_tooltip = "unplugged.5004.b.tt"
+
+	}
+	option = { # Stay out of it. Free speech prevails
+		name = unplugged.5004.c
+
+		add_modifier = {
+			modifier = unplugged_free_speech_encouraged
+			years = 5
+		}
+
+		custom_tooltip = "unplugged.5004.c.tt"
+
+	}
+}
+
+# Emotion Regulation Chip
+country_event = {
+	id = unplugged.5005
+	title = unplugged.5005.name
+	desc = unplugged.5005.desc
+	picture = GFX_evt_unplugged
+	is_triggered_only = yes
+
+	option = { #Neuroxene. We want less crime
+		name = unplugged.5005.a
+		every_owned_species = {
+			limit = {
+				AND = {
+					has_unplugged_positive_trait = yes
+					has_unplugged_negative_trait = yes
+				}
+			}
+			change_species_characteristics = {
+				add_trait = trait_unplugged_neurocalmed
+			}
+		}
+		custom_tooltip = "unplugged.5005.a.tt"
+	}
+	option = { # Regenol-X. Less time spent regenerating
+		name = unplugged.5005.b
+		every_owned_species = {
+			limit = {
+				AND = {
+					has_unplugged_positive_trait = yes
+					has_unplugged_negative_trait = yes
+				}
+			}
+			change_species_characteristics = {
+				add_trait = trait_unplugged_regenoptimized
+			}
+		}
+		custom_tooltip = "unplugged.5005.b.tt"
+	}
+	option = { # Cognivex. For sharper wits
+		name = unplugged.5005.c
+
+		every_owned_species = {
+			limit = {
+				AND = {
+					has_unplugged_positive_trait = yes
+					has_unplugged_negative_trait = yes
+				}
+			}
+			change_species_characteristics = {
+				add_trait = trait_unplugged_neurosavant
+			}
+		}
+		custom_tooltip = "unplugged.5005.c.tt"
+	}
+}

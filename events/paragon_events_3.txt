@@ -136,9 +136,9 @@ country_event = {
 					randomize_traits = no
 					traits = {
 						0 = leader_trait_carrier_specialization
-						1 = leader_trait_engineer_2
+						1 = leader_trait_engineer
 						2 = subclass_commander_admiral
-						3 = leader_trait_resilient_2
+						3 = leader_trait_resilient
 						4 = leader_trait_survivalist
 						5 = leader_trait_unyielding
 					}
@@ -688,7 +688,7 @@ situation_event = { #Cure not found step 3
 
 	immediate = {
 		event_target:admiral_sharpbeak = {
-			remove_trait = leader_trait_resilient_2
+			remove_trait = leader_trait_resilient
 		}
 	}
 
@@ -1530,7 +1530,7 @@ situation_event = { #Rebuild Skrand species finished
 				}
 			}
 			owner.capital_scope = {
-				create_pop = {
+				create_pop_group = {
 					species = last_created_species
 				}
 			}
@@ -1769,7 +1769,12 @@ country_event = { #Found cryostasis capsule
 	immediate = {
 		set_global_flag = frozen_legendary_leader_found
 		every_country = {
-			limit = { has_special_project = LEGENDARY_LEADER_FIRST_PROJECT }
+			limit = {
+				has_special_project = LEGENDARY_LEADER_FIRST_PROJECT
+				NOT = {
+					is_same_value = root
+				}
+			}
 			abort_special_project = {
 				type = LEGENDARY_LEADER_FIRST_PROJECT
 			}
@@ -1806,7 +1811,12 @@ country_event = { #Got the Leader
 	immediate = {
 		set_global_flag = frozen_legendary_leader_found
 		every_country = {
-			limit = { has_special_project = LEGENDARY_LEADER_FIRST_PROJECT }
+			limit = {
+				has_special_project = LEGENDARY_LEADER_FIRST_PROJECT
+				NOT = {
+					is_same_value = root
+				}
+			}
 			abort_special_project = {
 				type = LEGENDARY_LEADER_FIRST_PROJECT
 			}
@@ -1843,6 +1853,34 @@ country_event = { #Got the Leader
 			}
 		}
 		add_relic = r_wormhole_key_fragment_1
+	}
+
+	option = { #Eat the Baby
+		name = paragon.3105.c
+		trigger = {
+			OR = {
+				has_valid_civic = civic_hive_devouring_swarm
+				AND = {
+					is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+					values_others = no
+				}
+			}
+		}
+		capital_scope = {
+			enable_special_project = {
+				name = "LEGENDARY_LEADER_STUDY_RELIC_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+		add_relic = r_wormhole_key_fragment_1
+		add_resource = { food = 1 }
+		if = {
+			limit = {
+				owner = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+			}
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium TYPE = humanoid }
+		}
 	}
 
 	after = {
@@ -3212,7 +3250,7 @@ country_event = { #End The Story
 		event_target:legendary_lost_leader = {
 			hidden_effect = { unassign_leader = this }
 			remove_all_traits = yes
-			change_leader_class = commander # undercoat: moved to scripted trigger
+			change_leader_class = commander
 			set_skill = 1
 			add_experience = 54000
 		}
@@ -3225,7 +3263,7 @@ country_event = { #End The Story
 		event_target:legendary_lost_leader = {
 			hidden_effect = { unassign_leader = this }
 			remove_all_traits = yes
-			change_leader_class = official # undercoat: moved to scripted trigger
+			change_leader_class = official
 			set_skill = 1
 			add_experience = 54000
 		}
@@ -3238,7 +3276,7 @@ country_event = { #End The Story
 	#	event_target:legendary_lost_leader = {
 	#		hidden_effect = { unassign_leader = this }
 	#		remove_all_traits = yes
-	#		change_leader_class = commander # undercoat: moved to scripted trigger
+	#		change_leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 	#		set_skill = 1
 	#		add_experience = 54000
 	#	}

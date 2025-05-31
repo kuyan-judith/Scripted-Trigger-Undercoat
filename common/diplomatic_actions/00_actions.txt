@@ -107,6 +107,11 @@ action_build_spy_network = {
 						is_country_type = primitive
 						observation_owner_is_actor = yes
 					}
+					AND = {
+						is_galactic_emperor = yes
+						has_country_flag = fallen_empire_hive_control
+						root = { is_galactic_community_member = yes }
+					}
 				}
 				NOR = {
 					has_country_flag = fotd_seperatist_country
@@ -139,7 +144,16 @@ action_build_spy_network = {
 						is_primitive = no
 					}
 				}
-				from = { is_fallen_empire = no }
+				from = {
+					OR = {
+						is_fallen_empire = no
+						AND = {
+							is_galactic_emperor = yes
+							has_country_flag = fallen_empire_hive_control
+							root = { is_galactic_community_member = yes }
+						}
+					}
+				}
 			}
 		}
 	}
@@ -163,6 +177,11 @@ action_manage_spy_network = {
 					AND = {
 						is_country_type = primitive
 						observation_owner_is_actor = yes
+					}
+					AND = {
+						is_galactic_emperor = yes
+						has_country_flag = fallen_empire_hive_control
+						root = { is_galactic_community_member = yes }
 					}
 				}
 			}
@@ -189,7 +208,16 @@ action_manage_spy_network = {
 						is_primitive = no
 					}
 				}
-				from = { is_fallen_empire = no }
+				from = {
+					OR = {
+						is_fallen_empire = no
+						AND = {
+							is_galactic_emperor = yes
+							has_country_flag = fallen_empire_hive_control
+							root = { is_galactic_community_member = yes }
+						}
+					}
+				}
 			}
 		}
 	}
@@ -290,6 +318,12 @@ action_declare_war = {
 					}
 				}
 			}
+		}
+	}
+
+	on_accept = {
+		hidden_effect = {
+			set_country_flag = has_declared_war
 		}
 	}
 }
@@ -471,6 +505,7 @@ action_make_rival = {
 				target = from
 				type = cb_humiliation
 			}
+			set_country_flag = has_declared_rival
 		}
 	}
 }
@@ -540,6 +575,7 @@ action_form_defensive_pact = {
 		# - An Embassy OR the Diplomatic Networking tradition.
 		custom_tooltip = {
 			fail_text = requires_20_trust_or_good
+
 			OR = {
 				opinion_level = {
 					who = from
@@ -551,8 +587,18 @@ action_form_defensive_pact = {
 						value >= 20
 					}
 				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
+					}
+				}
 			}
 		}
+
 		custom_tooltip = {
 			fail_text = requires_embassy_or_diplomatic_networking
 			OR = {
@@ -604,6 +650,15 @@ action_form_non_aggression_pact = {
 						value >= 10
 					}
 				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
+					}
+				}
 			}
 		}
 		custom_tooltip = {
@@ -642,7 +697,6 @@ action_form_commercial_pact = {
 	possible = {
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
 		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
-		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "requires_actor_not_gestalt_consciousness"
 			is_gestalt = no
@@ -651,31 +705,31 @@ action_form_commercial_pact = {
 			fail_text = "requires_recipient_not_gestalt_consciousness"
 			from = { is_gestalt = no }
 		}
-		custom_tooltip = {
-			fail_text = "requires_actor_not_criminal_heritage"
-			is_criminal_syndicate = no
-		}
-		if = {
-			limit = { from = { is_criminal_syndicate = yes } }
-			if = {
-				limit = {
-					has_intel = {
-						who = from
-						intel = civics
-					}
-				}
-				custom_tooltip = {
-					fail_text = requires_recipient_not_criminal_heritage
-					always = no
-				}
-			}
-			else = {
-				custom_tooltip = {
-					fail_text = diplo_action_no_low_intel
-					always = no
-				}
-			}
-		}
+		#custom_tooltip = {
+		#	fail_text = "requires_actor_not_criminal_heritage"
+		#	is_criminal_syndicate = no
+		#}
+		#if = {
+		#	limit = { from = { is_criminal_syndicate = yes } }
+		#	if = {
+		#		limit = {
+		#			has_intel = {
+		#				who = from
+		#				intel = civics
+		#			}
+		#		}
+		#		custom_tooltip = {
+		#			fail_text = requires_recipient_not_criminal_heritage
+		#			always = no
+		#		}
+		#	}
+		#	else = {
+		#		custom_tooltip = {
+		#			fail_text = diplo_action_no_low_intel
+		#			always = no
+		#		}
+		#	}
+		#}
 		custom_tooltip = {
 			fail_text = "federation_actor_no_separate_treaties"
 			NOT = {
@@ -700,6 +754,7 @@ action_form_commercial_pact = {
 				}
 			}
 		}
+		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
 		# Requirements:
 		# - 20 Trust OR Good Opinion
 		# - An Embassy OR the Diplomatic Networking tradition OR Universal Transactions
@@ -714,6 +769,15 @@ action_form_commercial_pact = {
 					trust = {
 						who = root
 						value >= 20
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
 					}
 				}
 				# We don't take into consideration relations' status when dealing with the Mirror Empire
@@ -772,7 +836,6 @@ action_form_research_agreement = {
 	possible = {
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
 		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
-		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "federation_actor_no_separate_treaties"
 			NOT = {
@@ -807,6 +870,7 @@ action_form_research_agreement = {
 				}
 			}
 		}
+		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
 		# Requirements:
 		# - 20 Trust OR Good Opinion
 		# - An Embassy OR the Diplomatic Networking tradition.
@@ -821,6 +885,15 @@ action_form_research_agreement = {
 					trust = {
 						who = root
 						value >= 20
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
 					}
 				}
 			}
@@ -945,6 +1018,15 @@ action_guarantee_independence = {
 						value >= 10
 					}
 				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 5
+						}
+					}
+				}
 			}
 		}
 		custom_tooltip = {
@@ -1030,6 +1112,15 @@ action_support_independence = {
 						value >= 10
 					}
 				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 5
+						}
+					}
+				}
 			}
 		}
 		custom_tooltip = {
@@ -1072,10 +1163,6 @@ action_form_migration_pact = {
 	action_type = positive
 	possible = {
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
-		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
-		barbaric_despoilers_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
-		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
-		pompous_sender_diplomacy_restrictions = yes # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "requires_actor_not_gestalt_consciousness"
 			is_gestalt = no # undercoat: moved to scripted trigger
@@ -1084,6 +1171,7 @@ action_form_migration_pact = {
 			fail_text = "requires_recipient_not_gestalt_consciousness"
 			from = { is_gestalt = no } # undercoat: moved to scripted trigger
 		}
+		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
 		if = {
 			limit = {
 				from = {
@@ -1117,6 +1205,7 @@ action_form_migration_pact = {
 				NOT = { from = { is_same_species_class = root } }
 			}
 		}
+		barbaric_despoilers_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "federation_internal_migration"
 			NOT = {
@@ -1151,6 +1240,8 @@ action_form_migration_pact = {
 				}
 			}
 		}
+		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
+		pompous_sender_diplomacy_restrictions = yes # Undercoat scripted trigger
 		# Requirements:
 		# - 20 Trust OR Good Opinion
 		# - An Embassy OR the Diplomatic Networking tradition.
@@ -1165,6 +1256,15 @@ action_form_migration_pact = {
 					trust = {
 						who = root
 						value >= 20
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
 					}
 				}
 			}
@@ -1221,6 +1321,15 @@ action_offer_federation_association_status = {
 					trust = {
 						who = root
 						value >= 20
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
 					}
 				}
 			}
@@ -1312,6 +1421,15 @@ action_ask_for_federation_association_status = {
 					trust = {
 						who = root
 						value >= 20
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 10
+						}
 					}
 				}
 			}
@@ -1429,8 +1547,8 @@ action_invite_to_federation = {
 				is_playable = yes # undercoat: moved to scripted trigger
 			}
 			custom_tooltip = {
-				fail_text = requires_tradition_the_federation
-				has_tradition = tr_diplomacy_the_federation
+				fail_text = requires_tech_federation_code
+				has_technology = tech_federation_code
 			}
 		}
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
@@ -1449,6 +1567,15 @@ action_invite_to_federation = {
 					trust = {
 						who = root
 						value >= 30
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 15
+						}
 					}
 				}
 			}
@@ -1608,6 +1735,15 @@ action_ask_to_join_federation = {
 						value >= 30
 					}
 				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 15
+						}
+					}
+				}
 			}
 		}
 		custom_tooltip = {
@@ -1764,6 +1900,18 @@ action_close_borders = {
 				}
 			}
 		}
+
+		if = {
+			limit = {
+				from = {
+					has_menace_perk = menp_behemoth_mind_meld
+				}
+			}
+			custom_tooltip = {
+				fail_text = behemoth_no_borders
+				always = no
+			}
+		}
 	}
 	# Undercoat on_action
 	on_accept = {
@@ -1826,7 +1974,7 @@ action_demand_subjugation = {
 			limit = {
 				NOR = {
 					has_menace_perk = menp_intimidation
-					is_feudal_empire = yes # undercoat: moved to scripted trigger
+						is_feudal_empire = yes # undercoat: moved to scripted trigger
 				}
 			}
 			# Requirements:
@@ -1843,6 +1991,15 @@ action_demand_subjugation = {
 						trust = {
 							who = root
 							value >= 50
+						}
+					}
+					AND = {
+						is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+						from = {
+							trust = {
+								who = root
+								value >= 25
+							}
 						}
 					}
 				}
@@ -1919,7 +2076,6 @@ action_ask_to_become_subjugated = {
 
 	possible = {
 		homicidal_diplomacy_restrictions_no_exception = { mirror = yes } # Undercoat scripted trigger
-		pompous_sender_diplomacy_restrictions = yes # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "federation_actor_no_separate_treaties"
 			NOT = {
@@ -1971,6 +2127,7 @@ action_ask_to_become_subjugated = {
 			fail_text = "requires_recipient_not_btc"
 			has_been_declared_crisis = no
 		}
+		pompous_sender_diplomacy_restrictions = yes # Undercoat scripted trigger
 		# Requirements:
 		# - 50 Trust OR Excellent Opinion
 		# - An Embassy OR the Diplomatic Networking tradition.
@@ -1985,6 +2142,15 @@ action_ask_to_become_subjugated = {
 					trust = {
 						who = root
 						value >= 50
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 25
+						}
 					}
 				}
 			}
@@ -2254,7 +2420,6 @@ action_embassy = {
 			NOT = { is_at_war_with = from }
 		}
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
-		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "HAS_RIVALRY"
 			NOR = {
@@ -2262,6 +2427,7 @@ action_embassy = {
 				from = { is_rival = prev }
 			}
 		}
+		pompous_diplomacy_restrictions = yes # Undercoat scripted trigger
 	}
 
 	should_ai_propose = {
@@ -2347,6 +2513,15 @@ action_pledge_secret_fealty = {
 						value >= 50
 					}
 				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 25
+						}
+					}
+				}
 			}
 		}
 		custom_tooltip = {
@@ -2406,6 +2581,15 @@ action_propose_secret_fealty = {
 					trust = {
 						who = root
 						value >= 50
+					}
+				}
+				AND = {
+					is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+					from = {
+						trust = {
+							who = root
+							value >= 25
+						}
 					}
 				}
 			}
@@ -2605,7 +2789,6 @@ action_societal_enlightenment = {
 			from = { NOT = { has_country_flag =  fotd_seperatist_country@root } }
 		}
 		homicidal_diplomacy_restrictions = { mirror = yes } # Undercoat scripted trigger
-		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "requires_actor_not_gestalt_consciousness"
 			is_gestalt = no # undercoat: moved to scripted trigger
@@ -2614,6 +2797,7 @@ action_societal_enlightenment = {
 			fail_text = "requires_recipient_not_gestalt_consciousness"
 			from = { is_gestalt = no } # undercoat: moved to scripted trigger
 		}
+		inwards_perfection_diplomacy_restrictions = { mirror_with_intel = yes } # Undercoat scripted trigger
 		custom_tooltip = {
 			fail_text = "ACTION_CANNOT_INTERFERE_POLICY"
 			OR = {

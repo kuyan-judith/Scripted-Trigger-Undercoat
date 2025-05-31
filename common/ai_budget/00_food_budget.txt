@@ -18,6 +18,179 @@ food_expenditure_buffer = { # Buffer, will not be spent
 	}
 }
 
+food_expenditure_stations_low = {
+	resource = food
+	type = expenditure
+	category = stations
+
+	potential = {
+		country_uses_bio_ships = yes
+		resource_stockpile_compare = { resource = food value < 1500 }
+	}
+
+	weight = {
+		weight = 0.2
+	}
+	desired_max = {
+		base = 150
+	}
+}
+
+food_expenditure_stations_med = {
+	resource = food
+	type = expenditure
+	category = stations
+
+	potential = {
+		country_uses_bio_ships = yes
+		resource_stockpile_compare = { resource = food value >= 1500 }
+		resource_stockpile_compare = { resource = food value < 3000 }
+	}
+
+	weight = {
+		weight = 0.1
+	}
+	desired_max = {
+		base = 150
+	}
+}
+
+food_expenditure_stations_high = {
+	resource = food
+	type = expenditure
+	category = stations
+
+	potential = {
+		country_uses_bio_ships = yes
+		resource_stockpile_compare = { resource = food value >= 3000 }
+	}
+
+	weight = {
+		weight = 0.05
+	}
+	desired_max = {
+		base = 150
+	}
+}
+
+food_expenditure_starbases = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		country_uses_bio_ships = yes
+		NOT = {
+			is_country_type = fallen_empire
+		}
+	}
+
+	weight = {
+		weight = 0.4
+
+		# spend more on starbase upgrades if at fleet cap
+		modifier = {
+			factor = 2
+			used_naval_capacity_percent >= 1.0
+		}
+
+		# Reduce spending on claiming new systems if we have unclaimed planets
+		modifier = {
+			is_machine_empire = yes
+			has_country_resource = { type = food amount < 450 }
+			factor = 0.25 # more aggresive saving for robots since their colony ships cost more
+			ai_colonize_plans > 0
+		}
+		# Reduce spending on claiming new systems if we have unclaimed planets
+		modifier = {
+			is_machine_empire = no
+			has_country_resource = { type = food amount < 750 }
+			factor = 0.50
+			OR = {
+				ai_colonize_plans > 0
+				AND = {
+					is_wilderness_empire = yes
+					ai_terraform_plans > 0
+				}
+			}
+		}
+
+		modifier = {
+			factor = 1.5
+			used_starbase_capacity_percent < 1
+			any_owned_starbase = {
+				can_be_upgraded = yes
+			}
+		}
+		modifier = {
+			factor = 1.5
+			OR = {
+				any_owned_starbase = {
+					NOT = { has_starbase_size = starbase_outpost }
+					can_be_upgraded = yes
+				}
+				any_owned_nonprimary_starbase = {
+					can_be_upgraded = yes
+				}
+			}
+		}
+	}
+	desired_max = {
+		base = 1000
+		modifier = {
+			add = 5000
+			has_ascension_perk = ap_cosmogenesis
+		}
+	}
+}
+
+food_expenditure_starbases_fallen_empires = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		country_uses_bio_ships = yes
+		is_country_type = fallen_empire
+	}
+
+	weight = {
+		weight = 0.2
+	}
+}
+
+food_expenditure_starbases_expand = {
+	resource = food
+	type = expenditure
+	category = starbases
+
+	potential = {
+		country_uses_bio_ships = yes
+		has_ai_expansion_plan = yes
+		highest_threat < 50
+		NOR = {
+			is_fallen_empire = yes # undercoat: moved to scripted trigger
+			
+			OR = {
+				ai_colonize_plans > 0
+				AND = {
+					is_wilderness_empire = yes
+					ai_terraform_plans > 0
+				}
+			}
+		}
+		has_resource = { type = influence amount > 75 }
+	}
+
+	weight = {
+		weight = 0.2
+	}
+
+	desired_min = {
+		base = 300
+	}
+}
+
 food_expenditure_colonies_expand = {
 	resource = food
 	type = expenditure
@@ -37,6 +210,10 @@ food_expenditure_colonies_expand = {
 		has_monthly_income = {
 			resource = food
 			value > 0
+		}
+		OR = {
+			country_uses_bio_ships = no
+			has_resource = { type = food amount > 600 } # Bioship colony ship costs 600 food (900 for hive)
 		}
 	}
 
@@ -58,6 +235,34 @@ food_expenditure_colonies_expand = {
 			add = @colony_cost_high
 			is_tree_of_life_empire = yes # undercoat: moved to scripted trigger
 		}
+		modifier = {
+			add = @colony_cost_base
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = no
+			is_virtual_empire = no
+		}
+		modifier = {
+			add = @colony_cost_low
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = no
+			is_virtual_empire = yes
+		}
+		modifier = {
+			add = @colony_cost_mid
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = yes
+			is_virtual_empire = no
+		}
+		modifier = {
+			add = @colony_cost_base
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = yes
+			is_virtual_empire = yes
+		}
+		modifier = {
+			mult = 2
+			country_uses_bio_ships = yes
+		}
 	}
 
 	desired_max = {
@@ -73,6 +278,34 @@ food_expenditure_colonies_expand = {
 		modifier = {
 			add = @colony_cost_high_max
 			is_tree_of_life_empire = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @colony_cost_base_max
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = no
+			is_virtual_empire = no
+		}
+		modifier = {
+			add = @colony_cost_low_max
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = no
+			is_virtual_empire = yes
+		}
+		modifier = {
+			add = @colony_cost_mid_max
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = yes
+			is_virtual_empire = no
+		}
+		modifier = {
+			add = @colony_cost_base_max
+			country_uses_bio_ships = yes
+			is_guided_sapience_empire = yes
+			is_virtual_empire = yes
+		}
+		modifier = {
+			mult = 2
+			country_uses_bio_ships = yes
 		}
 	}
 }
@@ -116,6 +349,7 @@ food_expenditure_decisions = {
 		is_tree_of_life_empire = yes # undercoat: moved to scripted trigger
 		any_owned_planet = {
 			has_modifier = no_lifetree
+			is_under_colonization = no
 		}
 	}
 
@@ -137,6 +371,14 @@ food_expenditure_buildings = {
 
 	potential = {
 		country_uses_food = yes
+		OR = {
+			has_technology = tech_cloning
+			AND = { # holding_tree_of_life_sapling costs 1000 food
+				is_tree_of_life_empire = yes # undercoat: moved to scripted trigger
+				is_overlord = yes
+			}
+			is_wilderness_empire = yes #Wilderness Buildings can cost food
+		}
 	}
 
 	weight = {
@@ -146,13 +388,18 @@ food_expenditure_buildings = {
 	desired_min = {
 		base = 0
 		modifier = {
-			add = 450
-			has_ascension_perk = ap_engineered_evolution
+			add = 500
+			has_technology = tech_cloning
 		}
 	}
 
 	desired_max = {
 		base = 500
+		modifier = {
+			add = 500
+			is_tree_of_life_empire = yes # undercoat: moved to scripted trigger
+			is_overlord = yes
+		}
 	}
 }
 
@@ -162,21 +409,62 @@ food_expenditure_ships = {
 	category = ships
 
 	potential = {
-		uses_fauna_ship_sizes = yes
+		OR = {
+			uses_fauna_ship_sizes = yes
+			country_uses_bio_ships = yes
+		}
 	}
 
 	weight = {
 		weight = 0.6
-		
-		# spend more minerals building ships while at war
+
+		# spend more food building ships while at war
 		modifier = {
 			factor = 2
 			is_at_war = yes
 		}
-		
-		# spend less alloys on ships if over capacity
+
+		# spend less food on ships if over capacity
 		modifier = {
 			factor = 0.5
+			used_naval_capacity_percent >= 1.0
+		}
+
+		modifier = {
+			factor = 5
+			used_naval_capacity_percent < 1.0
+			OR = {
+				any_neighbor_country = {
+					has_ascension_perk = ap_become_the_crisis
+				}
+				any_country = {
+					is_crisis_faction = yes
+				}
+			}
+		}
+	}
+}
+
+food_expenditure_ship_upgrades = {
+	resource = food
+	type = expenditure
+	category = ship_upgrades
+
+	potential = {
+		country_uses_bio_ships = yes
+		is_at_war = no
+		any_owned_fleet = {
+			controller = { is_same_value = root }
+			can_be_upgraded = yes
+		}
+	}
+
+	weight = {
+		weight = 0.2
+
+		# spend more on ship upgrades if at capacity
+		modifier = {
+			factor = 2.5
 			used_naval_capacity_percent >= 1.0
 		}
 	}
@@ -194,6 +482,7 @@ food_upkeep_ships = {
 				is_dragon_breeder_country = yes
 			}
 			uses_fauna_ship_sizes = yes
+			country_uses_bio_ships = yes
 		}
 	}
 
@@ -213,5 +502,41 @@ food_upkeep_country = { # Covers most other things
 
 	weight = {
 		weight = 0.5
+	}
+}
+
+food_expenditure_megastructures = {
+	resource = food
+	type = expenditure
+	category = megastructures
+
+	potential = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		OR = {
+			is_at_war = no
+			used_naval_capacity_percent > 0.95
+		}
+		OR = {
+			country_uses_bio_ships = yes
+			has_crisis_perk = menp_behemoth_egg
+		}
+		can_build_megastructures = yes
+	}
+
+	weight = {
+		weight = 0.4
+
+		# increase budget if megastructures are unfinished
+		modifier = {
+			factor = 3
+			used_naval_capacity_percent > 0.8
+			any_owned_megastructure = {
+				can_be_upgraded = yes
+			}
+		}
+	}
+
+	desired_max = {
+		base = 20000 # current max alloy cost for a stage
 	}
 }

@@ -15,26 +15,32 @@ event = {
 	trigger = {
 		is_crises_allowed = yes
 		OR = {
-			has_global_flag = endgame_crisis_early_start
-			end_game_years_passed >= 0
-			AND = {
-				is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
-				is_active_resolution = resolution_galactic_threats_committee
-			}
-		}
-		OR = {
-			has_global_flag = endgame_crisis_early_start
-			end_game_years_passed >= 25
-			default_endgame_early_start_triggers = yes
-			any_country = {
-				is_playable = yes # undercoat: moved to scripted trigger
+			AND = { # Super early start prereqs
+				end_game_years_passed >= 0
 				OR = {
-					has_technology = tech_jump_drive_1
-					has_technology = tech_psi_jump_drive_1
+					has_global_flag = endgame_crisis_early_start #From Ultima Vigilis
+					AND = { #Both crisis summoning resolutions active
+						is_active_resolution = 	resolution_galacticstudies_extradimensional_experimentation
+						is_active_resolution = resolution_galactic_threats_committee
+					}
 				}
 			}
-			is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
-			is_active_resolution = resolution_galactic_threats_committee
+			AND = { # Early start
+				end_game_years_passed >= 25
+				OR = {
+					default_endgame_early_start_triggers = yes
+					any_country = {
+						is_playable = yes # undercoat: moved to scripted trigger
+						OR = {
+							has_technology = tech_jump_drive_1
+							has_technology = tech_psi_jump_drive_1
+						}
+					}
+					is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
+					is_active_resolution = resolution_galactic_threats_committee
+				}
+			}
+			end_game_years_passed >= 50 #Regular Start
 		}
 		OR = {
 			NOT = { has_global_flag = galactic_crisis_happened }
@@ -54,16 +60,16 @@ event = {
 		random_country = {
 			limit = { is_country_type = global_event } # global_event country is always around
 
-			if = {
-				limit = { #got to be someone doing jump drives in this case
-					end_game_years_passed < 50
-					default_endgame_early_start_triggers = no
-				}
-				set_timed_country_flag = {
-					flag = only_unbidden_this_time
-					days = 5
-				}
-			}
+			#if = { #Killed for 4.0 If it feels bad, just comment it back in
+			#	limit = { #got to be someone doing jump drives in this case
+			#		end_game_years_passed < 50
+			#		default_endgame_early_start_triggers = no
+			#	}
+			#	set_timed_country_flag = {
+			#		flag = only_unbidden_this_time
+			#		days = 5
+			#	}
+			#}
 			random_list = {
 
 				### Prethoryn Scourge (Swarm)

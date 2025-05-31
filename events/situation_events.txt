@@ -772,10 +772,10 @@ planet_event = {
 	immediate = {
 		owner = { save_event_target_as = saved_owner }
 		hidden_effect = {
-			every_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+			destroy_colony = yes
 		}
 		change_pc = pc_frozen
-		clear_deposits_stu = yes # undercoat: moved to scripted effect
+		clear_deposits_stu = yes
 	}
 
 	option = {
@@ -1517,7 +1517,12 @@ situation_event = {
 	id = situation.596
 	title = "situation.596.name"
 	desc = "situation.596.desc"
-	picture = GFX_evt_space_station
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_space_station
+		BIOSHIP_PICTURE = GFX_evt_bioship_hangar
+	}
 	is_triggered_only = yes
 	location = target
 
@@ -1541,7 +1546,12 @@ situation_event = {
 	id = situation.597
 	title = "situation.597.name"
 	desc = "situation.597.desc"
-	picture = GFX_evt_space_station
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_space_station
+		BIOSHIP_PICTURE = GFX_evt_bioship_hangar
+	}
 	is_triggered_only = yes
 	location = target
 
@@ -1603,7 +1613,7 @@ planet_event = {
 			is_artificial = yes
 		}
 		# checking if majority of pops on the planet are drones
-		pop_percentage = {
+		pop_amount_percentage = {
 			percentage > 0.50
 			limit = {
 				has_trait = trait_machine_unit
@@ -1636,8 +1646,8 @@ planet_event = {
 		name = situation.200.c
 		custom_tooltip = "situation.200.c.tooltip"
 		allow = {
-			any_owned_pop = {
-				is_robot_pop = yes
+			any_owned_pop_group = {
+				is_robot_pop_group = yes
 			}
 			owner = {
 				resource_stockpile_compare = {
@@ -1662,8 +1672,8 @@ planet_event = {
 		name = situation.200.a
 		custom_tooltip = "situation.200.a.tooltip"
 		allow = {
-			any_owned_pop = {
-				is_robot_pop = yes
+			any_owned_pop_group = {
+				is_robot_pop_group = yes
 				is_pop_category = simple_drone
 			}
 			owner = {
@@ -1688,8 +1698,8 @@ planet_event = {
 		name = situation.200.b
 		custom_tooltip = "situation.200.b.tooltip"
 		allow = {
-			any_owned_pop = {
-				is_robot_pop = yes
+			any_owned_pop_group = {
+				is_robot_pop_group = yes
 				is_pop_category = complex_drone
 			}
 			owner = {
@@ -1841,7 +1851,7 @@ situation_event = {
 		}
 		target = {
 			NOT = { has_deposit = d_machine_care_home }
-			any_owned_pop = {
+			any_owned_pop_group = {
 				is_pop_category = bio_trophy
 			}
 		}
@@ -1911,9 +1921,9 @@ situation_event = {
 		target = {
 			# make sure we're not killing the last pop
 			# and ending the colony
-			any_owned_pop = { is_robot_pop = yes }
-			count_owned_pop = {
-				count > 2
+			any_owned_pop_group = { is_robot_pop_group = yes }
+			count_owned_pop_amount = {
+				count >= 300
 			}
 		}
 	}
@@ -1937,7 +1947,7 @@ situation_event = {
 			trigger = current_stage
 			radiation_damage_low = {
 				event_target:broken_drone = {
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			radiation_damage_mid = {
@@ -1946,7 +1956,7 @@ situation_event = {
 				custom_tooltip = situation.210.a.2.tooltip
 				hidden_effect = {
 					event_target:broken_drone = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						kill_single_pop = yes
 					}
 				}
 			 }
@@ -1954,7 +1964,7 @@ situation_event = {
 				custom_tooltip = situation.210.a.3.tooltip
 				hidden_effect = {
 					event_target:broken_drone = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						kill_single_pop = yes
 					}
 				}
 			}
@@ -2177,8 +2187,8 @@ situation_event = {
 				modifier = {
 					add = 15
 					target = {
-						any_owned_pop = {
-							has_job = machine_nurse
+						any_owned_pop_job = {
+							has_job_type = machine_nurse
 						}
 					}
 				}
@@ -2332,8 +2342,8 @@ situation_event = {
 	immediate = {
 		set_situation_flag = vanished_pop
 		target = {
-			random_owned_pop = {
-				limit = { is_robot_pop = yes }
+			random_owned_pop_group = {
+				limit = { is_robot_pop_group = yes }
 				save_event_target_as = disappearing_pop
 			}
 		}
@@ -2353,7 +2363,7 @@ situation_event = {
 		hidden_effect = {
 			situation_event = { id = situation.251 days = 15 random = 90 }
 			event_target:disappearing_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				kill_single_pop = yes
 			}
 
 		}
@@ -2467,10 +2477,13 @@ situation_event = {
 
 	immediate = {
 		target = {
-			create_pop = {
+			create_pop_group = {
 				species = owner_main_species
+				effect = {
+					save_event_target_as = last_created_pop_group
+				}
 			}
-			last_created_pop = {
+			event_target:last_created_pop_group = {
 				modify_species = {
 					add_trait = trait_robot_high_bandwidth
 					add_traits_at_start_of_list = yes
@@ -2514,10 +2527,13 @@ situation_event = {
 
 	immediate = {
 		target = {
-			create_pop = {
+			create_pop_group = {
 				species = owner_main_species
+				effect = {
+					save_event_target_as = last_created_pop_group
+				}
 			}
-			last_created_pop = {
+			event_target:last_created_pop_group = {
 				modify_species = {
 					add_trait = trait_robot_enhanced_memory
 					add_traits_at_start_of_list = yes
@@ -2589,9 +2605,9 @@ situation_event = {
 		name = situation.290.a
 		hidden_effect = {
 			target = {
-				every_owned_pop = {
-					limit = { is_robot_pop = yes }
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				every_owned_pop_group = {
+					limit = { is_robot_pop_group = yes }
+					kill_all_pop = yes
 				}
 			}
 		}
@@ -2601,9 +2617,9 @@ situation_event = {
 		name = situation.290.b
 		hidden_effect = {
 			target = {
-				every_owned_pop = {
-					limit = { is_robot_pop = yes }
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				every_owned_pop_group = {
+					limit = { is_robot_pop_group = yes }
+					kill_all_pop = yes
 				}
 			}
 		}
@@ -2613,9 +2629,9 @@ situation_event = {
 		name = situation.290.c
 		hidden_effect = {
 			target = {
-				every_owned_pop = {
-					limit = { is_robot_pop = yes }
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				every_owned_pop_group = {
+					limit = { is_robot_pop_group = yes }
+					kill_all_pop = yes
 				}
 			}
 		}
@@ -2773,8 +2789,8 @@ planet_event = {
 	specimen = organic_machine_interface_sculpture
 
 	immediate = {
-		random_owned_pop = {
-			limit = { is_robot_pop = no }
+		weighted_random_owned_pop_group = {
+			limit = { is_robot_pop_group = no }
 			save_event_target_as = bio_pop
 		}
 	}
@@ -2886,6 +2902,11 @@ event = {
 					country_event = { id = situation.2002 random = 360 }
 				}
 			}
+		}
+	}
+	after = {
+		every_playable_country = {
+			country_event = { id = timeline.68 } # Timeline Kaleidoscope Crisis
 		}
 	}
 }
@@ -3461,6 +3482,8 @@ situation_event = {
 				OR = {
 					has_active_building = building_energy_grid
 					has_active_building = building_energy_nexus
+					has_active_building = building_bioelectric_stimulator_3
+					has_active_building = building_bioelectric_stimulator_4
 				}
 			}
 		}
@@ -3484,6 +3507,8 @@ situation_event = {
 					OR = {
 						has_active_building = building_energy_grid
 						has_active_building = building_energy_nexus
+						has_active_building = building_bioelectric_stimulator_3
+						has_active_building = building_bioelectric_stimulator_4
 					}
 				}
 				save_event_target_as = infested_planet
@@ -3493,9 +3518,20 @@ situation_event = {
 
 	option = {
 		name = situation.2031.a
-		event_target:infested_planet = {
-			ruin_building = building_energy_grid
-			ruin_building = building_energy_nexus
+		if = {
+			limit = {
+				owner = { is_wilderness_empire = yes }
+			}
+			event_target:infested_planet = {
+				ruin_building = building_bioelectric_stimulator_3
+				ruin_building = building_bioelectric_stimulator_4
+			}
+		}
+		else = {
+			event_target:infested_planet = {
+				ruin_building = building_energy_grid
+				ruin_building = building_energy_nexus
+			}
 		}
 		add_situation_progress = 5
 	}
@@ -4456,27 +4492,27 @@ situation_event = {
 		target = {
 			if = {
 				limit = {
-					any_owned_pop = {
+					any_owned_pop_group = {
 						NOT = { has_trait = trait_hive_mind }
-						is_robot_pop = no
+						is_robot_pop_group = no
 					}
 				}
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					limit = {
 						NOT = { has_trait = trait_hive_mind }
-						is_robot_pop = no
+						is_robot_pop_group = no
 					}
 					root.target = {
-						create_pop = {
+						create_pop_group = {
 							species = prev
 						}
 					}
 				}
 			}
 			else = {
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					root.target = {
-						create_pop = {
+						create_pop_group = {
 							species = prev
 						}
 					}
@@ -5031,9 +5067,6 @@ planet_event = {
 				trigger = has_planet_flag
 				black_hole_horror = {
 					clear_planet_modifiers = yes
-					every_owned_pop = {
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
-					}
 					destroy_colony = yes
 					set_planet_size = 2
 					change_pc = pc_black_hole
@@ -5084,8 +5117,8 @@ situation_event = {#Chamber from the fortress
 	option = {#Let the pop die
 		name = situation.1100.b
 		target = {
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -5112,8 +5145,8 @@ situation_event = {#Chamber from the fortress
 			}
 		}
 		target = {
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
 		}
 		if = {
@@ -5399,8 +5432,15 @@ country_event = {
 	desc = {
 		trigger = {
 			is_gestalt = yes
+			is_wilderness_empire = no
 		}
 		text = situation.1145.desc.gestalt
+	}
+	desc = {
+		trigger = {
+			is_wilderness_empire = yes
+		}
+		text = situation.1145.desc.wilderness
 	}
 	picture = GFX_evt_star_yellow
 	location = capital_star
@@ -5587,9 +5627,6 @@ situation_event = {
 					}
 					hidden_effect = {
 						clear_planet_modifiers = yes
-						every_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
-						}
 						destroy_colony = yes
 					}
 					if = {

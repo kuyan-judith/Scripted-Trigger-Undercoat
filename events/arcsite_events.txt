@@ -352,7 +352,48 @@ fleet_event = {
 					max = @tier2researchmax
 				}
 				fromfrom = {
-					set_archaeology_flag = gene_tech #not particular to Epigentic Triggers
+					set_archaeology_flag = gene_tech #not particular to Epigenetic Triggers
+				}
+			}
+			else_if = {
+				limit = {
+					has_technology = tech_genome_mapping
+				}
+				add_research_option = tech_epigenetic_triggers
+				add_tech_progress = {
+					tech = tech_epigenetic_triggers
+					progress = 0.4
+				}
+				fromfrom = {
+					set_archaeology_flag = gene_tech #not particular to Genome Mapping
+				}
+			}
+			else = {
+				add_research_option = tech_genome_mapping
+				add_tech_progress = {
+					tech = tech_genome_mapping
+					progress = 0.6
+				}
+			}
+		}
+	}
+	option = {
+		exclusive_trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = arcsite.1018.b.evopred
+		owner = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = aquatic }
+			if = {
+				limit = {
+					has_technology = tech_epigenetic_triggers
+				}
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+				fromfrom = {
+					set_archaeology_flag = gene_tech #not particular to Epigenetic Triggers
 				}
 			}
 			else_if = {
@@ -427,6 +468,7 @@ fleet_event = {
 					has_valid_civic = civic_indentured_assets
 					has_valid_civic = civic_private_prospectors
 					is_memorialist_empire = yes
+					is_wilderness_empire = yes
 				}
 			}
 		}
@@ -1054,6 +1096,63 @@ fleet_event = { #Ending - Revelation, Ignorance, Classified
 		}
 	}
 
+	option = {
+		exclusive_trigger = {
+			owner = {
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				check_variable = {
+					which = "studied_engineered_species"
+					value >= 2
+				}
+			}
+		}
+		name = arcsite.2040.evopred.ignorance
+		owner = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = large }
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 4
+				min = 100
+				max = 1000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = 10
+				min = 600
+				max = 5000
+			}
+			add_modifier = {
+				modifier = "engineered_species_ignorance"
+				days = -1
+			}
+		}
+	}
+
+	option = {
+		exclusive_trigger = {
+			owner = {
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				check_variable = {
+					which = "studied_engineered_species"
+					value >= 2
+				}
+			}
+		}
+		name = arcsite.2040.evopred
+		owner = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = large }
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_modifier = {
+				modifier = "engineered_species_ownway"
+				days = -1
+			}
+		}
+	}
 
 	after = {
 		from = {
@@ -1542,6 +1641,18 @@ fleet_event = {
 
 	option = {
 		name = INTERESTING
+	}
+
+	option = {
+		exclusive_trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = arcsite.3035.b.evopred
+		owner = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = avian }
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
 		owner = {
 			switch = {
 				trigger = has_technology
@@ -1590,10 +1701,6 @@ fleet_event = {
 				}
 			}
 		}
-	}
-
-	after = {
-		from = { set_site_progress_locked = no }
 	}
 }
 

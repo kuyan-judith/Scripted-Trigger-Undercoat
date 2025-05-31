@@ -13,7 +13,12 @@ fleet_event = {	# Crashed Ship
 	id = unique.1
 	title = unique.1.title
 	desc = unique.1.desc
-	picture = GFX_evt_big_landing_ship
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_big_landing_ship
+		BIOSHIP_PICTURE = GFX_evt_bioship_landing
+	}
 	show_sound = event_dig_site
 	location = from
 
@@ -120,7 +125,12 @@ fleet_event = {	# Unique Specimens
 			who = this
 		}
 		trigger = {
-			owner = { is_xenophile = no }
+			owner = {
+				NOR = {
+					values_others = yes
+					is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
 		}
 		owner = {
 			add_monthly_resource_mult = {
@@ -150,6 +160,26 @@ fleet_event = {	# Unique Specimens
 		hidden_effect = {
 			from.planet = { save_event_target_as = larion_planet }
 			owner = { country_event = { id = unique.15 } }
+		}
+	}
+
+	option = {
+		name = unique.10.c.evopred
+		trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		owner = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium }
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
 		}
 	}
 }
@@ -250,10 +280,11 @@ country_event = {
 		custom_tooltip = unique.20.a.tt
 		hidden_effect = {
 			event_target:larion_planet = {
-				every_owned_pop = {
-					resettle_pop = {
-						pop = this
-						planet = root.capital_scope
+				every_owned_pop_group = {
+					resettle_pop_group = {
+						POP_GROUP = this
+						PLANET = root.capital_scope
+						PERCENTAGE = 1 # 100%
 					}
 				}
 				create_country = {
@@ -333,7 +364,7 @@ country_event = {
 				}
 				while = {
 					count = 3
-					create_pop = { species = event_target:larion_species }
+					create_pop_group = { species = event_target:larion_species }
 				}
 				set_owner = event_target:larion_country
 				remove_all_buildings = yes
@@ -801,56 +832,56 @@ country_event = { # Animator of Clay - Unworthy
 			every_owned_planet = {
 				if = {
 					limit = {
-						num_pops > 100
+						pop_amount > 10000
 					}
 					while = {
 						count = 10
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						random_owned_pop_group = {
+							kill_single_pop = yes
 						}
 					}
 				}
 				else_if = {
 					limit = {
-						num_pops > 50
+						pop_amount > 5000
 					}
 					while = {
 						count = 5
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						random_owned_pop_group = {
+							kill_single_pop = yes
 						}
 					}
 				}
 				else_if = {
 					limit = {
-						num_pops > 25
+						pop_amount > 2500
 					}
 					while = {
 						count = 3
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						random_owned_pop_group = {
+							kill_single_pop = yes
 						}
 					}
 				}
 				else_if = {
 					limit = {
-						num_pops > 10
+						pop_amount > 1000
 					}
 					while = {
 						count = 2
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						random_owned_pop_group = {
+							kill_single_pop = yes
 						}
 					}
 				}
 				else_if = {
 					limit = {
-						num_pops > 5
+						pop_amount > 500
 					}
 					while = {
 						count = 1
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						random_owned_pop_group = {
+							kill_single_pop = yes
 						}
 					}
 				}
@@ -886,7 +917,6 @@ country_event = { # Animator of Clay - Unworthy
 				while = {
 					count = 3
 					add_district_and_planet_size_if_needed_effect = { district = district_city }
-					add_district_and_planet_size_if_needed_effect = { district = district_industrial }
 					add_district_and_planet_size_if_needed_effect = { district = district_generator }
 					add_district_and_planet_size_if_needed_effect = { district = district_mining }
 				}
@@ -994,11 +1024,10 @@ country_event = { # Animator of Clay - Unworthy
 				}
 				while = {
 					count = 35
-					create_pop = {
+					create_pop_group = {
 						species = event_target:mechanical_root_species
 					}
 				}
-				every_owned_pop = { clear_pop_category = yes }
 			}
 		}
 	}
@@ -1063,45 +1092,8 @@ ship_event = {
 	option = {
 		name = EXCELLENT
 		owner = {
-			if = {
-				limit = {
-					NOT = { has_technology = tech_destroyers }
-				}
-				add_research_option = tech_destroyers
-				add_tech_progress = {
-					tech = tech_destroyers
-					progress = 0.25
-				}
-			}
-			else_if = {
-				limit = {
-					has_technology = tech_destroyers
-					NOT = { has_technology = tech_cruisers }
-				}
-				add_research_option = tech_cruisers
-				add_tech_progress = {
-					tech = tech_cruisers
-					progress = 0.25
-				}
-			}
-			else_if = {
-				limit = {
-					has_technology = tech_cruisers
-					NOT = { has_technology = tech_battleships }
-				}
-				add_research_option = tech_battleships
-				add_tech_progress = {
-					tech = tech_battleships
-					progress = 0.25
-				}
-			}
-			else = {
-				add_monthly_resource_mult = {
-					resource = engineering_research
-					value = @tier3researchreward
-					min = @tier3researchmin
-					max = @tier3researchmax
-				}
+			give_next_regular_ship_tech_effect = {
+				PROGRESS = 0.25
 			}
 		}
 	}

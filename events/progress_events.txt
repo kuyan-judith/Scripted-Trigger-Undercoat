@@ -64,10 +64,17 @@ ship_event = {
 					is_machine_empire = yes
 					is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
 					is_individual_machine = yes
+					is_wilderness_empire = yes
 				}
 			}
 		}
 		text = "progress.2.desc"
+	}
+	desc = {
+		trigger = {
+			owner = { is_wilderness_empire = yes }
+		}
+		text = "progress.2.desc.wilderness"
 	}
 	desc = {
 		trigger = {
@@ -121,6 +128,16 @@ ship_event = {
 		}
 		text = "progress.2.desc.droid"
 	}
+
+	desc = {
+		trigger = {
+			owner = {
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		text = "progress.2.desc.evopred"
+	}
+
 	picture = GFX_evt_alien_planet
 
 	location = from
@@ -365,13 +382,30 @@ ship_event = {
 			}
 		}
 	}
+	option = {
+		exclusive_trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = progress.2.a.evopred
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
 }
 
 # First Colony
 planet_event = {
 	id = progress.3
 	title = "progress.3.name"
-	picture = GFX_evt_big_landing_ship
+	inline_script = {
+		script = events/biogenesis_event_art
+		OWNER = owner
+		REGULAR_PICTURE = GFX_evt_big_landing_ship
+		BIOSHIP_PICTURE = GFX_evt_bioship_landing
+	}
 
 	desc = { # Lithoid origin
 		text = progress.3.desc_lith
@@ -387,6 +421,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -406,6 +441,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -425,6 +461,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -444,6 +481,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -463,6 +501,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -482,6 +521,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -501,6 +541,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -520,6 +561,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -539,6 +581,7 @@ planet_event = {
 			NOR = {
 				owner = {
 					OR = {
+						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
 						is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
@@ -570,14 +613,14 @@ planet_event = {
 		}
 	}
 	desc = { # Storm Chasers Gestalt
-	text = progress.3.desc.storm.gestalt
-	trigger = {
-		owner = {
-			is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
-			is_gestalt = yes
+		text = progress.3.desc.storm.gestalt
+		trigger = {
+			owner = {
+				is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
+				is_gestalt = yes
+			}
 		}
 	}
-}
 
 	# Individual Machines
 	desc = {
@@ -585,6 +628,16 @@ planet_event = {
 		trigger = {
 			owner = {
 				is_individual_machine = yes
+			}
+		}
+	}
+
+	# Biological Hives
+	desc = {
+		text = progress.3.desc_11_hive
+		trigger = {
+			owner = {
+				is_hive_empire = yes
 			}
 		}
 	}
@@ -608,6 +661,7 @@ planet_event = {
 				is_remnants_empire = yes # undercoat: moved to scripted trigger
 				is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
 				has_legendary_leader_origin_active = yes # undercoat: moved to scripted trigger
+				is_wilderness_empire = yes # undercoat: moved to scripted trigger
 				has_country_flag = first_colony
 			}
 			num_owned_planets < 3
@@ -621,10 +675,223 @@ planet_event = {
 	}
 
 	option = {
-		trigger = { NOT = { owner = { is_storm_chasers_empire = yes } } } # undercoat: moved to scripted trigger
-		name = "progress.3.a"
+		trigger = {
+			owner = { is_materialist = yes }
+		}
+		name = "progress.3.materialist"
 		owner = {
-			#end_event_chain = "establish_colony"
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_materialist_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_spiritualist = yes }
+		}
+		name = "progress.3.spiritualist"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_spiritualist_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_militarist = yes }
+		}
+		name = "progress.3.militarist"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_militarist_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_pacifist = yes }
+		}
+		name = "progress.3.pacifist"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = consumer_goods
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_pacifist_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_authoritarian = yes }
+		}
+		name = "progress.3.authoritarian"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_authoritarian_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_xenophile = yes }
+		}
+		name = "progress.3.xenophile"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_xenophile_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_xenophobe = yes }
+		}
+		name = "progress.3.xenophobe"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_xenophobe_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_egalitarian = yes }
+		}
+		name = "progress.3.egalitarian"
+		owner = {
+			if = {
+				limit = {
+					is_lithoid_empire = yes
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = food
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+		}
+		root = {
+			add_modifier = {
+				modifier = planet_new_colony_egalitarian_attraction
+				years = 20
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_hive_empire = yes }
+		}
+		name = "progress.3.gestalt_consciousness_hive"
+		owner = {
+			if = {
+				limit = {
+					is_lithoid_empire = yes
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = food
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			owner = { is_machine_empire = yes }
+		}
+		name = "progress.3.gestalt_consciousness_machine"
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+	option = {
+		exclusive_trigger = { owner = { is_storm_chasers_empire = yes } } # undercoat: moved to scripted trigger
+		name = "progress.3.a.storm"
+		owner = {
 			add_monthly_resource_mult = {
 				resource = engineering_research
 				value = @tier1researchreward
@@ -634,8 +901,8 @@ planet_event = {
 		}
 	}
 	option = {
-		trigger = { owner = { is_storm_chasers_empire = yes } } # undercoat: moved to scripted trigger
-		name = "progress.3.a.storm"
+		exclusive_trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = "progress.3.b.evopred"
 		owner = {
 			#end_event_chain = "establish_colony"
 			add_monthly_resource_mult = {
@@ -646,7 +913,6 @@ planet_event = {
 			}
 		}
 	}
-
 	after = {
 		# This is done to inform the player that they get the research options.
 		if = {
@@ -782,7 +1048,7 @@ country_event = {
 		name = "progress.4.d"
 		trigger = {
 			is_hive_empire = yes
-			NOT = { has_government = "gov_devouring_swarm" }
+			has_devouring_swarm_government = no
 			NOT = { owner = { is_storm_chasers_empire = yes } } # undercoat: moved to scripted trigger
 		}
 	}
@@ -799,7 +1065,7 @@ country_event = {
 	option = {
 		name = "progress.4.f"
 		trigger = {
-			has_government = "gov_devouring_swarm"
+			has_devouring_swarm_government = yes
 			NOT = { owner = { is_storm_chasers_empire = yes } } # undercoat: moved to scripted trigger
 		}
 	}
@@ -830,7 +1096,7 @@ country_event = {
 # First Contact (Primitive)
 country_event = {
 	id = progress.5
-	title = "progress.4.name"
+	title = "progress.5.name"
 	picture = GFX_evt_news_room
 
 	desc = {
@@ -898,6 +1164,7 @@ country_event = {
 		NOR = {
 			is_payback_empire = yes # undercoat: moved to scripted trigger
 			is_broken_shackles_empire = yes # undercoat: moved to scripted trigger
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
 		}
 		event_target:contact_empire = { is_primitive = yes }
 	}
@@ -946,7 +1213,7 @@ country_event = {
 		trigger = {
 			is_hive_empire = yes
 			NOR = {
-				has_government = "gov_devouring_swarm"
+				has_devouring_swarm_government = yes
 				is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -964,7 +1231,7 @@ country_event = {
 	option = {
 		name = "progress.4.f"
 		trigger = {
-			has_government = "gov_devouring_swarm"
+			has_devouring_swarm_government = yes
 		}
 	}
 	option = {
@@ -1085,7 +1352,7 @@ country_event = {
 		trigger = {
 			is_hive_empire = yes
 			NOR = {
-				has_government = "gov_devouring_swarm"
+				has_devouring_swarm_government = yes
 				is_storm_chasers_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -1103,7 +1370,7 @@ country_event = {
 	option = {
 		name = "progress.4.f"
 		trigger = {
-			has_government = "gov_devouring_swarm"
+			has_devouring_swarm_government = yes
 		}
 	}
 	option = {
@@ -1231,12 +1498,9 @@ country_event = {
 			hidden_effect = {
 				while = {
 					count = 5
-					random_owned_pop = {
-						limit = {
-							is_same_species = owner.species
-							NOT = { has_ethic = "ethic_xenophobe" }
-						}
-						pop_change_ethic = "ethic_xenophobe"
+					pop_group_transfer_ethic = {
+						ETHOS = ethic_xenophobe
+						AMOUNT = 100
 					}
 				}
 			}
@@ -1268,13 +1532,17 @@ country_event = {
 			hidden_effect = {
 				while = {
 					count = 5
-					random_owned_pop = {
+					weighted_random_owned_pop_group = {
 						limit = {
 							is_same_species = owner.species
-							NOT = { has_ethic = "ethic_xenophile" }
+							has_any_ethic = yes
+							NOT = { has_ethic = ethic_xenophile }
 						}
-						pop_change_ethic = "ethic_xenophile"
-						set_pop_faction = xenoist
+						pop_group_transfer_ethic = {
+							POP_GROUP = this
+							ETHOS = ethic_xenophile
+							AMOUNT = 100
+						}
 					}
 				}
 			}
@@ -1307,7 +1575,7 @@ country_event = {
 
 	after = {
 		every_owned_planet = {
-			every_owned_pop = {
+			every_owned_pop_group = {
 				force_faction_evaluation = yes
 			}
 		}

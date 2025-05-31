@@ -183,6 +183,22 @@ astral_rift_event = {
 		}
 		finish_astral_rift = yes
 	}
+
+	option = {
+		exclusive_trigger = { explorer = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = astral_rift.2025.b.evopred
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = reptilian }
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier4researchreward
+				min = @tier4researchmin
+				max = @tier4researchmax
+			}
+			astral_thread_large_reward = yes
+		}
+		finish_astral_rift = yes
+	}
 }
 
 astral_rift_event = {
@@ -209,6 +225,17 @@ astral_rift_event = {
 
 	option = {
 		name = astral_rift.2030.a
+	}
+
+	option = {
+		exclusive_trigger = { explorer = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = astral_rift.2030.b.evopred
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = reptilian }
+		}
+	}
+
+	after = {
 		explorer = {
 			add_monthly_resource_mult = {
 				resource = physics_research
@@ -1410,7 +1437,7 @@ astral_rift_event = {
 			}
 		}
 		event_target:genesis_new_species_selected_planet = {
-			create_pop = {
+			create_pop_group = {
 				species = event_target:genesis_new_species_final_step
 			}
 		}
@@ -1929,7 +1956,7 @@ astral_rift_event = {
 			set_skill = 5
 			hidden_effect = {
 				add_trait = subclass_scientist_scholar
-				add_trait = leader_trait_resilient_2
+				add_trait = leader_trait_resilient
 				add_trait = leader_trait_planar_theorist
 				add_trait = leader_trait_psionic
 				add_trait = leader_trait_academic_astral_rift_expert
@@ -1938,6 +1965,15 @@ astral_rift_event = {
 					limit = {
 						owner = {
 							has_tradition = tr_aptitude_champions_of_the_empire
+						}
+					}
+					add_trait = "random_common"
+				}
+				if = {
+					limit = {
+						owner = {
+							has_country_flag = genetic_ascension_stage_1_purity
+							has_genetic_stage_1_tradition = yes
 						}
 					}
 					add_trait = "random_common"
@@ -1967,17 +2003,9 @@ astral_rift_event = {
 		leader = {
 			if = {
 				limit = {
-					NOT = { has_trait = leader_trait_resilient_2 }
+					NOT = { has_trait = leader_trait_resilient }
 				}
-				if = {
-					limit = {
-						NOT = { has_trait = leader_trait_resilient }
-					}
-					add_trait = leader_trait_resilient
-				}
-				else = {
-					add_trait = leader_trait_resilient_2
-				}
+				add_trait = leader_trait_resilient
 			}
 			if = {
 				limit = {
@@ -2656,9 +2684,23 @@ astral_rift_event = {
 		trigger = {
 			has_astral_rift_flag = avian_autopsy
 			has_astral_rift_flag = drone_reactivated
+			explorer = { is_evolutionary_predators_empire = no } # undercoat: moved to scripted trigger
 		}
 		name = astral_rift.2625.b
 		set_next_astral_rift_event = { id = astral_rift.2640 }
+	}
+
+	option = {
+		trigger = {
+			has_astral_rift_flag = avian_autopsy
+			has_astral_rift_flag = drone_reactivated
+			explorer = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+		}
+		name = astral_rift.2625.b.evopred
+		set_next_astral_rift_event = { id = astral_rift.2640 }
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = avian }
+		}
 	}
 
 	after = {
@@ -2818,7 +2860,12 @@ astral_rift_event = {
 
 	option = {
 		trigger = {
-			explorer = { is_organic_species = yes }
+			explorer = {
+				is_organic_species = yes
+				owner = {
+					is_wilderness_empire = no
+				}
+			}
 		}
 		name = astral_rift.2645.a
 		set_next_astral_rift_event = { id = astral_rift.2650 }
@@ -3008,7 +3055,15 @@ astral_rift_event = {
 		name = EXCELLENT
 		explorer = {
 			astral_thread_large_reward = yes
-			add_modifier = { modifier = colonization_drones_modifier }
+			if = {
+				limit = {
+					is_wilderness_empire = no
+				}
+				add_modifier = { modifier = colonization_drones_modifier }
+			}
+			else = {
+				add_modifier = { modifier = colonization_drones_modifier_wilderness }
+			}
 		}
 		finish_astral_rift = yes
 	}
@@ -3086,7 +3141,10 @@ planet_event = {
 	trigger = {
 		has_astral_planes_dlc = yes
 		owner = {
-			has_modifier = colonization_drones_modifier
+			OR = {
+				has_modifier = colonization_drones_modifier
+				has_modifier = colonization_drones_modifier_wilderness
+			}
 		}
 		habitable_planet_not_urban = yes
 	}
@@ -3133,7 +3191,10 @@ planet_event = {
 	trigger = {
 		has_astral_planes_dlc = yes
 		owner = {
-			has_modifier = colonization_drones_modifier
+			OR = {
+				has_modifier = colonization_drones_modifier
+				has_modifier = colonization_drones_modifier_wilderness
+			}
 		}
 		FROM = {
 			OR = {
@@ -3621,6 +3682,22 @@ astral_rift_event = {
 		}
 		finish_astral_rift = yes
 	}
+
+	option = {
+		exclusive_trigger = { explorer = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = astral_rift.2755.b.evopred
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = fungoid }
+			hidden_effect = {
+				set_variable = {
+					which = num_authorized_wind_creatures
+					value = 3
+				}
+			}
+			custom_tooltip = can_incubate_wind_creatures_tt
+		}
+		finish_astral_rift = yes
+	}
 }
 
 astral_rift_event = {
@@ -3642,6 +3719,16 @@ astral_rift_event = {
 		}
 		finish_astral_rift = yes
 	}
+
+	option = {
+		exclusive_trigger = { explorer = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = astral_rift.2760.b.evopred
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = avian }
+			add_modifier = { modifier = extra_dimensional_spores_modifier }
+		}
+		finish_astral_rift = yes
+	}
 }
 
 astral_rift_event = {
@@ -3657,6 +3744,18 @@ astral_rift_event = {
 
 	option = {
 		name = GOOD
+	}
+
+	option = {
+		exclusive_trigger = { explorer = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = astral_rift.2765.b.evopred
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = fungoid }
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = avian }
+		}
+	}
+
+	after = {
 		add_deposit = d_society_10
 		explorer = {
 			add_monthly_resource_mult = {
@@ -3714,6 +3813,18 @@ astral_rift_event = {
 
 	option = {
 		name = astral_rift.2770.a
+	}
+
+	option = {
+		exclusive_trigger = { explorer = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		name = astral_rift.2765.b.evopred
+		explorer = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = fungoid }
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = avian }
+		}
+	}
+
+	after = {
 		explorer = {
 			add_monthly_resource_mult = {
 				resource = food
@@ -4325,9 +4436,9 @@ country_event = {
 		name = astral_rift.2890.a
 	}
 }
-########################################
-# Astral Rift - Cleaning Drones Events #
-########################################
+############################################
+# Astral Rift - Entertainment Nexus Events #
+############################################
 
 namespace = astral_rift
 
@@ -4520,7 +4631,17 @@ astral_rift_event = {
 		ai_chance = {
 			inline_script = astral_rift/rift_difficulty_ai_weight
 		}
+
+		if = {
+			limit = {
+				explorer = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+			}
+			explorer = {
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = mammalian }
+			}
+		}
 	}
+
 	option = {
 		name = astral_rift.2930.b
 		allow = {
@@ -4565,7 +4686,16 @@ astral_rift_event = {
 		ai_chance = {
 			inline_script = astral_rift/rift_difficulty_ai_weight
 		}
+		if = {
+			limit = {
+				explorer = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+			}
+			explorer = {
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium TYPE = reptilian }
+			}
+		}
 	}
+
 	option = {
 		name = astral_rift.2935.b
 		allow = {
@@ -4610,7 +4740,16 @@ astral_rift_event = {
 		ai_chance = {
 			inline_script = astral_rift/rift_difficulty_ai_weight
 		}
+		if = {
+			limit = {
+				explorer = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+			}
+			explorer = {
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium TYPE = lithoid }
+			}
+		}
 	}
+
 	option = {
 		name = astral_rift.2940.b
 		allow = {

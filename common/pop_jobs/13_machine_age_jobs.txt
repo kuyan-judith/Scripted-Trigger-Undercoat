@@ -1,11 +1,18 @@
 # "CYBERNETIC CREED" ORIGIN
 
+
 haruspex = {
 	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_temple
-	clothes_texture_index = 3
-	icon = haruspex
+
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_temple
+			icon = haruspex
+		}
+	}
+
+	tags = { unity research amenities }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -24,7 +31,7 @@ haruspex = {
 	}
 
 	resources = {
-		category = planet_priests
+		category = planet_bureaucrats
 		produces = {
 			unity = 3
 			engineering_research = 2.5
@@ -37,6 +44,7 @@ haruspex = {
 				}
 			}
 			engineering_research = -0.5
+			trade = 2
 		}
 		upkeep = {
 			consumer_goods = 2
@@ -47,7 +55,7 @@ haruspex = {
 		potential = {
 			always = yes
 		}
-		planet_amenities_add = 2
+		planet_amenities_add = 200
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -57,7 +65,7 @@ haruspex = {
 				has_active_building = building_league_offices
 			}
 		}
-		planet_amenities_add = 1
+		planet_amenities_add = 100
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -82,27 +90,6 @@ haruspex = {
 		planet_jobs_worker_produces_mult = 0.02
 	}
 
-	triggered_planet_modifier = {	# Inheriting trade value from Prosperity Preachers
-		potential = {
-			exists = owner
-			owner = {
-				is_megacorp = yes
-			}
-		}
-		# Actual trade value determined in the script value below
-		trade_value_add = 1
-		mult = value:preacher_trade_value
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_councilor = { COUNCILOR = "councilor_dimensional_worship_corporate" } }
-		}
-		trade_value_add = @councilor_dimensional_worship_priest_trade_value
-		mult = value:scripted_modifier_councilor_level_mult|MODIFIER|pop_job_trade_mult|TYPE|councilor_dimensional_worship_corporate|
-	}
-
 	weight = {
 		weight = @specialist_job_weight
 		mult = value:job_weights_multiple_resources_modifier|JOB|haruspex|RESOURCE1|unity|WEIGHT1|0.50|RESOURCE2|engineering_research|WEIGHT2|0.50|
@@ -122,10 +109,6 @@ haruspex = {
 			can_take_servant_job = yes
 		}
 		modifier = {
-			factor = 1.5
-			has_job = haruspex
-		}
-		modifier = {
 			factor = 0.1
 			is_enslaved = yes
 			has_slavery_type = { type = slavery_indentured }
@@ -133,13 +116,29 @@ haruspex = {
 	}
 
 	inline_script = "jobs/automodding_priority_unity"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = specialist
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 technophant = {
 	category = ruler
-	condition_string = RULER_JOB_TRIGGER
-	building_icon = building_citadel_of_faith
-	clothes_texture_index = 1
+
+	swappable_data = {
+		default = {
+			condition_string = RULER_JOB_TRIGGER
+			building_icon = building_citadel_of_faith
+		}
+	}
+
+	tags = { unity research amenities }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -158,7 +157,7 @@ technophant = {
 	}
 
 	resources = {
-		category = planet_priests
+		category = planet_bureaucrats
 		produces = {
 			unity = 6
 			engineering_research = 5
@@ -172,7 +171,7 @@ technophant = {
 		potential = {
 			always = yes
 		}
-		planet_amenities_add = 5
+		planet_amenities_add = 500
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -185,10 +184,6 @@ technophant = {
 			factor = 0.1
 			has_citizenship_rights = no
 			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 5
-			has_job = technophant
 		}
 		# Crisis purge
 		modifier = {
@@ -205,6 +200,16 @@ technophant = {
 	}
 
 	inline_script = "jobs/automodding_priority_unity"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = ruler
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 # COSMOGENESIS
@@ -213,9 +218,35 @@ neural_chip = {
 	category = chip_slave
 	purge = purge_cosmogenesis
 	is_capped_by_modifier = no
-	building_icon = building_lathe_capital
-	clothes_texture_index = 2
-	icon = organic_battery
+
+	swappable_data = {
+		default = {
+			building_icon = building_lathe_capital
+			icon = organic_battery
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = chip_slave
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	tags = { research }
+
+	demotion = {
+		time = 60
+		effect = {
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+				pop_group = this
+				percentage = 0.04
+			}
+		}
+	}
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -238,7 +269,7 @@ neural_chip = {
 			mult = value:num_chip_slave
 		}
 		upkeep = {
-			energy = 4
+			energy = 4.5
 			mult = value:num_chip_slave_halved
 		}
 	}
@@ -252,23 +283,27 @@ neural_chip = {
 
 augmentor = { # Normal empire
 	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_augmentation_center
-	clothes_texture_index = 3
-	icon = augmentor
 
-	desc = { #Note: planet-scope
-		trigger = {
-			is_cyborg_empire = yes
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_augmentation_center
+			icon = augmentor
+			desc = job_augmentor_growth_desc
 		}
-		text = job_augmentor_growth_desc
-	}
-	desc = {
-		trigger = {
-			is_cyborg_empire = no
+
+		swap_type = {
+			desc = job_augmentor_research_desc
+
+			trigger = {
+				is_cyborg_empire = no
+			}
+
+			weight = 1
 		}
-		text = job_augmentor_research_desc
 	}
+
+	tags = { research amenities }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -305,7 +340,7 @@ augmentor = { # Normal empire
 		potential = {
 			always = yes
 		}
-		planet_amenities_add = 5
+		planet_amenities_add = 500
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -313,16 +348,7 @@ augmentor = { # Normal empire
 		potential = {
 			is_cyborg_empire = yes
 		}
-		pop_growth_speed = 0.1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		# Actual trade value determined in the script value below
-		trade_value_add = 1
-		mult = value:augmentor_trade_value
+		logistic_growth_mult = 0.1
 	}
 
 	weight = {
@@ -330,34 +356,43 @@ augmentor = { # Normal empire
 	}
 
 	inline_script = "jobs/automodding_priority_research"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = specialist
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 augmentor_drone = { # Hive empire
 	category = complex_drone
-	condition_string = DRONE_JOB_TRIGGER
-	building_icon = building_augmentation_center
-	clothes_texture_index = 3
-	icon = augmentor
 
-	desc = { #Note: planet-scope
-		trigger = {
-			OR = {
-				is_cyborg_empire = yes
-				can_assemble_hive_pop = yes
-			}
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_augmentation_center
+			icon = augmentor
+			desc = job_augmentor_drone_research_desc
 		}
-		text = job_augmentor_drone_assembly_desc
 
-	}
-	desc = {
-		trigger = {
-			NOR = {
-				is_cyborg_empire = yes
-				can_assemble_hive_pop = yes
+		swap_type = {
+			desc = job_augmentor_drone_assembly_desc
+
+			trigger = {
+				OR = {
+					is_cyborg_empire = yes
+					can_assemble_hive_pop = yes
+				}
 			}
+			weight = 1
 		}
-		text = job_augmentor_drone_research_desc
 	}
+
+	tags = { research amenities }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -401,7 +436,7 @@ augmentor_drone = { # Hive empire
 		potential = {
 			always = yes
 		}
-		planet_amenities_no_happiness_add = 5
+		planet_amenities_no_happiness_add = 500
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -412,8 +447,8 @@ augmentor_drone = { # Hive empire
 				can_assemble_hive_pop = yes
 			}
 		}
-		pop_growth_speed = 0.05
-		planet_pop_assembly_organic_mult = 0.05
+		logistic_growth_mult = 0.05
+		bonus_pop_growth_mult = 0.05
 	}
 
 	weight = {
@@ -439,33 +474,40 @@ augmentor_drone = { # Hive empire
 	}
 
 	inline_script = "jobs/automodding_priority_research"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = complex_drone
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 identity_designer = {
 	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_identity_complex
-	clothes_texture_index = 3
-	icon = identity_designer
 
-	desc = { #Note: planet-scope
-		trigger = {
-			exists = owner
-			owner = {
-				has_country_flag = identity_designer_converter
-			}
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_identity_complex
+			icon = identity_designer
+			desc = job_identity_designer_desc
 		}
-		text = job_identity_designer_converter_desc
-	}
-	desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				NOT = { has_country_flag = identity_designer_converter }
-			}
 
+		swap_type = {
+			desc = job_identity_designer_converter_desc
+
+			trigger = {
+				exists = owner
+				owner = {
+					has_country_flag = identity_designer_converter
+				}
+			}
+			weight = 1
 		}
-		text = job_identity_designer_desc
 	}
 
 	possible_pre_triggers = {
@@ -512,6 +554,59 @@ identity_designer = {
 
 	triggered_planet_modifier = {
 		potential = {
+			exists = owner
+			owner = {
+				exists = ruler
+				ruler = {
+					has_trait = leader_trait_legendary_great_inventor
+				}
+			}
+		}
+		planet_amenities_add = 100
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				exists = ruler
+				ruler = {
+					has_trait = leader_trait_legendary_great_inventor_2
+				}
+			}
+		}
+		planet_amenities_add = 200
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				exists = ruler
+				ruler = {
+					has_trait = leader_trait_legendary_great_inventor_3
+				}
+			}
+		}
+		planet_amenities_add = 300
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_active_tradition = tr_synthetics_prefabricated_components
+			}
+		}
+		planet_amenities_add = 200
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
 			always = yes
 		}
 		# Actual value determined in the script value below
@@ -528,9 +623,15 @@ identity_designer = {
 
 cyberdome_duelist = {
 	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_cyberdome
-	clothes_texture_index = 3
+
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_cyberdome
+		}
+	}
+
+	tags = { unity amenities }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -542,7 +643,7 @@ cyberdome_duelist = {
 	possible_precalc = can_fill_specialist_job
 
 	resources = {
-		category = planet_cyberdome_duelist
+		category = planet_jobs
 		produces = {
 			unity = 2
 		}
@@ -559,7 +660,7 @@ cyberdome_duelist = {
 		potential = {
 			always = yes
 		}
-		planet_amenities_add = 10
+		planet_amenities_add = 1000
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -570,13 +671,29 @@ cyberdome_duelist = {
 	}
 
 	inline_script = "jobs/automodding_priority_amenities"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = specialist
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 cyberdome_spectator = {
 	category = worker
-	condition_string = WORKER_JOB_TRIGGER
-	building_icon = building_cyberdome
-	clothes_texture_index = 2
+
+	swappable_data = {
+		default = {
+			condition_string = WORKER_JOB_TRIGGER
+			building_icon = building_cyberdome
+		}
+	}
+
+	tags = { energy trade}
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -591,15 +708,8 @@ cyberdome_spectator = {
 		category = planet_cyberdome_spectator
 		produces = {
 			energy = 2
+			trade = 2
 		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		trade_value_add = 2
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_trade_mult|
 	}
 
 	weight = {
@@ -607,6 +717,16 @@ cyberdome_spectator = {
 	}
 
 	inline_script = "jobs/automodding_priority_trade"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = worker
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 ## Obsessional Directive Purge
@@ -614,13 +734,30 @@ clip_maximizer = {
 	category = purge
 	purge = purge_clips
 	is_capped_by_modifier = no
-	building_icon = building_factory_1
-	clothes_texture_index = 2
-	icon = purge
+
+	swappable_data = {
+		default = {
+			building_icon = building_factory_1
+			icon = purge
+		}
+	}
+
+	tags = { consumer_goods }
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = purge
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 
 	possible_pre_triggers = {
 		has_owner = yes
 		has_planet = yes
+		is_being_purged = yes
 	}
 
 	possible = {
@@ -645,8 +782,14 @@ clip_maximizer = {
 
 nanotech_research_unit = {
 	category = complex_drone
-	condition_string = DRONE_JOB_TRIGGER
-	building_icon = building_nanolab_1
+
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_nanolab_1
+		}
+	}
+	tags = { research }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -696,9 +839,12 @@ nanotech_research_unit = {
 	}
 
 	triggered_country_modifier = {
-		modifier = {
-			country_naval_cap_add = 1
+		potential = {
+			local_or_sector_governor_has_trait = {
+				TRAIT = leader_trait_academia_recruiter
+			}
 		}
+		country_naval_cap_add = 1
 		mult = planet.modifier:job_researcher_naval_cap_add
 	}
 
@@ -715,13 +861,28 @@ nanotech_research_unit = {
 	}
 
 	inline_script = "jobs/automodding_priority_research"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = complex_drone
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }
 
 nanotech_researcher = {
 	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_nanolab_1
-	clothes_texture_index = 3
+
+	swappable_data = {
+		default = {
+			condition_string = SPECIALIST_JOB_TRIGGER
+			building_icon = building_nanolab_1
+		}
+	}
+	tags = { research }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -771,9 +932,12 @@ nanotech_researcher = {
 	}
 
 	triggered_country_modifier = {
-		modifier = {
-			country_naval_cap_add = 1
+		potential = {
+			local_or_sector_governor_has_trait = {
+				TRAIT = leader_trait_academia_recruiter
+			}
 		}
+		country_naval_cap_add = 1
 		mult = planet.modifier:job_researcher_naval_cap_add
 	}
 
@@ -794,10 +958,6 @@ nanotech_researcher = {
 			can_take_servant_job = yes
 		}
 		modifier = {
-			factor = 1.5
-			has_job = nanotech_researcher
-		}
-		modifier = {
 			factor = 0.8
 			is_enslaved = yes
 			has_slavery_type = { type = slavery_indentured }
@@ -805,4 +965,14 @@ nanotech_researcher = {
 	}
 
 	inline_script = "jobs/automodding_priority_research"
+
+	promotion = {
+		time = @standard_promotion_time
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = specialist
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
 }

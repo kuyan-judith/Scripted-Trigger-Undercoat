@@ -140,7 +140,7 @@ cara_execute_dealexample = {
 		else_if = { limit = { has_country_flag = fleet1dealcost5 }
 			while = {
 				count = 1
-				random_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+				random_owned_pop_group = { kill_single_pop = yes }
 			}
 			custom_tooltip = cost_3pops
 		}
@@ -353,9 +353,9 @@ cara_execute_deal1 = {
 		if = { limit = { has_country_flag = fleet1dealcost1 }
 			while = {
 				count = 1
-				random_owned_pop = {
-					limit = { is_pop_category = specialist }
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				random_owned_pop_group = {
+					limit = { is_specialist_category = yes }
+					kill_single_pop = yes
 				}
 			}
 			custom_tooltip = fleet1cost1_tooltip
@@ -418,7 +418,7 @@ cara_execute_deal1 = {
 		if = {		limit = { has_country_flag = fleet1dealcost6 }
 			while = {
 				count = 1
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						OR = {
 							is_unemployed = yes
@@ -436,7 +436,7 @@ cara_execute_deal1 = {
 							is_unemployed = yes
 						}
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			custom_tooltip = fleet1cost6_tooltip
@@ -700,21 +700,21 @@ cara_generate_deal2 = {
 	# Get planet tar for Deal 9
 	random_owned_planet = {
 		limit = {
-			num_pops > 0
+			pop_amount > 0
 		}
 		weights = {
 			base = 1
 			modifier = {
 				factor = 10
-				num_pops > 15
+				pop_amount > 1500
 			}
 			modifier = {
 				factor = 10
-				num_pops > 30
+				pop_amount > 3000
 			}
 			modifier = {
 				factor = 10
-				num_pops > 50
+				pop_amount > 5000
 			}
 		}
 		set_timed_planet_flag = { flag = fleet2deal9planet days = @fleet2dealdecay }
@@ -771,9 +771,9 @@ cara_execute_deal2 = {
 			custom_tooltip = "fleet2product6_tooltip"
 			while = {
 				count = 1
-				random_owned_pop = {
+				random_owned_pop_group = {
 					species = { save_global_event_target_as = fleet2_recent_pop_species }
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			add_resource = { rare_crystals = 200 }
@@ -789,7 +789,7 @@ cara_execute_deal2 = {
 				limit = {
 					NOT = { is_same_value = root }
 				}
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					limit = {
 						species = {
 							NOR = {
@@ -808,11 +808,9 @@ cara_execute_deal2 = {
 					add_trait = trait_nuumismatic_administration
 					ideal_planet_class = root.capital_scope
 				}
-				while = {
-					count = 2
-					create_pop = {
-						species = last_created_species
-					}
+				create_pop_group = {
+					size = 200
+					species = last_created_species
 				}
 			}
 		}
@@ -918,10 +916,10 @@ cara_execute_deal2 = {
 		}
 		else_if = { limit = { has_country_flag = fleet2deal12 }
 			add_resource = { alloys = -300 }
-			add_resource = { minor_artifacts = 250 }
+			add_resource = { minor_artifacts = 750 }
 			tooltip = {
 				add_resource = { alloys = -300 }
-				add_resource = { minor_artifacts = 250 }
+				add_resource = { minor_artifacts = 750 }
 			}
 		}
 	}
@@ -971,6 +969,7 @@ cara_generate_deal3 = {
 				modifier = {
 					add = 3
 					is_gestalt = yes # undercoat: moved to scripted trigger
+					is_wilderness_empire = no
 				}
 				modifier = {
 					factor = 0
@@ -979,6 +978,7 @@ cara_generate_deal3 = {
 							has_building = building_waste_reprocessing_center
 						}
 						has_country_flag = bought_waste_reprocessing_center
+						is_wilderness_empire = yes
 					}
 				}
 				set_timed_country_flag = { flag = fleet3deal5 days = @fleet3dealdecay }
@@ -1017,9 +1017,9 @@ cara_generate_deal3 = {
 			2 = {
 				modifier = {
 					factor = 0
-					NOR = {
-						is_machine_empire = yes
-						is_synthetic_empire = yes
+					OR = {
+						is_machine_empire = no
+						is_synthetic_empire = no
 					}
 				}
 				modifier = { #Lower chance if you've already gotten this deal once and still have that planet
@@ -1135,12 +1135,12 @@ cara_generate_deal3 = {
 		if = {
 			limit = {
 				any_owned_planet = {
-					free_housing > 3
+					free_housing > 300
 				}
 			}
 			random_owned_planet = {
 				limit = {
-					free_housing > 3
+					free_housing > 300
 				}
 				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
 				save_event_target_as = fleet3deal3planet
@@ -1149,12 +1149,12 @@ cara_generate_deal3 = {
 		else_if = {
 			limit = {
 				any_owned_planet = {
-					free_housing > 2
+					free_housing > 200
 				}
 			}
 			random_owned_planet = {
 				limit = {
-					free_housing > 2
+					free_housing > 200
 				}
 				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
 				save_event_target_as = fleet3deal3planet
@@ -1163,12 +1163,12 @@ cara_generate_deal3 = {
 		else_if = {
 			limit = {
 				any_owned_planet = {
-					free_housing > 1
+					free_housing > 100
 				}
 			}
 			random_owned_planet = {
 				limit = {
-					free_housing > 1
+					free_housing > 100
 				}
 				set_timed_planet_flag = { flag = fleet3deal3planet days = @fleet3dealdecay }
 				save_event_target_as = fleet3deal3planet
@@ -1348,7 +1348,7 @@ cara_generate_deal3 = {
 						factor = 100
 						num_assigned_jobs = {
 							job = technician_drone
-							value > 5
+							value > 500
 						}
 					}
 				}
@@ -1432,7 +1432,7 @@ cara_execute_deal3 = {
 			limit = { has_country_flag = fleet3deal5 }
 			while = {
 				count = 3
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						OR = {
 							is_unemployed = yes
@@ -1450,7 +1450,7 @@ cara_execute_deal3 = {
 							is_unemployed = yes
 						}
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			if = {
@@ -1649,19 +1649,15 @@ cara_execute_deal3 = {
 			event_target:fleet3deal3planet = {
 				if = {
 					limit = { owner = { is_machine_empire = yes } }
-					while = {
-						count = 3
-						create_pop = {
-							species = event_target:racket_robot_species
-						}
+					create_pop_group = {
+						size = 300
+						species = event_target:racket_robot_species
 					}
 				}
 				else = {
-					while = {
-						count = 3
-						create_pop = {
-							species = event_target:racket_species
-						}
+					create_pop_group = {
+						size = 300
+						species = event_target:racket_species
 					}
 				}
 				remove_planet_flag = fleet3deal3planet

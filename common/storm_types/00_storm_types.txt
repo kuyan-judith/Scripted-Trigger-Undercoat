@@ -1,0 +1,795 @@
+# Electric Storm Type
+
+electric_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+	affect_shield_regen = yes
+
+	spawn_weight = 1
+	description = electric_storm_lore_description
+
+	### positive effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+		}
+		planet_jobs_produces_mult = 0.25
+	}
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		modifier = {
+			ship_speed_mult = 1
+		}
+	}
+
+	### negative effects ###
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		modifier = {
+			custom_tooltip = electric_storm_fleet_tt
+		}
+	}
+
+	###
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			electric_storm_add = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			electric_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			electric_storm_remove = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			electric_storm_remove = yes
+		}
+	}
+
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/electric_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_electric_storm"
+	icon = GFX_planetview_storm_electric_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_big_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_big_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 5.0
+	cosmic_storm_galaxy_max_opacity = 0.4
+}
+
+# Particle Storm Type
+
+particle_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+	affect_hp_regen = yes
+	affect_armor_regen = yes
+	affect_shield_regen = yes
+
+	spawn_weight = 1
+	description = particle_storm_lore_description
+
+	### positive effects ###
+
+	### negative effects ###
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		modifier = {
+			ships_upkeep_mult = 0.5
+			custom_tooltip = particle_storm_fleet_tt
+			show_only_custom_tooltip = no
+		}
+	}
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			particle_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			particle_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			particle_storm_add = yes
+		}
+
+		every_system_removed_from_storm= {
+			removed_from_storm_base_effect = yes
+			particle_storm_remove = yes
+		}
+	}
+
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/particle_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_particle_storm"
+	icon = GFX_planetview_storm_particle_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_small_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_small_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 7.0
+	cosmic_storm_galaxy_max_opacity = 0.4
+}
+
+# Gravity Storm Type
+
+gravity_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+
+	spawn_weight = 1
+	description = gravity_storm_lore_description
+
+	### positive effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+		}
+		modifier = {
+			planet_enforcers_produces_mult = 0.5
+			planet_bureaucrats_produces_mult = 0.5
+			planet_entertainers_produces_mult = 0.5
+		}
+	}
+
+	### negative effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+			exists = owner
+			owner = { country_uses_consumer_goods = yes }
+			NOR = {
+				owner = { is_obsessional_directive_empire = yes } # undercoat: moved to scripted trigger
+				owner = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
+			}
+			system_has_negating_storm_building = no
+		}
+		custom_tooltip = gravity_storm_consumer_goods_upkeep_tt
+		planet_farmers_consumer_goods_upkeep_add = 1
+		planet_miners_consumer_goods_upkeep_add = 1
+		planet_technician_consumer_goods_upkeep_add = 1
+		mult = value:storm_resistant_production_multiplier
+	}
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+			exists = owner
+			OR = {
+				owner = { country_uses_consumer_goods = no }
+				OR = {
+					owner = { is_obsessional_directive_empire = yes } # undercoat: moved to scripted trigger
+					owner = { is_servitor_empire = yes } # undercoat: moved to scripted trigger
+				}
+			}
+			system_has_negating_storm_building = no
+		}
+		custom_tooltip = gravity_storm_energy_upkeep_tt
+		planet_farmers_energy_upkeep_add = 1
+		planet_miners_energy_upkeep_add = 1
+		planet_technician_energy_upkeep_add = 1
+		mult = value:storm_resistant_production_multiplier
+	}
+
+	triggered_ship_modifier = {
+		potential = {
+			OR = {
+				is_ship_class = shipclass_military
+				is_ship_class = shipclass_military_special
+			}
+		}
+		custom_tooltip = gravity_storm_ship_tt
+		ship_weapon_damage = @gravity_storm_dmg_malus
+		mult = value:gravity_storm_malus_mult
+	}
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			gravity_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			gravity_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			gravity_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			gravity_storm_remove = yes
+		}
+	}
+
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/gravity_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_gravity_storm"
+	icon = GFX_planetview_storm_gravity_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_small_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_small_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 7.0
+	cosmic_storm_galaxy_max_opacity = 0.5
+}
+
+# Magnetic Storm Type
+
+magnetic_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+
+	spawn_weight = 1
+	description = magnetic_storm_lore_description
+
+	### positive effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+		}
+		modifier = {
+			planet_metallurgists_upkeep_mult = -2
+		}
+	}
+
+	### negative effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			OR = {
+				is_colony = yes
+				is_colonizable = yes
+			}
+			system_has_negating_storm_building = no
+		}
+		planet_building_build_speed_mult = -0.5
+		mult = value:storm_resistant_production_multiplier
+	}
+
+	triggered_system_modifier = {
+		potential = {
+			system_has_negating_storm_building = no
+		}
+		modifier = {
+			starbase_shipyard_build_speed_mult = -0.5
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = no
+			system_has_negating_storm_building = no
+		}
+		modifier = {
+			stations_upkeep_mult = 1
+		}
+	}
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		modifier = {
+			ships_upkeep_mult = 1
+		}
+	}
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			magnetic_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			magnetic_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			magnetic_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			magnetic_storm_remove = yes
+		}
+	}
+
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/magnetic_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_magnetic_storm"
+	icon = GFX_planetview_storm_magnetic_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_small_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_small_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 7.0
+	cosmic_storm_galaxy_max_opacity = 0.4
+}
+
+# Solar Storm Type
+
+solar_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+
+	spawn_weight = 1
+	description = solar_storm_lore_description
+	custom_tooltip = "solar_storm_tt"
+
+	### positive effects ###
+
+	triggered_system_modifier = {
+		potential = {
+			always = yes
+		}
+		station_gatherers_produces_mult = 2
+		station_researchers_produces_mult = 2
+	}
+
+	### negative effects ###
+
+	###
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			solar_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			solar_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			solar_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			solar_storm_remove = yes
+		}
+	}
+
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/solar_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_solar_storm"
+	icon = GFX_planetview_storm_solar_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_small_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_small_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 10.0
+	cosmic_storm_galaxy_max_opacity = 0.4
+}
+
+# Celestial Storm Type
+
+celestial_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+	occlude_system = yes
+
+	spawn_weight = 1
+	description = celestial_storm_lore_description
+
+
+	### positive effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+		}
+		modifier = {
+			planet_farmers_produces_mult = 1
+			planet_miners_produces_mult = 1
+			planet_technician_produces_mult = 1
+		}
+	}
+
+	### negative effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			is_colony = yes
+			system_has_negating_storm_building = no
+		}
+		planet_enforcers_upkeep_mult = 0.5
+		planet_bureaucrats_upkeep_mult = 0.5
+		planet_entertainers_upkeep_mult = 0.5
+		mult = value:storm_resistant_production_multiplier
+	}
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		modifier = {
+			ship_cloaking_strength_add = 10
+			ship_speed_mult = -0.5
+		}
+	}
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			celestial_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			celestial_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			celestial_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			celestial_storm_remove = yes
+		}
+	}
+
+	custom_tooltip = "celestial_storm_tt"
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/celestial_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_celestial_storm"
+	icon = GFX_planetview_storm_celestial_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_small_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_small_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 7.0
+	cosmic_storm_galaxy_max_opacity = 0.5
+}
+
+# Shroud Storm Type
+
+shroud_storm = {
+	inline_script = "cosmic_storms/BaseModifier"
+
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 25
+		MAX_RADIUS = 50
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.02
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @cosmic_storm_base_monthly_devastation
+	}
+
+	spawn_weight = {
+		base = 0.1
+		modifier = {
+			set = 1
+			any_country = {
+				has_country_flag = breached_shroud
+			}
+		}
+	}
+	description = shroud_storm_lore_description
+
+	### positive effects ###
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		modifier = {
+			ship_evasion_mult = 0.1
+		}
+	}
+
+	triggered_fleet_modifier = {
+		potential = {
+			owner = { has_country_flag = breached_shroud }
+		}
+		modifier = {
+			ship_evasion_mult = @shroud_storm_evasion
+			custom_tooltip = "shroud_storm_ship_evasion_modifier_tt"
+		}
+	}
+
+	triggered_fleet_modifier = {
+		potential = {
+			owner = { has_country_flag = breached_shroud }
+		}
+		modifier = {
+			ship_weapon_damage = @shroud_storm_damage
+			custom_tooltip = "shroud_storm_ship_damage_modifier_tt"
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			OR = {
+				is_colony = yes
+				is_colonizable = yes
+			}
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		modifier = {
+			pop_telepath_bonus_workforce_mult = 0.5
+		}
+	}
+
+	### negative effects ###
+
+	triggered_planet_modifier = {
+		potential = {
+			OR = {
+				is_colony = yes
+				is_colonizable = yes
+			}
+			system_has_negating_storm_building = no
+		}
+		planet_stability_mult = -0.2
+		mult = value:storm_resistant_production_multiplier
+	}
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			shroud_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			shroud_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			shroud_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			shroud_storm_remove = yes
+		}
+	}
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/shroud_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_shroud_storm"
+	icon = GFX_planetview_storm_shroud_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_small_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_small_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 10.0
+	cosmic_storm_galaxy_max_opacity = 0.4
+}
+
+
+# Nexus Storm Type
+
+nexus_storm = {
+	inline_script = {
+		script = "cosmic_storms/StormConfig"
+		MIN_RADIUS = 55
+		MAX_RADIUS = 70
+		MIN_RANGE = value:storm_range_min
+		MAX_RANGE = value:storm_range_max
+		STORM_SPEED = 0.1
+		ACTIVATION_PERIOD_IN_MONTHS = 12
+		MONTHLY_ADDED_DEVASTATION = @nexus_storm_monthly_devastation
+	}
+	affect_hp_regen = yes
+	affect_armor_regen = yes
+	affect_shield_regen = yes
+
+	spawn_weight = {
+		base = 0.05
+		modifier = {
+			factor = 0
+			mid_game_years_passed < 1
+		}
+	}
+	description = nexus_storm_lore_description
+
+	triggered_fleet_modifier = {
+		potential = {
+			always = yes
+		}
+		nexus_storm_modifier = 1
+		custom_tooltip = nexus_storm_fleet_tt
+		show_only_custom_tooltip = no
+	}
+
+	on_start = {
+		every_system_within_storm = {
+			added_to_storm_base_effect = yes
+			nexus_storm_add = yes
+		}
+	}
+
+	on_finished = {
+		every_system_within_storm = {
+			removed_from_storm_base_effect = yes
+			nexus_storm_remove = yes
+		}
+	}
+
+	on_moved = {
+		every_system_added_to_storm = {
+			added_to_storm_base_effect = yes
+			nexus_storm_add = yes
+		}
+
+		every_system_removed_from_storm = {
+			removed_from_storm_base_effect = yes
+			nexus_storm_remove = yes
+		}
+	}
+
+	cosmic_storm_texture_path = "gfx/map/storms/NebulaOpacity.dds"
+	cosmic_storm_texture_color_path = "gfx/map/storms/nexus_storm_color.dds"
+	cosmic_storm_event_sprite = "GFX_nexus_storm"
+	icon = GFX_planetview_storm_nexus_modifier_frame
+
+	cosmic_storm_texture_lightning_paths = {
+		"gfx/map/storms/lightning/lightning_big_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_big_storm_02.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_01.dds"
+		"gfx/map/storms/lightning/lightning_mid_storm_02.dds"
+	}
+
+	cosmic_storm_galaxy_lightning_time = 5.0
+	cosmic_storm_galaxy_max_opacity = 0.4
+
+	show_notification = {
+		NOT = { has_country_flag = is_nexus_spawner }
+	}
+}

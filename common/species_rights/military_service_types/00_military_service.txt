@@ -14,6 +14,7 @@ military_service_full = {
 				has_trait = trait_cybernetic
 			}
 		}
+		is_disconnected_drone_pop = no
 	}
 
 	allow = {
@@ -55,29 +56,25 @@ military_service_full = {
 			fail_text = is_servitude_tooltip
 			NOT = { has_citizenship_type = { country = from type = citizenship_robot_servitude } }
 		}
-		if = {
-			limit = {
+		custom_tooltip = {
+			fail_text = too_alien
+			OR = {
+				is_same_species = from
 				from = {
-					is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
+					AND = {
+						is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
+						is_same_species_class = root
+					}
 				}
-				has_trait = trait_mechanical
-			}
-			custom_tooltip = {
-				fail_text = too_alien
-				OR = {
-					is_same_species = from
-					from = {
-						AND = {
-							is_selective_kinship_empire = yes # undercoat: moved to scripted trigger
-							is_same_species_class = root
-						}
+				from = {
+					NOR = {
+						has_ethic = ethic_xenophobe
+						has_ethic = ethic_fanatic_xenophobe
 					}
-					from = {
-						NOR = {
-							has_ethic = ethic_xenophobe
-							has_ethic = ethic_fanatic_xenophobe
-						}
-					}
+				}
+				from = {
+					is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
+					root = { has_trait = trait_mechanical }
 				}
 			}
 		}
@@ -163,6 +160,15 @@ military_service_limited = {
 						has_technology = tech_droid_workers
 					}
 				}
+			}
+		}
+		if = {
+			limit = {
+				is_disconnected_drone_pop = yes
+			}
+			has_citizenship_type = {
+				type = citizenship_exploited_drone
+				country = from
 			}
 		}
 	}

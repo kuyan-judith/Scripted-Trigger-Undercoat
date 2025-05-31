@@ -1,0 +1,257 @@
+
+########################
+# Megastructure Events #
+########################
+
+namespace = megastructures
+
+# Habitat Complex Complete Notification
+country_event = {
+	id = megastructures.10
+
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		create_message = {
+			type = TOAST_HABITAT_BUILT
+			localization =  TOAST_HABITAT_BUILT_DESC
+			days = @toast_message_days
+			target = event_target:target_habitat
+		}
+	}
+}
+
+# # Habitat Orbital Complete Notification
+# country_event = {
+# 	id = megastructures.11
+
+# 	hide_window = yes
+
+# 	is_triggered_only = yes
+
+# 	trigger = {
+# 		has_global_flag = game_started
+# 	}
+
+# 	immediate = {
+# 		create_message = {
+# 			type = TOAST_ORBITAL_BUILT
+# 			localization =  TOAST_ORBITAL_BUILT_DESC
+# 			days = @toast_message_days
+# 			target = event_target:target_planet
+# 		}
+# 	}
+# }
+
+planet_event = {
+	id = megastructures.20
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		last_building_changed = building_hab_major_capital
+	}
+
+	immediate = {
+		increase_habitat_level_effect = yes
+		owner = {
+			if = {
+				limit = {
+					is_void_dweller_empire = yes
+					NOT = { has_technology = tech_habitat_3 }
+					NOT = { has_tech_option = tech_habitat_3 }
+				}
+				add_research_option = tech_habitat_3
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = megastructures.30
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		last_building_changed = building_hab_system_capital
+	}
+
+	immediate = {
+		increase_habitat_level_effect = yes
+	}
+}
+
+# Spawn a energy orbital
+# Fired by on_built by district_hab_energy
+planet_event = {
+	id = megastructures.200
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_habitat = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		solar_system = {
+			random_system_planet = {
+				limit = {
+					is_artificial = no
+					is_astral_scar = no
+					NOT = {
+						has_planet_flag = has_orbital
+					}
+					has_orbital_energy_deposit = yes
+					habitat_owner_has_tech_for_deposit = yes
+				}
+				root.owner = {
+					save_event_target_as = habitat_owner
+				}
+				save_event_target_as = target_planet
+				if = {
+					limit = {
+						OR = {
+							is_moon = yes
+							is_asteroid = yes
+						}
+					}
+					solar_system = {
+						spawn_orbital_effect = {
+							TYPE = minor
+							HABITAT_OWNER = event_target:habitat_owner
+							TARGET_PLANET = event_target:target_planet
+						}
+					}
+				}
+				else = {
+					solar_system = {
+						spawn_orbital_effect = {
+							TYPE = major
+							HABITAT_OWNER = event_target:habitat_owner
+							TARGET_PLANET = event_target:target_planet
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Spawn a mining orbital
+# Fired by on_built by district_hab_mining
+planet_event = {
+	id = megastructures.210
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_habitat = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		solar_system = {
+			random_system_planet = {
+				limit = {
+					is_artificial = no
+					is_astral_scar = no
+					NOT = {
+						has_planet_flag = has_orbital
+					}
+					has_orbital_mining_deposit = yes
+					habitat_owner_has_tech_for_deposit = yes
+				}
+				root.owner = {
+					save_event_target_as = habitat_owner
+				}
+				save_event_target_as = target_planet
+				if = {
+					limit = {
+						OR = {
+							is_moon = yes
+							is_asteroid = yes
+						}
+					}
+					solar_system = {
+						spawn_orbital_effect = {
+							TYPE = minor
+							HABITAT_OWNER = event_target:habitat_owner
+							TARGET_PLANET = event_target:target_planet
+						}
+					}
+				}
+				else = {
+					solar_system = {
+						spawn_orbital_effect = {
+							TYPE = major
+							HABITAT_OWNER = event_target:habitat_owner
+							TARGET_PLANET = event_target:target_planet
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Spawn a research orbital
+# Fired by on_built by district_hab_science
+planet_event = {
+	id = megastructures.220
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_habitat = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		solar_system = {
+			random_system_planet = {
+				limit = {
+					is_artificial = no
+					is_astral_scar = no
+					NOT = {
+						has_planet_flag = has_orbital
+					}
+					has_deposit_for = shipclass_research_station
+					habitat_owner_has_tech_for_deposit = yes
+				}
+				root.owner = {
+					save_event_target_as = habitat_owner
+				}
+				save_event_target_as = target_planet
+				if = {
+					limit = {
+						OR = {
+							is_moon = yes
+							is_asteroid = yes
+						}
+					}
+					solar_system = {
+						spawn_orbital_effect = {
+							TYPE = minor
+							HABITAT_OWNER = event_target:habitat_owner
+							TARGET_PLANET = event_target:target_planet
+						}
+					}
+				}
+				else = {
+					solar_system = {
+						spawn_orbital_effect = {
+							TYPE = major
+							HABITAT_OWNER = event_target:habitat_owner
+							TARGET_PLANET = event_target:target_planet
+						}
+					}
+				}
+			}
+		}
+	}
+}

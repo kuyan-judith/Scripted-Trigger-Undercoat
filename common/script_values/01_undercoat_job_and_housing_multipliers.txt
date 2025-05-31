@@ -1,9 +1,40 @@
+virtuality_jobs_factor_stu = {
+	base = 1
+	modifier = {
+		mult = 1.5
+		exists = owner
+		owner = {
+			has_tradition = tr_virtuality_4
+		}
+	}
+}
+
+ranger_lodge_jobs_stu = {
+	base = 100
+	mult = value:natural_blocker_count
+	modifier = {
+		mult = 2
+		owner_has_resolution = { RES = resolution_ecology_paradise_initiative }
+	}
+	add = 100
+}
+
+housing_habitat_clerk_jobs_stu = {
+	base = 100
+	mult = value:virtuality_jobs_factor_stu
+}
+
 re_capital_roboticists = {
 	base = 0
 	modifier = {
-		add = 1
+		add = 100
 		exists = owner
-		owner = { is_individual_machine = yes }
+		owner = {
+			OR = {
+				is_individual_machine = yes
+				is_machine_empire = yes
+			}
+		}
 	}
 	modifier = {
 		add = $PRIMARY_JOB$
@@ -16,40 +47,52 @@ re_capital_roboticists = {
 }
 
 machine_capital_replicators_stu = {
-	base = 2
+	base = 200
 	modifier = {
-		subtract = 1
+		subtract = 100
 		exists = owner
 		owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 	}
 }
 
-machine_system_capital_replicators_stu = {
-	base = $base|2$
+machine_capital_logistic_drones_stu ={
+	base = $base$
 	modifier = {
-		subtract = 1
+		add = 100
+		owner = { is_machine_assimilator = yes }
+	}
+}
+
+machine_system_capital_replicators_stu = {
+	base = $base|200$
+	modifier = {
+		subtract = 100
 		exists = owner
 		owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
 	}
 	modifier = {
-		add = 1
-		num_sapient_pops >= 10
+		subtract = 100
+		has_modifier = gestation_colony
 	}
 	modifier = {
-		add = 1
-		num_sapient_pops >= 40
+		add = 100
+		sapient_pop_amount >= 1000
+	}
+	modifier = {
+		add = 100
+		sapient_pop_amount >= 4000
 	}
 }
 
 colony_shelter_roboticists_stu = {
 	base = 0
 	modifier = {
-		add = 1
+		add = 100
 		exists = owner
 		owner = { is_individual_machine = yes }
 	}
 	modifier = {
-		add = 1
+		add = 100
 		exists = owner
 		owner = { has_active_tradition = tr_synthetics_prefabricated_components }
 	}
@@ -105,295 +148,65 @@ machine_world_district_jobs_factor_stu = {
 	}
 }
 
-virtuality_jobs_factor_stu = {
+industrial_district_factory_jobs_stu = {
+	base = 1
+	# modifier = {
+	# 	subtract = 1
+	# 	NOT = { uses_district_set = city_world }
+	# 	OR = {
+	# 		has_foundry_designation = yes
+	# 		owner = { country_uses_consumer_goods = no }
+	# 	}
+	# }
+	modifier = {
+		add = 1
+		NOT = { uses_district_set = city_world }
+		has_factory_designation = yes
+	}
+	mult = value:machine_world_district_jobs_factor_stu
+}
+industrial_district_foundry_jobs_stu = {
+	base = 1
+	# modifier = {
+	# 	subtract = 1
+	# 	NOT = { uses_district_set = city_world }
+	# 	has_factory_designation = yes
+	# }
+	modifier = {
+		add = 1
+		NOT = { uses_district_set = city_world }
+		OR = {
+			has_foundry_designation = yes
+			owner = { country_uses_consumer_goods = no }
+		}
+	}
+	mult = value:machine_world_district_jobs_factor_stu
+}
+
+death_priests_jobs_factor_stu = {
 	base = 1
 	modifier = {
-		mult = 1.5
+		mult = 0.5
 		exists = owner
 		owner = {
-			has_tradition = tr_virtuality_4
+			is_death_cult_empire = yes
 		}
 	}
-}
-
-city_district_extra_housing_stu = {
-	base = 0
-	modifier = {
-		add = -1
-		exists = owner
-		owner = {
-			is_agrarian_empire = yes # undercoat: moved to scripted trigger
-		}
-	}
-	modifier = {
-		add = 1
-		exists = owner
-		owner = {
-			OR = {
-				has_active_tradition = tr_prosperity_public_works
-				has_active_tradition = tr_prosperity_extended_hives
-				has_active_tradition = tr_prosperity_optimized_nexus
-			}
-		}
-	}
-	modifier = {
-		add = 1
-		exists = owner
-		owner = {
-			has_technology = tech_housing_1
-		}
-	}
-	modifier = {
-		add = 1
-		exists = owner
-		owner = {
-			has_technology = tech_housing_2
-			is_agrarian_empire = no # undercoat: moved to scripted trigger
-		}
-	}
-}
-
-crashed_slaver_ship_housing_stu = {
-	base = 4
-	add = value:city_district_extra_housing_stu
-}
-
-resort_district_housing_stu = {
-	base = 2
-	add = value:city_district_extra_housing_stu
-}
-
-prison_district_housing_stu = {
-	base = 3
-	add = value:city_district_extra_housing_stu
-}
-
-slave_district_housing_stu = {
-	base = 10
-	add = value:city_district_extra_housing_stu
-}
-
-city_district_housing_stu = {
-	base = 5
-	add = value:city_district_extra_housing_stu
-}
-
-hive_district_housing_stu = {
-	base = 6
-	add = value:city_district_extra_housing_stu
-	modifier = {
-		add = 6
-		is_hive_world = yes
-	}
-}
-
-nexus_district_housing_stu = {
-	base = 6
-	add = value:city_district_extra_housing_stu
-}
-
-industrial_district_housing_stu = {
-	base = 2
-	modifier = {
-		add = 2
-		is_machine_world = yes # undercoat: moved to scripted trigger
-		owner = {
-			is_machine_empire = yes
-			has_ascension_perk = ap_machine_worlds
-		}
-	}
-}
-
-prison_industrial_district_housing_stu = {
-	base = 2
-}
-
-battle_thrall_district_housing_stu = {
-	base = 2
-}
-
-srw_commercial_district_housing_stu = {
-	base = 2
-}
-
-coordination_district_jobs_stu = {
-	base = 2
-	mult = value:machine_world_district_jobs_factor_stu
-	mult = value:virtuality_jobs_factor_stu
-}
-
-coordination_district_housing_stu = {
-	base = 2
-	modifier = {
-		add = 2
-		exists = owner
-		owner = {
-			has_ascension_perk = ap_machine_worlds
-		}
-	}
-}
-
-housing_arcology_housing_stu = {
-	base = 5
-	add = value:city_district_extra_housing_stu
-	mult = 3
-}
-
-foundry_arcology_housing_stu = {
-	base = 10
-}
-
-factory_arcology_housing_stu = {
-	base = 10
-}
-
-leisure_arcology_housing_stu = {
-	base = 10
-}
-
-administrative_arcology_jobs_stu = {
-	base = 6
-	mult = value:virtuality_jobs_factor_stu
-}
-
-administrative_arcology_housing_stu = {
-	base = 10
-}
-
-religious_arcology_jobs_stu = {
-	base = 6
-	mult = value:virtuality_jobs_factor_stu
-}
-
-religious_arcology_housing_stu = {
-	base = 10
 }
 
 rural_district_extra_jobs_stu = {
 	base = 0
 	modifier = {
-		add = 1
+		add = 100
 		exists = owner
 		owner = { is_hive_empire = yes }
 	}
-}
-
-rural_district_extra_housing_stu = {
-	base = 0
-	modifier = {
-		add = 1
-		exists = owner
-		owner = {
-			is_agrarian_empire = yes # undercoat: moved to scripted trigger
-		}
-	}
-	modifier = {
-		add = 1
-		exists = owner
-		owner = {
-			is_machine_empire = yes # undercoat: moved to scripted trigger
-		}
-	}
-	modifier = {
-		add = 3
-		uses_district_set = machine_world
-		exists = owner
-		owner = {
-			is_machine_empire = yes
-			has_ascension_perk = ap_machine_worlds
-		}
-	}
-}
-
-generator_district_jobs_stu = {
-	base = 2
-	mult = value:machine_world_district_jobs_factor_stu
-	add = value:rural_district_extra_jobs_stu
-}
-
-generator_district_housing_stu = {
-	base = 2
-	add = value:rural_district_extra_housing_stu
-}
-
-mining_district_jobs_stu = {
-	base = 2
-	mult = value:machine_world_district_jobs_factor_stu
-	add = value:rural_district_extra_jobs_stu
-}
-
-mining_district_housing_stu = {
-	base = 2
-	add = value:rural_district_extra_housing_stu
-	modifier = {
-		add = 5
-		has_modifier = metal_planet
-	}
-	modifier = {
-		add = owner.value:scripted_modifier_add|MODIFIER|mining_district_housing_add|
-		exists = owner
-	}
-}
-
-farming_district_jobs_stu = {
-	base = 2
-	modifier = {
-		subtract = 1
-		exists = owner
-		owner = { is_anglers_empire = yes }
-		planet = { is_wet = yes }
-	}
-	mult = value:machine_world_district_jobs_factor_stu
-	add = value:rural_district_extra_jobs_stu
-}
-
-farming_district_extra_housing_stu = {
-	base = 0
-	modifier = {
-		add = 1
-		exists = owner
-		owner = {
-			has_technology = tech_housing_agrarian_idyll
-			is_agrarian_empire = yes # undercoat: moved to scripted trigger
-		}
-	}
-}
-
-farming_district_housing_stu = {
-	base = 2
-	add = value:rural_district_extra_housing_stu
-	add = value:farming_district_extra_housing_stu
-}
-
-hab_housing_district_housing_stu = {
-	base = 6
-	modifier = {
-		add = 1
-		exists = owner
-		owner = { has_active_tradition = tr_prosperity_void_works }
-	}
-}
-
-hab_industrial_district_housing_stu = {
-	base = 3
-}
-
-hab_science_district_housing_stu = {
-	base = 3
-}
-
-hab_energy_district_housing_stu = {
-	base = 3
-}
-
-hab_mining_district_housing_stu = {
-	base = 3
+	[[factor]mult = $factor$]
 }
 
 hab_science_district_jobs_stu = {
 	base = 1
 	mult = owner.value:hab_void_dweller_jobs
-	mult = value:virtuality_jobs_factor_stu
 }
 
 hab_energy_district_jobs_stu = {
@@ -408,70 +221,362 @@ hab_mining_district_jobs_stu = {
 	add = value:rural_district_extra_jobs_stu
 }
 
+city_district_extra_housing_stu = {
+	base = 0
+	modifier = {
+		add = -200
+		exists = owner
+		owner = {
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		add = 100
+		exists = owner
+		owner = {
+			has_tradition = tr_prosperity_public_works
+		}
+	}
+	modifier = {
+		add = 100
+		exists = owner
+		owner = {
+			has_technology = tech_housing_1
+		}
+	}
+	modifier = {
+		add = 200
+		exists = owner
+		owner = {
+			has_technology = tech_housing_2
+			is_agrarian_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+}
+
+residential_district_extra_housing_stu = {
+	base = 0
+	modifier = {
+		add = -100
+		exists = owner
+		owner = {
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		add = -100
+		exists = owner
+		owner = {
+			has_tradition = tr_prosperity_public_works
+		}
+	}
+	modifier = {
+		add = -100
+		exists = owner
+		owner = {
+			has_technology = tech_housing_1
+		}
+	}
+	modifier = {
+		add = -100
+		exists = owner
+		owner = {
+			has_technology = tech_housing_2
+			is_agrarian_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+	[[factor]mult = $factor$]
+}
+
+city_district_housing_stu = {
+	base = 1000
+	add = value:city_district_extra_housing_stu
+}
+
+crashed_slaver_ship_housing_stu = {
+	base = 1000
+	add = value:city_district_extra_housing_stu
+}
+
+resort_district_housing_stu = {
+	base = 500
+	add = value:city_district_extra_housing_stu
+}
+
+prison_district_housing_stu = {
+	base = 300
+	add = value:city_district_extra_housing_stu
+}
+
+slave_district_housing_stu = {
+	base = 1000
+	add = value:city_district_extra_housing_stu
+}
+
+resort_attraction_housing_stu = {
+	base = 500
+	add = value:residential_district_extra_housing_stu
+}
+
+hive_district_housing_stu = {
+	base = 1200
+	add = value:residential_district_extra_housing_stu
+	modifier = {
+		add = 600
+		is_hive_world = yes
+	}
+}
+
+nexus_district_extra_housing_stu = {
+	base = 0
+	add = value:residential_district_extra_housing_stu
+	modifier = {
+		add = 100
+		has_modifier = gestation_colony
+	}
+}
+
+nexus_district_housing_stu = {
+	base = 1100
+	add = value:nexus_district_extra_housing_stu
+}
+
+prison_industrial_district_housing_stu = {
+	base = 200
+}
+
+battle_thrall_district_housing_stu = {
+	base = 200
+}
+
+srw_commercial_district_housing_stu = {
+	base = 200
+}
+
+generator_district_housing_stu = {
+	base = 200
+	add = value:rural_district_extra_housing_stu
+}
+
+mining_district_housing_stu = {
+	base = 200
+	add = value:rural_district_extra_housing_stu
+	modifier = {
+		add = 500
+		has_modifier = metal_planet
+	}
+	modifier = {
+		add = owner.value:scripted_modifier_add|MODIFIER|mining_district_housing_add|
+		exists = owner
+	}
+}
+
+farming_district_housing_stu = {
+	base = 200
+	add = value:rural_district_extra_housing_stu
+	modifier = {
+		add = 100
+		exists = owner
+		owner = {
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		add = 200
+		exists = owner
+		owner = {
+			has_technology = tech_housing_agrarian_idyll
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+}
+
+rural_district_extra_housing_stu = {
+	base = 0
+	modifier = {
+		add = 300
+		exists = owner
+		owner = {
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		add = 100
+		exists = owner
+		owner = {
+			is_gestalt = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		add = 3
+		uses_district_set = machine_world
+		exists = owner
+		owner = {
+			is_machine_empire = yes
+			has_ascension_perk = ap_machine_worlds
+		}
+	}
+}
+
+housing_arcology_housing_stu = {
+	base = 1500
+	add = value:residential_district_extra_housing_stu|factor|3|
+}
+
+foundry_arcology_housing_stu = {
+	base = 1000
+}
+
+factory_arcology_housing_stu = {
+	base = 1000
+}
+
+leisure_arcology_housing_stu = {
+	base = 1000
+}
+
+administrative_arcology_jobs_stu = {
+	base = 600
+	mult = value:virtuality_jobs_factor_stu
+}
+
+administrative_arcology_housing_stu = {
+	base = 1000
+}
+
+religious_arcology_jobs_stu = {
+	base = 600
+	mult = value:virtuality_jobs_factor_stu
+	mult = value:death_priests_jobs_factor_stu
+}
+
+religious_arcology_housing_stu = {
+	base = 1000
+}
+
+hab_housing_district_housing_stu = {
+	base = 1000
+	modifier = {
+		add = 100
+		exists = owner
+		owner = { has_active_tradition = tr_prosperity_void_works }
+	}
+}
+
+hab_science_district_housing_stu = {
+	base = 300
+}
+
+hab_energy_district_housing_stu = {
+	base = 300
+}
+
+hab_mining_district_housing_stu = {
+	base = 300
+}
+
+rw_city_district_housing_stu = {
+	base = 2500
+	add = value:residential_district_extra_housing_stu|factor|5|
+}
+
+rw_city_district_jobs_stu = {
+	base = 300
+	modifier = {
+		owner = { has_active_tradition = tr_virtuality_4 }
+		add = 600
+	}
+}
+
+rw_hive_district_housing_stu = {
+	base = 3000
+	add = value:residential_district_extra_housing_stu|factor|5|
+}
+
+rw_nexus_district_housing_stu = {
+	base = 2500
+	add = value:residential_district_extra_housing_stu|factor|5|
+}
+
 rw_rural_district_extra_housing_stu = {
 	base = 0
 	modifier = {
-		add = 5
+		add = 500
 		exists = owner
 		owner = { is_hive_empire = yes }
 	}
 }
 
-rw_city_district_housing_stu = {
-	base = 5
-	add = value:city_district_extra_housing_stu
-	mult = 5
-}
-
-rw_hive_district_housing_stu = {
-	base = 6
-	add = value:city_district_extra_housing_stu
-	mult = 5
-}
-
-rw_nexus_district_housing_stu = {
-	base = 6
-	add = value:city_district_extra_housing_stu
-	mult = 5
+rw_generator_district_housing_stu = {
+	base = 1000
+	add = value:rw_rural_district_extra_housing_stu
 }
 
 rw_generator_district_jobs_stu = {
-	base = 2
-	add = value:rural_district_extra_jobs_stu
-	mult = 5
-}
-
-rw_generator_district_housing_stu = {
-	base = 10
-	add = value:rw_rural_district_extra_housing_stu
+	base = 1000
+	add = value:rural_district_extra_jobs_stu|factor|5|
 }
 
 rw_commercial_district_housing_stu = {
-	base = 10
+	base = 1000
 }
 
-rw_science_district_jobs_stu = {
-	base = 10
-	mult = value:virtuality_jobs_factor_stu
+rw_commercial_district_clerks_stu = {
+	base = 600
+	modifier = {
+		owner = { has_active_tradition = tr_virtuality_4 }
+		add = 600
+	}
 }
 
 rw_science_district_housing_stu = {
-	base = 10
+	base = 1000
+}
+
+rw_science_district_jobs_stu = {
+	base = 1000
+	mult = value:virtuality_jobs_factor_stu
 }
 
 rw_farming_district_jobs_stu = {
-	base = 2
-	add = value:rural_district_extra_jobs_stu
-	mult = 5
+	base = 1000
+	add = value:rural_district_extra_jobs_stu|factor|5|
 }
 
 rw_farming_district_housing_stu = {
-	base = 2
+	base = 1000
 	add = value:rw_rural_district_extra_housing_stu
-	add = value:farming_district_extra_housing_stu
-	mult = 5
+	modifier = {
+		add = 500
+		exists = owner
+		owner = {
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		add = 500
+		exists = owner
+		owner = {
+			has_technology = tech_housing_agrarian_idyll
+			is_agrarian_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
 }
 
 rw_industrial_district_housing_stu = {
-	base = 10
+	base = 1000
 }
+
+wilderness_district_housing_stu = {
+	base = 100
+	modifier = {
+		add = 50
+		owner = { has_tradition = tr_prosperity_public_works }
+	}
+}
+
+
+
+
+
+

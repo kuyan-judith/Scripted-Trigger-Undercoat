@@ -41,28 +41,65 @@ civic_hive_subspace_ephapse = {
 
 	swap_type = {
 		name = civic_hive_subspace_ephapse_fircon
-
+		description = "civic_tooltip_hive_subspace_ephapse_fircon_effects"
 		trigger = { #No scope in empire creation but still checked. Otherwise, country scope is valid and the latter condition is checked
 			has_first_contact_dlc = yes
+			is_wilderness_empire = no
 		}
+	}
+	swap_type = {
+		name = civic_wilderness_subspace_ephapse # in order to show a new flavor description
 		description = "civic_tooltip_hive_subspace_ephapse_fircon_effects"
+		trigger = {
+			has_first_contact_dlc = yes
+			is_wilderness_empire = yes
+		}
+	}
+	swap_type = {
+		name = civic_wilderness_subspace_ephapse # in order to show a new flavor description
+		trigger = {
+			has_first_contact_dlc = no
+			is_wilderness_empire = yes
+		}
 	}
 }
 
 civic_hive_natural_neural_network = {
+	playable = { has_utopia = yes }
 	potential = { inline_script = "governments/conditions/is_hive" } # undercoat: moved to inline script
-	description = "civic_tooltip_natural_neural_network_effects"
+#	description = "civic_tooltip_natural_neural_network_effects"
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
 		base = @ai_civic_default_base_weight
 	}
 	modifier = {
-		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
 		num_tech_alternatives_add = 1
+		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	swap_type = {
+		name = civic_hive_natural_neural_network # in order to show a new flavor description
+		trigger = { is_wilderness_empire = no }
+		modifier = {
+			planet_maintenance_drones_physics_research_produces_add = 0.25
+			planet_maintenance_drones_society_research_produces_add = 0.25
+			planet_maintenance_drones_engineering_research_produces_add = 0.25
+			planet_maintenance_drones_unity_produces_add = 0.25
+			planet_maintenance_drones_minerals_upkeep_add = 0.50
+		}
+	}
+	swap_type = {
+		name = civic_wilderness_natural_neural_network # in order to show a new flavor description
+		trigger = { is_wilderness_empire = yes }
+		modifier = {
+			planet_miners_engineering_research_produces_add = 1
+			planet_technician_physics_research_produces_add = 1
+			planet_farmers_society_research_produces_add = 1
+		}
 	}
 }
 
 civic_hive_ascetic = {
+	playable = { has_utopia = yes }
 	potential = { inline_script = "governments/conditions/is_hive" } # undercoat: moved to inline script
 	random_weight = { base = @civic_default_random_weight }
 	ai_weight = {
@@ -72,6 +109,10 @@ civic_hive_ascetic = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		pop_environment_tolerance = 0.05
 		pop_amenities_usage_no_happiness_mult = -0.15
+	}
+	swap_type = {
+		name = civic_wilderness_ascetic # in order to show a new flavor description
+		trigger = { is_wilderness_empire = yes }
 	}
 }
 
@@ -92,6 +133,10 @@ civic_hive_one_mind = {
 		country_unity_produces_mult = 0.15
 		negative_traits_country = -1
 	}
+	swap_type = {
+		name = civic_wilderness_one_mind # in order to show a new flavor description
+		trigger = { is_wilderness_empire = yes }
+	}
 }
 
 civic_hive_divided_attention = {
@@ -103,6 +148,10 @@ civic_hive_divided_attention = {
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		empire_size_penalty_mult = -0.25
+	}
+	swap_type = {
+		name = civic_wilderness_divided_attention # in order to show a new flavor description
+		trigger = { is_wilderness_empire = yes }
 	}
 }
 
@@ -141,6 +190,7 @@ civic_hive_subsumed_will = {
 		empire_size_pops_mult = -0.20
 		planet_resettlement_unemployed_mult = 0.5
 		country_edict_fund_add = 25
+		pop_resettlement_cost_mult = -0.50
 	}
 }
 
@@ -162,9 +212,14 @@ civic_hive_pooled_knowledge = {
 		country_commander_cap_add = 1
 		country_scientist_cap_add = 1
 	}
+	swap_type = {
+		name = civic_wilderness_pooled_knowledge # in order to show a new flavor description
+		trigger = { is_wilderness_empire = yes }
+	}
 }
 
 civic_hive_devouring_swarm = {
+	playable = { has_utopia = yes }
 	modification = no
 	potential = {
 		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
@@ -184,6 +239,9 @@ civic_hive_devouring_swarm = {
 				value = civic_corporate_guided_sapience
 				value = civic_hive_guided_sapience
 				value = civic_machine_guided_sapience
+			}
+			NOR = {
+				value = civic_hive_bodysnatcher
 			}
 		}
 	}
@@ -212,18 +270,16 @@ civic_hive_devouring_swarm = {
 		name = civic_hive_devouring_swarm_lithoid
 		description = "civic_tooltip_devouring_swarm_lithoid_effects"
 
-		trigger = { #No scope in empire creation but still checked. Otherwise, country scope is valid and the latter condition is checked
-			OR = {
-				AND = {
-					is_scope_valid = no
-					local_human_species_class = LITHOID
-				}
-				AND = {
-					is_scope_valid = yes
-					is_lithoid_empire = yes
-				}
-			}
+		trigger = {
+			is_lithoid_empire = yes
+			is_wilderness_empire = no
 		}
+	}
+
+	swap_type = {
+		name = civic_hive_devouring_swarm_wilderness
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_devouring_swarm_wilderness_effects"
 	}
 }
 
@@ -254,7 +310,7 @@ civic_hive_empath = {
 	description = "civic_tooltip_empath_effects"
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
-		envoys_add = 2
+		official_initial_skill = 1
 		diplo_weight_mult = 0.20
 		country_trust_cap_add = 50
 		envoy_improve_relations_mult = 0.25
@@ -275,9 +331,17 @@ civic_hive_memorialist = {
 		civics = {
 			NOT = { value = civic_hive_devouring_swarm } #Includes Terravore
 		}
+		origin = {
+			NOT = { value = origin_wilderness }
+		}
 	}
 	modifier = {
 		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	swap_type = {
+		name = civic_wilderness_memorialist
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_memorialist_gestalt_effects"
 	}
 }
 
@@ -290,8 +354,9 @@ civic_hive_catalytic_processing = {
 	}
 	possible = {
 		origin = {
-			NOT = {
+			NOR = {
 				value = origin_lithoid
+				value = origin_wilderness
 			}
 		}
 	}
@@ -304,7 +369,7 @@ civic_hive_catalytic_processing = {
 	}
 }
 
-civic_hive_idyllic_bloom = {
+civic_hive_idyllic_bloom = { # Mycorrhizal Ideal
 	modification = no
 	playable = { host_has_dlc = "Plantoids Species Pack" }
 	ai_playable = { host_has_dlc = "Plantoids Species Pack" }
@@ -320,8 +385,9 @@ civic_hive_idyllic_bloom = {
 			}
 		}
 		origin = {
-			NOT = {
+			NOR = {
 				value = origin_void_dwellers
+				value = origin_evolutionary_predators
 			}
 		}
 	}
@@ -330,6 +396,14 @@ civic_hive_idyllic_bloom = {
 	}
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	swap_type = {
+		name = civic_wilderness_idyllic_bloom
+		trigger = {
+			exists = this
+			is_wilderness_empire = yes
+		}
+		description = "civic_tooltip_idyllic_bloom_effects"
 	}
 }
 
@@ -341,7 +415,12 @@ civic_hive_toxic_baths = {
 		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
 	}
 	possible = {
-		origin = { NOT = { value = origin_life_seeded } }
+		origin = {
+			NOR = {
+				value = origin_life_seeded
+				value = origin_wilderness
+			}
+		}
 	}
 	random_weight = {
 		base = @civic_default_random_weight
@@ -389,6 +468,11 @@ civic_hive_ascensionists = {
 			}
 		}
 	}
+	swap_type = {
+		name = civic_wilderness_ascensionists
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_ascensionists_effects"
+	}
 }
 
 civic_hive_cordyceptic_drones = {
@@ -410,6 +494,11 @@ civic_hive_cordyceptic_drones = {
 		attached_space_fauna_component_fire_rate_mult = 0.5
 		space_fauna_ship_damage_mult = 0.1
 	}
+	swap_type = {
+		name = civic_wilderness_cordyceptic_drones
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_cordyceptic_drones"
+	}
 }
 
 civic_hive_stargazers = {
@@ -422,11 +511,22 @@ civic_hive_stargazers = {
 	}
 
 	description = "civic_hive_stargazers_effects"
+	negative_description = "civic_eager_explorers_negative_effects"
 	modification = no
 	potential = {
 		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
 	}
 	possible = {
+		graphical_culture = {
+			NOR = {
+				text = graphical_culture_tooltip_not_biological
+				value = biogenesis_01
+				value = biogenesis_02
+			}
+		}
+		origin = {
+			NOT = { value = origin_wilderness }
+		}
 		civics = {
 			NOR = {
 				value = civic_hive_hyperspace_specialty
@@ -460,17 +560,20 @@ civic_memory_vault_hive = {
 	potential = {
 		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
 	}
-	possible = {
-	}
 	modifier = {
 		restored_node_bonus_skill = 1
 		councilor_gestalt_cognitive_exp_gain = @gestalt_civic_node_xp_rate
 		councilor_skill_add = 1
 		leader_initial_skill = 1
 	}
+	swap_type = {
+		name = civic_memory_vault_wilderness
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_memory_vault_hive_effects"
+	}
 }
 
-civic_hive_upkeep_twister = {
+civic_hive_upkeep_twister = { # Autonomous Drones
 	playable = { host_has_dlc = "Galactic Paragons" }
 	ai_playable = { host_has_dlc = "Galactic Paragons" }
 	random_weight = {
@@ -485,6 +588,11 @@ civic_hive_upkeep_twister = {
 	modifier = {
 		leader_trait_selection_options_add = 1
 		councilor_gestalt_regulatory_exp_gain = @gestalt_civic_node_xp_rate
+	}
+	swap_type = {
+		name = civic_wilderness_upkeep_twister
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_hive_upkeep_twister_effects"
 	}
 }
 
@@ -572,8 +680,9 @@ civic_hive_natural_design = {
 	}
 	possible = {
 		origin = {
-			NOT = {
+			NOR = {
 				value = origin_overtuned
+				value = origin_evolutionary_predators
 			}
 		}
 		civics = {
@@ -584,14 +693,20 @@ civic_hive_natural_design = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		BIOLOGICAL_species_trait_picks_add = 2
 		BIOLOGICAL_species_trait_points_add = 2
-		planet_researchers_society_research_produces_add = 0.5
+		planet_pop_assemblers_society_research_produces_add = 0.5
 	}
 
 	description = civic_hive_tooltip_natural_design_effects
 	negative_description = civic_hive_tooltip_natural_design_negative_effects
+
+	swap_type = {
+		name = civic_hive_wilderness_natural_design
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_tooltip_hive_upkeep_twister_effects"
+	}
 }
 
-civic_hive_guided_sapience = {
+civic_hive_guided_sapience = { # Genesis Symbiotes
 	modification = yes
 	playable = { has_machine_age_dlc = yes }
 	ai_playable = { has_machine_age_dlc = yes }
@@ -600,22 +715,20 @@ civic_hive_guided_sapience = {
 	}
 	potential = {
 		species_archetype = { NOT = { value = MACHINE } }
-		authority = {
-			value = auth_hive_mind
-			NOR = {
-				value = auth_corporate
-				value = auth_machine_intelligence
-			}
-		}
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
 	}
 	possible = {
 		origin = {
-			NOT = { value = origin_life_seeded }
+			NOR = {
+				value = origin_life_seeded
+				value = origin_wilderness
+			}
 		}
 		civics = {
 			NOR = {
 				value = civic_hive_stargazers
 				value = civic_hive_natural_design
+				value = civic_hive_bodysnatcher
 			}
 		}
 	}
@@ -635,25 +748,47 @@ civic_hive_beastmasters = {
 	flags = { first_alien_life amoeba_encountered Story1 Story5 }
 	description = "civic_beastmasters_effects"
 
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
 	possible = {
 		origin = {
 			NOT = {
 				value = origin_progenitor_hive
 			}
 		}
-		civics = { NOT = { value = civic_hive_stargazers } }
+		civics = {
+			NOT = { value = civic_hive_stargazers }
+		}
 	}
 
 	swap_type = {
 		description = "civic_cordyceptic_beastmasters_effects"
 		trigger = {
-			is_scope_valid = yes
+			exists = this
 			is_cordyceptic_empire = yes # undercoat: moved to scripted trigger
+			is_wilderness_empire = no
 		}
 	}
-	potential = {
-		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	swap_type = {
+		name = civic_wilderness_beastmasters
+		description = "civic_beastmasters_effects"
+		trigger = {
+			exists = this
+			is_cordyceptic_empire = no # undercoat: moved to scripted trigger
+			is_wilderness_empire = yes
+		}
 	}
+	swap_type = {
+		name = civic_wilderness_beastmasters
+		description = "civic_cordyceptic_beastmasters_effects"
+		trigger = {
+			exists = this
+			is_cordyceptic_empire = yes # undercoat: moved to scripted trigger
+			is_wilderness_empire = yes
+		}
+	}
+
 	modification = no
 
 	modifier = {
@@ -680,6 +815,11 @@ civic_astrometeorology_hive = {
 	}
 	potential = {
 		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+	possible = {
+		origin = {
+			NOT = { value = origin_wilderness }
+		}
 	}
 	description = civic_astrometeorology_hive_effect_tooltip
 	modifier = {
@@ -717,6 +857,7 @@ civic_environmental_architects_hive = {
 				value = origin_shattered_ring
 				value = origin_lithoid
 				value = origin_machine
+				value = origin_wilderness
 			}
 		}
 	}
@@ -729,7 +870,7 @@ civic_environmental_architects_hive = {
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		planet_jobs_produces_mult = 0.1
-		pop_growth_speed = 0.1
+		founder_species_growth_mult = 0.1
 		planet_pops_upkeep_mult = -0.15
 		planet_clear_blocker_speed_mult = 0.25
 	}
@@ -762,6 +903,178 @@ civic_hive_galactic_curators = {
 		planet_jobs_unity_produces_mult = @galactic_curators_civic_unity_jobs_production_mult
 		ship_anomaly_generation_chance_mult = @galactic_curators_civic_anomaly_discovery_mult
 		specimens_produces_mult = @galactic_curators_civic_specimens_produces_mult
+	}
+}
+
+##########################
+# Hive Mind - BioGenesis #
+##########################
+
+civic_hive_familiar_face = {
+	playable = { has_biogenesis_dlc = yes }
+	ai_playable = { has_biogenesis_dlc = yes }
+	description = "civic_hive_familiar_face_effects"
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+
+	possible = {
+		civics = { NOT = { value = civic_hive_devouring_swarm } }
+	}
+
+	modification = no
+
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+
+	ai_weight = {
+		base = @civic_default_random_weight
+	}
+
+	modifier = {
+		councilor_gestalt_regulatory_exp_gain = @gestalt_civic_node_xp_rate
+		envoys_add = 2
+		spy_network_daily_value_mult = 0.15
+		espionage_operation_difficulty_add = -2
+	}
+
+	swap_type = {
+		name = civic_wilderness_familiar_face
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_hive_familiar_face_effects"
+	}
+}
+
+civic_hive_shared_genetics = {
+	playable = {
+		has_biogenesis_dlc = yes
+	}
+	ai_playable = {
+		has_biogenesis_dlc = yes
+	}
+	description = "civic_hive_shared_genetics_effects"
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+
+	possible = {
+		graphical_culture = {
+			OR = {
+				text = graphical_culture_tooltip_biological
+				value = biogenesis_01
+				value = biogenesis_02
+			}
+		}
+	}
+
+	modification = no
+
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+
+	ai_weight = {
+		base = @civic_default_random_weight
+	}
+
+	modifier = {
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+		starbase_shipyard_build_speed_mult = 0.1
+	}
+
+	swap_type = {
+		name = civic_wilderness_shared_genetics
+		trigger = { is_wilderness_empire = yes }
+		description = "civic_hive_shared_genetics_effects"
+	}
+}
+
+civic_hive_aerospace_adaptation = {
+	playable = {
+		has_biogenesis_dlc = yes
+	}
+	ai_playable = {
+		has_biogenesis_dlc = yes
+	}
+	description = "civic_hive_aerospace_adaptation_effects"
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+
+	possible = {
+		graphical_culture = {
+			OR = {
+				text = graphical_culture_tooltip_biological
+				value = biogenesis_01
+				value = biogenesis_02
+			}
+		}
+	}
+
+	modification = no
+
+	random_weight = {
+		base = @civic_default_random_weight
+	}
+
+	ai_weight = {
+		base = @civic_default_random_weight
+	}
+
+	modifier = {
+		councilor_gestalt_legion_exp_gain = @gestalt_civic_node_xp_rate
+		ship_orbital_bombardment_mult = 1
+	}
+}
+
+civic_hive_bodysnatcher = {
+	playable = {
+		has_biogenesis_dlc = yes
+	}
+	ai_playable = {
+		has_biogenesis_dlc = yes
+	}
+	description = "civic_hive_bodysnatcher_effects"
+	potential = {
+		inline_script = "governments/conditions/is_hive" # undercoat: moved to inline script
+	}
+
+	possible = {
+		civics = {
+			NOR = {
+				value = civic_hive_devouring_swarm
+				value = civic_hive_guided_sapience
+			}
+		}
+		origin = {
+			NOR = {
+				value = origin_necrophage
+				value = origin_evolutionary_predators
+			}
+		}
+	}
+
+	modification = no
+
+	random_weight = {
+		base = @civic_default_random_weight
+		modifier = {
+			factor = 0
+			blocks_disruptive_gameplay = yes
+		}
+	}
+
+	modifier = {
+		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
+		operation_smuggle_pops_difficulty_add = -2
+	}
+
+	has_secondary_species = {	# see game_start.12
+		title = civic_hive_bodysnatcher_secondary_species
+		traits = {
+			trait = trait_hive_mind
+		}
 	}
 }
 
@@ -910,8 +1223,8 @@ civic_machine_builder = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		planet_structures_cost_mult = -0.15
 		planet_building_build_speed_mult = 0.15
-		planet_max_buildings_add = 1
 	}
+	description = "civic_functional_architecture_effects"
 }
 
 civic_machine_factory_overclock = {
@@ -1130,8 +1443,9 @@ civic_machine_maintenance_protocols = {
 	ai_weight = {
 		base = @ai_civic_default_base_weight
 	}
-	description = civic_tooltip_machine_maintenance_protocols_effects
+#	description = civic_tooltip_machine_maintenance_protocols_effects
 	modifier = {
+		planet_maintenance_drones_unity_produces_add = 1
 		planet_jobs_simple_drone_produces_mult = 0.05
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 	}
@@ -1251,6 +1565,7 @@ civic_machine_exploration_protocol = {
 	}
 
 	description = "civic_machine_exploration_protocol_effects"
+	negative_description = "civic_eager_explorers_negative_effects"
 	modification = {
 		add = {
 			has_technology = tech_subspace_drive
@@ -1264,6 +1579,13 @@ civic_machine_exploration_protocol = {
 	}
 
 	possible = {
+		graphical_culture = {
+			NOR = {
+				text = graphical_culture_tooltip_not_biological
+				value = biogenesis_01
+				value = biogenesis_02
+			}
+		}
 		civics = {
 			NOR = {
 				value = civic_machine_terminator
@@ -1461,13 +1783,7 @@ civic_machine_guided_sapience = {
 		base = @civic_rare_random_weight
 	}
 	potential = {
-		authority = {
-			value = auth_machine_intelligence
-			NOR = {
-				value = auth_corporate
-				value = auth_hive_mind
-			}
-		}
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
 		ethics = {
 			value = ethic_gestalt_consciousness
 		}
@@ -1539,6 +1855,14 @@ civic_machine_astromining_drones = {
 	}
 	potential = {
 		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+
+	possible = {
+		origin = {
+			NOT = {
+				value = origin_machine
+			}
+		}
 	}
 
 	random_weight = {
@@ -1649,7 +1973,7 @@ civic_environmental_architects_machine = {
 	modifier = {
 		councilor_gestalt_growth_exp_gain = @gestalt_civic_node_xp_rate
 		planet_jobs_produces_mult = 0.1
-		planet_pop_assembly_mult = 0.1
+		founder_species_growth_mult = 0.1
 		planet_pops_upkeep_mult = -0.15
 		planet_clear_blocker_speed_mult = 0.25
 	}
@@ -1682,5 +2006,31 @@ civic_machine_galactic_curators = {
 		planet_jobs_unity_produces_mult = @galactic_curators_civic_unity_jobs_production_mult
 		ship_anomaly_generation_chance_mult = @galactic_curators_civic_anomaly_discovery_mult
 		specimens_produces_mult = @galactic_curators_civic_specimens_produces_mult
+	}
+}
+
+civic_machine_stalwart_network = {
+	playable = { has_biogenesis_dlc = yes }
+	ai_playable = { has_biogenesis_dlc = yes }
+	potential = {
+		inline_script = "governments/conditions/is_machine" # undercoat: moved to inline script
+	}
+
+	modification = yes
+
+	random_weight = {
+		base = @civic_rare_random_weight
+	}
+
+	ai_weight = {
+		base = @civic_rare_random_weight
+	}
+
+	modifier = {
+		defensive_stations_tracking_add = 10
+		starbases_upkeep_mult = -0.1
+		ship_home_territory_fire_rate_mult = 0.10
+		ship_disengage_opportunities_add = 1
+		councilor_gestalt_legion_exp_gain = @gestalt_civic_node_xp_rate
 	}
 }

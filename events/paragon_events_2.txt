@@ -25,7 +25,6 @@ country_event = {
 							OR = {
 								has_trait = leader_trait_corsair
 								has_trait = leader_trait_corsair_2
-								has_trait = leader_trait_corsair_3
 							}
 							ROOT.FROM = { # Owner of losing ship.
 								is_default_or_fallen = yes
@@ -53,7 +52,7 @@ country_event = {
 					# Crusader / Crusader II
 					if = {
 						limit = {
-							has_trait_tier1or2or3 = {
+							has_trait_tier1or2 = {
 								TRAIT = leader_trait_crusader
 							}
 							ROOT.FROM = { # Owner of losing ship.
@@ -82,7 +81,6 @@ country_event = {
 							OR = {
 								has_trait = leader_trait_shipbreaker
 								has_trait = leader_trait_shipbreaker_2
-								has_trait = leader_trait_shipbreaker_3
 							}
 							ROOT.FROM = { # Owner of losing fleet.
 								is_default_or_fallen = yes
@@ -113,7 +111,6 @@ country_event = {
 							OR = {
 								has_trait = leader_trait_juryrigger
 								has_trait = leader_trait_juryrigger_2
-								has_trait = leader_trait_juryrigger_3
 							}
 						}
 						ROOT.FROMFROM = {
@@ -158,7 +155,7 @@ country_event = {
 							ROOT = {
 								add_intel = {
 									who = root.from
-									amount = 10
+									amount = 15
 								}
 							}
 						}
@@ -166,18 +163,6 @@ country_event = {
 							limit = {
 								exists = from
 								has_trait = leader_trait_interrogator_2
-							}
-							ROOT = {
-								add_intel = {
-									who = root.from
-									amount = 20
-								}
-							}
-						}
-						if = {
-							limit = {
-								exists = from
-								has_trait = leader_trait_interrogator_3
 							}
 							ROOT = {
 								add_intel = {
@@ -292,7 +277,6 @@ country_event = {
 							OR = {
 								has_trait = leader_trait_crusader
 								has_trait = leader_trait_crusader_2
-								has_trait = leader_trait_crusader_3
 							}
 						}
 					}
@@ -314,12 +298,12 @@ country_event = {
 						}
 					}
 					add_resource = {
-						unity = 25 # Tier 1
+						unity = 40 # Tier 1
 					}
 				}
 				else = {
 					add_resource = {
-						unity = 40 # Tier 2
+						unity = 60 # Tier 2
 					}
 				}
 			}
@@ -374,7 +358,7 @@ event = {
 					exists = planet
 				}
 				planet = {
-					random_owned_pop = {
+					weighted_random_owned_pop_group = {
 						limit = {
 							is_organic_species = yes
 							is_being_assimilated = no
@@ -559,7 +543,7 @@ country_event = { # Memorial Valuts Civic Paragon Level Tick / FROM = Leader
 	trigger = {
 		is_memory_vault_empire = yes
 		FROM = {
-			has_skill = 8
+			has_base_skill = 8
 			NOT = { has_leader_flag = memory_vault_contributed }
 		}
 	}
@@ -580,7 +564,7 @@ country_event = { # Memorial Valuts Civic Paragon Level Tick / FROM = Leader
 	}
 }
 
-# Change general/commander background class.
+# Change commander background class.
 # scope: country, from: leader
 country_event = {
 	id = paragon_2.2065
@@ -589,23 +573,14 @@ country_event = {
 
 	trigger = {
 		FROM = {
-			OR = {
-				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
-				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
-			}
+			leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 			has_miltary_background_job = no
 		}
 	}
 
 	immediate = {
 		FROM = {
-			if = {
-				limit = { leader_is_commander_stu = yes } # undercoat: moved to scripted trigger
-				set_random_commander_background_effect = yes
-			}
-			else = {
-				set_random_commander_background_effect = yes
-			}
+			set_random_commander_background_effect = yes
 		}
 	}
 }
@@ -628,10 +603,10 @@ planet_event = { #General with Chainbreaker trait
 
 	immediate = {
 		while = {
-			count = value:slaves_on_planet
+			count = value:slaves_on_planet_100
 			random_list = {
 				70 = {
-					random_owned_pop = {
+					weighted_random_owned_pop_group = {
 						limit = {
 							is_enslaved = yes
 						}
@@ -782,6 +757,7 @@ country_event = { # Set "Pending Negative Traits" for Leaders when created.
 	trigger = {
 		NOT = { has_country_flag = spawning_renowned_leader }
 		is_playable = yes # undercoat: moved to scripted trigger
+		FROM = { leader_is_envoy_stu = no } # undercoat: moved to scripted trigger
 	}
 
 	immediate = {
@@ -882,7 +858,7 @@ country_event = {
 			}
 			while = {
 				count = value:perc_of_planet_pop
-				random_owned_pop = { # Pick a pop
+				weighted_random_owned_pop_group = { # Pick a pop
 					limit = {
 						planet = { is_same_value = ROOT.FROMFROM }
 					}
@@ -894,9 +870,10 @@ country_event = {
 						save_event_target_as = target_planet
 					}
 				}
-				resettle_pop = { # Kidnap pop
-					pop = event_target:kidnapped_pop
-					planet = event_target:target_planet
+				resettle_pop_group = {
+					POP_GROUP = event_target:kidnapped_pop
+					PLANET = event_target:target_planet
+					AMOUNT = 100
 				}
 				event_target:kidnapped_pop = {
 					set_citizenship_type = {

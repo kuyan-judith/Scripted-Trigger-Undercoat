@@ -13,15 +13,45 @@ isolationist = {
 	resources = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			unity = @faction_base_output
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			society_research = @faction_major_output
+			engineering_research = @faction_minor_output
+			mult = @crowdsourcing_multiplier
 		}
 	}
 
 	extortion_resource = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			minerals = @faction_base_output
 			mult = @faction_extortion_minerals_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			society_research = @faction_major_output
+			engineering_research = @faction_minor_output
+			mult = @faction_extortion_crowdsourcing_ratio
 		}
 	}
 
@@ -474,6 +504,46 @@ isolationist = {
 		}
 	}
 
+	demand = { # Unplugged: De-Cyberize
+		title = ISOLATIONIST_UNPLUGGED_DECYBERIZE
+		unfulfilled_title = ISOLATIONIST_UNPLUGGED_NOT_DECYBERIZE
+		desc = ISOLATIONIST_UNPLUGGED_DECYBERIZE_DESC
+
+		unfulfilled_effect = -10
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+					OR = {
+						AND = { # safely in the De-Cyberize stage
+							current_stage = unplugged_identity_stage_1
+							situation_monthly_progress < 0
+						}
+						AND = { # trending towards De-Cyberization and our Approach is aligned
+							situation_monthly_progress < 0.05
+							OR = {
+								current_situation_approach = situation_unplugged_identity_discourage_change
+								current_situation_approach = situation_unplugged_identity_embrace_opinion
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	# Faction Demands for Ruler and Council positions.
 	inline_script = {
 		script = "paragon/global_faction_demands"
@@ -483,7 +553,7 @@ isolationist = {
 	}
 
 	on_create = {
-		pop_faction_event = { id = factions.1 }
+		pop_faction_event = { id = factions.0 }
 	}
 
 	on_destroy = {
@@ -509,5 +579,6 @@ isolationist = {
 		opposite = xenophile
 		apply_to_other_factions = "is_pop_faction_type = supremacist"
 		extortion_resource = minerals
+		crowdsourced_extortion_tooltip = "crowdsourced_extortion_tt"
 	}
 }

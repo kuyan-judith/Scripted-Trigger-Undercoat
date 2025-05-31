@@ -1,86 +1,30 @@
 @lathe_alloy_cost = 1000
 @lathe_logic_cost = 500
 @lathe_upkeep = 50
+@biomass_cost = 50
 
 @hab_cost = 500
 @hab_maintenance = 2
 @low_hab_maintenance = 0.2
 
-district_orders_demesne = {
-	base_buildtime = 240
-	is_capped_by_modifier = no
+district_cosmogenesis_goverment = {
+	icon = district_city
+	base_cap_amount = 1
+
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_cosmogenesis_government
+	}
 
 	show_on_uncolonized = {
-		uses_district_set = habitat
-		OR = {
-			has_planet_flag = toxic_knights_habitat
-			has_building = building_order_castle
-		}
+		uses_district_set = cosmogenesis_world
 	}
 
 	potential = {
-		uses_district_set = habitat
+		uses_district_set = cosmogenesis_world
 		exists = owner
-		owner = { is_toxic_knights_empire = yes } # undercoat: moved to scripted trigger
-		OR = {
-			has_planet_flag = toxic_knights_habitat
-			has_building = building_order_castle
-		}
-	}
-
-	convert_to = {
-		district_hab_housing
-	}
-
-	resources = {
-		category = planet_districts_orders_demesne
-		cost = {
-			minerals = @hab_cost
-		}
-		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
-		}
-	}
-
-	planet_modifier = {
-		planet_max_buildings_add = 0.50
-		planet_housing_add = 6
-		job_squire_add = 2
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			owner = {
-				is_void_dweller_empire = yes
-			}
-		}
-		job_squire_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			has_deposit = d_dimensional_manipulation_device
-			exists = owner
-			NOT = {
-				owner = { has_deficit = sr_dark_matter }
-			}
-		}
-		planet_max_buildings_add = 0.5
-		planet_housing_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			has_deposit = d_dimensional_manipulation_device
-			exists = owner
-			owner = { has_deficit = sr_dark_matter }
-		}
-		planet_housing_add = -1
-	}
-
-	triggered_desc = {
-		text = job_squire_effect_desc
+		owner = { has_ascension_perk = ap_cosmogenesis }
 	}
 }
 
@@ -93,11 +37,16 @@ district_cosmogenesis_world_science = {
 		uses_district_set = cosmogenesis_world
 	}
 
+	# TODO_CD: change to real slots
+	zone_slots = {
+		slot_cosmogenesis_empty
+	}
+
 	resources = {
 		category = planet_districts
 		cost = {
-			alloys = @lathe_alloy_cost 
-			advanced_logic = @lathe_logic_cost 
+			alloys = @lathe_alloy_cost
+			advanced_logic = @lathe_logic_cost
 		}
 		upkeep = {
 			energy = @lathe_upkeep
@@ -110,16 +59,17 @@ district_cosmogenesis_world_science = {
 		owner = { has_ascension_perk = ap_cosmogenesis }
 	}
 	planet_modifier = {
-		planet_housing_add = 15
+		planet_housing_add = 1500
 		pc_cosmogenesis_world_max_buildings_add = 1
+	}
+	triggered_planet_modifier = {
+		potential = {
+			NOT = { owner = { has_deficit = energy } }
+		}
 		planet_neural_chips_physics_research_produces_add = 0.75
 		planet_neural_chips_society_research_produces_add = 0.75
 		planet_neural_chips_engineering_research_produces_add = 0.75
-
 	}
-	#triggered_desc = {
-	#	text = chip_science_output_increased_tt
-	#}
 
 	ai_estimate_without_unemployment = yes
 	additional_ai_weight = 200
@@ -135,11 +85,16 @@ district_cosmogenesis_world_logic = {
 		uses_district_set = cosmogenesis_world
 	}
 
+	# TODO_CD: change to real slots
+	zone_slots = {
+		slot_cosmogenesis_empty
+	}
+
 	resources = {
 		category = planet_districts
 		cost = {
-			alloys = @lathe_alloy_cost 
-			advanced_logic = @lathe_logic_cost 
+			alloys = @lathe_alloy_cost
+			advanced_logic = @lathe_logic_cost
 		}
 		upkeep = {
 			energy = @lathe_upkeep
@@ -152,15 +107,188 @@ district_cosmogenesis_world_logic = {
 		owner = { has_ascension_perk = ap_cosmogenesis }
 	}
 	planet_modifier = {
-		planet_housing_add = 15
+		planet_housing_add = 1500
 		pc_cosmogenesis_world_max_buildings_add = 1
+	}
+	triggered_planet_modifier = {
+		potential = {
+			NOT = { owner = { has_deficit = energy } }
+		}
 		planet_neural_chips_advanced_logic_produces_add = 0.025
 	}
-	#triggered_desc = {
-	#	text = chip_logic_output_increased_tt
-	#}
 
 	ai_estimate_without_unemployment = yes
 	additional_ai_weight = 200
 	ai_weight_coefficient = 1.2
+}
+
+district_mindlink = {
+	base_buildtime = 720
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	show_on_uncolonized = {
+		always = no
+	}
+
+	potential = {
+		exists = owner
+		is_capital = yes
+		owner = {
+			has_menace_perk = menp_behemoth_mind_meld
+		}
+	}
+
+	allow = {
+		NOR = {
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+	}
+
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_arcology_housing
+		district_rw_city
+		district_rw_hive
+		district_rw_nexus
+		district_city
+		district_nexus
+		district_hive
+		district_hab_housing
+		district_crashed_slaver_ship
+		district_craglands
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			food = 1500
+		}
+		cost = {
+			trigger = {
+				owner = { is_wilderness_empire = yes }
+			}
+			biomass = @biomass_cost
+		}
+		upkeep = {
+			food = 2
+		}
+		produces = {
+			trigger = {
+				owner = { is_variable_set =  pops_transferred }
+				owner = { is_wilderness_empire = no }
+			}
+			unity = 1.5
+			physics_research = 0.5
+			society_research = 0.5
+			engineering_research = 0.5
+			mult = owner.value:transferred_pops_district_percent
+		}
+		produces = {
+			trigger = {
+				owner = { is_variable_set =  pops_transferred }
+				owner = { is_wilderness_empire = yes }
+			}
+			unity = 300
+			physics_research = 100
+			society_research = 100
+			engineering_research = 100
+			mult = owner.value:transferred_pops_district_percent
+		}
+	}
+
+	inline_script = {
+		script = buildings/on_all_wilderness_buildings_districts
+	}
+
+	planet_modifier = {
+		planet_housing_add = 3000
+	}
+
+	triggered_planet_modifier = { #Regular modifiers
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+			}
+		}
+		modifier = {
+			job_transference_volunteer_add = 1500
+		}
+	}
+
+	triggered_planet_modifier = { # Gestalt modifiers
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		modifier = {
+			planet_housing_add = 1000
+			job_transference_drone_add = 1500
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_agrarian_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			planet_housing_add = -500
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_active_tradition = tr_prosperity_public_works }
+		}
+		modifier = {
+			planet_housing_add = 500
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_housing_1
+			}
+		}
+		modifier = {
+			planet_housing_add = 500
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_housing_2
+				is_agrarian_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			planet_housing_add = 500
+		}
+	}
+
+	triggered_desc = { #same as transference drone so everyone gets it
+		trigger = {
+			exists = owner
+		}
+		text = job_transference_volunteer_effect_desc
+	}
 }

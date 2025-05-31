@@ -153,7 +153,7 @@ system_event = {
 						orbit_angle = { min = 0 max = 360 }
 						flags = { asteroid_triplet }
 						init_effect = {
-							clear_deposits_stu = yes # undercoat: moved to scripted effect
+							clear_deposits_stu = yes
 							# Undercoat on_action
 							fire_on_action = { on_action = on_planet_spawned }
 						}
@@ -166,7 +166,7 @@ system_event = {
 					orbit_angle = { min = 0 max = 360 }
 					flags = { asteroid_triplet }
 					init_effect = {
-						clear_deposits_stu = yes # undercoat: moved to scripted effect
+						clear_deposits_stu = yes
 						# Undercoat on_action
 						fire_on_action = { on_action = on_planet_spawned }
 					}
@@ -605,6 +605,14 @@ country_event = {
 					id = cstorms.905
 					days = value:storm_late_game_cooldown_in_days_scaled
 					random = value:storm_late_game_cooldown_variance_scaled
+				}
+				every_playable_country = {
+					limit = {
+						event_target:new_storm_location = {
+							is_surveyed = { who = prev status = yes }
+						}
+					}
+					country_event = { id = timeline.77 } # Timeline Nexus Storm
 				}
 			}
 		}
@@ -1991,8 +1999,25 @@ ship_event = {
 
 	option = {
 		name = cstorms.1500.b
-
+		trigger = { owner = { is_evolutionary_predators_empire = no } } # undercoat: moved to scripted trigger
 		owner = {
+			add_resource = { food = 50 }
+			add_resource = { unity = 50 }
+
+			add_tech_option_or_research_effect = {
+				TECH = tech_dangerous_wildlife
+				PROGRESS = 0.25
+				CATEGORY = society_research
+			}
+		}
+	}
+
+	option = {
+		name = cstorms.1500.evopred
+		trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		owner = {
+			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = mammalian }
+
 			add_resource = { food = 50 }
 			add_resource = { unity = 50 }
 
@@ -2106,6 +2131,15 @@ ship_event = {
 
 	option = {
 		name = cstorms.1515.a
+		hidden_effect = {
+			ship_event = { id = cstorms.1520 days = 100 }
+		}
+	}
+
+	option = {
+		name = cstorms.1515.evopred
+		exclusive_trigger = { owner = { is_evolutionary_predators_empire = yes } } # undercoat: moved to scripted trigger
+		owner = { give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = mammalian } }
 		hidden_effect = {
 			ship_event = { id = cstorms.1520 days = 100 }
 		}
@@ -3576,6 +3610,12 @@ planet_event = {
 				min = @tier3materialmin
 				max = @tier3materialmax
 			}
+			if = {
+				limit = {
+					owner = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+				}
+				give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium TYPE = avian }
+			}
 		}
 	}
 
@@ -3597,7 +3637,12 @@ planet_event = {
 	option = {
 		name = cstorms.1771.c
 		trigger = {
-			owner = { NOT = { has_civic = civic_hive_devouring_swarm } }
+			owner = {
+				NOR = {
+					has_valid_civic = civic_hive_devouring_swarm
+					is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
 		}
 		allow = {
 			owner = {
@@ -3620,6 +3665,17 @@ planet_event = {
 			}
 		}
 	}
+
+	option = {
+		name = cstorms.1771.evopred
+		trigger = {
+			owner = {
+				NOT = { has_valid_civic = civic_hive_devouring_swarm }
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		owner = { give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = medium TYPE = avian } }
+	}
 }
 
 system_event = {
@@ -3629,6 +3685,7 @@ system_event = {
 
 	trigger = {
 		from = { is_storm_type = gravity_storm }
+		exists = owner
 		any_system_planet = {
 			is_colony = yes
 			exists = owner
@@ -4287,7 +4344,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_mining_station
 							 	}
-							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							 	clear_deposits_stu = yes
 							}
 							random_list = {
 								20 = { add_deposit = d_zro_deposit_1 }
@@ -4303,7 +4360,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_research_station
 							 	}
-							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							 	clear_deposits_stu = yes
 							}
 							random_list = {
 								20 = { add_deposit = d_alloys_1 }
@@ -4319,7 +4376,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_research_station
 							 	}
-							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							 	clear_deposits_stu = yes
 							}
 							random_list = {
 								20 = { add_deposit = d_minerals_1 }
@@ -4335,7 +4392,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_mining_station
 							 	}
-							 	clear_deposits_stu = yes # undercoat: moved to scripted effect
+							 	clear_deposits_stu = yes
 							}
 							add_deposit = d_nanites_deposit
 						}
@@ -4350,7 +4407,7 @@ planet_event = {
 				limit = {
 					is_colony = yes
 				}
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					change_species = last_created_species
 				}
 				owner = { country_event = { id = cstorms.8515 } }

@@ -205,7 +205,7 @@ r_rubricator = {
 				modifier = "relic_activation_cooldown"
 				days = @triumph_duration
 			}
-			add_resource = { minor_artifacts = 500 }
+			add_resource = { minor_artifacts = 2000 }
 		}
 	}
 
@@ -709,7 +709,7 @@ r_prethoryn_queen = {
 			always = yes
 		}
 		weapon_swarm_weapon_fire_rate_mult = 0.05
-			mult = brood_usage
+		mult = brood_usage
 	}
 
 	score = 5000
@@ -813,14 +813,24 @@ r_contingency_core = {
 		weight = 100
 	}
 
+	# See 'GetContingencyCoreEffect'
 	triggered_country_modifier = {
 		potential = {
-			always = yes
+			is_hive_empire = no
 		}
 		planet_pop_assembly_mult = 1.00
 		show_only_custom_tooltip = no
-		custom_tooltip = relic_contingecy_core
+		custom_tooltip = relic_contingecy_core # +1 Megastructure
 	}
+	triggered_country_modifier = {
+		potential = {
+			is_hive_empire = yes
+		}
+		country_engineering_research_produces_mult = 1.5
+		show_only_custom_tooltip = no
+		custom_tooltip = relic_contingecy_core # +1 Megastructure
+	}
+
 
 	score = 5000
 
@@ -978,18 +988,22 @@ r_the_last_baol = {
 	triggered_country_modifier = {
 		potential = {
 			is_machine_empire = no
+			is_wilderness_empire = no
 		}
 		modifier = {
-			pop_growth_speed = 0.10
+			logistic_growth_mult = 0.1
 		}
 	}
 
 	triggered_country_modifier = {
 		potential = {
-			is_machine_empire = yes
+			OR = {
+				is_machine_empire = yes
+				is_wilderness_empire = yes
+			}
 		}
 		modifier = {
-			pop_growth_speed = 0.10
+			logistic_growth_mult = 0.1
 			country_society_research_produces_mult = 0.10
 		}
 	}
@@ -1205,10 +1219,19 @@ r_cryo_core = {
 
 	triggered_country_modifier = {
 		potential = {
-			always = yes
+			is_wilderness_empire = no
 		}
-		colony_start_num_pops_add = 1
+		planet_colony_development_speed_mult = 2
 		#custom_tooltip = r_cryo_core_effect
+		weapon_type_energy_weapon_fire_rate_mult = 0.2
+	}
+	triggered_country_modifier = {
+		potential = {
+			is_wilderness_empire = yes
+		}
+		custom_tooltip = tr_expansion_colonization_fever_wilderness_desc
+		show_only_custom_tooltip = no
+		# see 'wilderness.500'
 		weapon_type_energy_weapon_fire_rate_mult = 0.2
 	}
 
@@ -1676,13 +1699,6 @@ r_toxic_god = {
 		weapon_type_strike_craft_weapon_damage_mult = 0.15
 	}
 
-	triggered_country_modifier = {
-		potential = {
-			is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
-		}
-		custom_tooltip = r_toxic_god_knights_passive_effect
-	}
-
 	score = 3000
 
 	active_effect = {
@@ -1981,7 +1997,7 @@ r_plasmic_core = {
 		potential = {
 			is_robot_empire = no
 		}
-		pop_growth_speed = 0.1
+		logistic_growth_mult = 0.1
 	}
 	triggered_country_modifier = {
 		potential = {
@@ -1994,7 +2010,12 @@ r_plasmic_core = {
 
 	active_effect = {
 		if = {
-			limit = { is_robot_empire = yes }
+			limit = {
+				OR = {
+					is_robot_empire = yes
+					is_wilderness_empire = yes
+				}
+			}
 			custom_tooltip = machine_plasmic_core_effect
 			hidden_effect = {
 				random_owned_leader = {
@@ -2004,19 +2025,22 @@ r_plasmic_core = {
 				}
 			}
 		}
-		else = {
+		else_if = {
+			limit = {
+				is_evolutionary_predators_empire = no # undercoat: moved to scripted trigger
+			}
 			custom_tooltip = plasmic_core_effect
 			hidden_effect = {
 				random_owned_planet = {
 					limit = {
-						any_owned_pop = {
-							is_robot_pop = no
-							NOT = { pop_has_trait = trait_plasmic }
+						any_owned_pop_group = {
+							is_robot_pop_group = no
+							NOT = { pop_group_has_trait = trait_plasmic }
 						}
 					}
-					every_owned_pop = {
+					every_owned_pop_group = {
 						limit = {
-							is_robot_pop = no
+							is_robot_pop_group = no
 						}
 						modify_species = {
 							species = this
@@ -2024,6 +2048,18 @@ r_plasmic_core = {
 							portrait = this
 						}
 					}
+				}
+			}
+		}
+		else = {
+			custom_tooltip = plasmic_core_effect_evopred
+			hidden_effect = {
+				set_country_flag = consumed_plasmic_dna
+				random_situation = {
+					limit = {
+						is_situation_type = evolutionary_predators_situation
+					}
+					add_situation_progress = value:evopred_50
 				}
 			}
 		}
@@ -2042,10 +2078,12 @@ r_plasmic_core = {
 			fail_text = "plasmic_core_no_suitable_planet"
 			OR = {
 				is_robot_empire = yes
+				is_wilderness_empire = yes
+				is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
 				any_owned_planet = {
-					any_owned_pop = {
-						is_robot_pop = no
-						NOT = { pop_has_trait = trait_plasmic }
+					any_owned_pop_group = {
+						is_robot_pop_group = no
+						NOT = { pop_group_has_trait = trait_plasmic }
 					}
 				}
 			}
@@ -2182,7 +2220,7 @@ r_time_crystal = {
 				count = 0
 				limit = {
 					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
-					has_skill > @paragon_trait_level
+					has_base_skill > @paragon_trait_level
 				}
 			}
 		}

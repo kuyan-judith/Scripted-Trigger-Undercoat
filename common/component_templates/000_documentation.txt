@@ -36,6 +36,7 @@
 #
 # 	component_set = "COMPONENT_SET"				# The component set for this component, see common/component_sets for options.
 # 	upgrades_to = "UPGRADE_1"					# What other component that this component upgrades to.
+#	upgrade_path = growth						# For core components, components that have the same upgrade path are shown on the same row.
 # 	resources = {								# The cost of the ship component. Works like other resources script.
 #		category = ship_components
 #		cost = {
@@ -50,14 +51,28 @@
 #		TECH_1
 #		TECH_2
 #	}
-# 	class_restriction = {						# The ship class(es) that the component is restricted to.
+#   potential = {                               # Trigger that defines whether the component appears in the list of available ones to be placed in a slot. This = ship design, From = country.
+#       from = {
+#           is_playable = yes # undercoat: moved to scripted trigger
+#       }
+#       OR = {
+#           is_ship_class = shipclass_military
+#           is_ship_class = shipclass_constructor
+#       }
+#       OR = {
+#           is_ship_size = corvette
+#           is_ship_size = titan
+#       }
+#   }
+#   possible = {}                               # A trigger that allows a component to forbid the addition of other components to the design. The trigger can be used to check for the compatibility of components with each other. This = ship design, From = country.
+# 	class_restriction = {						# (DEPRECATED: use "potential" trigger instead) The ship class(es) that the component is restricted to.
 #		shipclass_military						# Options: shipclass_[military/constructor/colonizer/science_ship/transport/mining_station/research_station/military_station/
 #		shipclass_constructor					# /observation_station/starbase/military_special/none]
 #	}
-# 	size_restriction = { corvette titan }		# The sizes that the component is restricted to, see common/ship_sizes for options.
+# 	size_restriction = { corvette titan }		# (DEPRECATED: use "potential" trigger instead) The sizes that the component is restricted to, see common/ship_sizes for options.
 # 	slot_restriction = { slot_example }			# The slots that the component is restricted to, see common/component_slot_templates for options.
-# 	ship_limit = X								# Limits how many of this component that can be put in a ship design.
-# 	blocked_by = {								# Components that can't be in a ship design with this component.
+# 	ship_limit = X								# (DEPRECATED: use "possible" trigger instead) Limits how many of this component that can be put in a ship design.
+# 	blocked_by = {								# (DEPRECATED: use "possible" trigger instead) Components that can't be in a ship design with this component.
 #		COMPONENT_2
 #		COMPONENT_3
 #	}
@@ -114,8 +129,94 @@
 #	}
 # 	ai_tags = { example_tag }		# Tags for the AI to determine when to use the component.
 # 	ai_tag_weight					#
-
-
+#
+#	scripted_action = {
+#		scope = planet/fleet/self	# defines the target of the action (therefore the scope of the possible and finished triggers,
+#                                 	# as well as the scope of the performed action or on_cancel action)
+#		# the resulting scopes and behaviors are:
+#		# For scope = fleet:
+#		#	scope: target fleet (can't be triggering fleet)
+#		#	from: triggering fleet
+#		#	starts when in range specified by fleet_action_range (otherwise moves beforehand)
+#		# For scope = self:
+#		#	scope: triggering fleet
+#		#	from: triggering fleet
+#		#	starts immediately
+#		# For scope = planet:
+#		#	scope: target planet
+#		#	from: triggering fleet
+#		#	starts when in orbit of target planet (otherwise moves beforehand)
+#
+#		possible = {}	# trigger. evaluates if action is possible. Needs to come after scope in script
+#					  	# if not specified, action is always considered possible
+#		finished = {}	# trigger. evaluates if action is finished. Needs to come after scope in script
+#					  	# if not specified, action is always considered finished as soon as it is started
+#
+#		button_clickable = {}	# trigger. scope: triggering fleet. evaluates if scripted action button is clickable
+#		button_visible = {}		# trigger. scope: triggering fleet. evaluates if scripted action button is visible (also used for context menu options)
+#
+#		name = on_action_name				# name of the on_action to perform
+#		on_cancel = on_cancel_action_name	# name of the on_action to perform when scripted action is cancelled
+#
+#		context_menu_name = menu_loc_key	# loc key for option label in drop down menu
+#		tooltip = tooltip_loc_key			# button tooltip
+#		icon = "GFX_icon_1"					# button icon
+#
+#		on_click_sound = "sound_clip_1"				# sound clip to play when the button is clicked (or the target, if required)
+#		on_execution_sound = "sound_clip_2"			# sound clip to play when the on_action specified by field "name" is executed
+#
+#		activity_key = activity_loc_key				# loc key for the activity string to show on fleet UI. "NAME" loc parameter gives target localized name
+#		progress_activity_key = progress_loc_key	# loc key for the progress string to show on fleet UI. "PROGRESS" loc parameter gives current progress percentage
+#
+#		required_progress = 2.0		# required progress (number of ticks) to start performing scripted action. default = 0.0
+#						  			# progress starts counting at 1.0, so the minimum value for required_progress to make the action not instant is 2.0
+#		cooldown = 10				# number of days of cooldown before the action can be triggered again. default = 0
+#		cost = { energy = 5000 }	# resources needed to enable the action. will be deducted from controller country on action finish. default = no cost
+#
+#		fleet_action_range = 10.0	# only used when scope = fleet. max range from the target fleet tolerated to perform the action
+#						  			# if too far, the fleet will chase the target fleet until it's inside the desired range
+#						   			# default = 1.0
+#
+#		wait = no					# If yes, waits for the ships in the fleet to be still before starting the scripted action
+#									# default = yes
+#									# For AI: always no
+#
+#		ai = {			# Info concerning AI using this particular scripted order
+#			weight = 1	# Integer value representing the priority the AI will give choosing this action over other scripted ones
+#						# If 0 or lower, AI will ignore it
+#						# default: -1 # AI won't use this action by default
+#			war = yes	# If yes, AI will be able to use during war. default = yes
+#			enemy = yes	# Only applicable when scope = fleet. If yes, the targeted fleet will be pulled from hostile fleets (see below)
+#						# default: yes
+#
+#			# Depending on the scripted action scope, the target candidates will be:
+#			# scope = self # triggering fleet as usual
+#			# scope = planet # planets in the fleet's current system when AI is deciding on the fleet's next mission
+#			# scope = fleet AND enemy = yes # hostile fleets
+#			# scope = fleet AND enemy = no # fleets own by the AI country
+#
+#			# In order for AI to decide on using a scripted action, all regular conditions apply: possible trigger, cost, cooldown
+#			# AI will prioritize using scripted actions over regular orders when possible
+#		}
+#
+#		shortcut = "R"				# Keyboard shortcut for the scripted action button
+#									# Usual combinations like "CTRL+R" are also accepted
+#						  			# if the same shortcut is used for more than one simultaneously possible action on the same fleet,
+#						  			# the shortcut will only work for one of them
+#						  			# Same if the same shortcut is already used for any other already present button
+#
+#		slot = 1					# For hero ships (determined by ship size) UI
+#						  			# If 0, the scripted action button will be located on the regular permanent orders bar
+#						  			# If > 0, the scripted action button will be located on the custom orders bar, sorted by slot number
+#						  			# Default: 0
+#
+#		progress_anim_state = "moving"	# Trigger specific animation state on all ships of the fleet performing the order while the order is in progress
+#						  				# This overrides own weapon projectile induced animations, as well as regular animation states
+#										# This is ignored if scope=self because the order is instant in that case (no progress)
+#
+#		finish_anim_state = "rage"		# Trigger specific NON-LOOPING animation state on all ships of the fleet performing the order at the moment the order is finished/executed
+#						  				# This overrides own weapon projectile induced animations, as well as regular animation states
+#	}
 
 # Options for weapon components:
 #
@@ -134,12 +235,16 @@
 # missile_shield
 # missile_armor
 # missile_retarget_range
-# use_ship_kill_target
+# use_ship_main_target: if yes, overrides target_type and target_focus when ship's main target is within range, default no
+# target_type (target_enemies (default) / target_allies / target_controlled / target_own)
+# target_focus (single (default) / spread)
 # can_destroy_stars
 # prio_projectile
 # point_defence_targets
 # projectile_gfx
 # planet_destruction_gfx
+# on_hit: apply effects to target on hit. Scope = ship (target), from = ship (shooter)
+# hide_damage_values_from_tooltip = yes/no # If yes, it will hide Damage and Average Damage from weapon component tooltip (default = no)
 
 # Options for utility components:
 #
@@ -152,6 +257,8 @@
 # ftl_inhibitor
 # jumpdrive
 # armor_value
+# target_type: only valid if component_set has affects_target_type = yes
+# target_focus: only valid if component_set has affects_target_focus = yes
 
 # Options for strike craft components:
 #

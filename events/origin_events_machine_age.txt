@@ -228,7 +228,7 @@ situation_event = {
 		hidden_effect = {
 			owner = {
 				every_owned_planet = {
-					every_owned_pop = {
+					every_owned_pop_group = {
 						force_faction_evaluation = yes
 					}
 				}
@@ -782,7 +782,8 @@ situation_event = {
 		owner = {
 			set_country_flag = cybercreed_final_form
 			set_country_flag = cybernetics_traditions_unlocked
-			every_owned_pop = {
+			country_event = { id = timeline.79 }
+			every_owned_pop_group = {
 				limit = {
 					has_trait = trait_cybernetic
 					has_ethic = ethic_spiritualist
@@ -935,6 +936,7 @@ situation_event = {
 
 	immediate = {
 		owner = {
+			country_event = { id = timeline.79 }
 			set_country_flag = cybernetics_traditions_unlocked
 		}
 	}
@@ -1028,164 +1030,47 @@ situation_event = {
 
 	immediate = {
 		owner = {
-			if = {
+			weighted_random_owned_pop_group = {
 				limit = {
-					NOT = {
-						exists = event_target:cybercreedspecies@root.owner
-					}
+					is_same_species = owner.species
+					NOT = {	has_trait = trait_cybernetic }
+					pop_group_size > 0
 				}
-				random_owned_pop = {
-					limit = {
-						is_same_species = owner.species
-						NOT = {	has_trait = trait_cybernetic }
-					}
-					species = {
-						modify_species = {
-							remove_trait = trait_latent_psionic
-							remove_trait = trait_psionic
-							remove_trait = trait_cyborg_creed_of_construction
-							remove_trait = trait_cyborg_creed_of_war
-							remove_trait = trait_cyborg_creed_of_research
-							remove_trait = trait_cyborg_creed_of_labor
-							remove_trait = trait_cyborg_ritualistic_implants
-							effect = {
-								create_species = {
-									is_mod = yes
-									name = this
-									plural = this
-									class = this
-									portrait = this
-									traits = this
-									can_be_modified = this
-									homeworld = this
-									namelist = this
-									gender = this
-									traits = {
-										ideal_planet_class = this
-										trait = trait_cybernetic
-									}
-								}
-								last_created_species = {
-									save_global_event_target_as = cybercreedspecies@root.owner
-								}
-							}
+				species = {
+					if = {
+						limit = {
+							NOT = { exists = event_target:cybercreedspecies@root.owner }
 						}
+						create_cyber_creed_species_effect = yes
 					}
 				}
 			}
 
-			while = {
+			every_owned_pop_group = {
 				limit = {
-					any_owned_pop = {
-						exists = event_target:cybercreedspecies@root.owner
-						is_same_species = owner.species
-						NOT = {	has_trait = trait_cybernetic }
-					}
-				}
-				count = value:pop_to_cyberize_per_month_creed
-				random_owned_pop = {
-					limit = {
-						is_same_species = owner.species
-						NOT = {	has_trait = trait_cybernetic }
-					}
-					change_species = event_target:cybercreedspecies@root.owner
-					IF = {
-						limit = {
-							has_ethic = ethic_spiritualist
-						}
-						owner = {
-							switch = {
-								trigger = has_country_flag
-								cybernetic_creed_construction = {
-									prev = {
-										modify_species = {
-											species = this
-											add_trait = trait_cyborg_creed_of_construction
-											add_traits_at_start_of_list = yes
-										}
-									}
-								}
-								cybernetic_creed_war = {
-									prev = {
-										modify_species = {
-											species = this
-											add_trait = trait_cyborg_creed_of_war
-											add_traits_at_start_of_list = yes
-										}
-									}
-								}
-								cybernetic_creed_research = {
-									prev = {
-										modify_species = {
-											species = this
-											add_trait = trait_cyborg_creed_of_research
-											add_traits_at_start_of_list = yes
-										}
-									}
-								}
-								cybernetic_creed_labor = {
-									prev = {
-										modify_species = {
-											species = this
-											add_trait = trait_cyborg_creed_of_labor
-											add_traits_at_start_of_list = yes
-										}
-									}
-								}
-								cybernetic_creed_general = {
-									prev = {
-										modify_species = {
-											species = this
-											add_trait = trait_cyborg_ritualistic_implants
-											add_traits_at_start_of_list = yes
-										}
-									}
-								}
-							}
-						}
-					}
-					IF = {
-						limit = {
-							NOT = { has_ethic = ethic_spiritualist }
-						}
-						modify_species = {
-							species = this
-							remove_trait = trait_cyborg_creed_of_construction
-							remove_trait = trait_cyborg_creed_of_war
-							remove_trait = trait_cyborg_creed_of_research
-							remove_trait = trait_cyborg_creed_of_labor
-							remove_trait = trait_cyborg_ritualistic_implants
-						}
-					}
-				}
-			}
-			every_owned_leader = {
-				limit = {
-					exists = event_target:cybercreedspecies@root.owner
+					exists = event_target:cyberspecies_current
 					is_same_species = owner.species
-					NOT = {	has_trait = leader_trait_cyborg }
+					NOT = {	has_trait = trait_cybernetic }
+					pop_group_size > 0
+					pop_group_size < 5
 				}
-				remove_trait = leader_trait_ritualistic_implants_cyborg
-				change_species = event_target:cybercreedspecies@root.owner
-				add_trait_no_notify = leader_trait_cyborg
-			}
-			every_pool_leader = {
-				limit = {
-					exists = event_target:cybercreedspecies@root.owner
-					is_same_species = owner.species
-					NOT = {	has_trait = leader_trait_cyborg }
+				owner = {
+					cyberize_creed_pops_effect = {
+						SINGLE_LOOP = yes
+						TINY_GROUPS = yes
+					}
 				}
-				remove_trait = leader_trait_ritualistic_implants_cyborg
-				change_species = event_target:cybercreedspecies@root.owner
-				add_trait_no_notify = leader_trait_cyborg
 			}
+
+			cyberize_creed_pops_effect = yes
+			cyberize_creed_leaders_effect = yes
 		}
 		# Check if there are any pops left to cyberize, otherwise remove the cyberization flag to unpause the situation.
 		if = {
 			limit = {
 				NOT = {
 					owner = {
-						any_owned_pop = {
+						any_owned_pop_group = {
 							exists = event_target:cybercreedspecies@root.owner
 							is_same_species = owner.species
 							NOT = {	has_trait = trait_cybernetic }
@@ -1203,19 +1088,20 @@ situation_event = {
 }
 
 #This event changes traits if the pop changes ethics, makes sure spiritualist pops always have cyborg traits.
-#This = Pop
+#Fired by on_daily_pop_ethics_divergence
+#This = Pop Group
 #From = Planet Owner
-pop_event = {
+pop_group_event = {
 	id = machine_age.2100
 	hide_window = yes
 
 	is_triggered_only = yes
 
 	trigger = {
-		owner = { is_cybernetic_creed_empire = yes } # undercoat: moved to scripted trigger
+		from = { is_cybernetic_creed_empire = yes } # undercoat: moved to scripted trigger
 		has_cybernetic_creed_trait = no
 		has_ethic = ethic_spiritualist
-		is_robot_pop = no
+		is_robot_pop_group = no
 	}
 
 	immediate = {
@@ -1327,10 +1213,11 @@ pop_event = {
 	}
 }
 
-#This event removes the Cybercreed Traits from non-spiritualist pops | Fired by on_pop_ethic_changed
-#This = Pop
+#This event removes the Cybercreed Traits from non-spiritualist pops
+#Fired by on_daily_pop_ethics_divergence
+#This = Pop Group
 #From = Planet Owner
-pop_event = {
+pop_group_event = {
 	id = machine_age.2101
 	hide_window = yes
 
@@ -1371,7 +1258,7 @@ country_event = {
 		#Before Situation Ends
 		if = {
 			limit = { NOT = { has_country_flag = cyber_creed_finished_situation } }
-			every_owned_pop = {
+			every_owned_pop_group = {
 				if = {
 					limit = {
 						OR = {
@@ -1435,7 +1322,7 @@ country_event = {
 			}
 		}
 		else = {
-			every_owned_pop = {
+			every_owned_pop_group = {
 				#After Situation Ends
 				if = {
 					limit = {
@@ -1904,8 +1791,13 @@ country_event = {
 		is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
 		from = {
 			has_ethic = ethic_spiritualist
-			NOT = {
+			NOR = {
+				leader_is_envoy_stu = yes # undercoat: moved to scripted trigger
 				has_trait = leader_trait_ritualistic_implants_cyborg
+				has_trait = leader_trait_psionic
+				has_chosen_one_leader_trait = yes
+				has_trait = leader_trait_cyborg
+				has_trait = leader_trait_limited_cyborg
 			}
 		}
 	}
@@ -1925,39 +1817,6 @@ country_event = {
 #											#
 #											#
 #############################################
-
-# A pop has finished declining (while not being purged)
-# This = Planet scope
-# From = Country
-# FromFrom = Pop
-#Synthetic Fertility Killing Pops Events
-planet_event = {
-	id = machine_age.3000
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		from = {
-			is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
-		}
-		fromfrom = {
-			has_trait = trait_pathogenic_genes
-		}
-	}
-
-	immediate = {
-		from = {
- 			change_variable = {
- 				which = num_dead_identities
- 				value = 1
- 			}
- 			change_variable = {
-				which = remaining_synth_fert_pops
-				value = -1
-			}
-		}
-	}
-}
 
 country_event = {
 	id = machine_age.3100
@@ -2042,7 +1901,7 @@ country_event = {
 				add_building = building_robot_assembly_plant
 				while = {
 					count = 3
-					create_pop = {
+					create_pop_group = {
 						species = last_created_species
 					}
 				}
@@ -2201,7 +2060,7 @@ country_event = {
 				create_synth_species_effect = yes
 			}
 			capital_scope = {
-				create_pop = {
+				create_pop_group = {
 					species = event_target:synthspecies@root.owner
 				}
 			}
@@ -2315,14 +2174,6 @@ situation_event = {
 
 	is_triggered_only = yes
 
-	immediate = {
-		owner = {
-			every_owned_planet = {
-				reset_decline = yes
-			}
-		}
-	}
-
 	option = {
 		name = "machine_age.3305.a"
 		custom_tooltip = "machine_age.3305.a.tooltip"
@@ -2336,18 +2187,22 @@ situation_event = {
 		custom_tooltip = "machine_age.3305.b.tooltip"
 		hidden_effect = {
 			owner = {
+				divide_variable = {
+					which = num_dead_identities
+					value = 100
+				}
 				while = {
 					limit = {
-						any_owned_pop = {
+						any_owned_pop_group = {
 							NOT = { is_same_species = owner.species }
-							is_robot_pop = yes
+							is_robot_pop_group = yes
 						}
 					}
 					count = num_dead_identities
-					random_owned_pop = {
+					weighted_random_owned_pop_group = {
 						limit = {
 							NOT = { is_same_species = owner.species }
-							is_robot_pop = yes
+							is_robot_pop_group = yes
 						}
 						change_species = event_target:synthspecies@root.owner
 					}
@@ -2359,7 +2214,7 @@ situation_event = {
 				while = {
 					count = num_dead_identities
 					capital_scope = {
-						create_pop = {
+						create_pop_group = {
 							species = event_target:synthspecies@root.owner
 						}
 					}
@@ -2576,7 +2431,7 @@ situation_event = {
 	immediate = {
 		owner = {
 			export_trigger_value_to_variable = {
-				trigger = count_owned_pop
+				trigger = count_owned_pop_amount
 				parameters = {
 					limit = {
 						has_trait = trait_pathogenic_genes
@@ -2588,15 +2443,25 @@ situation_event = {
 	}
 }
 
+situation_event = { # We need a 1 day delay otherwise the count gets borked
+	id = machine_age.3324
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		situation_event = { id = machine_age.3325 days = 1 }
+	}
+}
+
 situation_event = {
 	id = machine_age.3325
 	hide_window = yes
 	is_triggered_only = yes
 
 	immediate = {
-		owner = {
+		owner = { #Check how many pops are still alive
 			export_trigger_value_to_variable = {
-				trigger = count_owned_pop
+				trigger = count_owned_pop_amount
 				parameters = {
 					limit = {
 						has_trait = trait_pathogenic_genes
@@ -2605,7 +2470,7 @@ situation_event = {
 				variable = remaining_synth_fert_pops_month_check
 			}
 		}
-		if = {
+		if = { #Update the situation pace in case of discrepancy
 			limit = {
 				owner = {
 					check_variable_arithmetic = {
@@ -2622,6 +2487,32 @@ situation_event = {
 					value = remaining_synth_fert_pops_month_check
 				}
 			}
+		}
+		if = { #Update the ID repository - Not foolproof, will break if new pops are somehow acquired
+			limit = {
+				owner = {
+					check_variable_arithmetic = {
+						which = remaining_synth_fert_pops
+						add = num_dead_identities
+						value != 6000
+					}
+				}
+			}
+			owner = {
+				set_variable = { which = synth_fert_living_deads value = 6000 }
+				subtract_variable = {
+					which = synth_fert_living_deads
+					value = remaining_synth_fert_pops
+				}
+				subtract_variable = {
+					which = synth_fert_living_deads
+					value = num_dead_identities
+				}
+				change_variable = {
+ 					which = num_dead_identities
+ 					value = synth_fert_living_deads
+ 				}
+ 			}
 		}
 	}
 }

@@ -1,0 +1,116 @@
+# Starlit Citadel Sealed System
+starlit_sealed_1 = {
+	class = "sc_black_hole"
+
+	flags = { starlit_sealed_system }
+
+	planet = {
+		class = "pc_black_hole"
+		orbit_distance = 0
+		orbit_angle = 0
+		size = 5
+		has_ring = no
+		init_effect = {
+			prevent_anomaly = yes
+			clear_deposits_stu = yes
+		}
+		flags = { suppress_archaeological_sites }
+	}
+
+	change_orbit = 60
+
+	planet = {
+		class = "rl_habitable_normal"
+		orbit_distance = 20
+		orbit_angle = { min = 90 max = 270 }
+		size = {
+			min = 18
+			max = 21
+		}
+		modifiers = none
+		init_effect = {
+			prevent_anomaly = yes
+			add_blocker = {
+				type = d_ruined_hatchery
+			}
+			set_planet_flag = biomechanical_world
+		}
+		flags = { suppress_archaeological_sites }
+	}
+
+	change_orbit = 30
+
+	planet = {
+		count = 2
+		class = "pc_gas_giant"
+		orbit_distance = 20
+		orbit_angle = { min = 90 max = 270 }
+
+		change_orbit = @base_moon_distance
+
+		init_effect = {
+			prevent_anomaly = yes
+			clear_deposits_stu = yes
+			# Either Food & Exotic Gases
+			# Or Society Research
+			random_list = {
+				50 = {
+					random_list = {
+						25 = { }	# No luck
+						25 = { add_deposit = d_food_3 }
+						25 = { add_deposit = d_food_4 }
+						25 = { add_deposit = d_food_5 }
+					}
+					random_list = {
+						25 = { }	# No luck
+						25 = { add_deposit = d_exotic_gases_1 }
+						25 = { add_deposit = d_exotic_gases_2 }
+						25 = { add_deposit = d_exotic_gases_3 }
+					}
+				}
+				50 = {
+					random_list = {
+						25 = { }	# No luck
+						25 = { add_deposit = d_society_3 }
+						25 = { add_deposit = d_society_4 }
+						25 = { add_deposit = d_society_5 }
+					}
+				}
+			}
+		}
+		flags = { suppress_archaeological_sites }
+		moon = {
+			count = { min = 0 max = 2 }
+			class = "pc_toxic"
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+			init_effect = {
+				prevent_anomaly = yes
+				clear_deposits_stu = yes
+				random_list = {
+					50 = {
+						random_list = {
+							50 = { }	# No luck
+							50 = { add_deposit = d_food_3 }
+						}
+						random_list = {
+							50 = { }	# No luck
+							50 = { add_deposit = d_exotic_gases_1 }
+						}
+					}
+					50 = {
+						random_list = {
+							50 = { }	# No luck
+							50 = { add_deposit = d_society_2 }
+						}
+					}
+				}
+			}
+			flags = { suppress_archaeological_sites }
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}

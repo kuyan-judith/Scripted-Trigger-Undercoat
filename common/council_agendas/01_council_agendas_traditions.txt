@@ -60,6 +60,7 @@ agenda_civil_exclusion = {
 	}
 	potential = {
 		has_paragon_dlc = yes
+		is_wilderness_empire = no # see 'agenda_confidence_in_variance'
 	}
 	modifier = {
 		planet_jobs_worker_produces_mult = 0.05
@@ -69,6 +70,22 @@ agenda_civil_exclusion = {
 	finish_modifier = agenda_civil_exclusion_finish
 }
 
+agenda_confidence_in_variance = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_domination_adopt
+	}
+	potential = {
+		has_paragon_dlc = yes
+		is_wilderness_empire = yes
+	}
+	modifier = {
+		planet_jobs_productive_produces_mult = 0.04
+		planet_crime_no_happiness_add = 10
+	}
+	finish_modifier = agenda_confidence_in_variance_finish
+}
+
 agenda_superior_colonies = {
 	agenda_cost = @base_tradition_agenda_cost
 	allow = {
@@ -76,11 +93,30 @@ agenda_superior_colonies = {
 	}
 	potential = {
 		has_paragon_dlc = yes
+		is_wilderness_empire = no
 	}
 	modifier = {
 		planet_colony_development_speed_mult = 0.25
 	}
 	finish_modifier = agenda_superior_colonies_finish
+	effect = {
+		custom_tooltip = council_agenda_agenda_superior_colonies_effect
+	}
+}
+
+agenda_superior_colonies_wilderness = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		is_wilderness_empire = yes
+		has_tradition = tr_expansion_adopt
+	}
+	potential = {
+		has_paragon_dlc = yes
+	}
+	modifier = {
+		terraform_speed_mult = 0.25
+	}
+	finish_modifier = agenda_superior_colonies_finish_wilderness
 	effect = {
 		custom_tooltip = council_agenda_agenda_superior_colonies_effect
 	}
@@ -112,6 +148,9 @@ agenda_open_markets = {
 	potential = {
 		has_paragon_dlc = yes
 		is_regular_empire = yes		# Copied from Tradition potential.
+		NOT = {
+			has_valid_civic = civic_criminal_heritage
+		}
 	}
 	modifier = {
 		commercial_pact_mult = 0.2
@@ -128,6 +167,7 @@ agenda_open_markets_criminal_heritage = {
 	potential = {
 		has_paragon_dlc = yes
 		is_regular_empire = yes		# Copied from Tradition potential.
+		has_valid_civic = civic_criminal_heritage
 	}
 	modifier = {
 		branch_office_holding_crime_mult = 0.2
@@ -142,9 +182,33 @@ agenda_favored_society = {
 	}
 	potential = {
 		has_paragon_dlc = yes
+		is_wilderness_empire = no # see 'agenda_favor_the_core'
 	}
 	modifier = {
 		planet_jobs_specialist_produces_mult = 0.05
+	}
+	finish_modifier = agenda_favored_society_finish
+	effect = {
+		capital_scope = {
+			add_modifier = {
+				modifier = agenda_favored_society_finish_planet
+				days = 3600
+			}
+		}
+	}
+}
+
+agenda_favor_the_core = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_prosperity_adopt
+	}
+	potential = {
+		has_paragon_dlc = yes
+		is_wilderness_empire = yes
+	}
+	modifier = {
+		planet_jobs_produces_mult = 0.03
 	}
 	finish_modifier = agenda_favored_society_finish
 	effect = {
@@ -316,7 +380,7 @@ agenda_leadership_conditioning = {
 		hidden_effect = {
 			every_owned_leader = {
 				limit = {
-					has_skill < 10
+					has_base_skill < 10
 				}
 				add_experience = owner.value:agenda_leadership_conditioning_reward
 			}

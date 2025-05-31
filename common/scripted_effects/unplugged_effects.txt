@@ -1,0 +1,1090 @@
+unplugged_origin_place_special_system_effect = {
+	reroll_random = yes
+	random_system = {
+		limit = {
+			has_owner = no
+			has_star_flag = $SYSTEM_FLAG$
+		}
+		spawn_system = {
+			min_distance = 10
+			max_distance = 15
+			max_jumps = 0
+			hyperlane = yes
+			initializer = $INITIALIZER$
+		}
+		imperial_origin_start_hyperlane_effect = {
+			ORIGINAL_STAR_SYSTEM = this
+			SECOND_STAR_SYSTEM = last_created_system
+		}
+	}
+	unplugged_origin_expand_machine_legacy_border_effect = yes
+}
+
+unplugged_origin_spawn_random_tomb_system_effect = {
+	reroll_random = yes
+	random_system = {
+		limit = {
+			has_star_flag = unplugged_machine_legacy_flag
+		}
+		weights = {
+			base = 1
+			modifier = {
+				factor = 2
+				has_star_flag = unplugged_machine_legacy_border_flag_3
+			}
+			modifier = {
+				factor = 4
+				has_star_flag = unplugged_machine_legacy_border_flag_2
+			}
+			modifier = {
+				factor = 8
+				has_star_flag = unplugged_machine_legacy_border_flag_1
+			}
+		}
+		random_list = {
+			25 = {
+				spawn_system = {
+					min_distance = 10
+					max_distance = 30
+					max_jumps = 0
+					hyperlane = yes
+					initializer =  unplugged_machine_legacy_tomb_1_system_init
+				}
+			}
+			25 = {
+				spawn_system = {
+					min_distance = 10
+					max_distance = 30
+					max_jumps = 0
+					hyperlane = yes
+					initializer =  unplugged_machine_legacy_tomb_2_system_init
+				}
+			}
+			25 = {
+				spawn_system = {
+					min_distance = 10
+					max_distance = 30
+					max_jumps = 0
+					hyperlane = yes
+					initializer = unplugged_machine_legacy_tomb_3_system_init
+				}
+			}
+			25 = {
+				spawn_system = {
+					min_distance = 10
+					max_distance = 30
+					max_jumps = 0
+					hyperlane = yes
+					initializer = unplugged_machine_legacy_tomb_4_system_init
+				}
+			}
+		}
+	}
+}
+
+unplugged_origin_system_backup_effect = {
+	while = {
+		limit = {
+			count_system = {
+				limit = { has_star_flag = unplugged_machine_legacy_tomb_system_flag }
+				count < 4
+			}
+		}
+		unplugged_origin_spawn_random_tomb_system_effect = yes
+	}
+}
+
+unplugged_origin_expand_machine_legacy_border_effect = {
+	every_system = {
+		limit = {
+			any_neighbor_system = {
+				has_star_flag = unplugged_machine_legacy_core_flag
+			}
+			NOR = {
+				has_owner = yes
+				has_star_flag = unplugged_machine_legacy_flag
+			}
+		}
+		set_star_flag = unplugged_machine_legacy_border_flag_1
+		set_star_flag = unplugged_machine_legacy_flag
+	}
+
+	every_system = {
+		limit = {
+			any_neighbor_system = {
+				has_star_flag = unplugged_machine_legacy_border_flag_1
+			}
+			NOR = {
+				has_owner = yes
+				has_star_flag = unplugged_machine_legacy_flag
+			}
+		}
+		set_star_flag = unplugged_machine_legacy_border_flag_2
+		set_star_flag = unplugged_machine_legacy_flag
+	}
+
+	every_system = {
+		limit = {
+			any_neighbor_system = {
+				has_star_flag = unplugged_machine_legacy_border_flag_2
+			}
+			NOR = {
+				has_owner = yes
+				has_star_flag = unplugged_machine_legacy_flag
+			}
+		}
+		set_star_flag = unplugged_machine_legacy_border_flag_3
+		set_star_flag = unplugged_machine_legacy_flag
+	}
+}
+
+unplugged_origin_mark_exisiting_tomb_worlds_effect = {
+	every_system = {
+		limit = {
+			has_star_flag = unplugged_machine_legacy_flag
+			has_planet_class = pc_nuked
+			NOT = { has_star_flag = unplugged_machine_legacy_unique_flag }
+			has_special_star_flag_trigger = no
+		}
+		every_system_planet = {
+			limit = {
+				is_nuked_world = yes # undercoat: moved to scripted trigger
+				is_preventing_anomaly = no
+			}
+			set_planet_flag = unplugged_machine_legacy_planet_flag
+			prevent_anomaly = yes
+			prev = {
+				set_star_flag = unplugged_machine_legacy_tomb_system_flag
+			}
+		}
+	}
+}
+
+unplugged_origin_populate_machine_legacy_effect = {
+	optimize_memory
+	every_system = {
+		limit = {
+			has_star_flag = unplugged_machine_legacy_flag
+			NOT = {
+				has_star_flag = unplugged_machine_legacy_unique_flag
+				has_star_flag = hostile_system
+			}
+		}
+		set_variable = {
+			which = difficulty_level
+			value = 0
+		}
+		switch = {
+			trigger = has_star_flag
+			unplugged_machine_legacy_border_flag_3 = {
+				random_list = {
+					55 = {
+						change_variable = {
+							which = difficulty_level
+							value = 4
+						}
+					}
+					30 = {
+						change_variable = {
+							which = difficulty_level
+							value = 3
+						}
+					}
+					10 = {
+						change_variable = {
+							which = difficulty_level
+							value = 5
+						}
+					}
+					5 = {
+						change_variable = {
+							which = difficulty_level
+							value = 7
+						}
+					}
+				}
+			}
+			unplugged_machine_legacy_border_flag_2 = {
+				random_list = {
+					50 = {
+						change_variable = {
+							which = difficulty_level
+							value = 11
+						}
+					}
+					25 = {
+						change_variable = {
+							which = difficulty_level
+							value = 14
+						}
+					}
+					15 = {
+						change_variable = {
+							which = difficulty_level
+							value = 17
+						}
+					}
+					10 = {
+						change_variable = {
+							which = difficulty_level
+							value = 21
+						}
+					}
+				}
+			}
+			unplugged_machine_legacy_border_flag_1 = {
+				random_list = {
+					50 = {
+						change_variable = {
+							which = difficulty_level
+							value = 25
+						}
+					}
+					25 = {
+						change_variable = {
+							which = difficulty_level
+							value = 28
+						}
+					}
+					15 = {
+						change_variable = {
+							which = difficulty_level
+							value = 33
+						}
+					}
+					10 = {
+						change_variable = {
+							which = difficulty_level
+							value = 35
+						}
+					}
+				}
+			}
+			default = {
+				change_variable = {
+					which = difficulty_level
+					value = 5
+				}
+			}
+		}
+		unplugged_origin_spawn_machine_fleet_effect = {
+			DIFFICULTY_LEVEL = difficulty_level
+			LOCATION = this
+		}
+		set_star_flag = hostile_system
+	}
+
+	event_target:origin_unplugged_maker_planet = {
+		add_deposit = d_fallen_orbital_shipyard
+		set_variable = {
+			which = difficulty_level
+			value = 7
+		}
+		unplugged_origin_spawn_machine_fleet_effect = {
+			DIFFICULTY_LEVEL = difficulty_level
+			LOCATION = this
+		}
+		solar_system = {
+			set_star_flag = hostile_system
+		}
+	}
+	event_target:origin_unplugged_taken_planet = {
+		create_ambient_object = {
+			type = abandoned_observation_outpost_generic
+			location = this
+		}
+		create_ambient_object = {
+			type = medium_debris_02_object
+			location = this
+		}
+		set_variable = {
+			which = difficulty_level
+			value = 10
+		}
+		unplugged_origin_spawn_machine_fleet_effect = {
+			DIFFICULTY_LEVEL = difficulty_level
+			LOCATION = this
+		}
+		solar_system = {
+			set_star_flag = hostile_system
+		}
+	}
+	event_target:origin_unplugged_creators_planet = {
+		clear_deposits_stu = yes
+		random_list = {
+			25 = {
+				add_deposit = d_mineral_fields
+				add_deposit = d_tempestous_mountain
+				add_deposit = d_bomb_crater
+				add_deposit = d_bomb_crater
+				add_deposit = d_radioactive_wasteland
+				add_deposit = d_radioactive_wasteland
+				add_deposit = d_radioactive_wasteland
+			}
+			25 = {
+				add_deposit = d_mineral_fields
+				add_deposit = d_searing_desert
+				add_deposit = d_bomb_crater
+				add_deposit = d_bomb_crater
+				add_deposit = d_bomb_crater
+				add_deposit = d_radioactive_wasteland
+			}
+			25 = {
+				add_deposit = d_ore_rich_caverns
+				add_deposit = d_dust_caverns
+				add_deposit = d_bomb_crater
+				add_deposit = d_bomb_crater
+				add_deposit = d_radioactive_wasteland
+				add_deposit = d_radioactive_wasteland
+			}
+			25 = {
+				add_deposit = d_ore_rich_caverns
+				add_deposit = d_searing_desert
+				add_deposit = d_bomb_crater
+				add_deposit = d_bomb_crater
+				add_deposit = d_radioactive_wasteland
+			}
+		}
+	}
+
+	every_country = {
+		limit = {
+			is_unplugged_empire = yes # undercoat: moved to scripted trigger
+		}
+		event_target:origin_unplugged_unplugged_planet_@this = {
+			set_variable = {
+				which = difficulty_level
+				value = 15
+			}
+			unplugged_origin_spawn_machine_fleet_effect = {
+				DIFFICULTY_LEVEL = difficulty_level
+				LOCATION = this
+			}
+			solar_system = {
+				set_star_flag = hostile_system
+			}
+		}
+	}
+
+	every_system = {
+		limit = {
+			has_star_flag = unplugged_machine_legacy_flag
+			NOT = { has_star_flag = unplugged_machine_legacy_unique_flag }
+		}
+		every_system_planet = {
+			limit = {
+				OR = {
+					has_planet_flag = pre_ftl_default
+					has_planet_flag = pre_ftl_hive_mind
+				}
+			}
+			set_variable = {
+				which = difficulty_level
+				value = 3
+			}
+			unplugged_origin_spawn_machine_fleet_effect = {
+				DIFFICULTY_LEVEL = difficulty_level
+				LOCATION = this
+			}
+			last_created_fleet = {
+				set_name = NAME_Prospector_Fleet
+			}
+			create_ambient_object = {
+				type = small_debris_object
+				location = this
+			}
+			prev = {
+				if = {
+					limit = {
+						NOT = { has_star_flag = hostile_system }
+					}
+					set_star_flag = hostile_system
+				}
+			}
+		}
+	}
+}
+
+unplugged_origin_spawn_machine_fleet_effect = {
+	event_target:origin_unplugged_assimilator_empire = {
+		create_fleet = {
+			name = NAME_Barrier_Fleet
+			effect = {
+				set_owner = event_target:origin_unplugged_assimilator_empire
+
+				set_variable = {
+					which = scaled_difficulty
+					value = prevprev.$DIFFICULTY_LEVEL$
+				}
+
+				switch = {
+					trigger = is_difficulty
+					0 = {	# Civilian
+						multiply_variable = {
+							which = scaled_difficulty
+							value = 0.5
+						}
+					}
+					1 = {	# Cadet
+						multiply_variable = {
+							which = scaled_difficulty
+							value = 0.75
+						}
+					}
+					2 = {	# Ensign
+					}
+					3 = {	# Captain
+						multiply_variable = {
+							which = scaled_difficulty
+							value = 1.25
+						}
+					}
+					4 = {	# Commodore
+						multiply_variable = {
+							which = scaled_difficulty
+							value = 1.5
+						}
+					}
+					5 = {	# Admiral
+						multiply_variable = {
+							which = scaled_difficulty
+							value = 1.75
+						}
+					}
+					6 = {	# Grand Admiral
+						multiply_variable = {
+							which = scaled_difficulty
+							value = 2
+						}
+					}
+				}
+
+				ceiling_variable = scaled_difficulty
+
+				set_variable = {
+					which = corvette_amount
+					value = scaled_difficulty
+				}
+
+				if = {
+					limit = {
+						check_variable = {
+							which = corvette_amount
+							value > 7
+						}
+					}
+					set_variable = {
+						which = corvette_amount
+						value = 7
+					}
+				}
+
+				while = {
+					count = corvette_amount
+					create_ship = {
+						name = random
+						design = "NAME_Unplugged_Machine_Legacy_Corvette"
+						prefix = no
+					}
+				}
+
+				set_variable = {
+					which = destroyer_amount
+					value = scaled_difficulty
+				}
+
+				divide_variable = {
+					which = destroyer_amount
+					value = 7
+				}
+
+				floor_variable = destroyer_amount
+
+				while = {
+					count = destroyer_amount
+					create_ship = {
+						name = random
+						design = "NAME_Unplugged_Machine_Legacy_Destroyer"
+						prefix = no
+					}
+				}
+
+				set_variable = {
+					which = crusier_amount
+					value = scaled_difficulty
+				}
+
+				divide_variable = {
+					which = crusier_amount
+					value = 11
+				}
+
+				floor_variable = crusier_amount
+
+				while = {
+					count = crusier_amount
+					create_ship = {
+						name = random
+						design = "NAME_Unplugged_Machine_Legacy_Cruiser"
+						prefix = no
+					}
+				}
+
+				set_variable = {
+					which = battleship_amount
+					value = scaled_difficulty
+				}
+
+				divide_variable = {
+					which = battleship_amount
+					value = 17
+				}
+
+				floor_variable = battleship_amount
+
+				while = {
+					count = battleship_amount
+					create_ship = {
+						name = random
+						design = "NAME_Unplugged_Machine_Legacy_Battleship"
+						prefix = no
+					}
+				}
+
+				set_location = prevprev.$LOCATION$
+				set_fleet_stance = aggressive
+				set_aggro_range_measure_from = self
+				set_aggro_range = 400
+			}
+		}
+	}
+}
+
+unplugged_origin_find_available_machine_legacy_world_effect = {
+	random_system = {
+		limit = {
+			has_star_flag = unplugged_machine_legacy_tomb_system_flag
+		}
+		remove_star_flag = unplugged_machine_legacy_tomb_system_flag
+		every_system_planet = {
+			limit = {
+				has_planet_flag = unplugged_machine_legacy_planet_flag
+			}
+			if = {
+				limit = {
+					NOT = { exists = event_target:$LOCAL_EVENT_TARGET$ }
+				}
+				save_event_target_as = $LOCAL_EVENT_TARGET$
+			}
+		}
+	}
+	if = {
+		limit = {
+			NOT = { exists = event_target:$LOCAL_EVENT_TARGET$ }
+		}
+		unplugged_origin_spawn_random_tomb_system_effect = yes
+		last_created_system = {
+			remove_star_flag = unplugged_machine_legacy_tomb_system_flag
+			every_system_planet = {
+				limit = {
+					has_planet_flag = unplugged_machine_legacy_planet_flag
+				}
+				if = {
+					limit = {
+						NOT = { exists = event_target:$LOCAL_EVENT_TARGET$ }
+					}
+					save_event_target_as = $LOCAL_EVENT_TARGET$
+				}
+			}
+		}
+	}
+}
+
+unplugged_origin_queue_identity_situation_event_effect = {
+	situation_event = {
+		id = unplugged.3901
+		days = 1800
+		random = 120
+	}
+}
+
+unplugged_origin_check_remove_poi_effect = {
+	if = {
+		limit = {
+			is_point_of_interest = {
+				id = $POI$
+				event_chain = unplugged_origin_machine_legacy_chain
+				owner = root.controller
+			}
+		}
+		root.controller = {
+			remove_point_of_interest = $POI$
+		}
+	}
+}
+
+unplugged_spawn_factions_check = { # country scope
+	random_list = {
+		3 = {
+			country_event = { id = unplugged.4005 days = 20 }
+		}
+		2 = {
+			# nothing
+		}
+	}
+}
+
+unplugged_identity_situation_update_traits_effect = {
+	target = {
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 2
+				}
+				owner_main_species = {
+					NOT = { has_trait = trait_unplugged_cybernetic_positives_2 }
+				}
+			}
+
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_unplugged_cybernetic_positives_3
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					remove_trait = trait_unplugged_cybernetic_positives_3
+					add_trait = trait_unplugged_cybernetic_positives_2
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+
+			every_owned_leader = {
+				limit = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+					has_trait = leader_trait_unplugged_cybernetic_positives_3
+				}
+				remove_trait = leader_trait_unplugged_cybernetic_positives_3
+				add_trait_no_notify = leader_trait_unplugged_cybernetic_positives_2
+			}
+			unplugged_decyberization_random_event_effect = yes
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 1
+				}
+				owner_main_species = {
+					NOT = { has_trait = trait_unplugged_cybernetic_positives_1 }
+				}
+			}
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_unplugged_cybernetic_positives_2
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					remove_trait = trait_unplugged_cybernetic_positives_2
+					add_trait = trait_unplugged_cybernetic_positives_1
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+			every_owned_leader = {
+				limit = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+					has_trait = leader_trait_unplugged_cybernetic_positives_2
+				}
+				remove_trait = leader_trait_unplugged_cybernetic_positives_2
+				add_trait_no_notify = leader_trait_unplugged_cybernetic_positives_1
+			}
+			unplugged_decyberization_random_event_effect = yes
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 0
+				}
+			}
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_unplugged_cybernetic_positives_1
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					remove_trait = trait_unplugged_cybernetic_positives_1
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+			every_owned_leader = {
+				limit = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+					has_trait = leader_trait_unplugged_cybernetic_positives_1
+				}
+				remove_trait = leader_trait_unplugged_cybernetic_positives_1
+			}
+			unplugged_decyberization_random_event_effect = yes
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 2
+				}
+				owner_main_species = {
+					NOT = { has_trait = trait_unplugged_cybernetic_negatives_2 }
+				}
+			}
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_unplugged_cybernetic_negatives_3
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					remove_trait = trait_unplugged_cybernetic_negatives_3
+					add_trait = trait_unplugged_cybernetic_negatives_2
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+				owner_main_species = {
+					NOT = { has_trait = trait_unplugged_cybernetic_negatives_1 }
+				}
+			}
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_unplugged_cybernetic_negatives_2
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					remove_trait = trait_unplugged_cybernetic_negatives_2
+					add_trait = trait_unplugged_cybernetic_negatives_1
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 0
+				}
+			}
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_unplugged_cybernetic_negatives_1
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					remove_trait = trait_unplugged_cybernetic_negatives_1
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 0
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 0
+				}
+				owner_main_species = {
+					NOT = { has_trait = trait_unplugged_decyberized }
+				}
+			}
+			every_owned_pop_group = {
+				limit = {
+					NOT = { has_trait = trait_unplugged_decyberized }
+					species = {
+						has_species_flag = unplugged_species
+					}
+				}
+				species = {
+					save_event_target_as = previous_species
+				}
+				modify_species = {
+					species = this
+					add_trait = trait_unplugged_decyberized
+					inline_script = {
+						script = traits/remove_all_cybernetic_traits
+					}
+					effect = {
+						copy_flags_and_variables_from = event_target:previous_species
+						save_event_target_as = target_species
+					}
+				}
+			}
+			change_dominant_species = {
+				species = event_target:target_species
+				change_all = yes
+			}
+		}
+	}
+}
+
+# Random event following decyberization trait change
+unplugged_decyberization_random_event_effect = {
+	if = {
+		limit = {
+			owner_main_species = {
+				NOT = { has_trait = trait_unplugged_decyberized }
+			}
+		}
+		random_list = {
+			2 = {
+				# No effect
+			}
+			1 = {
+				country_event = {
+					id = unplugged.5001
+					days = 30
+					random = 30
+				}
+			}
+			1 = {
+				country_event = {
+					id = unplugged.5002
+					days = 30
+					random = 30
+				}
+			}
+			1 = {
+				country_event = {
+					id = unplugged.5003
+					days = 30
+					random = 30
+				}
+			}
+			1 = {
+				country_event = {
+					id = unplugged.5004
+					days = 30
+					random = 30
+				}
+			}
+		}
+	}
+}
+
+unplugged_identity_situation_spawn_decyberization_notification_effect = {
+	target = {
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 2
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 2
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_DECYBERIZED
+				localization = situation_unplugged_decyber_notification_22
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 2
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_DECYBERIZED
+				localization = situation_unplugged_decyber_notification_21
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 2
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 0
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_DECYBERIZED
+				localization = situation_unplugged_decyber_notification_20
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 1
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_DECYBERIZED
+				localization = situation_unplugged_decyber_notification_11
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 1
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 0
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_DECYBERIZED
+				localization = situation_unplugged_decyber_notification_10
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_benefits
+					value = 0
+				}
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 0
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_DECYBERIZED
+				localization = situation_unplugged_decyber_notification_00
+				days = 90
+			}
+		}
+	}
+}
+
+unplugged_identity_situation_spawn_cyberization_notification_effect = {
+	target = {
+		if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 2
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_CYBERIZED
+				localization = situation_unplugged_lost_negative_3
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 1
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_CYBERIZED
+				localization = situation_unplugged_lost_negative_2
+				days = 90
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = var_unplugged_cybernetic_negatives
+					value = 0
+				}
+			}
+			create_message = {
+				type = MESSAGE_UNPLUGGED_CYBERIZED
+				localization = situation_unplugged_lost_negative_1
+				days = 90
+			}
+		}
+	}
+}

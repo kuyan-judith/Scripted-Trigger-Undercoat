@@ -4963,13 +4963,19 @@ country_event = {
 				}
 				modifier = {
 					factor = 1.6
-					num_buildings = {
-						type = building_clinic
-						value = 0
-					}
-					num_buildings = {
-						type = building_hospital
-						value = 0
+					OR = {
+						num_buildings = {
+							type = building_medical_1
+							value = 0
+						}
+						num_buildings = {
+							type = building_medical_2
+							value = 0
+						}
+						num_buildings = {
+							type = building_medical_3
+							value = 0
+						}
 					}
 				}
 				modifier = {
@@ -5000,7 +5006,7 @@ country_event = {
 					factor = 1.5
 					OR = {
 						has_citizen_service = yes # undercoat: moved to scripted trigger
-						is_homicidal = yes # undercoat: moved to scripted trigger
+						has_civic = civic_fanatic_purifiers
 						has_civic = civic_distinguished_admiralty
 						has_civic = civic_naval_contractors
 						is_despoiler_empire = yes # undercoat: moved to scripted trigger
@@ -5063,7 +5069,7 @@ country_event = {
 						is_aristocratic_empire = yes # undercoat: moved to scripted trigger
 						is_feudal_empire = yes # undercoat: moved to scripted trigger
 						has_slaver_civic = yes # undercoat: moved to scripted trigger
-						is_pleasure_seeker = yes # undercoat: moved to scripted trigger
+						is_pleasure_seeker_empire = yes # undercoat: moved to scripted trigger
 						has_toxic_baths = yes
 						
 						
@@ -5385,17 +5391,17 @@ country_event = {
 			random_owned_planet = {
 				limit = {
 					is_capital = no
-					any_owned_pop = {
+					any_owned_pop_group = {
 						is_sapient = yes
-						is_robot_pop = no
+						is_robot_pop_group = no
 					}
 				}
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						is_sapient = yes
-						is_robot_pop = no
+						is_robot_pop_group = no
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			set_variable = {
@@ -5418,17 +5424,17 @@ country_event = {
 			random_owned_planet = {
 				limit = {
 					is_capital = no
-					any_owned_pop = {
+					any_owned_pop_group = {
 						is_sapient = yes
-						is_robot_pop = no
+						is_robot_pop_group = no
 					}
 				}
-				random_owned_pop = {
+				random_owned_pop_group = {
 					limit = {
 						is_sapient = yes
-						is_robot_pop = no
+						is_robot_pop_group = no
 					}
-					kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+					kill_single_pop = yes
 				}
 			}
 			if = {
@@ -5583,6 +5589,9 @@ country_event = {
 		hidden_effect = {
 			remove_country_flag = form_covenant_flag
 		}
+	}
+	after = {
+		country_event = { id = timeline.24 } # Milestone First Custodian Appointment
 	}
 }
 
@@ -5800,10 +5809,10 @@ country_event = {
 					add_building = building_hydroponics_farm
 					while = {
 						limit = {
-							num_pops < 8
+							pop_amount < 800
 							free_housing > 0
 						}
-						create_pop = {
+						create_pop_group = {
 							species = owner
 						}
 					}
@@ -5826,10 +5835,10 @@ country_event = {
 					add_building = building_factory_1
 					while = {
 						limit = {
-							num_pops < 8
+							pop_amount < 800
 							free_housing > 0
 						}
-						create_pop = {
+						create_pop_group = {
 							species = owner
 						}
 					}
@@ -5864,7 +5873,7 @@ country_event = {
 			limit = { has_modifier = covenant_shroud_marked }
 			remove_modifier = covenant_shroud_marked
 			remove_all_armies = yes
-			every_owned_pop = {
+			every_owned_pop_group = {
 				root = {
 					change_variable = {
 						which = "end_power"
@@ -5922,12 +5931,12 @@ country_event = {
 				}
 				change_pc = pc_ringworld_habitable_damaged
 				clear_planet_modifiers = yes
-				clear_deposits_stu = yes # undercoat: moved to scripted effect
+				clear_deposits_stu = yes
 			}
 			else = {
 				change_pc = pc_shrouded
 				clear_planet_modifiers = yes
-				clear_deposits_stu = yes # undercoat: moved to scripted effect
+				clear_deposits_stu = yes
 			}
 		}
 
@@ -6241,12 +6250,12 @@ planet_event = {
 			}
 			change_pc = pc_ringworld_habitable_damaged
 			clear_planet_modifiers = yes
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes
 		}
 		else = {
 			change_pc = pc_shrouded
 			clear_planet_modifiers = yes
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes
 		}
 	}
 
@@ -6434,12 +6443,12 @@ country_event = {
 
 	trigger = {
 		any_owned_planet = {
-			num_pops > 1
+			pop_amount > 100
 			NOR = {
 				has_modifier = whisperers_madness
 				has_modifier = whisperers_psychosis
 			}
-			any_owned_pop = {
+			any_owned_pop_group = {
 				has_trait = "trait_psionic"
 			}
 		}
@@ -6448,17 +6457,17 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				num_pops > 1
+				pop_amount > 100
 				NOR = {
 					has_modifier = whisperers_madness
 					has_modifier = whisperers_psychosis
 				}
-				any_owned_pop = {
+				any_owned_pop_group = {
 					has_trait = "trait_psionic"
 				}
 			}
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -6485,12 +6494,12 @@ country_event = {
 
 	trigger = {
 		any_owned_planet = {
-			num_pops > 5
+			pop_amount > 500
 			NOR = {
 				has_modifier = whisperers_madness
 				has_modifier = whisperers_psychosis
 			}
-			any_owned_pop = {
+			any_owned_pop_group = {
 				has_trait = "trait_psionic"
 			}
 		}
@@ -6499,17 +6508,17 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				num_pops > 1
+				pop_amount > 100
 				NOR = {
 					has_modifier = whisperers_madness
 					has_modifier = whisperers_psychosis
 				}
-				any_owned_pop = {
+				any_owned_pop_group = {
 					has_trait = "trait_psionic"
 				}
 			}
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -6571,7 +6580,7 @@ country_event = {
 
 	trigger = {
 		any_owned_planet = {
-			num_pops > 4
+			pop_amount > 400
 			NOR = {
 				has_modifier = eater_unhappiness_planet_1
 				has_modifier = eater_unhappiness_planet_2
@@ -6582,21 +6591,21 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				num_pops > 4
+				pop_amount > 400
 				NOR = {
 					has_modifier = eater_unhappiness_planet_1
 					has_modifier = eater_unhappiness_planet_2
 				}
 			}
 			save_event_target_as = planet_target
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -6660,7 +6669,7 @@ country_event = {
 			save_event_target_as = planet_target
 			change_pc = pc_shrouded
 			clear_planet_modifiers = yes
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes
 			if = {
 				limit = { has_orbital_station = yes }
 				orbital_station = {
@@ -6855,11 +6864,11 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				any_owned_pop = {
+				any_owned_pop_group = {
 					has_trait = trait_psionic
 				}
 			}
-			random_owned_pop = {
+			weighted_random_owned_pop_group = {
 				limit = {
 					has_trait = trait_psionic
 				}
@@ -6925,7 +6934,7 @@ country_event = {
 
 	trigger = {
 		any_owned_planet = {
-			num_pops > 1
+			pop_amount > 100
 			NOR = {
 				has_modifier = eater_unhappiness_planet_1
 				has_modifier = eater_unhappiness_planet_2
@@ -6936,15 +6945,15 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				num_pops > 1
+				pop_amount > 100
 				NOR = {
 					has_modifier = eater_unhappiness_planet_1
 					has_modifier = eater_unhappiness_planet_2
 				}
 			}
 			save_event_target_as = planet_target
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			random_owned_pop_group = {
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -7030,8 +7039,8 @@ country_event = {
 
 	trigger = {
 		any_owned_planet = {
-			count_owned_pop = {
-				count >= 8
+			count_owned_pop_amount = {
+				count >= 800
 				limit = {
 					is_sapient = yes
 					has_trait = trait_psionic
@@ -7044,8 +7053,8 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				count_owned_pop = {
-					count >= 8
+				count_owned_pop_amount = {
+					count >= 800
 					limit = {
 						is_sapient = yes
 						has_trait = trait_psionic
@@ -7054,7 +7063,7 @@ country_event = {
 				}
 			}
 			save_event_target_as = devolved_species_planet
-			random_owned_pop = {
+			weighted_random_owned_pop_group = {
 				limit = {
 					is_sapient = yes
 					has_trait = trait_psionic
@@ -7062,16 +7071,20 @@ country_event = {
 				}
 				species = { save_event_target_as = species_target }
 				create_random_devolved_species = yes
-			}
-			while = {
-				count = 4
-				random_owned_pop = {
-					limit = {
-						is_sapient = yes
-						has_trait = trait_psionic
-						has_presapient_trait = no
+				save_event_target_as = source_pop_group
+				prev = {
+					create_pop_group = {
+						pop_group = event_target:source_pop_group
+						size = 0
+						effect = {
+							change_species = event_target:devolved_species_target
+							transfer_pop_amount = {
+								source = event_target:source_pop_group
+								target = this
+								amount = 400
+							}
+						}
 					}
-					change_species = event_target:devolved_species_target
 				}
 			}
 			check_planet_employment = yes

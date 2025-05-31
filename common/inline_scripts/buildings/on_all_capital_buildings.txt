@@ -5,6 +5,9 @@ triggered_planet_modifier = {
 			is_imperial_authority = yes
 			is_cyber_imperial = no
 			is_synth_imperial = no
+			is_purity_authority = no
+			is_cloning_authority = no
+			is_mutation_authority = no
 			capital_scope.solar_system = {
 				is_same_value = ROOT.solar_system
 			}
@@ -14,10 +17,11 @@ triggered_planet_modifier = {
 }
 
 inline_script = {
-	script = jobs/triggered/soldiers_add
-	desc = 0
-	trigger = " "
+	script = stu/jobs_add
+	job_type = soldiers
+	trigger = "owner = { is_wilderness_empire = no }"
 	mult_line = "mult = modifier:job_soldier_or_warrior_add"
+	desc = 0
 }
 
 # Cyber Organ Harvesting
@@ -34,7 +38,7 @@ triggered_planet_modifier = {
 			}
 		}
 	}
-	pop_growth_speed = 0.10
+	logistic_growth_mult = 0.1
 }
 
 # Cyber Implant Taxes
@@ -119,6 +123,19 @@ triggered_planet_modifier = {
 	mult = value:count_any_districts
 }
 
+# Synthetic Physical Specialist Production
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = {
+			has_auth_synth_democratic_physical = yes # undercoat - moved to scripted trigger
+		}
+	}
+	key = auth_synth_democratic_physical
+	pop_cat_specialist_bonus_workforce_mult = 0.01
+	mult = value:count_any_districts
+}
+
 triggered_planet_modifier = {
 	potential = {
 		exists = owner
@@ -156,8 +173,34 @@ triggered_planet_modifier = {
 			has_active_tradition = tr_synthetics_prefabricated_components_machine
 		}
 	}
-	job_replicator_add = 1
+	job_replicator_add = 100
 }
 
 # Primal Calling origin: Give Ethic-based jobs
 inline_script = jobs/wranglers_or_variant_add
+
+#Traders from Branch Offices
+triggered_planet_modifier = {
+	potential = {
+		exists = owner
+		owner = { is_megacorp = yes } # undercoat: moved to scripted trigger
+		is_capital = yes
+	}
+	job_trader_add = 1
+	mult = modifier:job_capital_trader_add
+}
+
+# Corporate Evolutionary Predators
+triggered_country_modifier = {
+	potential = {
+		exists = owner
+		is_capital = yes
+		owner = {
+			is_megacorp = yes
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+			is_mutation_authority = yes
+		}
+	}
+	commercial_pact_mult = 0.01
+	mult = owner.species.species_traits_evopred_count
+}

@@ -1,317 +1,30 @@
 @base_cost = 300
 @city_cost = 500
 
-district_crashed_slaver_ship = {
-	is_capped_by_modifier = yes
-	can_demolish = no
-	exempt_from_ai_planet_specialization = yes
-
-	show_on_uncolonized = {
-		always = no
-	}
-
-	potential = {
-		exists = owner
-		uses_district_set = standard
-		has_deposit = d_crashed_slaver_ship
-	}
-
-	allow = {
-		NOT = { has_modifier = resort_colony }
-		NOT = { has_modifier = slave_colony }
-	}
-
-	conversion_ratio = 1
-	convert_to = {
-		district_city
-		district_arcology_housing
-		district_rw_city
-		district_nexus
-		district_hive
-	}
-
-	resources = {
-		category = planet_districts_cities
-		upkeep = {
-			energy = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_max_buildings_add = 0.75
-	}
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:crashed_slaver_ship_housing_stu
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				NOT = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
-			}
-		}
-		job_broken_shackles_scavenger_add = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
-		}
-		modifier = {
-			job_clerk_add = 1
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				NOT = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
-			}
-		}
-		text = job_broken_shackles_scavenger_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted
-			}
-		}
-		text = job_clerk_effect_desc
-	}
-}
-
-district_resort = {
-	base_buildtime = 480
-	is_capped_by_modifier = no
-	exempt_from_ai_planet_specialization = yes
-
-	show_on_uncolonized = {
-		exists = from
-		from = { is_regular_empire = yes }
-		has_modifier = resort_colony
-	}
-
-	potential = {
-		exists = owner
-		owner = { is_regular_empire = yes }
-		has_modifier = resort_colony
-	}
-
-	allow = {
-		NOT = { has_modifier = slave_colony }
-	}
-
-	conversion_ratio = 1
-	convert_to = {
-		district_city
-		district_arcology_housing
-		district_rw_city
-		district_nexus
-		district_hive
-	}
-
-	resources = {
-		category = planet_districts_cities
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_max_buildings_add = 0.5
-	}
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:resort_district_housing_stu
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-			}
-		}
-		modifier = {
-			job_resort_worker_add = 2
-		}
-	}
-
-	# Undercoat inline script
-	inline_script = {
-		script = stu/jobs_add
-		job_type = entertainers
-		AMOUNT = 1
-		trigger = "
-			owner = { is_pleasure_seeker = yes }
-		"
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_resort_worker_effect_desc
-	}
-}
-
-district_prison = {
-	base_buildtime = 480
-	is_capped_by_modifier = no
-	exempt_from_ai_planet_specialization = yes
-	icon = district_city
-
-	show_on_uncolonized = {
-		exists = from
-		from = { is_regular_empire = yes }
-		has_modifier = penal_colony
-	}
-
-	potential = {
-		exists = owner
-		owner = { is_regular_empire = yes }
-		has_modifier = penal_colony
-	}
-
-	allow = {
-		has_modifier = penal_colony
-	}
-
-	conversion_ratio = 1
-	convert_to = {
-		district_arcology_housing
-		district_rw_city
-		district_nexus
-		district_hive
-	}
-
-	resources = {
-		category = planet_districts_cities
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_max_buildings_add = 1
-	}
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:prison_district_housing_stu
-	}
-
-	# Undercoat inline script
-	# (vanilla triggers are redundant with is_regular_empire)
-	inline_script = {
-		script = jobs/enforcers_add
-		AMOUNT = 2
-	}
-}
-
-district_slave = {
-	base_buildtime = 480
-	is_capped_by_modifier = no
-	exempt_from_ai_planet_specialization = yes
-	icon = district_city
-
-	show_on_uncolonized = {
-		exists = from
-		from = { is_regular_empire = yes }
-		has_modifier = slave_colony
-	}
-
-	potential = {
-		exists = owner
-		owner = { is_regular_empire = yes }
-		has_modifier = slave_colony
-	}
-
-	allow = {
-		has_modifier = slave_colony
-	}
-
-	conversion_ratio = 1
-	convert_to = {
-		district_arcology_housing
-		district_rw_city
-		district_nexus
-		district_hive
-		district_city
-	}
-
-	resources = {
-		category = planet_districts_cities
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_max_buildings_add = 1
-	}
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:slave_district_housing_stu
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = no
-				is_fallen_empire_spiritualist = no
-			}
-		}
-		modifier = {
-			job_slave_overseer_add = 2
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_slave_overseer_effect_desc
-	}
-
-}
-
 district_city = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
+	default_starting_district = yes
+
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
 
 	show_on_uncolonized = {
 		exists = from
-		from = { is_regular_empire = yes }
+		from = {
+			is_regular_empire = yes
+		}
 		OR = {
 			uses_district_set = standard
 			uses_district_set = hive_world
 			uses_district_set = machine_world
 			uses_district_set = shattered_ring_world
 		}
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = penal_colony
-			has_modifier = slave_colony
-		}
+		is_special_colony_type = no
 	}
 
 	potential = {
@@ -338,27 +51,207 @@ district_city = {
 			uses_district_set = machine_world
 			uses_district_set = shattered_ring_world
 		}
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = penal_colony
-			has_modifier = slave_colony
+		is_special_colony_type = no
+
+		NAND = {
+			is_capital = yes
+			owner = {
+				has_menace_perk = menp_behemoth_mind_meld
+			}
 		}
+
 	}
 
 	allow = {
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = penal_colony
-			has_modifier = slave_colony
-		}
+		is_special_colony_type = no
 	}
 
 	conversion_ratio = 1
 	convert_to = {
+		district_crashed_slaver_ship
 		district_arcology_housing
 		district_rw_city
 		district_nexus
 		district_hive
+		district_prison
+		district_craglands
+		district_mindlink
+		district_crashed_slaver_ship
+		district_resort
+		district_slave
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+			trigger = {
+				NOT = { has_modifier = wooden_planet }
+			}
+		}
+		cost = {
+			food = @city_cost
+			trigger = {
+				has_modifier = wooden_planet
+			}
+		}
+		upkeep = {
+			energy = 2
+			trigger = {
+				NOT = { has_modifier = wooden_planet }
+			}
+		}
+		upkeep = {
+			food = 2
+			trigger = {
+				has_modifier = wooden_planet
+			}
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:city_district_housing_stu
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_urban
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_urban
+	}
+
+	inline_script = {
+		script = districts/ai_urban_district_extra_weighting
+	}
+}
+
+district_crashed_slaver_ship = {
+	is_capped_by_modifier = yes
+	can_demolish = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_city_government
+	}
+
+	show_on_uncolonized = {
+		always = no
+		exists = from
+		from = { is_wilderness_empire = no }
+	}
+
+	potential = {
+		uses_district_set = standard
+		has_deposit = d_crashed_slaver_ship
+		if = {
+			limit = {
+				exists = owner
+			}
+			NAND = {
+				is_capital = yes
+				owner = {
+					has_menace_perk = menp_behemoth_mind_meld
+				}
+			}
+			owner = { is_wilderness_empire = no }
+		}
+	}
+
+	allow = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_city
+		district_arcology_housing
+		district_rw_city
+		district_nexus
+		district_hive
+		district_craglands
+		district_mindlink
+	}
+
+	resources = {
+		category = planet_districts_cities
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:crashed_slaver_ship_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				NOT = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
+			}
+		}
+		job_broken_shackles_scavenger_add = 100
+	}
+
+	inline_script = {
+		script = stu/jobs_add
+		job_type = clerks
+		trigger = "owner = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }"
+		AMOUNT = 100
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				NOT = { has_country_flag = origin_broken_shackles_crashed_slaver_ship_depleted }
+			}
+		}
+		text = job_broken_shackles_scavenger_effect_desc
+	}
+}
+
+district_resort = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_city_government
+		slot_resort_01
+		slot_resort_02
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = resort_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = resort_colony
+	}
+
+	allow = {
+		NOT = { has_modifier = slave_colony }
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_city
+		district_arcology_housing
+		district_rw_city
+		district_nexus
+		district_hive
+		district_craglands
+		district_mindlink
+		district_crashed_slaver_ship
 		district_prison
 	}
 
@@ -390,38 +283,20 @@ district_city = {
 		}
 	}
 
-	planet_modifier = {
-		planet_max_buildings_add = 1
-	}
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:city_district_housing_stu
+		planet_housing_add = 1
+		mult = value:resort_district_housing_stu
 	}
 
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
 			owner = {
-				OR = {
-					is_regular_empire = yes
-					is_fear_of_the_dark_empire = yes # undercoat: moved to scripted trigger
-				}
+				is_regular_empire = yes
 			}
 		}
 		modifier = {
-			job_clerk_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_active_tradition = tr_virtuality_4
-			}
-		}
-		modifier = {
-			job_clerk_add = 2
+			job_resort_worker_add = @[special_district_jobs+base_district_jobs]
 		}
 	}
 
@@ -430,47 +305,41 @@ district_city = {
 			exists = owner
 			owner = { is_regular_empire = yes }
 		}
-		text = job_clerk_effect_desc
+		text = job_resort_worker_effect_desc
+	}
+
+	triggered_name = {
+		text = resort_default
+	}
+
+	triggered_flavor_desc = {
+		text = district_resort_desc
 	}
 }
 
-district_hive = {
+district_resort_1 = {
+	icon = district_resort_secondary
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
 
+	zone_slots = {
+		slot_resort_attraction_01
+	}
+
 	show_on_uncolonized = {
-		exists = from # ariphaos
-		from = { is_hive_empire = yes }
-		OR = {
-			uses_district_set = standard
-			uses_district_set = hive_world
-			uses_district_set = machine_world
-			uses_district_set = shattered_ring_world
-		}
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = resort_colony
 	}
 
 	potential = {
 		exists = owner
-		owner = { is_hive_empire = yes }
-		OR = {
-			uses_district_set = standard
-			uses_district_set = hive_world
-			uses_district_set = machine_world
-			uses_district_set = shattered_ring_world
-		}
+		owner = { is_regular_empire = yes }
+		has_modifier = resort_colony
 	}
 
 	allow = {
-		NOT = { has_modifier = resort_colony }
-	}
-
-	conversion_ratio = 1
-	convert_to = {
-		district_arcology_housing
-		district_rw_hive
-		district_nexus
-		district_city
 	}
 
 	resources = {
@@ -483,61 +352,152 @@ district_hive = {
 		}
 	}
 
-	planet_modifier = {
-		job_maintenance_drone_add = 3
-		planet_max_buildings_add = 1
-	}
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:hive_district_housing_stu
+		planet_housing_add = 1
+		mult = value:resort_attraction_housing_stu
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			is_hive_world = yes # undercoat: moved to scripted trigger
-		}
-		modifier = {
-			job_maintenance_drone_add = 3
-		}
+	triggered_name = {
+		text = resort_attraction_default
+	}
+
+	triggered_flavor_desc = {
+		text = district_resort_1_desc
 	}
 }
 
-district_nexus = {
+district_resort_2 = {
+	icon = district_resort_secondary
 	base_buildtime = 480
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
 
+	zone_slots = {
+		slot_resort_attraction_01
+	}
+
 	show_on_uncolonized = {
-		exists = from # ariphaos
-		from = { is_machine_empire = yes }
-		OR = {
-			uses_district_set = standard
-			uses_district_set = hive_world
-			uses_district_set = machine_world
-			uses_district_set = shattered_ring_world
-		}
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = resort_colony
 	}
 
 	potential = {
 		exists = owner
-		owner = { is_machine_empire = yes }
-		OR = {
-			uses_district_set = standard
-			uses_district_set = hive_world
-			uses_district_set = machine_world
-			uses_district_set = shattered_ring_world
-		}
+		owner = { is_regular_empire = yes }
+		has_modifier = resort_colony
 	}
 
 	allow = {
-		NOT = { has_modifier = resort_colony }
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:resort_attraction_housing_stu
+	}
+
+	triggered_name = {
+		text = resort_attraction_default
+	}
+
+	triggered_flavor_desc = {
+		text = district_resort_1_desc
+	}
+}
+
+district_resort_3 = {
+	icon = district_resort_secondary
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_resort_attraction_01
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = resort_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = resort_colony
+	}
+
+	allow = {
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:resort_attraction_housing_stu
+	}
+
+	triggered_name = {
+		text = resort_attraction_default
+	}
+
+	triggered_flavor_desc = {
+		text = district_resort_1_desc
+	}
+}
+
+district_prison = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+	icon = district_city
+
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = penal_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = penal_colony
+	}
+
+	allow = {
+		has_modifier = penal_colony
 	}
 
 	conversion_ratio = 1
 	convert_to = {
-		district_arcology_housing
-		district_rw_nexus
 		district_city
+		district_arcology_housing
+		district_rw_city
+		district_nexus
 		district_hive
 	}
 
@@ -551,12 +511,445 @@ district_nexus = {
 		}
 	}
 
-	planet_modifier = {
-		job_maintenance_drone_add = 3
-		planet_max_buildings_add = 1
-	}
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
+		planet_housing_add = 1
+		mult = value:prison_district_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
+		}
+		modifier = {
+			job_enforcer_add = @base_district_jobs
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_civil_education_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		text = job_enforcer_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_civil_education_empire = yes } # undercoat: moved to scripted trigger
+		}
+		text = job_educator_effect_desc
+	}
+}
+
+district_slave = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+	icon = district_city
+
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_regular_empire = yes }
+		has_modifier = slave_colony
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_regular_empire = yes }
+		has_modifier = slave_colony
+	}
+
+	allow = {
+		has_modifier = slave_colony
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_arcology_housing
+		district_rw_city
+		district_nexus
+		district_hive
+		district_city
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:slave_district_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
+		}
+		modifier = {
+			job_slave_overseer_add = @base_district_jobs
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		text = job_slave_overseer_effect_desc
+	}
+}
+
+district_hive = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = { is_hive_empire = yes }
+		OR = {
+			uses_district_set = standard
+			uses_district_set = hive_world
+			uses_district_set = machine_world
+			uses_district_set = shattered_ring_world
+		}
+		exists = from
+		from = { is_wilderness_empire = no }
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			is_hive_empire = yes
+			is_wilderness_empire = no
+		}
+		OR = {
+			uses_district_set = standard
+			uses_district_set = hive_world
+			uses_district_set = machine_world
+			uses_district_set = shattered_ring_world
+		}
+		NAND = {
+			is_capital = yes
+			owner = {
+				has_menace_perk = menp_behemoth_mind_meld
+			}
+		}
+	}
+
+	allow = {
+		NOT = { has_modifier = resort_colony }
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_arcology_housing
+		district_rw_hive
+		district_nexus
+		district_city
+		district_craglands
+		district_mindlink
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:hive_district_housing_stu
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_hive
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_hive
+	}
+
+	inline_script = {
+		script = districts/ai_urban_district_extra_weighting
+	}
+}
+
+district_hive_1 = {
+	icon = district_hive_secondary
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_hive_01
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = hive_world
+	}
+
+	potential = {
+		uses_district_set = hive_world
+	}
+
+	allow = {
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_nexus_1
+		district_generator
+		district_generator_uncapped
+		district_photosynthesis_fields
+		district_photosynthesis_fields_uncapped
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:hive_district_housing_stu
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_hive
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_hive
+	}
+}
+
+district_hive_2 = {
+	icon = district_hive_secondary
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_hive_02
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = hive_world
+	}
+
+	potential = {
+		uses_district_set = hive_world
+	}
+
+	allow = {
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_nexus_2
+		district_mining
+		district_mining_uncapped
+		district_hollow_mountains
+		district_hollow_mountains_uncapped
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:hive_district_housing_stu
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_hive
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_hive
+	}
+}
+
+district_hive_3 = {
+	icon = district_hive_secondary
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_hive_03
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = hive_world
+	}
+
+	potential = {
+		uses_district_set = hive_world
+	}
+
+	allow = {
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_nexus_3
+		district_farming
+		district_farming_uncapped
+		district_orchard_forests
+		district_orchard_forests_uncapped
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:hive_district_housing_stu
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		text = job_logistics_drone_effect_desc
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_hive
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_hive
+	}
+}
+
+district_nexus = {
+	base_buildtime = 480
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
+	show_on_uncolonized = {
+		exists = from
+		from = {
+			is_machine_empire = yes
+		}
+		OR = {
+			uses_district_set = standard
+			uses_district_set = hive_world
+			uses_district_set = machine_world
+			uses_district_set = shattered_ring_world
+		}
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			is_machine_empire = yes
+		}
+		OR = {
+			uses_district_set = standard
+			uses_district_set = hive_world
+			uses_district_set = machine_world
+			uses_district_set = shattered_ring_world
+		}
+		NAND = {
+			is_capital = yes
+			owner = {
+				has_menace_perk = menp_behemoth_mind_meld
+			}
+		}
+	}
+
+	allow = {
+		NOT = { has_modifier = resort_colony }
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_arcology_housing
+		district_rw_nexus
+		district_city
+		district_hive
+		district_craglands
+		district_mindlink
+	}
+
+	resources = {
+		category = planet_districts_cities
+		cost = {
+			minerals = @city_cost
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
 		mult = value:nexus_district_housing_stu
 	}
 
@@ -565,28 +958,7 @@ district_nexus = {
 			has_modifier = gestation_colony
 		}
 		modifier = {
-			job_maintenance_drone_add = -1
-			job_gestation_drone_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_technology = tech_housing_2 }
-		}
-		modifier = {
-			job_maintenance_drone_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_virtuality_4 }
-		}
-		modifier = {
-			job_maintenance_drone_add = 2
+			job_gestation_drone_add = 100
 		}
 	}
 
@@ -596,117 +968,218 @@ district_nexus = {
 		}
 		text = job_gestation_drone_effect_desc
 	}
+
+	inline_script = {
+		script = districts/district_triggered_name_machine
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_machine
+	}
+
+	inline_script = {
+		script = districts/ai_urban_district_extra_weighting
+	}
 }
 
-district_industrial = {
-	base_buildtime = 480
+district_nexus_1 = {
+	icon = district_nexus_secondary
+	base_buildtime = 600
 	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
 
-	prerequisites = {
-		tech_basic_industry
+	zone_slots = {
+		slot_nexus_01
 	}
 
 	show_on_uncolonized = {
-		exists = from
-		uses_district_industrial = yes
-		NOR = {	
-			has_modifier = penal_colony 
-			has_modifier = slave_colony 
-		}
+		uses_district_set = machine_world
 	}
 
 	potential = {
-		exists = owner
-		uses_district_industrial = yes
-		NOR = {	
-			has_modifier = penal_colony 
-			has_modifier = slave_colony 
-		}
-	}
-
-	allow = {
-		NOR = {
-			has_modifier = resort_colony
-			has_modifier = penal_colony
-			has_modifier = slave_colony
-		}
+		uses_district_set = machine_world
 	}
 
 	conversion_ratio = 1
 	convert_to = {
-		district_arcology_arms_industry
-		district_rw_industrial
-		district_prison_industrial
-		district_battle_thrall
+		district_hive_1
+		district_generator
+		district_generator_uncapped
+		district_photosynthesis_fields
+		district_photosynthesis_fields_uncapped
 	}
 
 	resources = {
-		category = planet_districts_industrial
+		category = planet_districts
 		cost = {
-			minerals = @city_cost
+			minerals = 1000
 		}
 		upkeep = {
-			energy = 2
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_edict = industrial_maintenance
-				}
-			}
-			energy = 2
+			energy = 5
 		}
 	}
 
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:industrial_district_housing_stu
+		planet_housing_add = 1
+		mult = value:nexus_district_extra_housing_stu
 	}
 
 	triggered_planet_modifier = {
 		potential = {
-			exists = owner
-			owner = { is_crafter_empire = yes }
+			has_modifier = gestation_colony
 		}
 		modifier = {
-			planet_max_buildings_add = 0.34
-		}
-	}
-
-	inline_script = {
-		script = jobs/industrial_districts_factory_add
-		AMOUNT = 1
-	}
-
-	inline_script = {
-		script = jobs/industrial_districts_foundry_add
-		AMOUNT = 1
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_edict = industrial_maintenance
-			}
-		}
-		modifier = {
-			job_maintenance_drone_add = 1
+			job_gestation_drone_add = 100
 		}
 	}
 
 	triggered_desc = {
 		trigger = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_edict = industrial_maintenance
-			}
+			has_modifier = gestation_colony
 		}
-		text = job_maintenance_drone_effect_desc
+		text = job_gestation_drone_effect_desc
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_machine
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_machine
+	}
+}
+
+district_nexus_2 = {
+	icon = district_nexus_secondary
+	base_buildtime = 600
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_nexus_01
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = machine_world
+	}
+
+	potential = {
+		uses_district_set = machine_world
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_hive_2
+		district_mining
+		district_mining_uncapped
+		district_hollow_mountains
+		district_hollow_mountains_uncapped
+	}
+
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = 1000
+		}
+		upkeep = {
+			energy = 5
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:nexus_district_extra_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = gestation_colony
+		}
+		modifier = {
+			job_gestation_drone_add = 100
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = gestation_colony
+		}
+		text = job_gestation_drone_effect_desc
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_machine
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_machine
+	}
+}
+
+district_nexus_3 = {
+	icon = district_nexus_secondary
+	base_buildtime = 600
+	is_capped_by_modifier = no
+	exempt_from_ai_planet_specialization = yes
+
+	zone_slots = {
+		slot_nexus_03
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = machine_world
+	}
+
+	potential = {
+		uses_district_set = machine_world
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_hive_3
+		district_farming
+		district_farming_uncapped
+		district_orchard_forests
+		district_orchard_forests_uncapped
+	}
+
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = 1000
+		}
+		upkeep = {
+			energy = 5
+		}
+	}
+
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:nexus_district_extra_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = gestation_colony
+		}
+		modifier = {
+			job_gestation_drone_add = 100
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			has_modifier = gestation_colony
+		}
+		text = job_gestation_drone_effect_desc
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_machine
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_machine
 	}
 }
 
@@ -715,6 +1188,12 @@ district_prison_industrial = {
 	is_capped_by_modifier = no
 	icon = district_industrial
 
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
 	prerequisites = {
 		tech_basic_industry
 	}
@@ -727,10 +1206,7 @@ district_prison_industrial = {
 	}
 
 	potential = {
-		exists = owner
-		owner = { is_gestalt = no }
-		uses_district_industrial = yes
-		has_modifier = penal_colony
+		always = no
 	}
 
 	allow = {
@@ -744,7 +1220,7 @@ district_prison_industrial = {
 	convert_to = {
 		district_arcology_arms_industry
 		district_rw_industrial
-		district_industrial
+	#		district_industrial
 		district_battle_thrall
 	}
 
@@ -768,18 +1244,19 @@ district_prison_industrial = {
 		}
 	}
 
-	planet_modifier = {
-		planet_housing_add = 2
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:prison_industrial_district_housing_stu
 	}
 
 	inline_script = {
 		script = jobs/industrial_prison_districts_factory_add
-		AMOUNT = 1
+		AMOUNT = 100
 	}
 
 	inline_script = {
 		script = jobs/industrial_prison_districts_foundry_add
-		AMOUNT = 1
+		AMOUNT = 100
 	}
 }
 
@@ -787,18 +1264,23 @@ district_battle_thrall = {
 	base_buildtime = 480
 	is_capped_by_modifier = no
 
+	zone_slots = {
+		slot_city_government
+		slot_city_01
+		slot_city_02
+	}
+
 	prerequisites = {
 		tech_basic_industry
 	}
 
 	show_on_uncolonized = {
 		exists = from
-		has_modifier = slave_colony 
+		has_modifier = slave_colony
 	}
 
 	potential = {
-		exists = owner
-		has_modifier = slave_colony 
+		always = no
 	}
 
 	allow = {
@@ -809,7 +1291,7 @@ district_battle_thrall = {
 	convert_to = {
 		district_arcology_arms_industry
 		district_rw_industrial
-		district_industrial
+		#district_industrial
 		district_prison_industrial
 	}
 
@@ -833,13 +1315,30 @@ district_battle_thrall = {
 		}
 	}
 
-	planet_modifier = {
-		planet_housing_add = 2
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:battle_thrall_district_housing_stu
 	}
 
-	inline_script = { # undercoat: moved to inline script
-		script = jobs/soldiers_add
-		AMOUNT = 2
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
+		}
+		modifier = {
+			job_battle_thrall_add = @base_district_jobs
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		text = job_battle_thrall_effect_desc
 	}
 }
 
@@ -850,13 +1349,19 @@ district_srw_commercial = {
 	min_for_deposits_on_planet = 3
 	max_for_deposits_on_planet = 15
 
+	zone_slots = {
+		slot_city_04
+	}
+
 	show_on_uncolonized = {
+		always = no
 		exists = from
 		from = { is_regular_empire = yes }
 		uses_district_set = shattered_ring_world
 	}
 
 	potential = {
+		always = no
 		exists = owner
 		owner = { is_regular_empire = yes }
 		uses_district_set = shattered_ring_world
@@ -882,8 +1387,9 @@ district_srw_commercial = {
 		}
 	}
 
-	planet_modifier = {
-		planet_housing_add = 2
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:srw_commercial_district_housing_stu
 	}
 
 	triggered_planet_modifier = {
@@ -892,15 +1398,14 @@ district_srw_commercial = {
 			owner = { is_fallen_empire_spiritualist = no }
 		}
 		modifier = {
-			job_trader_add = 1
+			job_trader_add = 100
 		}
 	}
-
-	# Undercoat: moved to inline script
-	# (artificial worlds can't be slave colonies for some reason)
 	inline_script = {
-		script = jobs/factory_add
-		AMOUNT = 1
+		script = stu/jobs_add
+		job_type = factory
+		trigger = "owner = { is_regular_empire = yes }"
+		AMOUNT = 100
 	}
 
 	triggered_planet_modifier = {
@@ -909,7 +1414,7 @@ district_srw_commercial = {
 			owner = { is_fallen_empire_spiritualist = yes }
 		}
 		modifier = {
-			job_manager_add = 2
+			job_bureaucrat_add = @base_district_jobs
 		}
 	}
 
@@ -921,7 +1426,7 @@ district_srw_commercial = {
 			}
 		}
 		modifier = {
-			job_trader_add = 1
+			job_trader_add = 100
 		}
 	}
 
@@ -930,65 +1435,110 @@ district_srw_commercial = {
 	}
 }
 
-district_machine_coordination = {
-	base_buildtime = 480
-	is_capped_by_modifier = no
-	icon = district_arcology_administrative
+# district_machine_coordination = {
+# 	base_buildtime = 480
+# 	is_capped_by_modifier = no
+# 	icon = district_arcology_administrative
 
-	prerequisites = {
-		tech_planetary_government
-	}
+# 	# TODO_CD: change to real slots
+# 	zone_slots = {
+# 		slot_city_government
+# 		slot_city_01
+# 		slot_city_02
+# 	}
 
-	show_on_uncolonized = {
-		exists = from
-		from = {
-			is_machine_empire = yes
-			is_servitor_empire = no # undercoat: moved to scripted trigger
-		}
-		is_machine_world = yes # undercoat: moved to scripted trigger
-	}
+# 	prerequisites = {
+# 		tech_planetary_government
+# 	}
 
-	potential = {
-		exists = owner
-		owner = {
-			is_machine_empire = yes
-			is_servitor_empire = no # undercoat: moved to scripted trigger
-		}
-		is_machine_world = yes # undercoat: moved to scripted trigger
-	}
+# 	show_on_uncolonized = {
+# 		exists = from
+# 		from = {
+# 			is_machine_empire = yes
+# 			is_servitor_empire = no # undercoat: moved to scripted trigger
+# 		}
+# 		is_machine_world = yes # undercoat: moved to scripted trigger
+# 	}
 
-	allow = {
-		NOT = { has_modifier = resort_colony }
-		NOT = { has_modifier = slave_colony }
-	}
+# 	potential = {
+# 		exists = owner
+# 		owner = {
+# 			is_machine_empire = yes
+# 			is_servitor_empire = no # undercoat: moved to scripted trigger
+# 		}
+# 		is_machine_world = yes # undercoat: moved to scripted trigger
+# 	}
 
-	conversion_ratio = 1
-	convert_to = {
-		district_city
-		district_nexus
-		district_hive
-		district_arcology_administrative
-		district_arcology_religious
-	}
+# 	allow = {
+# 		NOT = { has_modifier = resort_colony }
+# 		NOT = { has_modifier = slave_colony }
+# 	}
 
-	resources = {
-		category = planet_districts
-		cost = {
-			minerals = @city_cost
-		}
-		upkeep = {
-			energy = 2
-		}
+# 	conversion_ratio = 1
+# 	convert_to = {
+# 		district_city
+# 		district_nexus
+# 		district_hive
+# 		district_arcology_administrative
+# 		district_arcology_religious
+# 	}
 
-	}
+# 	resources = {
+# 		category = planet_districts
+# 		cost = {
+# 			minerals = @city_cost
+# 		}
+# 		upkeep = {
+# 			energy = 2
+# 		}
 
-	inline_script = {
-		script = stu/jobs_add
-		job_type = bureaucrats
-		mult_line = "mult = value:coordination_district_jobs_stu"
-	}
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:coordination_district_housing_stu
-	}
-}
+# 	}
+
+# 	planet_modifier = {
+# 		planet_housing_add = 200
+# 		job_coordinator_add = @base_district_jobs
+# 	}
+
+# 	triggered_planet_modifier = {
+# 		potential = {
+# 			exists = owner
+# 			owner = {
+# 				is_machine_empire = yes
+# 				has_ascension_perk = ap_machine_worlds
+# 			}
+# 		}
+# 		job_coordinator_add = @base_district_jobs
+# 		planet_housing_add = 200
+# 	}
+
+# 	triggered_planet_modifier = {
+# 		potential = {
+# 			exists = owner
+# 			owner = {
+# 				is_machine_empire = yes
+# 				has_tradition = tr_virtuality_4
+# 			}
+# 		}
+# 		modifier = {
+# 			job_coordinator_add = 100
+# 		}
+# 	}
+
+# 	triggered_planet_modifier = {
+# 		potential = {
+# 			exists = owner
+# 			owner = {
+# 				is_machine_empire = yes
+# 				has_ascension_perk = ap_machine_worlds
+# 				has_tradition = tr_virtuality_4
+# 			}
+# 		}
+# 		modifier = {
+# 			job_coordinator_add = 100
+# 		}
+# 	}
+
+# 	triggered_desc = {
+# 		text = job_coordinator_effect_desc
+# 	}
+# }

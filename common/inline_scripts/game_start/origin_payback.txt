@@ -1,0 +1,104 @@
+# Payback Initial Setup
+# Districts Removed:
+#	* -1 City District
+# Rural Districts set to:
+#	* 1× Generator District
+#	* 1× Mining District
+#	* 1× Agriculture District
+# Rural Districts Added:
+#	* +1 Agriculture Districts if species is Biological
+#	* +1 Mining Districts if species is Lithoid
+# Blockers Added:
+#	* +6 Ship Debris
+# Zones Replaced:
+#	* Archives replaced with Uplift Center
+# Buildings Added:
+#	* Gene Clinic
+#	* Energy Grid
+#	* Mineral Purification Plants
+# Devastation Added:
+#	* +33
+# Modifiers Added:
+#	* Debris Field
+#	* Unified Purpose for 20 years
+
+if = {
+	limit = {
+		exists = owner
+		owner = {
+			is_payback_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	remove_district = district_city
+
+	set_variable = {
+		which = energy_districts
+		value = 1
+	}
+	set_variable = {
+		which = mining_districts
+		value = 1
+	}
+	set_variable = {
+		which = farming_districts
+		value = 1
+	}
+
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_lithoid = yes
+			}
+		}
+		change_variable = {
+			which = mining_districts
+			value = 1
+		}
+	}
+	else = {
+		change_variable = {
+			which = farming_districts
+			value = 1
+		}
+	}
+
+	add_planet_devastation = 33
+
+	add_modifier = {
+		modifier = payback_debris_field
+	}
+
+	add_modifier = {
+		modifier = payback_unified_purpose
+		days = 7200
+	}
+
+	while = {
+		count = 6
+		add_deposit = d_ship_debris_payback_blocker
+	}
+
+	add_zone = {
+		district = district_city
+		zone = zone_payback_enlightenment
+		zone_slot = 1
+		replace = yes
+	}
+
+	add_building = {
+		zone = zone_payback_enlightenment
+		building = building_medical_2
+	}
+	add_building = {
+		zone = zone_payback_enlightenment
+		building = building_energy_grid
+	}
+	set_planet_flag = ignore_ai_building_limitations
+	add_building = {
+		zone = zone_payback_enlightenment
+		building = building_mineral_purification_plant
+	}
+	remove_planet_flag = ignore_ai_building_limitations
+}

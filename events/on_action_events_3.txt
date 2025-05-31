@@ -41,28 +41,90 @@ country_event = {
 
 # Pops random events gatekeeper
 # Random pulse (set up the delay) - on_yearly_pulse_country - for pop events
-planet_event = {
-	id = action.2020
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		planet_event = { id = action.2021 random = 360 }
-	}
-}
+#planet_event = {
+#	id = action.2020
+#	hide_window = yes
+#
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		planet_event = { id = action.2021 random = 360 }
+#	}
+#}
 
 # Random pulse part 2 (fire the on action) - on_yearly_pulse_country - for pop random events
-planet_event = {
-	id = action.2021
+#planet_event = {
+#	id = action.2021
+#	hide_window = yes
+#
+#	is_triggered_only = yes
+#
+#
+#	immediate = {
+#		weighted_random_owned_pop_group = {
+#			fire_on_action = { on_action = on_colony_10_year_pulse_random_pop_events_list }
+#		}
+#	}
+#}
+
+country_event = {
+	id = country.2050
 	hide_window = yes
 
 	is_triggered_only = yes
 
+	trigger = {
+		has_ascension_perk = ap_eternal_vigilance
+	}
 
 	immediate = {
-		random_owned_pop = {
-			fire_on_action = { on_action = on_colony_10_year_pulse_random_pop_events_list }
+		if = {
+			limit = {
+				has_policy_flag = eternal_vigilance_full_spending
+			}
+			every_owned_starbase = {
+				limit = {
+					fleet = { is_in_combat = no }
+					used_defense_platform_capacity_percent < 0.5
+				}
+				spawn_free_defense_platform = yes
+			}
+			every_owned_nonprimary_starbase = {
+				limit = {
+					fleet = { is_in_combat = no }
+					used_defense_platform_capacity_percent < 0.5
+				}
+				spawn_free_defense_platform = yes
+			}
+
+		}
+		else_if = {
+			limit = {
+				has_policy_flag = eternal_vigilance_half_spending
+			}
+			every_owned_starbase = {
+				limit = {
+					is_starbase_type = sfortress
+					fleet = { is_in_combat = no }
+					used_defense_platform_capacity_percent < 0.5
+				}
+				spawn_free_defense_platform = yes
+			}
+			every_owned_nonprimary_starbase = {
+				limit = {
+					fleet = { is_in_combat = no }
+					OR = {
+						is_starbase_type = sorbital_fortress
+						is_starbase_type = sdeepspacecitadel
+					}
+					used_defense_platform_capacity_percent < 0.5
+				}
+				spawn_free_defense_platform = yes
+			}
+		}
+		country_event = {
+			id = country.2050
+			days = 180
 		}
 	}
 }

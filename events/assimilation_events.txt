@@ -1,0 +1,1150 @@
+#########################################
+#
+# Assimilation Events
+#
+#########################################
+
+# Each type of assimilation uses a separate X00 block of namespace to future proof this.
+
+namespace = assimilation
+
+# Pops Sub-Species integration on Montly Pulse
+event = {
+	id = assimilation.50
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			any_owned_species = {
+				is_being_integrated_by = prev
+			}
+		}
+	}
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				any_owned_species = {
+					is_being_integrated_by = prev
+				}
+			}
+			integrate_species = yes
+		}
+	}
+}
+
+# Assimilate Pops on Montly Pulse
+event = {
+	id = assimilation.100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			num_unique_species > 1
+			any_owned_species = {
+				has_citizenship_type = {
+					type = citizenship_assimilation
+					country = prev
+				}
+			}
+		}
+	}
+
+	immediate = {
+		every_playable_country = {
+			limit = {
+				num_unique_species > 1
+				any_owned_species = {
+					has_citizenship_type = {
+						type = citizenship_assimilation
+						country = prev
+					}
+				}
+			}
+			# Cyborg Assimilation - Driven Assimilator or Regular Empire
+			if = {
+				limit = {
+					is_hive_empire = no
+					num_unique_species > 1
+					any_owned_species = {
+						has_cyborg_assimilation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.200
+					}
+				}
+			}
+			# Cyborg Assimilation - Hive Mind
+			else_if = {
+				limit = {
+					is_hive_empire = yes
+					num_unique_species > 1
+					any_owned_species = {
+						has_cyborg_assimilation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.210
+					}
+				}
+			}
+			# Psionic Assimilation
+			if = {
+				limit = {
+					num_unique_species > 1
+					any_owned_species = {
+						has_psionic_assimilation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.300
+					}
+				}
+			}
+			# Synthetic/Machine Assimilation
+			if = {
+				limit = {
+					num_unique_species > 1
+					any_owned_species = {
+						has_synthetic_assimilation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.400
+					}
+				}
+			}
+			# Hive Dissociation Assimilation
+			if = {
+				limit = {
+					num_unique_species > 1
+					any_owned_species = {
+						has_dissociation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.500
+					}
+				}
+			}
+			# Hive Mind Ego Assimilation
+			if = {
+				limit = {
+					is_wilderness_empire = no
+					num_unique_species > 1
+					any_owned_species = {
+						has_ego_assimilation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.600
+					}
+				}
+			}
+			# Wilderness Ego Assimilation
+			if = {
+				limit = {
+					is_wilderness_empire = yes
+					num_unique_species > 1
+					any_owned_species = {
+						has_ego_assimilation_living_standard = {
+							COUNTRY = prev
+						}
+					}
+				}
+				every_owned_planet = {
+					limit = {
+						is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+					}
+					planet_event = {
+						id = assimilation.610
+					}
+				}
+			}
+		}
+	}
+}
+
+# Pops Similar Sub-Species merge on Montly Pulse
+event = {
+	id = assimilation.150
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_playable_country = {
+			merge_species = yes
+		}
+	}
+}
+
+# Cyborg Assimilation - Driven Assimilator or Regular Empire
+planet_event = {
+	id = assimilation.200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_cyborg_assimilation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_cyborg_assimilation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = assimilation_species_of_species@event_target:old_species
+								has_species_flag = assimilation_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						traits = {
+							trait = trait_cybernetic
+						}
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_hive_mind
+								remove_trait = trait_self_modified
+								remove_trait = trait_latent_psionic
+								remove_trait = trait_psionic
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = assimilation_species_of_species@event_target:old_species
+									set_species_flag = assimilation_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assimilation_species_of_species@event_target:old_species
+							has_species_flag = assimilation_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 5
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}
+
+# Cyborg Assimilation - Hive Mind
+planet_event = {
+	id = assimilation.210
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_cyborg_assimilation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_cyborg_assimilation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = assimilation_species_of_species@event_target:old_species
+								has_species_flag = assimilation_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						traits = {
+							trait = trait_hive_mind
+							trait = trait_cybernetic
+						}
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_self_modified
+								remove_trait = trait_latent_psionic
+								remove_trait = trait_psionic
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = assimilation_species_of_species@event_target:old_species
+									set_species_flag = assimilation_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assimilation_species_of_species@event_target:old_species
+							has_species_flag = assimilation_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 5
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}
+
+# Psionic Assimilation
+planet_event = {
+	id = assimilation.300
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_psionic_assimilation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_psionic_assimilation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = assimilation_species_of_species@event_target:old_species
+								has_species_flag = assimilation_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						traits = {
+							trait = trait_psionic
+						}
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_hive_mind
+								remove_trait = trait_self_modified
+								remove_trait = trait_latent_psionic
+								remove_trait = trait_cybernetic
+								remove_trait = trait_limited_cybernetic
+								inline_script = {
+									script = traits/remove_all_cybernetic_traits
+								}
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = assimilation_species_of_species@event_target:old_species
+									set_species_flag = assimilation_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assimilation_species_of_species@event_target:old_species
+							has_species_flag = assimilation_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 5
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}
+
+# Synthetic/Machine Assimilation
+planet_event = {
+	id = assimilation.400
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_synthetic_assimilation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_synthetic_assimilation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# Synthetic/Machine Assimilation just turns you into the founder species
+				root.owner.species = {
+					save_event_target_as = target_species
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 5
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}
+
+# Hive Dissociation Assimilation
+planet_event = {
+	id = assimilation.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_dissociation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_dissociation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = assimilation_species_of_species@event_target:old_species
+								has_species_flag = assimilation_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_hive_mind
+								remove_trait = trait_self_modified
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = assimilation_species_of_species@event_target:old_species
+									set_species_flag = assimilation_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assimilation_species_of_species@event_target:old_species
+							has_species_flag = assimilation_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 5
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}
+
+# Hive Mind Ego Assimilation
+planet_event = {
+	id = assimilation.600
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_ego_assimilation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_ego_assimilation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = assimilation_species_of_species@event_target:old_species
+								has_species_flag = assimilation_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						traits = {
+							trait = trait_hive_mind
+						}
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_self_modified
+								remove_trait = trait_latent_psionic
+								remove_trait = trait_psionic
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = assimilation_species_of_species@event_target:old_species
+									set_species_flag = assimilation_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assimilation_species_of_species@event_target:old_species
+							has_species_flag = assimilation_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 5
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}
+
+# Wilderness Ego Assimilation
+planet_event = {
+	id = assimilation.610
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_owned_species = {
+			has_ego_assimilation_living_standard = {
+				COUNTRY = root.owner
+			}
+		}
+	}
+
+	immediate = {
+		set_assimilation_counter_variable = yes		# Sets number of pops to assimilate to 4d25 + Auto-Modded Modifier
+		set_update_modifiers_batch = begin			# Freeze modifier calculation for performance
+
+		while = {
+			count = assimilation_counter
+
+			# Find a pop group with the right assimilation type
+			random_owned_pop_group = {
+				limit = {
+					NOT = {
+						has_pop_group_flag = already_assimilated
+					}
+					has_ego_assimilation_living_standard = {
+						COUNTRY = root.owner
+					}
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = assimilation_species_of_species@event_target:old_species
+								has_species_flag = assimilation_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						traits = {
+							trait = trait_hive_mind
+							trait = trait_wilderness
+						}
+						effect = {
+							modify_species = {
+								species = this
+								remove_trait = trait_self_modified
+								remove_trait = trait_latent_psionic
+								remove_trait = trait_psionic
+								remove_trait = trait_incubator
+								remove_trait = trait_nomadic
+								remove_trait = trait_sedentary
+								remove_trait = trait_vat_grown
+								remove_trait = trait_nascent_stage
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = assimilation_species_of_species@event_target:old_species
+									set_species_flag = assimilation_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = assimilation_species_of_species@event_target:old_species
+							has_species_flag = assimilation_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = 1
+							}
+							set_timed_pop_group_flag = {
+								flag = already_assimilated
+								days = 15
+							}
+							apply_post_assimilation_effects = yes
+						}
+					}
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = event_target:old_pop_group
+						amount = 4
+					}
+				}
+			}
+		}
+
+		owner = { #Only doing it once since assimilating more than 100 pops a month is hard
+			if = {
+				limit = { has_ascension_perk = ap_become_the_crisis }
+				complete_crisis_objective = crisobj_purge_pops
+			}
+			assimilate_armies = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_colony_ships = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+			assimilate_leaders = {
+				SOURCE = event_target:old_species
+				TARGET = event_target:target_species
+			}
+		}
+
+		set_update_modifiers_batch = end			# Unfreeze modifier calculation for performance
+		clear_assimilation_variables = yes			# Clears variables
+	}
+}

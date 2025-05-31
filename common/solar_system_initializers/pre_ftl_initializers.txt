@@ -7,10 +7,13 @@ pre_ftl_init_01 = {
 
 	usage = misc_system_init
 	usage_odds = {
-		base = 2.6
-		modifier = {
-			add = 0.4
-			has_utopia = no
+		base = 3.0
+		modifier = { # If you have Utopia or BioGenesis, decrease the chance to get normal pre-ftls because pre-ftl hives can spawn
+			subtract = 0.4
+			OR = {
+				has_utopia = yes
+				has_biogenesis_dlc = yes
+			}
 		}
 		modifier = {
 			factor = 0
@@ -251,11 +254,10 @@ pre_ftl_init_sol = {
 							set_location = PREV
 						}
 					}
-					while = {
-						count = @early_space_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+
+					create_pop_group = {
+						species = last_created_species
+						size = @early_space_age_pops
 					}
 					add_building = building_primitive_farm
 					add_building = building_primitive_factory
@@ -324,11 +326,9 @@ pre_ftl_init_sol = {
 
 					create_pre_ftl_blockers = yes
 
-					while = {
-						count = @industrial_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @industrial_age_pops
 					}
 					add_building = building_primitive_farm
 					add_building = building_primitive_factory
@@ -428,11 +428,9 @@ pre_ftl_init_sol = {
 
 					set_owner = last_created_country
 
-					while = {
-						count = @late_medieval_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @late_medieval_age_pops
 					}
 					add_building = building_primitive_dwellings
 					add_building = building_primitive_dwellings
@@ -657,17 +655,12 @@ sanctuary_system = {
 	}
 	usage = misc_system_init
 	usage_odds = {
-		base = 2000000
-		modifier = {
-			factor = 0
-			is_fe_cluster = yes
-		}
-		modifier = {
-			factor = 0
-			has_star_flag = empire_cluster
-		}
+		base = @spawn_system_common
+		inline_script = "solar_system_initializers/initializer_modifiers_habitable_world_systems"
 	}
 	max_instances = 1
+	primitive_system = yes	# usage odds modified by primitives setup slider
+
 	flags = { sanctuary_system ring_world_built }
 	scaled_spawn_chance = 2	# scales by galaxy size (1000 stars = 10x base)
 
@@ -1131,10 +1124,13 @@ pre_ftl_hive_init_01 = {
 
 	usage = misc_system_init
 	usage_odds = {
-		base = 0.4
-		modifier = {
-			factor = 0
-			has_utopia = no
+		base = 0
+		modifier = { # Hive Minds are enabled by Utopia or BioGenesis
+			add = 0.4
+			OR = {
+				has_utopia = yes
+				has_biogenesis_dlc = yes
+			}
 		}
 		modifier = {
 			factor = 0
@@ -1380,7 +1376,7 @@ pre_ftl_shattered_ring = {
 	max_instances = 1
 	usage = misc_system_init
 	usage_odds = {
-		base = 5
+		base = @spawn_system_slightlycommon
 		modifier = {
 			factor = 0
 			any_system = {
@@ -1392,10 +1388,7 @@ pre_ftl_shattered_ring = {
 			has_federations_dlc = no
 			has_first_contact_dlc = no
 		}
-		modifier = {
-			factor = 0
-			is_fe_cluster = yes
-		}
+		inline_script = "solar_system_initializers/initializer_modifiers_habitable_world_systems"
 	}
 	primitive_system = yes	# usage odds modified by primitives setup slider
 

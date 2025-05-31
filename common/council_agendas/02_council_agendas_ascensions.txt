@@ -20,6 +20,9 @@ agenda_mind_over_matter = {
 			has_synthetic_ascension = yes
 			is_natural_design_empire = yes
 			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 		NAND = {
 			has_technology = tech_psionic_theory
@@ -74,6 +77,9 @@ agenda_psionic_supremacy = {
 			has_synthetic_ascension = yes
 			is_natural_design_empire = yes
 			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 		NOR = {
 			has_country_flag = composer_covenant_confirmed
@@ -83,7 +89,7 @@ agenda_psionic_supremacy = {
 		}
 	}
 	modifier = {
-		planet_psionic_jobs_produces_mult = 0.05
+		psionic_pop_bonus_workforce_mult = 0.05
 		category_psionics_research_speed_mult = 0.1
 	}
 	finish_modifier = agenda_psionic_supremacy_finish_no_covenant
@@ -99,7 +105,7 @@ agenda_psionic_supremacy_composer = {
 		has_country_flag = composer_covenant_confirmed
 	}
 	modifier = {
-		planet_psionic_jobs_produces_mult = 0.05
+		psionic_pop_bonus_workforce_mult = 0.05
 		category_psionics_research_speed_mult = 0.1
 	}
 	finish_modifier = agenda_psionic_supremacy_finish_composer
@@ -115,7 +121,7 @@ agenda_psionic_supremacy_instrument = {
 		has_country_flag = instrument_covenant_confirmed
 	}
 	modifier = {
-		planet_psionic_jobs_produces_mult = 0.05
+		psionic_pop_bonus_workforce_mult = 0.05
 		category_psionics_research_speed_mult = 0.1
 	}
 	finish_modifier = agenda_psionic_supremacy_finish_instrument
@@ -131,7 +137,7 @@ agenda_psionic_supremacy_eater = {
 		has_country_flag = eater_covenant_confirmed
 	}
 	modifier = {
-		planet_psionic_jobs_produces_mult = 0.05
+		psionic_pop_bonus_workforce_mult = 0.05
 		category_psionics_research_speed_mult = 0.1
 	}
 	finish_modifier = agenda_psionic_supremacy_finish_eater
@@ -147,7 +153,7 @@ agenda_psionic_supremacy_whisperers = {
 		has_country_flag = whisperers_covenant_confirmed
 	}
 	modifier = {
-		planet_psionic_jobs_produces_mult = 0.05
+		psionic_pop_bonus_workforce_mult = 0.05
 		category_psionics_research_speed_mult = 0.1
 	}
 	finish_modifier = agenda_psionic_supremacy_finish_whisperers
@@ -178,44 +184,87 @@ agenda_engineered_evolution = {
 		}
 	}
 	effect = {
-		inverted_switch = {
-			trigger = has_technology
-			tech_genome_mapping = {
-				add_tech_progress = {
-					tech = tech_genome_mapping
-					progress = @agenda_award_tech_progress
+		if = {
+			limit = {
+				is_wilderness_empire = no
+			}
+			inverted_switch = {
+				trigger = has_technology
+				tech_genome_mapping = {
+					add_tech_progress = {
+						tech = tech_genome_mapping
+						progress = @agenda_award_tech_progress
+					}
+				}
+				tech_gene_tailoring = {
+					add_tech_progress = {
+						tech = tech_gene_tailoring
+						progress = @agenda_award_tech_progress
+					}
+				}
+				tech_glandular_acclimation = {
+					add_tech_progress = {
+						tech = tech_glandular_acclimation
+						progress = @agenda_award_tech_progress
+					}
+				}
+				tech_gene_expressions = {
+					add_tech_progress = {
+						tech = tech_gene_expressions
+						progress = @agenda_award_tech_progress
+					}
+				}
+				tech_gene_seed_purification = {
+					add_tech_progress = {
+						tech = tech_gene_seed_purification
+						progress = @agenda_award_tech_progress
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = society_research
+						value = @tier3researchreward
+						min = @tier3researchmin
+						max = @tier3researchmax
+					}
 				}
 			}
-			tech_gene_tailoring = {
-				add_tech_progress = {
-					tech = tech_gene_tailoring
-					progress = @agenda_award_tech_progress
+		}
+		# Wilderness can't get Gene Seed Purification, so it gets swapped out for them
+		else = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_genome_mapping = {
+					add_tech_progress = {
+						tech = tech_genome_mapping
+						progress = @agenda_award_tech_progress
+					}
 				}
-			}
-			tech_glandular_acclimation = {
-				add_tech_progress = {
-					tech = tech_glandular_acclimation
-					progress = @agenda_award_tech_progress
+				tech_gene_tailoring = {
+					add_tech_progress = {
+						tech = tech_gene_tailoring
+						progress = @agenda_award_tech_progress
+					}
 				}
-			}
-			tech_gene_expressions = {
-				add_tech_progress = {
-					tech = tech_gene_expressions
-					progress = @agenda_award_tech_progress
+				tech_glandular_acclimation = {
+					add_tech_progress = {
+						tech = tech_glandular_acclimation
+						progress = @agenda_award_tech_progress
+					}
 				}
-			}
-			tech_gene_seed_purification = {
-				add_tech_progress = {
-					tech = tech_gene_seed_purification
-					progress = @agenda_award_tech_progress
+				tech_gene_expressions = {
+					add_tech_progress = {
+						tech = tech_gene_expressions
+						progress = @agenda_award_tech_progress
+					}
 				}
-			}
-			default = {
-				add_monthly_resource_mult = {
-					resource = society_research
-					value = @tier3researchreward
-					min = @tier3researchmin
-					max = @tier3researchmax
+				default = {
+					add_monthly_resource_mult = {
+						resource = society_research
+						value = @tier3researchreward
+						min = @tier3researchmin
+						max = @tier3researchmax
+					}
 				}
 			}
 		}
@@ -229,6 +278,7 @@ agenda_genetic_pursuit = {
 	}
 	potential = {
 		has_utopia = yes
+		has_biogenesis_dlc = no
 		is_machine_empire = no
 		NOR = {
 			has_cybernetic_ascension = yes
@@ -240,8 +290,8 @@ agenda_genetic_pursuit = {
 	}
 	modifier = {
 		category_biology_research_speed_mult = 0.05
-		pop_growth_speed = 0.025
-		planet_pop_assembly_organic_mult = 0.025
+		logistic_growth_mult = 0.025
+		bonus_pop_growth_mult = 0.025
 	}
 	finish_modifier = agenda_genetic_pursuit_finish
 }
@@ -263,11 +313,14 @@ agenda_cybernetic_advantage = {
 			has_synthetic_ascension = yes
 			is_natural_design_empire = yes
 			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 	}
 	modifier = {
 		planet_pops_cyborgs_upkeep_mult = -0.05
-		pop_growth_speed = 0.025
+		logistic_growth_mult = 0.025
 	}
 	finish_modifier = agenda_cybernetic_advantage_finish
 }
@@ -293,6 +346,9 @@ agenda_flesh_is_weak = {
 			has_synthetic_ascension = yes
 			is_natural_design_empire = yes
 			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 		NAND = {
 			has_technology = tech_powered_exoskeletons
@@ -351,6 +407,9 @@ agenda_organo_machine_interfacing = {
 			has_synthetic_ascension = yes
 			is_natural_design_empire = yes
 			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 		NAND = {
 			has_technology = tech_powered_exoskeletons
@@ -406,7 +465,7 @@ agenda_cybernetic_advantage_assimilator = {
 	}
 	modifier = {
 		planet_pops_cyborgs_upkeep_mult = -0.05
-		pop_growth_speed = 0.05
+		logistic_growth_mult = 0.05
 	}
 	finish_modifier = agenda_cybernetic_advantage_assimilator_finish
 }
@@ -484,6 +543,9 @@ agenda_synthetic_evolution = {
 			has_genetic_ascension = yes
 			has_psionic_ascension = yes
 			is_natural_design_empire = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 		NAND = {
 			has_technology = tech_powered_exoskeletons
@@ -557,6 +619,9 @@ agenda_synthetic_yield = {
 			has_genetic_ascension = yes
 			has_psionic_ascension = yes
 			is_natural_design_empire = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
 		}
 	}
 	modifier = {
@@ -653,7 +718,7 @@ agenda_virtuality_optimized_network = {
 
 	}
 	modifier = {
-		planet_virtual_jobs_produces_mult = 0.05
+		pop_bonus_workforce_mult = 0.05
 	}
 	finish_modifier = agenda_virtuality_optimized_network_finish
 }
@@ -704,7 +769,178 @@ agenda_modularity_reshape_form = {
 	modifier = {
 		planet_pops_robotics_upkeep_mult = -0.05
 		planet_jobs_sr_living_metal_produces_mult = 0.05
-		auto_mod_monthly_add = 1
+		auto_mod_monthly_add = 100
 	}
 	finish_modifier = agenda_modularity_reshape_form_finish
+}
+
+agenda_purity_perfection = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_purity_adopt
+	}
+	potential = {
+		has_biogenesis_dlc = yes
+		is_machine_empire = no
+		is_wilderness_empire = no
+		NOR = {
+			has_cybernetic_ascension = yes
+			has_psionic_ascension = yes
+			has_synthetic_ascension = yes
+			is_natural_design_empire = yes
+			is_individual_machine = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		logistic_growth_mult = 0.025
+	}
+	effect = {
+		custom_tooltip = agenda_purity_perfection_unity_effect_tt
+		add_resource = {
+			unity = @perfection_protocols_base_reward
+			mult = value:purity_perfection_posneg_value|POSNEG|positive|
+		}
+		custom_tooltip = agenda_purity_perfection_society_effect_tt
+		add_resource = {
+			society_research = @perfection_protocols_base_reward
+			mult = value:purity_perfection_posneg_value|POSNEG|negative|
+		}
+	}
+	finish_modifier = agenda_purity_perfection_finish
+}
+
+agenda_purity_perfection_wilderness = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_purity_adopt
+	}
+	potential = {
+		has_biogenesis_dlc = yes
+		is_wilderness_empire = yes
+		NOR = {
+			has_cybernetic_ascension = yes
+			has_psionic_ascension = yes
+			has_synthetic_ascension = yes
+			is_natural_design_empire = yes
+			is_individual_machine = yes
+			has_cloning_ascension = yes
+			has_mutation_ascension = yes
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		planet_building_build_speed_mult = 0.1
+	}
+	finish_modifier = agenda_purity_perfection_wilderness_finish
+}
+
+agenda_cloning_replication = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_cloning_adopt
+	}
+	potential = {
+		has_biogenesis_dlc = yes
+		is_machine_empire = no
+		NOR = {
+			has_cybernetic_ascension = yes
+			has_psionic_ascension = yes
+			has_synthetic_ascension = yes
+			is_natural_design_empire = yes
+			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_mutation_ascension = yes
+		}
+	}
+	modifier = {
+		bonus_pop_growth_mult = 0.25
+	}
+	finish_modifier = agenda_cloning_replication_finish
+}
+
+agenda_mutation_divergence = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_mutation_adopt
+	}
+	potential = {
+		has_biogenesis_dlc = yes
+		is_machine_empire = no
+		NOR = {
+			has_cybernetic_ascension = yes
+			has_psionic_ascension = yes
+			has_synthetic_ascension = yes
+			is_natural_design_empire = yes
+			is_individual_machine = yes
+			has_purity_ascension = yes
+			has_cloning_ascension = yes
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+	modifier = {
+		auto_mod_monthly_add = 200
+	}
+	effect = {
+		custom_tooltip = agenda_mutation_divergence_tt
+		hidden_effect = {
+			every_owned_species = {
+				limit = {
+					NOR = {
+						has_trait = trait_adaptive_mutations
+						has_trait = trait_malleable_genes
+					}
+					OR = {
+						is_archetype = BIOLOGICAL
+						is_archetype = LITHOID
+					}
+				}
+				change_species_characteristics = {
+					add_trait = trait_adaptive_mutations
+					add_traits_at_start_of_list = yes
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_mutation_environmental_integration_tradition = yes
+			}
+			custom_tooltip = agenda_mutation_divergence_2_tt
+			hidden_effect = {
+				every_owned_species = {
+					limit = {
+						NOT = {
+							has_trait = trait_auto_hab_preference
+						}
+						OR = {
+							is_archetype = BIOLOGICAL
+							is_archetype = LITHOID
+						}
+					}
+					set_habitability_trait = { trait = trait_auto_hab_preference }
+				}
+			}
+		}
+		hidden_effect = {
+			update_node_portraits_if_gestalt_effect = yes
+		}
+	}
+	finish_modifier = agenda_mutation_divergence_finish
+}
+
+agenda_mutation_divergence_evo_pred = {
+	agenda_cost = @base_tradition_agenda_cost
+	allow = {
+		has_tradition = tr_mutation_adopt
+	}
+	potential = {
+		has_biogenesis_dlc = yes
+		is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+	}
+	modifier = {
+		auto_mod_monthly_add = 200
+	}
+	finish_modifier = agenda_mutation_divergence_evo_pred_finish
 }

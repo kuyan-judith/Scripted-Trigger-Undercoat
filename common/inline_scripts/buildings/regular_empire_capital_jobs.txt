@@ -1,55 +1,36 @@
-# Undercoat inline script
 inline_script = {
-	script = jobs/politicians_add
-	POLITICIAN_AMOUNT = @[ $PRIMARY_JOB$ + $SECONDARY_JOB$ ]
-	STEWARD_AMOUNT = @[ $PRIMARY_JOB$ + ( $SECONDARY_JOB$ * 2 ) ]
+	script = "jobs/politician_add"
+	AMOUNT = $AMOUNT$
 }
 
-# Undercoat inline script
+# Synthetics Prefabricated Components
+# +1 Roboticist
+# undercoat
 inline_script = {
-	script = jobs/civic_capital_jobs
-	AMOUNT = $SECONDARY_JOB$
-}
-
-# Undercoat inline script
-inline_script = {
-	script = jobs/misc_re_capital_jobs
-	PRIMARY_JOB = $PRIMARY_JOB$
-}
-
-# Base 1 Warden Job
-triggered_planet_modifier = {
-	potential = {
-		exists = owner
-		owner = { is_regular_empire = yes }
-		has_modifier = penal_colony
-	}
-	modifier = {
-		job_warden_add = $PRIMARY_JOB$
-	}
-}
-
-triggered_desc = {
-	trigger = {
-		exists = owner
-		owner = {
-			is_regular_empire = yes
-			is_megacorp = no
-		}
-		has_modifier = penal_colony
-	}
-	text = job_warden_effect_desc
-}
-
-inline_script = { # undercoat: moved to inline script
-	script = jobs/triggered/politicians_add
-	POLITICIAN_AMOUNT = @[ $PRIMARY_JOB$ * -1 ]
-	STEWARD_AMOUNT = @[ $PRIMARY_JOB$ * -1 ]
-	desc = 0
+	script = stu/jobs_add
+	job_type = roboticist
+	mult_line = "mult = value:re_capital_roboticists|PRIMARY_JOB|200|"
 	trigger = "
-		exists = owner
-		owner = { is_regular_empire = yes }
-		has_modifier = penal_colony
+		owner = {
+			OR = {
+				is_individual_machine = yes
+				AND = {
+					is_regular_empire = yes
+					has_active_tradition = tr_synthetics_prefabricated_components
+				}
+			}
+		}
 	"
-	mult_line = " "
+}
+
+# Pharma State
+# +1 Medical Worker
+# undercoat
+inline_script = {
+	script = stu/jobs_add
+	job_type = healthcare
+	AMOUNT = 100
+	trigger = "
+		owner = { is_private_healthcare_empire = yes }
+	"
 }

@@ -19,7 +19,6 @@ DISTAR_WRECK_CAT = {
 						is_at_war_with = from.owner
 						is_same_value = from.owner
 					}
-					ROOT.solar_system = { has_access_fleet = prev } # ariphaos (match event triggers)
 				}
 			}
 		}
@@ -247,7 +246,6 @@ DISTAR_DEAD_GOD_CAT = {
 			has_distar = yes
 			is_moon = yes
 			habitable_planet = no
-			NOT = { has_deposit_for = shipclass_mining_station } # ariphaos
 			solar_system = {
 				any_system_colony = {
 					exists = owner
@@ -529,8 +527,7 @@ DISTAR_DIAMOND_CAT = {
 			has_distar = yes
 			is_star = yes #Necessary b/c is_star_class actually means is_system_class
 			is_planet_class = pc_f_star
-			# Stars without resources are really, really rare.
-			NOT = { has_deposit_for = shipclass_mining_station } # ariphaos
+			has_any_strategic_resource = no
 		}
 	}
 
@@ -624,6 +621,12 @@ DISTAR_BRAINSLUG_CAT = {
 			OR = {
 				has_deposit = d_dangerous_wildlife_blocker
 				has_planet_modifier = pm_dangerous_wildlife
+			}
+		}
+		modifier = {
+			factor = 0
+			from.owner = {
+				is_wilderness_empire = yes
 			}
 		}
 	}
@@ -1155,26 +1158,6 @@ ast_debris_field_1_cat_2 = {
 					}
 				}
 			}
-			modifier = { # ariphaos
-				factor = 0
-				NOT = {	# rewrite event's trigger block here
-					any_country = {
-						is_playable = yes # undercoat: moved to scripted trigger
-						NOR = {
-							is_same_value = prev.owner
-							has_communications = root.owner
-							has_country_flag = lost_colony_parent
-							is_machine_empire = yes
-							is_synthetic_empire = yes
-							owner_species = {
-								has_trait = trait_mechanical
-								has_trait = trait_machine_unit
-								has_trait = trait_lithoid
-							}
-						}
-					}
-				}
-			}
 			anomaly_event = distar.1050
 		}
 		1 = {
@@ -1428,7 +1411,10 @@ alien_life_cat = {
 			add = 3
 			has_distar = yes
 			habitable_planet = yes
-			NOT = { has_modifier = dangerous_wildlife }
+			NOR = {
+				has_modifier = dangerous_wildlife
+				from.owner = { is_wilderness_empire = yes }
+			}
 		}
 	}
 	on_success = distar.2020
@@ -1519,7 +1505,7 @@ transmitter_cat = {
 			has_distar = yes
 			is_star = no
 			from.owner = {
-				NOR = {
+				NOT = {
 					has_global_flag = l_cluster_opened
 					has_completed_event_chain_counter = {
 						event_chain = l_cluster_chain
@@ -1690,7 +1676,10 @@ disco_speed_demon_cat = {
 		modifier = {
 			factor = 0
 			from.owner = {
-				is_synthetic_empire = yes
+				OR = {
+					is_synthetic_empire = yes
+					is_wilderness_empire = yes
+				}
 			}
 		}
 	}

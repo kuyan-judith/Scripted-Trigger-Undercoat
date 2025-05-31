@@ -1,14 +1,12 @@
 complex_drone = {
-	rank = 0
-	clothes_texture_index = 2
-
+	rank = 3
 	change_job_threshold = 1.25
 
 	weight = {
 		weight = 2
 	}
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_housing_usage_base = 1
 		pop_amenities_usage_no_happiness_base = 1
 	}
@@ -34,87 +32,23 @@ complex_drone = {
 		unity = 10
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			can_assemble_budding_pop = yes
-		}
-		planet_pop_assembly_organic_add = @plantoid_budding_rate
-		mult = value:budding_multiplier
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			can_assemble_tiyanki_pop = yes
-		}
-		planet_pop_assembly_organic_add = @tiyanki_budding_rate
-	}
-
 	# Triggered Modifiers
 	inline_script = "pop_categories/social_classes_triggered_modifiers_no_happiness"
 
-	unemployment_resources = {
-		category = unemployment_resources
-	}
-
 	resources = {
 		category = pop_category_drones
-
-		# Regular food, mineral and energy upkeep.
-		inline_script = "pop_categories/regular_upkeep"
-
-		# Additional energy upkeep for cyborgs.
-		inline_script = "pop_categories/cyborg_upkeep"
-
-		# Additional energy upkeep for robot traits.
-		inline_script = "pop_categories/trait_upkeep"
-
-		# Exotic Metabolism Upkeep
-		upkeep = {
-			trigger = {
-				is_organic_species = yes
-				has_trait = trait_exotic_metabolism
-			}
-			exotic_gases = @exotic_metabolism
-		}
-
-		# Resource Production
-
-		# Lithoid Trait Output
-		inline_script = "pop_categories/trait_production"
-
-		produces = {
-			trigger = {
-				is_organic_species = yes
-				has_trait = trait_inorganic_breath
-			}
-			exotic_gases = @inorganic_breath
-		}
-
-		produces = {
-			trigger = {
-				has_trait = trait_drake_scaled
-			}
-			alloys = @drake_scaled_trait_resource_production
-		}
 	}
 }
 
 simple_drone = {
-	rank = 0
-	clothes_texture_index = 2
-
+	rank = 2
 	change_job_threshold = 1.15
 
-	# This is called whenever a Pop is created, moved to a different planet, or gets a new owner
-	assign_to_pop = {
-		exists = owner
-		owner = { is_gestalt = yes }
-	}
 	weight = {
 		weight = 1
 	}
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_housing_usage_base = 1
 		pop_amenities_usage_no_happiness_base = 1
 	}
@@ -140,88 +74,39 @@ simple_drone = {
 		unity = 10
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			can_assemble_budding_pop = yes
-		}
-		planet_pop_assembly_organic_add = @plantoid_budding_rate
-		mult = value:budding_multiplier
+	# Triggered Modifiers
+	inline_script = "pop_categories/social_classes_triggered_modifiers_no_happiness"
+
+	resources = {
+		category = pop_category_drones
+	}
+}
+
+maintenance_drone = {
+	rank = 1
+
+	weight = {
+		weight = 0
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			can_assemble_tiyanki_pop = yes
-		}
-		planet_pop_assembly_organic_add = @tiyanki_budding_rate
+	pop_group_modifier = {
+		pop_housing_usage_base = 1
+	}
+
+	# scope: pop to be resettled
+	allow_resettlement = {
+		always = yes
+	}
+
+	resettlement_cost = {
+		energy = 100
 	}
 
 	# Triggered Modifiers
 	inline_script = "pop_categories/social_classes_triggered_modifiers_no_happiness"
 
-	unemployment_resources = {
-		category = unemployment_resources
-		produces = {
-			trigger = {
-				owner = {
-					is_hive_empire = yes
-				}
-			}
-			minerals = 1
-		}
-		produces = {
-			trigger = {
-				owner = {
-					is_hive_empire = yes
-					has_natural_neural_network = yes # undercoat: moved to scripted trigger
-				}
-			}
-			physics_research = 1
-			engineering_research = 1
-			society_research = 1.5
-		}
-		upkeep = {
-		}
-	}
-
 	resources = {
-		category = pop_category_drones
-
-		# Regular food, mineral and energy upkeep.
-		inline_script = "pop_categories/regular_upkeep"
-
-		# Additional energy upkeep for cyborgs.
-		inline_script = "pop_categories/cyborg_upkeep"
-
-		# Additional energy upkeep for robot traits.
-		inline_script = "pop_categories/trait_upkeep"
-
-		# Exotic Metabolism Upkeep
-		upkeep = {
-			trigger = {
-				is_organic_species = yes
-				has_trait = trait_exotic_metabolism
-			}
-			exotic_gases = @exotic_metabolism
-		}
-
-		# Resource Production
-		
-		# Lithoid Trait Output
-		inline_script = "pop_categories/trait_production"
-
-		produces = {
-			trigger = {
-				is_organic_species = yes
-				has_trait = trait_inorganic_breath
-			}
-			exotic_gases = @inorganic_breath
-		}
-
-		produces = {
-			trigger = {
-				has_trait = trait_drake_scaled
-			}
-			alloys = @drake_scaled_trait_resource_production
-		}
+		category = pop_category_maintenance_drones
 	}
+
 }

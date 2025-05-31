@@ -126,6 +126,296 @@ create_cyber_species_effect = {
 	}
 }
 
+create_cyber_creed_species_effect = {
+	species = {
+		modify_species = {
+			effect = {
+				create_species = {
+					is_mod = yes
+					name = this
+					plural = this
+					class = this
+					portrait = this
+					traits = this
+					can_be_modified = this
+					homeworld = this
+					namelist = this
+					gender = this
+					traits = {
+						ideal_planet_class = this
+					}
+				}
+				last_created_species = {
+					change_species_characteristics = {
+						remove_trait = trait_latent_psionic
+						remove_trait = trait_psionic
+						remove_trait = trait_cyborg_creed_of_construction
+						remove_trait = trait_cyborg_creed_of_war
+						remove_trait = trait_cyborg_creed_of_research
+						remove_trait = trait_cyborg_creed_of_labor
+						remove_trait = trait_cyborg_ritualistic_implants
+						add_trait = trait_cybernetic
+					}
+
+					save_global_event_target_as = cybercreedspecies@root.owner
+				}
+			}
+		}
+	}
+}
+
+cyberize_pops_effect = {
+	event_target:changing_pop_group = {
+		event_target:cyberspecies@species = {
+			save_event_target_as = cyberspecies_current
+		}
+	}
+
+	while = {
+		limit = {
+			any_owned_pop_group = {
+				exists = event_target:cyberspecies_current
+				exists = event_target:changing_species
+				is_exact_same_species = event_target:changing_species
+				[[SPIRITUALIST]
+					is_spiritualist = yes
+				]
+				[[!SPIRITUALIST]
+					is_spiritualist = no
+				]
+				NOR = {
+					has_trait = trait_cybernetic
+					has_trait = trait_limited_cybernetic
+				}
+			}
+		}
+		count = value:pop_to_cyberize_per_month
+		weighted_random_owned_pop_group = {
+			limit = {
+				is_exact_same_species = event_target:changing_species
+				[[SPIRITUALIST]
+					is_spiritualist = yes
+				]
+				[[!SPIRITUALIST]
+					is_spiritualist = no
+				]
+				NOR = {
+					has_trait = trait_cybernetic
+					has_trait = trait_limited_cybernetic
+				}
+			}
+			this = { save_event_target_as = source_pop_group }
+		}
+
+		event_target:source_pop_group = {
+			planet = {
+				create_pop_group = {
+					pop_group = event_target:source_pop_group
+					species = event_target:cyberspecies_current
+					size = 0
+					effect = {
+						save_event_target_as = target_pop_group
+
+						transfer_pop_amount = {
+							source = event_target:source_pop_group
+							target = event_target:target_pop_group
+							amount = 100
+						}
+					}
+				}
+			}
+		}
+
+		event_target:target_pop_group = {
+			[[LIMITED]
+				modify_species = {
+					species = this
+					remove_trait = trait_cybernetic
+					add_trait = trait_limited_cybernetic
+					add_traits_at_start_of_list = yes
+				}
+			]
+		}
+	}
+}
+
+cyberize_limited_hive_pops_effect = {
+	event_target:changing_pop_group = {
+		event_target:cyberspecies@species = {
+			save_event_target_as = cyberspecies_current
+		}
+	}
+
+	every_owned_pop_group = {
+		limit = {
+			exists = event_target:cyberspecies_current
+			exists = event_target:changing_species
+			is_exact_same_species = event_target:changing_species
+			NOR = {
+				has_trait = trait_cybernetic
+				has_trait = trait_limited_cybernetic
+			}
+		}
+		planet = {
+			create_pop_group = {
+				pop_group = event_target:source_pop_group
+				species = event_target:cyberspecies_current
+				size = 0
+				effect = {
+					save_event_target_as = target_pop_group
+
+					transfer_pop_amount = {
+						source = event_target:source_pop_group
+						target = event_target:target_pop_group
+						percentage = 0.05
+					}
+				}
+			}
+		}
+
+		event_target:target_pop_group = {
+			modify_species = {
+				species = this
+				remove_trait = trait_cybernetic
+				add_trait = trait_limited_cybernetic
+				add_traits_at_start_of_list = yes
+			}
+		}
+	}
+}
+
+cyberize_creed_pops_effect = {
+	event_target:cybercreedspecies@root.owner = {
+		save_event_target_as = cyberspecies_current
+	}
+
+	while = {
+		limit = {
+			any_owned_pop_group = {
+				exists = event_target:cyberspecies_current
+				is_same_species = owner.species
+				NOT = {	has_trait = trait_cybernetic }
+				pop_group_size > 0
+			}
+		}
+		[[SINGLE_LOOP]
+			count = 1
+		]
+		[[!SINGLE_LOOP]
+			count = value:pop_to_cyberize_per_month_creed
+		]
+
+		weighted_random_owned_pop_group = {
+			limit = {
+				is_same_species = owner.species
+				NOT = { has_trait = trait_cybernetic }
+				[[TINY_GROUPS]
+					pop_group_size > 0
+					pop_group_size < 5
+				]
+			}
+			this = { save_event_target_as = source_pop_group }
+		}
+
+		if = {
+			limit = {
+				exists = event_target:source_pop_group
+			}
+			event_target:source_pop_group = {
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:source_pop_group
+						species = event_target:cyberspecies_current
+						size = 0
+						effect = {
+							save_event_target_as = target_pop_group
+
+							transfer_pop_amount = {
+								source = event_target:source_pop_group
+								target = event_target:target_pop_group
+								amount = 100
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				exists = event_target:target_pop_group
+			}
+			event_target:target_pop_group = {
+				if = {
+					limit = { # Spiritualist
+						has_ethic = ethic_spiritualist
+					}
+					owner = {
+						switch = {
+							trigger = has_country_flag
+							cybernetic_creed_construction = {
+								prev = {
+									modify_species = {
+										species = this
+										add_trait = trait_cyborg_creed_of_construction
+										add_traits_at_start_of_list = yes
+									}
+								}
+							}
+							cybernetic_creed_war = {
+								prev = {
+									modify_species = {
+										species = this
+										add_trait = trait_cyborg_creed_of_war
+										add_traits_at_start_of_list = yes
+									}
+								}
+							}
+							cybernetic_creed_research = {
+								prev = {
+									modify_species = {
+										species = this
+										add_trait = trait_cyborg_creed_of_research
+										add_traits_at_start_of_list = yes
+									}
+								}
+							}
+							cybernetic_creed_labor = {
+								prev = {
+									modify_species = {
+										species = this
+										add_trait = trait_cyborg_creed_of_labor
+										add_traits_at_start_of_list = yes
+									}
+								}
+							}
+							cybernetic_creed_general = {
+								prev = {
+									modify_species = {
+										species = this
+										add_trait = trait_cyborg_ritualistic_implants
+										add_traits_at_start_of_list = yes
+									}
+								}
+							}
+						}
+					}
+				}
+				else = { # Not Spiritualist
+					modify_species = {
+						species = this
+						remove_trait = trait_cyborg_creed_of_construction
+						remove_trait = trait_cyborg_creed_of_war
+						remove_trait = trait_cyborg_creed_of_research
+						remove_trait = trait_cyborg_creed_of_labor
+						remove_trait = trait_cyborg_ritualistic_implants
+					}
+				}
+			}
+		}
+	}
+}
+
 # Requires: event_target:changing_species and event_target:cyberspecies@species
 cyberize_leaders_effect = {
 	every_owned_leader = {
@@ -164,18 +454,7 @@ cyberize_leaders_effect = {
 		change_species = event_target:cyberspecies@species
 		add_trait_no_notify = leader_trait_cyborg
 	}
-	if = {
-		limit = {
-			is_gestalt = yes
-		}
-		every_owned_leader = {
-			limit = {
-				is_councilor = yes
-				is_ruler = no
-			}
-			set_gestalt_node_portrait_effect = yes
-		}
-	}
+	update_node_portraits_if_gestalt_effect = yes
 }
 
 # Requires: event_target:changing_species and event_target:cyberspecies@species
@@ -210,6 +489,31 @@ cyberize_leaders_limited_effect = {
 		change_species = event_target:cyberspecies@species
 		add_trait_no_notify = leader_trait_limited_cyborg
 	}
+}
+
+# Requires: event_target:cybercreedspecies@root.owner
+cyberize_creed_leaders_effect = {
+	every_owned_leader = {
+		limit = {
+			exists = event_target:cybercreedspecies@root.owner
+			is_same_species = owner.species
+			NOT = {	has_trait = leader_trait_cyborg }
+		}
+		remove_trait = leader_trait_ritualistic_implants_cyborg
+		change_species = event_target:cybercreedspecies@root.owner
+		add_trait_no_notify = leader_trait_cyborg
+	}
+	every_pool_leader = {
+		limit = {
+			exists = event_target:cybercreedspecies@root.owner
+			is_same_species = owner.species
+			NOT = {	has_trait = leader_trait_cyborg }
+		}
+		remove_trait = leader_trait_ritualistic_implants_cyborg
+		change_species = event_target:cybercreedspecies@root.owner
+		add_trait_no_notify = leader_trait_cyborg
+	}
+	update_node_portraits_if_gestalt_effect = yes
 }
 
 # Requires: event_target:changing_species and event_target:cyberspecies@species
@@ -272,6 +576,127 @@ cyberize_armies_effect = {
 			name = random
 			species = event_target:cyberspecies@species
 		}
+	}
+}
+
+# Synthesize $COUNT$ number of pops
+synthesize_pops_effect = {
+	while = {
+		limit = {
+			any_owned_pop_group = {
+				exists = event_target:synthspecies@root.owner
+				is_same_species = owner.species
+				NOT = {
+					has_trait = trait_mechanical
+				}
+			}
+		}
+		count = $COUNT$
+		weighted_random_owned_pop_group = {
+			limit = {
+				is_same_species = owner.species
+				NOT = {
+					has_trait = trait_mechanical
+				}
+			}
+			this = { save_event_target_as = source_pop_group }
+		}
+
+		event_target:source_pop_group = {
+			planet = {
+				create_pop_group = {
+					pop_group = event_target:source_pop_group
+					species = event_target:synthspecies@root.owner
+					size = 0
+					effect = {
+						save_event_target_as = target_pop_group
+
+						transfer_pop_amount = {
+							source = event_target:source_pop_group
+							target = event_target:target_pop_group
+							amount = 100
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+assimilate_armies = {
+	every_owned_army = {
+		limit = {
+			exists = $SOURCE$
+			exists = $TARGET$
+			exists = species
+			species = {
+				is_exact_same_species = $SOURCE$
+			}
+			army_type = assault_army
+		}
+		modify_army = {
+			name = random
+			species = $TARGET$
+		}
+	}
+	every_owned_army = {
+		limit = {
+			exists = $SOURCE$
+			exists = $TARGET$
+			exists = species
+			exists = planet
+			species = {
+				is_exact_same_species = $SOURCE$
+			}
+			army_type = defense_army
+		}
+		modify_army = {
+			name = random
+			species = $TARGET$
+		}
+	}
+}
+
+assimilate_colony_ships = {
+	every_controlled_ship = {
+		limit = {
+			is_ship_class = shipclass_colonizer
+			exists = $SOURCE$
+			exists = $TARGET$
+			exists = species
+			species = {
+				is_exact_same_species = $SOURCE$
+			}
+		}
+		change_species = $TARGET$
+	}
+}
+
+assimilate_leaders = {
+	if = {
+		limit = {
+			exists = $SOURCE$
+			exists = $TARGET$
+		}
+		every_owned_leader = {
+			limit = {
+				is_exact_same_species = $SOURCE$
+			}
+			change_species = $TARGET$
+			update_leader_after_modification = {
+				SPECIES = $TARGET$
+			}
+		}
+		every_pool_leader = {
+			limit = {
+				is_exact_same_species = $SOURCE$
+			}
+			change_species = $TARGET$
+			update_leader_after_modification = {
+				SPECIES = $TARGET$
+			}
+		}
+		update_node_portraits_if_gestalt_effect = yes
 	}
 }
 
@@ -781,10 +1206,7 @@ synth_queen_wipe_planet = {
 	save_global_event_target_as = synth_queen_capital
 	if = {
 		limit = {
-			num_pops > 0
-		}
-		every_owned_pop = {
-			kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+			pop_amount > 0
 		}
 		remove_all_buildings = yes
 		destroy_colony = yes
@@ -814,12 +1236,9 @@ synth_queen_wipe_system = {
 		# Kill everyone
 		every_system_planet = {
 			limit = {
-				num_pops > 0
+				pop_amount > 0
 				exists = owner
 				owner = { is_primitive = no }
-			}
-			every_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 			remove_all_buildings = yes
 			destroy_colony = yes
@@ -841,7 +1260,29 @@ synth_queen_wipe_system = {
 			}
 			# Ships
 			else = {
-				if = {
+				if = { #handle ships that should never be killed like that
+					limit = {
+						any_owned_ship = {
+							OR = {
+								is_ship_size = behemoth_04
+								is_ship_size = voidspawn_boss
+							}
+						}
+					}
+					every_owned_ship = {
+						reduce_hp_percent = 15
+					}
+					closest_system = {
+						limit = {
+							NOT = {
+								has_modifier = queen_scorn_storm
+							}
+						}
+						save_event_target_as = destination_system
+					}
+					set_location = event_target:destination_system
+				}
+				else_if = {
 					limit = {
 						owner = {
 							NOR = {
@@ -889,7 +1330,7 @@ synth_queen_wipe_system = {
 					}
 				}
 				change_pc = pc_gray_goo
-				clear_deposits_stu = yes # undercoat: moved to scripted effect
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 				if = {
 					limit = {
 						NOT = {
@@ -1685,12 +2126,9 @@ synth_queen_mini_wipe_system = {
 		set_star_flag = synth_queen_system
 		every_system_planet = {
 			limit = {
-				num_pops > 0
+				pop_amount > 0
 				exists = owner
 				owner = { is_primitive = no }
-			}
-			every_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
 			}
 			destroy_colony = yes
 		}
@@ -1739,7 +2177,7 @@ synth_queen_mini_wipe_system = {
 				}
 			}
 			change_pc = pc_gray_goo
-			clear_deposits_stu = yes # undercoat: moved to scripted effect
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 		}
 		random_system_planet = {
 			limit = {
@@ -1838,80 +2276,117 @@ make_fallen_empire = {
 	ruler = {
 		add_skill = 9
 	}
-
 	if = {
 		limit = {
-			is_gestalt = yes
+			country_uses_bio_ships = no
 		}
-		add_global_ship_design = "NAME_Omega"
-		add_global_ship_design = "NAME_Alpha"
-		add_global_ship_design = "NAME_Beta"
-		add_global_ship_design = "NAME_Gamma"
-		add_global_ship_design = "NAME_Theta"
-		add_global_ship_design = "NAME_Tau"
-		add_global_ship_design = "NAME_Sigma"
-		add_global_ship_design = "NAME_FE_Starbase"
-		set_graphical_culture = fallen_machine_empire_01
-	}
-	else_if = {
-		limit = {
-			OR = {
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_fanatic_militarist
+		if = {
+			limit = {
+				is_gestalt = yes
 			}
+			add_global_ship_design = "NAME_Omega"
+			add_global_ship_design = "NAME_Alpha"
+			add_global_ship_design = "NAME_Beta"
+			add_global_ship_design = "NAME_Gamma"
+			add_global_ship_design = "NAME_Theta"
+			add_global_ship_design = "NAME_Tau"
+			add_global_ship_design = "NAME_Sigma"
+			add_global_ship_design = "NAME_FE_MACHINE_Citadel_1"
+			add_global_ship_design = "NAME_FE_MACHINE_Citadel_2"
+			add_global_ship_design = "NAME_FE_MACHINE_Citadel_3"
+			add_global_ship_design = "NAME_FE_Starbase"
+			set_graphical_culture = fallen_machine_empire_01
 		}
-		add_global_ship_design = "NAME_Reaper"
-		add_global_ship_design = "NAME_Imperium"
-		add_global_ship_design = "NAME_Supremacy"
-		add_global_ship_design = "NAME_Glory"
-		add_global_ship_design = "NAME_Devastator"
-		add_global_ship_design = "NAME_Servitor"
-		add_global_ship_design = "NAME_Destiny"
-		add_global_ship_design = "NAME_FE_Starbase"
-		set_graphical_culture = fallen_empire_04
-	}
-	else_if = {
-		limit = {
-			OR = {
-				has_ethic = ethic_fanatic_xenophile
-				has_ethic = ethic_fanatic_pacifist
+		else_if = {
+			limit = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_fanatic_militarist
+				}
 			}
+			add_global_ship_design = "NAME_Reaper"
+			add_global_ship_design = "NAME_Imperium"
+			add_global_ship_design = "NAME_Supremacy"
+			add_global_ship_design = "NAME_Glory"
+			add_global_ship_design = "NAME_Devastator"
+			add_global_ship_design = "NAME_Servitor"
+			add_global_ship_design = "NAME_Destiny"
+			add_global_ship_design = "NAME_FE_Starbase"
+			add_global_ship_design = "NAME_FE_XENOPHOBE_Citadel_1"
+			add_global_ship_design = "NAME_FE_XENOPHOBE_Citadel_2"
+			add_global_ship_design = "NAME_FE_XENOPHOBE_Citadel_3"
+			set_graphical_culture = fallen_empire_04
 		}
-		add_global_ship_design = "NAME_Adjuster"
-		add_global_ship_design = "NAME_Keeper"
-		add_global_ship_design = "NAME_Custodian"
-		add_global_ship_design = "NAME_Overseer"
-		add_global_ship_design = "NAME_Watcher"
-		add_global_ship_design = "NAME_Seeder"
-		add_global_ship_design = "NAME_Builder"
-		add_global_ship_design = "NAME_FE_Starbase"
-		set_graphical_culture = fallen_empire_03
-	}
-	else_if = {
-		limit = {
-			has_ethic = ethic_fanatic_spiritualist
+		else_if = {
+			limit = {
+				OR = {
+					has_ethic = ethic_fanatic_xenophile
+					has_ethic = ethic_fanatic_pacifist
+				}
+			}
+			add_global_ship_design = "NAME_Adjuster"
+			add_global_ship_design = "NAME_Keeper"
+			add_global_ship_design = "NAME_Custodian"
+			add_global_ship_design = "NAME_Overseer"
+			add_global_ship_design = "NAME_Watcher"
+			add_global_ship_design = "NAME_Seeder"
+			add_global_ship_design = "NAME_Builder"
+			add_global_ship_design = "NAME_FE_Starbase"
+			add_global_ship_design = "NAME_FE_XENOPHILE_Citadel_1"
+			add_global_ship_design = "NAME_FE_XENOPHILE_Citadel_2"
+			add_global_ship_design = "NAME_FE_XENOPHILE_Citadel_3"
+			set_graphical_culture = fallen_empire_03
 		}
-		add_global_ship_design = "NAME_Cleanser"
-		add_global_ship_design = "NAME_Eternal"
-		add_global_ship_design = "NAME_Avatar"
-		add_global_ship_design = "NAME_Zealot"
-		add_global_ship_design = "NAME_Penitent"
-		add_global_ship_design = "NAME_Faith"
-		add_global_ship_design = "NAME_Pilgrim"
-		add_global_ship_design = "NAME_FE_Starbase"
-		set_graphical_culture = fallen_empire_01
+		else_if = {
+			limit = {
+				has_ethic = ethic_fanatic_spiritualist
+			}
+			add_global_ship_design = "NAME_Cleanser"
+			add_global_ship_design = "NAME_Eternal"
+			add_global_ship_design = "NAME_Avatar"
+			add_global_ship_design = "NAME_Zealot"
+			add_global_ship_design = "NAME_Penitent"
+			add_global_ship_design = "NAME_Faith"
+			add_global_ship_design = "NAME_Pilgrim"
+			add_global_ship_design = "NAME_FE_Starbase"
+			add_global_ship_design = "NAME_Pilgrim"
+			add_global_ship_design = "NAME_FE_SPIRITUALIST_Citadel_1"
+			add_global_ship_design = "NAME_FE_SPIRITUALIST_Citadel_2"
+			add_global_ship_design = "NAME_FE_SPIRITUALIST_Citadel_3"
+			set_graphical_culture = fallen_empire_01
+		}
+		else = {
+			add_global_ship_design = "NAME_Enforcer"
+			add_global_ship_design = "NAME_Savant"
+			add_global_ship_design = "NAME_Scholar"
+			add_global_ship_design = "NAME_Sage"
+			add_global_ship_design = "NAME_Cloaker"
+			add_global_ship_design = "NAME_Librarian"
+			add_global_ship_design = "NAME_Seeker"
+			add_global_ship_design = "NAME_FE_Starbase"
+			add_global_ship_design = "NAME_FE_MATERIALIST_Citadel_1"
+			add_global_ship_design = "NAME_FE_MATERIALIST_Citadel_2"
+			add_global_ship_design = "NAME_FE_MATERIALIST_Citadel_3"
+			set_graphical_culture = fallen_empire_02
+		}
 	}
 	else = {
-		add_global_ship_design = "NAME_Enforcer"
-		add_global_ship_design = "NAME_Savant"
-		add_global_ship_design = "NAME_Scholar"
-		add_global_ship_design = "NAME_Sage"
-		add_global_ship_design = "NAME_Cloaker"
-		add_global_ship_design = "NAME_Librarian"
-		add_global_ship_design = "NAME_Seeker"
-		add_global_ship_design = "NAME_FE_Starbase"
-		set_graphical_culture = fallen_empire_02
-
+		add_global_ship_design = "NAME_HIVE_FE_Small_Weaver_War"
+		add_global_ship_design = "NAME_HIVE_FE_Small_Weaver_Growth"
+		add_global_ship_design = "NAME_HIVE_FE_Small_Weaver_Control"
+		add_global_ship_design = "NAME_HIVE_FE_Large_Mauler_Swarm"
+		add_global_ship_design = "NAME_HIVE_FE_Large_Mauler_Picket"
+		add_global_ship_design = "NAME_HIVE_FE_Large_Weaver_Control"
+		add_global_ship_design = "NAME_HIVE_FE_Large_Harbinger"
+		add_global_ship_design = "NAME_HIVE_FE_Construction"
+		add_global_ship_design = "NAME_HIVE_FE_Colony"
+		add_global_ship_design = "NAME_HIVE_FE_Colossus"
+		add_global_ship_design = "NAME_HIVE_FE_Platform"
+		add_global_ship_design = "NAME_HIVE_FE_Starbase"
+		add_global_ship_design = "NAME_HIVE_Citadel_1"
+		add_global_ship_design = "NAME_HIVE_Citadel_2"
+		add_global_ship_design = "NAME_HIVE_Citadel_3"
+		set_graphical_culture = "biogenesis_01_fallen_empire"
 	}
 
 	create_fallen_empire_cosmogenesis_navy = yes
@@ -1964,9 +2439,8 @@ make_fallen_empire = {
 					}
 				}
 				9 = {
-					create_pop = {
+					create_pop_group = {
 						species = root.species
-						ethos = random
 					}
 				}
 			}
@@ -1977,15 +2451,6 @@ make_fallen_empire = {
 		limit = {
 			exists = owner
 			is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
-		}
-
-		while = {
-			limit = {
-				num_pops > 0
-			}
-			random_owned_pop = {
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
-			}
 		}
 		destroy_colony = yes
 
@@ -2017,7 +2482,6 @@ make_fallen_empire = {
 		create_colony = {
 			owner = root
 			species = root.species
-		#	ethos = random
 		}
 
 		create_fallen_empire_planet = yes
@@ -2226,9 +2690,8 @@ create_fallen_empire_planet = {
 				}
 			}
 			9 = {
-				create_pop = {
+				create_pop_group = {
 					species = root.species
-					ethos = random
 				}
 			}
 		}
@@ -2273,7 +2736,12 @@ create_fallen_empire_planet = {
 					factor = 0
 					exists = owner
 					owner = {
-						NOT = { has_tradition = tr_genetics_finish }
+						NOR = {
+							has_tradition = tr_cloning_finish
+							has_tradition = tr_purity_finish
+							has_tradition = tr_mutation_finish
+							has_tradition = tr_genetics_finish
+						}
 					}
 				}
 				create_army = {
@@ -2291,6 +2759,9 @@ create_fallen_empire_planet = {
 					owner = {
 						OR = {
 							has_tradition = tr_genetics_finish
+							has_tradition = tr_cloning_finish
+							has_tradition = tr_purity_finish
+							has_tradition = tr_mutation_finish
 							has_tradition = tr_psionics_finish
 							is_machine_empire = yes
 						}
@@ -3178,11 +3649,11 @@ arc_welders_start_effect = {
 		set_planet_size = 15
 		while = {
 			count = 3
-			random_owned_pop = {
+			random_owned_pop_group = {
 				limit = {
 					is_same_species = event_target:arc_welders_empire.species
 				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				kill_single_pop = yes
 			}
 		}
 		while = {
@@ -3222,22 +3693,6 @@ obsessional_directive_start_effect = {
 						days = -1
 					}
 				}
-			}
-		}
-	}
-	capital_scope = {
-		if = {
-			limit = {
-				is_habitat = yes # undercoat: moved to scripted trigger
-			}
-			add_district = {
-				district_type = district_hab_industrial
-				ignore_cap = yes
-			}
-		}
-		else = {
-			add_district_and_planet_size_if_needed_effect = {
-				district = district_industrial
 			}
 		}
 	}

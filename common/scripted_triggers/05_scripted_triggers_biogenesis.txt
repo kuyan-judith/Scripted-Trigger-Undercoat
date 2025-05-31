@@ -1,0 +1,724 @@
+##################################
+# Scripted Triggers - BioGenesis #
+##################################
+
+game_start_auto_mod_empire = {
+	OR = {
+		is_overtuned_empire = yes # undercoat: moved to scripted trigger
+		is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+is_space_citadel = {
+	OR = {
+		has_starbase_size = starbase_deep_space_citadel_1
+		has_starbase_size = starbase_deep_space_citadel_2
+		has_starbase_size = starbase_deep_space_citadel_3
+	}
+}
+
+is_space_citadel_ship_size = {
+	OR = {
+		is_ship_size = starbase_deep_space_citadel_1
+		is_ship_size = starbase_deep_space_citadel_2
+		is_ship_size = starbase_deep_space_citadel_3
+	}
+}
+
+#called in the owner scope
+has_protected_disconnected_drones = {
+	any_owned_species = {
+		prev = { #owner scope
+			any_owned_pop_group = {
+				is_exact_same_species = prevprev #species scope
+			}
+		}
+		has_citizenship_type = {
+			type = citizenship_protected_drone
+			country = prev
+		}
+	}
+}
+
+#called in the owner scope
+has_symbiotic_disconnected_drones = {
+	any_owned_species = {
+		prev = { #owner scope
+			any_owned_pop_group = {
+				is_exact_same_species = prevprev #species scope
+			}
+		}
+		has_citizenship_type = {
+			type = citizenship_symbiotic_drone
+			country = prev
+		}
+	}
+}
+
+#called in the owner scope
+has_exploited_disconnected_drones = {
+	any_owned_species = {
+		prev = { #owner scope
+			any_owned_pop_group = {
+				is_exact_same_species = prevprev #species scope
+			}
+		}
+		has_citizenship_type = {
+			type = citizenship_exploited_drone
+			country = prev
+		}
+	}
+}
+
+has_disconnected_drone_citizenship_type = {
+	exists = owner
+	OR = {
+		has_citizenship_type = {
+			type = citizenship_protected_drone
+			country = owner
+		}
+		has_citizenship_type = {
+			type = citizenship_symbiotic_drone
+			country = owner
+		}
+		has_citizenship_type = {
+			type = citizenship_exploited_drone
+			country = owner
+		}
+	}
+}
+
+disconnected_drone_can_be_worker = {
+	exists = owner
+	OR = {
+		has_citizenship_type = {
+			type = citizenship_symbiotic_drone
+			country = owner
+		}
+		AND = {
+			has_citizenship_type = {
+				type = citizenship_exploited_drone
+				country = owner
+			}
+			exists = root.planet
+			root.planet = {
+				has_active_building = building_slave_processing
+			}
+		}
+	}
+	is_livestock = no
+}
+
+has_any_consumed_genes = {
+	OR = {
+		has_country_flag = consumed_humanoid_dna
+		has_country_flag = consumed_mammalian_dna
+		has_country_flag = consumed_reptilian_dna
+		has_country_flag = consumed_avian_dna
+		has_country_flag = consumed_arthropoid_dna
+		has_country_flag = consumed_molluscoid_dna
+		has_country_flag = consumed_fungoid_dna
+		has_country_flag = consumed_plantoid_dna
+		has_country_flag = consumed_lithoid_dna
+		has_country_flag = consumed_necroid_dna
+		has_country_flag = consumed_aquatic_dna
+		has_country_flag = consumed_toxoid_dna
+	}
+}
+
+has_completed_genetic_situation = {
+	OR = {
+		has_country_flag = purity_tradition_unlocked
+		has_country_flag = cloning_tradition_unlocked
+		has_country_flag = mutation_tradition_unlocked
+	}
+}
+
+has_purity_ascension = {
+	OR = {
+		has_country_flag = purity_tradition_unlocked
+		is_wilderness_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+has_cloning_ascension = {
+	OR = {
+		has_country_flag = cloning_tradition_unlocked
+		has_country_flag = clone_army_full_potential
+	}
+}
+
+has_mutation_ascension = {
+	OR = {
+		has_country_flag = mutation_tradition_unlocked
+		is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+has_cloning_tradition = {
+	OR = {
+		has_tradition = tr_genetics_adopt
+		has_tradition = tr_cloning_adopt
+	}
+}
+
+has_genetic_stage_1_tradition = {
+	OR = {
+		has_tradition = tr_purity_stage_1_swap
+		has_tradition = tr_cloning_stage_1_swap
+		has_tradition = tr_mutation_stage_1_swap
+	}
+}
+
+has_genetic_stage_2_tradition = {
+	OR = {
+		has_tradition = tr_purity_stage_2_swap
+		has_tradition = tr_cloning_stage_2_swap
+		has_tradition = tr_mutation_stage_2_swap
+	}
+}
+
+has_genetic_stage_3_tradition = {
+	OR = {
+		has_tradition = tr_purity_stage_3_swap
+		has_tradition = tr_cloning_stage_3_swap
+		has_tradition = tr_mutation_stage_3_swap
+	}
+}
+
+has_one_genetic_ascension_choice = {
+	OR = {
+		is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		is_wilderness_empire = yes # undercoat: moved to scripted trigger
+		has_country_flag = clone_army_full_potential
+	}
+}
+
+planet_has_cloning_facility = {
+	OR = {
+		has_active_building = building_clone_vats
+		has_active_building = building_clone_army_clone_vat
+		has_active_building = building_ancient_cryo_chamber
+		has_active_building = building_fe_clinic_1
+		has_active_building = building_fe_clinic_2
+		has_active_building = building_genomic_facility
+	}
+}
+
+country_can_have_backup_clones = {
+	OR = {
+		is_cloning_authority = yes
+		has_cloning_biochemical_composure_tradition = yes
+	}
+}
+
+leader_can_have_backup_clone = {
+	is_robotic_species = no
+	exists = owner
+	owner = {
+		country_can_have_backup_clones = yes
+		any_owned_planet = {
+			planet_has_cloning_facility = yes
+		}
+	}
+}
+
+leader_has_reduced_clone_degradation = {
+	exists = owner
+	owner = {
+		is_cloning_authority = yes
+	}
+	OR = {
+		# Democratic - Everyone
+		owner = {
+			is_democratic_authority = yes
+		}
+		# Oligarchic - Councilors
+		AND = {
+			owner = {
+				is_oligarchic_authority = yes
+			}
+			OR = {
+				is_ruler = yes
+				is_councilor = yes
+			}
+		}
+		# Dictatorship - Class Dependent
+		AND = {
+			owner = {
+				is_dictatorial_authority = yes
+			}
+			OR = {
+				AND = {
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+					owner = { has_policy_flag = homogenous_class_scientists }
+				}
+				AND = {
+					leader_is_official_stu = yes # undercoat: moved to scripted trigger
+					owner = { has_policy_flag = homogenous_class_officials }
+				}
+				AND = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+					owner = { has_policy_flag = homogenous_class_commanders }
+				}
+			}
+		}
+		# Imperial - Ruler
+		AND = {
+			owner = { is_imperial_authority = yes }
+			is_ruler = yes
+		}
+		# Corporate - Insurance Policy
+		AND = {
+			owner = {
+				is_megacorp = yes
+			}
+			OR = {
+				owner = { has_policy_flag = replicatory_association_insurance_stellar }
+				AND = {
+					OR = {
+						is_ruler = yes
+						is_councilor = yes
+					}
+					owner = { has_policy_flag = replicatory_association_insurance_platinium }
+				}
+				AND = {
+					is_ruler = yes
+					owner = { has_policy_flag = replicatory_association_insurance_basic }
+				}
+			}
+		}
+		# Hive-Mind - Node Culling
+		owner = {
+			is_hive_empire = yes
+			has_technology = tech_node_culling_1
+		}
+	}
+}
+
+leader_backup_clone_can_activate = {
+	has_trait = leader_trait_has_backup_clone
+}
+
+can_perform_genetic_assimilation = {
+	OR = {
+		has_active_tradition = tr_genetics_creation
+		has_active_tradition = tr_purity_genotype_regeneration
+		has_active_tradition = tr_purity_genotype_regeneration_wilderness
+		has_active_tradition = tr_cloning_evolutionary_extrapolation
+		has_tradition = tr_mutation_planned_polymorphism
+		is_bodysnatcher_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+has_purity_heightened_attributes_tradition = {
+	has_country_flag = genetic_ascension_stage_2_purity
+	has_genetic_stage_2_tradition = yes
+}
+
+has_purity_imperfection_remediation_tradition = {
+	custom_tooltip = {
+		text = has_purity_imperfection_remediation_tradition_tt
+		has_country_flag = genetic_ascension_stage_3_purity
+		has_genetic_stage_3_tradition = yes
+	}
+}
+
+has_cloning_genomic_growth_tradition = {
+	OR = {
+		has_country_flag = genetic_ascension_stage_1_cloning
+		has_country_flag = clone_army_full_potential
+	}
+	has_genetic_stage_1_tradition = yes
+}
+
+has_cloning_artificial_population_tradition = {
+	OR = {
+		has_country_flag = genetic_ascension_stage_2_cloning
+		has_country_flag = clone_army_full_potential
+	}
+	has_genetic_stage_2_tradition = yes
+}
+
+has_cloning_biochemical_composure_tradition = {
+	OR = {
+		has_country_flag = genetic_ascension_stage_3_cloning
+		has_country_flag = clone_army_full_potential
+	}
+	has_genetic_stage_3_tradition = yes
+}
+
+has_mutation_environmental_integration_tradition = {
+	OR = {
+		has_country_flag = genetic_ascension_stage_1_mutation
+		is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+	}
+	has_genetic_stage_1_tradition = yes
+}
+
+has_mutation_somatic_subversiveness_tradition = {
+	OR = {
+		has_country_flag = genetic_ascension_stage_2_mutation
+		is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+	}
+	has_genetic_stage_2_tradition = yes
+}
+
+has_mutation_nucleotide_isolation_tradition = {
+	custom_tooltip = {
+		text = has_mutation_nucleotide_isolation_tradition_tt
+		OR = {
+			has_country_flag = genetic_ascension_stage_3_mutation
+			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
+		}
+		has_genetic_stage_3_tradition = yes
+	}
+}
+
+has_genetically_ascended = {
+	OR = {
+		has_tradition = tr_genetics_finish
+		has_tradition = tr_purity_finish
+		has_tradition = tr_cloning_finish
+		has_tradition = tr_mutation_finish
+	}
+}
+
+is_purity_authority = {
+	has_country_flag = bio_purity
+}
+
+is_cloning_authority = {
+	has_country_flag = bio_cloning
+}
+
+is_mutation_authority = {
+	has_country_flag = bio_mutation
+}
+
+has_uncapped_wilderness_districts = {
+	is_wilderness_empire = yes
+	has_tradition = tr_purity_finish
+}
+
+should_show_standard_terraforming = {
+	OR = {
+		is_wilderness_empire = no
+		has_technology = "tech_terrestrial_sculpting"
+	}
+}
+
+has_interesting_species_trait = {
+	OR = {
+		AND = {
+			has_trait = trait_cave_dweller
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_cave_dweller
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_survivor
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_survivor
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_stargazer
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_stargazer
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_storm_touched
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_storm_touched
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_bioadaptability
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_bioadaptability
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_social_pheromones
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_social_pheromones
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_limited_regeneration
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_limited_regeneration
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_enigmatic_intelligence
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_enigmatic_intelligence
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_brainslug
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_brainslug
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_plasmic
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_plasmic
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_storm_fused
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_storm_fused
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_drake_scaled
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_drake_scaled
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_tiyanki
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_tiyanki
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_voidling
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_voidling
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_notofthisworld
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_notofthisworld
+				}
+			}
+		}
+		AND = {
+			has_trait = trait_exd
+			NOT = {
+				event_target:fallen_empire_hive_growth.species = {
+					has_trait = trait_exd
+				}
+			}
+		}
+		has_trait = trait_cave_dweller
+		has_trait = trait_survivor
+		has_trait = trait_stargazer
+		has_trait = trait_storm_touched
+		has_trait = trait_bioadaptability
+		has_trait = trait_social_pheromones
+		has_trait = trait_limited_regeneration
+		has_trait = trait_enigmatic_intelligence
+		has_trait = trait_brainslug
+		has_trait = trait_plasmic
+		has_trait = trait_storm_fused
+		has_trait = trait_drake_scaled
+		has_trait = trait_tiyanki
+		has_trait = trait_voidling
+		has_trait = trait_notofthisworld
+		has_trait = trait_exd #Extradimensional
+	}
+}
+
+has_nemesis_or_control_fragment = {
+	OR = {
+		has_nemesis = yes
+		has_global_flag = control_awoke
+	}
+}
+
+is_player_crisis = {
+	OR = {
+		has_ascension_perk = ap_become_the_crisis
+		has_ascension_perk = ap_cosmogenesis
+		has_ascension_perk = ap_behemoths
+	}
+}
+
+is_level_4_player_crisis = {
+	OR = {
+		has_crisis_level = crisis_level_4
+		has_crisis_level = crisis_cosmogenesis_level_4
+		has_crisis_level = crisis_behemoth_level_4
+	}
+}
+
+is_level_5_player_crisis = {
+	OR = {
+		has_crisis_level = crisis_level_5
+		has_crisis_level = crisis_cosmogenesis_level_5
+		has_crisis_level = crisis_behemoth_level_5
+	}
+}
+
+is_behemoth = {
+	OR = {
+		is_ship_size = behemoth_01
+		is_ship_size = behemoth_02
+		is_ship_size = behemoth_03
+		is_ship_size = behemoth_04
+	}
+}
+
+any_available_random_trait_by_tag = {
+	any_trait_available_for_species = {
+		trait_has_all_tags = { $TAG$ }
+		NOT = { trait_has_any_tag = { $NOTTAG$ } }
+		OR = {
+			NOT = { trait_has_any_tag = { individual } }
+			root.owner = { is_gestalt = no }
+		}
+	}
+}
+
+any_available_random_trait_by_tag_evopred = {
+	species = {
+		[[SPECIES]
+			any_trait_available_for_species = {
+				trait_has_all_tags = { $TAG$ organic positive }
+				NOT = { trait_has_any_tag = { special cybernetic psionic presapient drawbacks } }
+				NOT = { trait_has_any_tag = { genetic_ascension } }
+				OR = {
+					NOT = { trait_has_any_tag = { individual } }
+					root.owner = { is_gestalt = no }
+				}
+			}
+		]
+		[[!SPECIES]
+			any_trait_available_for_species = {
+				trait_has_all_tags = { $TAG$ organic positive }
+				NOT = { trait_has_any_tag = { special species cybernetic psionic presapient drawbacks } }
+				NOT = { trait_has_any_tag = { genetic_ascension } }
+				OR = {
+					NOT = { trait_has_any_tag = { individual } }
+					root.owner = { is_gestalt = no }
+				}
+			}
+		]
+	}
+}
+
+can_be_smuggled = {
+	species = {
+		NOR = {
+			has_virtual_species_trait = yes
+			has_trait = trait_clone_soldier_infertile
+			has_trait = trait_clone_soldier_infertile_full_potential
+			AND = {
+				has_trait = trait_hive_mind
+				root.owner = {
+					NOT = {
+						can_perform_genetic_assimilation = yes
+						has_active_tradition = tr_cybernetics_transubstantiation_synthesis # cybernetic assimilation
+					}
+				}
+			}
+			has_trait = trait_machine_unit # Hive Machines can not be smuggled, robots and synths can
+		}
+	}
+}
+
+is_habitable_for_wilderness = {
+	NOR = {
+		is_artificial = yes
+		is_city_world = yes # undercoat: moved to scripted trigger
+		is_hive_world = yes # undercoat: moved to scripted trigger
+		is_machine_world = yes # undercoat: moved to scripted trigger
+		is_relic_world = yes # undercoat: moved to scripted trigger
+		is_nanotech_world = yes # undercoat: moved to scripted trigger
+	}
+}
+
+is_same_planet_class = {
+	switch = {
+		trigger = is_planet_class
+		pc_desert = {
+			has_planet_flag = desert_terraform
+		}
+		pc_arid = {
+			has_planet_flag = arid_terraform
+		}
+		pc_savannah = {
+			has_planet_flag = savannah_terraform
+		}
+		pc_tropical = {
+			has_planet_flag = tropical_terraform
+		}
+		pc_ocean = {
+			has_planet_flag = ocean_terraform
+		}
+		pc_continental = {
+			has_planet_flag = continental_terraform
+		}
+		pc_tundra = {
+			has_planet_flag = tundra_terraform
+		}
+		pc_arctic = {
+			has_planet_flag = arctic_terraform
+		}
+		pc_alpine = {
+			has_planet_flag = alpine_terraform
+		}
+		pc_nuked = {
+			has_planet_flag = nuked_terraform
+		}
+		pc_barren = {
+			has_planet_flag = barren_terraform
+		}
+		pc_barren_cold = {
+			has_planet_flag = barren_cold_terraform
+		}
+		pc_nanotech = {
+			has_planet_flag = nanotech_terraform
+		}
+		pc_machine = {
+			has_planet_flag = machine_terraform
+		}
+		pc_hive = {
+			has_planet_flag = hive_terraform
+		}
+		pc_toxic = {
+			has_planet_flag = toxic_terraform
+		}
+		default = {
+			always = no
+		}
+	}
+}

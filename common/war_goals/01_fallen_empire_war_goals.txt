@@ -9,12 +9,6 @@ wg_fe_humiliation = {
 		imperial_authority >= 100
 	}
 
-	allowed_peace_offers = {
-		status_quo
-		surrender
-		demand_surrender
-	}
-
 	potential = {
 		always = yes
 	}
@@ -41,12 +35,6 @@ wg_fe_stop_atrocities = {
 	galactic_empire_joins_defender = {
 		from = { is_galactic_emperor = yes }
 		imperial_authority >= 100
-	}
-
-	allowed_peace_offers = {
-		status_quo
-		surrender
-		demand_surrender
 	}
 
 	potential = {
@@ -79,12 +67,6 @@ wg_fe_stop_ai = {
 		imperial_authority >= 100
 	}
 
-	allowed_peace_offers = {
-		status_quo
-		surrender
-		demand_surrender
-	}
-
 	potential = {
 		always = yes
 	}
@@ -113,12 +95,6 @@ wg_fe_cleanse_holy_worlds = {
 	galactic_empire_joins_defender = {
 		from = { is_galactic_emperor = yes }
 		imperial_authority >= 100
-	}
-
-	allowed_peace_offers = {
-		status_quo
-		surrender
-		demand_surrender
 	}
 
 	potential = {
@@ -151,12 +127,6 @@ wg_fe_cleanse_border_worlds = {
 		imperial_authority >= 100
 	}
 
-	allowed_peace_offers = {
-		status_quo
-		surrender
-		demand_surrender
-	}
-
 	potential = {
 		always = yes
 	}
@@ -180,24 +150,27 @@ wg_fe_cleanse_border_worlds = {
 
 wg_ae_domination = {
 	casus_belli = cb_subjugation
-	set_defender_wargoal = wg_end_threat
+	set_defender_wargoal = wg_end_threat_vs_ae_subjugation
 	hide_if_no_cb = yes
-	total_war = yes
 
 	galactic_empire_joins_defender = {
 		from = { is_galactic_emperor = yes }
 		imperial_authority >= 100
 	}
 
-	allowed_peace_offers = {
-		status_quo
+	forbidden_peace_offers = {
+		surrender = ""
 	}
 
 	cede_claims = occupied_only
 
 	potential = {
 		is_country_type = awakened_fallen_empire
-		is_gestalt = no # undercoat: moved to scripted trigger
+		NOR = {
+			is_machine_empire = yes
+			has_country_flag = fallen_empire_hive_growth
+			has_country_flag = fallen_empire_hive_war
+		}
 	}
 	possible = {
 		always = yes
@@ -259,10 +232,133 @@ wg_ae_domination = {
 				}
 			}
 		}
+		else_if = {
+			limit = {
+				has_country_flag = fallen_empire_hive_control
+			}
+			from = {
+				set_subject_of_stu = { # undercoat: moved to scripted effect with on_action
+					who = root
+					preset = preset_political_client
+				}
+			}
+		}
 	}
 
 	ai_weight = {
 		weight = 100
+		modifier = {
+			factor = 0
+			from = {
+				OR = {
+					is_level_4_player_crisis = yes
+					is_level_5_player_crisis = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 0.1
+			from = { is_homicidal = yes }
+		}
+	}
+}
+
+wg_ae_total_war = {
+	casus_belli = cb_ae_total_war
+	set_defender_wargoal = wg_end_threat
+	hide_if_no_cb = yes
+	total_war = yes
+
+	galactic_empire_joins_defender = {
+		from = { is_galactic_emperor = yes }
+		imperial_authority >= 100
+	}
+
+	forbidden_peace_offers = {
+		demand_surrender = ""
+		surrender = ""
+	}
+
+	cede_claims = occupied_only
+
+	potential = {
+		is_country_type = awakened_fallen_empire
+		is_machine_empire = no
+		NOT = { has_valid_civic = civic_hive_devouring_swarm }
+	}
+	possible = {
+		always = yes
+	}
+
+	ai_weight = {
+		weight = 5
+		modifier = {
+			factor = 2
+			from = { is_level_4_player_crisis = yes }
+		}
+		modifier = {
+			factor = 10
+			from = { is_level_5_player_crisis = yes }
+		}
+		modifier = {
+			factor = 2
+			from = { is_homicidal = yes }
+		}
+	}
+}
+
+wg_ae_entertainment = {
+	casus_belli = cb_ae_entertainment
+	set_defender_wargoal = wg_end_threat
+	hide_if_no_cb = yes
+	total_war = no
+
+	galactic_empire_joins_defender = {
+		from = { is_galactic_emperor = yes }
+		imperial_authority >= 100
+	}
+
+	forbidden_peace_offers = {
+		surrender = ""
+	}
+
+	cede_claims = no
+
+	potential = {
+		is_country_type = awakened_fallen_empire
+		has_country_flag = fallen_empire_hive_war
+	}
+	possible = {
+		always = yes
+	}
+	on_accept = {
+		custom_tooltip = wg_ae_war_entertainment_effect
+		random_war = {
+			limit = {
+				using_war_goal = { type = wg_ae_entertainment owner = root }
+				any_defender = {
+					is_same_value = from
+				}
+			}
+			save_event_target_as = entertainment_war
+		}
+		generate_ae_entertainment_reward = yes
+	}
+
+	ai_weight = {
+		weight = 100
+		modifier = {
+			factor = 0.1
+			from = { is_level_4_player_crisis = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { is_level_5_player_crisis = yes }
+		}
+		modifier = {
+			factor = 0.5
+			from = { is_homicidal = yes }
+		}
 	}
 }
 
@@ -273,22 +369,33 @@ wg_end_threat_ae = {
 	total_war = yes
 	set_defender_wargoal = wg_ae_domination
 
-	allowed_peace_offers = {
-		status_quo
+	forbidden_peace_offers = {
+		demand_surrender = ""
+		surrender = ""
 	}
 
 	surrender_acceptance = -1000
 
 	potential = {
 		is_playable = yes # undercoat: moved to scripted trigger
-		from = { is_country_type = awakened_fallen_empire }
+		from = {
+			is_country_type = awakened_fallen_empire
+			NOT = { has_valid_civic = civic_hive_devouring_swarm }
+		}
 	}
 	possible = {
-		always = yes
+		custom_tooltip = {
+			fail_text = cannot_use_against_emperor
+			OR = {
+				from = { is_galactic_emperor = no }
+				is_galactic_community_member = no
+			}
+		}
 	}
 
 	ai_weight = {
-		weight = 100
+		weight = 0
+
 	}
 }
 
@@ -298,7 +405,10 @@ wg_end_threat_synth_queen = {
 	hide_if_no_cb = yes
 	total_war = yes
 
-	allowed_peace_offers = {
+	forbidden_peace_offers = {
+		demand_surrender = ""
+		status_quo = ""
+		surrender = ""
 	}
 
 	surrender_acceptance = -1000

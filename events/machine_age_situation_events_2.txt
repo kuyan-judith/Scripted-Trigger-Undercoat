@@ -669,9 +669,9 @@ situation_event = { # Stage 3 - Start event
 			owner = {
 				while = {
 					count = value:num_synth_opposition
-					random_owned_pop = {
+					random_owned_pop_group = {
 						limit = { is_same_species = owner.species }
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						kill_single_pop = yes
 					}
 				}
 				capital_scope = {
@@ -697,9 +697,9 @@ situation_event = { # Stage 3 - Start event
 			owner = {
 				while = {
 					count = value:num_synth_opposition
-					random_owned_pop = {
+					random_owned_pop_group = {
 						limit = { is_same_species = owner.species }
-						kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						kill_single_pop = yes
 					}
 				}
 				capital_scope = {
@@ -1218,6 +1218,9 @@ situation_event = { # Digitization - Final hidden event
 	immediate = {
 		set_situation_flag = digitization_ongoing
 		set_situation_flag = digitization_final
+		owner = {
+			country_event = { id = timeline.79 }
+		}
 		situation_event = { id = synth.3 } # Run digitization again to change remaining people
 		situation_event = { id = synth.4 days = 1 } # Real final event
 	}
@@ -1226,8 +1229,23 @@ situation_event = { # Digitization - Final hidden event
 # Fired by: event
 situation_event = { # Final event
 	id = synth.4
-	title = "synth.4.name"
-	desc = "synth.4.desc"
+	title = synth.4.name
+	desc = {
+		trigger = {
+			owner = {
+				is_unplugged_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		text = synth.4.desc
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		text = synth.4.desc.unplugged
+	}
 	picture = GFX_evt_synth_situation
 	show_sound = event_ai_started
 	situation = this
@@ -1286,7 +1304,7 @@ situation_event = { # Event to digitize pops
 						has_situation_flag = digitization_final
 					}
 				}
-				every_owned_pop = {
+				every_owned_pop_group = {
 					limit = {
 						is_same_species = owner.species
 						NOT = {
@@ -1303,49 +1321,13 @@ situation_event = { # Event to digitize pops
 							is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
 						}
 					}
-					while = {
-						limit = {
-							any_owned_pop = {
-								exists = event_target:synthspecies@root.owner
-								is_same_species = owner.species
-								NOT = {
-									has_trait = trait_mechanical
-								}
-							}
-						}
-						count = value:pop_to_digitize_per_month_synthetic_fertility
-						random_owned_pop = {
-							limit = {
-								is_same_species = owner.species
-								NOT = {
-									has_trait = trait_mechanical
-								}
-							}
-							change_species = event_target:synthspecies@root.owner
-						}
+					synthesize_pops_effect = {
+						COUNT = value:pop_to_digitize_per_month_synthetic_fertility
 					}
 				}
 				else = {
-					while = {
-						limit = {
-							any_owned_pop = {
-								exists = event_target:synthspecies@root.owner
-								is_same_species = owner.species
-								NOT = {
-									has_trait = trait_mechanical
-								}
-							}
-						}
-						count = value:pop_to_digitize_per_month
-						random_owned_pop = {
-							limit = {
-								is_same_species = owner.species
-								NOT = {
-									has_trait = trait_mechanical
-								}
-							}
-							change_species = event_target:synthspecies@root.owner
-						}
+					synthesize_pops_effect = {
+						COUNT = value:pop_to_digitize_per_month
 					}
 				}
 			}
@@ -1447,7 +1429,7 @@ situation_event = { # Event to digitize pops
 			limit = {
 				NOT = {
 					owner = {
-						any_owned_pop = {
+						any_owned_pop_group = {
 							exists = event_target:synthspecies@root.owner
 							is_same_species = owner.species
 							NOT = {
@@ -2129,7 +2111,7 @@ country_event = { # Infinite Possibility Matrix
 		name = synth.1010.b
 		custom_tooltip = synth.social_consequences.tt
 		trigger = {
-			is_pleasure_seeker = no # undercoat: moved to scripted trigger
+			is_pleasure_seeker_empire = no # undercoat: moved to scripted trigger
 		}
 		hidden_effect = {
 			change_variable = {
@@ -2149,7 +2131,7 @@ country_event = { # Infinite Possibility Matrix
 		name = synth.1010.b.hedonist
 		custom_tooltip = synth.social_consequences.tt
 		trigger = {
-			is_pleasure_seeker = yes # undercoat: moved to scripted trigger
+			is_pleasure_seeker_empire = yes # undercoat: moved to scripted trigger
 		}
 		hidden_effect = {
 			change_variable = {
@@ -3009,7 +2991,7 @@ country_event = {
 	immediate = {
 		from = {
 			switch = {
-				trigger = has_skill
+				trigger = has_total_skill
 				1 = {
 					switch = {
 						trigger = leader_class

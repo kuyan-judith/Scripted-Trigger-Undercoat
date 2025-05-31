@@ -1,0 +1,328 @@
+# The first category is also the default one (it is used when a focus card doesn't define it's category explicitly)
+# Categores are selectable by default ( selectable = yes )
+#conquest = {
+#	name = "FOCUS_CARD_TYPE_CONQUEST"                                          # Refers to name localization
+#	desc = "FOCUS_CARD_TYPE_CONQUEST_DESC"                                     # Refers to desctiption localization
+#	background = "GFX_focus_priority_background_conquest"                      # Refers to background texture used for not-selected UI entry
+#	background_expanded = "GFX_focus_priority_background_expanded_conquest"    # Refers to background texture used for selected UI entry
+#	icon = "GFX_focus_priority_icon_conquest"                                  # Refers to icon texture
+#	resources = {                                                              # Resource fee required to switch to this focus category
+#		category = country_focus
+#
+#       cost = {
+#           unity = @switchingCostUnity
+#       }
+#   }
+#	starting_weight = {									# Probability of the empire starting with this Empire Focus, based on ethics, civics, and so on.
+#		base = 1
+#		modifier = {
+#			add = @startingFocusFanaticEthic
+#			has_ethic = ethic_fanatic_materialist
+# 		}
+#	}
+#	weights = {											# Probability weights affect the new active card selection logic.
+#		{                                               # The probability that a new card from a corresponding category is selected is proportional to the weight.
+#			category = core_focus                       # If at the moment there are no available cards from the categories with higher weight the atempts to draw the card randomly from any category are made.
+#			value = {
+#				base = 1
+#				modifier = {							# A Country Scope is used for the scriptable value calculation
+#                   factor = 2
+#                   has_government = ..
+#               }
+#			}
+#		}
+#		{
+#			category = exploration
+#			value = {
+#				base = 2
+#				modifier = {
+#					add = 2
+#				}
+#			}
+#		}
+#}
+
+@switchingCostUnity = 50
+@startingFocusFanaticEthic = 100
+@startingFocusEthic = 10
+@startingFocusAuthority = 10
+@startingFocusCivic = 10
+@waivedYearsDefine = 5 # should match COUNTRY_FOCUS_COST_WAIVED_YEARS define
+
+core_focus = {
+	name = "FOCUS_CARD_TYPE_CORE"
+	desc = "FOCUS_CARD_TYPE_CORE_DESC"
+	selectable = no
+}
+
+exploration = {
+	name = "FOCUS_CARD_TYPE_EXPLORATION"
+	desc = "FOCUS_CARD_TYPE_EXPLORATION_DESC"
+	background = "GFX_focus_priority_background_exploration"
+	background_expanded = "GFX_focus_priority_background_expanded_exploration"
+	icon = "GFX_focus_priority_icon_exploration"
+	resources = {
+		category = country_focus
+
+		cost = {
+			trigger = {
+				years_passed >= @waivedYearsDefine
+			}
+			unity = @switchingCostUnity
+		}
+	}
+
+	starting_weight = {
+		base = 1
+		modifier = {
+			add = @startingFocusFanaticEthic
+			has_ethic = ethic_fanatic_materialist
+		}
+		modifier = {
+			add = @startingFocusEthic
+			has_ethic = ethic_materialist
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_eager_explorer_empire = yes
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_curator_empire = yes
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_crowdsourcing_empire = yes
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_memory_vault_empire = yes
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_technocracy = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	weights = {
+		{
+			category = core_focus
+			value = {
+				base = 3
+			}
+		}
+
+		{
+			category = exploration
+			value = {
+				base = 4
+			}
+		}
+
+		{
+			category = conquest
+			value = {
+				base = 1
+			}
+		}
+
+		{
+			category = development
+			value = {
+				base = 1
+			}
+		}
+	}
+}
+
+conquest = {
+	name = "FOCUS_CARD_TYPE_CONQUEST"
+	desc = "FOCUS_CARD_TYPE_CONQUEST_DESC"
+	background = "GFX_focus_priority_background_conquest"
+	background_expanded = "GFX_focus_priority_background_expanded_conquest"
+	icon = "GFX_focus_priority_icon_conquest"
+	resources = {
+		category = country_focus
+
+		cost = {
+			trigger = {
+				years_passed >= @waivedYearsDefine
+			}
+			unity = @switchingCostUnity
+		}
+	}
+
+	starting_weight = {
+		base = 0
+		modifier = {
+			add = @startingFocusFanaticEthic
+			has_ethic = ethic_fanatic_militarist
+		}
+		modifier = {
+			add = @startingFocusEthic
+			has_ethic = ethic_militarist
+		}
+		modifier = {
+			add = @startingFocusEthic
+			is_unfriendly = yes
+		}
+		modifier = {
+			add = @startingFocusEthic
+			is_crusader_empire = yes
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_citizen_service = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_distinguished_admiralty
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_nationalistic_zeal
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_warrior_culture = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_private_military_companies
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_hive_strength_of_legions
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_tactical_algorithms_empire = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_machine_warbots
+		}
+	}
+
+	weights = {
+		{
+			category = core_focus
+			value = {
+				base = 3
+			}
+		}
+
+		{
+			category = exploration
+			value = {
+				base = 1
+			}
+		}
+
+		{
+			category = conquest
+			value = {
+				base = 4
+			}
+		}
+
+		{
+			category = development
+			value = {
+				base = 1
+			}
+		}
+	}
+}
+
+development = {
+	name = "FOCUS_CARD_TYPE_DEVELOPMENT"
+	desc = "FOCUS_CARD_TYPE_DEVELOPMENT_DESC"
+	background = "GFX_focus_priority_background_development"
+	background_expanded = "GFX_focus_priority_background_expanded_development"
+	icon = "GFX_focus_priority_icon_development"
+	resources = {
+		category = country_focus
+
+		cost = {
+			trigger = {
+				years_passed >= @waivedYearsDefine
+			}
+			unity = @switchingCostUnity
+		}
+	}
+
+	starting_weight = {
+		base = 0
+		modifier = {
+			add = 1000
+			species_portrait = fun12 # Blorg
+		}
+		modifier = {
+			add = @startingFocusFanaticEthic
+			has_ethic = ethic_fanatic_xenophile
+		}
+		modifier = {
+			add = @startingFocusEthic
+			has_ethic = ethic_xenophile
+		}
+		modifier = {
+			add = @startingFocusAuthority
+			is_megacorp = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_crafter_empire = yes
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_diplomatic_corps
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_hive_empath
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @startingFocusCivic
+			is_astromining_drones_empire = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = @startingFocusCivic
+			has_valid_civic = civic_machine_spybots
+		}
+	}
+
+	weights = {
+		{
+			category = core_focus
+			value = {
+				base = 3
+			}
+		}
+
+		{
+			category = exploration
+			value = {
+				base = 1
+			}
+		}
+
+		{
+			category = conquest
+			value = {
+				base = 1
+			}
+		}
+
+		{
+			category = development
+			value = {
+				base = 4
+			}
+		}
+	}
+}

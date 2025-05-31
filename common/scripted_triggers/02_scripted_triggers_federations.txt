@@ -3,17 +3,17 @@
 scion_losing_defensive_war = {
 	any_war = {
 		any_defender = {
-			is_same_value = $country|root$
+			is_same_value = root
 		}
 		any_attacker = {
 			OR = {
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = overwhelming
 				}
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = superior
 				}
@@ -27,17 +27,17 @@ scion_losing_defensive_war = {
 scion_losing_offensive_war = {
 	any_war = {
 		any_attacker = {
-			is_same_value = $country|root$
+			is_same_value = root
 		}
 		any_defender = {
 			OR = {
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = overwhelming
 				}
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = superior
 				}
@@ -51,18 +51,18 @@ scion_losing_offensive_war = {
 scion_losing_defensive_war_combatant = {
 	any_war = {
 		any_defender = {
-			is_same_value = $country|root$
+			is_same_value = root
 		}
 		any_attacker = {
 			is_same_value = prevprev
 			OR = {
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = overwhelming
 				}
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = superior
 				}
@@ -76,18 +76,18 @@ scion_losing_defensive_war_combatant = {
 scion_losing_offensive_war_combatant = {
 	any_war = {
 		any_attacker = {
-			is_same_value = $country|root$
+			is_same_value = root
 		}
 		any_defender = {
 			is_same_value = prevprev
 			OR = {
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = overwhelming
 				}
 				relative_power = {
-					who = $country|root$
+					who = root
 					category = fleet
 					value = superior
 				}
@@ -167,5 +167,138 @@ has_orbital_mining_deposit = {
 		has_deposit = d_alloys_25
 		has_deposit = d_guardian_dragon_hoard
 		has_deposit = d_consumer_goods_obsessional_directive
+	}
+}
+
+habitat_owner_has_tech_for_deposit = {
+	if = {
+		limit = {
+			has_resource = {
+				type = volatile_motes
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_mine_volatile_motes
+		}
+	}
+	if = {
+		limit = {
+			has_resource = {
+				type = exotic_gases
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_mine_exotic_gases
+		}
+	}
+	if = {
+		limit = {
+			has_resource = {
+				type = rare_crystals
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_mine_rare_crystals
+		}
+	}
+	if = {
+		limit = {
+			has_resource = {
+				type = sr_living_metal
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_mine_living_metal
+		}
+	}
+	if = {
+		limit = {
+			has_resource = {
+				type = sr_zro
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_mine_zro
+		}
+	}
+	if = {
+		limit = {
+			has_resource = {
+				type = sr_dark_matter
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_mine_dark_matter
+		}
+	}
+	if = {
+		limit = {
+			has_resource = {
+				type = astral_threads
+				amount > 0
+			}
+		}
+		root.owner = {
+			has_technology = tech_astral_harvesting
+		}
+	}
+}
+
+# Checks if an empire can form a federation with another empire
+# this = Country scope, the other empire that is being checked as a potential federation partner
+# prev = Country scope, the original empire that checks if they can form a federation with the other empire
+can_form_federation_with_empire = {
+	this = { is_playable = yes } # The other country should be normal - we know that WE are # undercoat: moved to scripted trigger
+	NOR = {
+		AND = { # We are a Determined Exterminator or Fanatic Purifiers and they are not the same species as us or a machine empire
+			prev = {
+				OR = {
+					has_valid_civic = civic_machine_terminator
+					has_valid_civic = civic_fanatic_purifiers
+				}
+			}
+			this = {
+				NOR = {
+					is_same_species = from
+					OR = {
+						has_country_flag = synthetic_empire
+						is_machine_empire = yes
+						is_individual_machine = yes
+					}
+				}
+			}
+		}
+		AND = { # As above, but THEY are a Determined Exterminator or Fanatic Purifiers
+			prev = {
+				NOR = {
+					is_same_species = from
+					OR = {
+						has_country_flag = synthetic_empire
+						is_machine_empire = yes
+						is_individual_machine = yes
+					}
+				}
+			}
+			this = {
+				OR = {
+					has_valid_civic = civic_machine_terminator
+					has_valid_civic = civic_fanatic_purifiers
+				}
+			 }
+		}
+	}
+	NOR = { # Devouring Swarms are too hangry to form federations
+		prev = { has_valid_civic = civic_hive_devouring_swarm }
+		this = { has_valid_civic = civic_hive_devouring_swarm }
+	}
+	NOR = { # Inward Perfectionists would never consider joining
+		prev = { is_inwards_perfection_empire = yes } # undercoat: moved to scripted trigger
+		this = { is_inwards_perfection_empire = yes } # undercoat: moved to scripted trigger
 	}
 }

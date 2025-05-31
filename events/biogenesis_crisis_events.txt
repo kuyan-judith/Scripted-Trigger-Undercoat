@@ -1,0 +1,3512 @@
+##############################
+# Crisis Events - BioGenesis #
+##############################
+
+namespace = biocrisis
+
+@growth_factor_planet_mult = 75
+@growth_factor_from_pop = 0.02
+@growth_factor_monthly_decrease = -1.5
+@growth_factor_from_ship = 0.7
+
+# Behemoth Hatching
+planet_event = {
+	id = biocrisis.1
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_biogenesis_dlc = yes
+	}
+
+	immediate = {
+		save_event_target_as = target_planet
+		spawn_behemoth_hatchling_effect = yes
+	}
+
+	after = { # Crisis Objective: Birth Behemoth
+		event_target:behemoth_parent_country = { complete_crisis_objective = crisobj_birth_behemoth }
+	}
+}
+
+# Crisis Special Project 1 Completed - Crisis Level 2 Unlocked
+#country_event = {
+#	id = biocrisis.5
+#	title = "biocrisis.5.name"
+#	desc = biocrisis.5.desc
+#	picture = GFX_evt_surreal_visions
+#	show_sound = event_necrophage
+#	event_chain = behemoth_crisis_chain
+#
+#	is_triggered_only = yes
+#
+#	option = {
+#		name = biocrisis.5.a
+#	}
+#
+#	after = {
+#		custom_tooltip = can_advance_crisis_progression
+#	}
+#}
+
+# Crisis Special Project 2 Completed - Crisis Level 3 Unlocked
+#country_event = {
+#	id = biocrisis.10
+#	title = "biocrisis.10.name"
+#	desc = biocrisis.10.desc
+#	picture = GFX_evt_surreal_visions
+#	show_sound = event_necrophage
+#	event_chain = behemoth_crisis_chain
+#
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		NOT = {
+#			has_country_flag = biocrisis_10_fired
+#		}
+#	}
+#
+#	option = {
+#		name = biocrisis.10.a
+#		hidden_effect = {
+#			country_event = {
+#				id =  biocrisis.60 days = 120
+#			}
+#		}
+#	}
+#
+#	after = {
+#		custom_tooltip = can_advance_crisis_progression
+#		set_country_flag = biocrisis_10_fired
+#	}
+#}
+
+# Crisis Special Project 3 Completed - Crisis Level 4 Unlocked
+country_event = {
+	id = biocrisis.15
+	title = "biocrisis.15.name"
+	desc = biocrisis.15.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.15.a
+	}
+
+	after = {
+		custom_tooltip = can_advance_crisis_progression
+	}
+}
+
+# Crisis Special Project 4 Completed - Crisis Level 5 Unlocked
+country_event = {
+	id = biocrisis.20
+	title = "biocrisis.20.name"
+	desc = biocrisis.20.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.20.a
+	}
+
+	after = {
+		custom_tooltip = can_advance_crisis_progression
+	}
+}
+
+# Crisis Level 1
+country_event = {
+	id = biocrisis.50
+	title = "biocrisis.50.name"
+	desc = biocrisis.50.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.50.a
+	}
+}
+
+# Crisis Level 2
+country_event = {
+	id = biocrisis.55
+	title = "biocrisis.55.name"
+	desc = biocrisis.55.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.55.a
+	}
+}
+
+# Crisis Level 3
+country_event = {
+	id = biocrisis.60
+	title = "biocrisis.60.name"
+	desc = biocrisis.60.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			has_country_flag = biocrisis_60_fired
+		}
+	}
+
+	option = {
+		name = biocrisis.60.a
+	}
+
+	after = {
+		set_country_flag = biocrisis_60_fired
+		enable_special_project = {
+			name = BEHEMOTH_CRISIS_SPECIAL_PROJECT_3
+			owner = root
+			location = capital_scope
+		}
+	}
+}
+
+# Crisis Level 4
+country_event = {
+	id = biocrisis.65
+	title = "biocrisis.65.name"
+	desc = biocrisis.65.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.65.a
+	}
+
+	after = {
+		enable_special_project = {
+			name = BEHEMOTH_CRISIS_SPECIAL_PROJECT_4
+			owner = root
+			location = capital_scope
+		}
+		enable_special_project = {
+			name = BEHEMOTH_MUTATION_PROJECT
+			owner = root
+		}
+	}
+}
+
+# Crisis Level 5
+country_event = {
+	id = biocrisis.70
+	title = "biocrisis.70.name"
+	desc = biocrisis.70.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_necrophage
+	event_chain = behemoth_crisis_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.70.a
+		#Start situation
+		start_situation = { type = behemoth_finale_situation target = root }
+		begin_event_chain = {
+			event_chain = behemoth_victory_chain
+			target = root
+		}
+		# Add pop nerfing modifier - increment at every situation stage
+		add_modifier = {
+			modifier = behemoth_transference
+			days = -1
+		}
+	}
+
+	immediate = {
+		set_variable = {
+			which = pops_transferred
+			value = 0
+		}
+		capital_scope = {
+			save_event_target_as = behemoth_capital
+			validate_planet_buildings_and_districts = yes
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_variable = {
+				which = growth_factor_variable
+				value = 0
+			}
+			# Kill a few pops across country
+			every_owned_planet = {
+				limit = {
+					pop_amount > 500
+				}
+				random_list = {
+					20 = {}
+					20 = {
+						weighted_random_owned_pop_group = {
+							kill_single_pop = yes
+						}
+						owner = {
+							change_variable = {
+								which = pops_transferred
+								value = 100
+							}
+						}
+					}
+					20 = {
+						while = {
+							count = 2
+							weighted_random_owned_pop_group = {
+								kill_single_pop = yes
+							}
+						}
+						owner = {
+							change_variable = {
+								which = pops_transferred
+								value = 200
+							}
+						}
+					}
+					20 = {
+						while = {
+							count = 3
+							weighted_random_owned_pop_group = {
+								kill_single_pop = yes
+							}
+						}
+						owner = {
+							change_variable = {
+								which = pops_transferred
+								value = 300
+							}
+						}
+					}
+					20 = {
+						while = {
+							count = 4
+							weighted_random_owned_pop_group = {
+								kill_single_pop = yes
+							}
+						}
+						owner = {
+							change_variable = {
+								which = pops_transferred
+								value = 400
+							}
+						}
+					}
+				}
+			}
+			# Set up event to kill some transference workers every six months
+			country_event = { id = biocrisis.255 days = 180 }
+
+			random_owned_fleet = { # Delete the Behemoth that just researched the project
+				limit = {
+					is_ship_size = behemoth_03
+					solar_system = {
+						is_same_value = root.capital_scope.solar_system
+					}
+				}
+				delete_fleet = this
+			}
+
+			#Swap with a tier 4 Behemoth (same visuals but has to be different ship type)
+			event_target:behemoth_capital = {
+				create_fleet = {
+					name = "NAME_Behemoth_fleet"
+					settings = {
+						spawn_debris = no
+					}
+					effect = {
+						set_owner = root
+						create_ship = {
+							name = "NAME_Behemoth_ship"
+							design = "NAME_Behemoth_04"
+							effect = {
+								set_ship_flag = behemoth_hatchling_ship
+							}
+						}
+						set_location = {
+							target = event_target:behemoth_capital
+							distance = 0
+							angle = 90
+							direction = in_system
+						}
+						set_fleet_stance = aggressive
+						set_aggro_range_measure_from = self #or return_point
+						set_aggro_range = 30000
+						set_fleet_bombardment_stance = behemoth_invasion
+					}
+				}
+			}
+
+			#Make everyone hate you
+			every_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+				}
+				establish_communications_no_message = root
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_destroying_galaxy
+				}
+			}
+			every_country = {
+				limit = { is_fallen_empire = yes }
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_destroying_galaxy
+				}
+			}
+			every_playable_country = { #Notify other level 5 Behemoths
+				limit = {
+					NOT = { is_same_value = root }
+					has_menace_perk = menp_behemoth_ever_hungry
+				}
+				country_event = { id = biocrisis.185 days = 1 }
+			}
+			every_playable_country = { #Notify the rest of the galacy
+				limit = {
+					NOT = { is_same_value = root }
+					NOT = { has_menace_perk = menp_behemoth_ever_hungry }
+				}
+				country_event = { id = biocrisis.187 days = 1 }
+			}
+		}
+	}
+}
+
+### Behemoth Behaviour
+
+# 75 - Behemoth rage check - fired from biocrisis.1 and the yearly pulse then from itself.
+fleet_event = {
+	id = biocrisis.75
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		#rage check again
+		fleet_event = { id = biocrisis.75 days = 540 random = 270 }
+		random_owned_ship = {
+			set_timed_ship_flag = { flag = rage_checked days = 540 }
+		}
+
+		#actual check
+		if = {
+			limit = {
+				any_owned_ship = {
+					NOT = {
+						has_ship_flag = raging
+						has_ship_flag = recently_raged
+						has_ship_flag = recently_fed
+						is_ship_size = behemoth_03
+						is_growth_complete = yes
+						owner = {
+							has_menace_perk	= menp_behemoth_mind_meld
+						}
+					}
+				}
+
+			}
+			random_list = { #effect of cyber mutation
+				75 = {
+					enrage_behemoth = yes
+				}
+
+				25 = {
+					modifier = {
+						factor = 0
+						owner = {
+							NOT = { has_country_flag = behemoth_mutation_cyber }
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# 82 - Raging Kaiju reaches its mEGGastructural destination
+country_event = {
+	id = biocrisis.82
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		from = {
+			any_owned_ship = {
+				has_ship_flag = raging
+			}
+			solar_system = {
+				any_system_megastructure = {
+					is_megastructure_type = behemoth_egg
+				}
+			}
+		}
+		fromfrom = {
+			has_planet_flag = has_megastructure
+		}
+	}
+
+	immediate = {
+		from = {
+			add_growth = 50
+			solar_system = {
+				random_system_megastructure = {
+					limit = {
+						is_megastructure_type = behemoth_egg
+					}
+					remove_megastructure = this
+					#Spawn the broken egg
+					solar_system = {
+						spawn_planet = {
+							class = "pc_egg_cracked"
+							location = prev.planet
+							orbit_location = yes
+							orbit_angle_offset = 45
+							orbit_distance_offset = 19.799
+							plane_offset = -3
+							size = 40
+							has_ring = no
+							init_effect = {
+								set_name = "behemoth_egg_ruined"
+								# Undercoat on_action
+								fire_on_action = { on_action = on_planet_spawned }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# 80 - Bombarding Behemoth spawns army
+planet_event = {
+	id = biocrisis.80
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		any_fleet_in_orbit = {
+			controller = { is_hostile = root.owner }
+			any_owned_ship = {
+				has_ship_flag = behemoth_hatchling_ship
+			}
+		}
+	}
+
+	immediate = {
+		random_list = {
+			97 = {}
+			3 = {
+				create_army = {
+					name = "NAME_Behemoth_Army"
+					owner = from
+					type = "behemoth_army"
+				}
+				random_fleet_in_orbit = {
+					limit = {
+						controller = { is_hostile = root.owner }
+						any_owned_ship = {
+							has_ship_flag = behemoth_hatchling_ship
+						}
+					}
+					random_owned_ship = {
+						limit = {
+							has_ship_flag = behemoth_hatchling_ship
+						}
+						add_growth = 1
+						set_timed_ship_flag = { flag = recently_fed days = 180 }
+					}
+				}
+			}
+		}
+	}
+}
+
+# 85 - Behemoth armies took over a planet
+country_event = {
+	id = biocrisis.85
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		fromfrom = {
+			any_ground_combat_attacker = {
+				army_type = behemoth_army
+			}
+		}
+	}
+
+	immediate = {
+
+		fromfrom = {
+			# Wipe armies
+			every_planet_army = {
+				remove_army = yes
+			}
+			set_variable = { #math out growth gain
+				which = pops_devoured
+				value = 0
+			}
+			export_trigger_value_to_variable = {
+				trigger = count_owned_pop_amount
+				variable = pops_devoured
+				rounded = yes
+			}
+			divide_variable = {
+				which = pops_devoured
+				value = 100 #1 per 100 pops
+			}
+			random_fleet_in_orbit = {
+				limit = {
+					any_owned_ship = {
+						has_ship_flag = behemoth_hatchling_ship
+					}
+				}
+				add_growth = prev.pops_devoured
+				random_owned_ship = {
+					limit = {
+						has_ship_flag = behemoth_hatchling_ship
+					}
+					set_timed_ship_flag = { flag = recently_fed days = 900 }
+				}
+			}
+
+			# Wipe colony and spawn custom blockers
+			every_owned_pop_group = {
+				kill_all_pop = yes
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_deposit = d_kaiju_lair
+					}
+				}
+				add_blocker = {
+					type = d_kaiju_lair
+					blocked_deposit = none
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_deposit = d_devastated_cities
+					}
+				}
+				add_blocker = {
+					type = d_devastated_cities
+					blocked_deposit = none
+				}
+			}
+			if = {
+				limit = {
+					NOT = {
+						has_deposit = d_devoured_continent
+					}
+				}
+				add_blocker = {
+					type = d_devoured_continent
+					blocked_deposit = none
+				}
+			}
+		}
+	}
+}
+
+# 90 - Behemoth meets other behemoth, they rage out
+fleet_event = {
+	id = biocrisis.90
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			NOT = { has_menace_perk	= menp_behemoth_mind_meld }
+		}
+		any_owned_ship = {
+			NOT = { has_ship_flag = raging }
+			OR = {
+				is_ship_size = behemoth_01
+				is_ship_size = behemoth_02
+				is_ship_size = behemoth_03
+			}
+		}
+		from = {
+			any_fleet_in_system = {
+				NOT = { is_same_value = root }
+				OR = {
+					is_ship_size = behemoth_01
+					is_ship_size = behemoth_02
+					is_ship_size = behemoth_03
+					is_ship_size = behemoth_04
+				}
+			}
+		}
+	}
+
+	immediate = {
+		enrage_behemoth = yes
+	}
+}
+
+# 95 - Behemoth is let loose via fleet action
+fleet_event = {
+	id = biocrisis.95
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		#rage up
+		enrage_behemoth = yes
+	}
+}
+
+# 99 - Behemoth is disabled in battle from on_ship_disabled
+# This = Ship
+# From = Disabler Ship
+ship_event = {
+	id = biocrisis.99
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_ship_flag = behemoth_hatchling_ship
+	}
+
+	immediate = {
+		remove_ship_flag = recently_tamed
+		# check who disabled it
+		if = {
+			limit = {
+				from.owner = { #any behemoth crisis country can capture another behemoth
+					has_ascension_perk = ap_behemoths
+				}
+			}
+			#Fire the subduing event
+			from.owner = {
+				save_event_target_as = behemoth_parent_country
+			}
+			ship_event = { id = biocrisis.100 }
+			set_timed_ship_flag = { flag = recently_tamed days = 720 }
+		}
+		else = {
+			#kill the beast if the ship that disabled it is not a kaiju country
+			destroy_ship = this
+			if = {
+				limit = {
+					from.owner = { is_reanimator = yes }
+				}
+				from.owner = {
+					country_event = { id = biocrisis.520 } # If the beast is killed by a reanimator
+				}
+			}
+			# notify the parents
+			random_country = {
+				limit = {
+					has_country_flag = hatched@root
+				}
+				country_event = { id = biocrisis.105 }
+				remove_country_flag = hatched@root
+			}
+		}
+	}
+}
+
+# 100 - Behemoth calms down (via .75 and .99)
+ship_event = {
+	id = biocrisis.100
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		NOT = { has_ship_flag = recently_tamed }
+	}
+
+	immediate = {
+		if = { #if it's currently fighting or bombing something, check again in a month. Also if you have a food deficit. (Crisis level 5 can rage down despite fight or deficit, but not while eating a planet.)
+			limit = {
+				OR = {
+					AND = {
+						solar_system = {
+							any_fleet_in_system = {
+								owner = { is_hostile = root.owner }
+								is_disabled = no
+							}
+						}
+						event_target:behemoth_parent_country = {
+							NOT = { has_menace_perk	= menp_behemoth_mind_meld }
+						}
+					}
+					AND = {
+						exists = orbit
+						orbit = { has_orbital_bombardment = yes }
+					}
+					AND = {
+						event_target:behemoth_parent_country = {
+							any_situation = {
+								is_situation_type = situation_food_deficit
+							}
+							NOT = { has_menace_perk	= menp_behemoth_mind_meld }
+						}
+					}
+				}
+				is_disabled = no
+			}
+			ship_event = { id = biocrisis.100 days = 30 }
+			set_timed_ship_flag = { flag = combat_rage days = 30 }
+			if = { # if ongoing deficit, they seek new targets every six months
+				limit = {
+					NOT = { has_ship_flag = target_acquired }
+					NOR = {
+						solar_system = {
+							any_fleet_in_system = {
+								owner = { is_hostile = root.owner }
+								is_disabled = no
+							}
+						}
+						AND = {
+							exists = orbit
+							orbit = { has_orbital_bombardment = yes }
+						}
+					}
+					event_target:behemoth_parent_country = {
+						any_situation = {
+							is_situation_type = situation_food_deficit
+						}
+					}
+				}
+				find_raging_behemoth_target = yes
+				set_timed_ship_flag = {
+					flag = target_acquired
+					days = 170
+				}
+			}
+		}
+		else = {
+			repair_percentage = 0.2
+			remove_ship_flag = raging
+			remove_modifier = behemoth_rage_buffs
+			set_timed_ship_flag = {
+				flag = recently_raged
+				days = 720
+			}
+			fleet = {
+				set_owner = event_target:behemoth_parent_country
+				clear_orders = yes
+				remove_auto_move_target = yes
+			}
+			ship_event = { id = biocrisis.101 days = 1}
+			create_message = {
+				type = MESSAGE_BEHEMOTH_CALM
+				localization = MESSAGE_BEHEMOTH_CALM_DESC
+				days = 30
+				target = root.fleet
+			}
+		}
+	}
+
+	after = { # Crisis Objective: Behemoth Raging
+		event_target:behemoth_parent_country = { complete_crisis_objective = crisobj_behemoth_rage }
+		fleet = {
+			if = {
+				limit = {
+					exists = event_target:behemoth_parent_country@root
+				}
+				clear_global_event_target = behemoth_parent_country@root
+			}
+		}
+	}
+}
+
+ship_event = { #Somehow, I need a separate event to rename the fleet once it comes back under your control.
+	id = biocrisis.101
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		fleet = {
+			set_name = "NAME_Behemoth_fleet"
+		}
+		if = {
+			limit = {
+				is_disabled = yes
+			}
+			set_disabled = no
+		}
+	}
+}
+
+# 105 - Behemoth dies but it gives you a fair bit of feral insight
+country_event = {
+	id = biocrisis.105
+	title = "biocrisis.105.name"
+	desc = biocrisis.105.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_necrophage
+
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			NOT = {
+				has_country_flag = kaiju_dissection
+			}
+		}
+		name = biocrisis.105.a
+		add_resource = {
+			feral_insight = 1500
+		}
+		hidden_effect = {
+			set_country_flag = kaiju_dissection
+		}
+	}
+
+	option = {
+		trigger = {
+			has_country_flag = kaiju_dissection
+		}
+		name = biocrisis.105.b
+	}
+}
+
+# 115 - Behemoth Anger Failsafe (from on_yearly_pulse_country)
+country_event = {
+	id = biocrisis.115
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_ascension_perk = ap_behemoths
+	}
+
+	immediate = {
+		every_owned_fleet = {
+			limit = {
+				any_owned_ship = {
+					has_ship_flag = behemoth_hatchling_ship
+					NOR = {
+						has_ship_flag = raging
+						has_ship_flag = recently_raged
+						has_ship_flag = recently_fed
+						has_ship_flag = rage_checked
+						is_ship_size = behemoth_04
+					}
+				}
+			}
+			fleet_event = { id = biocrisis.75 days = 1 random = 120 }
+		}
+	}
+}
+
+# Incubating Behemoth Awakens
+planet_event = {
+	id = biocrisis.125
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		#Spawn Bigger Behemoth (animation?)
+		if = {
+			limit = {
+				event_target:behemoth_chrysalis = {
+					is_megastructure_type = behemoth_chrysalis_big_hatch
+				}
+			}
+			create_fleet = {
+				name = "NAME_Behemoth_fleet"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = event_target:behemoth_owner
+					fleet_event = { id = biocrisis.75 days = 450 random = 450 }
+					create_ship = {
+						name = "NAME_Behemoth_ship"
+						design = "NAME_Behemoth_03"
+						effect = {
+							set_ship_flag = behemoth_hatchling_ship
+							set_timed_ship_flag = { flag = recently_fed days = 900 }
+							event_target:behemoth_owner = {
+								set_country_flag = hatched@prev
+							}
+							set_disable_at_health = 0.01
+						}
+					}
+					set_location = {
+						target = root
+						distance = 0
+						angle = 90
+						direction = in_system
+					}
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = self #or return_point
+					set_aggro_range = 30000
+					set_fleet_bombardment_stance = behemoth_invasion
+				}
+			}
+			event_target:behemoth_chrysalis = {
+				solar_system = {
+					spawn_megastructure = {
+						type = behemoth_big_egg_ruined
+						owner = event_target:behemoth_owner
+						planet = root
+						coords_from = root
+					}
+				}
+				remove_megastructure = this
+			}
+		}
+		else = {
+			create_fleet = {
+				name = "NAME_Behemoth_fleet"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = event_target:behemoth_owner
+					fleet_event = { id = biocrisis.75 days = 450 random = 450 }
+					create_ship = {
+						name = "NAME_Behemoth_ship"
+						design = "NAME_Behemoth_02"
+						effect = {
+							set_ship_flag = behemoth_hatchling_ship
+							set_timed_ship_flag = {
+								flag = recently_raged
+								days = 720
+							}
+							event_target:behemoth_owner = {
+								set_country_flag = hatched@prev
+							}
+							set_disable_at_health = 0.01
+						}
+					}
+					set_location = {
+						target = root
+						distance = 0
+						angle = 90
+						direction = in_system
+					}
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = self #or return_point
+					set_aggro_range = 30000
+					set_fleet_bombardment_stance = behemoth_invasion
+				}
+			}
+			event_target:behemoth_chrysalis = {
+				solar_system = {
+					spawn_megastructure = {
+						type = behemoth_egg_ruined
+						owner = event_target:behemoth_owner
+						planet = root
+						coords_from = root
+					}
+				}
+				remove_megastructure = this
+			}
+		}
+		event_target:behemoth_owner = {
+			#clean up flags/logs
+			remove_point_of_interest = behemoth_incubation_poi@root
+			#notify owner
+			if = {
+				limit = {
+					NOT = {
+						has_country_flag = first_time_incubating
+					}
+				}
+				country_event = { id = biocrisis.130 }
+				set_country_flag = first_time_incubating
+			}
+			else = {
+				create_message = {
+					type = MESSAGE_BEHEMOTH_GROWTH
+					localization =  MESSAGE_BEHEMOTH_GROWTH_DESC
+					days = 30
+					target = last_created_fleet
+				}
+			}
+		}
+	}
+}
+
+# 130 Country incubates a tier 2 Behemoth for the first time
+country_event = {
+	id = biocrisis.130
+	title = "biocrisis.130.name"
+	desc = biocrisis.130.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.130.a
+	}
+}
+
+# 150 Spawn the VOIDSPAWN BOSS - From the behemoth finale situation
+situation_event = {
+	id = biocrisis.150
+	title = "biocrisis.150.name"
+	desc = {
+		trigger = {
+			NOT = { has_global_flag = voidspawn_boss_spawned }
+		}
+		text = biocrisis.150.desc
+	}
+	desc = {
+		trigger = {
+			has_global_flag = voidspawn_boss_spawned
+		}
+		text = biocrisis.150.desc.b
+	}
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { has_global_flag = voidspawn_boss_spawned }
+			}
+			set_global_flag = voidspawn_boss_spawned
+			owner = {
+				random_owned_fleet = {
+					closest_system = {
+						limit = {
+							is_rim_system = yes
+						}
+						use_bypasses = no
+						min_steps = 15
+						max_steps = 30
+						save_event_target_as = voidspawn_spawn_location
+					}
+				}
+			}
+
+			create_country = {
+				name = {
+					key = NAME_Voidspawn_Boss
+				}
+				contact_rule = always
+				type = voidspawn_boss
+				flag = {
+					icon = {
+						category="domination"
+						file="domination_14.dds"
+					}
+					background = {
+						category="backgrounds"
+						file="flag_BG_2.dds"
+					}
+					colors = {
+						"dark_green"
+						"black"
+						"black"
+						"null"
+					}
+				}
+				effect = {
+					save_global_event_target_as = voidspawn_boss_country
+					add_modifier = {
+						modifier = voidspawn_boss_buffs
+						days = -1
+					}
+				}
+			}
+			create_fleet = {
+				name = "NAME_Voidspawn_Boss_Fleet"
+				settings = {
+					spawn_debris = no
+					is_ultra_boss = yes
+				}
+				effect = {
+					set_owner = event_target:voidspawn_boss_country
+					create_ship = {
+						name = "NAME_Boss_Voidspawn"
+						design = "NAME_Boss_Voidspawn"
+						effect = {
+						}
+					}
+					set_location = {
+						target = event_target:voidspawn_spawn_location
+						distance = 0
+						angle = 90
+						direction = in_system
+					}
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = self
+					set_aggro_range = 30000
+					# Give it its target
+					queue_actions = {
+						repeat = {
+							find_random_fleet = {
+								trigger = {
+									id = "biocrisis_150"
+									any_owned_ship = {
+										is_ship_size = behemoth_04
+									}
+								}
+								found_fleet = {
+									move_to = this
+								}
+							}
+						}
+					}
+				}
+			}
+			# Make it basically invincible
+			every_country = {
+				limit = {
+					NOT = { is_country_type = voidspawn_boss }
+				}
+				add_modifier = {
+					modifier = voidspawn_boss_invincible
+					days = -1
+				}
+			}
+		}
+	}
+
+	option = {
+		name = biocrisis.150.a
+	}
+
+	after = {
+		hidden_effect = {
+			if = { # Curators notify everyone if they exist
+				limit = {
+					exists = event_target:curator_enclave_country
+				}
+				every_playable_country = {
+					limit = {
+						is_ai = no
+						NOT = { has_ascension_perk = ap_behemoths }
+					}
+					country_event = { id = biocrisis.155 }
+					set_country_flag = voidspawn_boss_met
+				}
+			}
+			owner = {
+				save_event_target_as = event_target:behemoth_empire
+			}
+		}
+	}
+}
+
+# The Voidspawn wreaks havoc in each system it enters and forces decloak
+# Also re-checks for Behemoth target
+fleet_event = {
+    id = biocrisis.151
+    hide_window = yes
+
+	is_triggered_only = yes
+
+    trigger = {
+        owner = { is_country_type = voidspawn_boss }  # Voidspawn is the only fleet in this country
+    }
+
+    immediate = {
+		solar_system = {
+			add_modifier = {
+				modifier = voidspawn_system_mod
+				days = 666
+			}
+			every_fleet_in_system = {
+				limit = {
+					is_cloaked = yes
+				}
+				set_cloaking_active = no
+			}
+			star = {
+				create_ambient_object = { # The storm affects the star closest to the Voidspawn
+					type = "voidspawn_storm_1"
+					location = this
+					duration = 666
+				}
+			}
+			every_system_planet = {
+				limit = {
+					is_colony = yes
+				}
+				add_modifier = {
+					modifier = voidspawn_colony_mod # Colonies in this system get a Voidspawn modifier
+					days = 666
+				}
+			}
+        }
+        queue_actions = { # Make sure the Voidspawn doesn't lose its target
+			repeat = {
+				find_closest_fleet = {
+					trigger = {
+						id = "biocrisis_151"
+						owner = {
+							has_ascension_perk = ap_behemoths
+						}
+						any_owned_ship = {
+							is_ship_size = behemoth_04
+						}
+					}
+					found_fleet = {
+						move_to = this
+					}
+				}
+			}
+		}
+    }
+
+	after = {
+		hidden_effect = {
+			fleet_event = { id = biocrisis.151 days = 666} # If the Voidspawn is still in the system after 666 days, the event fires again.
+		}
+	}
+}
+
+# 155 Curators notify the rest of the Galaxy that a Voidspawn has arrived
+country_event = {
+	id = biocrisis.155
+	title = TRANSMISSION
+	desc = biocrisis.155.desc
+	diplomatic = yes
+	custom_gui = "enclave_curator_window"
+	custom_gui_option = "enclave_curator_option"
+	picture_event_data = {
+		portrait = event_target:curator_enclave_country
+		room = enclave_curator_room
+	}
+	location = event_target:curator_enclave_system
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = voidspawn_boss_met }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_country = {
+					has_menace_perk = menp_behemoth_ever_hungry
+				}
+			}
+			random_country = {
+				limit = {
+					has_menace_perk = menp_behemoth_ever_hungry
+				}
+				save_event_target_as = event_target:behemoth_empire
+			}
+		}
+	}
+
+	option = {
+		name = biocrisis.155.a
+		is_dialog_only = yes
+		response_text = biocrisis.156.desc
+	}
+
+	option = {
+		name = biocrisis.155.b
+		is_dialog_only = yes
+		response_text = biocrisis.157.desc
+	}
+
+	option = {
+		name = biocrisis.155.c
+		is_dialog_only = yes
+		response_text = biocrisis.158.desc
+	}
+
+	option = {
+		name = biocrisis.155.d
+		is_dialog_only = yes
+		response_text = biocrisis.159.desc
+	}
+
+	option = {
+		name = "UNDERSTOOD"
+	}
+
+	after = {
+		hidden_effect = {
+			set_country_flag = voidspawn_boss_met
+		}
+		begin_event_chain = {
+			event_chain = elder_voidspawn_chain
+			target = root
+		}
+	}
+}
+
+# 160 Voidspawn enters borders - Notify owner (only if Curators gave no warning)
+fleet_event = {
+	id = biocrisis.160
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			is_country_type = voidspawn_boss
+		}
+		solar_system = {
+			exists = owner
+			owner = {
+				NOT = {
+					has_country_flag = voidspawn_boss_met
+				}
+			}
+		}
+	}
+
+	immediate = {
+		solar_system.owner = {
+			country_event = { id = biocrisis.162 }
+		}
+	}
+}
+
+country_event = {
+	id = biocrisis.162
+	title = "biocrisis.162.name"
+	desc = biocrisis.162.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = voidspawn_boss_met
+	}
+
+	option = {
+		name = biocrisis.162.a
+		begin_event_chain = {
+			event_chain = elder_voidspawn_chain
+			target = root
+		}
+	}
+}
+
+# 165 Newly created country receives Voidspawn Debuff
+country_event = {
+	id = biocrisis.165
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		any_country = {
+			is_country_type = voidspawn_boss
+		}
+		NOT = {
+			has_modifier = voidspawn_boss_invincible
+		}
+	}
+
+	immediate = {
+		add_modifier = {
+			modifier = voidspawn_boss_invincible
+			days = -1
+		}
+	}
+}
+
+# 170 Voidspawn dies, remove debuff and whomever killed it gets flagged
+country_event = {
+	id = biocrisis.170
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = { is_country_type = voidspawn_boss }
+	}
+
+	immediate = {
+		from = { #Killer country gets special event
+			set_country_flag = voidspawn_slayer
+			country_event = { id = biocrisis.180 }
+		}
+		every_country = {
+			limit = {
+				has_modifier = voidspawn_boss_invincible
+			}
+			remove_modifier = voidspawn_boss_invincible
+			end_event_chain = elder_voidspawn_chain
+		}
+		every_country = { #Notify galaxy
+			limit = {
+				is_ai = no
+				NOT = { has_country_flag = voidspawn_slayer }
+			}
+			country_event = { id = biocrisis.175 }
+		}
+	}
+}
+
+# 175 Notify the Galaxy that the Voidspawn is dead
+country_event = {
+	id = biocrisis.175
+	title = "biocrisis.175.name"
+	desc = {
+		trigger = {
+			NOT = { has_menace_perk = menp_behemoth_ever_hungry }
+		}
+		text = biocrisis.175.desc
+	}
+	desc = {
+		trigger = {
+			has_menace_perk = menp_behemoth_ever_hungry
+		}
+		text = biocrisis.175.desc.kaiju
+	}
+	picture = GFX_evt_voidspawn
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+
+	option = {
+		name = biocrisis.175.a
+	}
+}
+
+# 180 Voidspawn slayer gets a special event
+country_event = {
+	id = biocrisis.180
+	title = "biocrisis.180.name"
+	desc = {
+		trigger = {
+			NOT = { has_menace_perk = menp_behemoth_ever_hungry }
+		}
+		text = biocrisis.180.desc
+	}
+	desc = {
+		trigger = {
+			has_menace_perk = menp_behemoth_ever_hungry
+		}
+		text = biocrisis.180.desc.kaiju
+	}
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.180.a
+		trigger = {
+			NOT = { has_menace_perk = menp_behemoth_ever_hungry }
+		}
+	}
+
+	option = {
+		name = biocrisis.180.b
+		trigger = {
+			has_menace_perk = menp_behemoth_ever_hungry
+		}
+	}
+
+	after = {
+		add_modifier = {
+			modifier = voidslayers
+			days = -1
+		}
+	}
+}
+
+# 185 There can be only one Behemoth Country
+country_event = {
+	id = biocrisis.185
+	title = "biocrisis.185.name"
+	desc = biocrisis.185.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.185.a
+	}
+}
+
+# 187 Class IV Behemoth Warning
+country_event = {
+	id = biocrisis.187
+	title = "biocrisis.187.name"
+	desc = biocrisis.187.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.187.a
+	}
+}
+
+# 190 Behemoth about to win the game
+#If no other tier 5 behemoth country, no voidspawn, and situation complete.
+country_event = {
+	id = biocrisis.190
+	title = "biocrisis.190.name"
+	desc = biocrisis.190.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_menace_perk = menp_behemoth_ever_hungry
+		has_country_flag = finished_behemoth_situation
+		NOT = { has_country_flag = behemoth_victory }
+		NOT = { any_situation = { is_situation_type = behemoth_finale_situation } }
+		NOT = {
+			any_country = {
+				is_country_type = voidspawn_boss
+			}
+		}
+		NOT = {
+			any_playable_country = {
+				NOT = { is_same_value = root }
+				has_menace_perk = menp_behemoth_ever_hungry
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = behemoth_winner
+		set_country_flag = king_of_monsters_achievement
+	}
+
+	option = { #COMPLETE THE TRANSFERENCE!
+		name = biocrisis.190.a
+		custom_tooltip = biocrisis.190.tt
+		hidden_effect = {
+			country_event = { id = biocrisis.191 days = 30 }
+		}
+	}
+
+	after = {
+		every_playable_country = {
+			limit = {
+				NOT = { is_same_value = root }
+				is_ai = no
+			}
+			country_event = { id = biocrisis.192 days = 1 }
+		}
+	}
+}
+
+#191 Behemoth Victory
+country_event = {
+	id = biocrisis.191
+	title = "biocrisis.191.name"
+	desc = biocrisis.191.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = { #Stay a while
+		name = biocrisis.191.a
+		hidden_effect = {
+			#Turn the country into a hatchling country and buff it
+			set_country_type = behemoth_hatchling
+			add_modifier = {
+				modifier = behemoth_superbuff
+				days = -1
+			}
+			#wipe leaders
+			every_owned_leader = {
+				kill_leader = {
+					show_notification = no
+				}
+			}
+			#wipe stations and civvy ships
+			every_owned_fleet = {
+				limit = {
+					OR = {
+						is_mobile = no
+						is_civilian = yes
+					}
+				}
+				delete_fleet = this
+			}
+			
+			#Find the tier IV behemoth and save it
+			random_owned_fleet = {
+				limit = {
+					is_ship_size = behemoth_04
+				}
+				save_global_event_target_as = winning_behemoth
+			}
+			every_owned_fleet = { #Order everyone else to follow it
+				limit = {
+					NOT = {
+						is_ship_size = behemoth_04
+					}
+				}
+				auto_follow_fleet = event_target:winning_behemoth
+			}
+			#Order the behemoth to move to the most populated planet then wait for a bit, then repeat.
+			event_target:winning_behemoth = {
+				closest_system = {
+					limit = {
+						any_system_planet = {
+							is_colony = yes
+							owner = {
+								NOT = { is_same_value = root }
+							}
+						}
+					}
+					use_bypasses = no
+					random_system_planet = {
+						limit = {
+							is_colony = yes
+							owner = {
+								NOT = { is_same_value = root }
+							}
+						}
+						save_event_target_as = behemoth_rage_target
+					}
+				}
+				auto_move_to_planet = {
+					target = event_target:behemoth_rage_target
+					clear_auto_move_on_arrival = no
+				}
+				fleet_event = { id = biocrisis.193 days = 720 }
+			}
+		}
+	}
+
+	option = { #Depart the Galaxy
+		name = biocrisis.191.b
+	}
+
+	option = { #Go confront the [REDACTED]
+		name = biocrisis.191.c
+		trigger = {
+			has_country_flag = learned_about_redacted
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			every_owned_fleet = {
+				limit = {
+					is_mobile = no
+				}
+				delete_fleet = this
+			}
+		}
+		win = yes
+		hidden_effect = {
+			set_country_flag = behemoth_victory
+			every_owned_planet = {
+				every_owned_pop_group = {
+					kill_all_pop = yes
+				}
+			}
+			country_event = { id = biocrisis.194 days = 1800 } #Egg hatcher and feral behemoths grower
+		}
+	}
+}
+
+#192 Warn other players that they're about to lose
+country_event = {
+	id = biocrisis.192
+	title = "biocrisis.192.name"
+	desc = biocrisis.192.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = CURSES
+		custom_tooltip = biocrisis.192.tt
+	}
+}
+
+#193 Roaming post game behemoth handler
+fleet_event = {
+	id = biocrisis.193
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		#Order the behemoth to move to the most populated planet then wait for a bit, then repeat.
+		event_target:winning_behemoth = {
+			closest_system = {
+				limit = {
+					any_system_planet = {
+						is_colony = yes
+						owner = {
+							NOT = { is_same_value = root }
+						}
+					}
+				}
+				use_bypasses = no
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+						owner = {
+							NOT = { is_same_value = root }
+						}
+					}
+					save_event_target_as = behemoth_rage_target
+				}
+			}
+			auto_move_to_planet = {
+				target = event_target:behemoth_rage_target
+				clear_auto_move_on_arrival = no
+			}
+			fleet_event = { id = biocrisis.193 days = 720 }
+		}
+	}
+}
+
+#194 Unattended eggs hatch/baby behemoths grow
+country_event = {
+	id = biocrisis.194
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		random_owned_fleet = { #Grow 02 to 03
+			limit = {
+				is_ship_size = behemoth_02
+			}
+			delete_fleet = this
+			#Swap with a tier 2 Behemoth
+			create_fleet = {
+				name = "NAME_Behemoth_fleet"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = root
+					create_ship = {
+						name = "NAME_Behemoth_ship"
+						design = "NAME_Behemoth_03"
+						effect = {
+							set_ship_flag = behemoth_hatchling_ship
+						}
+					}
+					set_location = {
+						target = event_target:winning_behemoth
+						distance = 10
+						angle = 90
+						direction = in_system
+					}
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = self #or return_point
+					set_aggro_range = 30000
+					set_fleet_bombardment_stance = behemoth_invasion
+					auto_follow_fleet = event_target:winning_behemoth
+				}
+			}
+		}
+		random_owned_fleet = { #Grow 01 to 02
+			limit = {
+				is_ship_size = behemoth_01
+			}
+			delete_fleet = this
+			#Swap with a tier 2 Behemoth
+			create_fleet = {
+				name = "NAME_Behemoth_fleet"
+				settings = {
+					spawn_debris = no
+				}
+				effect = {
+					set_owner = root
+					create_ship = {
+						name = "NAME_Behemoth_ship"
+						design = "NAME_Behemoth_02"
+						effect = {
+							set_ship_flag = behemoth_hatchling_ship
+						}
+					}
+					set_location = {
+						target = event_target:winning_behemoth
+						distance = 10
+						angle = 90
+						direction = in_system
+					}
+					set_fleet_stance = aggressive
+					set_aggro_range_measure_from = self #or return_point
+					set_aggro_range = 30000
+					set_fleet_bombardment_stance = behemoth_invasion
+					auto_follow_fleet = event_target:winning_behemoth
+				}
+			}
+		}
+		# hatch an egg
+		random_megastructure = {
+			limit = {
+				OR = {
+					is_megastructure_type = behemoth_egg
+					is_megastructure_type = behemoth_fleet_egg
+					is_megastructure_type = behemoth_chrysalis
+					is_megastructure_type = behemoth_chrysalis_big
+				}
+			}
+			if = {
+				limit = {
+					is_megastructure_type = behemoth_egg
+				}
+				create_fleet = {
+					name = "NAME_Behemoth_fleet"
+					settings = {
+						spawn_debris = no
+					}
+					effect = {
+						set_owner = root
+						create_ship = {
+							name = "NAME_Behemoth_ship"
+							design = "NAME_Behemoth_01"
+							effect = {
+								set_ship_flag = behemoth_hatchling_ship
+							}
+						}
+						set_location = {
+							target = prev.planet
+							distance = 10
+							angle = 90
+							direction = in_system
+						}
+						set_fleet_stance = aggressive
+						set_aggro_range_measure_from = self #or return_point
+						set_aggro_range = 30000
+						set_fleet_bombardment_stance = behemoth_invasion
+						auto_follow_fleet = event_target:winning_behemoth
+					}
+				}
+				#Remove the megastructure
+				planet =  { 
+					save_event_target_as = target_planet
+					remove_planet_flag = has_megastructure
+				}
+				solar_system = {
+					spawn_megastructure = {
+						type = behemoth_egg_ruined
+						owner = root
+						planet = event_target:target_planet
+						coords_from = event_target:target_planet
+					}
+				}
+				remove_megastructure = this
+			}
+			else_if = {
+				limit = {
+					is_megastructure_type = behemoth_chrysalis
+				}
+				upgrade_megastructure_to = behemoth_chrysalis_hatch
+			}
+			else_if = {
+				limit = {
+					is_megastructure_type = behemoth_chrysalis_big
+				}
+				upgrade_megastructure_to = behemoth_chrysalis_big_hatch
+			}
+			else = {
+				upgrade_megastructure_to = behemoth_strong_egg_hatch
+			}
+		}
+		country_event = { id = biocrisis.194 days = 1800 }
+	}
+}
+
+#195 Behemoth_country kills biomass ship (meat ship, space fauna, leviathan or other behemoth)
+# This = owner of ship 1 (combatant)
+# From = owner of ship 2 (destroyed)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+country_event = {
+	id = biocrisis.195
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		fromfromfrom = {
+			is_organic_ship = yes
+		}
+		OR = {
+			fromfrom.owner = {
+				has_menace_perk = menp_behemoth_ever_hungry
+			}
+			fromfrom = {
+				is_behemoth = yes
+			}
+		}
+	}
+
+	immediate = {
+		if = { # Set ship size factor
+			limit = {
+				fromfromfrom = {
+					ship_size_multiplier <= 3
+				}
+			}
+			#smol ship (0.5)
+			set_variable = {
+				which = growth_factor_ship_size_variable
+				value = 0.5
+			}
+		}
+		else_if = {
+			limit = {
+				fromfromfrom = {
+					ship_size_multiplier > 3
+					ship_size_multiplier < 16
+				}
+			}
+			#medium ship (2)
+			set_variable = {
+				which = growth_factor_ship_size_variable
+				value = 2
+			}
+		}
+		else_if = {
+			limit = {
+				fromfromfrom = {
+					ship_size_multiplier >= 16
+				}
+			}
+			set_variable = {
+				which = growth_factor_ship_size_variable
+				value = 10
+			}
+		}
+		if = { # leviathan size override
+			limit = {
+				fromfromfrom = {
+					OR = {
+						is_ship_size = leviathan_01_elder_tiyanki
+						is_ship_size = leviathan_01_voidspawn
+						is_ship_size = nanite_space_dragon_baby
+						is_ship_size = space_dragon_red
+						is_ship_size = space_dragon_baby
+						is_ship_size = space_dragon_blue # Shard
+						is_ship_size = space_dragon_origin
+						is_ship_size = space_dragon_origin_baby
+
+					}
+				}
+			}
+			# Leviathan ship (40)
+			set_variable = {
+				which = growth_factor_ship_size_variable
+				value = 40
+			}
+		}
+		else_if = {
+			limit = {
+				fromfromfrom = { is_ship_size = voidspawn_boss }
+			}
+			# Biggest and Baddest (2000)
+			set_variable = {
+				which = growth_factor_ship_size_variable
+				value = 2000
+			}
+		}
+		# Growth Factor increase
+		if = { # failsafe because you can't initialize variables with a script value
+			limit = {
+				NOT = { is_variable_set = growth_factor_variable }
+			}
+			set_variable = {
+				which = growth_factor_variable
+				value = 0
+			}
+		}
+		change_variable = {
+			which = growth_factor_variable
+			value = value:growth_factor_from_ships
+		}
+
+		if = { #handle behemoth feeding meter
+			limit = {
+				fromfrom = {
+					is_behemoth = yes
+				}
+			}
+			fromfrom = {
+				set_timed_ship_flag = { flag = recently_fed days = 720 }
+				add_growth = owner.growth_factor_ship_size_variable
+			}# noneed to process this one further
+		}
+		# Food reward
+		add_resource = {
+			food = 500
+			mult = growth_factor_ship_size_variable
+		}
+	}
+}
+
+#200 Behemoth devours planet (from on_destroy_planet_with_BEHEMOTH_MAW) this = planet from = behemoth
+planet_event = {
+	id = biocrisis.200
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		from = {
+			random_owned_ship = {
+				limit = {
+					has_ship_flag = behemoth_hatchling_ship
+				}
+				set_timed_ship_flag = { flag = recently_fed days = 720 }
+			}
+		}
+		owner = {
+			if = { # failsafe because you can't initialize variables with a script value
+				limit = { NOT = { is_variable_set = growth_factor_variable } }
+				set_variable = {
+					which = growth_factor_variable
+					value = 0
+				}
+			}
+	
+			#add the planet value
+			change_variable = {
+				which = growth_factor_variable
+				value = @growth_factor_planet_mult
+			}
+		}
+	
+		set_variable = {  #add 1 per pop too - has to go through a second variable as to not 	overwrite the first when using export_trigger_to_var
+			which = pops_devoured
+			value = 0
+		}
+		export_trigger_value_to_variable = {
+			trigger = count_owned_pop_amount
+			variable = pops_devoured
+			rounded = yes
+		}
+		#Food Reward
+		from.owner = {
+			add_resource = {
+				food = 25
+				mult = root.pops_devoured
+			}
+			add_resource = {
+				food = 1000
+				mult = root.trigger:planet_size
+			}
+		}
+		multiply_variable = {
+			which = pops_devoured
+			value = @growth_factor_from_pop
+		}
+		from.owner = {
+			change_variable = {
+				which = growth_factor_variable
+				value = prev.pops_devoured
+			}
+		}
+	}
+}
+
+#205 Monthly Decrease in growth factor
+country_event = {
+	id = biocrisis.205
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			has_menace_perk = menp_behemoth_ever_hungry
+			is_variable_set = growth_factor_variable
+			check_variable = {
+				which = growth_factor_variable
+				value > 0.75
+			}
+		}
+	}
+
+	immediate = {
+		change_variable = {
+			which = growth_factor_variable
+			value = @growth_factor_monthly_decrease
+		}
+	}
+}
+
+#210 Situation Stage 1 Pick - EGG perk
+situation_event = {
+	id = biocrisis.210
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.210.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.210.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_fast_egg
+			}
+		}
+		custom_tooltip = biocrisis.210.a.tt
+	}
+	option = {
+		name = biocrisis.210.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_slow_egg
+			}
+		}
+		custom_tooltip = biocrisis.210.b.tt
+	}
+	option = {
+		name = biocrisis.210.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_strong_egg
+			}
+		}
+		custom_tooltip = biocrisis.210.c.tt
+	}
+}
+
+#215 Situation Stage 2 Pick - Mobility Perk
+situation_event = {
+	id = biocrisis.215
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.215.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	immediate = {
+
+	}
+
+	option = {
+		name = biocrisis.215.a
+		hidden_effect = {
+			owner = {
+				random_owned_ship = {
+					limit = {
+						is_ship_size = behemoth_04
+					}
+					set_ship_design = {
+						design = NAME_Behemoth_04_jump
+					}
+				}
+				set_country_flag = behemoth_jump_design
+			}
+		}
+		custom_tooltip = biocrisis.215.a.tt
+	}
+	option = {
+		name = biocrisis.215.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_turbo
+			}
+		}
+		custom_tooltip = biocrisis.215.b.tt
+	}
+	option = {
+		name = biocrisis.215.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_reflexes
+			}
+		}
+		custom_tooltip = biocrisis.215.c.tt
+	}
+	option = {
+		trigger = {
+			has_first_contact_dlc = yes
+			owner = {
+				has_technology = tech_cloaking_1
+			}
+		}
+		name = biocrisis.215.d
+		hidden_effect = {
+			owner = {
+				random_owned_ship = {
+					limit = {
+						is_ship_size = behemoth_04
+					}
+					set_ship_design = {
+						design = NAME_Behemoth_04_cloaking
+					}
+				}
+				set_country_flag = behemoth_cloaking_design
+			}
+		}
+		custom_tooltip = biocrisis.215.d.tt
+	}
+}
+
+#220 Situation Stage 3 Pick - Tankiness Perk
+situation_event = {
+	id = biocrisis.220
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.220.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.220.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_hull_1
+			}
+		}
+		custom_tooltip = biocrisis.220.a.tt
+	}
+	option = {
+		name = biocrisis.220.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_armor_1
+			}
+		}
+		custom_tooltip = biocrisis.220.b.tt
+	}
+	option = {
+		name = biocrisis.220.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_shield_1
+			}
+		}
+		custom_tooltip = biocrisis.220.c.tt
+	}
+}
+
+#225 Situation Stage 4 Pick - DPS Passive Perk
+situation_event = {
+	id = biocrisis.225
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.225.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.225.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_anti_shield
+			}
+		}
+		custom_tooltip = biocrisis.225.a.tt
+	}
+	option = {
+		name = biocrisis.225.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_anti_armor
+			}
+		}
+		custom_tooltip = biocrisis.225.b.tt
+	}
+	option = {
+		name = biocrisis.225.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_tracking
+			}
+		}
+		custom_tooltip = biocrisis.225.c.tt
+	}
+}
+
+#230 Situation Stage 5 Pick - DPS Perk
+situation_event = {
+	id = biocrisis.230
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.230.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	immediate = {
+
+	}
+
+	option = {
+		name = biocrisis.230.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_drain
+			}
+		}
+		custom_tooltip = biocrisis.230.a.tt
+	}
+	option = {
+		name = biocrisis.230.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_spike
+			}
+		}
+		custom_tooltip = biocrisis.230.b.tt
+	}
+	option = {
+		name = biocrisis.230.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_burst
+			}
+		}
+		custom_tooltip = biocrisis.230.c.tt
+	}
+}
+
+#235 Situation Stage 6 Pick - Tankiness Perk 2
+situation_event = {
+	id = biocrisis.235
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.235.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.235.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_hull_2
+			}
+		}
+		custom_tooltip = biocrisis.235.a.tt
+	}
+	option = {
+		name = biocrisis.235.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_damage_reduction
+			}
+		}
+		custom_tooltip = biocrisis.235.b.tt
+	}
+	option = {
+		name = biocrisis.235.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_hardening
+			}
+		}
+		custom_tooltip = biocrisis.235.c.tt
+	}
+}
+
+#240 Situation Stage 7 Pick - Support Perk
+situation_event = {
+	id = biocrisis.240
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.240.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	immediate = {
+
+	}
+
+	option = {
+		name = biocrisis.240.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_buff
+			}
+		}
+		custom_tooltip = biocrisis.240.a.tt
+	}
+	option = {
+		name = biocrisis.240.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_summon
+			}
+		}
+		custom_tooltip = biocrisis.240.b.tt
+	}
+	option = {
+		name = biocrisis.240.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_healing
+			}
+		}
+		custom_tooltip = biocrisis.240.c.tt
+	}
+}
+
+#245 Situation Stage 8 Pick - Role Perk
+situation_event = {
+	id = biocrisis.245
+	title = "behemoth_mutation_reward"
+	desc = biocrisis.245.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	immediate = {
+
+	}
+
+	option = {
+		name = biocrisis.245.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_frenzy
+			}
+		}
+		custom_tooltip = biocrisis.245.a.tt
+	}
+	option = {
+		name = biocrisis.245.b
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_tempered_rage
+			}
+		}
+		custom_tooltip = biocrisis.245.b.tt
+	}
+	option = {
+		name = biocrisis.245.c
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_inspiration
+			}
+		}
+		custom_tooltip = biocrisis.245.c.tt
+	}
+}
+
+#250 Situation Final Pick - Behemoth Superweapon
+situation_event = {
+	id = biocrisis.250
+	title = "biocrisis.250.name"
+	desc = biocrisis.250.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.250.a
+		hidden_effect = {
+			owner = {
+				set_country_flag = behemoth_superweapon
+			}
+			destroy_situation = this
+		}
+		custom_tooltip = biocrisis.250.a.tt
+	}
+}
+
+#255 Kill off transference workers
+country_event = {
+	id = biocrisis.255
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		capital_scope = {
+			if = {
+				#check that someone is working a transference job and that there are more than 5 pops on the planet
+				limit = {
+					pop_amount > 500
+					OR = {
+						num_assigned_jobs = {
+							job = transference_volunteer
+							value > 0
+						}
+						num_assigned_jobs = {
+							job = transference_drone
+							value > 0
+						}
+					}
+				}
+				owner = {
+					if = {
+						limit = {
+							is_gestalt = no
+						}
+						export_trigger_value_to_variable = { #Kill 10% rounded up
+							trigger = num_assigned_jobs
+							parameters = {
+								job = transference_volunteer
+							}
+							variable = num_transference_jobs_var
+						}
+						divide_variable = { which = num_transference_jobs_var value = 10 }
+						ceiling_variable = num_transference_jobs_var
+					}
+					if = {
+						limit = {
+							is_gestalt = yes
+						}
+						export_trigger_value_to_variable = { #Kill 10% rounded up
+							trigger = num_assigned_jobs
+							parameters = {
+								job = transference_drone
+							}
+							variable = num_transference_jobs_var
+						}
+						divide_variable = { which = num_transference_jobs_var value = 10 }
+						ceiling_variable = num_transference_jobs_var
+					}
+				}
+				while = {
+					count = owner.num_transference_jobs_var
+					random_owned_pop_job = {
+						limit = {
+							has_job_type = transference_volunteer
+						}
+						kill_assigned_pop_amount = {
+							amount = 1
+						}
+					}
+					random_owned_pop_job = {
+						limit = {
+							has_job_type = transference_drone
+						}
+						kill_assigned_pop_amount = {
+							amount = 1
+						}
+					}
+				}
+				owner = {
+					create_message = {
+						type = MESSAGE_POPS_TRANSFERRED
+						localization =  MESSAGE_POPS_TRANSFERRED_DESC
+						days = @toast_message_days
+						target = root
+						variable = {
+							type = variable
+							varname = num_transference_jobs_var
+							localization = VALUE
+							scope = root
+						}
+					}
+				}
+			}
+		}
+
+		change_variable = {
+			which = pops_transferred
+			value = num_transference_jobs_var
+		}
+		country_event = { id = biocrisis.255 days = 180 }
+	}
+
+	after = {
+		set_variable = {
+			which = num_transference_jobs_var
+			value = 0
+		}
+	}
+}
+
+#260 Validate buildings and districts if the Mindlink Districts are moved
+#You have changed the location of your capital. Also called when a country's capital is first set e.g. during galaxy creation (but then FROM is not set)
+#this/root = new capital
+#from = old capital
+planet_event = {
+	id = biocrisis.260
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_menace_perk = menp_behemoth_mind_meld
+		}
+	}
+
+	immediate = {
+		validate_and_repair_planet_buildings_and_districts = yes
+		from = {
+			validate_and_repair_planet_buildings_and_districts = yes
+		}
+	}
+}
+
+#265 Mindlinked Behemoth dies - Game Over x_x
+country_event = {
+	id = biocrisis.265
+	title = "biocrisis.265.name"
+	desc = biocrisis.265.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_necrophage
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			fromfrom = {
+				is_ship_size = behemoth_04
+			}
+			has_country_flag = about_to_die_behemoth
+		}
+	}
+
+	immediate = {
+		if = { # Check if it's raging, in which case this would destroy the wrong country. Kudos to discord user Kalisalos for finding this one.
+			limit = {
+				fromfrom = {
+					has_ship_flag = raging
+				}
+			}
+			random_playable_country = {
+				limit = {
+					has_menace_perk = menp_behemoth_ever_hungry
+					NOT = {
+						any_controlled_ship = {
+							is_ship_size = behemoth_04
+						}
+					}
+				}
+				set_country_flag = about_to_die_behemoth
+				country_event = { id = biocrisis.265 }
+			}
+		}
+		else = {
+			every_owned_planet = {
+				limit = {
+					is_capital = no
+				}
+				destroy_colony = yes
+			}
+			every_owned_ship = {
+				destroy_ship = this
+			}
+		}
+	}
+
+	option = {
+		name = biocrisis.265.a
+	}
+
+	after = {
+		destroy_country = yes
+	}
+}
+
+#270 Raging Kaiju Enters somebody else's system - opinion loss
+fleet_event = {
+	id = biocrisis.270
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			is_country_type = behemoth_hatchling
+			NOT = { has_country_flag = behemoth_victory }
+		}
+		solar_system = {
+			exists = space_owner
+			space_owner = {
+				NOT = {
+					is_same_value = event_target:behemoth_parent_country@root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		solar_system = {
+			space_owner = {
+				add_opinion_modifier = {
+					modifier = opinion_behemoth_raging
+					who = event_target:behemoth_parent_country@root
+				}
+			}
+		}
+	}
+}
+
+#275 Raging Kaiju attacks an egg or planet - opinion loss
+fleet_event = {
+	id = biocrisis.275
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = { 
+			is_country_type = behemoth_hatchling 
+			NOT = { has_country_flag = behemoth_victory }
+		}
+		from = {
+			exists = owner
+			owner = {
+				NOT = {
+					is_same_value = event_target:behemoth_parent_country@root
+				}
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_behemoth_destruction
+					who = event_target:behemoth_parent_country@root
+				}
+			}
+		}
+	}
+}
+
+# 280 Mutation pick after special project
+country_event = {
+	id = biocrisis.280
+	title = "biocrisis.280.name"
+	desc = biocrisis.280.desc
+	picture = GFX_evt_behemoth_engineering
+	show_sound = event_engineered_evolution
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.280.a
+		add_modifier = {
+			modifier = behemoth_mutation_a
+			days = -1
+		}
+	}
+	option = {
+		name = biocrisis.280.b
+		add_modifier = {
+			modifier = behemoth_mutation_b
+			days = -1
+		}
+	}
+	option = {
+		name = biocrisis.280.c
+		add_modifier = {
+			modifier = behemoth_mutation_c
+			days = -1
+		}
+	}
+	option = {
+		name = biocrisis.280.psi
+		trigger = {
+			has_tradition = tr_psionics_adopt
+		}
+
+		icon = {
+			icon = GFX_tradition_category_icon_tradition_psionics
+		}
+		add_modifier = {
+			modifier = behemoth_mutation_psi
+			days = -1
+		}
+		add_modifier = {
+			modifier = behemoth_mutation_psi_2
+			days = -1
+			mult = value:num_telepaths_and_transference
+		}
+	}
+	option = {
+		name = biocrisis.280.bio
+		trigger = {
+			OR = {
+				has_tradition = tr_genetics_adopt
+				has_tradition = tr_cloning_adopt
+				has_tradition = tr_mutation_adopt
+				has_tradition = tr_purity_adopt
+			}
+		}
+		icon = {
+			icon = GFX_tradition_category_icon_tradition_genetics
+		}
+		add_modifier = {
+			modifier = behemoth_mutation_bio
+			days = -1
+		}
+	}
+	option = {
+		name = biocrisis.280.cyber
+		trigger = {
+			has_tradition = tr_cybernetics_adopt
+		}
+		icon = {
+			icon = GFX_tradition_category_icon_tradition_cybernetics
+		}
+		add_modifier = {
+			modifier = behemoth_mutation_cyber
+			days = -1
+		}
+		custom_tooltip  = biocrisis.280.cyber.tt
+		hidden_effect = {
+			set_country_flag = behemoth_mutation_cyber
+		}
+	}
+	option = {
+		name = biocrisis.280.synth
+		trigger = {
+			has_tradition = tr_synthetics_adopt
+		}
+		icon = {
+			icon = GFX_tradition_category_icon_tradition_synthetics
+		}
+		add_modifier = {
+			modifier = behemoth_mutation_synth
+			days = -1
+		}
+	}
+	option = {
+		name = biocrisis.280.corp
+		trigger = {
+			is_megacorp = yes # undercoat: moved to scripted trigger
+		}
+		add_modifier = {
+			modifier = behemoth_mutation_corpo
+			days = -1
+			mult = value:num_behemoths
+		}
+	}
+	option = {
+		name = biocrisis.280.machine
+		trigger = {
+			OR = {
+				has_tradition = tr_virtuality_adopt
+				has_tradition = tr_nanotech_adopt
+				has_tradition = tr_modularity_adopt
+			}
+		}
+		icon = {
+			icon = GFX_tradition_category_icon_tradition_synthetics
+		}
+		custom_tooltip  = biocrisis.280.machine_tt
+		hidden_effect = {
+			set_country_flag = behemoth_mutation_machine
+		}
+	}
+}
+
+#285 - monthly update for the psionic modifier
+country_event = {
+	id = biocrisis.285
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		is_playable = yes # undercoat: moved to scripted trigger
+		has_modifier = behemoth_mutation_psi_2
+	}
+
+	immediate = {
+		add_modifier = {
+			modifier = behemoth_mutation_psi_2
+			days = -1
+			mult = value:num_telepaths_and_transference
+		}
+	}
+}
+
+planet_event = {
+	id = biocrisis.290
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owner = {
+			has_special_project = BEHEMOTH_CRISIS_SPECIAL_PROJECT_4
+		}
+	}
+
+	immediate = {
+		owner = {
+			abort_special_project = {
+				type = BEHEMOTH_CRISIS_SPECIAL_PROJECT_4
+				location = from
+			}
+		}
+		enable_special_project = {
+			name = BEHEMOTH_CRISIS_SPECIAL_PROJECT_4
+			owner = root.owner
+			location = this
+		}
+	}
+}
+
+
+### Scripted Actions for Behemoth Growth Situation
+
+# Fired by on_behemoth_fast_egg_planet_reached, on_behemoth_slow_egg_planet_reached and on_behemoth_strong_egg_planet_reached
+planet_event = {
+	id = biocrisis.300
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		save_event_target_as = target_planet
+		set_planet_flag = has_megastructure
+		from.owner = {
+			save_event_target_as = behemoth_owner
+			complete_crisis_objective = crisobj_build_behemoth_egg
+		}
+		solar_system = {
+			spawn_megastructure = {
+				type = behemoth_fleet_egg
+				owner = event_target:behemoth_owner
+				planet = event_target:target_planet
+				coords_from = event_target:target_planet
+			}
+		}
+		from.owner = {
+			create_message = {
+				type = BEHEMOTH_EGG_BUILT
+				localization =  BEHEMOTH_EGG_BUILT_DESC
+				days = @toast_message_days
+				target = event_target:target_planet
+			}
+		}
+	}
+}
+
+# Fired by on_behemoth_turbo_activated
+fleet_event = {
+	id = biocrisis.305
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = behemoth_turbo_modifier
+			days = 90
+		}
+	}
+}
+
+# Fired by on_behemoth_reflexes_activated
+fleet_event = {
+	id = biocrisis.310
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = behemoth_reflexes_modifier
+			days = 90
+		}
+	}
+}
+
+# Fired by on_behemoth_drain_activated
+fleet_event = {
+	id = biocrisis.320
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		solar_system = {
+			every_fleet_in_system = {
+				limit = {
+					controller = {
+						is_hostile = root.owner
+					}
+					is_civilian = no
+				}
+				every_owned_ship = {
+					set_variable_to_random_value = {
+						which = behemoth_drain_damaage
+						min = @behemoth_drain_min_damage
+						max = @behemoth_drain_max_damage
+						rounded = yes
+					}
+					damage_ship = behemoth_drain_damaage
+					clear_variable = behemoth_drain_damaage
+				}
+				add_modifier = {
+					modifier = behemoth_drain_modifier
+					days = @behemoth_drain_duration
+				}
+			}
+		}
+	}
+}
+
+# Fired by on_behemoth_spike_activated
+fleet_event = {
+	id = biocrisis.325
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		solar_system = {
+			ordered_ship_in_system = {
+				limit = {
+					controller = {
+						is_hostile = root.owner
+					}
+					is_civilian = no
+				}
+				order_by = trigger:ship_size_multiplier
+				position = 0
+				damage_ship = @behemoth_spike_damage
+			}
+		}
+	}
+}
+
+# Fired by on_behemoth_burst_activated
+fleet_event = {
+	id = biocrisis.330
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		solar_system = {
+			ordered_fleet_in_system = {
+				limit = {
+					controller = {
+						is_hostile = root.owner
+					}
+					is_civilian = no
+				}
+				order_by = trigger:num_ships
+				position = 0
+				every_owned_ship = {
+					reduce_hp_percent = @behemoth_burst_damage
+				}
+			}
+		}
+	}
+}
+
+# Fired by on_behemoth_buff_activated
+fleet_event = {
+	id = biocrisis.350
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		solar_system = {
+			every_fleet_in_system = {
+				limit = {
+					controller = {
+						NOT = { is_hostile = root.owner }
+					}
+					is_ship_category = bio_ship
+				}
+				add_modifier = {
+					modifier = behemoth_buff_modifier
+					days = @behemoth_buff_duration
+				}
+			}
+		}
+	}
+}
+
+# Fired by on_behemoth_summon_activated
+fleet_event = {
+	id = biocrisis.360
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		spawn_behemoth_summon_fleet = yes
+	}
+}
+
+# Destroy Behemoth Summoned Fleet
+# Queued by spawn_behemoth_summon_fleet
+fleet_event = {
+	id = biocrisis.365
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		delete_fleet = this
+	}
+}
+
+# Fired by on_behemoth_healing_activated
+fleet_event = {
+	id = biocrisis.370
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		solar_system = {
+			every_fleet_in_system = {
+				limit = {
+					controller = {
+						NOT = { is_hostile = root.owner }
+					}
+					is_ship_category = bio_ship
+				}
+				repair_percentage = @behemoth_healing_hp_percentage
+				repair_armor_percentage = @behemoth_healing_armor_percentage
+			}
+		}
+	}
+}
+
+# Fired by on_entering_battle
+country_event = {
+	id = biocrisis.375
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = behemoth_frenzy
+		fromfrom = {
+			is_ship_size = behemoth_04
+		}
+	}
+
+	immediate = {
+		fromfrom = {
+			add_modifier = {
+				modifier = behemoth_frenzy_modifier
+				days = @behemoth_frenzy_duration
+			}
+		}
+	}
+}
+
+# Fired by on_entering_battle
+country_event = {
+	id = biocrisis.380
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = behemoth_inspiration
+		fromfrom = {
+			is_ship_size = behemoth_04
+		}
+	}
+
+	immediate = {
+		solar_system = {
+			every_fleet_in_system = {
+				limit = {
+					controller = {
+						NOT = { is_hostile = root.owner }
+					}
+					is_ship_category = bio_ship
+				}
+				add_modifier = {
+					modifier = behemoth_inspiration_modifier
+					days = @behemoth_inspiration_duration
+				}
+			}
+		}
+	}
+}
+
+# Fired by on_behemoth_summon_activated
+fleet_event = {
+	id = biocrisis.400
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		solar_system = {
+			activate_behemoth_superweapon = yes
+		}
+	}
+}
+
+# Fired by assorted on_behemoth_... on actions
+# Decloak Behemoth - planet scope event
+planet_event = {
+	id = biocrisis.450
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		from = { is_cloaked = yes }
+	}
+
+	immediate = {
+		from = { set_cloaking_active = no }
+	}
+}
+
+# Fired by assorted on_behemoth_... on actions
+# Decloak Behemoth - fleet scope event
+fleet_event = {
+	id = biocrisis.451
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		from = { is_cloaked = yes }
+	}
+
+	immediate = {
+		from = { set_cloaking_active = no }
+	}
+}
+
+
+# Crisis Objective events for winning Feral Insight
+
+# Crisis Objective: Building Bioships and Breeding Space Fauna
+# Scope: Ship Event
+#A ship has been built
+# Root = Ship
+# From = Planet
+#on_ship_built
+
+ship_event = {
+	id = biocrisis.500
+
+	hide_window = yes
+
+	trigger = {
+		OR = {
+			is_organic_ship = yes
+			# Titans, Juggernauts, civilian ships etc... technically don't satisfy the above trigger
+			AND = {
+				owner = { country_uses_bio_ships = yes }
+				OR = {
+					is_ship_size = titan
+					is_ship_size = constructor
+					is_ship_size = colonizer
+					is_ship_size = sponsored_colonizer
+					is_ship_size = guided_sapience_colonizer
+					is_ship_size = science
+					is_ship_size = colossus
+					is_ship_size = juggernaut
+					is_ship_size = bio_titan
+				}
+			}
+		}
+		owner = {
+			has_ascension_perk = ap_behemoths
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		while = {
+			count = trigger:ship_size_multiplier
+			if = {
+				limit = {
+					has_grand_archive_dlc = yes
+					NOT = {
+						is_ship_category = bio_ship
+					}
+				}
+				owner = {
+					complete_crisis_objective = crisobj_breed_fauna
+				}
+			}
+			else = {
+				owner = {
+					complete_crisis_objective = crisobj_build_bioships
+				}
+			}
+		}
+	}
+}
+
+# Crisis Objective: Capture or Destroy Space Fauna or Bioships
+# This = owner of ship 1 (combatant)
+# From = owner of ship 2 (destroyed)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+# Fired from on_ship_destroyed_perp
+
+country_event = {
+	id = biocrisis.505
+
+	hide_window = yes
+
+	trigger = {
+		has_ascension_perk = ap_behemoths
+		fromfromfrom = { is_organic_ship = yes }
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		while = {
+			count = fromfromfrom.trigger:ship_size_multiplier
+			if = {
+				limit = {
+					fromfromfrom = { is_ship_category = bio_ship }
+				}
+				owner = {
+					complete_crisis_objective = crisobj_kill_bioships
+				}
+			}
+			else = {
+				owner = {
+					complete_crisis_objective = crisobj_kill_space_fauna
+				}
+			}
+		}
+	}
+}
+
+# Fired when a space fauna is captured
+# This = Ship captured by a gravity snare - deleted after event fired and sent to vivarium
+# From = Fleet / Gravity snare that captured the space fauna
+
+ship_event = {
+	id = biocrisis.515
+
+	hide_window = yes
+
+	trigger = {
+		from.owner = {
+			has_ascension_perk = ap_behemoths
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		while = {
+			count = trigger:ship_size_multiplier
+			from.owner = { complete_crisis_objective = crisobj_cap_fauna }
+		}
+	}
+}
+
+#  Fired when a Necromancer / Reanimator kills a Behemoth
+
+# This = owner of ship 1 (combatant)
+# From = owner of ship 2 (destroyed)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+
+country_event = {
+	id = biocrisis.520
+	title = biocrisis.520.name
+	desc = biocrisis.520.desc
+
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_necrophage
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.520.a
+		trigger = {
+			owner = {
+				is_spiritualist = no
+			}
+		}
+		owner = {
+			add_resource = {
+				food = 100000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+
+	option = {
+		name = biocrisis.520.b
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+			}
+		}
+		owner = {
+			add_resource = {
+				food = 100000
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}

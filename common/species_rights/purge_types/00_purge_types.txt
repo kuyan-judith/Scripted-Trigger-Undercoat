@@ -3,9 +3,9 @@
 
 purge_normal = {
 	pop_escape_chance = 0.05
-	pop_decline_rate = 100 # 1 pops per month, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 100 # 100 pops per month, overrides BASE_POP_DECLINE, will only work on purge types
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -10
 	}
 
@@ -18,7 +18,15 @@ purge_normal = {
 		hidden_trigger = { exists = from }
 		if = {
 			limit = {
-				is_lonely_hive_mind_pop = yes
+				OR = {
+					is_lonely_hive_mind_pop = yes
+					AND = {
+						is_disconnected_drone_pop = yes
+						from = {
+							has_policy_flag = disconnected_drones_purge
+						}
+					}
+				}
 			}
 			always = yes
 		}
@@ -33,7 +41,7 @@ purge_normal = {
 							has_policy_flag = purge_allowed
 						}
 					}
-					is_robotic_species = yes # undercoat - this should be root not from
+					from = { is_robotic_species = yes }
 				}
 			}
 		}
@@ -54,15 +62,16 @@ purge_normal = {
 
 purge_neutering = {
 	pop_escape_chance = 0.0
-	pop_decline_rate = 10 # 1 pop per 10 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 10
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -0.2
 	}
 
 	potential = {
 		host_has_dlc = "Utopia"
 		from = { is_gestalt = no } # undercoat: moved to scripted trigger
+		is_disconnected_drone_pop = no
 	}
 
 	allow = {
@@ -119,9 +128,9 @@ purge_neutering = {
 
 purge_displacement = {
 	pop_escape_chance = 1.0
-	pop_decline_rate = 25 # 1 pop per 4 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 25
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -0.3
 		pop_housing_usage_mult = -0.50
 	}
@@ -149,6 +158,7 @@ purge_displacement = {
 				}
 			}
 		}
+		is_disconnected_drone_pop = no
 	}
 
 	allow = {
@@ -197,9 +207,9 @@ purge_displacement = {
 
 purge_labor_camps = {
 	pop_escape_chance = 0.25
-	pop_decline_rate = 50 # 1 pop per 2 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 50
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -10
 	}
 
@@ -207,6 +217,7 @@ purge_labor_camps = {
 		exists = from
 		from = { is_gestalt = no } # undercoat: moved to scripted trigger
 		host_has_dlc = "Utopia"
+		is_disconnected_drone_pop = no
 	}
 
 	allow = {
@@ -250,9 +261,9 @@ purge_labor_camps = {
 
 purge_matrix = {
 	pop_escape_chance = 0.20
-	pop_decline_rate = 50 # 1 pop per 2 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 50
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -10
 	}
 
@@ -292,9 +303,9 @@ purge_matrix = {
 
 purge_processing = {
 	pop_escape_chance = 0.20
-	pop_decline_rate = 50 # 1 pop per 2 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 50
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -10
 	}
 
@@ -302,6 +313,7 @@ purge_processing = {
 		host_has_dlc = "Utopia"
 		exists = from
 		from = { is_machine_empire = no }
+		is_disconnected_drone_pop = no
 	}
 
 	allow = {
@@ -350,6 +362,7 @@ purge_processing = {
 					from = {
 						has_policy_flag = pre_sapients_eat
 					}
+					NOT = { has_trait = trait_nascent_stage }
 				}
 			}
 		}
@@ -367,9 +380,9 @@ purge_processing = {
 
 purge_necrophage = {
 	pop_escape_chance = 0.25
-	pop_decline_rate = 20 # 1 pop per 5 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 20
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -0.5
 	}
 
@@ -388,7 +401,12 @@ purge_necrophage = {
 			is_robotic = no
 		}
 		if = {
-			limit = { is_lonely_hive_mind_pop = no }
+			limit = {
+				OR = {
+					is_lonely_hive_mind_pop = no
+					is_disconnected_drone_pop = no
+				}
+			}
 			custom_tooltip = {
 				fail_text = PURGES_ALLOWED
 				from = {
@@ -409,7 +427,7 @@ purge_cosmogenesis = {
 	pop_escape_chance = 0.05
 	pop_decline_rate = value:num_chip_slave_purge # 0.2 per pop used as neural chip
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -0.33
 	}
 
@@ -428,9 +446,9 @@ purge_cosmogenesis = {
 
 purge_cosmogenesis_lathe_resettle = {
 	pop_escape_chance = 0.05
-	pop_decline_rate = 100 # 1 pop per month, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 100
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -0.33
 	}
 
@@ -451,9 +469,9 @@ purge_cosmogenesis_lathe_resettle = {
 
 purge_clips = {
 	pop_escape_chance = 0.2
-	pop_decline_rate = 50 # 1 pop per 2 months, overrides BASE_POP_DECLINE, will only work on purge types
+	pop_decline_rate = 50
 
-	pop_modifier = {
+	pop_group_modifier = {
 		pop_happiness = -10
 	}
 

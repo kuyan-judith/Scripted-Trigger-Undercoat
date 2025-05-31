@@ -28,7 +28,6 @@ event = {
 				change_species_characteristics = {
 					portrait = prev.ruler
 					gender = prev.ruler
-					can_be_modified = no
 					can_change_leader = yes
 				}
 			}
@@ -79,26 +78,29 @@ country_event = {
 					type = building_clone_army_clone_vat
 					disabled = no
 				}
-				variable = num_clone_vats
+				variable = num_ancient_clone_vats
+			}
+			# If there are no ancient clone vats, set the variable to 1 to prevent a divide by 0 later on
+			if = {
+				limit = {
+					check_variable = { which = num_ancient_clone_vats value = 0 }
+				}
+				set_variable = { which = num_ancient_clone_vats value = 1 }
 			}
 
-			# Figure out Clone Army Population (only OWN species are compatible, not imported ones)
+			# Figure out Clone Army Population
 			set_variable = { which = num_clone_pops value = 0 }
-			every_owned_pop = {
-				limit = {
-					owner_main_species = { is_same_species = prev }
-					OR = {
-						has_trait = trait_clone_soldier_infertile
-						has_trait = trait_clone_soldier_infertile_full_potential
-					}
-				}
-				prev = { change_variable = { which = num_clone_pops value = 1 } }
+			set_variable = {
+				which = num_clone_pops
+				value = value:clone_pops_value
 			}
 
 			### Variable 'clone_pops_missing' read by 'should_force_decline_species' and must be updated.
-			### clone_pops_missing = (20 * num_clone_vats) - num_clone_pops
-			set_variable = { which = clone_pops_missing value = 20 }
-			multiply_variable = { which = clone_pops_missing value = num_clone_vats }
+			### clone_pops_missing = clone_soldiers_sustained - num_clone_pops
+			export_modifier_to_variable = {
+				modifier = clone_soldiers_sustained
+				variable = clone_pops_missing
+			}
 			subtract_variable = { which = clone_pops_missing value = num_clone_pops }
 
 			### Override it to -1 if there are no pops on the planet, but the planet could not sustain them
@@ -106,7 +108,7 @@ country_event = {
 			if = {
 				limit = {
 					check_variable = { which = num_clone_pops value = 0 }
-					check_variable = { which = num_clone_vats value = 0 }
+					check_modifier_value = { modifier = clone_soldiers_sustained value = 0 }
 				}
 				set_variable = { which = clone_pops_missing value = -1 }
 			}
@@ -123,9 +125,9 @@ country_event = {
 				}
 
 				### Growing.
-				### clone_pops_missing_per_vat = clone_pops_missing / num_clone_vats, don't divide by 0.
+				### clone_pops_missing_per_vat = clone_pops_missing / num_ancient_clone_vats, don't divide by 0.
 				set_variable = { which = clone_pops_missing_per_vat value = clone_pops_missing }
-				divide_variable = { which = clone_pops_missing_per_vat value = num_clone_vats }
+				divide_variable = { which = clone_pops_missing_per_vat value = num_ancient_clone_vats }
 			}
 			else_if = {
 				limit = {
@@ -138,10 +140,17 @@ country_event = {
 					check_variable = { which = num_clone_pops value > 0 }
 					OR = {
 						NOT = { exists = declining_species }
-						declining_species = { is_same_species = root }
+						declining_species = {
+							OR = {
+								has_trait = trait_clone_soldier_infertile
+								has_trait = trait_clone_soldier_infertile_full_potential
+							}
+						}
 					}
 				}
 				### Pop above max, should decline. Variable 'clone_pops_missing' is negative:
+				# Divide clone_pops_missing by 100 to renormalise
+				divide_variable = { which = clone_pops_missing value = 100 }
 				### clone_pops_decline_factor = ( 4 % per month - clone_pops_missing ) / BASE_POP_DECLINE
 				set_variable = { which = clone_pops_decline_factor value = 4 }
 				subtract_variable = { which = clone_pops_decline_factor value = clone_pops_missing }
@@ -173,7 +182,7 @@ planet_event = {
 			is_clone_army_empire = yes # undercoat: moved to scripted trigger
 			NOT = { has_country_flag = clone_army_fertility_unlocked }
 		}
-		NOT = { has_building = building_clone_army_clone_vat } #just in case
+		check_modifier_value = { modifier = clone_soldiers_sustained value = 0 } #just in case
 	}
 
 	immediate = {
@@ -433,7 +442,6 @@ country_event = {
 				owner = root
 			}
 		}
-
 	}
 }
 
@@ -495,7 +503,7 @@ country_event = {
 									is_same_value = prevprev
 								}
 							}
-							any_species_pop = {
+							any_species_pop_group = {
 								NOT = { is_owned_by = root }
 							}
 						}
@@ -563,39 +571,22 @@ country_event = {
 
 	specimen = genetic_code
 
+	immediate = {
+		set_country_flag = clone_army_full_potential
+	}
+
 	option = {
 		name = EXCELLENT
-		hidden_effect = {
-			modify_species = {
-				remove_trait = trait_clone_soldier_infertile
-				add_trait = trait_clone_soldier_infertile_full_potential
-				add_traits_at_start_of_list = yes
-				effect = {
-					root = {
-						change_dominant_species = {
-							species = prev
-						}
-					}
-				}
+		if = {
+			limit = {
+				has_biogenesis_dlc = yes
 			}
-			owner_main_species = {
-				every_galaxy_species = {
-					limit = {
-						is_same_species = prev
-						NOT = { is_same_value = prev }
-						has_trait = trait_clone_soldier_infertile
-						NOR = {
-							any_country = {
-								NOT = { is_same_value = root }
-								owner_main_species = {
-									is_same_value = prevprev
-								}
-							}
-							any_species_pop = {
-								NOT = { is_owned_by = root }
-							}
-						}
-					}
+			custom_tooltip = clones.23.bio.tt
+		}
+		hidden_effect = {
+			every_owned_pop_group = {
+				limit = { has_trait = trait_clone_soldier_infertile }
+				species = {
 					change_species_characteristics = {
 						remove_trait = trait_clone_soldier_infertile
 						add_trait = trait_clone_soldier_infertile_full_potential
@@ -618,7 +609,6 @@ country_event = {
 				add_trait = leader_trait_clone_army_full_commander
 			}
 		}
-		set_country_flag = clone_army_full_potential
 	}
 }
 
@@ -630,6 +620,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		from = { leader_is_envoy_stu = no } # undercoat: moved to scripted trigger
 		from.species = {
 			OR = {
 				has_trait = trait_clone_soldier_fertile
@@ -690,7 +681,9 @@ planet_event = {
 	trigger = {
 		is_variable_set = clone_pops_missing
 		OR = {
-			num_pops = 0
+			count_owned_pop_amount = {
+				count = 0
+			}
 			AND = {
 				exists = from
 				NOT = { is_owned_by = from }
@@ -708,8 +701,8 @@ planet_event = {
 			clear_variable = num_clone_pops
 		}
 		if = {
-			limit = { is_variable_set = num_clone_vats }
-			clear_variable = num_clone_vats
+			limit = { is_variable_set = num_ancient_clone_vats }
+			clear_variable = num_ancient_clone_vats
 		}
 		if = {
 			limit = { is_variable_set = clone_pops_decline_factor }

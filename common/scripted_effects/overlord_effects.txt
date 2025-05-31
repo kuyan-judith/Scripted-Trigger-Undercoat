@@ -194,18 +194,18 @@ experiments_kill_pop_effect = { # Research demands sacrifice (kills 1 pop in cap
 	capital_scope = {
 		if = {
 			limit = {
-				count_owned_pop = {
-					count > 1
+				count_owned_pop_amount = {
+					count > 100
 					limit = {
 						is_same_species = root.species
 					}
 				}
 			}
-			random_owned_pop = {
+			random_owned_pop_group = {
 				limit = {
 					is_same_species = root.species
 				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -892,6 +892,20 @@ refresh_splinter_hive_modifier = {
 	}
 }
 
+refresh_wilderness_glade_modifier = {
+	if = {
+		limit = { has_modifier = holding_wilderness_glade_modifier }
+		remove_modifier = holding_wilderness_glade_modifier
+	}
+	if = {
+		limit = { is_variable_set = symbiotic_links }
+		add_modifier = {
+			modifier = holding_wilderness_glade_modifier
+			multiplier = symbiotic_links
+		}
+	}
+}
+
 append_noble_vacation_home = {
 	if = {
 		limit = { is_variable_set = noble_vacation_home }
@@ -969,18 +983,34 @@ origin_imperial_vassal_new_overlord_eventchain_2 = {
 }
 
 origin_imperial_fiefdom_bulwark_specialization_effect = {
-	custom_tooltip = origin.5705.a.tt
 
-	hidden_effect = {
-		random_agreement = {
-			limit = {
-				owner = { is_same_value = root.overlord }
-				target = { is_same_value = root }
+	if = {
+		limit = {
+			country_uses_bio_ships = yes
+		}
+		custom_tooltip = origin.5705.a.bioships.tt
+		create_fleet = {
+			effect = {
+				set_owner = root
+				while = {
+					count = 10
+					create_ship = {
+						name = random
+						design = NAME_CHARGER_1
+						growth_stage = 2
+					}
+				}
+				set_location = root.capital_star
 			}
-			set_agreement_preset = { preset = preset_bulwark }
-			set_agreement_terms = { subject_expand = subject_can_expand_with_tithe }
 		}
 
+		give_technology = {
+			tech = tech_mauler_growth_1
+			message = yes
+		}
+	}
+	else = {
+		custom_tooltip = origin.5705.a.tt
 		create_fleet = {
 			effect = {
 				set_owner = root
@@ -998,6 +1028,17 @@ origin_imperial_fiefdom_bulwark_specialization_effect = {
 		give_technology = {
 			tech = tech_destroyers
 			message = yes
+		}
+	}
+
+	hidden_effect = {
+		random_agreement = {
+			limit = {
+				owner = { is_same_value = root.overlord }
+				target = { is_same_value = root }
+			}
+			set_agreement_preset = { preset = preset_bulwark }
+			set_agreement_terms = { subject_expand = subject_can_expand_with_tithe }
 		}
 	}
 }
@@ -1020,7 +1061,7 @@ origin_imperial_fiefdom_scholarium_specialization_effect = {
 				set_owner = root
 				create_ship = {
 					name = random
-					design = NAME_Scholarium_Science
+					random_existing_design = science
 				}
 				set_location = root.capital_star
 				save_event_target_as = new_science_ship_target
@@ -1058,7 +1099,7 @@ origin_imperial_fiefdom_prospectorium_specialization_effect = {
 					set_owner = root
 					create_ship = {
 						name = random
-						design = NAME_Prospectorium_Constructor
+						random_existing_design = constructor
 					}
 					set_location = root.capital_star
 				}
@@ -1410,7 +1451,7 @@ create_shroudwalker_teacher_effect = {
 			0 = subclass_official_governor
 			1 = leader_trait_shroudwalker
 			2 = leader_trait_psionic
-			3 = leader_trait_bureaucrat_2
+			3 = leader_trait_bureaucrat
 			4 = leader_trait_righteous
 		}
 		effect = {

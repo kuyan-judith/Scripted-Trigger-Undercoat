@@ -1717,7 +1717,7 @@ country_event = {
 				}
 			}
 		}
-		hidden_effect = { country_event = { id = cara.1100 } }
+		hidden_effect = { country_event = { id = cara.1200 } }
 		custom_gui = "enclave_caravaneer_option"
 	}
 
@@ -1773,6 +1773,9 @@ country_event = {
 	diplomatic = yes
 	is_triggered_only = yes
 	custom_gui = "enclave_caravaneer_window"
+	auto_opens = no
+	notification_event_icon = "GFX_message_caravaneers_trade"
+	show_sound = advisor_notification_incoming_transmission_01
 
 	picture_event_data = {
 		portrait = event_target:caravaneer_fleet1_country
@@ -1901,6 +1904,9 @@ country_event = {
 	diplomatic = yes
 	is_triggered_only = yes
 	custom_gui = "enclave_caravaneer_window"
+	auto_opens = no
+	notification_event_icon = "GFX_message_caravaneers_trade"
+	show_sound = advisor_notification_incoming_transmission_01
 
 	picture_event_data = {
 		portrait = event_target:caravaneer_fleet1_country
@@ -2413,7 +2419,7 @@ country_event = {
 			}
 		}
 		hidden_effect = {
-			country_event = { id = cara.2100 }
+			country_event = { id = cara.2200 }
 		}
 		custom_gui = "enclave_caravaneer_option"
 	}
@@ -2459,6 +2465,8 @@ country_event = {
 	diplomatic = yes
 	is_triggered_only = yes
 	custom_gui = "enclave_caravaneer_window"
+	auto_opens = no
+	show_sound = advisor_notification_incoming_transmission_01 # TODO_CD - Repoint to unique icon
 
 	picture_event_data = {
 		portrait = event_target:caravaneer_fleet2_country
@@ -2690,6 +2698,8 @@ country_event = {
 	diplomatic = yes
 	is_triggered_only = yes
 	custom_gui = "enclave_caravaneer_window"
+	auto_opens = no
+	show_sound = advisor_notification_incoming_transmission_01 # TODO_CD - Repoint to unique icon
 
 	picture_event_data = {
 		portrait = event_target:caravaneer_fleet2_country
@@ -3235,7 +3245,7 @@ country_event = {
 			}
 		}
 		hidden_effect = {
-			country_event = { id = cara.3100 }
+			country_event = { id = cara.3200 }
 		}
 		custom_gui = "enclave_caravaneer_option"
 	}
@@ -3291,7 +3301,7 @@ country_event = {
 		trigger = {
 			exists = event_target:ratling_species
 			any_country = {
-				any_owned_pop = {
+				any_owned_pop_group = {
 					is_same_species = event_target:ratling_species
 				}
 			}
@@ -3303,6 +3313,9 @@ country_event = {
 	diplomatic = yes
 	is_triggered_only = yes
 	custom_gui = "enclave_caravaneer_window"
+	auto_opens = no
+	notification_event_icon = "GFX_message_caravaneers_trade"
+	show_sound = advisor_notification_incoming_transmission_01
 
 	picture_event_data = {
 		portrait = event_target:caravaneer_fleet3_country
@@ -3552,6 +3565,9 @@ country_event = {
 	diplomatic = yes
 	is_triggered_only = yes
 	custom_gui = "enclave_caravaneer_window"
+	auto_opens = no
+	notification_event_icon = "GFX_message_caravaneers_trade"
+	show_sound = advisor_notification_incoming_transmission_01
 
 	picture_event_data = {
 		portrait = event_target:caravaneer_fleet3_country
@@ -4336,8 +4352,8 @@ country_event = {
 			caravaneer_fleet_in_system = yes
 			any_system_planet = {
 				is_colony = yes
-				count_owned_pop = {
-					count > 5
+				count_owned_pop_amount = {
+					count >= 600
 					limit = {
 						is_enslaved = no
 						is_being_purged = no
@@ -4377,13 +4393,13 @@ country_event = {
 				}
 			}
 			save_event_target_as = pops_join_caravan_planet
-			random_owned_pop = {
+			random_owned_pop_group = {
 				limit = {
 					is_enslaved = no
 					is_being_purged = no
 					happiness < 0.60
 				}
-				kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+				kill_single_pop = yes
 			}
 		}
 	}
@@ -4422,10 +4438,10 @@ country_event = {
 		any_owned_planet = {
 			solar_system = { caravaneer_fleet_in_system = yes }
 			is_colony = yes
-			count_owned_pop = {
-				count > 2
+			count_owned_pop_amount = {
+				count >= 300
 			}
-			#free_housing > 6
+			#free_housing > 600
 		}
 	}
 
@@ -4434,10 +4450,10 @@ country_event = {
 			limit = {
 				solar_system = { caravaneer_fleet_in_system = yes }
 				is_colony = yes
-				count_owned_pop = {
-					count > 2
+				count_owned_pop_amount = {
+					count >= 300
 				}
-				#free_housing > 6
+				#free_housing > 600
 			}
 			save_event_target_as = caravan_pops_join_planet
 			solar_system = {
@@ -4470,7 +4486,7 @@ country_event = {
 			event_target:caravan_pops_join_planet = {
 				while = {
 					count = 3
-					create_pop = { species = event_target:caravan_pops_join_country.species }
+					create_pop_group = { species = event_target:caravan_pops_join_country.species }
 				}
 			}
 		}
@@ -4736,19 +4752,9 @@ country_event = {
 			random_list = {
 				10 = {
 					modifier = {
-						factor = 0
-						xeno_compatibility_enabled = no
-					}
-					modifier = {
-						factor = 0
-						event_target:welcome_fleet.owner.species = {
-							is_crossbreeding_possible = no
-						}
-					}
-					modifier = {
 						factor = 2
 						event_target:pleased_planet = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								has_ethic = "ethic_xenophile"
 							}
 						}
@@ -4756,7 +4762,7 @@ country_event = {
 					modifier = {
 						factor = 2
 						event_target:pleased_planet = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								has_ethic = "ethic_fanatic_xenophile"
 							}
 						}
@@ -4765,8 +4771,7 @@ country_event = {
 						factor = 0
 						event_target:pleased_planet = {
 							NOT = {
-								any_owned_pop = {
-									species = { is_crossbreeding_possible = yes }
+								any_owned_pop_group = {
 									NOT = { is_same_species = event_target:welcome_fleet.owner.species }
 								}
 							}
@@ -4810,16 +4815,14 @@ country_event = {
 		event_target:pleased_planet = {
 			if = {
 				limit = {
-					any_owned_pop = {
+					any_owned_pop_group = {
 						is_xenophile = yes
-						species = { is_crossbreeding_possible = yes }
 						NOT = { is_same_species = event_target:party_host }
 					}
 				}
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					limit = {
 						is_xenophile = yes
-						species = { is_crossbreeding_possible = yes }
 						NOT = { is_same_species = event_target:party_host }
 					}
 					save_event_target_as = party_goer
@@ -4827,25 +4830,22 @@ country_event = {
 			}
 			else_if = {
 				limit = {
-					any_owned_pop = {
+					any_owned_pop_group = {
 						is_xenophobe = no
-						species = { is_crossbreeding_possible = yes }
 						NOT = { is_same_species = event_target:party_host }
 					}
 				}
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					limit = {
 						is_xenophobe = no
-						species = { is_crossbreeding_possible = yes }
 						NOT = { is_same_species = event_target:party_host }
 					}
 					save_event_target_as = party_goer
 				}
 			}
 			else = {
-				random_owned_pop = {
+				weighted_random_owned_pop_group = {
 					limit = {
-						species = { is_crossbreeding_possible = yes }
 						NOT = { is_same_species = event_target:party_host }
 					}
 					save_event_target_as = party_goer
@@ -4854,15 +4854,10 @@ country_event = {
 		}
 
 		event_target:pleased_planet = {
-			create_half_species = {
-				species_one = event_target:party_host
-				species_two = event_target:party_goer.species
-				country = root
-			}
 			while = {
-				count = 2
-				create_pop = {
-					species = last_created_species
+				count = 3
+				create_pop_group = {
+					species = event_target:party_host
 				}
 			}
 		}
@@ -4894,17 +4889,10 @@ country_event = {
 	after = {
 		tooltip = {
 			event_target:pleased_planet = {
-				create_half_species = {
-					species_one = event_target:party_host
-					species_two = event_target:party_goer.species
-					country = root
-				}
-				hidden_effect = {
-					while = {
-						count = 3
-						create_pop = {
-							species = last_created_species
-						}
+				while = {
+					count = 3
+					create_pop_group = {
+						species = event_target:party_host
 					}
 				}
 			}
@@ -5098,6 +5086,7 @@ country_event = {
 				if = {
 					limit = {
 						is_gestalt = no
+						is_evolutionary_predators_empire = no # undercoat: moved to scripted trigger
 					}
 					event_target:cara_border_planet = { planet_event = { id = cara.4150 } }
 				}
@@ -5346,7 +5335,7 @@ planet_event = { #Caravan pops organize a rowdy festival (timed stability modifi
 					modifier = {
 						factor = 2
 						event_target:pleased_planet = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								has_ethic = "ethic_xenophile"
 							}
 						}
@@ -5354,27 +5343,16 @@ planet_event = { #Caravan pops organize a rowdy festival (timed stability modifi
 					modifier = {
 						factor = 2
 						event_target:pleased_planet = {
-							any_owned_pop = {
+							any_owned_pop_group = {
 								has_ethic = "ethic_fanatic_xenophile"
 							}
-						}
-					}
-					modifier = {
-						factor = 0
-						xeno_compatibility_enabled = no
-					}
-					modifier = {
-						factor = 0
-						event_target:caravaneer_neighbor_species = {
-							is_crossbreeding_possible = no
 						}
 					}
 					owner = {
 						if = {
 							limit = {
 								event_target:pleased_planet = {
-									any_owned_pop = {
-										species = { is_crossbreeding_possible = yes }
+									any_owned_pop_group = {
 										NOT = { is_same_species = event_target:caravaneer_neighbor_species }
 									}
 								}
@@ -5422,8 +5400,8 @@ planet_event = { #Pops become accustomed to Bartertown (Pops gain resilient trai
 	is_triggered_only = yes
 
 	trigger = {
-		any_owned_pop = {
-			is_robot_pop = no
+		any_owned_pop_group = {
+			is_robot_pop_group = no
 			NOT = {
 				has_trait = trait_resilient
 			}
@@ -5431,33 +5409,29 @@ planet_event = { #Pops become accustomed to Bartertown (Pops gain resilient trai
 	}
 
 	immediate = {
-		every_owned_pop = {
+		every_owned_pop_group = {
 			limit = {
-				is_robot_pop = no
+				is_robot_pop_group = no
 				NOT = {
 					has_trait = trait_resilient
 				}
 			}
-			set_pop_flag = caravan_tough_flag
+			set_pop_group_flag = caravan_tough_flag
 		}
 	}
 
 
 	option = {
 		name = EXCELLENT
-		while = {
+		every_owned_pop_group = {
 			limit = {
-				any_owned_pop = { has_pop_flag = caravan_tough_flag }
+				has_pop_group_flag = caravan_tough_flag
 			}
-			count = 50 # fallback, max number of pops likely to have the flag
-			random_owned_pop = {
-				limit = { has_pop_flag = caravan_tough_flag }
-				modify_species = {
-					species = this
-					add_trait = trait_resilient
-				}
-				remove_pop_flag = caravan_tough_flag
+			modify_species = {
+				species = this
+				add_trait = trait_resilient
 			}
+			remove_pop_group_flag = caravan_tough_flag
 		}
 	}
 }
@@ -5536,8 +5510,12 @@ planet_event = { #Megacorpse
 			}
 		}
 		add_planet_devastation = 20
-		random_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
-		random_owned_pop = { kill_pop_stu = yes } # undercoat: moved to scripted effect with on_action
+		random_owned_pop_group = {
+			kill_single_pop = yes
+		}
+		random_owned_pop_group = {
+			kill_single_pop = yes
+		}
 		enable_special_project = {
 			name = MEGACORPSE_ORIGINS
 			location = this

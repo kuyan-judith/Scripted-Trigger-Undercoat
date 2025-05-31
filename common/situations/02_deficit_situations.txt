@@ -1,3 +1,7 @@
+@stage_1_workforce_penalty = -0.33
+@stage_2_workforce_penalty = -0.50
+@stage_3_workforce_penalty = -0.66
+@stage_4_workforce_penalty = -0.75
 
 situation_energy_deficit = {
 	picture = GFX_evt_deficit
@@ -11,7 +15,8 @@ situation_energy_deficit = {
 		set_situation_flag = deficit_situation
 		owner = {
 			country_event = { id = advisor.20 days = 10 random = 20 }
-			save_event_target_as = kaleidoscope_new_owner	
+			save_event_target_as = kaleidoscope_new_owner
+			country_event = { id = timeline.19 } # Timeline Deficit
 		}
 		random_playable_country = {
 			limit = {
@@ -29,7 +34,7 @@ situation_energy_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	on_monthly = {
 		random_events = {
 			80 = 0
@@ -42,25 +47,62 @@ situation_energy_deficit = {
 			icon = GFX_situation_stage_1
 			icon_background = GFX_situation_stage_frame_red
 			end = 25
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_machine_empire = yes
+					}
+				}
+				pop_calculator_physicist_bonus_workforce_mult = @stage_1_workforce_penalty
+				pop_calculator_biologist_bonus_workforce_mult = @stage_1_workforce_penalty
+				pop_calculator_engineer_bonus_workforce_mult = @stage_1_workforce_penalty
+			}
 			modifier = {
-				planet_researchers_physics_research_produces_add = -0.5
-				planet_researchers_society_research_produces_add = -0.5
-				planet_researchers_engineering_research_produces_add = -0.5
+				#		planet_crime_per_pop = 0.1 #todo: doesn't exist
 				diplo_weight_economy_mult = -0.1
 				planet_pop_assembly_reduction = 0.1
 				ship_disengage_chance_mult = -0.1
 				ship_weapon_damage = -0.20
 				ship_speed_mult = -0.20
 			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						any_owned_planet = {
+							is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+				pop_neural_chip_bonus_workforce_mult = -1
+				pop_purge_speed = 2
+			}
 		}
 		deficit_second = {
 			icon = GFX_situation_stage_2
 			icon_background = GFX_situation_stage_frame_red
 			end = 50
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_machine_empire = yes
+					}
+				}
+				pop_calculator_physicist_bonus_workforce_mult = @stage_2_workforce_penalty
+				pop_calculator_biologist_bonus_workforce_mult = @stage_2_workforce_penalty
+				pop_calculator_engineer_bonus_workforce_mult = @stage_2_workforce_penalty
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						any_owned_planet = {
+							is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+				pop_neural_chip_bonus_workforce_mult = -1
+				pop_purge_speed = 2
+			}
 			modifier = {
-				planet_researchers_physics_research_produces_add = -1
-				planet_researchers_society_research_produces_add = -1
-				planet_researchers_engineering_research_produces_add = -1
 				diplo_weight_economy_mult = -0.2
 				planet_pop_assembly_reduction = 0.2
 				ship_disengage_chance_mult = -0.25
@@ -72,10 +114,28 @@ situation_energy_deficit = {
 			icon = GFX_situation_stage_3
 			icon_background = GFX_situation_stage_frame_red
 			end = 75
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_machine_empire = yes
+					}
+				}
+				pop_calculator_physicist_bonus_workforce_mult = @stage_3_workforce_penalty
+				pop_calculator_biologist_bonus_workforce_mult = @stage_3_workforce_penalty
+				pop_calculator_engineer_bonus_workforce_mult = @stage_3_workforce_penalty
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						any_owned_planet = {
+							is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+				pop_neural_chip_bonus_workforce_mult = -1
+				pop_purge_speed = 2
+			}
 			modifier = {
-				planet_researchers_physics_research_produces_add = -1.5
-				planet_researchers_society_research_produces_add = -1.5
-				planet_researchers_engineering_research_produces_add = -1.5
 				diplo_weight_economy_mult = -0.33
 				planet_pop_assembly_reduction = 0.33
 				ship_disengage_chance_mult = -0.50
@@ -90,10 +150,28 @@ situation_energy_deficit = {
 			on_first_enter = {
 				situation_event = { id = deficit.100 }
 			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_machine_empire = yes
+					}
+				}
+				pop_calculator_physicist_bonus_workforce_mult = @stage_4_workforce_penalty
+				pop_calculator_biologist_bonus_workforce_mult = @stage_4_workforce_penalty
+				pop_calculator_engineer_bonus_workforce_mult = @stage_4_workforce_penalty
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						any_owned_planet = {
+							is_cosmogenesis_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+				pop_neural_chip_bonus_workforce_mult = -1
+				pop_purge_speed = 2
+			}
 			modifier = {
-				planet_researchers_physics_research_produces_add = -2
-				planet_researchers_society_research_produces_add = -2
-				planet_researchers_engineering_research_produces_add = -2
 				diplo_weight_economy_mult = -0.5
 				planet_pop_assembly_reduction = 0.5
 				ship_disengage_chance_mult = -0.75
@@ -202,6 +280,9 @@ situation_mineral_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	on_abort = {
 		owner = {
@@ -212,7 +293,7 @@ situation_mineral_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	on_monthly = {
 		random_events = {
 			80 = 0
@@ -227,28 +308,60 @@ situation_mineral_deficit = {
 			end = 25
 			triggered_modifier = {
 				potential = {
-					owner = { is_hive_empire = yes }
+					owner = {
+						is_hive_empire = yes
+					}
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -1
-					planet_researchers_society_research_produces_add = -1
-					planet_researchers_engineering_research_produces_add = -1
+					pop_calculator_physicist_bonus_workforce_mult = @stage_1_workforce_penalty
+					pop_calculator_biologist_bonus_workforce_mult = @stage_1_workforce_penalty
+					pop_calculator_engineer_bonus_workforce_mult = @stage_1_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { country_uses_consumer_goods = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_artisans_consumer_goods_produces_add = -0.5
+					pop_artisan_bonus_workforce_mult = @stage_1_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = no }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -0.5
+					pop_artisan_drone_bonus_workforce_mult = @stage_1_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_1_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_1_workforce_penalty
 				}
 			}
 			triggered_modifier = {
@@ -256,7 +369,7 @@ situation_mineral_deficit = {
 					owner = { is_lithoid_empire = yes }
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.2
+					bonus_pop_growth_mult = -0.2
 				}
 			}
 			triggered_modifier = {
@@ -269,7 +382,7 @@ situation_mineral_deficit = {
 				}
 				modifier = {
 					lithoid_pop_happiness = -0.1
-					lithoid_pop_growth_speed_reduction = 0.2
+					lithoid_logistic_growth_mult = -0.2
 				}
 			}
 		}
@@ -279,28 +392,60 @@ situation_mineral_deficit = {
 			end = 50
 			triggered_modifier = {
 				potential = {
-					owner = { is_hive_empire = yes }
+					owner = {
+						is_hive_empire = yes
+					}
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -1.5
-					planet_researchers_society_research_produces_add = -1.5
-					planet_researchers_engineering_research_produces_add = -1.5
+					pop_calculator_physicist_bonus_workforce_mult = @stage_2_workforce_penalty
+					pop_calculator_biologist_bonus_workforce_mult = @stage_2_workforce_penalty
+					pop_calculator_engineer_bonus_workforce_mult = @stage_2_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { country_uses_consumer_goods = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_artisans_consumer_goods_produces_add = -1
+					pop_artisan_bonus_workforce_mult = @stage_2_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = no }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -1
+					pop_artisan_drone_bonus_workforce_mult = @stage_2_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_2_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_2_workforce_penalty
 				}
 			}
 			triggered_modifier = {
@@ -308,7 +453,7 @@ situation_mineral_deficit = {
 					owner = { is_lithoid_empire = yes }
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.33
+					bonus_pop_growth_mult = -0.33
 				}
 			}
 			triggered_modifier = {
@@ -321,7 +466,7 @@ situation_mineral_deficit = {
 				}
 				modifier = {
 					lithoid_pop_happiness = -0.15
-					lithoid_pop_growth_speed_reduction = 0.33
+					lithoid_logistic_growth_mult = -0.33
 				}
 			}
 		}
@@ -331,28 +476,60 @@ situation_mineral_deficit = {
 			end = 75
 			triggered_modifier = {
 				potential = {
-					owner = { is_hive_empire = yes }
+					owner = {
+						is_hive_empire = yes
+					}
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -2.5
-					planet_researchers_society_research_produces_add = -2.5
-					planet_researchers_engineering_research_produces_add = -2.5
+					pop_calculator_physicist_bonus_workforce_mult = @stage_3_workforce_penalty
+					pop_calculator_biologist_bonus_workforce_mult = @stage_3_workforce_penalty
+					pop_calculator_engineer_bonus_workforce_mult = @stage_3_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { country_uses_consumer_goods = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_artisans_consumer_goods_produces_add = -1.5
+					pop_artisan_bonus_workforce_mult = @stage_3_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = no }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -1.5
+					pop_artisan_drone_bonus_workforce_mult = @stage_3_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_3_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_3_workforce_penalty
 				}
 			}
 			triggered_modifier = {
@@ -360,7 +537,7 @@ situation_mineral_deficit = {
 					owner = { is_lithoid_empire = yes }
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.5
+					bonus_pop_growth_mult = -0.5
 				}
 			}
 			triggered_modifier = {
@@ -373,7 +550,7 @@ situation_mineral_deficit = {
 				}
 				modifier = {
 					lithoid_pop_happiness = -0.2
-					lithoid_pop_growth_speed_reduction = 0.5
+					lithoid_logistic_growth_mult = -0.5
 				}
 			}
 		}
@@ -386,28 +563,60 @@ situation_mineral_deficit = {
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_hive_empire = yes }
+					owner = {
+						is_hive_empire = yes
+					}
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -3
-					planet_researchers_society_research_produces_add = -3
-					planet_researchers_engineering_research_produces_add = -3
+					pop_calculator_physicist_bonus_workforce_mult = @stage_4_workforce_penalty
+					pop_calculator_biologist_bonus_workforce_mult = @stage_4_workforce_penalty
+					pop_calculator_engineer_bonus_workforce_mult = @stage_4_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { country_uses_consumer_goods = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_artisans_consumer_goods_produces_add = -2
+					pop_artisan_bonus_workforce_mult = @stage_4_workforce_penalty
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = no }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -2
+					pop_artisan_drone_bonus_workforce_mult = @stage_4_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_4_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+						is_catalytic_empire = no
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_4_workforce_penalty
 				}
 			}
 			triggered_modifier = {
@@ -415,7 +624,7 @@ situation_mineral_deficit = {
 					owner = { is_lithoid_empire = yes }
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.75
+					bonus_pop_growth_mult = -0.75
 				}
 			}
 			triggered_modifier = {
@@ -428,7 +637,7 @@ situation_mineral_deficit = {
 				}
 				modifier = {
 					lithoid_pop_happiness = -0.25
-					lithoid_pop_growth_speed_reduction = 0.75
+					lithoid_logistic_growth_mult = -0.75
 				}
 			}
 		}
@@ -564,6 +773,9 @@ situation_food_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	abort_trigger = {
 		owner = { country_uses_food = no }
@@ -580,7 +792,7 @@ situation_food_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	on_monthly = {
 		random_events = {
 			80 = 0
@@ -603,7 +815,7 @@ situation_food_deficit = {
 				}
 				modifier = {
 					biological_pop_happiness = -0.1
-					biological_pop_growth_speed_reduction = 0.2
+					biological_logistic_growth_mult = -0.2
 				}
 			}
 			triggered_modifier = {
@@ -616,15 +828,53 @@ situation_food_deficit = {
 					}
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.2
+					bonus_pop_growth_mult = -0.2
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -0.5
+					pop_artisan_bonus_workforce_mult = @stage_1_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_artisan_drone_bonus_workforce_mult = @stage_1_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_1_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_1_workforce_penalty
 				}
 			}
 		}
@@ -642,7 +892,7 @@ situation_food_deficit = {
 				}
 				modifier = {
 					biological_pop_happiness = -0.15
-					biological_pop_growth_speed_reduction = 0.33
+					biological_logistic_growth_mult = -0.33
 				}
 			}
 			triggered_modifier = {
@@ -655,15 +905,54 @@ situation_food_deficit = {
 					}
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.33
+					bonus_pop_growth_mult = -0.33
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -1
+					pop_artisan_bonus_workforce_mult = @stage_2_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_artisan_drone_bonus_workforce_mult = @stage_2_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_2_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_2_workforce_penalty
 				}
 			}
 		}
@@ -681,7 +970,7 @@ situation_food_deficit = {
 				}
 				modifier = {
 					biological_pop_happiness = -0.2
-					biological_pop_growth_speed_reduction = 0.5
+					biological_logistic_growth_mult = -0.5
 				}
 			}
 			triggered_modifier = {
@@ -694,15 +983,54 @@ situation_food_deficit = {
 					}
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.5
+					bonus_pop_growth_mult = -0.5
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -1.5
+					pop_artisan_bonus_workforce_mult = @stage_3_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_artisan_drone_bonus_workforce_mult = @stage_3_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_3_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_3_workforce_penalty
 				}
 			}
 		}
@@ -723,7 +1051,7 @@ situation_food_deficit = {
 				}
 				modifier = {
 					biological_pop_happiness = -0.25
-					biological_pop_growth_speed_reduction = 0.75
+					biological_logistic_growth_mult = -0.75
 				}
 			}
 			triggered_modifier = {
@@ -736,15 +1064,53 @@ situation_food_deficit = {
 					}
 				}
 				modifier = {
-					planet_pop_assembly_organic_reduction = 0.75
+					bonus_pop_growth_mult = -0.75
 				}
 			}
 			triggered_modifier = {
 				potential = {
-					owner = { is_catalytic_empire = yes }
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
 				}
 				modifier = {
-					planet_metallurgists_alloys_produces_add = -2
+					pop_artisan_bonus_workforce_mult = @stage_4_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						country_uses_consumer_goods = yes
+						is_gestalt = yes
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_artisan_drone_bonus_workforce_mult = @stage_4_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = no
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_foundry_bonus_workforce_mult = @stage_4_workforce_penalty
+				}
+			}
+			triggered_modifier = {
+				potential = {
+					owner = {
+						is_gestalt = yes
+						is_catalytic_empire = yes
+					}
+				}
+				modifier = {
+					pop_fabricator_bonus_workforce_mult = @stage_4_workforce_penalty
 				}
 			}
 		}
@@ -851,6 +1217,9 @@ situation_consumer_goods_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	abort_trigger = {
 		owner = { country_uses_consumer_goods = no }
@@ -867,7 +1236,7 @@ situation_consumer_goods_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	on_monthly = {
 		random_events = {
 			80 = 0
@@ -889,9 +1258,9 @@ situation_consumer_goods_deficit = {
 					owner = { is_gestalt = no }
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -1
-					planet_researchers_society_research_produces_add = -1
-					planet_researchers_engineering_research_produces_add = -1
+					pop_physicist_bonus_workforce_mult = @stage_1_workforce_penalty
+					pop_biologist_bonus_workforce_mult = @stage_1_workforce_penalty
+					pop_engineer_bonus_workforce_mult = @stage_1_workforce_penalty
 				}
 			}
 			triggered_modifier = {
@@ -916,9 +1285,9 @@ situation_consumer_goods_deficit = {
 					owner = { is_gestalt = no }
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -1.5
-					planet_researchers_society_research_produces_add = -1.5
-					planet_researchers_engineering_research_produces_add = -1.5
+					pop_physicist_bonus_workforce_mult = -0.50
+					pop_biologist_bonus_workforce_mult = -0.50
+					pop_engineer_bonus_workforce_mult = -0.50
 				}
 			}
 			triggered_modifier = {
@@ -943,9 +1312,9 @@ situation_consumer_goods_deficit = {
 					owner = { is_gestalt = no }
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -2.5
-					planet_researchers_society_research_produces_add = -2.5
-					planet_researchers_engineering_research_produces_add = -2.5
+					pop_physicist_bonus_workforce_mult = -0.66
+					pop_biologist_bonus_workforce_mult = -0.66
+					pop_engineer_bonus_workforce_mult = -0.66
 				}
 			}
 			triggered_modifier = {
@@ -970,9 +1339,9 @@ situation_consumer_goods_deficit = {
 					owner = { is_gestalt = no }
 				}
 				modifier = {
-					planet_researchers_physics_research_produces_add = -3
-					planet_researchers_society_research_produces_add = -3
-					planet_researchers_engineering_research_produces_add = -3
+					pop_physicist_bonus_workforce_mult = -0.75
+					pop_biologist_bonus_workforce_mult = -0.75
+					pop_engineer_bonus_workforce_mult = -0.75
 				}
 			}
 			triggered_modifier = {
@@ -1095,6 +1464,9 @@ situation_alloys_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	on_abort = {
 		owner = {
@@ -1105,21 +1477,21 @@ situation_alloys_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	on_monthly = {
 		random_events = {
 			80 = 0
 			20 = origin.4170	# Payback | MSI helping you
 		}
 	}
-	
+
 	stages = {
 		deficit_first = {
 			icon = GFX_situation_stage_1
 			icon_background = GFX_situation_stage_frame_red
 			end = 25
 			modifier = {
-				planet_jobs_robotic_produces_mult = -0.10
+				pop_bonus_workforce_mult = -0.10
 				planet_pop_assembly_mult = -0.25
 				planet_pop_assemblers_upkeep_mult = 0.25
 				ships_energy_upkeep_mult = 0.10
@@ -1132,7 +1504,7 @@ situation_alloys_deficit = {
 			icon_background = GFX_situation_stage_frame_red
 			end = 50
 			modifier = {
-				planet_jobs_robotic_produces_mult = -0.20
+				pop_bonus_workforce_mult = -0.20
 				planet_pop_assembly_mult = -0.50
 				planet_pop_assemblers_upkeep_mult = 0.50
 				ships_energy_upkeep_mult = 0.20
@@ -1147,7 +1519,7 @@ situation_alloys_deficit = {
 			icon_background = GFX_situation_stage_frame_red
 			end = 75
 			modifier = {
-				planet_jobs_robotic_produces_mult = -0.30
+				pop_bonus_workforce_mult = -0.30
 				planet_pop_assembly_mult = -0.75
 				planet_pop_assemblers_upkeep_mult = 0.75
 				ships_energy_upkeep_mult = 0.20
@@ -1165,7 +1537,7 @@ situation_alloys_deficit = {
 				situation_event = { id = deficit.170 }
 			}
 			modifier = {
-				planet_jobs_robotic_produces_mult = -0.50
+				pop_bonus_workforce_mult = -0.50
 				planet_pop_assembly_mult = -1
 				planet_pop_assemblers_upkeep_mult = 1
 				ships_energy_upkeep_mult = 0.30
@@ -1302,6 +1674,9 @@ situation_rare_crystals_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	on_abort = {
 		owner = {
@@ -1312,7 +1687,7 @@ situation_rare_crystals_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	stages = {
 		deficit_first = {
 			icon = GFX_situation_stage_1
@@ -1475,6 +1850,9 @@ situation_volatile_motes_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	on_abort = {
 		owner = {
@@ -1485,7 +1863,7 @@ situation_volatile_motes_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	stages = {
 		deficit_first = {
 			icon = GFX_situation_stage_1
@@ -1649,6 +2027,9 @@ situation_exotic_gases_deficit = {
 
 	on_start = {
 		set_situation_flag = deficit_situation
+		owner = {
+			country_event = { id = timeline.19 } # Timeline Deficit
+		}
 	}
 	on_abort = {
 		owner = {
@@ -1659,7 +2040,7 @@ situation_exotic_gases_deficit = {
 		}
 	}
 
-	start_value = 15
+	initial_progress = 15
 	stages = {
 		deficit_first = {
 			icon = GFX_situation_stage_1

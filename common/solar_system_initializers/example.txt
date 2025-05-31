@@ -135,16 +135,27 @@ example_initializer = {
 		distance = { min = 10 max = 100 }			# Euclidean distance, i.e. a straight line between 2 points
 		hyperlane_distance = { min = 1 max = 20 }	# Total distance via hyperlanes (distance traveled inside systems is not included)
 		hyperlane_jumps = { min = 1 max = 20 }		# Number of discrete jumps via hyperlanes
+		min_orientation_angle = 0					# Min angle (sexagesimal deg) where the neighbor will be sought
+		max_orientation_angle = 120					# Max angle (sexagesimal deg) where the neighbor will be sought
+
+		spawn_chance = 90							# default: 100. Value 0-100 representing the chance of the neighbor spawning.
+													# If <100 and it fails the roll, the neighbor will not be chosen/spawned (even if mandatory_neighbors = yes)
 
 		trigger = {
 			# [Default/blank = succeed]
 			# this = galactic_object (parent solar system);
 			# root = first system in this initializer tree (if any);
-			# prev = closest parent system in this initializer tree (if any) — may carry on up the chain via 'prevprev' or 'prevprevprev'
+			# prev = closest parent system in this initializer tree (if any) - may carry on up the chain via 'prevprev' or 'prevprevprev'
 		}
 
-		initializer = "example_neighbor"			# ID for the initializer to be used in this next, neighboring system
+		initializer = "example_neighbor"			# ID for the initializer to be used in this next, neighboring system.
+													# If not valid, the neighbor will not be chosen/spawned (even if mandatory_neighbors = yes)
 	}
+	mandatory_neighbors = yes	# default: no. If yes, when a suitable neighbor is not found, a new solar system will be created to fulfill it.
+								# The distance and angle from the system to the newly created neighbor will be random values between
+								# the specified limits, and the hyperlane connecting them will always be a single jump. The trigger will be
+								# evaluated but ignored if it fails, only printing an error log in that case.
+
 	init_effect = { # undercoat
 		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
 		fire_on_action = { on_action = on_system_spawned }
@@ -155,7 +166,7 @@ example_neighbor = {
 	name = "Example Neighbor"
 	class = "rl_standard_stars"
 
-	# This initializer does not specify any 'usage' conditions, so it will only ever be used explicitly — in this case, called via 'neighbor_system'.
+	# This initializer does not specify any 'usage' conditions, so it will only ever be used explicitly - in this case, called via 'neighbor_system'.
 
 	change_orbit = 30
 	planet = {

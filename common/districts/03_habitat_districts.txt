@@ -1,42 +1,45 @@
-@hab_cost = 500
+@hab_cost = 150
 @hab_maintenance = 2
-@low_hab_maintenance = 0.2
-@hab_time = 240
-@hab_jobs = 2
+@low_hab_maintenance = 0.25
+@hab_time = 360
+
+# NOTE: district_hab_energy_max, district_hab_mining_max and district_hab_science_max
+# are provided by habitat_modifiers on orbital deposits
+# These modifiers are equal to 1 + FLOOR(n/2), where n is the deposit size.
 
 district_hab_housing = {
 	base_buildtime = @hab_time
 	is_capped_by_modifier = no
 	exempt_from_ai_planet_specialization = yes
 
+	zone_slots = {
+		slot_city_government
+		slot_habitat_01
+		slot_habitat_02
+	}
+
 	show_on_uncolonized = {
 		uses_district_set = habitat
-		NOR = {
-			has_planet_flag = toxic_knights_habitat
-			has_building = building_order_castle
-		}
 	}
 
 	potential = {
 		uses_district_set = habitat
 		NAND = {
-			exists = owner
-			owner = { is_toxic_knights_empire = yes } # undercoat: moved to scripted trigger
-			OR = {
-				has_planet_flag = toxic_knights_habitat
-				has_building = building_order_castle
+			is_capital = yes
+			owner = {
+				has_menace_perk = menp_behemoth_mind_meld
 			}
 		}
 	}
 
 	convert_to = {
-		district_orders_demesne
+		district_mindlink
 	}
 
 	resources = {
-		category = planet_districts
+		category = planet_districts_hab
 		cost = {
-			minerals = @hab_cost
+			alloys = @hab_cost
 		}
 		upkeep = {
 			energy = @hab_maintenance
@@ -44,23 +47,23 @@ district_hab_housing = {
 		}
 	}
 
-	planet_modifier = {
-		planet_max_buildings_add = 0.50
-	}
-
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
+		planet_housing_add = 1
 		mult = value:hab_housing_district_housing_stu
 	}
 
 	inline_script = {
-		script = districts/habitat_housing_job_swaps
+		script = districts/ai_urban_district_extra_weighting
 	}
 }
 
-district_hab_industrial = {
+district_hab_energy = {
 	base_buildtime = @hab_time
-	is_capped_by_modifier = no
+	is_capped_by_modifier = yes
+
+	zone_slots = {
+		slot_habitat_energy
+	}
 
 	show_on_uncolonized = {
 		uses_district_set = habitat
@@ -70,10 +73,13 @@ district_hab_industrial = {
 		uses_district_set = habitat
 	}
 
+	convert_to = {
+	}
+
 	resources = {
-		category = planet_districts_hab_industrial
+		category = planet_districts_hab
 		cost = {
-			minerals = @hab_cost
+			alloys = @hab_cost
 		}
 		upkeep = {
 			energy = @hab_maintenance
@@ -90,75 +96,74 @@ district_hab_industrial = {
 		}
 	}
 
-	planet_modifier = {
-		planet_max_buildings_add = 0.25
+	triggered_planet_modifier = {
+		planet_housing_add = 1
+		mult = value:hab_energy_district_housing_stu
+	}
+
+	inline_script = {
+		script = jobs/habitat_technicians_add
+		AMOUNT = @habitat_rural_district_jobs
+	}
+
+	on_built = {
+		planet_event = {
+			id = megastructures.200		# Spawn an energy orbital
+		}
+	}
+}
+
+district_hab_mining = {
+	base_buildtime = @hab_time
+	is_capped_by_modifier = yes
+
+	zone_slots = {
+		slot_habitat_minerals
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = habitat
+	}
+
+	potential = {
+		uses_district_set = habitat
+	}
+
+	resources = {
+		category = planet_districts_hab
+		cost = {
+			alloys = @hab_cost
+		}
+		upkeep = {
+			energy = @hab_maintenance
+			alloys = @low_hab_maintenance
+		}
 	}
 
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:hab_industrial_district_housing_stu
+		planet_housing_add = 1
+		mult = value:hab_energy_district_housing_stu
 	}
 
 	inline_script = {
-		script = jobs/industrial_districts_factory_add
-		AMOUNT = 1
+		script = jobs/habitat_miners_add
+		AMOUNT = @habitat_rural_district_jobs
 	}
 
-	inline_script = {
-		script = jobs/industrial_districts_foundry_add
-		AMOUNT = 1
-	}
-
-	# Void Dweller Extra Jobs
-	# Undercoat inline scripts
-	inline_script = {
-		script = stu/jobs_add
-		job_type = foundry
-		AMOUNT = 1
-		trigger = "
-			has_factory_designation = no
-			owner = { is_void_dweller_empire = yes }
-		"
-	}
-	# Undercoat inline script
-	inline_script = {
-		script = stu/jobs_add
-		job_type = factory
-		AMOUNT = 1
-		trigger = "
-			has_factory_designation = yes
-			owner = { is_void_dweller_empire = yes }
-		"
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_edict = industrial_maintenance
-			}
+	on_built = {
+		planet_event = {
+			id = megastructures.210		# Spawn a mining orbital
 		}
-		modifier = {
-			job_maintenance_drone_add = 1
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_machine_empire = yes
-				has_edict = industrial_maintenance
-			}
-		}
-		text = job_maintenance_drone_effect_desc
 	}
 }
 
 district_hab_science = {
 	base_buildtime = @hab_time
 	is_capped_by_modifier = yes
+
+	zone_slots = {
+		slot_habitat_research
+	}
 
 	show_on_uncolonized = {
 		uses_district_set = habitat
@@ -179,14 +184,15 @@ district_hab_science = {
 				owner = {
 					has_technology = tech_basic_science_lab_1
 				}
+				has_deposit = d_payback_habitat_research
 			}
 		}
 	}
 
 	resources = {
-		category = planet_districts_hab_research
+		category = planet_districts_hab
 		cost = {
-			minerals = @hab_cost
+			alloys = @hab_cost
 		}
 		upkeep = {
 			energy = @hab_maintenance
@@ -195,122 +201,19 @@ district_hab_science = {
 	}
 
 	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
+		planet_housing_add = 1
 		mult = value:hab_science_district_housing_stu
 	}
 
 	inline_script = {
-		script = districts/habitat_districts_triggered_mods
+		script = jobs/habitat_researchers_add
+		AMOUNT = @habitat_research_district_jobs
+		LARGE_AMOUNT = @habitat_rural_district_jobs
 	}
 
-	# Undercoat inline script
-	inline_script = {
-		script = stu/jobs_add
-		job_type = researchers
-		mult_line = "mult = value:hab_science_district_jobs_stu"
-	}
-
-	triggered_desc = {
-		trigger = {
-			always = yes
+	on_built = {
+		planet_event = {
+			id = megastructures.220		# Spawn a research orbital
 		}
-		text = num_science_orbitals
-	}
-}
-
-district_hab_energy = {
-	base_buildtime = @hab_time
-	is_capped_by_modifier = yes
-
-	show_on_uncolonized = {
-		uses_district_set = habitat
-	}
-
-	potential = {
-		uses_district_set = habitat
-	}
-
-	convert_to = {
-	}
-
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:hab_energy_district_housing_stu
-	}
-
-	inline_script = {
-		script = districts/habitat_districts_triggered_mods
-	}
-
-	resources = {
-		category = planet_districts_hab_energy
-		cost = {
-			minerals = @hab_cost
-		}
-		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
-		}
-	}
-
-	# Undercoat inline script
-	inline_script = {
-		script = stu/jobs_add
-		job_type = technicians
-		mult_line = "mult = value:hab_energy_district_jobs_stu"
-	}
-
-	triggered_desc = {
-		trigger = {
-			always = yes
-		}
-		text = num_energy_orbitals
-	}
-}
-
-district_hab_mining = {
-	base_buildtime = @hab_time
-	is_capped_by_modifier = yes
-
-	show_on_uncolonized = {
-		uses_district_set = habitat
-	}
-
-	potential = {
-		uses_district_set = habitat
-	}
-
-	triggered_planet_modifier = {
-		modifier = { planet_housing_add = 1 }
-		mult = value:hab_mining_district_housing_stu
-	}
-
-	inline_script = {
-		script = districts/habitat_districts_triggered_mods
-	}
-
-	resources = {
-		category = planet_districts_hab_mining
-		cost = {
-			minerals = @hab_cost
-		}
-		upkeep = {
-			energy = @hab_maintenance
-			alloys = @low_hab_maintenance
-		}
-	}
-
-	# Undercoat inline script
-	inline_script = {
-		script = stu/jobs_add
-		job_type = miners
-		mult_line = "mult = value:hab_mining_district_jobs_stu"
-	}
-
-	triggered_desc = {
-		trigger = {
-			always = yes
-		}
-		text = num_mining_orbitals
 	}
 }

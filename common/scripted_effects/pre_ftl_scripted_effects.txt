@@ -264,7 +264,7 @@ pre_ftl_clean_up_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_primitive_factory
 						add_building = building_primitive_mine
 						add_building = building_primitive_power_plant
@@ -280,7 +280,7 @@ pre_ftl_clean_up_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_hive_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_hive_primitive_factory
 						add_building = building_hive_primitive_mine
 						add_building = building_hive_primitive_power_plant
@@ -292,24 +292,24 @@ pre_ftl_clean_up_effect = {
 				capital_scope = {
 					if = {
 						limit = {
-							num_pops > @industrial_age_pops
+							pop_amount > @industrial_age_pops
 						}
 						while = {
 							limit = {
-								num_pops > @industrial_age_pops
+								pop_amount > @industrial_age_pops
 							}
-							random_owned_pop = {
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+							random_owned_pop_group = {
+								remove_pop_amount = 100
 							}
 						}
 					}
 					else_if = {
-						limit = { num_pops < @industrial_age_pops }
+						limit = { pop_amount < @industrial_age_pops }
 						while = {
 							limit = {
-								num_pops < @industrial_age_pops
+								pop_amount < @industrial_age_pops
 							}
-							create_pop = {
+							create_pop_group = {
 								species = owner_main_species
 							}
 						}
@@ -355,7 +355,7 @@ pre_ftl_clean_up_effect = {
 					}
 				}
 				capital_scope = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -371,30 +371,30 @@ pre_ftl_clean_up_effect = {
 			capital_scope = {
 				while = {
 					count = 4
-					create_pop = {
+					create_pop_group = {
 						species = event_target:pre_ftl_mechanist_robot
 					}
 				}
 				if = {
 					limit = {
-						num_pops > @industrial_age_pops
+						pop_amount > @industrial_age_pops
 					}
 					while = {
 						limit = {
-							num_pops > @industrial_age_pops
+							pop_amount > @industrial_age_pops
 						}
-						random_owned_pop = {
-							kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+						random_owned_pop_group = {
+							remove_pop_amount = 100
 						}
 					}
 				}
 				else_if = {
-					limit = { num_pops < @industrial_age_pops }
+					limit = { pop_amount < @industrial_age_pops }
 					while = {
 						limit = {
-							num_pops < @industrial_age_pops
+							pop_amount < @industrial_age_pops
 						}
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
@@ -931,11 +931,9 @@ setup_pre_ftl_planet = {
 				prev = {
 					add_building = building_crude_huts
 					remove_building = building_colony_shelter
-					while = {
-						count = @stone_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @stone_age_pops
 					}
 				}
 			}
@@ -944,11 +942,9 @@ setup_pre_ftl_planet = {
 					add_building = building_primitive_dwellings
 					add_building = building_stone_palace
 					remove_building = building_colony_shelter
-					while = {
-						count = @bronze_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @bronze_age_pops
 					}
 				}
 			}
@@ -957,11 +953,9 @@ setup_pre_ftl_planet = {
 					add_building = building_primitive_dwellings
 					add_building = building_stone_palace
 					remove_building = building_colony_shelter
-					while = {
-						count = @iron_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @iron_age_pops
 					}
 				}
 			}
@@ -971,11 +965,9 @@ setup_pre_ftl_planet = {
 					add_building = building_primitive_dwellings
 					add_building = building_stone_palace
 					remove_building = building_colony_shelter
-					while = {
-						count = @late_medieval_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @late_medieval_age_pops
 					}
 				}
 			}
@@ -985,11 +977,9 @@ setup_pre_ftl_planet = {
 					add_building = building_primitive_dwellings
 					add_building = building_stone_palace
 					remove_building = building_colony_shelter
-					while = {
-						count = @renaissance_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @renaissance_age_pops
 					}
 				}
 			}
@@ -1000,28 +990,24 @@ setup_pre_ftl_planet = {
 					add_building = building_primitive_mine
 					add_building = building_stone_palace
 					remove_building = building_colony_shelter
-					while = {
-						count = @steam_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @steam_age_pops
 					}
 				}
 			}
 			industrial_age = {
 				prev = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
 					add_building = building_primitive_capital
 					add_building = building_urban_dwellings
 					remove_building = building_colony_shelter
-					while = {
-						count = @industrial_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @industrial_age_pops
 					}
 				}
 				if = {
@@ -1034,13 +1020,13 @@ setup_pre_ftl_planet = {
 					prev = {
 						while = {
 							count = 2
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -1049,18 +1035,17 @@ setup_pre_ftl_planet = {
 			}
 			machine_age = {
 				prev = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
-					add_building = building_primitive_mine
+
 					add_building = building_primitive_power_plant
 					add_building = building_primitive_capital
 					add_building = building_urban_dwellings
 					remove_building = building_colony_shelter
-					while = {
-						count = @machine_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+
+					create_pop_group = {
+						species = last_created_species
+						size = @machine_age_pops
 					}
 				}
 				if = {
@@ -1073,13 +1058,13 @@ setup_pre_ftl_planet = {
 					prev = {
 						while = {
 							count = 4
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -1088,18 +1073,16 @@ setup_pre_ftl_planet = {
 			}
 			atomic_age = {
 				prev = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
 					add_building = building_primitive_capital
 					add_building = building_urban_dwellings
 					remove_building = building_colony_shelter
-					while = {
-						count = @atomic_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @atomic_age_pops
 					}
 				}
 				if = {
@@ -1112,13 +1095,13 @@ setup_pre_ftl_planet = {
 					prev = {
 						while = {
 							count = 6
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -1127,18 +1110,16 @@ setup_pre_ftl_planet = {
 			}
 			early_space_age = {
 				prev = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
 					add_building = building_primitive_capital
 					add_building = building_urban_dwellings
 					remove_building = building_colony_shelter
-					while = {
-						count = @early_space_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @early_space_age_pops
 					}
 				}
 				if = {
@@ -1151,13 +1132,13 @@ setup_pre_ftl_planet = {
 					prev = {
 						while = {
 							count = 8
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -1232,11 +1213,9 @@ setup_pre_ftl_broken_shackles_planet = {
 			trigger = has_country_flag
 			stone_age = {
 				prev = {
-					while = {
-						count = @stone_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @stone_age_pops
 					}
 					add_building = building_crude_huts
 				}
@@ -1244,11 +1223,9 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			bronze_age = {
 				prev = {
-					while = {
-						count = @bronze_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @bronze_age_pops
 					}
 					add_building = building_stone_palace
 					add_building = building_primitive_dwellings
@@ -1257,11 +1234,9 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			iron_age = {
 				prev = {
-					while = {
-						count = @iron_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @iron_age_pops
 					}
 					add_building = building_stone_palace
 					add_building = building_primitive_dwellings
@@ -1270,11 +1245,9 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			late_medieval_age = {
 				prev = {
-					while = {
-						count = @late_medieval_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @late_medieval_age_pops
 					}
 					add_building = building_stone_palace
 					add_building = building_primitive_dwellings
@@ -1284,11 +1257,9 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			renaissance_age = {
 				prev = {
-					while = {
-						count = @renaissance_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @renaissance_age_pops
 					}
 					add_building = building_stone_palace
 					add_building = building_primitive_dwellings
@@ -1298,11 +1269,9 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			steam_age = {
 				prev = {
-					while = {
-						count = @steam_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @steam_age_pops
 					}
 					add_building = building_stone_palace
 					add_building = building_urban_dwellings
@@ -1313,14 +1282,12 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			industrial_age = {
 				prev = {
-					while = {
-						count = @industrial_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @industrial_age_pops
 					}
 					add_building = building_primitive_capital
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -1330,14 +1297,12 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			machine_age = {
 				prev = {
-					while = {
-						count = @machine_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @machine_age_pops
 					}
 					add_building = building_primitive_capital
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -1347,14 +1312,12 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			atomic_age = {
 				prev = {
-					while = {
-						count = @atomic_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @atomic_age_pops
 					}
 					add_building = building_primitive_capital
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -1364,14 +1327,12 @@ setup_pre_ftl_broken_shackles_planet = {
 
 			early_space_age = {
 				prev = {
-					while = {
-						count = @early_space_age_pops
-						create_pop = {
-							species = owner_main_species
-						}
+					create_pop_group = {
+						species = owner_main_species
+						size = @early_space_age_pops
 					}
 					add_building = building_primitive_capital
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -1649,7 +1610,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_primitive_factory
 						add_building = building_primitive_mine
 						add_building = building_primitive_power_plant
@@ -1682,10 +1643,10 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_primitive_factory
 						add_building = building_primitive_mine
-						add_building = building_primitive_power_plant
+						add_building = building_primitive_power_plant#
 						add_building = building_primitive_capital
 						add_building = building_urban_dwellings
 						add_deposit = d_decrepit_dwellings
@@ -1717,7 +1678,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_primitive_factory
 						add_building = building_primitive_mine
 						add_building = building_primitive_power_plant
@@ -1752,7 +1713,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_primitive_factory
 						add_building = building_primitive_mine
 						add_building = building_primitive_power_plant
@@ -1962,7 +1923,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_hive_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_hive_primitive_factory
 						add_building = building_hive_primitive_mine
 						add_building = building_hive_primitive_power_plant
@@ -1994,7 +1955,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_hive_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_hive_primitive_factory
 						add_building = building_hive_primitive_mine
 						add_building = building_hive_primitive_power_plant
@@ -2028,7 +1989,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_hive_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_hive_primitive_factory
 						add_building = building_hive_primitive_mine
 						add_building = building_hive_primitive_power_plant
@@ -2062,7 +2023,7 @@ set_pre_ftl_age_effect = {
 						}
 					}
 					capital_scope = {
-						add_building = building_hive_primitive_farm
+						add_primitive_farm_or_mine = yes
 						add_building = building_hive_primitive_factory
 						add_building = building_hive_primitive_mine
 						add_building = building_hive_primitive_power_plant
@@ -2091,7 +2052,7 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @ancient_or_medieval_era_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
@@ -2101,7 +2062,7 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @ancient_or_medieval_era_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
@@ -2111,7 +2072,7 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @ancient_or_medieval_era_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
@@ -2121,7 +2082,7 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @ancient_or_medieval_era_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
@@ -2131,7 +2092,7 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @victorian_era_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
@@ -2157,7 +2118,7 @@ increase_pre_ftl_pops_by_age_effect = {
 							count = 2
 							while = {
 								count = @victorian_era_growth
-								create_pop = {
+								create_pop_group = {
 									species = event_target:pre_ftl_mechanist_robot
 								}
 							}
@@ -2166,7 +2127,7 @@ increase_pre_ftl_pops_by_age_effect = {
 					else = {
 						while = {
 							count = @victorian_era_growth
-							create_pop = {
+							create_pop_group = {
 								species = owner_main_species
 							}
 						}
@@ -2177,18 +2138,18 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @machine_age_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
 					random_list = {
 						25 = {
 							# One fewer pop gained
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
 						}
 						50 = {
@@ -2196,7 +2157,7 @@ increase_pre_ftl_pops_by_age_effect = {
 						}
 						25 = {
 							# One extra pop gained
-							create_pop = {
+							create_pop_group = {
 								species = owner_main_species
 							}
 						}
@@ -2217,13 +2178,13 @@ increase_pre_ftl_pops_by_age_effect = {
 						}
 						while = {
 							count = 2
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -2234,18 +2195,18 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @atomic_age_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
 					random_list = {
 						25 = {
 							# One fewer pop gained
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
 						}
 						50 = {
@@ -2253,7 +2214,7 @@ increase_pre_ftl_pops_by_age_effect = {
 						}
 						25 = {
 							# One extra pop gained
-							create_pop = {
+							create_pop_group = {
 								species = owner_main_species
 							}
 						}
@@ -2274,13 +2235,13 @@ increase_pre_ftl_pops_by_age_effect = {
 						}
 						while = {
 							count = 2
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -2291,18 +2252,18 @@ increase_pre_ftl_pops_by_age_effect = {
 				capital_scope = {
 					while = {
 						count = @early_space_age_growth
-						create_pop = {
+						create_pop_group = {
 							species = owner_main_species
 						}
 					}
 					random_list = {
 						25 = {
 							# One fewer pop gained
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
 						}
 						50 = {
@@ -2310,7 +2271,7 @@ increase_pre_ftl_pops_by_age_effect = {
 						}
 						25 = {
 							# One extra pop gained
-							create_pop = {
+							create_pop_group = {
 								species = owner_main_species
 							}
 						}
@@ -2331,13 +2292,13 @@ increase_pre_ftl_pops_by_age_effect = {
 						}
 						while = {
 							count = 2
-							random_owned_pop = {
+							random_owned_pop_group = {
 								limit = {
 									is_robotic_species = no
 								}
-								kill_pop_stu = yes # undercoat: moved to scripted effect with on_action
+								remove_pop_amount = 100
 							}
-							create_pop = {
+							create_pop_group = {
 								species = event_target:pre_ftl_mechanist_robot
 							}
 						}
@@ -2346,7 +2307,7 @@ increase_pre_ftl_pops_by_age_effect = {
 			}
 		}
 	}
-	remove_country_flag = $pre_ftl_age$_pops
+	remove_country_flag = $PRE_FTL_AGE$_pops
 }
 
 create_pre_ftl_blockers = {
@@ -2402,7 +2363,7 @@ create_generic_presapient_species = {
 	}
 	while = {
 		count = 3
-		create_pop = { species = event_target:latest_presapient }
+		create_pop_group = { species = event_target:latest_presapient }
 	}
 	event_target:pre_sapient_planet = {
 		set_planet_flag = pre_sapient_planet
@@ -2455,7 +2416,7 @@ create_generic_presapient_species_homeworld = {
 	}
 	while = {
 		count = 3
-		create_pop = { species = last_created_species }
+		create_pop_group = { species = last_created_species }
 	}
 }
 
@@ -2920,11 +2881,9 @@ setup_pre_ftl_hive_planet = {
 			stone_age = {
 				prev = {
 					add_building = building_hive_crude_huts
-					while = {
-						count = @stone_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @stone_age_pops
 					}
 				}
 			}
@@ -2932,11 +2891,9 @@ setup_pre_ftl_hive_planet = {
 				prev = {
 					add_building = building_hive_primitive_dwellings
 					add_building = building_hive_stone_palace
-					while = {
-						count = @bronze_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @bronze_age_pops
 					}
 				}
 			}
@@ -2944,11 +2901,9 @@ setup_pre_ftl_hive_planet = {
 				prev = {
 					add_building = building_hive_primitive_dwellings
 					add_building = building_hive_stone_palace
-					while = {
-						count = @iron_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @iron_age_pops
 					}
 				}
 			}
@@ -2957,11 +2912,9 @@ setup_pre_ftl_hive_planet = {
 					add_building = building_hive_primitive_dwellings
 					add_building = building_hive_primitive_dwellings
 					add_building = building_hive_stone_palace
-					while = {
-						count = @late_medieval_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @late_medieval_age_pops
 					}
 				}
 			}
@@ -2970,11 +2923,9 @@ setup_pre_ftl_hive_planet = {
 					add_building = building_hive_primitive_dwellings
 					add_building = building_hive_primitive_dwellings
 					add_building = building_hive_stone_palace
-					while = {
-						count = @renaissance_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @renaissance_age_pops
 					}
 				}
 			}
@@ -2984,75 +2935,67 @@ setup_pre_ftl_hive_planet = {
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_stone_palace
-					while = {
-						count = @steam_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @steam_age_pops
 					}
 				}
 			}
 			industrial_age = {
 				prev = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
 					add_building = building_hive_primitive_capital
 					add_building = building_hive_urban_dwellings
-					while = {
-						count = @industrial_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @industrial_age_pops
 					}
 				}
 			}
 			machine_age = {
 				prev = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
 					add_building = building_hive_primitive_capital
 					add_building = building_hive_urban_dwellings
-					while = {
-						count = @machine_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @machine_age_pops
 					}
 				}
 			}
 			atomic_age = {
 				prev = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
 					add_building = building_hive_primitive_capital
 					add_building = building_hive_urban_dwellings
-					while = {
-						count = @atomic_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+
+					add_building = building_hive_urban_dwellings
+					create_pop_group = {
+						species = last_created_species
+						size = @atomic_age_pops
 					}
 				}
 			}
 			early_space_age = {
 				prev = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
 					add_building = building_hive_primitive_capital
 					add_building = building_hive_urban_dwellings
-					while = {
-						count = @early_space_age_pops
-						create_pop = {
-							species = last_created_species
-						}
+					create_pop_group = {
+						species = last_created_species
+						size = @early_space_age_pops
 					}
 				}
 			}
@@ -3115,7 +3058,7 @@ achieve_ftl_effect = {
 		capital_scope = {
 			while = {
 				count = 4
-				create_pop = {
+				create_pop_group = {
 					species = owner
 				}
 			}
@@ -3226,32 +3169,6 @@ achieve_ftl_effect = {
 					message = no
 				}
 				add_research_option = tech_habitat_2
-				if = {
-					limit = {
-						OR = {
-							is_lithoid_empire = no
-							is_catalytic_empire = yes
-						}
-					}
-					give_technology = {
-						tech = tech_eco_simulation
-						message = no
-					}
-					give_technology = {
-						tech = tech_hydroponics
-						message = no
-					}
-				}
-				else = {
-					give_technology = {
-						tech = tech_powered_exoskeletons
-						message = no
-					}
-					give_technology = {
-						tech = tech_space_mining_1
-						message = no
-					}
-				}
 			}
 			add_building = building_hab_major_capital
 			# 2 jobs
@@ -3285,7 +3202,7 @@ achieve_ftl_effect = {
 				limit = {
 					owner = {
 						is_spiritualist = yes
-						is_death_cult_empire = no # undercoat - death cult corps shouldn't get this
+						NOT = { has_valid_civic = civic_death_cult }
 					}
 				}
 				add_building = building_temple
@@ -3294,10 +3211,10 @@ achieve_ftl_effect = {
 
 		while = {
 			limit = {
-				num_pops < 8
+				pop_amount < 800
 				#free_housing > 0
 			}
-			create_pop = {
+			create_pop_group = {
 				species = owner
 			}
 		}
@@ -3429,11 +3346,9 @@ spawn_old_foes_effect = {
 		}
 		set_owner = last_created_country
 		set_capital = yes
-		while = {
-			count = @bronze_age_pops
-			create_pop = {
-				species = last_created_species
-			}
+		create_pop_group = {
+			species = last_created_species
+			size = @bronze_age_pops
 		}
 		add_building = building_primitive_dwellings
 		add_building = building_stone_palace
@@ -3504,11 +3419,9 @@ spawn_old_foes_effect = {
 		}
 		set_owner = last_created_country
 		set_capital = yes
-		while = {
-			count = @bronze_age_pops
-			create_pop = {
-				species = last_created_species
-			}
+		create_pop_group = {
+			species = last_created_species
+			size = @bronze_age_pops
 		}
 		add_building = building_primitive_dwellings
 		add_building = building_stone_palace
@@ -3570,7 +3483,7 @@ add_pre_ftl_buildings = {
 			}
 			industrial_age = {
 				capital_scope = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -3580,7 +3493,7 @@ add_pre_ftl_buildings = {
 			}
 			machine_age = {
 				capital_scope = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -3590,7 +3503,7 @@ add_pre_ftl_buildings = {
 			}
 			atomic_age = {
 				capital_scope = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -3600,7 +3513,7 @@ add_pre_ftl_buildings = {
 			}
 			early_space_age = {
 				capital_scope = {
-					add_building = building_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_primitive_factory
 					add_building = building_primitive_mine
 					add_building = building_primitive_power_plant
@@ -3654,7 +3567,7 @@ add_pre_ftl_buildings = {
 			}
 			industrial_age = {
 				capital_scope = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
@@ -3664,7 +3577,7 @@ add_pre_ftl_buildings = {
 			}
 			machine_age = {
 				capital_scope = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
@@ -3676,7 +3589,7 @@ add_pre_ftl_buildings = {
 			}
 			atomic_age = {
 				capital_scope = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
@@ -3688,7 +3601,7 @@ add_pre_ftl_buildings = {
 			}
 			early_space_age = {
 				capital_scope = {
-					add_building = building_hive_primitive_farm
+					add_primitive_farm_or_mine = yes
 					add_building = building_hive_primitive_factory
 					add_building = building_hive_primitive_mine
 					add_building = building_hive_primitive_power_plant
@@ -3699,5 +3612,38 @@ add_pre_ftl_buildings = {
 				}
 			}
 		}
+	}
+}
+
+add_primitive_farm_or_mine = {
+	if = {
+		limit = {
+			owner = {
+				is_lithoid_empire = no
+				is_hive_empire = no
+			}
+		}
+		add_building = building_primitive_farm
+	}
+	else_if = {
+		limit = {
+			owner = {
+				is_lithoid_empire = yes
+				is_hive_empire = no
+			}
+		}
+		add_building = building_primitive_mine
+	}
+	else_if = {
+		limit = {
+			owner = {
+				is_lithoid_empire = no
+				is_hive_empire = yes
+			}
+		}
+		add_building = building_hive_primitive_farm
+	}
+	else = {
+		add_building = building_hive_primitive_mine
 	}
 }

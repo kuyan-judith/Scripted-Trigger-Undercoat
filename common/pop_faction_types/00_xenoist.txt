@@ -13,14 +13,45 @@ xenoist = {
 	resources = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			unity = @faction_base_output
 		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			society_research = @faction_major_output
+			physics_research = @faction_minor_output
+			mult = @crowdsourcing_multiplier
+		}
 	}
+
 	extortion_resource = {
 		category = pop_factions
 		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
 			energy = @faction_base_output
 			mult = @faction_extortion_energy_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			society_research = @faction_major_output
+			physics_research = @faction_minor_output
+			mult = @faction_extortion_crowdsourcing_ratio
 		}
 	}
 
@@ -146,7 +177,10 @@ xenoist = {
 					NOR = {
 						is_same_species = prev
 						is_robotic = yes
-						is_sapient = no
+						AND = {
+							is_sapient = no
+							NOT = { has_trait = trait_nascent_stage }
+						}
 					}
 				}
 			}
@@ -338,8 +372,9 @@ xenoist = {
 				OR = {
 					has_country_flag = found_presapients
 					any_planet_within_border = {
-						any_owned_pop = {
+						any_owned_pop_group = {
 							is_sapient = no
+							NOT = { has_trait = trait_nascent_stage }
 						}
 					}
 				}
@@ -365,7 +400,7 @@ xenoist = {
 			exists = owner
 			owner = {
 				has_country_flag = encountered_first_primitive
-				is_current_or_former_necrophage_empire = no # undercoat: moved to scripted trigger
+				is_necrophage_empire = no # undercoat: moved to scripted trigger
 			}
 		}
 
@@ -413,6 +448,8 @@ xenoist = {
 					NOT = { has_communications = prev}
 					OR = {
 						is_empire = yes # undercoat: moved to scripted trigger
+						
+						
 						is_country_type = primitive
 						is_country_type = marauder_raiders
 						is_country_type = enclave
@@ -595,6 +632,46 @@ xenoist = {
 		}
 	}
 
+	demand = { # Unplugged: De-Cyberize
+		title = XENOIST_UNPLUGGED_DECYBERIZE
+		unfulfilled_title = XENOIST_UNPLUGGED_NOT_DECYBERIZE
+		desc = XENOIST_UNPLUGGED_DECYBERIZE_DESC
+
+		unfulfilled_effect = -10
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				any_situation = {
+					is_situation_type = situation_unplugged_identity
+					OR = {
+						AND = { # safely in the De-Cyberize stage
+							current_stage = unplugged_identity_stage_1
+							situation_monthly_progress < 0
+						}
+						AND = { # trending towards De-Cyberization and our Approach is aligned
+							situation_monthly_progress < 0.05
+							OR = {
+								current_situation_approach = situation_unplugged_identity_discourage_change
+								current_situation_approach = situation_unplugged_identity_embrace_opinion
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	# Global Faction Demands.
 	inline_script = {
 		script = "paragon/global_faction_demands"
@@ -632,7 +709,7 @@ xenoist = {
 	}
 
 	on_create = {
-		pop_faction_event = { id = factions.1 }
+		pop_faction_event = { id = factions.0 }
 	}
 
 	on_destroy = {
@@ -658,5 +735,6 @@ xenoist = {
 		opposite = xenophobe
 		apply_to_other_factions = "always = no"
 		extortion_resource = energy
+		crowdsourced_extortion_tooltip = "crowdsourced_extortion_tt"
 	}
 }

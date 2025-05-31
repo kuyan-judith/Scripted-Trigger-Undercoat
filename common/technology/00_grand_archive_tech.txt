@@ -1,0 +1,653 @@
+################################
+# Grand Archive - Technologies #
+################################
+
+#################
+# Grand Archive #
+#################
+
+tech_galactic_archivism = {
+	cost = @tier2cost1
+	area = society
+	tier = 2
+	category = { statecraft }
+	weight = @tier2weight1
+
+	potential = {
+		has_grand_archive_dlc = yes
+		OR = {
+			acquired_specimen_count > 0
+			is_galactic_curators_empire = yes
+			is_beastmasters_empire = yes
+		}
+	}
+
+	ai_weight = {
+		weight = 2
+		modifier = {
+			factor = 0
+			is_unfriendly = yes
+		}
+	}
+}
+
+#################
+# Gravity Wells #
+#################
+
+tech_gravity_wells = {
+	cost = @tier2cost1
+	area = physics
+	tier = 2
+	category = { field_manipulation }
+	weight = @tier2weight1
+
+	feature_flags = {
+		unlock_gravity_snares
+	}
+
+	potential = {
+		has_grand_archive_dlc = yes
+		OR = {
+			has_encountered_any_fauna = yes
+			is_beastmasters_empire = yes
+		}
+	}
+
+	ai_weight = {
+		modifier = {
+			factor = 0.5
+			is_beastmasters_empire = no
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				is_playable = no # undercoat: moved to scripted trigger
+				is_homicidal = yes
+			}
+		}
+	}
+}
+
+tech_gravity_snare_capacity_1 = {
+	area = physics
+	category = { field_manipulation }
+	tier = 2
+	cost = @tier2cost1
+	weight = @tier2weight1
+	prerequisites = { "tech_gravity_wells" }
+
+	modifier = {
+		country_capture_amount_add = 1
+		country_capture_chance_add = 0.05
+	}
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	gateway = snare_capacity
+}
+
+tech_gravity_snare_capacity_2 = {
+	area = physics
+	category = { field_manipulation }
+	tier = 3
+	cost = @tier3cost1
+	weight = @tier3weight1
+	is_rare = yes
+	prerequisites = { "tech_gravity_snare_capacity_1" }
+
+	modifier = {
+		country_capture_amount_add = 1
+		country_capture_chance_add = 0.05
+	}
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	gateway = snare_capacity
+
+	weight_modifier = {
+		modifier = {
+			factor = value:tech_weight_likelihood
+			has_trait_in_council = { TRAIT = leader_trait_curator }
+		}
+		inline_script = {
+			script = technologies/rare_technologies_weight_modifiers
+			TECHNOLOGY = tech_gravity_snare_capacity_2
+		}
+	}
+}
+
+tech_gravity_snare_capacity_3 = {
+	area = physics
+	category = { field_manipulation }
+	tier = 4
+	cost = @tier4cost1
+	weight = @tier4weight1
+	is_rare = yes
+	prerequisites = {
+		"tech_gravity_snare_capacity_2"
+	}
+
+	modifier = {
+		country_capture_amount_add = 1
+		country_capture_chance_add = 0.05
+	}
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	gateway = snare_capacity
+
+	weight_modifier = {
+		modifier = {
+			factor = value:tech_weight_likelihood
+			has_trait_in_council = { TRAIT = leader_trait_curator }
+		}
+		inline_script = {
+			script = technologies/rare_technologies_weight_modifiers
+			TECHNOLOGY = tech_gravity_snare_capacity_3
+		}
+	}
+}
+
+tech_containment_vessel = {
+	area = physics
+	category = { field_manipulation }
+	tier = 3
+	cost = @tier3cost1
+	is_reverse_engineerable = no
+	is_rare = yes
+	weight = 0
+	prerequisites = { "tech_gravity_wells" }
+
+	modifier = {
+		country_capture_amount_mult = 1
+		country_capture_chance_add = 0.1
+	}
+
+	prereqfor_desc = {
+		component = {
+			title = "TECH_UNLOCK_CONTAINMENT_VESSEL_TITLE"
+			desc = "TECH_UNLOCK_CONTAINMENT_VESSEL_DESC"
+		}
+	}
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	weight_modifier = {
+		modifier = {
+			factor = value:tech_weight_likelihood
+			has_trait_in_council = { TRAIT = leader_trait_curator }
+		}
+		inline_script = {
+			script = technologies/rare_technologies_weight_modifiers
+			TECHNOLOGY = tech_containment_vessel
+		}
+	}
+}
+
+tech_voidworm_immunity = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = 0
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	modifier = {
+		description = tech_voidworm_immunity_effect
+		damage_vs_country_type_voidworms_mult = @vaccine_damage_vs_country_type_voidworms_mult
+		damage_vs_country_type_voidworms_crisis_mult = @vaccine_damage_vs_country_type_voidworms_mult
+		damage_vs_country_type_voidworms_treasure_hunters_mult = @vaccine_damage_vs_country_type_voidworms_mult
+		damage_vs_country_type_frenzied_voidworms_mult = @vaccine_damage_vs_country_type_voidworms_mult
+	}
+
+	technology_swap = {
+		name = tech_voidworm_immunity
+		trigger = {
+			any_situation = {
+				is_situation_type = situation_voidworm_plague
+			}
+		}
+		modifier = {
+			description = tech_voidworm_immunity_effect_during_situation
+			damage_vs_country_type_voidworms_mult = @vaccine_damage_vs_country_type_voidworms_mult
+			damage_vs_country_type_voidworms_crisis_mult = @vaccine_damage_vs_country_type_voidworms_mult
+			damage_vs_country_type_voidworms_treasure_hunters_mult = @vaccine_damage_vs_country_type_voidworms_mult
+			damage_vs_country_type_frenzied_voidworms_mult = @vaccine_damage_vs_country_type_voidworms_mult
+		}
+		weight = {
+			factor = 1
+		}
+	}
+}
+
+tech_asteroidal_carapace = {
+	area = engineering
+	tier = 3
+	category = { materials }
+	weight = 0
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+}
+
+############
+# Vivarium #
+############
+
+tech_alien_cloning = {
+	cost = @tier2cost1
+	area = society
+	tier = 2
+	category = { biology }
+	weight = @tier2weight1
+	prerequisites = { tech_gravity_wells }
+	ai_update_type = military
+
+	potential = {
+		has_grand_archive_dlc = yes
+		OR = {
+			is_beastmasters_empire = yes
+			can_research_technology = tech_genome_mapping
+		}
+	}
+
+	feature_flags = {
+		alien_cloning_unlocked
+	}
+
+	technology_swap = {
+		name = tech_alien_cloning_beastmasters
+		inherit_effects = yes
+		trigger = {
+			is_beastmasters_empire = yes
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
+	weight_modifier = {
+		modifier = {
+            factor = @federation_perk_factor
+            has_federation = yes
+            federation = {
+                any_member = { has_technology = tech_alien_cloning }
+				NOT = { has_federation_law = fleet_contribution_none }
+            }
+        }
+	}
+
+	prereqfor_desc = {
+		custom = {
+			title = tech_alien_cloning_tt
+		}
+	}
+}
+
+tech_improved_incubators = {
+	cost = @tier2cost1
+	area = society
+	tier = 2
+	category = { biology }
+	weight = @tier3weight1
+	prerequisites = { "tech_alien_cloning" }
+	ai_update_type = military
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	technology_swap = {
+		name = tech_improved_incubators_beastmasters
+		inherit_effects = yes
+		trigger = {
+			is_beastmasters_empire = yes
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = ship
+		custom = {
+			title = tech_improved_incubators_tt
+			desc = tech_improved_incubators_tt_desc
+		}
+	}
+
+	weight_modifier = {
+		modifier = {
+			factor = 0.1
+			NOT = { years_passed > 10 }
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = {
+				has_technology = tech_improved_incubators
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 15
+		}
+		modifier = {
+			factor = 3
+			years_passed > 20
+		}
+		modifier = {
+			factor = 4
+			years_passed > 30
+		}
+		modifier = {
+			factor = 1.25
+			has_tradition = tr_domestication_adopt
+		}
+	}
+
+	ai_weight = {
+		factor = @ai_ship_types_factor
+	}
+}
+
+tech_metabolic_gases = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = @tier4weight1
+	prerequisites = { "tech_improved_incubators" }
+	ai_update_type = military
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+
+	technology_swap = {
+		name = tech_metabolic_gases_beastmasters
+		inherit_effects = yes
+		trigger = {
+			is_beastmasters_empire = yes
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = ship
+		custom = {
+			title = tech_metabolic_gases_tt
+			desc = tech_metabolic_gases_tt_desc
+		}
+	}
+
+	weight_modifier = {
+		modifier = {
+			factor = 0.1
+			NOT = { years_passed > 20 }
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = {
+				has_technology = tech_metabolic_gases
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 30
+		}
+		modifier = {
+			factor = 3
+			years_passed > 35
+		}
+		modifier = {
+			factor = 4
+			years_passed > 40
+		}
+		modifier = {
+			factor = 1.25
+			has_tradition = tr_domestication_adopt
+		}
+	}
+
+	ai_weight = {
+		factor = @ai_ship_types_factor
+	}
+}
+
+###########
+# Pirates #
+###########
+
+tech_boarding_cables = {
+	cost = @tier3cost1
+	area = engineering
+	tier = 1
+	category = { propulsion }
+	weight = 0
+
+	potential = {
+		has_grand_archive_dlc = yes
+	}
+}
+
+#############
+# Mutations #
+#############
+
+tech_controlled_mutations = {
+	cost = @tier2cost2
+	area = society
+	tier = 2
+	category = { biology }
+	weight = @tier2cost2
+	prerequisites = { tech_alien_cloning }
+
+	potential = {
+		has_any_dna = yes
+	}
+
+	feature_flags = {
+		mutations
+	}
+
+	modifier = {
+		mutation_slots_add = 3
+	}
+
+	technology_swap = {
+		name = tech_controlled_mutations
+		trigger = {
+			is_reanimator = yes
+		}
+		modifier = {
+			mutation_slots_add = 3
+			reanimated_ship_damage_mult = 0.15
+			reanimated_ship_fire_rate_mult = 0.15
+		}
+		weight = {
+			factor = 1
+		}
+	}
+}
+
+tech_controlled_mutations_2 = {
+	cost = @tier4cost2
+	area = society
+	tier = 4
+	category = { biology }
+	weight = @tier4cost2
+	prerequisites = { tech_controlled_mutations }
+
+	modifier = {
+		mutation_slots_add = 3
+	}
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = component
+		custom = {
+			title = tech_controlled_mutations_2_title
+			desc = tech_controlled_mutations_2_tooltip
+		}
+	}
+
+	technology_swap = {
+		name = tech_controlled_mutations_2
+		trigger = {
+			is_reanimator = yes
+		}
+		modifier = {
+			mutation_slots_add = 3
+			reanimated_ship_damage_mult = 0.15
+			reanimated_ship_fire_rate_mult = 0.15
+		}
+		weight = {
+			factor = 1
+		}
+	}
+}
+
+tech_unique_mutation_space_amoeba = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+tech_unique_mutation_tiyanki = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+tech_unique_mutation_voidworm = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+tech_unique_mutation_cutholoid = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+tech_unique_mutation_crystalline_entity = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+tech_unique_mutation_restorative_enzymes = {
+	cost = @tier4cost1
+	area = society
+	tier = 4
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+tech_unique_mutation_starborne_biology = {
+	cost = @tier4cost1
+	area = society
+	tier = 4
+	category = { biology }
+	weight = 0
+	prerequisites = { tech_controlled_mutations_2 }
+}
+
+#########################
+# Fauna Core Components #
+#########################
+
+tech_thrusters_bio_integration = {
+	cost = @tier2cost1
+	area = engineering
+	tier = 2
+	category = { propulsion }
+	weight = 0
+	prerequisites = { tech_controlled_mutations }
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = component
+		custom = {
+			title = tech_thrusters_bio_integration_effect
+		}
+	}
+}
+
+tech_hyper_drive_bio_integration = {
+	cost = @tier2cost1
+	area = physics
+	tier = 2
+	category = { particles }
+	weight = 0
+	prerequisites = { tech_controlled_mutations }
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = component
+		custom = {
+			title = tech_hyper_drive_bio_integration_effect
+		}
+	}
+}
+
+tech_sensors_bio_integration = {
+	cost = @tier2cost1
+	area = physics
+	tier = 2
+	category = { computing }
+	weight = 0
+	prerequisites = { tech_controlled_mutations }
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = component
+		custom = {
+			title = tech_sensors_bio_integration_effect
+		}
+	}
+}
+
+tech_combat_computers_bio_integration = {
+	cost = @tier2cost1
+	area = physics
+	tier = 2
+	category = { computing }
+	weight = 0
+	prerequisites = { tech_controlled_mutations }
+
+	prereqfor_desc = {
+		hide_prereq_for_desc = component
+		custom = {
+			title = tech_combat_computers_bio_integration_effect
+		}
+	}
+}

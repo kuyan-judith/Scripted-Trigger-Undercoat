@@ -103,7 +103,7 @@ leader_trait_planar_theorist = {
 		}
 		modifier = {
 			from = {
-				is_dimensional_worship_empire = yes # undercoat: moved to scripted trigger
+				is_dimensional_worship_empire = yes
 			}
 			factor = @synergy_weight_mult
 		}
@@ -179,7 +179,7 @@ leader_trait_academic_astral_rift_expert = {
 		}
 		modifier = {
 			from = {
-				is_dimensional_worship_empire = yes # undercoat: moved to scripted trigger
+				is_dimensional_worship_empire = yes
 			}
 			factor = @synergy_weight_mult
 		}
@@ -240,6 +240,11 @@ leader_trait_foreign_consciousness = {
 		RARITY = paragon
 		COUNCIL = no
 		TIER = none
+	}
+	on_gained_effect = {
+		owner = {
+			country_event = { id = timeline.50 } # Timeline First Leader with Destiny Trait
+		}
 	}
 	modifier = {
 		ship_astral_rift_speed_mult = 0.25
@@ -306,6 +311,11 @@ leader_trait_spacebender = {
 		COUNCIL = no
 		TIER = none
 	}
+	on_gained_effect = {
+		owner = {
+			country_event = { id = timeline.50 } # Timeline First Leader with Destiny Trait
+		}
+	}
 	inline_script = {
 		script = paragon/leader_resource_produces
 		RESOURCE = astral_threads
@@ -357,6 +367,11 @@ leader_trait_blorg_insight = {
 		COUNCIL = yes
 		TIER = none
 	}
+	on_gained_effect = {
+		owner = {
+			country_event = { id = timeline.50 } # Timeline First Leader with Destiny Trait
+		}
+	}
 	councilor_modifier = {
 		intel_decryption_add = 2
 		add_base_country_intel = 15
@@ -385,10 +400,17 @@ trait_plasmic = {
 	species_possible_merge_add = {
 		always = no
 	}
+	species_possible_remove = {
+		OR = {
+			can_remove_beneficial_genetic_traits = yes
+			can_remove_pop_growth_genetic_traits = yes
+		}
+	}
 	allowed_archetypes = { BIOLOGICAL LITHOID }
+	tags = { organic positive pop_growth housing habitability special }
 
 	modifier = {
-		pop_growth_speed = 0.15
+		logistic_growth_mult = 0.15
 		pop_housing_usage_mult = -0.15
 		pop_environment_tolerance = 0.15
 	}
@@ -402,7 +424,6 @@ trait_plasmic = {
 
 trait_exd = {
 	cost = 0
-	potential_crossbreeding_chance = 0
 
 	sorting_priority = 20
 
@@ -419,6 +440,7 @@ trait_exd = {
 	}
 
 	allowed_archetypes = { OTHER }
+	tags = { organic positive upkeep production research special }
 	species_class = { EXD }
 	ai_weight = {
 		weight = 0
@@ -430,7 +452,17 @@ trait_exd = {
 	modifier = {
 		leader_lifespan_mult = 0.5
 		pop_environment_tolerance = 0.50
-		pop_growth_speed = -0.25
+		logistic_growth_mult = -0.25
 		planet_pops_upkeep_mult = 0.50
+	}
+
+	resources = {
+		category = planet_pops
+		produces = {
+			trigger = {
+				is_slave_or_better = yes
+			}
+			physics_research = 0.5
+		}
 	}
 }

@@ -23,10 +23,9 @@ entertainer_job_check_trigger = {
 		is_being_purged = no
 		is_being_assimilated = no
 		# Rule out Traits for servitude & lack of free will
-		NOR = {
-			has_trait = trait_syncretic_proles
-			can_think = no
-		}
+		can_think = yes
+		# Rule out Disconnected Drones
+		has_disconnected_drone_citizenship_type = no
 		OR = {
 			NOT = { has_trait = trait_mechanical }
 			owner = { has_technology = tech_droid_workers }
@@ -57,10 +56,9 @@ battle_thrall_job_check_trigger = {
 		is_being_purged = no
 		is_being_assimilated = no
 		# Rule out Traits for servitude & lack of free will
-		NOR = {
-			has_trait = trait_syncretic_proles
-			can_think = no
-		}
+		can_think = yes
+		# Rule out Disconnected Drones
+		has_disconnected_drone_citizenship_type = no
 		NOT = {
 			has_military_service_type = {
 				type = military_service_none
@@ -137,7 +135,7 @@ divinity_right_to_work_job_check_trigger_exempt = {
 divinity_right_to_work_job_check_trigger_worker = {
 	NOT = {
 		planet = {
-			any_owned_pop = {
+			any_owned_pop_group = {
 				is_unemployed = yes
 				is_robotic_species = no
 				is_pop_category = worker
@@ -149,11 +147,11 @@ divinity_right_to_work_job_check_trigger_worker = {
 divinity_right_to_work_job_check_trigger_specialist = {
 	NOT = {
 		planet = {
-			any_owned_pop = {
+			any_owned_pop_group = {
 				is_unemployed = yes
 				is_robotic_species = no
 				OR = {
-					is_pop_category = specialist
+					is_specialist_category = yes
 					is_pop_category = worker
 				}
 			}
@@ -164,7 +162,7 @@ divinity_right_to_work_job_check_trigger_specialist = {
 divinity_right_to_work_job_check_trigger_ruler = {
 	NOT = {
 		planet = {
-			any_owned_pop = {
+			any_owned_pop_group = {
 				is_unemployed = yes
 				is_robotic_species = no
 			}
@@ -263,7 +261,7 @@ can_take_servant_job = {
 can_fill_specialist_job_trigger = {
 	custom_tooltip = SPECIALIST_JOB_TRIGGER
 	hidden_trigger = {
-		NOT = { has_ethic = ethic_gestalt_consciousness } # undercoat - left as is since pop scope
+		is_gestalt = no # undercoat: moved to scripted trigger
 		exists = owner
 		OR = {
 			is_enslaved = no
@@ -272,10 +270,10 @@ can_fill_specialist_job_trigger = {
 		is_being_purged = no
 		is_being_assimilated = no
 		# Rule out Traits for servitude & lack of free will
-		NOR = {
-			has_trait = trait_syncretic_proles
-			can_think = no
-		}
+		can_think = yes
+		NOT = {	has_pop_group_flag = cant_work }
+		# Rule out Disconnected Drones
+		has_disconnected_drone_citizenship_type = no
 		OR = {
 			NOT = { has_trait = trait_mechanical }
 			owner = { has_technology = tech_droid_workers }
@@ -335,44 +333,452 @@ has_unemployed_or_servants = {
 
 has_sr_producing_job = {
 	OR = {
-		has_job = mote_harvester
-		has_job = mote_harvesting_drone
-		has_job = chemist
-		has_job = chemist_drone
-		has_job = gas_extractor
-		has_job = gas_extraction_drone
-		has_job = gas_refiner
-		has_job = gas_refiner_drone
-		has_job = crystal_miner
-		has_job = crystal_mining_drone
-		has_job = translucer
-		has_job = translucer_drone
+		has_building = building_refinery
+		has_building = building_chemical_plant
+		has_building = building_crystal_plant
+		has_building = building_nanite_transmuter
+		has_building = building_mote_harvesters
+		has_building = building_gas_extractors
+		has_building = building_crystal_mines
 	}
 }
 
-has_research_job = {
+# Planet Scope
+has_ethics_output = {
 	OR = {
-		has_job = researcher
-		has_job = brain_drone
-		has_job = calculator
-		has_job = dimensional_portal_researcher
-		has_job = dimensional_portal_researcher_gestalt
-		has_job = space_time_anomaly_researcher
-		has_job = space_time_anomaly_researcher_gestalt
-		has_job = necromancer
-		has_job = xeno_zoo_keeper
-		has_job = head_researcher
-		has_job = archaeoengineers
-		has_job = archaeo_drone
-		has_job = archaeo_unit
-		has_job = munitions_decommissioner
-		has_job = munitions_decommissioning_unit
-		has_job = munitions_decommissioning_drone
-		has_job = astral_researcher
-		has_job = astral_drone
-		has_job = astral_unit
-		has_job = astrometeorologist
-		has_job = astrometeorologist_hive
-		has_job = astrometeorologist_machine
+		has_building = building_autochthon_monument
+		has_building = building_heritage_site
+		has_building = building_hypercomms_forum
+		has_building = building_galactic_memorial_1
+		has_building = building_galactic_memorial_2
+		has_building = building_galactic_memorial_3
+		has_building = building_corporate_monument
+		has_building = building_corporate_site
+		has_building = building_corporate_forum
+		has_building = building_artist_patron
+		num_zones = {
+			type = zone_broken_shackles_memorial
+			value >= 1
+		}
+		AND = {
+			exists = owner.federation
+			owner.federation = {
+				has_federation_perk = culture_workers_1
+			}
+		}
+	}
+}
+
+# Job/Pop Group scope triggers
+physicist_is_astrometeorologist_trigger = {
+	has_building = building_astrometeorology_observation_center
+}
+
+physicist_is_astral_researcher_trigger = {
+	OR = {
+		has_building = building_astral_siphon_1
+		has_building = building_astral_siphon_2
+		has_building = building_astral_siphon_3
+	}
+}
+
+physicist_is_dimensional_portal_researcher_trigger = {
+	OR = {
+		has_deposit = d_portal_research_zone
+		AND = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_galactic_community_member = yes
+			}
+			is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+			has_modifier = pm_extradimensional_experimentation
+		}
+	}
+}
+
+physicist_is_space_time_researcher_trigger = {
+	has_deposit = d_space_time_anomaly
+}
+
+biologist_is_archaeo_engineer_trigger = {
+	has_building = building_archaeostudies_faculty
+}
+
+biologist_is_ranger_trigger = {
+	has_building = building_ranger_lodge
+}
+
+biologist_is_vent_researcher_trigger = {
+	OR = {
+		has_modifier = stratovent_world_modifier_tourism
+		has_modifier = stratovent_world_modifier_tourism_boost
+	}
+}
+
+biologist_is_zookeeper_trigger = {
+	OR = {
+		has_building = building_xeno_zoo
+		has_deposit = d_alien_sanctuary
+		has_zone = {
+			zone = zone_resort_zoo
+		}
+	}
+}
+
+engineer_is_munitions_decommissioner_trigger = {
+	has_deposit = d_weapon_extraction_facility
+}
+
+engineer_is_manufactorium_scraper_trigger = {
+	has_deposit = d_ancient_manufactorium_scrapyard
+}
+
+artisan_is_artificer_trigger = {
+	exists = owner
+	owner = {
+		is_crafter_empire = yes
+	}
+}
+
+artisan_is_pearl_diver_trigger = {
+	num_zones = {
+		type = zone_anglers
+		value > 0
+	}
+}
+
+bureaucrat_is_spiritualist = {
+	exists = owner
+	OR = {
+		owner = {
+			OR = {
+				is_spiritualist = yes
+				has_make_spiritualist_perk = yes
+			}
+		}
+		AND = {
+			owner = {
+				has_valid_civic = civic_imperial_cult
+				ruler = {
+					has_trait = trait_imperial_heir
+				}
+			}
+			owner.ruler = {
+				is_background_planet = prev
+			}
+		}
+	}
+}
+
+bureaucrat_is_priest = {
+	exists = owner
+	owner = {
+		is_megacorp = no
+	}
+	bureaucrat_is_spiritualist = yes
+}
+
+bureaucrat_is_manager = {
+	exists = owner
+	owner = {
+		is_megacorp = yes
+		is_worker_coop_empire = no
+	}
+}
+
+bureaucrat_is_steward = {
+	exists = owner
+	owner = {
+		is_megacorp = yes
+		is_worker_coop_empire = yes
+	}
+}
+
+bureaucrat_is_preacher = {
+	exists = owner
+	owner = {
+		is_megacorp = yes
+	}
+	bureaucrat_is_spiritualist = yes
+}
+
+
+bureaucrat_is_numistic_priest = {
+	has_building = building_nuumismatic_shrine
+}
+
+bureaucrat_is_unifier = {
+	has_modifier = payback_unified_purpose
+}
+
+bureaucrat_is_death_priest = {
+	exists = owner
+	owner = {
+		is_death_cult_empire = yes
+	}
+}
+
+bureaucrat_is_low_tech = {
+	has_building = building_low_tech_admin_hub
+	bureaucrat_is_spiritualist = no
+	exists = owner
+	owner = {
+		is_megacorp = no
+	}
+}
+
+bureaucrat_is_low_tech_manager = {
+	has_building = building_low_tech_admin_hub
+	bureaucrat_is_spiritualist = no
+	exists = owner
+	owner = {
+		is_megacorp = yes
+	}
+}
+
+bureaucrat_is_low_tech_priest = {
+	has_building = building_low_tech_admin_hub
+	bureaucrat_is_spiritualist = yes
+	exists = owner
+	owner = {
+		is_megacorp = no
+	}
+}
+
+bureaucrat_is_haruspex = {
+	exists = owner
+	owner = {
+		is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+	}
+	bureaucrat_is_spiritualist = yes
+}
+
+bureaucrat_is_memorialist = {
+	exists = owner
+	owner = {
+		is_memorialist_empire = yes
+	}
+}
+
+bureaucrat_is_culture_worker = {
+	OR = {
+		has_building = building_artist_patron
+		num_zones = {
+			type = zone_broken_shackles_memorial
+			value >= 1
+		}
+	}
+}
+
+healthcare_is_mutagenic_trigger = {
+	has_building = building_toxic_bath
+}
+
+healthcare_is_genomic_researcher_trigger = {
+	OR = {
+		has_building = building_genomic_facility
+		AND = {
+			exists = owner
+			owner = {
+				OR = {
+					has_tradition = tr_cloning_evolutionary_extrapolation
+					has_tradition = tr_mutation_finish
+					has_tradition = tr_purity_finish
+				}
+			}
+		}
+	}
+}
+
+industrial_jobs_are_catalytic_trigger = {
+	exists = owner
+	owner = {
+		is_catalytic_empire = yes
+	}
+}
+
+spawning_drone_is_offspring_drone_trigger = {
+	exists = owner
+	owner = {
+		is_progenitor_hive_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+enforcer_is_educator_trigger = {
+	exists = owner
+	owner = {
+		is_civil_education_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+roboticist_is_identity_designer = {
+	has_building = building_identity_complex
+}
+
+roboticist_is_bath_attendant_individual_machine = {
+	has_building = building_toxic_bath_machine
+}
+
+replicator_is_bath_attendant_machine = {
+	has_building = building_toxic_bath_machine
+}
+
+spawning_drone_is_bath_attendant_hive_trigger = {
+	has_building = building_toxic_bath_hive
+}
+
+spawning_drone_is_broodsymbiont_trigger = {
+	exists = owner
+	owner = { is_wilderness_empire = yes }
+}
+
+miner_is_scrap_miner_trigger = {
+	OR = {
+		has_deposit = d_space_ship_graveyard
+		has_deposit = d_fallen_orbital_shipyard
+		is_shattered_ring_habitable = yes # undercoat: moved to scripted trigger
+	}
+}
+
+miner_is_cave_cleaner_trigger = {
+	has_deposit = d_cave_shroom_veins
+}
+
+miner_is_mineral_diver_trigger = {
+	has_deposit = d_mineral_seabed
+}
+
+miner_is_turtle_miner_trigger = {
+	has_deposit = d_turtle_miner
+}
+
+farmer_is_titan_hunter_trigger = {
+	OR = {
+		has_modifier = eat_the_titans
+		has_modifier = eat_the_titans_evopred
+	}
+}
+
+farmer_is_puddle_technician_trigger = {
+	exists = planet
+	planet = {
+		has_deposit = d_metallic_puddles
+	}
+}
+
+farmer_is_angler_trigger = {
+	num_zones = {
+		type = zone_anglers
+		value > 0
+	}
+}
+
+entertainer_is_duelist_trigger = {
+	exists = owner
+	owner = {
+		has_warrior_culture = yes # undercoat: moved to scripted trigger
+	}
+}
+
+entertainer_is_storm_dancer_trigger = {
+	exists = owner
+	owner = {
+		is_storm_callers_empire = yes
+	}
+}
+
+politician_is_executive = {
+	exists = owner
+	owner = {
+		has_corporate_government = yes
+	}
+}
+
+politician_is_science_director = {
+	exists = owner
+	OR = {
+		owner = {
+			is_technocracy = yes # undercoat: moved to scripted trigger
+		}
+		has_building = building_institute
+		has_building = building_vultaum_reality_computer
+		has_building = building_fe_lab_1
+		has_building = building_fe_lab_2
+	}
+}
+
+politician_is_noble = {
+	exists = owner
+	owner = {
+		is_aristocratic_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+politician_is_merchant = {
+	exists = owner
+	OR = {
+		owner = {
+			has_valid_civic = civic_merchant_guilds
+		}
+		has_building = building_galactic_stock_exchange
+		has_building = building_fe_market_1
+		has_building = building_fe_market_2
+		AND = {
+			has_branch_office = yes
+			has_holding = {
+				holding = building_imperial_concession_port
+				owner = branch_office_owner
+			}
+		}
+		AND = {
+			has_branch_office = yes
+			has_holding = {
+				holding = building_corporate_embassy
+				owner = branch_office_owner
+			}
+		}
+		AND = {
+			has_branch_office = yes
+			has_holding = {
+				holding = building_disinformation_center
+				owner = branch_office_owner
+			}
+		}
+	}
+}
+
+politician_is_high_priest = {
+	exists = owner
+	OR = {
+		owner = {
+			has_exalted_priesthood = yes # undercoat: moved to scripted trigger
+		}
+		has_building = building_citadel_of_faith
+	}
+}
+
+politician_is_technophant = {
+	exists = owner
+	owner = {
+		is_cybernetic_creed_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+politician_is_augmentation_merchant = {
+	exists = owner
+	owner = {
+		is_augmentation_bazaars_empire = yes # undercoat: moved to scripted trigger
+	}
+}
+
+politician_is_planetary_warden = {
+	has_designation = col_penal
+}
+
+soldier_is_necromancer = {
+	exists = owner
+	owner = {
+		has_reanimated_armies = yes # undercoat: moved to scripted trigger
 	}
 }
