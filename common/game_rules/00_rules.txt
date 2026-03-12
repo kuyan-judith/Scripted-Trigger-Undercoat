@@ -531,8 +531,8 @@ can_modify_species = {
 							}
 							OR  = {
 								is_life_seeded_empire = yes # undercoat: moved to scripted trigger
-								is_ocean_paradise_empire = yes # undercoat: moved to scripted trigger
-								has_void_dweller_origin = yes # undercoat: moved to scripted trigger
+								has_origin = origin_ocean_machines
+								has_origin = origin_void_machines
 								is_shattered_ring_empire = yes # undercoat: moved to scripted trigger
 							}
 						}
@@ -1243,8 +1243,6 @@ can_orbital_bombard = {
 					OR = {
 						is_country_type = awakened_marauders
 						is_country_type = formless
-						# Undercoat
-						has_country_flag = stu_can_bombard_any_hostile
 					}
 					FROM.CONTROLLER = { is_hostile = prev }
 				}
@@ -1255,8 +1253,6 @@ can_orbital_bombard = {
 					}
 				}
 				has_country_flag = revengeful_patron
-				# Undercoat
-				has_country_flag = stu_can_bombard_everyone
 			}
 		}
 		AND = {
@@ -2263,7 +2259,14 @@ can_be_part_of_galactic_community = {
 	}
 	custom_tooltip = {
 		fail_text = "community_homicidal_failtext"
-		is_homicidal = no # undercoat: moved to scripted trigger
+		NOR = {
+			has_homicidal_civic = yes # undercoat: moved to scripted trigger
+			
+			
+			has_menace_perk = menp_behemoth_ever_hungry
+			is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+			
+		}
 	}
 	custom_tooltip = {
 		fail_text = "community_declared_crisis_failtext"
@@ -2297,7 +2300,14 @@ can_be_part_of_galactic_empire = {
 	}
 	custom_tooltip = {
 		fail_text = "community_homicidal_failtext"
-		is_homicidal = no # undercoat: moved to scripted trigger
+		NOR = {
+			has_homicidal_civic = yes # undercoat: moved to scripted trigger
+			
+			
+			has_menace_perk = menp_behemoth_ever_hungry
+			is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+			
+		}
 	}
 	custom_tooltip = {
 		fail_text = "community_declared_crisis_failtext"
@@ -2328,7 +2338,14 @@ can_be_part_of_galactic_council = {
 		is_playable = yes # undercoat: moved to scripted trigger
 		has_country_flag = fallen_empire_hive_control
 	}
-	is_homicidal = no # undercoat: moved to scripted trigger
+	NOR = {
+		has_homicidal_civic = yes # undercoat: moved to scripted trigger
+		
+		
+		has_menace_perk = menp_behemoth_ever_hungry
+		is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+		
+	}
 }
 
 # If, 'yes', forces an empire to be advanced at game start (overrides game settings)
@@ -2337,21 +2354,18 @@ must_be_advanced_empire = {
 	OR = {
 		has_country_flag = lost_colony_parent
 		has_country_flag = MSI
-		# Undercoat
-		has_country_flag = stu_force_advanced_empire
 	}
 }
 
 # If 'no', blocks an empire from being advanced at game start (overrides 'must_be_advanced_empire' above)
 # This = country
 is_allowed_to_be_advanced_empire = {
-	# Undercoat
-	NOT = { has_country_flag = stu_cannot_be_advanced_empire }
+	always = yes
 }
 
 # This = planet
 has_enough_pops_for_necrophage_on_planet = {
-	owner = { is_necrophage_empire = yes } # undercoat: moved to scripted trigger
+	owner = { is_current_or_former_necrophage_empire = yes } # undercoat: moved to scripted trigger
 	has_available_jobs = necro_apprentice
 	if = {
 		limit = {
