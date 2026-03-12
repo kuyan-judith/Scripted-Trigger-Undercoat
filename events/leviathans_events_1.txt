@@ -215,6 +215,7 @@ country_event = {
 					mercenary_enclave_country = { country_event = { id = enclave.204 } }
 					salvager_enclave_country = { country_event = { id = enclave.304 } }
 					shroudwalker_enclave_country = { country_event = { id = enclave.404 } }
+					mindwarden_enclave_country = { country_event = { id = shroud.4199 } }
 					default = { log_error = "Unexpected enclave type or missing script flag" }
 				}
 			}
@@ -229,7 +230,12 @@ country_event = {
 	option = {
 		name = leviathans.98.a
 		trigger = {
-			has_homicidal_civic = no # undercoat: moved to scripted trigger
+			NOR = {
+				has_homicidal_civic = yes # undercoat: moved to scripted trigger
+				
+				
+				is_genocidal_infernal = yes
+			}
 		}
 	}
 }
@@ -394,7 +400,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.502.a
 		}
@@ -2458,7 +2469,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.156.a
 		}
@@ -2561,7 +2577,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.156.a
 		}
@@ -2664,7 +2685,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.156.a
 		}
@@ -2895,7 +2921,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = INTERESTING
 		}
@@ -3085,7 +3116,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.502.a
 		}
@@ -3133,7 +3169,12 @@ country_event = {
 		name = {
 			trigger = {
 				has_country_flag = enclave_artist_encountered
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.301.a
 		}
@@ -4489,10 +4530,18 @@ country_event = {
 				is_galactic_curators_empire = no
 			}
 		}
-		name = leviathans.502.a
-		inline_script = {
-			script = events/homicidal_option_text
-			who = this
+		name = {
+			trigger = {
+				switch = {
+					trigger = has_valid_civic
+					civic_fanatic_purifiers = { text = SCUM }
+					civic_hive_devouring_swarm = { text = TASTY }
+					civic_machine_terminator = { text = EXTERMINATE }
+					civic_scorched_earth = { text = BURN }
+					civic_hive_scorched_earth = { text = BURN }
+					default = { text = leviathans.502.a }
+				}
+			}
 		}
 		hidden_effect = {
 			set_country_flag = curator_intro
@@ -4740,12 +4789,18 @@ country_event = {
 					}
 				}
 			}
+
+			resource_stockpile_compare = {
+				resource = energy
+				value >= value:curator_purchase_cost|COST|5000|
+			}
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = energy
-			AMOUNT = value:curator_purchase_cost|COST|5000|
+
+		add_resource = {
+			energy = -1
+			mult = value:curator_purchase_cost|COST|5000|
 		}
+
 		add_research_option = tech_containment_vessel
 		hidden_effect = {
 			set_country_flag = tech_containment_vessel_acquired
@@ -4810,7 +4865,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = GOODBYE
 		}
@@ -4862,12 +4922,17 @@ country_event = {
 		name = leviathans.507.a
 		allow = {
 			NOT = { has_modifier = curator_insight }
+			resource_stockpile_compare = {
+				resource = energy
+				value >= value:curator_purchase_cost|COST|curator_insight_cost|
+			}
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = energy
-			AMOUNT = value:curator_purchase_cost|COST|curator_insight_cost|
+
+		add_resource = {
+			energy = -1
+			mult = value:curator_purchase_cost|COST|curator_insight_cost|
 		}
+
 		add_modifier = {
 			modifier = curator_insight
 			days = 3600
@@ -6205,7 +6270,7 @@ country_event = {
 	}
 
 	# Standard options
-	inline_script = enclaves/curators_guardians_options #TODO: check the Sentinel is as tough as other Leviathans, otherwise we'll need custom options with bespoke values (see Toxic God)
+	inline_script = enclaves/curators_guardians_options
 
 	after = {
 		hidden_effect = {
@@ -6287,16 +6352,23 @@ country_event = {
 				}
 			}
 			custom_tooltip = leviathans.590.tt_scientist
+			resource_stockpile_compare = {
+				resource = energy
+				value >= value:curator_purchase_cost|COST|1000|
+			}
+			resource_stockpile_compare = {
+				resource = influence
+				value >= value:curator_purchase_cost|COST|50|
+			}
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = energy
-			AMOUNT = value:curator_purchase_cost|COST|1000|
+
+		add_resource = {
+			energy = -1
+			mult = value:curator_purchase_cost|COST|1000|
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = influence
-			AMOUNT = value:curator_purchase_cost|COST|50|
+		add_resource = {
+			influence = -1
+			mult = value:curator_purchase_cost|COST|50|
 		}
 		custom_tooltip = opinion20
 		hidden_effect = {
@@ -6368,16 +6440,23 @@ country_event = {
 				}
 			}
 			custom_tooltip = leviathans.598.tt_principles
+			resource_stockpile_compare = {
+				resource = energy
+				value >= value:curator_purchase_cost|COST|1000|
+			}
+			resource_stockpile_compare = {
+				resource = influence
+				value >= value:curator_purchase_cost|COST|50|
+			}
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = energy
-			AMOUNT = value:curator_purchase_cost|COST|1000|
+
+		add_resource = {
+			energy = -1
+			mult = value:curator_purchase_cost|COST|1000|
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = influence
-			AMOUNT = value:curator_purchase_cost|COST|50|
+		add_resource = {
+			influence = -1
+			mult = value:curator_purchase_cost|COST|50|
 		}
 		custom_tooltip = opinion20
 		hidden_effect = {
@@ -6392,7 +6471,9 @@ country_event = {
 				limit = {
 					is_councilor_type = councilor_gestalt_cognitive
 				}
-				add_trait = leader_trait_curator
+				add_trait = {
+					trait = leader_trait_curator
+				}
 			}
 			country_event = { id = leviathans.591 } # Post-sale thanks
 		}
@@ -6614,11 +6695,15 @@ country_event = {
 					has_country_flag = curator_clue_purchased
 				}
 			}
+			resource_stockpile_compare = {
+				resource = energy
+				value >= value:curator_purchase_cost|COST|5000|
+			}
 		}
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = energy
-			AMOUNT = value:curator_purchase_cost|COST|5000|
+
+		add_resource = {
+			energy = -1
+			mult = value:curator_purchase_cost|COST|5000|
 		}
 		custom_tooltip = opinion20
 		generate_lcluster_clue = yes
@@ -6782,6 +6867,7 @@ country_event = {
 						
 						is_country_type = dormant_marauders
 						is_country_type = awakened_marauders
+						is_country_type = mindwarden_enclave
 					}
 				}
 				save_event_target_as = unfriends
@@ -7262,7 +7348,12 @@ country_event = {
 		}
 		name = {
 			trigger = {
-				has_homicidal_civic = no # undercoat: moved to scripted trigger
+				NOR = {
+					has_homicidal_civic = yes # undercoat: moved to scripted trigger
+					
+					
+					is_genocidal_infernal = yes
+				}
 			}
 			text = leviathans.156.a
 		}
@@ -8450,7 +8541,9 @@ country_event = {
 					limit = {
 						leader_is_commander_stu = yes # undercoat: moved to scripted trigger
 					}
-					add_trait = leader_trait_dragonslayer
+					add_trait = {
+						trait = leader_trait_dragonslayer
+					}
 				}
 			}
 		}

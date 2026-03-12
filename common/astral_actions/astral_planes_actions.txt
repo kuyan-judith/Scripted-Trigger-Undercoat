@@ -148,22 +148,6 @@ action_summon_dimensional_fleet = {
 	effect = {
 		custom_tooltip = "action_summon_dimensional_fleet_tooltip"
 
-		hidden_effect = {
-			set_variable = {
-				which = current_naval_capacity
-				value = trigger:max_naval_capacity
-			}
-			set_variable = {
-				which = years_passed
-				value = trigger:years_passed
-			}
-
-			set_variable = {
-				which = final_dimensional_fleet_value
-				value = value:dimensional_fleet_power_scaling|YEARS|root.years_passed|NAVAL_CAPACITY|root.current_naval_capacity|
-			}
-		}
-
 		create_fleet = {
 			name = "NAME_Dimensional_Fleet"
 			settings = {
@@ -176,8 +160,9 @@ action_summon_dimensional_fleet = {
 			effect = {
 				set_owner = root
 				while = {
-					count = value:num_dimensional_fleet_big_ships|VALUE|root.final_dimensional_fleet_value|SHIP_STRENGTH|1200|
+					count = value:num_dimensional_fleet_big_ships
 					create_ship = {
+						fleet_cache_recalc = no #skip fleet cache recalculation on each individual ship being added. Effect create_fleet will recalculate everything once after all the ships are in.
 						name = "NAME_Astral_Avatar"
 						design = "NAME_Astral_Avatar"
 						upgradable = no
@@ -185,8 +170,9 @@ action_summon_dimensional_fleet = {
 					}
 				}
 				while = {
-					count = value:num_dimensional_fleet_small_ships|VALUE|root.final_dimensional_fleet_value|BIG_SHIP_STRENGTH|1200|SMALL_SHIP_STRENGTH|400|
+					count = value:num_dimensional_fleet_small_ships
 					create_ship = {
+						fleet_cache_recalc = no #skip fleet cache recalculation on each individual ship being added. Effect create_fleet will recalculate everything once after all the ships are in.
 						name = "NAME_Astral_Avatar_Small"
 						design = "NAME_Astral_Avatar_Small"
 						upgradable = no
@@ -257,62 +243,13 @@ action_astral_splitting = {
 	}
 
 	effect = {
-		custom_tooltip = "action_astral_splitting_tooltip"
-
 		hidden_effect = {
 			change_variable = {
 				which = num_rifts_splitted
 				value = 1
 			}
-
-			random_system_within_border = {
-				limit = {
-					can_spawn_astral_rift = yes
-				}
-
-				weights = {
-					inline_script = "astral_rift/spawn_weights"
-					modifier = {
-						factor = 0.25
-						any_system = {
-							distance = {
-								source = prev
-								min_jumps  = 2
-								max_jumps = 2
-							}
-							OR = {
-								has_astral_rift = yes
-								any_system_planet = {
-									is_astral_scar = yes
-								}
-							}
-						}
-					}
-					modifier = {
-						factor = 0.5
-						any_system = {
-							distance = {
-								source = prev
-								min_jumps  = 2
-								max_jumps = 4
-							}
-							OR = {
-								has_astral_rift = yes
-								any_system_planet = {
-									is_astral_scar = yes
-								}
-							}
-						}
-					}
-				}
-
-				spawn_astral_rift = {
-					random_pos = yes
-					orbit_angle = 360
-					spawn_sound = no
-				}
-			}
 		}
+		astral_splitting = yes
 	}
 
 	ai_weight = {

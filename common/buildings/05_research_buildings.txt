@@ -23,6 +23,23 @@ building_research_lab_1 = {
 			is_wilderness_empire = no
 		}
 		is_special_colony_type = no
+
+		OR = {
+			has_planet_flag = ignore_ai_building_limitations
+			owner = {
+				is_ai = no
+			}
+
+			# AI is allowed to build one of these.
+			AND = {
+				has_any_research_zone = yes
+				NOR = {
+					has_building = building_research_lab_1
+					has_building = building_research_lab_2
+					has_building = building_research_lab_3
+				}
+			}
+		}
 	}
 
 	allow = {
@@ -41,7 +58,6 @@ building_research_lab_1 = {
 	inline_script = {
 		script = jobs/researchers_add
 		AMOUNT = @building_static_jobs_3
-		LARGE_AMOUNT = @building_static_jobs
 	}
 
 	resources = {
@@ -106,7 +122,6 @@ building_research_lab_2 = {
 	inline_script = {
 		script = jobs/researchers_add
 		AMOUNT = @building_static_jobs_high_3
-		LARGE_AMOUNT = @building_static_jobs
 	}
 
 	prerequisites = {
@@ -158,24 +173,11 @@ building_research_lab_3 = {
 			energy = @b3_upkeep
 			exotic_gases = @b3_rare_upkeep
 		}
-		upkeep = {
-			trigger = {
-				owner = {
-					is_galactic_community_member = yes
-				}
-				is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
-				planet = {
-					has_modifier = pm_extradimensional_experimentation
-				}
-			}
-			sr_zro = 1
-		}
 	}
 
 	inline_script = {
 		script = jobs/researchers_add
 		AMOUNT = @building_static_jobs_very_high_3
-		LARGE_AMOUNT = @building_static_jobs
 	}
 
 	prerequisites = {
@@ -248,9 +250,7 @@ building_institute = {
 				is_gestalt = no
 			}
 		}
-		planet_physicists_consumer_goods_upkeep_add = 1.5
-		planet_biologists_consumer_goods_upkeep_add = 1.5
-		planet_engineers_consumer_goods_upkeep_add = 1.5
+		planet_researchers_consumer_goods_upkeep_add = 1.5
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -259,9 +259,7 @@ building_institute = {
 				is_machine_empire = yes
 			}
 		}
-		planet_physicists_energy_upkeep_add = 3
-		planet_biologists_energy_upkeep_add = 3
-		planet_engineers_energy_upkeep_add = 3
+		planet_researchers_energy_upkeep_add = 3
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -270,9 +268,7 @@ building_institute = {
 				is_hive_empire = yes
 			}
 		}
-		planet_physicists_minerals_upkeep_add = 4
-		planet_biologists_minerals_upkeep_add = 4
-		planet_engineers_minerals_upkeep_add = 4
+		planet_researchers_minerals_upkeep_add = 4
 	}
 
 	prerequisites = {
@@ -283,9 +279,11 @@ building_institute = {
 		is_regular_empire = yes
 	}
 
+	ai_weight_coefficient = 1.5
+
 	inline_script = {
 		script = districts/ai_research_extra_weighting
-		AMOUNT = 5
+		AMOUNT = 10
 	}
 }
 
@@ -357,9 +355,7 @@ building_supercomputer = {
 				is_gestalt = no
 			}
 		}
-		planet_physicists_consumer_goods_upkeep_add = 1.5
-		planet_biologists_consumer_goods_upkeep_add = 1.5
-		planet_engineers_consumer_goods_upkeep_add = 1.5
+		planet_researchers_consumer_goods_upkeep_add = 1.5
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -368,9 +364,7 @@ building_supercomputer = {
 				is_machine_empire = yes
 			}
 		}
-		planet_physicists_energy_upkeep_add = 3
-		planet_biologists_energy_upkeep_add = 3
-		planet_engineers_energy_upkeep_add = 3
+		planet_researchers_energy_upkeep_add = 3
 	}
 	triggered_planet_modifier = {
 		potential = {
@@ -379,9 +373,7 @@ building_supercomputer = {
 				is_hive_empire = yes
 			}
 		}
-		planet_physicists_minerals_upkeep_add = 4
-		planet_biologists_minerals_upkeep_add = 4
-		planet_engineers_minerals_upkeep_add = 4
+		planet_researchers_minerals_upkeep_add = 4
 	}
 
 	prerequisites = {
@@ -393,9 +385,198 @@ building_supercomputer = {
 		is_wilderness_empire = no
 	}
 
+	ai_weight_coefficient = 1.5
+
 	inline_script = {
 		script = districts/ai_research_extra_weighting
-		AMOUNT = 5
+		AMOUNT = 10
+	}
+}
+
+# Shroud-Forged
+building_shroud_observatory_1 = {
+	base_buildtime = @b1_time
+
+	exempt_from_ai_planet_specialization = no
+
+	category = research
+	building_sets = {
+		research
+	}
+
+	potential = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = SHROUD_RIFT_MISSING_TT
+			has_deposit = d_shroud_rift_deposit
+		}
+	}
+
+	destroy_trigger = {
+		OR = {
+			NOT = { exists = owner }
+			owner = { is_shroud_forged_empire = no } # undercoat: moved to scripted trigger
+			NOT = { has_deposit = d_shroud_rift_deposit }
+		}
+	}
+
+	inline_script = {
+		script = jobs/biologists_add
+		AMOUNT = @building_static_jobs		# 200 jobs
+	}
+
+	triggered_desc = {
+		text = biology_unit_is_observator_tt
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b1_minerals
+		}
+		upkeep = {
+			energy = @b1_upkeep
+		}
+	}
+
+	upgrades = {
+		"building_shroud_observatory_2"
+	}
+}
+
+building_shroud_observatory_2 = {
+	base_buildtime = @b2_time
+	can_build = no
+
+	exempt_from_ai_planet_specialization = no
+
+	category = research
+	building_sets = {
+		research
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			NOT = { exists = owner }
+			owner = { is_shroud_forged_empire = no } # undercoat: moved to scripted trigger
+			NOT = { has_deposit = d_shroud_rift_deposit }
+		}
+	}
+
+	inline_script = {
+		script = jobs/biologists_add
+		AMOUNT = @building_static_jobs		# 200 jobs
+	}
+
+	planet_modifier = {
+		planet_biologists_physics_research_produces_add = 1
+		planet_biologists_society_research_produces_add = 1
+		planet_biologists_sr_zro_upkeep_add	= 0.5
+	}
+
+	triggered_desc = {
+		text = biology_unit_is_observator_tt
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b2_minerals
+		}
+		upkeep = {
+			energy = @b2_upkeep
+		}
+	}
+
+	upgrades = {
+		"building_shroud_observatory_3"
+	}
+
+	prerequisites = {
+		"tech_psionic_theory"
+	}
+
+	show_tech_unlock_if = {
+		exists = owner
+		owner = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+	}
+}
+
+building_shroud_observatory_3 = {
+	base_buildtime = @b3_time
+	can_build = no
+
+	exempt_from_ai_planet_specialization = no
+
+	category = research
+	building_sets = {
+		research
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			NOT = { exists = owner }
+			owner = { is_shroud_forged_empire = no } # undercoat: moved to scripted trigger
+			NOT = { has_deposit = d_shroud_rift_deposit }
+		}
+	}
+
+	inline_script = {
+		script = jobs/biologists_add
+		AMOUNT = @building_static_jobs		# 200 jobs
+	}
+
+	planet_modifier = {
+		planet_biologists_physics_research_produces_add = 2
+		planet_biologists_society_research_produces_add = 2
+		planet_biologists_sr_zro_upkeep_add	= 1
+	}
+
+	triggered_desc = {
+		text = biology_unit_is_observator_tt
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+		}
+		upkeep = {
+			energy = @b3_upkeep
+		}
+	}
+
+	prerequisites = {
+		"tech_mine_zro"
+	}
+
+	show_tech_unlock_if = {
+		exists = owner
+		owner = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
 	}
 }
 
@@ -446,16 +627,6 @@ building_archaeostudies_faculty = {
 		upkeep = {
 			energy = @b4_upkeep
 		}
-	}
-
-	inline_script = {
-		script = jobs/biologists_add
-		AMOUNT = @building_static_jobs
-	}
-
-	country_modifier = {
-		category_archaeostudies_research_speed_mult = 0.5
-		country_resource_max_minor_artifacts_add = 1000
 	}
 
 	planet_modifier = {
@@ -524,6 +695,16 @@ building_archaeostudies_faculty = {
 		category_archaeostudies_research_speed_mult = 0.5
 	}
 
+	inline_script = {
+		script = jobs/biologists_add
+		AMOUNT = @building_static_jobs
+	}
+
+	country_modifier = {
+		category_archaeostudies_research_speed_mult = 0.5
+		country_resource_max_minor_artifacts_add = 1000
+	}
+
 	prerequisites = {
 		"tech_archaeostudies"
 	}
@@ -533,7 +714,44 @@ building_archaeostudies_faculty = {
 	}
 
 	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+			}
+		}
+		text = biologist_is_archaeo_engineer_tt
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_hive_empire = yes
+			}
+		}
+		text = biology_drone_is_archaeo_engineer_tt
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_machine_empire = yes
+			}
+		}
+		text = biology_unit_is_archaeo_engineer_tt
+	}
+
+	triggered_desc = {
 		text = building_archaeostudies_faculty_relic_effect
+	}
+
+	ai_weight_coefficient = 1.5
+
+	inline_script = {
+		script = districts/ai_research_society_extra_weighting
+		AMOUNT = 5
 	}
 }
 
@@ -620,6 +838,8 @@ building_vultaum_reality_computer = {
 		AMOUNT = 7.5
 	}
 
+	ai_weight_coefficient = 2
+
 	prerequisites = {
 		"tech_secrets_vultaum"
 	}
@@ -647,6 +867,15 @@ building_physics_lab_1 = {
 		exists = owner
 		owner = {
 			is_wilderness_empire = no
+		}
+
+		OR = {
+			has_planet_flag = ignore_ai_building_limitations
+			owner = {
+				is_ai = no
+			}
+			has_any_research_physics_zone = yes
+			has_any_unspecialized_research_zone = yes
 		}
 	}
 
@@ -687,9 +916,11 @@ building_physics_lab_1 = {
 		is_wilderness_empire = no
 	}
 
+	ai_weight_coefficient = 1.2
+
 	inline_script = {
 		script = districts/ai_research_physics_extra_weighting
-		AMOUNT = 7.5
+		AMOUNT = 5
 	}
 
 	prerequisites = {
@@ -759,7 +990,7 @@ building_physics_lab_2 = {
 
 	inline_script = {
 		script = districts/ai_research_physics_extra_weighting
-		AMOUNT = 10
+		AMOUNT = 7.5
 	}
 
 	show_tech_unlock_if = {
@@ -816,8 +1047,8 @@ building_physics_lab_3 = {
 	}
 
 	planet_modifier = {
-		planet_physicists_physics_research_produces_add = 2
 		physicist_jobs_bonus_workforce_mult = 0.15
+		planet_physicists_physics_research_produces_add = 2
 		planet_physicists_volatile_motes_upkeep_add = 0.5
 	}
 
@@ -827,7 +1058,7 @@ building_physics_lab_3 = {
 
 	inline_script = {
 		script = districts/ai_research_physics_extra_weighting
-		AMOUNT = 12.5
+		AMOUNT = 10
 	}
 
 	show_tech_unlock_if = {
@@ -857,6 +1088,15 @@ building_biolab_1 = {
 		exists = owner
 		owner = {
 			is_wilderness_empire = no
+		}
+
+		OR = {
+			has_planet_flag = ignore_ai_building_limitations
+			owner = {
+				is_ai = no
+			}
+			has_any_research_society_zone = yes
+			has_any_unspecialized_research_zone = yes
 		}
 	}
 
@@ -897,9 +1137,11 @@ building_biolab_1 = {
 		"tech_society_1"
 	}
 
+	ai_weight_coefficient = 1.2
+
 	inline_script = {
 		script = districts/ai_research_society_extra_weighting
-		AMOUNT = 7.5
+		AMOUNT = 5
 	}
 
 	show_tech_unlock_if = {
@@ -974,7 +1216,7 @@ building_biolab_2 = {
 
 	inline_script = {
 		script = districts/ai_research_society_extra_weighting
-		AMOUNT = 10
+		AMOUNT = 7.5
 	}
 
 	show_tech_unlock_if = {
@@ -1031,8 +1273,8 @@ building_biolab_3 = {
 	}
 
 	planet_modifier = {
-		planet_biologists_society_research_produces_add = 2
 		biologist_jobs_bonus_workforce_mult = 0.15
+		planet_biologists_society_research_produces_add = 2
 		planet_biologists_exotic_gases_upkeep_add = 0.5
 	}
 
@@ -1042,7 +1284,7 @@ building_biolab_3 = {
 
 	inline_script = {
 		script = districts/ai_research_society_extra_weighting
-		AMOUNT = 12.5
+		AMOUNT = 10
 	}
 
 	show_tech_unlock_if = {
@@ -1072,6 +1314,15 @@ building_engineering_facility_1 = {
 		exists = owner
 		owner = {
 			is_wilderness_empire = no
+		}
+
+		OR = {
+			has_planet_flag = ignore_ai_building_limitations
+			owner = {
+				is_ai = no
+			}
+			has_any_research_engineering_zone = yes
+			has_any_unspecialized_research_zone = yes
 		}
 	}
 
@@ -1112,9 +1363,11 @@ building_engineering_facility_1 = {
 		"tech_engineering_1"
 	}
 
+	ai_weight_coefficient = 1.2
+
 	inline_script = {
 		script = districts/ai_research_engineering_extra_weighting
-		AMOUNT = 7.5
+		AMOUNT = 5
 	}
 
 	show_tech_unlock_if = {
@@ -1184,7 +1437,7 @@ building_engineering_facility_2 = {
 
 	inline_script = {
 		script = districts/ai_research_engineering_extra_weighting
-		AMOUNT = 10
+		AMOUNT = 7.5
 	}
 
 	show_tech_unlock_if = {
@@ -1240,8 +1493,8 @@ building_engineering_facility_3 = {
 	}
 
 	planet_modifier = {
-		planet_engineers_engineering_research_produces_add = 2
 		engineer_jobs_bonus_workforce_mult = 0.15
+		planet_engineers_engineering_research_produces_add = 2
 		planet_engineers_rare_crystals_upkeep_add = 0.5
 	}
 
@@ -1251,7 +1504,7 @@ building_engineering_facility_3 = {
 
 	inline_script = {
 		script = districts/ai_research_engineering_extra_weighting
-		AMOUNT = 12.5
+		AMOUNT = 10
 	}
 
 	show_tech_unlock_if = {
@@ -1339,7 +1592,6 @@ building_ranger_lodge = {
 		script = stu/jobs_add
 		job_type = biologists
 		mult_line = "mult = value:ranger_lodge_jobs_stu"
-		desc = 0 # this building changes the planet's biologist job type, so the description needs to be handled separately
 	}
 
 	planet_modifier = {
@@ -1373,10 +1625,6 @@ building_ranger_lodge = {
 
 	triggered_desc = {
 		text = biologist_is_ranger_tt
-	}
-
-	triggered_desc = {
-		text = job_ranger_effect_desc
 	}
 
 	on_built = {
@@ -1414,6 +1662,9 @@ building_research_upkeep_1 = {
 		owner = {
 			is_wilderness_empire = no
 		}
+		NOT = {
+			has_modifier = resort_colony
+		}
 	}
 
 	allow = {
@@ -1423,8 +1674,6 @@ building_research_upkeep_1 = {
 		exists = owner
 		OR = {
 			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = penal_colony
 			owner = { is_wilderness_empire = yes }
 		}
 	}
@@ -1433,11 +1682,11 @@ building_research_upkeep_1 = {
 		category = planet_buildings
 		cost = {
 			minerals = @b2_minerals
-			exotic_gases = @b2_rare_cost
+			exotic_gases = @b3_rare_cost
 		}
 		upkeep = {
 			energy = @b2_upkeep
-			exotic_gases = @b2_rare_upkeep
+			exotic_gases = @b3_rare_upkeep
 		}
 	}
 
@@ -1504,6 +1753,9 @@ building_research_efficiency_1 = {
 		owner = {
 			is_wilderness_empire = no
 		}
+		NOT = {
+			has_modifier = resort_colony
+		}
 	}
 
 	allow = {
@@ -1513,8 +1765,6 @@ building_research_efficiency_1 = {
 		exists = owner
 		OR = {
 			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = penal_colony
 			owner = { is_wilderness_empire = yes }
 		}
 	}
@@ -1523,30 +1773,28 @@ building_research_efficiency_1 = {
 		category = planet_buildings
 		cost = {
 			minerals = @b3_minerals
-			exotic_gases = @b3_rare_cost
+			exotic_gases = @b4_rare_cost
 		}
 		upkeep = {
 			energy = @b3_upkeep
-			exotic_gases = @b3_rare_upkeep
-		}
-		upkeep = {
-			trigger = {
-				owner = {
-					is_galactic_community_member = yes
-				}
-				is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
-				planet = {
-					has_modifier = pm_extradimensional_experimentation
-				}
-			}
-			sr_zro = 1
+			exotic_gases = @b4_rare_upkeep
 		}
 	}
 
 	planet_modifier = {
-		pop_physicist_bonus_workforce_mult = 0.15
-		pop_biologist_bonus_workforce_mult = 0.15
-		pop_engineer_bonus_workforce_mult = 0.15
+		researcher_jobs_bonus_workforce_mult = 0.15
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			owner = {
+				is_galactic_community_member = yes
+			}
+			is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+			has_modifier = pm_extradimensional_experimentation
+		}
+		planet_physicists_sr_zro_upkeep_add = 1
+		planet_physicists_physics_research_produces_add = 2
 	}
 
 	prerequisites = {

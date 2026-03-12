@@ -17,6 +17,13 @@ add_cosmogenesis_level_1_perks = { #FE Buildings are random draw now
 	add_research_option = tech_cosmogenesis_crisis_1
 	add_research_option = tech_dark_matter_power_core
 	add_research_option = tech_cosmogenesis_world
+	if = {
+		limit = {
+			country_uses_bio_ships = yes
+		}
+		add_research_option = tech_weaver_bio_healing_6
+		add_research_option = tech_weaver_bio_evasion_6
+	}
 }
 
 add_cosmogenesis_level_2_perks = {
@@ -24,15 +31,37 @@ add_cosmogenesis_level_2_perks = {
 	add_research_option = tech_cosmogenesis_crisis_2
 	add_research_option = tech_dark_matter_propulsion
 	add_research_option = tech_enigmatic_decoder
-	add_research_option = tech_cosmogenesis_escort
+	if = {
+		limit = {
+			country_uses_bio_ships = no
+		}
+		add_research_option = tech_cosmogenesis_escort
+	}
+	else = {
+		add_research_option = tech_cosmogenesis_mauler
+		add_research_option = tech_cosmogenesis_weaver
+		add_research_option = tech_weaver_bio_fire_rate_6
+		add_research_option = tech_weaver_bio_confuser_6
+	}
 }
+
 
 add_cosmogenesis_level_3_perks = {
 
 	add_research_option = tech_cosmogenesis_crisis_3
 	add_research_option = tech_dark_matter_deflector
 	add_research_option = tech_enigmatic_encoder
-	add_research_option = tech_cosmogenesis_battlecruiser
+	if = {
+		limit = {
+			country_uses_bio_ships = no
+		}
+		add_research_option = tech_cosmogenesis_battlecruiser
+	}
+	else = {
+		add_research_option = tech_cosmogenesis_harbinger
+		add_research_option = tech_weaver_bio_anti_evasion_6
+		add_research_option = tech_weaver_bio_anti_fire_rate_6
+	}
 }
 
 add_cosmogenesis_level_4_perks = {
@@ -40,7 +69,15 @@ add_cosmogenesis_level_4_perks = {
 	add_research_option = tech_cosmogenesis_crisis_4
 	add_research_option = tech_energy_lance_2
 	add_research_option = tech_dragon_armor
-	add_research_option = tech_cosmogenesis_FE_titan
+	if = {
+		limit = {
+			country_uses_bio_ships = no
+		}
+		add_research_option = tech_cosmogenesis_FE_titan
+	}
+	else = {
+		add_research_option = tech_cosmogenesis_stinger
+	}
 	add_research_option = tech_cosmogenesis_thesis
 }
 
@@ -434,7 +471,10 @@ cyberize_leaders_effect = {
 		}
 		remove_trait = leader_trait_psionic
 		change_species = event_target:cyberspecies@species
-		add_trait_no_notify = leader_trait_cyborg
+		add_trait = {
+			trait = leader_trait_cyborg
+			show_message = no
+		}
 	}
 	every_pool_leader = {
 		limit = {
@@ -452,7 +492,10 @@ cyberize_leaders_effect = {
 		}
 		remove_trait = leader_trait_psionic
 		change_species = event_target:cyberspecies@species
-		add_trait_no_notify = leader_trait_cyborg
+		add_trait = {
+			trait = leader_trait_cyborg
+			show_message = no
+		}
 	}
 	update_node_portraits_if_gestalt_effect = yes
 }
@@ -472,7 +515,10 @@ cyberize_leaders_limited_effect = {
 		}
 		remove_trait = leader_trait_psionic
 		change_species = event_target:cyberspecies@species
-		add_trait_no_notify = leader_trait_limited_cyborg
+		add_trait = {
+			trait = leader_trait_limited_cyborg
+			show_message = no
+		}
 	}
 	every_pool_leader = {
 		limit = {
@@ -487,7 +533,10 @@ cyberize_leaders_limited_effect = {
 		}
 		remove_trait = leader_trait_psionic
 		change_species = event_target:cyberspecies@species
-		add_trait_no_notify = leader_trait_limited_cyborg
+		add_trait = {
+			trait = leader_trait_limited_cyborg
+			show_message = no
+		}
 	}
 }
 
@@ -501,7 +550,10 @@ cyberize_creed_leaders_effect = {
 		}
 		remove_trait = leader_trait_ritualistic_implants_cyborg
 		change_species = event_target:cybercreedspecies@root.owner
-		add_trait_no_notify = leader_trait_cyborg
+		add_trait = {
+			trait = leader_trait_cyborg
+			show_message = no
+		}
 	}
 	every_pool_leader = {
 		limit = {
@@ -511,7 +563,10 @@ cyberize_creed_leaders_effect = {
 		}
 		remove_trait = leader_trait_ritualistic_implants_cyborg
 		change_species = event_target:cybercreedspecies@root.owner
-		add_trait_no_notify = leader_trait_cyborg
+		add_trait = {
+			trait = leader_trait_cyborg
+			show_message = no
+		}
 	}
 	update_node_portraits_if_gestalt_effect = yes
 }
@@ -683,18 +738,14 @@ assimilate_leaders = {
 				is_exact_same_species = $SOURCE$
 			}
 			change_species = $TARGET$
-			update_leader_after_modification = {
-				SPECIES = $TARGET$
-			}
+			update_leader_after_modification = yes
 		}
 		every_pool_leader = {
 			limit = {
 				is_exact_same_species = $SOURCE$
 			}
 			change_species = $TARGET$
-			update_leader_after_modification = {
-				SPECIES = $TARGET$
-			}
+			update_leader_after_modification = yes
 		}
 		update_node_portraits_if_gestalt_effect = yes
 	}
@@ -857,7 +908,6 @@ synth_queen_spawn = {
 
 					set_graphical_culture = synth_queen_01
 					activate_fog_machine = synth_queen_nanite
-					fog_machine_auto_tracking = yes
 					create_leader = {
 						class = commander
 						species = event_target:synth_queen_country
@@ -1864,7 +1914,6 @@ synth_queen_create_outpost = {
 			create_ship_design = { design = "NAME_Synth_Queen_Starbase_Big" }
 			add_ship_design = last_created_design
 			activate_fog_machine = synth_queen_nanite
-			fog_machine_auto_tracking = yes
 		}
 	}
 
@@ -2079,7 +2128,6 @@ synth_queen_create_mini_outpost = {
 			create_ship_design = { design = "NAME_Synth_Queen_Starbase_Big" }
 			add_ship_design = last_created_design
 			activate_fog_machine = synth_queen_nanite
-			fog_machine_auto_tracking = yes
 		}
 	}
 
@@ -2320,8 +2368,8 @@ make_fallen_empire = {
 		else_if = {
 			limit = {
 				OR = {
-					has_ethic = ethic_fanatic_xenophile
-					has_ethic = ethic_fanatic_pacifist
+					is_fanatic_xenophile = yes
+					is_fanatic_pacifist = yes
 				}
 			}
 			add_global_ship_design = "NAME_Adjuster"
@@ -2619,9 +2667,9 @@ create_fallen_empire_planet = {
 			}
 			random_list = {
 				3 = { add_district = district_rw_city }
-				1 = { add_district = district_rw_generator }
-				1 = { add_district = district_rw_farming }
-				1 = { add_district = district_rw_industrial }
+				1 = { add_district = district_rw_urban_1 }
+				1 = { add_district = district_rw_urban_2 }
+				1 = { add_district = district_rw_urban_3 }
 			}
 		}
 	}
@@ -2648,9 +2696,45 @@ create_fallen_empire_planet = {
 			}
 			random_list = {
 				3 = { add_district = district_hive }
-				1 = { add_district = district_generator_uncapped }
-				1 = { add_district = district_mining_uncapped }
-				1 = { add_district = district_farming_uncapped }
+				1 = { add_district = district_hive_1 }
+				1 = { add_district = district_hive_2 }
+				1 = { add_district = district_hive_3 }
+			}
+		}
+		if = {
+			limit = {
+				num_districts = {
+					type = district_nexus_1
+					value >= 1
+				}
+			}
+			add_zone = {
+				district = district_nexus_1
+				zone = zone_energy_hive
+			}
+		}
+		if = {
+			limit = {
+				num_districts = {
+					type = district_nexus_2
+					value >= 1
+				}
+			}
+			add_zone = {
+				district = district_nexus_2
+				zone = zone_minerals_hive
+			}
+		}
+		if = {
+			limit = {
+				num_districts = {
+					type = district_nexus_3
+					value >= 1
+				}
+			}
+			add_zone = {
+				district = district_nexus_3
+				zone = zone_food_hive
 			}
 		}
 	}
@@ -2664,10 +2748,34 @@ create_fallen_empire_planet = {
 				free_district_slots > 0
 			}
 			random_list = {
-				3 = { add_district = district_nexus}
-				1 = { add_district = district_generator_uncapped }
-				1 = { add_district = district_mining_uncapped }
-				1 = { add_district = district_farming_uncapped }
+				3 = { add_district = district_nexus }
+				1 = { add_district = district_nexus_1 }
+				1 = { add_district = district_nexus_2 }
+				1 = { add_district = district_nexus_3 }
+			}
+		}
+		if = {
+			limit = {
+				num_districts = {
+					type = district_nexus_1
+					value >= 1
+				}
+			}
+			add_zone = {
+				district = district_nexus_1
+				zone = zone_energy_nexus
+			}
+		}
+		if = {
+			limit = {
+				num_districts = {
+					type = district_nexus_2
+					value >= 1
+				}
+			}
+			add_zone = {
+				district = district_nexus_2
+				zone = zone_minerals_nexus
 			}
 		}
 	}
@@ -2720,7 +2828,7 @@ create_fallen_empire_planet = {
 					factor = 0
 					exists = owner
 					owner = {
-						NOT = { has_tradition = tr_psionics_finish }
+						has_finished_psionic_tradition = no
 					}
 				}
 				create_army = {
@@ -2762,7 +2870,7 @@ create_fallen_empire_planet = {
 							has_tradition = tr_cloning_finish
 							has_tradition = tr_purity_finish
 							has_tradition = tr_mutation_finish
-							has_tradition = tr_psionics_finish
+							has_finished_psionic_tradition = yes
 							is_machine_empire = yes
 						}
 					}
@@ -2929,13 +3037,13 @@ create_fallen_empire_cosmogenesis_navy = {
 }
 
 create_army_on_planet = {
-    $PLANET$ = {
-        create_army = {
-            owner = $OWNER$
-            type = $TYPE$
-            species = $SPECIES$
-        }
-    }
+	$PLANET$ = {
+		create_army = {
+			owner = $OWNER$
+			type = $TYPE$
+			species = $SPECIES$
+		}
+	}
 }
 
 create_individual_machine_country = {

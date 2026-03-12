@@ -464,7 +464,7 @@ planet_event = {
 	trigger = {
 		has_ancrel = yes
 		pop_amount > 0
-		is_starting_planet_type = yes # undercoat: moved to scripted trigger
+		is_standard_starting_planet_type_stu = yes # undercoat: moved to scripted trigger
 		NOT = { exists = archaeological_site }
 		NOR = {
 			has_global_flag = arc_hunting_grounds
@@ -3179,7 +3179,9 @@ fleet_event = {
 	option = {
 		name = INTENSIFIES
 		leader = {
-			add_trait = leader_trait_traumatized
+			add_trait = {
+				trait = leader_trait_traumatized
+			}
 		}
 		owner = {
 			add_monthly_resource_mult = {
@@ -6460,19 +6462,13 @@ country_event = {
 	# Phobe
 	desc = {
 		trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		text = ancrel.9001.desc.phobe
 	}
 	desc = {
 		trigger = {
-			NOR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = no
 		}
 		text = ancrel.9001.desc
 	}
@@ -6582,19 +6578,13 @@ country_event = {
 	# Phobe
 	desc = {
 		trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		text = ancrel.10050.desc.1.phobe
 	}
 	desc = {
 		trigger = {
-			NOR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = no
 		}
 		text = ancrel.10050.desc.1
 	}
@@ -6702,19 +6692,13 @@ country_event = {
 	# Phobe
 	desc = {
 		trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		text = ancrel.10200.desc.phobe
 	}
 	desc = {
 		trigger = {
-			NOR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = no
 		}
 		text = ancrel.10200.desc
 	}
@@ -6852,8 +6836,7 @@ country_event = {
 			is_individual_machine = no
 			OR = {
 				has_policy_flag = ai_outlawed
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_spiritualist
+				is_spiritualist = yes
 			}
 		}
 		text = ancrel.10250.desc.antimachine
@@ -6867,11 +6850,7 @@ country_event = {
 				}
 				AND = {
 					is_individual_machine = no
-					has_ethic = ethic_spiritualist
-				}
-				AND = {
-					is_individual_machine = no
-					has_ethic = ethic_fanatic_spiritualist
+					is_spiritualist = yes
 				}
 			}
 		}
@@ -6964,14 +6943,14 @@ country_event = {
 	desc = {
 		trigger = {
 			is_regular_empire = yes
-			has_ethic = ethic_fanatic_materialist
+			is_fanatic_materialist = yes
 		}
 		text = ancrel.10100.desc_fm
 	}
 	desc = {
 		trigger = {
 			is_regular_empire = yes
-			NOT = { has_ethic = ethic_fanatic_materialist }
+			is_fanatic_materialist = no
 		}
 		text = ancrel.10100.desc
 	}
@@ -7080,7 +7059,7 @@ country_event = {
 		trigger = {
 			owner = {
 				is_regular_empire = yes
-				NOT = { has_ethic = ethic_fanatic_materialist }
+				is_fanatic_materialist = no
 			}
 		}
 
@@ -7126,7 +7105,7 @@ country_event = {
 
 	option = {
 		trigger = {
-			owner = { has_ethic = ethic_fanatic_materialist }
+			owner = { is_fanatic_materialist = yes }
 		}
 
 		name = ancrel.10100.option.fm_enough
@@ -7172,7 +7151,7 @@ country_event = {
 	option = {
 		trigger = {
 			owner = {
-				has_ethic = ethic_fanatic_materialist
+				is_fanatic_materialist = yes
 			}
 		}
 
@@ -7386,7 +7365,9 @@ country_event = {
 			add_or_level_up_veteran_trait_effect = {
 				TRAIT = leader_trait_maniacal
 			}
-			add_trait = leader_trait_substance_abuser
+			add_trait = {
+				trait = leader_trait_substance_abuser
+			}
 			add_experience = 200
 		}
 	}
@@ -7567,9 +7548,12 @@ country_event = {
 			if = {
 				limit = {
 					NOT = { has_technology = tech_psionic_theory } # Psionic Theory
-					is_gestalt = no # undercoat: moved to scripted trigger
+					can_research_technology = tech_psionic_theory
 				}
-				add_research_option = tech_psionic_theory
+				if = {
+					limit = { NOT = { has_tech_option = tech_psionic_theory } }
+					add_research_option = tech_psionic_theory
+				}
 				add_tech_progress = {
 					tech = tech_psionic_theory
 					progress = 0.2
@@ -8092,7 +8076,9 @@ fleet_event = {
 						has_trait = leader_trait_meticulous_2
 					}
 				}
-				add_trait = leader_trait_meticulous
+				add_trait = {
+					trait = leader_trait_meticulous
+				}
 			}
 		}
 		allow = {
@@ -8111,7 +8097,9 @@ fleet_event = {
 		leader = {
 			if = {
 				limit = { NOT = { has_trait = leader_trait_percussive_maintainer } }
-				add_trait = leader_trait_percussive_maintainer
+				add_trait = {
+					trait = leader_trait_percussive_maintainer
+				}
 			}
 		}
 		custom_tooltip = percussive_maintainer_tooltip
@@ -8431,7 +8419,7 @@ fleet_event = {
 		}
 
 		from.planet = {
-			hidden_effect = { clear_deposits_stu = yes }
+			hidden_effect = { clear_deposits_stu = yes } # undercoat: moved to scripted effect with possibility of protecting certain deposits
 			add_deposit = d_society_8
 			add_deposit = d_engineering_8
 			add_deposit = d_physics_8
@@ -8452,6 +8440,7 @@ event = {
 			2 = { } # nothing
 			1 = {
 				random_rim_system = {
+					limit = { is_mindwardens_story_system = no }
 					system_event = { id = ancrel.12055 }
 				}
 			}
@@ -8469,6 +8458,7 @@ event = {
 					num_ai_empires_setting = 0
 				}
 				random_rim_system = {
+					limit = { is_mindwardens_story_system = no }
 					system_event = { id = fircon.3500 }
 				}
 			}
@@ -8732,6 +8722,10 @@ fleet_event = {
 			change_pc = pc_machine
 			hidden_effect = {
 				set_owner = root.owner
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
+				}
 				add_building = building_machine_major_capital
 				add_building = building_machine_assembly_complex
 				while = {
@@ -8740,8 +8734,16 @@ fleet_event = {
 				}
 				while = {
 					count = 5
-					add_district = district_generator_uncapped
-					add_district = district_mining_uncapped
+					add_district = district_nexus_1
+					add_district = district_nexus_2
+				}
+				add_zone = {
+					district = district_nexus_1
+					zone = zone_energy_nexus
+				}
+				add_zone = {
+					district = district_nexus_2
+					zone = zone_minerals_nexus
 				}
 				while = {
 					count = 80
@@ -8913,6 +8915,10 @@ fleet_event = {
 					}
 				}
 				change_pc = pc_machine
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
+				}
 				while = {
 					count = 80
 					create_pop_group = {
@@ -8925,8 +8931,16 @@ fleet_event = {
 				}
 				while = {
 					count = 2
-					add_district = district_generator_uncapped
-					add_district = district_mining_uncapped
+					add_district = district_nexus_1
+					add_district = district_nexus_2
+				}
+				add_zone = {
+					district = district_nexus_1
+					zone = zone_energy_nexus
+				}
+				add_zone = {
+					district = district_nexus_2
+					zone = zone_minerals_nexus
 				}
 				add_building = building_machine_major_capital
 				add_building = building_machine_assembly_complex
@@ -10170,7 +10184,9 @@ fleet_event = {
 		name = site_setback
 		fromfrom = { add_stage_clues = -1 }
 		leader = {
-			add_trait = leader_trait_paranoid
+			add_trait = {
+				trait = leader_trait_paranoid
+			}
 		}
 	}
 
@@ -10182,7 +10198,9 @@ fleet_event = {
 			give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small }
 		}
 		leader = {
-			add_trait = leader_trait_paranoid
+			add_trait = {
+				trait = leader_trait_paranoid
+			}
 		}
 	}
 }

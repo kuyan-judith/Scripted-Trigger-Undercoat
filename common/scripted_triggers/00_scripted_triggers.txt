@@ -124,9 +124,14 @@ is_non_sapient_robot = { # The pop is a non-sapient robot
 			NOT = { has_policy_flag = ai_outlawed }
 		}
 	}
+	AND = {
+		exists = owner
+		owner = {
+			is_machine_empire = no
+		}
+	}
 }
 
-# undercoat: added parameter
 is_non_menial_laborer = {
 	OR = {
 		is_enslaved = no
@@ -272,12 +277,12 @@ is_fallen_empire_berserk_machine = {
 
 is_fallen_empire_materialist = {
 	is_fallen_empire = yes # undercoat: moved to scripted trigger
-	has_ethic = ethic_fanatic_materialist
+	is_fanatic_materialist = yes
 }
 
 is_fallen_empire_spiritualist = {
 	is_fallen_empire = yes # undercoat: moved to scripted trigger
-	has_ethic = ethic_fanatic_spiritualist
+	is_fanatic_spiritualist = yes
 }
 
 is_fallen_empire_xenophobe = {
@@ -287,7 +292,7 @@ is_fallen_empire_xenophobe = {
 
 is_fallen_empire_xenophile = {
 	is_fallen_empire = yes # undercoat: moved to scripted trigger
-	has_ethic = ethic_fanatic_xenophile
+	is_fanatic_xenophile = yes
 }
 
 is_valid_fallen_empire_for_task = {
@@ -295,9 +300,9 @@ is_valid_fallen_empire_for_task = {
 	is_at_war = no
 	fleet_power > 60000
 	OR = {
-		has_ethic = ethic_fanatic_spiritualist
-		has_ethic = ethic_fanatic_xenophile
-		has_ethic = ethic_fanatic_materialist
+		is_fanatic_spiritualist = yes
+		is_fanatic_xenophile = yes
+		is_fanatic_materialist = yes
 		is_machine_empire = yes
 	}
 }
@@ -482,6 +487,30 @@ has_biogenesis_dlc = {
 	host_has_dlc = "BioGenesis"
 }
 
+has_shroud_dlc = {
+	optimize_memory
+	host_has_dlc = "Shadows of the Shroud"
+}
+
+has_shroud_dlc_not_machine_age = {
+	optimize_memory
+	host_has_dlc = "Shadows of the Shroud"
+	NOT = {
+		host_has_dlc = "The Machine Age"
+	}
+}
+
+has_shroud_dlc_and_machine_age = {
+	optimize_memory
+	host_has_dlc = "Shadows of the Shroud"
+	host_has_dlc = "The Machine Age"
+}
+
+has_infernals = {
+	optimize_memory
+	host_has_dlc = "Infernals Species Pack"
+}
+
 uninhabitable_regular_planet = {
 	OR = {
 		is_planet_class = pc_molten
@@ -533,15 +562,8 @@ is_urban_planet = {
 
 is_starting_planet_type = {
 	OR = {
-		is_planet_class = pc_desert
-		is_planet_class = pc_tropical
-		is_planet_class = pc_arid
-		is_planet_class = pc_continental
-		is_planet_class = pc_ocean
-		is_planet_class = pc_tundra
-		is_planet_class = pc_arctic
-		is_planet_class = pc_alpine
-		is_planet_class = pc_savannah
+		is_standard_starting_planet_type_stu = yes # undercoat: moved to scripted trigger
+		is_planet_class = pc_volcanic
 	}
 }
 
@@ -558,7 +580,7 @@ can_have_habitable_deposits = {
 		
 		
 		is_gaia_world = yes # undercoat: moved to scripted trigger
-		is_relic_world = yes # undercoat: moved to scripted trigger
+		is_relic_world = yes # undercoat: moved to scripted trigger		
 	}
 }
 
@@ -685,7 +707,10 @@ allows_alien_leaders = {
 
 # undercoat: added parameter
 can_be_leader = {
-	has_citizenship_rights = yes
+	OR = {
+		has_citizenship_rights = yes
+		has_citizenship_type = { type = citizenship_shroud_touched country = $country|root$ }
+	}
 	# Rule out Traits for servitude & lack of free will
 	can_think = yes
 	OR = {
@@ -696,6 +721,7 @@ can_be_leader = {
 				is_machine_empire = yes
 				is_mechanical_empire = yes
 				is_individual_machine = yes
+				has_country_flag = synthetic_fertility_no_bodies_left
 			}
 		}
 	}
@@ -719,7 +745,10 @@ can_be_military_leader = {
 	OR = {
 		AND = { # MIs only accept Fully Integrated leaders
 			owner = { is_machine_empire = yes }
-			has_citizenship_type = { type = citizenship_full_machine country = owner }
+			OR = {
+				has_citizenship_type = { type = citizenship_full_machine country = owner }
+				has_citizenship_type = { type = citizenship_shroud_touched country = root }
+			}
 			has_military_service_type = { type = military_service_full }
 		}
 		AND = { # non-MIs accept whatever
@@ -732,6 +761,7 @@ can_be_military_leader = {
 can_be_soldier = {
 	is_sapient = yes
 	exists = prev.owner
+	NOT = { has_trait = trait_tankbound }
 	OR = {
 		has_military_service_type = { type = military_service_full country = prev.owner }
 		has_military_service_type = { type = military_service_limited country = prev.owner }
@@ -873,6 +903,8 @@ has_advanced_government = {
 	OR = {
 		has_cyber_government = yes
 		has_synth_government = yes
+		has_transcendent_government = yes
+		has_corporeal_government = yes
 	}
 }
 
@@ -904,6 +936,30 @@ has_synth_government = {
 		has_government = gov_synth_imperial_virtual
 		has_government = gov_synth_corporate_physical
 		has_government = gov_synth_corporate_virtual
+	}
+}
+
+has_transcendent_government = {
+	OR = {
+		has_government = gov_shroud_transcendent_democracy
+		has_government = gov_shroud_transcendent_oligarchy
+		has_government = gov_shroud_transcendent_dictatorial
+		has_government = gov_shroud_transcendent_imperial
+		has_government = gov_shroud_transcendent_corporate
+		has_government = gov_shroud_transcendent_hive
+		has_government = gov_shroud_transcendent_machine
+	}
+}
+
+has_corporeal_government = {
+	OR = {
+		has_government = gov_shroud_corporeal_democracy
+		has_government = gov_shroud_corporeal_oligarchy
+		has_government = gov_shroud_corporeal_dictatorial
+		has_government = gov_shroud_corporeal_imperial
+		has_government = gov_shroud_corporeal_corporate
+		has_government = gov_shroud_corporeal_hive
+		has_government = gov_shroud_corporeal_machine
 	}
 }
 
@@ -1039,6 +1095,13 @@ has_any_megastructure_in_empire = {
 			has_megastructure = quantum_catapult_restored
 			has_megastructure = quantum_catapult_ruined_slingshot
 			has_megastructure = quantum_catapult_restored_slingshot
+			has_megastructure = galactic_crucible_0
+			has_megastructure = galactic_crucible_1
+			has_megastructure = galactic_crucible_2
+			has_megastructure = galactic_crucible_3
+			has_megastructure = galactic_crucible_4
+			has_megastructure = galactic_crucible_5
+			has_megastructure = galactic_crucible_ruined
 			# Undercoat
 			any_system_megastructure = { has_megastructure_flag = stu_structure_can_teach_megaengineering }
 		}
@@ -1057,6 +1120,11 @@ is_binary_star = {
 		is_star_class = sc_binary_8
 		is_star_class = sc_binary_9
 		is_star_class = sc_binary_10
+		is_star_class = sc_crisis_binary_1
+		is_star_class = sc_crisis_binary_2
+		is_star_class = sc_crisis_binary_5
+		is_star_class = sc_crisis_binary_7_8_9
+		is_star_class = sc_crisis_binary_10
 	}
 }
 
@@ -1180,6 +1248,10 @@ is_trinary_star = {
 		is_star_class = sc_trinary_2
 		is_star_class = sc_trinary_3
 		is_star_class = sc_trinary_4
+		is_star_class = sc_crisis_trinary_1
+		is_star_class = sc_crisis_trinary_2
+		is_star_class = sc_crisis_trinary_3
+		is_star_class = sc_crisis_trinary_4
 	}
 }
 
@@ -1347,10 +1419,7 @@ has_autonomous_combat_computer = {
 
 # This can replace all the specific ones.
 is_ethics_aligned = {
-	OR = {
-		has_ethic = ethic_$ARG1$
-		has_ethic = ethic_fanatic_$ARG1$
-	}
+	is_$ARG1$ = yes
 }
 
 has_opposing_ethics = {
@@ -1469,29 +1538,37 @@ has_alternative_ethics = { # Consider THIS_SCOPE as the entity you are checking 
 
 is_fanatic = {
 	OR = {
-		has_ethic = ethic_fanatic_authoritarian
-		has_ethic = ethic_fanatic_egalitarian
-		has_ethic = ethic_fanatic_materialist
-		has_ethic = ethic_fanatic_militarist
-		has_ethic = ethic_fanatic_pacifist
-		has_ethic = ethic_fanatic_spiritualist
-		has_ethic = ethic_fanatic_xenophile
-		has_ethic = ethic_fanatic_xenophobe
+		is_fanatic_authoritarian = yes
+		is_fanatic_egalitarian = yes
+		is_fanatic_materialist = yes
+		is_fanatic_militarist = yes
+		is_fanatic_pacifist = yes
+		is_fanatic_spiritualist = yes
+		is_fanatic_xenophile = yes
+		is_fanatic_xenophobe = yes
 	}
 }
 
 is_pacifist = {
 	OR = {
 		has_ethic = ethic_pacifist
-		has_ethic = ethic_fanatic_pacifist
+		is_fanatic_pacifist = yes
 	}
+}
+
+is_fanatic_pacifist = {
+	has_ethic = ethic_fanatic_pacifist
 }
 
 is_militarist = {
 	OR = {
 		has_ethic = ethic_militarist
-		has_ethic = ethic_fanatic_militarist
+		is_fanatic_militarist = yes
 	}
+}
+
+is_fanatic_militarist = {
+	has_ethic = ethic_fanatic_militarist
 }
 
 is_materialist = {
@@ -1501,39 +1578,63 @@ is_materialist = {
 	}
 }
 
+is_fanatic_materialist = {
+	has_ethic = ethic_fanatic_materialist
+}
+
 is_spiritualist = {
 	OR = {
 		has_ethic = ethic_spiritualist
-		has_ethic = ethic_fanatic_spiritualist
+		is_fanatic_spiritualist = yes
 	}
+}
+
+is_fanatic_spiritualist = {
+	has_ethic = ethic_fanatic_spiritualist
 }
 
 is_egalitarian = {
 	OR = {
 		has_ethic = ethic_egalitarian
-		has_ethic = ethic_fanatic_egalitarian
+		is_fanatic_egalitarian = yes
 	}
+}
+
+is_fanatic_egalitarian = {
+	has_ethic = ethic_fanatic_egalitarian
 }
 
 is_authoritarian = {
 	OR = {
 		has_ethic = ethic_authoritarian
-		has_ethic = ethic_fanatic_authoritarian
+		is_fanatic_authoritarian = yes
 	}
+}
+
+is_fanatic_authoritarian = {
+	has_ethic = ethic_fanatic_authoritarian
 }
 
 is_xenophile = {
 	OR = {
 		has_ethic = ethic_xenophile
-		has_ethic = ethic_fanatic_xenophile
+		is_fanatic_xenophile = yes
 	}
+}
+
+is_fanatic_xenophile = {
+	has_ethic = ethic_fanatic_xenophile
 }
 
 is_xenophobe = {
 	OR = {
 		has_ethic = ethic_xenophobe
-		has_ethic = ethic_fanatic_xenophobe
+		is_fanatic_xenophobe = yes
 	}
+}
+
+is_fanatic_xenophobe = {
+	has_ethic = ethic_fanatic_xenophobe
 }
 
 is_regular_empire = {
@@ -1543,6 +1644,7 @@ is_regular_empire = {
 		is_country_type = awakened_marauders
 		
 		
+		is_country_type = exiled
 	}
 	is_gestalt = no # undercoat: moved to scripted trigger
 }
@@ -1594,6 +1696,17 @@ is_wilderness_empire = {
 	has_origin = origin_wilderness
 }
 
+is_infernal_empire = {
+	owner_species = { has_trait = trait_infernal }
+}
+
+is_lithoid_or_infernal_empire = {
+	OR = {
+		is_lithoid_empire = yes
+		is_infernal_empire = yes
+	}
+}
+
 is_autocracy = { #Power of one
 	OR = {
 		is_gestalt = yes # undercoat: moved to scripted trigger
@@ -1604,13 +1717,10 @@ is_autocracy = { #Power of one
 
 is_oligarchy = { #Power of few
 	OR = {
-		is_oligarchic_authority = yes # undercoat: moved to scripted trigger
+		is_oligarchic_authority = yes
 		is_megacorp = yes
 	}
-	NOR = {
-		has_ethic = ethic_egalitarian
-		has_ethic = ethic_fanatic_egalitarian
-	}
+	is_egalitarian = no
 }
 
 is_democracy = { #Power of many
@@ -1792,6 +1902,8 @@ has_total_war_cb = {
 				has_valid_civic = civic_hive_devouring_swarm
 				has_menace_perk = menp_behemoth_ever_hungry
 				is_machine_assimilator = yes # undercoat: moved to scripted trigger
+				is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+				
 				AND = {
 					has_valid_civic = civic_machine_terminator
 					$target|from$ = {
@@ -1817,6 +1929,8 @@ has_total_war_cb = {
 				
 				is_machine_assimilator = yes # undercoat: moved to scripted trigger
 				
+				is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+				
 			}
 			$target|from$ = {
 				OR = {
@@ -1825,9 +1939,18 @@ has_total_war_cb = {
 					
 					is_machine_assimilator = yes # undercoat: moved to scripted trigger
 					
+					is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+					
 					has_menace_perk = menp_behemoth_ever_hungry
 				}
 			}
+		}
+		# EotC Total War
+		has_country_flag = reached_eotc_situation_stage2
+		# Total War against EotC
+		AND = {
+			has_country_flag = can_declare_total_war_to_eotc
+			from = { has_covenant_with_end_of_the_cycle = yes }
 		}
 	}
 }
@@ -1961,9 +2084,11 @@ system_has_dyson_sphere = {
 
 is_homicidal = {
 	OR = {
-		has_valid_civic = civic_fanatic_purifiers
-		has_valid_civic = civic_machine_terminator
-		has_valid_civic = civic_hive_devouring_swarm
+		has_homicidal_civic = yes # undercoat: moved to scripted trigger
+		
+		
+		is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+		
 		has_menace_perk = menp_behemoth_ever_hungry
 	}
 }
@@ -1974,6 +2099,8 @@ is_unfriendly = {
 		
 		
 		is_despoiler_empire = yes # undercoat: moved to scripted trigger
+		is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+		
 	}
 }
 
@@ -2214,6 +2341,25 @@ can_build_unity_megastructures = {
 can_build_fallen_empire_buildings = {
 	OR = {
 		is_fallen_empire = yes
+		has_country_flag = affluence_emporium_can_build
+		has_country_flag = nourishment_complex_can_build
+		has_country_flag = dimensional_replicator_can_build
+		has_country_flag = class_3_singularity_can_build
+		has_country_flag = micro_forge_can_build
+		has_country_flag = fe_sky_dome_can_build
+		has_country_flag = fe_fortress_can_build
+		has_country_flag = fe_administration_1_can_build
+		has_country_flag = fe_administration_hive_1_can_build
+		has_country_flag = fe_administration_machine_1_can_build
+		has_country_flag = fe_assembly_1_can_build
+		has_country_flag = affluence_center_can_build
+		has_country_flag = fe_clinic_1_can_build
+		has_country_flag = fe_security_1_can_build
+		has_country_flag = fe_market_1_can_build
+		has_country_flag = fe_silo_1_can_build
+		has_country_flag = fe_entertainment_1_can_build
+		has_country_flag = fe_lab_1_can_build
+		has_country_flag = fe_mine_1_can_build
 		has_country_flag = nano_forge_can_build
 		has_country_flag = skydome_can_build
 		has_country_flag = dimensional_fabricator_can_build
@@ -2430,6 +2576,13 @@ clinic_upkeep_affordable = {
 }
 
 ministry_production_upkeep_affordable = {
+	has_monthly_income = {
+		resource = energy
+		value > 5
+	}
+}
+
+psi_corps_upkeep_affordable = {
 	has_monthly_income = {
 		resource = energy
 		value > 5
@@ -3198,7 +3351,7 @@ basic_eligibility_for_separatism_joining_trigger = {
 			is_same_species = event_target:rebellion_species
 			AND = {
 				event_target:revolt_situation = { has_situation_flag = slave_revolt }
-				has_ethic = ethic_fanatic_egalitarian
+				is_fanatic_egalitarian = yes
 			}
 		}
 	}
@@ -3642,15 +3795,20 @@ is_dragon = {
 }
 
 values_others = {
-	OR = {
-		is_xenophile = yes
-		has_valid_civic = civic_hive_empath
-		is_servitor_empire = yes # undercoat: moved to scripted trigger
-		has_valid_civic = civic_machine_exploration_protocol
-		is_fruitful_empire = yes # undercoat: moved to scripted trigger
-		has_animal_handler_job = yes
-		has_symbiosis_integrator_job = yes
-		is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+	AND = {
+		OR = {
+			is_xenophile = yes
+			has_valid_civic = civic_hive_empath
+			is_servitor_empire = yes # undercoat: moved to scripted trigger
+			has_valid_civic = civic_machine_exploration_protocol
+			is_fruitful_empire = yes # undercoat: moved to scripted trigger
+			has_animal_handler_job = yes
+			has_symbiosis_integrator_job = yes
+			is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+		}
+		NOT = {
+			has_menace_perk = menp_behemoth_ever_hungry
+		}
 	}
 }
 
@@ -3665,7 +3823,7 @@ has_organic_pops = {
 
 is_robotic_or_voidspawn_species = {
 	OR = {
-		is_robotic_species = yes
+		is_robotic = yes
 		has_trait = trait_voidling
 	}
 }
@@ -3733,7 +3891,7 @@ can_have_sensory_readings = {
 		is_frozen_world = yes # undercoat: moved to scripted trigger
 		is_barren_dry_world = yes # undercoat: moved to scripted trigger
 		is_barren_cold_world = yes # undercoat: moved to scripted trigger
-		is_starting_planet_type = yes # undercoat: moved to scripted trigger
+		is_standard_starting_planet_type_stu = yes # undercoat: moved to scripted trigger
 		
 		
 		
@@ -3787,7 +3945,8 @@ uses_standard_ship_sizes = {
 	OR = {
 		is_playable = yes # undercoat: moved to scripted trigger
 		is_country_type = gdf
-		is_country_type = enclave_mercenary
+		is_mercenary = yes
+		is_country_type = exiled
 		has_country_flag = use_default_ships #for modders: apply this in on_country_created for new country types that you want to use corvettes etc
 	}
 	is_beastmasters_empire = no
@@ -3912,13 +4071,10 @@ has_any_industry_zone = {
 	}
 }
 
-has_any_farming_district_or_buildings = {
+has_any_farming_district_or_building = {
 	OR = {
 		has_district = district_farming
-		has_district = district_rw_farming
-		has_district = district_farming_uncapped
 		has_district = district_orchard_forests
-		has_district = district_orchard_forests_uncapped
 		has_building = building_hydroponics_farm
 	}
 }
@@ -3929,22 +4085,15 @@ has_any_capped_planet_farming_district = {
 		has_district = district_rw_farming
 		has_district = district_orchard_forests
 	}
-}
-
-has_any_uncapped_farming_district = {
-	OR = {
-		has_district = district_farming_uncapped
-		has_district = district_orchard_forests_uncapped
-	}
+	is_farming_district_uncapped = no
 }
 
 has_any_mining_district_or_building = {
 	OR = {
 		has_district = district_mining
+		has_district = district_melting
 		has_district = district_hab_mining
-		has_district = district_mining_uncapped
 		has_district = district_hollow_mountains
-		has_district = district_hollow_mountains_uncapped
 		has_building = building_mine_generic
 	}
 }
@@ -3952,25 +4101,18 @@ has_any_mining_district_or_building = {
 has_any_capped_planet_mining_district = {
 	OR = {
 		has_district = district_mining
+		has_district = district_melting
 		has_district = district_hollow_mountains
 	}
-}
-
-has_any_uncapped_mining_district = {
-	OR = {
-		has_district = district_mining_uncapped
-		has_district = district_hollow_mountains_uncapped
-	}
+	is_mining_district_uncapped = no
 }
 
 has_any_generator_district_or_building = {
 	OR = {
 		has_district = district_generator
+		has_district = district_geothermal
 		has_district = district_hab_energy
-		has_district = district_generator_uncapped
-		has_district = district_rw_generator
 		has_district = district_photosynthesis_fields
-		has_district = district_photosynthesis_fields_uncapped
 		has_building = building_generator_generic
 	}
 }
@@ -3978,14 +4120,77 @@ has_any_generator_district_or_building = {
 has_any_capped_planet_generator_district = {
 	OR = {
 		has_district = district_generator
+		has_district = district_geothermal
 		has_district = district_rw_generator
+	}
+	is_generator_district_uncapped = no
+}
+
+is_generator_district_uncapped = {
+	OR = {
+		uses_district_set = shattered_ring_world
+		has_planet_flag = uncapped_generator_districts 			# For Modders
 	}
 }
 
-has_any_uncapped_generator_district = {
+is_wilderness_generator_district_uncapped = {
 	OR = {
-		has_district = district_generator_uncapped
-		has_district = district_photosynthesis_fields_uncapped
+		AND = {
+			exists = owner_or_space_owner
+			owner_or_space_owner = {
+				has_uncapped_wilderness_districts = yes
+			}
+		}
+		has_planet_flag = uncapped_generator_districts 			# For Modders
+	}
+}
+
+is_mining_district_uncapped = {
+	OR = {
+		uses_district_set = shattered_ring_world
+		AND = {
+			exists = owner_or_space_owner
+			owner_or_space_owner = {
+				is_subterranean_empire = yes
+			}
+		}
+		has_planet_flag = uncapped_mining_districts 			# For Modders
+	}
+}
+
+is_wilderness_mining_district_uncapped = {
+	OR = {
+		AND = {
+			exists = owner_or_space_owner
+			owner_or_space_owner = {
+				has_uncapped_wilderness_districts = yes
+			}
+		}
+		has_planet_flag = uncapped_mining_districts 			# For Modders
+	}
+}
+
+is_farming_district_uncapped = {
+	OR = {
+		uses_district_set = shattered_ring_world
+		AND = {
+			exists = owner_or_space_owner
+			owner_or_space_owner = { is_anglers_empire = yes }
+			is_ocean_world = yes # undercoat: moved to scripted trigger
+		}
+		has_planet_flag = uncapped_farming_districts 			# For Modders
+	}
+}
+
+is_wilderness_farming_district_uncapped = {
+	OR = {
+		AND = {
+			exists = owner_or_space_owner
+			owner_or_space_owner = {
+				has_uncapped_wilderness_districts = yes
+			}
+		}
+		has_planet_flag = uncapped_farming_districts 			# For Modders
 	}
 }
 
@@ -4105,6 +4310,7 @@ has_special_star_flag_trigger = {
 		has_star_flag = guardian
 		has_star_flag = sealed_system
 		has_star_flag = starlit_sealed_system
+		has_star_flag = exiled_system
 		# Megastructures
 		has_star_flag = abandoned_gateway
 		has_star_flag = ruined_mega_shipyard_system
@@ -4142,6 +4348,16 @@ can_think = {
 		has_trait = trait_robot_suppressed
 		# Undercoat
 		stu_flag_modifier_check = { flag = cannot_think }
+	}
+}
+
+has_zroni_equilibrators = {
+	count_owned_planet = {
+		count >= 3
+		limit = {
+			has_building = building_zroni_equilibrator
+			is_controlled_by = root
+		}
 	}
 }
 
@@ -4524,6 +4740,7 @@ blocks_minister_of_state = {
 		is_gestalt = yes
 		is_inwards_perfection_empire = yes # undercoat: moved to scripted trigger
 		has_valid_civic = civic_fanatic_purifiers
+		has_valid_civic = civic_scorched_earth
 	}
 }
 
@@ -4586,6 +4803,10 @@ has_mind_over_matter_synergy = {
 
 has_mind_over_matter_anti_synergy = {
 	is_spiritualist = no
+	if = {
+		limit = { has_shroud_dlc = yes }
+		is_gestalt = no
+	}
 }
 
 has_synthetic_age_anti_synergy = {
@@ -4724,8 +4945,8 @@ is_legit_or_legal_criminal = {
 					is_subject = yes
 					overlord = {
 						OR = {
-							is_same_value = prev
-							is_same_value = prev.overlord
+							is_same_value = prevprev
+							is_same_value = prevprev.overlord
 						}
 					}
 				}
@@ -4763,8 +4984,8 @@ is_illegal_criminal = {
 			is_subject = yes
 			overlord = {
 				OR = {
-					is_same_value = prev
-					is_same_value = prev.overlord
+					is_same_value = prevprev
+					is_same_value = prevprev.overlord
 				}
 			}
 		}
@@ -4960,10 +5181,8 @@ fears_unplugged_empire = { # see also: 'triggered_opinion_cyborgs_normal'
 
 can_have_slaves = {
 	OR = {
-		has_ethic = ethic_authoritarian
-		has_ethic = ethic_fanatic_authoritarian
-		has_ethic = ethic_xenophobe
-		has_ethic = ethic_fanatic_xenophobe
+		is_authoritarian = yes
+		is_xenophobe = yes
 		is_gestalt = yes # undercoat: moved to scripted trigger
 	}
 	is_broken_shackles_empire = no # undercoat: moved to scripted trigger
@@ -4985,7 +5204,7 @@ has_natural_blocker = { # planet scope | see also 'add_random_natural_blocker_an
 
 can_talk_to_prethoryn = {
 	OR = {
-		owner_species = { has_trait = trait_psionic }
+		owner_species = { is_psionic_species = yes }
 		owner_species = { has_trait = trait_hive_mind }
 		has_menace_perk = menp_behemoth_mind_meld
 	}
@@ -4993,7 +5212,10 @@ can_talk_to_prethoryn = {
 
 has_subspecies_civic_or_origin = {
 	owner = {
-		has_secondary_species = yes # undercoat: moved to scripted trigger
+		OR = {
+			has_secondary_species = yes # undercoat: moved to scripted trigger
+			is_guided_sapience_empire = yes
+		}
 	}
 }
 

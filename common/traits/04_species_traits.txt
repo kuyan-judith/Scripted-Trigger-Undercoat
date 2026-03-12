@@ -4,6 +4,10 @@ trait_auto_mod_biological = {
 	auto_mod = yes
 	category = normal
 
+	opposites = {
+		"trait_wilderness"
+	}
+
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	tags = { organic automod positive }
 	initial = no
@@ -400,7 +404,7 @@ trait_rapid_breeders = {
 	species_possible_merge_remove = {
 		always = yes
 	}
-	opposites = { "trait_slow_breeders" "trait_fertile" "trait_rapid_breeders_lithoid" "trait_plantoid_budding" "trait_lithoid_budding" "trait_vat_grown" "trait_tiyanki" "trait_humanoid_existential_iteroparity" "trait_egg_laying" }
+	opposites = { "trait_pyroclastic" "trait_slow_breeders" "trait_fertile" "trait_rapid_breeders_lithoid" "trait_plantoid_budding" "trait_lithoid_budding" "trait_vat_grown" "trait_tiyanki" "trait_humanoid_existential_iteroparity" "trait_egg_laying" }
 	allowed_archetypes = { BIOLOGICAL }
 	tags = { organic positive pop_growth }
 	modifier = {
@@ -417,7 +421,7 @@ trait_slow_breeders = {
 	species_potential_add = {
 		can_add_negative_organic_traits = yes
 	}
-	opposites = { "trait_rapid_breeders" "trait_fertile" "trait_rapid_breeders_lithoid" "trait_plantoid_budding" "trait_lithoid_budding" "trait_vat_grown" "trait_tiyanki" "trait_humanoid_psychological_infertility" "trait_humanoid_existential_iteroparity" "trait_egg_laying" "trait_nascent_stage" }
+	opposites = { "trait_pyroclastic" "trait_rapid_breeders" "trait_fertile" "trait_rapid_breeders_lithoid" "trait_plantoid_budding" "trait_lithoid_budding" "trait_vat_grown" "trait_tiyanki" "trait_humanoid_psychological_infertility" "trait_humanoid_existential_iteroparity" "trait_egg_laying" "trait_nascent_stage" }
 	allowed_archetypes = { BIOLOGICAL }
 	tags = { organic negative pop_growth }
 	modifier = {
@@ -692,11 +696,10 @@ trait_strong = {
 trait_weak = {
 	cost = -1
 	category = normal
-	custom_tooltip_with_modifiers = trait_weak_tt
 	species_potential_add = {
 		can_add_negative_organic_traits = yes
 	}
-	opposites = { "trait_strong" "trait_very_strong" }
+	opposites = { "trait_strong" "trait_very_strong" "trait_tankbound" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	tags = { organic negative pop_output army }
 	modifier = {
@@ -829,7 +832,7 @@ trait_charismatic = {
 	}
 	tags = { organic positive pop_output amenities }
 	modifier = {
-		entertainer_jobs_bonus_workforce_mult = 0.20
+		influential_jobs_bonus_workforce_mult = 0.20
 	}
 	slave_cost = {
 		energy = 500
@@ -847,7 +850,7 @@ trait_repugnant = {
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	tags = { organic negative pop_output amenities }
 	modifier = {
-		entertainer_jobs_bonus_workforce_mult = -0.20
+		influential_jobs_bonus_workforce_mult = -0.20
 	}
 
 	ai_weight = {
@@ -1236,30 +1239,9 @@ trait_latent_psionic = {
 		always = no
 	}
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	tags = { organic positive pop_output research unity psionic }
+	tags = { organic positive pop_output research unity psionic special }
 
-	modifier = {
-		researcher_jobs_bonus_workforce_mult = 0.10
-		bureaucrat_jobs_bonus_workforce_mult = 0.05
-		enforcer_jobs_bonus_workforce_mult = 0.05
-	}
-	slave_cost = {
-		energy = 1500
-	}
-	assembly_score = {
-		modifier = {
-			add = 0.5
-			from = { has_research_designation = yes }
-		}
-		modifier = {
-			add = 0.5
-			from = { has_unity_designation = yes }
-		}
-		modifier = {
-			add = 0.5
-			from = { has_building = building_order_keep }
-		}
-	}
+	inline_script = "traits/latent_psionic_effects"
 }
 
 trait_psionic = {
@@ -1282,156 +1264,9 @@ trait_psionic = {
 	}
 
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	tags = { organic positive pop_output research unity happiness psionic }
+	tags = { organic positive pop_output research unity happiness psionic special }
 
-	modifier = {
-		researcher_jobs_bonus_workforce_mult = 0.10
-		bureaucrat_jobs_bonus_workforce_mult = 0.10
-		enforcer_jobs_bonus_workforce_mult = 0.10
-		pop_happiness = 0.05
-	}
-
-	triggered_pop_group_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				OR = {
-					has_modifier = agenda_psionic_supremacy_finish_composer
-					has_modifier = agenda_psionic_supremacy_finish_eater
-					has_modifier = agenda_psionic_supremacy_finish_instrument
-					has_modifier = agenda_psionic_supremacy_finish_whisperers
-					has_modifier = agenda_psionic_supremacy_finish_no_covenant
-				}
-			}
-		}
-		pop_bonus_workforce_mult = 0.2
-	}
-	slave_cost = {
-		energy = 1500
-	}
-
-	resources = {
-		category = planet_pops
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_consumer_goods
-				}
-			}
-			consumer_goods = @instrument_upkeep_common
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_alloys
-				}
-			}
-			alloys = @instrument_upkeep_rare
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_unity
-				}
-			}
-			unity = @instrument_upkeep_rare
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_gas
-				}
-			}
-			exotic_gases = @instrument_upkeep_very_rare
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_crystal
-				}
-			}
-			rare_crystals = @instrument_upkeep_very_rare
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_motes
-				}
-			}
-			volatile_motes = @instrument_upkeep_very_rare
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_zro
-				}
-			}
-			sr_zro = @instrument_upkeep_legendary
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_dark_matter
-				}
-			}
-			sr_dark_matter = @instrument_upkeep_legendary
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_living_metal
-				}
-			}
-			sr_living_metal = @instrument_upkeep_epic
-		}
-
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_country_flag = instrument_craving_nanites
-				}
-			}
-			nanites = @instrument_upkeep_epic
-		}
-	}
-
-	assembly_score = {
-		base = 0.5
-		modifier = {
-			add = 0.5
-			from = { has_research_designation = yes }
-		}
-		modifier = {
-			add = 0.5
-			from = { has_unity_designation = yes }
-		}
-		modifier = {
-			add = 0.5
-			from = { has_building = building_order_keep }
-		}
-		modifier = {
-			subtract = 1.5
-			from.owner = { has_ascension_perk = ap_the_flesh_is_weak }
-		}
-	}
+	inline_script = "traits/psionic_effects"
 }
 
 trait_self_modified = {
@@ -1596,6 +1431,7 @@ trait_bioadaptability = { #green
 		base = 1
 		modifier = {
 			mult = 0
+			exists = owner
 			owner = { has_country_flag = modification_green }
 		}
 	}
@@ -1637,6 +1473,7 @@ trait_social_pheromones = { #red
 		base = 1
 		modifier = {
 			mult = 0
+			exists = owner
 			owner = { has_country_flag = modification_red }
 		}
 	}
@@ -1675,6 +1512,7 @@ trait_limited_regeneration = { #blue
 		base = 1
 		modifier = {
 			mult = 0
+			exists = owner
 			owner = { has_country_flag = modification_blue }
 		}
 	}
@@ -1929,10 +1767,7 @@ trait_void_dweller_2 = {
 	species_potential_add = {
 		exists = from
 		from = {
-			OR = {
-				has_origin = origin_void_machines
-				has_origin = origin_void_dwellers
-			}
+			has_void_dweller_origin = yes # undercoat: moved to scripted trigger
 		}
 	}
 	species_possible_add = {
@@ -2110,6 +1945,18 @@ trait_plantoid_phototrophic = {
 	sorting_priority = 30
 	custom_tooltip = TRAIT_PLANTOID_PHOTOTROPHIC_EFFECT
 
+	resources = {
+		category = planet_pops
+		# Energy Upkeep
+		upkeep = {
+			trigger = {
+				is_being_purged = no
+				is_sapient = yes
+			}
+			energy = @living_standard_phototrophic_normal
+		}
+	}
+
 	slave_cost = {
 		energy = 1000
 	}
@@ -2135,11 +1982,12 @@ trait_plantoid_radiotrophic = {
 	}
 	opposites = { "trait_plantoid_phototrophic" "trait_voidling" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
-	species_class = { PLANT FUN LITHOID }
+	species_class = { PLANT FUN LITHOID INF }
 	localized_tags = {
 		SPECIES_TRAIT_FUNGOID
 		SPECIES_TRAIT_PLANTOID
 		SPECIES_TRAIT_LITHOID
+		SPECIES_TRAIT_INFERNAL
 	}
 	species_class_override = {
 		hidden_trigger = {
@@ -2150,27 +1998,87 @@ trait_plantoid_radiotrophic = {
 			}
 		}
 	}
-	tags = { organic positive plantoid fungoid lithoid upkeep species }
+	tags = { organic positive plantoid fungoid lithoid infernal upkeep species }
 	custom_tooltip = TRAIT_PLANTOID_RADIOTROPHIC_EFFECT
-	inline_script = "traits/radiotrophic_effects"
+	resources = {
+		category = planet_pops
+		# Energy Upkeep
+		upkeep = {
+			trigger = {
+				is_being_purged = no
+				exists = planet
+				NOT = {
+					planet = { is_nuked_world = yes } # undercoat: moved to scripted trigger
+				}
+				is_sapient = yes
+			}
+			energy = @living_standard_phototrophic_normal
+		}
+	}
+	modifier = {
+		pc_nuked_habitability = 0.1
+	}
+	triggered_planet_growth_habitability_modifier = {
+		potential = {
+			exists = planet
+			planet = { has_deposit = d_lithoid_crater }
+		}
+		pc_nuked_habitability = 0.05
+	}
+	triggered_planet_growth_habitability_modifier = {
+		potential = {
+			exists = planet
+			planet = { is_nuked_world = yes } # undercoat: moved to scripted trigger
+		}
+		logistic_growth_mult = 0.1
+		mult = value:lithoid_trait_mult
+	}
+	triggered_pop_group_modifier = {
+		potential = {
+			exists = planet
+			planet = { has_modifier = wasteland_radiation }
+		}
+		pop_happiness = 0.1
+		mult = value:lithoid_trait_mult
+	}
+	slave_cost = {
+		energy = 1500
+	}
+	assembly_score = {
+		modifier = {
+			add = 1
+			from = { is_nuked_world = yes } # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			add = 0.05
+			from = {
+				is_nuked_world = yes # undercoat: moved to scripted trigger
+				has_deposit = d_lithoid_crater
+			}
+		}
+	}
 }
 
 trait_plantoid_budding = {
 	host_has_dlc = "Plantoids Species Pack"
 	cost = 2
 	species_possible_add = {
-		can_add_genetic_traits = yes
+		OR = {
+			can_add_genetic_traits = yes
+			can_add_or_remove_phenotype_traits = yes
+		}
 	}
 	species_possible_remove = {
 		OR = {
 			can_remove_beneficial_genetic_traits = yes
+			can_add_or_remove_phenotype_traits = yes
 			can_remove_pop_growth_genetic_traits = yes
 		}
 	}
 	species_possible_merge_remove = {
 		always = yes
 	}
-	opposites = { "trait_slow_breeders" "trait_rapid_breeders" "trait_rapid_breeders_lithoid" "trait_necrophage" "trait_clone_soldier_infertile" "trait_clone_soldier_infertile_full_potential" "trait_lithoid_budding" "trait_tiyanki" "trait_egg_laying" }
+	opposites = { "trait_pyroclastic" "trait_slow_breeders" "trait_rapid_breeders" "trait_rapid_breeders_lithoid" "trait_necrophage" "trait_clone_soldier_infertile" "trait_clone_soldier_infertile_full_potential" "trait_lithoid_budding" "trait_tiyanki" "trait_egg_laying" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	species_class = { PLANT FUN }
 	localized_tags = {
@@ -2193,6 +2101,7 @@ trait_plantoid_budding = {
 		potential = {
 			has_budding_trait = yes
 		}
+		divide_over_pop_groups = no
 		bonus_pop_growth = @plantoid_budding_rate
 	}
 
@@ -2205,7 +2114,8 @@ trait_invasive = {
 	icon = "gfx/interface/icons/traits/trait_plantoid_invasive_species.dds"
 	cost = 2
 	opposites = { "trait_agrarian" "trait_ingenious" "trait_industrious" "trait_intelligent" "trait_thrifty" "trait_natural_engineers" "trait_natural_physicists" "trait_natural_sociologists" "trait_extremely_adaptive" "trait_adaptive" "trait_rapid_breeders" "trait_talented" "trait_quick_learners" "trait_traditional" "trait_docile" "trait_very_strong" "trait_strong" "trait_nomadic" "trait_communal" "trait_charismatic" "trait_conformists" "trait_venerable" "trait_enduring"
-	"trait_resilient" "trait_conservational" "trait_noxious" "trait_inorganic_breath" "trait_humanoid_existential_iteroparity" "trait_incubator" "trait_delicious" "trait_nerve_stapled" "trait_fertile" "trait_robust" "trait_erudite" "trait_vat_grown" "trait_felsic" "trait_natural_machinist" "trait_drake_scaled" "trait_voidling" "trait_tiyanki" "trait_exotic_metabolism" "trait_egg_laying" "trait_chromalogs" "trait_camouflage" "trait_shelled" }
+	"trait_resilient" "trait_conservational" "trait_noxious" "trait_inorganic_breath" "trait_humanoid_existential_iteroparity" "trait_incubator" "trait_delicious" "trait_nerve_stapled" "trait_fertile" "trait_robust" "trait_erudite" "trait_vat_grown" "trait_felsic" "trait_natural_machinist" "trait_drake_scaled" "trait_voidling" "trait_tiyanki" "trait_exotic_metabolism" "trait_egg_laying" "trait_chromalogs" "trait_camouflage" "trait_shelled" "trait_uncanny_intuition"
+	"trait_cranial_hypertrophy" "trait_cranial_megatrophy" "trait_shell_slag" "trait_unbreakable_resolve" }
 	host_has_dlc = "Plantoids Species Pack"
 	sorting_priority = 30
 
@@ -2258,18 +2168,22 @@ trait_lithoid_budding = {
 	host_has_dlc = "Plantoids Species Pack"
 	cost = 2
 	species_possible_add = {
-		can_add_genetic_traits = yes
+		OR = {
+			can_add_genetic_traits = yes
+			can_add_or_remove_phenotype_traits = yes
+		}
 	}
 	species_possible_remove = {
 		OR = {
 			can_remove_beneficial_genetic_traits = yes
+			can_add_or_remove_phenotype_traits = yes
 			can_remove_pop_growth_genetic_traits = yes
 		}
 	}
 	species_possible_merge_remove = {
 		always = yes
 	}
-	opposites = { "trait_slow_breeders" "trait_rapid_breeders" "trait_rapid_breeders_lithoid" "trait_necrophage" "trait_clone_soldier_infertile" "trait_clone_soldier_infertile_full_potential" "trait_incubator" "trait_plantoid_budding" "trait_tiyanki" "trait_egg_laying" }
+	opposites = { "trait_pyroclastic" "trait_slow_breeders" "trait_rapid_breeders" "trait_rapid_breeders_lithoid" "trait_necrophage" "trait_clone_soldier_infertile" "trait_clone_soldier_infertile_full_potential" "trait_incubator" "trait_plantoid_budding" "trait_tiyanki" "trait_egg_laying" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	species_class = { LITHOID }
 	localized_tags = {
@@ -2289,9 +2203,21 @@ trait_lithoid_budding = {
 	triggered_planet_pop_group_modifier_for_species = {
 		potential = {
 			has_budding_trait = yes
+			exists = planet
+			NOT = { planet = { has_deposit = d_lithoid_crater } }
 		}
+		divide_over_pop_groups = no
 		bonus_pop_growth = @plantoid_budding_rate
 	}
+	triggered_planet_pop_group_modifier_for_species = {
+		potential = {
+			has_budding_trait = yes
+			exists = planet
+			planet = { has_deposit = d_lithoid_crater }
+		}
+		bonus_pop_growth = @lithoid_crater_budding_rate
+	}
+
 
 	slave_cost = {
 		energy = 2000
@@ -2319,6 +2245,7 @@ trait_zombie = {
 	tags = { organic negative upkeep pop_output blocks_leaders }
 	modifier = {
 		pop_bonus_workforce_mult = -0.25
+		civilian_and_maintenance_drone_cat_bonus_workforce_mult = -0.50
 		planet_pops_upkeep_mult = -1
 	}
 
@@ -2351,7 +2278,7 @@ trait_humanoid_existential_iteroparity = {
 			can_remove_pop_growth_genetic_traits = yes
 		}
 	}
-	opposites = { "trait_humanoid_psychological_infertility" "trait_rapid_breeders" "trait_fertile" "trait_rapid_breeders_lithoid" "trait_plantoid_budding" "trait_lithoid_budding" "trait_vat_grown" "trait_tiyanki" "trait_egg_laying" }
+	opposites = { "trait_pyroclastic" "trait_humanoid_psychological_infertility" "trait_rapid_breeders" "trait_fertile" "trait_rapid_breeders_lithoid" "trait_plantoid_budding" "trait_lithoid_budding" "trait_vat_grown" "trait_tiyanki" "trait_egg_laying" }
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	tags = { organic positive pop_growth }
 	icon = "gfx/interface/icons/traits/trait_existential_iteroparity.dds"

@@ -89,7 +89,7 @@ tech_destroyers = {
 	}
 
 	modifier = {
-		command_limit_add = 10
+		command_limit_add = 20
 	}
 
 	weight_modifier = {
@@ -150,7 +150,7 @@ tech_cruisers = {
 	}
 
 	modifier = {
-		command_limit_add = 10
+		command_limit_add = 20
 	}
 
 	weight_modifier = {
@@ -209,7 +209,7 @@ tech_battleships = {
 	}
 
 	modifier = {
-		command_limit_add = 10
+		command_limit_add = 20
 	}
 
 	weight_modifier = {
@@ -262,7 +262,7 @@ tech_titans = {
 	ai_update_type = military
 
 	modifier = {
-		command_limit_add = 10
+		command_limit_add = 20
 	}
 
 	potential = {
@@ -1131,6 +1131,13 @@ tech_starbase_2 = {
 	}
 
 	# unlocks Starport
+	ai_weight = {
+		factor = @ai_starbase_types_factor
+		modifier = {
+			factor = @shattered_ring_ai_tech_factor
+			is_shattered_ring_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
 }
 
 tech_starbase_3 = {
@@ -1191,7 +1198,10 @@ tech_starbase_3 = {
 
 	ai_weight = {
 		factor = @ai_starbase_types_factor
-
+		modifier = {
+			factor = @shattered_ring_ai_tech_factor
+			is_shattered_ring_empire = yes # undercoat: moved to scripted trigger
+		}
 	}
 }
 
@@ -1574,10 +1584,7 @@ tech_space_defense_station_improvement = {
 		}
 		modifier = {
 			factor = 1.25
-			OR = {
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_militarist
-			}
+			is_militarist = yes
 		}
 	}
 
@@ -2097,7 +2104,10 @@ tech_thrusters_2 = {
 	}
 
 	ai_weight = {
-
+		modifier = {
+			factor = @shattered_ring_ai_tech_factor
+			is_shattered_ring_empire = yes # undercoat: moved to scripted trigger
+		}
 	}
 }
 
@@ -2503,12 +2513,10 @@ tech_mining_3 = {
 	}
 
 	weight_modifier = {
-
 	}
 
 	ai_weight = {
 		factor = @ai_mining_factor
-
 	}
 }
 
@@ -2543,8 +2551,11 @@ tech_mineral_purification_1 = {
 		modifier = {
 			factor = 5
 			OR = {
-				num_districts = { type = district_generator value > 0 }
-				num_districts = { type = district_generator_uncapped value > 0 }
+				num_districts = { type = district_mining value > 0 }
+				num_districts = { type = district_hab_mining value > 0 }
+				num_districts = { type = district_hollow_mountains value > 0 }
+				num_districts = { type = district_melting value > 0 }
+				has_any_mining_zone = yes
 			}
 		}
 	}
@@ -2591,7 +2602,6 @@ tech_mineral_purification_2 = {
 
 	ai_weight = {
 		factor = @ai_mining_building_factor
-
 	}
 }
 
@@ -2820,6 +2830,7 @@ tech_engineering_1 = {
 
 	ai_weight = {
 		factor = @ai_engineering_tech_speed_factor
+		factor = @zone_clear_ai_tech_factor
 	}
 }
 
@@ -2869,6 +2880,7 @@ tech_engineering_2 = {
 
 	ai_weight = {
 		factor = @ai_engineering_tech_speed_factor
+		factor = @zone_clear_ai_tech_factor
 	}
 }
 
@@ -3001,10 +3013,7 @@ tech_robotic_workers = {
 		}
 		modifier = {
 			factor = 2
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 
 	}
@@ -3013,10 +3022,7 @@ tech_robotic_workers = {
 		factor = @robots_ai_tech_factor
 		modifier = {
 			factor = 2
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 		modifier = {
 			factor = 0
@@ -3070,10 +3076,7 @@ tech_droid_workers = {
 		}
 		modifier = {
 			factor = 2
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 		modifier = {
 			factor = 2
@@ -3085,10 +3088,7 @@ tech_droid_workers = {
 		factor = @robots_ai_tech_factor
 		modifier = {
 			factor = 2
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 		modifier = {
 			factor = 0
@@ -3149,10 +3149,7 @@ tech_synthetic_workers = {
 		}
 		modifier = {
 			factor = 2
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 		inline_script = {
 			script = technologies/rare_technologies_weight_modifiers
@@ -3180,10 +3177,7 @@ tech_synthetic_workers = {
 		factor = @robots_ai_tech_factor
 		modifier = {
 			factor = 2
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 		modifier = {
 			factor = 0
@@ -3431,14 +3425,24 @@ tech_assembly_pattern = {
 		planet_building_build_speed_mult = 0.25
 	}
 
-	weight_modifier = {
+	technology_swap = {
+		name = tech_assembly_pattern_tankbound
+		inherit_icon = yes
+		inherit_effects = no
+		trigger = {
+			is_tankbound_empire = yes
+		}
+		modifier = {
+			planet_building_build_speed_mult = 0.25
+			show_only_custom_tooltip = no
+			custom_tooltip = tech_assembly_pattern_tankbound_effect
+		}
+	}
 
+	weight_modifier = {
 		modifier = {
 			factor = 1.25
-			OR = {
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_militarist
-			}
+			is_militarist = yes
 		}
 	}
 
@@ -3463,6 +3467,21 @@ tech_construction_templates = {
 		custom_tooltip = tech_construction_templates_effect
 	}
 
+	technology_swap = {
+		name = tech_construction_templates_tankbound
+		inherit_icon = yes
+		inherit_effects = no
+		trigger = {
+			is_tankbound_empire = yes
+		}
+		modifier = {
+		planet_building_build_speed_mult = 0.50
+		empire_size_districts_mult = -0.10
+			show_only_custom_tooltip = no
+			custom_tooltip = tech_construction_templates_tankbound_effect
+		}
+	}
+
 	weight_modifier = {
 		factor = 0.5
 		modifier = {
@@ -3478,10 +3497,7 @@ tech_construction_templates = {
 		}
 		modifier = {
 			factor = 1.25
-			OR = {
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_militarist
-			}
+			is_militarist = yes
 		}
 	}
 

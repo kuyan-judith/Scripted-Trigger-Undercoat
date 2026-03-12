@@ -73,7 +73,7 @@ ship_event = {
 				country_event = { id = story.1 days = 30 }
 			}
 			from = {
-				clear_deposits_stu = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 			}
 		}
 	}
@@ -331,7 +331,7 @@ ship_event = {
 		trigger = {
 			owner = {
 				OR = {
-					has_ethic = ethic_fanatic_xenophile
+					is_fanatic_xenophile = yes
 					has_valid_civic = civic_memorialist
 				}
 				is_evolutionary_predators_empire = no # undercoat: moved to scripted trigger
@@ -486,7 +486,7 @@ country_event = {
 		name = "anomaly.4016.a"
 		custom_tooltip = "anomaly.4016.tooltip"
 		trigger = {
-			root = { NOT = {has_ethic = ethic_fanatic_spiritualist }}
+			root = { is_fanatic_spiritualist = no }
 		}
 		hidden_effect = {
 			fromfrom = {
@@ -500,7 +500,7 @@ country_event = {
 		trigger = {
 			root = {
 				is_individual_machine = no
-				has_ethic = ethic_fanatic_spiritualist
+				is_fanatic_spiritualist = yes
 				}
 		}
 		hidden_effect = {
@@ -513,7 +513,7 @@ country_event = {
 		name = "anomaly.4016.b"
 		custom_tooltip = "anomaly.4016.tooltip"
 		trigger = {
-			root = { NOT = {has_ethic = ethic_fanatic_xenophobe }}
+			root = { is_fanatic_xenophobe = no }
 		}
 		hidden_effect = {
 			fromfrom = {
@@ -525,7 +525,7 @@ country_event = {
 		name = "anomaly.4016.d.phobe"
 		custom_tooltip = "anomaly.4016.tooltip"
 		trigger = {
-			root = { has_ethic = ethic_fanatic_xenophobe }
+			root = { is_fanatic_xenophobe = yes }
 		}
 		hidden_effect = {
 			fromfrom = {
@@ -794,8 +794,8 @@ ship_event = {
 				name = "NAME_0101010111"
 				skill = 3
 				traits = {
-					trait = leader_trait_aggressive
-					trait = leader_trait_fleet_logistician
+					1 = leader_trait_aggressive
+					2 = leader_trait_fleet_logistician
 				}
 				event_leader = yes
 			}
@@ -1948,7 +1948,7 @@ ship_event = {
 
 	is_triggered_only = yes
 
-	immediate = { from = { clear_deposits_stu = yes } }
+	immediate = { from = { clear_deposits_stu = yes } } # undercoat: moved to scripted effect with possibility of protecting certain deposits
 
 	option = {
 		name = anomaly.4055.a
@@ -1962,7 +1962,9 @@ ship_event = {
 				}
 				last_created_leader = {
 					add_experience = 200
-					add_trait = leader_trait_eager
+					add_trait = {
+						trait = leader_trait_eager
+					}
 					if = {
 						limit = {
 							NOR = {
@@ -1970,7 +1972,9 @@ ship_event = {
 								has_trait = leader_trait_spark_of_genius_2
 							}
 						}
-						add_trait = leader_trait_spark_of_genius
+						add_trait = {
+							trait = leader_trait_spark_of_genius
+						}
 					}
 				}
 			}
@@ -2024,10 +2028,7 @@ ship_event = {
 		name = anomaly.4060.b
 		trigger = {
 			owner = {
-				NOR = {
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_spiritualist
-				}
+				is_spiritualist = no
 			}
 		}
 		owner = {
@@ -2043,10 +2044,7 @@ ship_event = {
 		name = anomaly.4060.spirit.b
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_spiritualist
-				}
+				is_spiritualist = yes
 			}
 		}
 		owner = {
@@ -2143,10 +2141,7 @@ ship_event = {
 		name = BREAKTHROUGH
 		trigger = {
 			owner = {
-				NOR = {
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_spiritualist
-				}
+				is_spiritualist = no
 			}
 		}
 		owner = {
@@ -2160,10 +2155,7 @@ ship_event = {
 		name = anomaly.4062.spirit.a
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_spiritualist
-				}
+				is_spiritualist = yes
 			}
 		}
 		owner = {
@@ -2562,15 +2554,10 @@ ship_event = {
 		trigger = {
 			owner = {
 				OR = {
-					has_ethic = ethic_fanatic_pacifist
-					has_ethic = ethic_pacifist
-					has_ethic = ethic_fanatic_authoritarian
-					has_ethic = ethic_authoritarian
+					is_pacifist = yes
+					is_authoritarian = yes
 				}
-				NOR = {
-					has_ethic = ethic_fanatic_xenophobe
-					has_ethic = ethic_xenophobe
-				}
+				is_xenophobe = no
 			}
 		}
 		owner = {
@@ -2829,11 +2816,9 @@ ship_event = {
 				limit = {
 					owner = {
 						OR = {
-							has_ethic = "ethic_fanatic_xenophobe"
-							has_ethic = "ethic_fanatic_militarist"
+							is_xenophobe = yes
+							is_militarist = yes
 							has_ethic = "ethic_fanatic_egalitarian"
-							has_ethic = "ethic_xenophobe"
-							has_ethic = "ethic_militarist"
 						}
 					}
 				}
@@ -2845,11 +2830,9 @@ ship_event = {
 				limit = {
 					owner = {
 						NOR = {
-							has_ethic = "ethic_fanatic_xenophobe"
-							has_ethic = "ethic_fanatic_militarist"
 							has_ethic = "ethic_fanatic_egalitarian"
-							has_ethic = "ethic_xenophobe"
-							has_ethic = "ethic_militarist"
+							is_xenophobe = yes
+							is_militarist = yes
 						}
 					}
 				}
@@ -3293,7 +3276,7 @@ ship_event = {
 		hidden_effect = {
 			owner = { country_event = { id = story.5 days = 30 } }
 		}
-		from = { clear_deposits_stu = yes }
+		from = { clear_deposits_stu = yes } # undercoat: moved to scripted effect with possibility of protecting certain deposits
 	}
 
 	option = {
@@ -3764,7 +3747,7 @@ ship_event = {
 #	immediate = {
 #		hidden_effect = {
 #			owner = { country_event = { id = story.5 days = 30 } }
-#			from = { clear_deposits_stu = yes }
+#			from = { clear_deposits_stu = yes } # undercoat: moved to scripted effect with possibility of protecting certain deposits
 #		}
 #	}
 #
@@ -4298,8 +4281,7 @@ ship_event = {
 		name = anomaly.4155.b
 		trigger = {
 			owner = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
+				is_spiritualist = yes
 			}
 		}
 		owner = {
@@ -4413,17 +4395,12 @@ country_event = {
 		}
 		trigger = {
 			OR = {
-				has_ethic = ethic_fanatic_xenophile
-				has_ethic = ethic_xenophile
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_pacifist
+				is_xenophile = yes
+				is_fanatic_spiritualist = yes
+				is_pacifist = yes
 			}
-			NOR = {
-				has_ethic = ethic_fanatic_materialist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-			}
+			is_fanatic_materialist = no
+			is_militarist = no
 		}
 	}
 	option = {
@@ -4440,18 +4417,13 @@ country_event = {
 		}
 		trigger = {
 			OR = {
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_egalitarian
-				has_ethic = ethic_fanatic_materialist
+				is_xenophobe = yes
+				is_militarist = yes
+				is_fanatic_egalitarian = yes
+				is_fanatic_materialist = yes
 			}
-			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_pacifist
-			}
+			is_fanatic_spiritualist = no
+			is_pacifist = no
 		}
 	}
 }
@@ -4484,12 +4456,9 @@ country_event = {
 		is_dialog_only = yes
 		trigger = {
 			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
+				is_spiritualist = yes
+				is_militarist = yes
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -4498,15 +4467,10 @@ country_event = {
 		response_text = anomaly.4158.b.response
 		is_dialog_only = yes
 		trigger = {
-			OR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-			}
+			is_militarist = yes
 			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
+				is_spiritualist = yes
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -4516,14 +4480,11 @@ country_event = {
 		is_dialog_only = yes
 		trigger = {
 			OR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
+				is_spiritualist = yes
 			}
 			NOR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
+				is_militarist = yes
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -4532,21 +4493,17 @@ country_event = {
 		response_text = anomaly.4158.c.response
 		is_dialog_only = yes
 		trigger = {
-			NOR = {
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
-			}
+			is_xenophobe = no
 		}
 	}
 	option = { # Rejecting
 		name = anomaly.4158.d
 		trigger = {
 			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
+				is_spiritualist = yes
 				has_ethic = ethic_pacifist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_materialist
+				is_fanatic_militarist = yes
+				is_fanatic_materialist = yes
 			}
 		}
 		hidden_effect = {
@@ -4563,17 +4520,13 @@ country_event = {
 				}
 			}
 			OR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
+				is_spiritualist = yes
 				has_ethic = ethic_pacifist
 			}
-			NOR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_materialist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
-			}
+			is_fanatic_militarist = no
+			is_fanatic_materialist = no
+			is_fanatic_pacifist = no
+			is_xenophobe = no
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4160 }
@@ -4589,15 +4542,11 @@ country_event = {
 				}
 			}
 			OR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_materialist
+				is_fanatic_militarist = yes
+				is_fanatic_materialist = yes
 			}
-			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_pacifist
-			}
+			is_spiritualist = no
+			is_pacifist = no
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4162 }
@@ -4607,9 +4556,7 @@ country_event = {
 	option = {
 		name = anomaly.4158.f
 		trigger = {
-			NOT = {
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_fanatic_xenophobe = no
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4163 }
@@ -4618,7 +4565,7 @@ country_event = {
 	option = {
 		name = anomaly.4158.xenophobe.f
 		trigger = {
-			has_ethic = ethic_fanatic_xenophobe
+			is_fanatic_xenophobe = yes
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4163 }
@@ -4655,12 +4602,9 @@ country_event = {
 		is_dialog_only = yes
 		trigger = {
 			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
+				is_spiritualist = yes
+				is_militarist = yes
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -4669,15 +4613,10 @@ country_event = {
 		response_text = anomaly.4158.b.response
 		is_dialog_only = yes
 		trigger = {
-			OR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-			}
+			is_militarist = yes
 			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
+				is_spiritualist = yes
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -4686,15 +4625,10 @@ country_event = {
 		response_text = anomaly.4158.b.response
 		is_dialog_only = yes
 		trigger = {
-			OR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-			}
+			is_spiritualist = yes
 			NOR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
+				is_militarist = yes
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -4703,21 +4637,17 @@ country_event = {
 		response_text = anomaly.4158.c.response
 		is_dialog_only = yes
 		trigger = {
-			NOR = {
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
-			}
+			is_xenophobe = no
 		}
 	}
 	option = { # Rejecting
 		name = anomaly.4158.d
 		trigger = {
 			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
+				is_spiritualist = yes
 				has_ethic = ethic_pacifist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_materialist
+				is_fanatic_militarist = yes
+				is_fanatic_materialist = yes
 			}
 		}
 		hidden_effect = {
@@ -4734,17 +4664,13 @@ country_event = {
 				}
 			}
 			OR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
+				is_spiritualist = yes
 				has_ethic = ethic_pacifist
 			}
-			NOR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_materialist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophobe
-			}
+			is_fanatic_militarist = no
+			is_fanatic_materialist = no
+			is_fanatic_pacifist = no
+			is_xenophobe = no
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4160 }
@@ -4760,15 +4686,11 @@ country_event = {
 				}
 			}
 			OR = {
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_materialist
+				is_fanatic_militarist = yes
+				is_fanatic_materialist = yes
 			}
-			NOR = {
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_pacifist
-			}
+			is_spiritualist = no
+			is_pacifist = no
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4162 }
@@ -4778,9 +4700,7 @@ country_event = {
 	option = {
 		name = anomaly.4158.f
 		trigger = {
-			NOT = {
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_fanatic_xenophobe = no
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4163 }
@@ -4789,7 +4709,7 @@ country_event = {
 	option = {
 		name = anomaly.4158.xenophobe.f
 		trigger = {
-			has_ethic = ethic_fanatic_xenophobe
+			is_fanatic_xenophobe = yes
 		}
 		hidden_effect = {
 			country_event = {id = anomaly.4163 }
@@ -4834,7 +4754,7 @@ country_event = {
 			name = "NAME_Majula_the_Bearer"
 			skill = 5
 			traits = {
-				trait = leader_trait_butcher
+				1 = leader_trait_butcher
 			}
 			event_leader = yes
 		}
@@ -4878,12 +4798,8 @@ country_event = {
 	option = {
 		name = anomaly.4161.b
 		trigger = {
-			NOR = {
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_pacifist
-				has_ethic = ethic_fanatic_xenophile
-				has_ethic = ethic_xenophile
-			}
+			is_pacifist = no
+			is_xenophile = no
 		}
 	}
 }
@@ -5055,10 +4971,7 @@ country_event = {
 
 	option = {
 		trigger = {
-			OR = {
-				has_ethic = "ethic_fanatic_militarist"
-				has_ethic = "ethic_militarist"
-			}
+			is_militarist = yes
 		}
 		name = SPLENDID
 		custom_tooltip = "anomaly.4166.a.tooltip"
@@ -5068,10 +4981,7 @@ country_event = {
 	}
 	option = {
 		trigger = {
-			NOR = {
-				has_ethic = "ethic_fanatic_militarist"
-				has_ethic = "ethic_militarist"
-			}
+			is_militarist = yes
 		}
 		name = anomaly.4166.a
 		custom_tooltip = "anomaly.4166.a.tooltip"
@@ -5090,10 +5000,7 @@ ship_event = {
 		trigger = {
 			root = {
 				owner = {
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_fanatic_materialist
-					}
+					is_materialist = yes
 				}
 			}
 		}
@@ -5103,10 +5010,7 @@ ship_event = {
 		trigger = {
 			root = {
 				owner = {
-					NOR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_fanatic_materialist
-					}
+					is_materialist = no
 				}
 			}
 		}

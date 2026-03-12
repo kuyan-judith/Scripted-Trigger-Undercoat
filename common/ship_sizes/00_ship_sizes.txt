@@ -35,6 +35,7 @@
 							 #  the one that costs more is considered an upgrade compared to the cheaper one
 #
 # is_bio_ship = yes					# this indicates that this ship uses bioship mechanic
+# is_entropy_conduit = yes			# this indicates that this ship is a type of entropy conduit ship used in the galactic hyperthermia crisis
 # upgrades_to = mauler_stage_2		# the next stage of the bioship growth
 #
 # bioship_growth_progress_required  = 150	# for bioships: growth threshold at which the ship will grow into its next stage
@@ -135,13 +136,8 @@ corvette = {
 				is_hive_empire = yes
 			}
 			modifier = {
-				factor = 1.25
-				NOT = { is_preferred_weapons = weapon_type_explosive }
-			}
-			modifier = {
-				factor = 0.75
-				is_preferred_weapons = weapon_type_strike_craft
-				has_technology = tech_destroyers
+				factor = 0.5
+				has_technology = tech_cruisers 
 			}
 			modifier = {
 				factor = 1.5
@@ -234,7 +230,7 @@ frigate = {
 				is_preferred_weapons = weapon_type_explosive
 			}
 			modifier = {
-				factor = 1.5
+				factor = 1.25
 				has_technology = tech_battleships
 			}
 		}
@@ -303,7 +299,7 @@ destroyer = {
 		fraction = {
 			base = 0
 			modifier = {
-				add = 15
+				add = 10
 				uses_standard_ship_sizes = yes
 			}
 			modifier = {
@@ -318,11 +314,11 @@ destroyer = {
 			modifier = {
 				factor = 1.5
 				has_valid_civic = civic_hive_devouring_swarm
+				NOT = { has_technology = tech_cruisers }
 			}
 			modifier = {
-				factor = 1.5
-				has_valid_civic = civic_hive_devouring_swarm
-				NOT = { has_technology = tech_battleships }
+				factor = 0.5
+				has_technology = tech_battleships
 			}
 		}
 	}
@@ -412,7 +408,7 @@ cruiser = {
 		fraction = {
 			base = 0
 			modifier = {
-				add = 25
+				add = 50
 				uses_standard_ship_sizes = yes
 			}
 			modifier = {
@@ -821,6 +817,7 @@ colonizer = {
 			trigger = {
 				from = {
 					is_lithoid_empire = no
+					is_infernal_empire = no
 					is_robot_empire = no
 					is_hive_empire = no
 					is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
@@ -833,6 +830,7 @@ colonizer = {
 			trigger = {
 				from = {
 					is_lithoid_empire = no
+					is_infernal_empire = no
 					is_robot_empire = no
 					is_hive_empire = yes
 				}
@@ -939,6 +937,27 @@ colonizer = {
 				}
 			}
 			energy = @colony_cost_very_high
+		}
+
+		# Alloys for Infernals
+		# 100 normally
+		cost = {
+			trigger = {
+				from = {
+					is_infernal_empire = yes
+				}
+			}
+			alloys = @colony_cost_low
+		}
+		# 400 Energy for Hives, replacing CG
+		cost = {
+			trigger = {
+				from = {
+					is_infernal_empire = yes
+					is_hive_empire = yes
+				}
+			}
+			energy = @colony_cost_mid
 		}
 
 		upkeep = {
@@ -1416,9 +1435,8 @@ science = {
 	}
 
 	potential_country = {
-		NOT = {
-			is_country_type = enclave_mercenary
-		}
+		is_mercenary = no
+		NOT = { is_country_type = mindwarden_enclave }
 		OR = {
 			has_technology = tech_hyper_drive_1
 			has_technology = tech_hyper_drive_2

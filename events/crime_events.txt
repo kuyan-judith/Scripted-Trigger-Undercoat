@@ -12,21 +12,31 @@ planet_event = {
 	title = crime.1.name
 	desc = {
 		trigger = {
-			owner = { is_gestalt = no }
+			if = {
+				limit = { owner = { is_gestalt = no } }
+				text = crime.1.desc
+
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = newline
+					text = crime.1.desc.experimenters
+				}
+			}
+			else_if = {
+				limit = { owner = { is_hive_empire = yes } }
+				text = crime.1.b.desc
+
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = newline
+					text = crime.1.b.desc.experimenters
+				}
+			}
+			else_if = {
+				limit = { owner = { is_machine_empire = yes } }
+				text = crime.1.c.desc
+			}
 		}
-		text = crime.1.desc
-	}
-	desc = {
-		trigger = {
-			owner = { is_hive_empire = yes }
-		}
-		text = crime.1.b.desc
-	}
-	desc = {
-		trigger = {
-			owner = { is_machine_empire = yes }
-		}
-		text = crime.1.c.desc
 	}
 	picture = {
 		trigger = {
@@ -60,8 +70,8 @@ planet_event = {
 		owner = {
 			is_playable = yes # undercoat: moved to scripted trigger
 		}
-		pop_amount > 300
-		num_unemployed > 300 #early out before the expensive count_owned_pop to come
+		pop_amount > 500
+		num_unemployed > 500 #early out before the expensive count_owned_pop to come
 		NOR = {
 			has_planet_flag = criminal_underworld_disappeared # Cooldown
 			has_planet_flag = criminal_underworld_event_up
@@ -69,12 +79,12 @@ planet_event = {
 			has_modifier = unemployment_benefits
 			has_modifier = activity_program
 			has_modifier = standby_mode
-			has_modifier = criminal_underworld
-			has_modifier = drone_deviancy
+			has_criminal_underworld_modifier = yes
+			has_drone_deviancy_modifier = yes
 			has_modifier = drone_corruption
-			has_modifier = gang_wars
-			has_modifier = center_of_drug_trade
-			has_modifier = mob_rule
+			has_gang_wars_modifier = yes
+			has_center_of_drug_trade_modifier = yes
+			has_mob_rule_modifier = yes
 		}
 		OR = {
 			AND = {
@@ -83,6 +93,7 @@ planet_event = {
 					limit = {
 						is_unemployed = yes
 						is_shackled_robot = no
+						is_enslaved = no
 						NOR = {
 							has_living_standard = { type = living_standard_utopian }
 							has_living_standard = { type = living_standard_good }
@@ -90,7 +101,7 @@ planet_event = {
 							has_living_standard = { type = living_standard_worker_ownership }
 						}
 					}
-					count > 300
+					count > 500
 				}
 			}
 			AND = {
@@ -114,67 +125,117 @@ planet_event = {
 		factor = 1
 		modifier = {
 			factor = 2.0
-			num_unemployed > 500
+			num_unemployed > 750
 		}
 		modifier = {
 			factor = 2.0
-			num_unemployed > 700
+			num_unemployed > 1000
 		}
 		modifier = {
 			factor = 2.0
-			num_unemployed > 900
+			num_unemployed > 1500
 		}
 		modifier = {
 			factor = 2.0
-			num_unemployed > 1100
+			num_unemployed > 2000
 		}
 	}
 
+	# Top Option
 	option = {
-		name = crime.1.a
 		trigger = {
-			owner = {
-				is_gestalt = no # undercoat: moved to scripted trigger
+			owner = { is_gestalt = no }
+		}
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.1.a.experimenters
+				}
+				else = {
+					text = crime.1.a
+				}
 			}
 		}
 		add_modifier = { modifier = "unemployment_benefits" days = 3600 }
 	}
 	option = {
-		name = crime.1.a2
 		trigger = {
 			owner = { is_hive_empire = yes }
+		}
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.1.a2.experimenters
+				}
+				else = {
+					text = crime.1.a2
+				}
+			}
 		}
 		add_modifier = { modifier = "activity_program" days = 3600 }
 	}
 	option = {
-		name = crime.1.a3
-		custom_tooltip = crime.1.a3.tooltip
 		trigger = {
 			owner = { is_machine_empire = yes }
 		}
+		name = crime.1.a3
+		custom_tooltip = crime.1.a3.tooltip
 		hidden_effect = { add_modifier = { modifier = "standby_mode" days = 3600 } }
 	}
+
+	# Bottom Option
 	option = {
-		name = crime.1.b
 		trigger = {
-			owner = {
-				is_gestalt = no # undercoat: moved to scripted trigger
+			owner = { is_twisted_experimenters_empire = yes }
+		}
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_gestalt = no } }
+					text = crime.1.b.experimenters
+				}
+				else_if = {
+					limit = { owner = { is_hive_empire = yes } }
+					text = crime.1.b2.experimenters
+				}
 			}
 		}
+		if = {
+			limit = { owner = { is_gestalt = no } }
+			add_modifier = { modifier = "criminal_underworld_experimenters" days = -1 }
+		}
+		else_if = {
+			limit = { owner = { is_hive_empire = yes } }
+			add_modifier = { modifier = "drone_deviancy_experimenters" days = -1 }
+		}
+	}
+	option = {
+		trigger = {
+			owner = {
+				is_gestalt = no
+				is_twisted_experimenters_empire = no
+			}
+		}
+		name = crime.1.b
 		add_modifier = { modifier = criminal_underworld days = -1 }
 	}
 	option = {
-		name = crime.1.b2
 		trigger = {
-			owner = { is_hive_empire = yes }
+			owner = {
+				is_hive_empire = yes
+				is_twisted_experimenters_empire = no
+			}
 		}
+		name = crime.1.b2
 		add_modifier = { modifier = drone_deviancy days = -1 }
 	}
 	option = {
-		name = crime.1.b3
 		trigger = {
 			owner = { is_machine_empire = yes }
 		}
+		name = crime.1.b3
 		add_modifier = { modifier = drone_corruption days = -1 }
 	}
 
@@ -200,7 +261,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -212,7 +273,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.2.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.2.a.experimenters
+				}
+				else = {
+					text = crime.2.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = bribed_officials days = 3600 }
 		}
@@ -223,7 +294,16 @@ planet_event = {
 planet_event = {
 	id = crime.3
 	title = crime.3.name
-	desc = crime.3.desc
+	desc = {
+		trigger = {
+			text = crime.3.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.3.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -234,7 +314,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -246,7 +326,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.3.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.3.a.experimenters
+				}
+				else = {
+					text = crime.3.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = substance_abuse days = 3600 }
 		}
@@ -257,7 +347,16 @@ planet_event = {
 planet_event = {
 	id = crime.4
 	title = crime.4.name
-	desc = crime.4.desc
+	desc = {
+		trigger = {
+			text = crime.4.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.4.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_derelict_interior
 	show_sound = event_ground_battle
 	location = root
@@ -268,7 +367,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -280,7 +379,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.4.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.4.a.experimenters
+				}
+				else = {
+					text = crime.4.a
+				}
+			}
+		}
 		tooltip = {
 			add_planet_devastation = 15
 		}
@@ -291,7 +400,16 @@ planet_event = {
 planet_event = {
 	id = crime.5
 	title = crime.5.name
-	desc = crime.5.desc
+	desc = {
+		trigger = {
+			text = crime.5.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.5.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_ship_offloading_cargo
 	show_sound = event_criminal_activity
 	location = root
@@ -302,7 +420,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -314,7 +432,17 @@ planet_event = {
 	}
 
 	option = {
-		name = UNFORTUNATE
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.5.a.experimenters
+				}
+				else = {
+					text = crime.5.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = smuggler_activity days = 3600 }
 		}
@@ -325,7 +453,16 @@ planet_event = {
 planet_event = {
 	id = crime.6
 	title = crime.6.name
-	desc = crime.6.desc
+	desc = {
+		trigger = {
+			text = crime.6.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.6.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -336,7 +473,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -348,7 +485,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.6.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.6.a.experimenters
+				}
+				else = {
+					text = crime.6.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = crime_wave days = 3600 }
 		}
@@ -359,7 +506,16 @@ planet_event = {
 planet_event = {
 	id = crime.7
 	title = crime.7.name
-	desc = crime.7.desc
+	desc = {
+		trigger = {
+			text = crime.7.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.7.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_ship_offloading_cargo
 	show_sound = event_criminal_activity
 	location = root
@@ -370,7 +526,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -427,7 +583,17 @@ planet_event = {
 	}
 
 	option = {
-		name = EXCELLENT
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.7.a.experimenters
+				}
+				else = {
+					text = crime.7.a
+				}
+			}
+		}
 		if = {
 			limit = { has_planet_flag = contraband_alloys }
 			owner = { add_resource = { alloys = 100 } }
@@ -488,7 +654,16 @@ planet_event = {
 planet_event = {
 	id = crime.8
 	title = crime.8.name
-	desc = crime.8.desc
+	desc = {
+		trigger = {
+			text = crime.8.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.8.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -499,7 +674,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
+		has_criminal_underworld_modifier = yes
 	}
 
 	immediate = {
@@ -511,7 +686,17 @@ planet_event = {
 	}
 
 	option = {
-		name = EXCELLENT
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.8.a.experimenters
+				}
+				else = {
+					text = crime.8.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = crime_boss_arrested days = 3600 }
 		}
@@ -524,24 +709,33 @@ planet_event = {
 	title = crime.40.name
 	desc = {
 		trigger = {
-			owner = {
-				is_gestalt = no # undercoat: moved to scripted trigger
+			if = {
+				limit = { owner = { is_gestalt = no } }
+				text = crime.40.desc
+
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = newline
+					text = crime.40.desc.experimenters
+				}
+			}
+			else_if = {
+				limit = { owner = { is_hive_empire = yes } }
+				text = crime.40.b.desc
+
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = newline
+					text = crime.40.b.desc.experimenters
+				}
+			}
+			else_if = {
+				limit = { owner = { is_machine_empire = yes } }
+				text = crime.40.c.desc
 			}
 		}
-		text = crime.40.desc
 	}
-	desc = {
-		trigger = {
-			owner = { is_hive_empire = yes }
-		}
-		text = crime.40.b.desc
-	}
-	desc = {
-		trigger = {
-			owner = { is_machine_empire = yes }
-		}
-		text = crime.40.c.desc
-	}
+
 	picture = {
 		trigger = {
 			owner = {
@@ -579,12 +773,12 @@ planet_event = {
 			has_modifier = unemployment_benefits
 			has_modifier = activity_program
 			has_modifier = standby_mode
-			has_modifier = criminal_underworld
-			has_modifier = drone_deviancy
+			has_criminal_underworld_modifier = yes
+			has_drone_deviancy_modifier = yes
 			has_modifier = drone_corruption
-			has_modifier = gang_wars
-			has_modifier = center_of_drug_trade
-			has_modifier = mob_rule
+			has_gang_wars_modifier = yes
+			has_center_of_drug_trade_modifier = yes
+			has_mob_rule_modifier = yes
 		}
 		NOT = { has_planet_flag = criminal_underworld_disappeared } # Cooldown
 	}
@@ -614,14 +808,26 @@ planet_event = {
 					is_gestalt = no # undercoat: moved to scripted trigger
 				}
 			}
-			add_modifier = { modifier = "criminal_underworld" days = -1 }
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				add_modifier = { modifier = "criminal_underworld_experimenters" days = -1 }
+			}
+			else = {
+				add_modifier = { modifier = "criminal_underworld" days = -1 }
+			}
 			break = yes
 		}
 		if = {
 			limit = {
 				owner = { is_hive_empire = yes }
 			}
-			add_modifier = { modifier = "drone_deviancy" days = -1 }
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				add_modifier = { modifier = "drone_deviancy_experimenters" days = -1 }
+			}
+			else = {
+				add_modifier = { modifier = "drone_deviancy" days = -1 }
+			}
 			break = yes
 		}
 		if = {
@@ -637,6 +843,7 @@ planet_event = {
 		trigger = {
 			owner = {
 				is_gestalt = no # undercoat: moved to scripted trigger
+				is_twisted_experimenters_empire = no
 			}
 		}
 		tooltip = {
@@ -646,10 +853,40 @@ planet_event = {
 	option = {
 		name = crime.40.b
 		trigger = {
-			owner = { is_hive_empire = yes }
+			owner = {
+				is_hive_empire = yes
+				is_twisted_experimenters_empire = no
+			}
 		}
 		tooltip = {
 			add_modifier = { modifier = "drone_deviancy" days = -1 }
+		}
+	}
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_hive_empire = yes } }
+					text = crime.40.b.experimenters
+				}
+				else = {
+					text = crime.40.a.experimenters
+				}
+			}
+		}
+		trigger = {
+			owner = {
+				is_twisted_experimenters_empire = yes
+			}
+		}
+		tooltip = {
+			if = {
+				limit = { owner = { is_hive_empire = yes } }
+				add_modifier = { modifier = "drone_deviancy_experimenters" days = -1 }
+			}
+			else = {
+				add_modifier = { modifier = "criminal_underworld_experimenters" days = -1 }
+			}
 		}
 	}
 	option = {
@@ -675,23 +912,31 @@ planet_event = {
 	title = crime.41.name
 	desc = {
 		trigger = {
-			owner = {
-				is_gestalt = no # undercoat: moved to scripted trigger
+			if = {
+				limit = { owner = { is_gestalt = no } }
+				text = crime.41.desc
+
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = newline
+					text = crime.41.desc.experimenters
+				}
+			}
+			else_if = {
+				limit = { owner = { is_hive_empire = yes } }
+				text = crime.41.b.desc
+
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = newline
+					text = crime.41.b.desc.experimenters
+				}
+			}
+			else_if = {
+				limit = { owner = { is_machine_empire = yes } }
+				text = crime.41.c.desc
 			}
 		}
-		text = crime.41.desc
-	}
-	desc = {
-		trigger = {
-			owner = { is_hive_empire = yes }
-		}
-		text = crime.41.b.desc
-	}
-	desc = {
-		trigger = {
-			owner = { is_machine_empire = yes }
-		}
-		text = crime.41.c.desc
 	}
 	picture = {
 		trigger = {
@@ -717,7 +962,7 @@ planet_event = {
 	location = root
 	is_triggered_only = yes
 	auto_opens = no
-	notification_event_icon = "GFX_message_low_crime" # TODO_CD replace with unique icon AUG-50247
+	notification_event_icon = "GFX_message_low_crime"
 
 	pre_triggers = {
 		has_owner = yes
@@ -731,12 +976,12 @@ planet_event = {
 			}
 		}
 		OR = {
-			has_modifier = criminal_underworld
-			has_modifier = drone_deviancy
+			has_criminal_underworld_modifier = yes
+			has_drone_deviancy_modifier = yes
 			has_modifier = drone_corruption
-			has_modifier = gang_wars
-			has_modifier = center_of_drug_trade
-			has_modifier = mob_rule
+			has_gang_wars_modifier = yes
+			has_center_of_drug_trade_modifier = yes
+			has_mob_rule_modifier = yes
 		}
 		NOT = { has_planet_flag = criminal_underworld_appeared } # Cooldown
 		pop_amount > 0
@@ -838,21 +1083,71 @@ planet_event = {
 	}
 
 	option = {
-		name = GOOD
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.41.a.experimenters
+				}
+				else = {
+					text = crime.41.a
+				}
+			}
+		}
 		if = {
-			limit = { has_modifier = criminal_underworld }
+			limit = {
+				has_criminal_underworld_modifier = yes
+				owner = { is_twisted_experimenters_empire = yes }
+			}
+			remove_modifier = criminal_underworld_experimenters
+		}
+		if = {
+			limit = {
+				has_criminal_underworld_modifier = yes
+				owner = { is_twisted_experimenters_empire = no }
+			}
 			remove_modifier = criminal_underworld
 		}
 		if = {
-			limit = { has_modifier = gang_wars }
+			limit = {
+				has_gang_wars_modifier = yes
+				owner = { is_twisted_experimenters_empire = yes }
+			}
+			remove_modifier = gang_wars_experimenters
+		}
+		if = {
+			limit = {
+				has_gang_wars_modifier = yes
+				owner = { is_twisted_experimenters_empire = no }
+			}
 			remove_modifier = gang_wars
 		}
 		if = {
-			limit = { has_modifier = center_of_drug_trade }
+			limit = {
+				has_center_of_drug_trade_modifier = yes
+				owner = { is_twisted_experimenters_empire = yes }
+			}
+			remove_modifier = center_of_drug_trade_experimenters
+		}
+		if = {
+			limit = {
+				has_center_of_drug_trade_modifier = yes
+				owner = { is_twisted_experimenters_empire = no }
+			}
 			remove_modifier = center_of_drug_trade
 		}
 		if = {
-			limit = { has_modifier = mob_rule }
+			limit = {
+				has_mob_rule_modifier = yes
+				owner = { is_twisted_experimenters_empire = yes }
+			}
+			remove_modifier = mob_rule_experimenters
+		}
+		if = {
+			limit = {
+				has_mob_rule_modifier = yes
+				owner = { is_twisted_experimenters_empire = no }
+			}
 			remove_modifier = mob_rule
 		}
 		if = {
@@ -889,8 +1184,9 @@ planet_event = {
 		}
 		# Hive Minds
 		if = {
-			limit = { has_modifier = drone_deviancy }
+			limit = { has_drone_deviancy_modifier = yes }
 			remove_modifier = drone_deviancy
+			remove_modifier = drone_deviancy_experimenters
 		}
 		if = {
 			limit = { has_modifier = deviant_interference }
@@ -930,10 +1226,10 @@ event = {
 				is_gestalt = no # undercoat: moved to scripted trigger
 				any_owned_planet = {
 					OR = {
-						has_modifier = criminal_underworld
-						has_modifier = gang_wars
-						has_modifier = center_of_drug_trade
-						has_modifier = mob_rule
+						has_criminal_underworld_modifier = yes
+						has_gang_wars_modifier = yes
+						has_center_of_drug_trade_modifier = yes
+						has_mob_rule_modifier = yes
 					}
 					NOR = {
 						has_planet_flag = planet_crime_flag
@@ -947,7 +1243,7 @@ event = {
 			limit = {
 				is_hive_empire = yes
 				any_owned_planet = {
-					has_modifier = drone_deviancy
+					has_drone_deviancy_modifier = yes
 				}
 			}
 			country_event = { id = crime.52 }
@@ -975,10 +1271,10 @@ country_event = {
 		random_owned_planet = {
 			limit = {
 				OR = {
-					has_modifier = criminal_underworld
-					has_modifier = gang_wars
-					has_modifier = center_of_drug_trade
-					has_modifier = mob_rule
+					has_criminal_underworld_modifier = yes
+					has_gang_wars_modifier = yes
+					has_center_of_drug_trade_modifier = yes
+					has_mob_rule_modifier = yes
 				}
 				NOR = {
 					has_planet_flag = planet_crime_flag
@@ -990,56 +1286,56 @@ country_event = {
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.2 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.3 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.4 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.5 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.6 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.7 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 					}
 					planet_event = { id = crime.8 days = 1 random = 300 }
 				}
 				10 = { # Gang Wars
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 						planet_crime < 50
 					}
 					planet_event = { id = crime.100 days = 1 random = 300 }
@@ -1047,7 +1343,7 @@ country_event = {
 				10 = { # Center of Drug Trade
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 						planet_crime < 50
 					}
 					planet_event = { id = crime.200 days = 1 random = 300 }
@@ -1055,7 +1351,7 @@ country_event = {
 				10 = { # Mob Rule
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = criminal_underworld }
+						has_criminal_underworld_modifier = no
 						planet_crime < 50
 					}
 					planet_event = { id = crime.300 days = 1 random = 300 }
@@ -1063,70 +1359,70 @@ country_event = {
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = gang_wars }
+						has_gang_wars_modifier = no
 					}
 					planet_event = { id = crime.101 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = gang_wars }
+						has_gang_wars_modifier = no
 					}
 					planet_event = { id = crime.102 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = gang_wars }
+						has_gang_wars_modifier = no
 					}
 					planet_event = { id = crime.103 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = gang_wars }
+						has_gang_wars_modifier = no
 					}
 					planet_event = { id = crime.104 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = center_of_drug_trade }
+						has_center_of_drug_trade_modifier = no
 					}
 					planet_event = { id = crime.201 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = center_of_drug_trade }
+						has_center_of_drug_trade_modifier = no
 					}
 					planet_event = { id = crime.202 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = center_of_drug_trade }
+						has_center_of_drug_trade_modifier = no
 					}
 					planet_event = { id = crime.203 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = center_of_drug_trade }
+						has_center_of_drug_trade_modifier = no
 					}
 					planet_event = { id = crime.204 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = mob_rule }
+						has_mob_rule_modifier = no
 					}
 					planet_event = { id = crime.301 days = 1 random = 300 }
 				}
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = mob_rule }
+						has_mob_rule_modifier = no
 					}
 					planet_event = { id = crime.302 days = 1 random = 300 }
 				}
@@ -1134,7 +1430,7 @@ country_event = {
 					modifier = {
 						factor = 0
 						OR = {
-							NOT = { has_modifier = mob_rule }
+							has_mob_rule_modifier = no
 							NOT = { exists = leader }
 							owner = { has_country_flag = gangsters_killed_governor }
 						}
@@ -1144,8 +1440,8 @@ country_event = {
 						exists = leader
 						leader = {
 							OR = {
-								has_chosen_one_leader_trait = yes
-								has_leader_flag = legendary_leader
+								has_any_chosen_one_leader_trait = yes
+								is_leader_tier = leader_tier_legendary
 							}
 						}
 					}
@@ -1154,7 +1450,7 @@ country_event = {
 				10 = {
 					modifier = {
 						factor = 0
-						NOT = { has_modifier = mob_rule }
+						has_mob_rule_modifier = no
 					}
 					planet_event = { id = crime.304 days = 1 random = 300 }
 				}
@@ -1173,7 +1469,7 @@ country_event = {
 	immediate = {
 		random_owned_planet = {
 			limit = {
-				has_modifier = drone_deviancy
+				has_drone_deviancy_modifier = yes
 				NOT = { has_planet_flag = planet_crime_flag }
 			}
 			random_list = {
@@ -1213,7 +1509,16 @@ country_event = {
 planet_event = {
 	id = crime.100
 	title = crime.100.name
-	desc = crime.100.desc
+	desc = {
+		trigger = {
+			text = crime.100.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.100.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -1224,20 +1529,40 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
-		NOT = { has_modifier = gang_wars }
+		has_criminal_underworld_modifier = yes
+		has_gang_wars_modifier = no
 	}
 
 	immediate = {
 		remove_modifier = criminal_underworld
-		add_modifier = { modifier = "gang_wars" days = -1 }
+		remove_modifier = criminal_underworld_experimenters
+		if = {
+			limit = { owner = { is_twisted_experimenters_empire = yes } }
+			add_modifier = { modifier = "gang_wars_experimenters" days = -1 }
+		}
+		else = {
+			add_modifier = { modifier = "gang_wars" days = -1 }
+		}
 	}
 
 	option = {
 		name = crime.100.a
 		tooltip = {
-			remove_modifier = criminal_underworld
-			add_modifier = { modifier = "gang_wars" days = -1 }
+			if = {
+				limit = { has_modifier = criminal_underworld }
+				remove_modifier = criminal_underworld
+			}
+			if = {
+				limit = { has_modifier = criminal_underworld_experimenters }
+				remove_modifier = criminal_underworld_experimenters
+			}
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				add_modifier = { modifier = "gang_wars_experimenters" days = -1 }
+			}
+			else = {
+				add_modifier = { modifier = "gang_wars" days = -1 }
+			}
 		}
 	}
 }
@@ -1246,7 +1571,16 @@ planet_event = {
 planet_event = {
 	id = crime.101
 	title = crime.101.name
-	desc = crime.101.desc
+	desc = {
+		trigger = {
+			text = crime.101.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.101.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_derelict_interior
 	show_sound = event_ground_battle
 	location = root
@@ -1257,7 +1591,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = gang_wars
+		has_gang_wars_modifier = yes
 		any_owned_pop_job = {
 			has_job_type = enforcer
 		}
@@ -1275,7 +1609,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.200.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.101.a.experimenters
+				}
+				else = {
+					text = crime.101.a
+				}
+			}
+		}
 		custom_tooltip = crime.101.tooltip
 	}
 }
@@ -1284,7 +1628,16 @@ planet_event = {
 planet_event = {
 	id = crime.102
 	title = crime.102.name
-	desc = crime.102.desc
+	desc = {
+		trigger = {
+			text = crime.102.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.102.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_pirates_attacking_cargo
 	show_sound = event_space_battle
 	location = root
@@ -1299,7 +1652,7 @@ planet_event = {
 			has_country_flag = birth_of_piracy
 			NOT = { has_country_flag = crime_pirates_spawned }
 		}
-		has_modifier = gang_wars
+		has_gang_wars_modifier = yes
 	}
 
 	immediate = {
@@ -1315,7 +1668,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.200.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.102.a.experimenters
+				}
+				else = {
+					text = crime.102.a
+				}
+			}
+		}
 		custom_tooltip = crime.102.tooltip
 	}
 }
@@ -1324,7 +1687,16 @@ planet_event = {
 planet_event = {
 	id = crime.103
 	title = crime.103.name
-	desc = crime.103.desc
+	desc = {
+		trigger = {
+			text = crime.103.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.103.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_derelict_interior
 	show_sound = event_ground_battle
 	location = root
@@ -1335,7 +1707,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = gang_wars
+		has_gang_wars_modifier = yes
 	}
 
 	immediate = {
@@ -1346,7 +1718,17 @@ planet_event = {
 	}
 
 	option = {
-		name = DISCONCERTING
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.103.a.experimenters
+				}
+				else = {
+					text = crime.103.a
+				}
+			}
+		}
 		custom_tooltip = crime.103.tooltip
 		tooltip = { add_planet_devastation = 15 }
 	}
@@ -1356,7 +1738,16 @@ planet_event = {
 planet_event = {
 	id = crime.104
 	title = crime.104.name
-	desc = crime.104.desc
+	desc = {
+		trigger = {
+			text = crime.104.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.104.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_cargoship_caravan
 	show_sound = event_criminal_activity
 	location = root
@@ -1367,7 +1758,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = gang_wars
+		has_gang_wars_modifier = yes
 	}
 
 	immediate = {
@@ -1379,7 +1770,17 @@ planet_event = {
 	}
 
 	option = {
-		name = WORRYING
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.104.a.experimenters
+				}
+				else = {
+					text = crime.104.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = "travel_advisory" days = 3600 }
 		}
@@ -1390,7 +1791,16 @@ planet_event = {
 planet_event = {
 	id = crime.200
 	title = crime.200.name
-	desc = crime.200.desc
+	desc = {
+		trigger = {
+			text = crime.200.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.200.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_smugglers_in_bar
 	show_sound = event_criminal_activity
 	location = root
@@ -1401,19 +1811,42 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
-		NOT = { has_modifier = center_of_drug_trade }
+		has_criminal_underworld_modifier = yes
+		has_center_of_drug_trade_modifier = no
 	}
 
 	immediate = {
 		remove_modifier = criminal_underworld
-		add_modifier = { modifier = "center_of_drug_trade" days = -1 }
+		remove_modifier = criminal_underworld_experimenters
+		if = {
+			limit = { owner = { is_twisted_experimenters_empire = yes } }
+			add_modifier = { modifier = "center_of_drug_trade_experimenters" days = -1 }
+		}
+		else = {
+			add_modifier = { modifier = "center_of_drug_trade" days = -1 }
+		}
 	}
 
 	option = {
-		name = crime.200.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.200.a.experimenters
+				}
+				else = {
+					text = crime.200.a
+				}
+			}
+		}
 		tooltip = {
-			add_modifier = { modifier = "center_of_drug_trade" days = -1 }
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				add_modifier = { modifier = "center_of_drug_trade_experimenters" days = -1 }
+			}
+			else = {
+				add_modifier = { modifier = "center_of_drug_trade" days = -1 }
+			}
 		}
 	}
 }
@@ -1422,7 +1855,16 @@ planet_event = {
 planet_event = {
 	id = crime.201
 	title = crime.201.name
-	desc = crime.201.desc
+	desc = {
+		trigger = {
+			text = crime.201.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.201.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_disease_outbreak
 	show_sound = event_life_support_fail
 	location = root
@@ -1433,7 +1875,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = center_of_drug_trade
+		has_center_of_drug_trade_modifier = yes
 		pop_amount > 400
 	}
 
@@ -1448,7 +1890,17 @@ planet_event = {
 	}
 
 	option = {
-		name = WORRYING
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.201.a.experimenters
+				}
+				else = {
+					text = crime.201.a
+				}
+			}
+		}
 		custom_tooltip = crime.201.tooltip
 	}
 }
@@ -1457,7 +1909,16 @@ planet_event = {
 planet_event = {
 	id = crime.202
 	title = crime.202.name
-	desc = crime.202.desc
+	desc = {
+		trigger = {
+			text = crime.202.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.202.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_derelict_interior
 	show_sound = event_ground_battle
 	location = root
@@ -1468,7 +1929,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = center_of_drug_trade
+		has_center_of_drug_trade_modifier = yes
 	}
 
 	immediate = {
@@ -1491,7 +1952,16 @@ planet_event = {
 planet_event = {
 	id = crime.203
 	title = crime.203.name
-	desc = crime.203.desc
+	desc = {
+		trigger = {
+			text = crime.203.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.203.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_nuclear_explosion
 	show_sound = event_super_explosion
 	location = root
@@ -1502,7 +1972,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = center_of_drug_trade
+		has_center_of_drug_trade_modifier = yes
 	}
 
 	immediate = {
@@ -1513,7 +1983,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.203.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.203.a.experimenters
+				}
+				else = {
+					text = crime.203.a
+				}
+			}
+		}
 		custom_tooltip = crime.103.tooltip
 		tooltip = { add_planet_devastation = 15 }
 	}
@@ -1523,7 +2003,16 @@ planet_event = {
 planet_event = {
 	id = crime.204
 	title = crime.204.name
-	desc = crime.204.desc
+	desc = {
+		trigger = {
+			text = crime.204.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.204.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -1534,7 +2023,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = center_of_drug_trade
+		has_center_of_drug_trade_modifier = yes
 		owner = {
 			has_country_resource = { type = exotic_gases amount > 10 }
 		}
@@ -1547,7 +2036,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.204.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.204.a.experimenters
+				}
+				else = {
+					text = crime.204.a
+				}
+			}
+		}
 		tooltip = {
 			owner = {
 				add_resource = { exotic_gases = -10 }
@@ -1560,7 +2059,16 @@ planet_event = {
 planet_event = {
 	id = crime.300
 	title = crime.300.name
-	desc = crime.300.desc
+	desc = {
+		trigger = {
+			text = crime.300.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.300.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -1571,20 +2079,40 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = criminal_underworld
-		NOT = { has_modifier = mob_rule }
+		has_criminal_underworld_modifier = yes
+		has_mob_rule_modifier = no
 	}
 
 	immediate = {
 		remove_modifier = criminal_underworld
-		add_modifier = { modifier = "mob_rule" days = -1 }
+		remove_modifier = criminal_underworld_experimenters
+		if = {
+			limit = { owner = { is_twisted_experimenters_empire = yes } }
+			add_modifier = { modifier = "mob_rule_experimenters" days = -1 }
+		}
+		else = {
+			add_modifier = { modifier = "mob_rule" days = -1 }
+		}
 	}
 
 	option = {
 		name = crime.300.a
 		tooltip = {
-			remove_modifier = criminal_underworld
-			add_modifier = { modifier = "mob_rule" days = -1 }
+			if = {
+				limit = { has_modifier = criminal_underworld }
+				remove_modifier = criminal_underworld
+			}
+			if = {
+				limit = { has_modifier = criminal_underworld_experimenters }
+				remove_modifier = criminal_underworld_experimenters
+			}
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				add_modifier = { modifier = "mob_rule_experimenters" days = -1 }
+			}
+			else = {
+				add_modifier = { modifier = "mob_rule" days = -1 }
+			}
 		}
 	}
 }
@@ -1593,7 +2121,16 @@ planet_event = {
 planet_event = {
 	id = crime.301
 	title = crime.301.name
-	desc = crime.301.desc
+	desc = {
+		trigger = {
+			text = crime.301.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.301.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -1604,7 +2141,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = mob_rule
+		has_mob_rule_modifier = yes
 	}
 
 	immediate = {
@@ -1616,7 +2153,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.301.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.301.a.experimenters
+				}
+				else = {
+					text = crime.301.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = "protection_racket" days = 3600 }
 		}
@@ -1627,7 +2174,16 @@ planet_event = {
 planet_event = {
 	id = crime.302
 	title = crime.302.name
-	desc = crime.302.desc
+	desc = {
+		trigger = {
+			text = crime.302.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.302.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_dark_alley
 	show_sound = event_criminal_activity
 	location = root
@@ -1638,7 +2194,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = mob_rule
+		has_mob_rule_modifier = yes
 	}
 
 	immediate = {
@@ -1740,7 +2296,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = mob_rule
+		has_mob_rule_modifier = yes
 		exists = leader
 	}
 
@@ -1751,7 +2307,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.303.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.303.a.experimenters
+				}
+				else = {
+					text = crime.303.a
+				}
+			}
+		}
 		leader = { kill_leader = { show_notification = no } }
 	}
 }
@@ -1760,7 +2326,16 @@ planet_event = {
 planet_event = {
 	id = crime.304
 	title = crime.304.name
-	desc = crime.304.desc
+	desc = {
+		trigger = {
+			text = crime.304.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.304.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_ship_offloading_cargo
 	show_sound = event_criminal_activity
 	location = root
@@ -1771,7 +2346,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = mob_rule
+		has_mob_rule_modifier = yes
 	}
 
 	immediate = {
@@ -1783,7 +2358,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.40.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.304.a.experimenters
+				}
+				else = {
+					text = crime.304.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = "trade_pilfering" days = 3600 }
 		}
@@ -1807,7 +2392,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = drone_deviancy
+		has_drone_deviancy_modifier = yes
 	}
 
 	immediate = {
@@ -1830,7 +2415,16 @@ planet_event = {
 planet_event = {
 	id = crime.501
 	title = crime.501.name
-	desc = crime.501.desc
+	desc = {
+		trigger = {
+			text = crime.501.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.501.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_hive_mind
 	show_sound = event_administrative_work
 	location = root
@@ -1841,7 +2435,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = drone_deviancy
+		has_drone_deviancy_modifier = yes
 	}
 
 	immediate = {
@@ -1853,7 +2447,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.500.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.501.a.experimenters
+				}
+				else = {
+					text = crime.501.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = "deviant_interference" days = 3600 }
 		}
@@ -1864,7 +2468,16 @@ planet_event = {
 planet_event = {
 	id = crime.502
 	title = crime.502.name
-	desc = crime.502.desc
+	desc = {
+		trigger = {
+			text = crime.502.desc
+			if = {
+				limit = { owner = { is_twisted_experimenters_empire = yes } }
+				text = newline
+				text = crime.502.desc.experimenters
+			}
+		}
+	}
 	picture = GFX_evt_hive_mind
 	show_sound = event_criminal_activity
 	location = root
@@ -1875,7 +2488,7 @@ planet_event = {
 	}
 
 	trigger = {
-		has_modifier = drone_deviancy
+		has_drone_deviancy_modifier = yes
 	}
 
 	immediate = {
@@ -1887,7 +2500,17 @@ planet_event = {
 	}
 
 	option = {
-		name = crime.502.a
+		name = {
+			trigger = {
+				if = {
+					limit = { owner = { is_twisted_experimenters_empire = yes } }
+					text = crime.502.a.experimenters
+				}
+				else = {
+					text = crime.502.a
+				}
+			}
+		}
 		tooltip = {
 			add_modifier = { modifier = "ringleader_killed" days = 3600 }
 		}

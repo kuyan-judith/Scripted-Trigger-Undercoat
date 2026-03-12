@@ -73,15 +73,15 @@ alloys_expenditure_ships = {
 			}
 		}
 	}
-	
+
 	desired_min = {
 		base = 0
-		
+
 		modifier = {
 			add = 3
 			country_uses_bio_ships = no
 		}
-		
+
 		modifier = {
 			factor = trigger:years_passed
 		}
@@ -129,6 +129,20 @@ alloys_expenditure_planets = {
 
 	weight = {
 		weight = 0.1
+	}
+
+	desired_min = {
+		modifier = {
+			add = 250
+			any_owned_planet = {
+				is_habitat = yes # undercoat: moved to scripted trigger
+				free_district_slots > 0
+			}
+		}
+		modifier = {
+			add = 250
+			is_void_dweller_empire = yes
+		}
 	}
 
 	desired_max = {
@@ -250,7 +264,53 @@ alloys_expenditure_starbases_expand = {
 		base = 150
 	}
 }
+alloys_expenditure_colonies_infernal_expand = {
+	resource = alloys
+	type = expenditure
+	category = colonies
 
+	potential = {
+		is_infernal_empire = yes
+		is_synthetic_fertility_empire = no # undercoat: moved to scripted trigger
+		has_resource = { type = alloys amount > 400 }
+		has_monthly_income = {
+			resource = alloys
+			value > 0
+		}
+	}
+
+	weight = {
+		weight = 0.8
+	}
+
+	desired_min = {
+		base = 0
+		modifier = {
+			add = @colony_cost_base
+			is_hive_empire = no
+		}
+		modifier = {
+			add = @colony_cost_high
+			OR = {
+				is_hive_empire = yes
+			}
+		}
+	}
+
+	desired_max = {
+		base = 0
+		modifier = {
+			add = @colony_cost_base_max
+			is_hive_empire = no
+		}
+		modifier = {
+			add = @colony_cost_high_max
+			OR = {
+				is_hive_empire = yes
+			}
+		}
+	}
+}
 alloys_expenditure_colonies_expand = {
 	resource = alloys
 	type = expenditure
@@ -265,6 +325,7 @@ alloys_expenditure_colonies_expand = {
 		OR = {
 			AND = {
 				is_lithoid_empire = no
+				is_infernal_empire = no
 				has_resource = { type = food amount > 400 }
 				has_monthly_income = {
 					resource = food
@@ -284,6 +345,14 @@ alloys_expenditure_colonies_expand = {
 				has_resource = { type = energy amount > 400 }
 				has_monthly_income = {
 					resource = energy
+					value > 0
+				}
+			}
+			AND = {
+				is_infernal_empire = yes
+				has_resource = { type = alloys amount > 400 }
+				has_monthly_income = {
+					resource = alloys
 					value > 0
 				}
 			}
@@ -400,7 +469,7 @@ alloys_expenditure_habitats = {
 	weight = {
 		weight = 0.2
 		modifier = {
-			factor = 2.5
+			factor = 2
 			is_void_dweller_empire = yes
 		}
 		modifier = {
@@ -481,6 +550,53 @@ alloys_expenditure_decisions = {
 			any_owned_planet = {
 				is_shattered_ring_habitable = yes # undercoat: moved to scripted trigger
 				num_uncleared_blockers < 1
+			}
+		}
+	}
+}
+
+alloys_expenditure_deposit_blockers = {
+	resource = alloys
+	type = expenditure
+	category = deposit_blockers
+
+	potential = {
+		OR = {
+			any_owned_planet = {
+				is_shattered_ring_habitable = yes # undercoat: moved to scripted trigger
+				num_uncleared_blockers > 0
+			}
+			AND = {
+				OR = {
+					has_technology = tech_climate_restoration
+					has_ascension_perk = ap_machine_worlds
+				}
+				any_owned_planet = {
+					has_deposit = d_machine_prototype_pc_machine
+				}
+			}
+		}
+	}
+
+	weight = {
+		weight = 0.15
+	}
+
+	# base remove blocker cost
+	desired_min = {
+		base = 250
+	}
+
+	desired_max = {
+		base = 1250
+		modifier = {
+			mult = 2
+			OR = {
+				has_technology = tech_climate_restoration
+				has_ascension_perk = ap_machine_worlds
+			}
+			any_owned_planet = {
+				has_deposit = d_machine_prototype_pc_machine
 			}
 		}
 	}

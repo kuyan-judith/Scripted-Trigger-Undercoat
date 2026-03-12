@@ -85,6 +85,7 @@ country_event = {
 			every_owned_starbase = {
 				limit = {
 					fleet = { is_in_combat = no }
+					is_controlled_by = owner
 					used_defense_platform_capacity_percent < 0.5
 				}
 				spawn_free_defense_platform = yes
@@ -92,6 +93,7 @@ country_event = {
 			every_owned_nonprimary_starbase = {
 				limit = {
 					fleet = { is_in_combat = no }
+					is_controlled_by = owner
 					used_defense_platform_capacity_percent < 0.5
 				}
 				spawn_free_defense_platform = yes
@@ -106,6 +108,7 @@ country_event = {
 				limit = {
 					is_starbase_type = sfortress
 					fleet = { is_in_combat = no }
+					is_controlled_by = owner
 					used_defense_platform_capacity_percent < 0.5
 				}
 				spawn_free_defense_platform = yes
@@ -117,6 +120,7 @@ country_event = {
 						is_starbase_type = sorbital_fortress
 						is_starbase_type = sdeepspacecitadel
 					}
+					is_controlled_by = owner
 					used_defense_platform_capacity_percent < 0.5
 				}
 				spawn_free_defense_platform = yes
@@ -126,5 +130,63 @@ country_event = {
 			id = country.2050
 			days = 180
 		}
+	}
+}
+
+# Grant XP for building districts, district specializations and buildings.
+planet_event = {
+	id = action.2100
+
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			exists = leader
+			AND = {
+				exists = sector
+				exists = sector.sector_capital.leader
+			}
+		}
+	}
+
+	immediate = {
+		# Planetary governor takes priority.
+		if = {
+			limit = {
+				exists = leader
+			}
+			leader = {
+				add_experience = 10
+			}
+		}
+		# Otherwise fall back to the sector governor.
+		else_if = {
+			limit = {
+				exists = sector
+				exists = sector.sector_capital.leader
+			}
+			sector.sector_capital.leader = {
+				add_experience = 10
+			}
+		}
+	}
+}
+
+# Clear planet purge flag
+planet_event = {
+	id = action.2105
+
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		always = yes
+	}
+
+	immediate = {
+		clear_planet_purge_type = yes
 	}
 }

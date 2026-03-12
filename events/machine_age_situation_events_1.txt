@@ -1677,7 +1677,7 @@ situation_event = { # Corporate rival escalation
 		trigger = {
 			owner = {
 				NOT = {
-					has_ethic = ethic_fanatic_pacifist
+					is_fanatic_pacifist = yes
 				}
 			}
 		}
@@ -2020,14 +2020,6 @@ country_event = {
 				set_faction_extorted = no
 			}
 		}
-		else_if = {
-			limit = {
-				has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
-				
-			}
-			remove_relic = r_the_rulerchip
-			remove_modifier = rulerchip_intergenerational_knowledge
-		}
 	}
 }
 
@@ -2041,15 +2033,24 @@ country_event = {
 
 	trigger = {
 		is_playable = yes # undercoat: moved to scripted trigger
-		has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
-		
+		has_country_flag = cyber_individualist
 	}
 
 	immediate = {
 		if = {
 			limit = {
+				is_imperial_authority = no
+				has_country_flag = cyber_individualist
+				has_relic = r_the_rulerchip
+			}
+			remove_relic = r_the_rulerchip
+			remove_modifier = rulerchip_intergenerational_knowledge
+		}
+		if = {
+			limit = {
 				has_auth_cyber_imperial_individualist = yes # undercoat: moved to scripted trigger
 				
+				NOT = { has_relic = r_the_rulerchip }
 			}
 			add_relic = r_the_rulerchip
 		}
@@ -2086,7 +2087,17 @@ situation_event = { # Event to cyberize pops except Spiritualists
 					save_event_target_as = changing_species
 					if = {
 						limit = {
-							NOT = { exists = event_target:cyberspecies@species }
+							OR = {
+								NOT = { exists = event_target:cyberspecies@species }
+								AND = {
+									exists = event_target:cyberspecies@species
+									event_target:cyberspecies@species = {
+										NOT = {
+											is_same_species = prev
+										}
+									}
+								}
+							}
 						}
 						create_cyber_species_effect = yes
 					}
@@ -2190,7 +2201,17 @@ situation_event = { # Event to minimally cyberize spiritualist pops
 					save_event_target_as = changing_species
 					if = {
 						limit = {
-							NOT = { exists = event_target:cyberspecies@species }
+							OR = {
+								NOT = { exists = event_target:cyberspecies@species }
+								AND = {
+									exists = event_target:cyberspecies@species
+									event_target:cyberspecies@species = {
+										NOT = {
+											is_same_species = prev
+										}
+									}
+								}
+							}
 						}
 						create_cyber_species_effect = yes
 					}
@@ -2278,7 +2299,17 @@ situation_event = { # Event to force cyberize spiritualist pops
 					save_event_target_as = changing_species
 					if = {
 						limit = {
-							NOT = { exists = event_target:cyberspecies@species }
+							OR = {
+								NOT = { exists = event_target:cyberspecies@species }
+								AND = {
+									exists = event_target:cyberspecies@species
+									event_target:cyberspecies@species = {
+										NOT = {
+											is_same_species = prev
+										}
+									}
+								}
+							}
 						}
 						create_cyber_species_effect = yes
 					}
@@ -2395,7 +2426,10 @@ country_event = {
 	immediate = {
 		from = {
 			remove_trait = leader_trait_cyborg
-			add_trait_no_notify = leader_trait_limited_cyborg
+			add_trait = {
+				trait = leader_trait_limited_cyborg
+				show_message = no
+			}
 		}
 	}
 }
@@ -2428,7 +2462,17 @@ situation_event = { # Hive Cyberization - Event to minimally cyberize some non-c
 					save_event_target_as = changing_species
 					if = {
 						limit = {
-							NOT = { exists = event_target:cyberspecies@species }
+							OR = {
+								NOT = { exists = event_target:cyberspecies@species }
+								AND = {
+									exists = event_target:cyberspecies@species
+									event_target:cyberspecies@species = {
+										NOT = {
+											is_same_species = prev
+										}
+									}
+								}
+							}
 						}
 						create_cyber_species_effect = yes
 					}
@@ -3189,10 +3233,7 @@ country_event = { # Unforeseeable Mechanical Failure
 	option = { # Individualist
 		name = cyber.655.c
 		trigger = {
-			NOT = {
-				has_ethic = ethic_egalitarian
-				has_ethic = ethic_fanatic_egalitarian
-			}
+			is_egalitarian = no
 		}
 		custom_tooltip = cyber.social_consequences.tt
 		add_monthly_resource_mult = {
@@ -3519,8 +3560,8 @@ country_event = {
 	trigger = {
 		NOR = {
 			is_gestalt = yes # undercoat: moved to scripted trigger
-			has_ethic = ethic_fanatic_authoritarian
-			has_ethic = ethic_fanatic_egalitarian
+			is_fanatic_authoritarian = yes
+			is_fanatic_egalitarian = yes
 		}
 	}
 
@@ -3691,7 +3732,7 @@ country_event = {
 		name = cyber.820.c
 		custom_tooltip = cyber.social_consequences.tt
 		trigger = {
-			NOT = { has_ethic = ethic_fanatic_xenophobe }
+			NOT = { is_fanatic_xenophobe = yes }
 		}
 		allow = {
 			resource_stockpile_compare = {
@@ -5283,7 +5324,9 @@ country_event = {
 				limit = {
 					has_trait = leader_trait_cyborg
 				}
-				add_trait = leader_trait_hacked
+				add_trait = {
+					trait = leader_trait_hacked
+				}
 			}
 			every_owned_leader = {
 				limit = {
@@ -5303,7 +5346,9 @@ country_event = {
 								negative = yes
 							}
 						}
-						add_trait = leader_trait_hacked
+						add_trait = {
+							trait = leader_trait_hacked
+						}
 					}
 					66 = { } # do nothing
 				}
@@ -5434,7 +5479,9 @@ country_event = {
 				limit = {
 					has_trait = leader_trait_cyborg
 				}
-				add_trait = leader_trait_firewalled
+				add_trait = {
+					trait = leader_trait_firewalled
+				}
 				if = {
 					limit = {
 						has_trait = leader_trait_hacked
@@ -5446,7 +5493,9 @@ country_event = {
 				limit = {
 					has_trait = leader_trait_cyborg
 				}
-				add_trait = leader_trait_firewalled
+				add_trait = {
+					trait = leader_trait_firewalled
+				}
 			}
 		}
 		add_modifier = {
@@ -7078,7 +7127,9 @@ country_event = {
 
 	after = {
 		ruler = {
-			add_trait = leader_trait_cyborg
+			add_trait = {
+				trait = leader_trait_cyborg
+			}
 		}
 	}
 }

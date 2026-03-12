@@ -7,16 +7,45 @@ civilian = {
 	is_capped_by_modifier = no
 	count_as_available_for_ai = yes
 
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
 	possible = {
 		hidden_trigger = { exists = owner }
 		owner = {
 			is_gestalt = no
 		}
+		OR = {
+			NOT = {
+				owner = {
+					has_active_tradition = tr_virtuality_finish
+				}
+			}
+			has_virtual_species_trait = no
+		}
+		planet = { is_cosmogenesis_world = no  } # undercoat: moved to scripted trigger
 	}
 
 	swappable_data = {
 		default = {
 			building_icon = building_residence
+		}
+		# Tourists
+		swap_type = {
+			trigger = {
+				exists = owner
+				has_modifier = resort_colony
+			}
+			name = tourist
+			desc = tourist_desc
+			icon = trader
+			building_icon = building_amusement_megaplex
+			weight = 6
 		}
 		# Hedonists
 		swap_type = {
@@ -37,6 +66,13 @@ civilian = {
 	resources = {
 		category = planet_civilians
 		produces = {
+			trade = 1
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				has_modifier = resort_colony
+			}
 			trade = 1
 		}
 		inline_script = "jobs/ethic_job_resources"
@@ -78,8 +114,8 @@ civilian = {
 				has_policy_flag = computation_core_production
 			}
 		}
-		planet_jobs_alloys_produces_mult = 0.005
-		planet_jobs_consumer_goods_produces_mult = 0.005
+		foundry_jobs_bonus_workforce_mult = 0.005
+		artisan_jobs_bonus_workforce_mult = 0.005
 	}
 
 	triggered_planet_modifier = {
@@ -89,7 +125,7 @@ civilian = {
 				has_policy_flag = computation_core_stability
 			}
 		}
-		planet_jobs_unity_produces_mult = 0.005
+		bureaucrat_jobs_bonus_workforce_mult = 0.005
 	}
 
 	triggered_planet_modifier = {
@@ -99,9 +135,9 @@ civilian = {
 				has_policy_flag = computation_core_research
 			}
 		}
-		planet_jobs_physics_research_produces_mult = 0.005
-		planet_jobs_society_research_produces_mult = 0.005
-		planet_jobs_engineering_research_produces_mult = 0.005
+		physicist_jobs_bonus_workforce_mult = 0.005
+		biologist_jobs_bonus_workforce_mult = 0.005
+		engineer_jobs_bonus_workforce_mult = 0.005
 	}
 
 	inline_script = "jobs/ethic_job_modifiers"
@@ -112,7 +148,7 @@ civilian = {
 }
 
 slave_processing = {
-	category = slave
+	category = slave_unemployment2
 	first_come_first_served = yes
 	is_capped_by_modifier = no
 
@@ -135,16 +171,25 @@ slave_processing = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		is_enslaved = yes
 		is_being_purged = no
 		is_being_assimilated = no
 	}
 
 	possible = {
-		is_enslaved = no
-		NOT = {
+		NOR = {
 			is_pop_category = chip_slave
+			is_pop_category = slave
+			is_pop_category = slave_unemployment
+			is_pop_category = criminal
+			has_slavery_type = { type = slavery_orderly }
+
 		}
+		hidden_trigger = { exists = owner }
+		has_citizenship_type = { type = citizenship_slavery country = owner }
+	}
+
+	weight = {
+		weight = 9999
 	}
 }
 
@@ -207,13 +252,48 @@ slave_unprocessing = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 	}
 
 	possible = {
 		is_enslaved = yes
+		NOT = { has_citizenship_type = { type = citizenship_slavery country = owner } }
+	}
+}
+
+presapient_unprocessing = {
+	category = pre_sapients
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_crude_huts
+			icon = primitive_laborer
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = civilian
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+	}
+
+	possible = {
+		is_pop_category = pre_sapients
+		is_sapient = yes
 	}
 }
 
@@ -360,7 +440,14 @@ organic_battery = {
 
 livestock = {
 	category = worker
+	first_come_first_served = no
 	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_food_processing_facility
+		}
+	}
 
 	tags = { food }
 
@@ -383,12 +470,67 @@ livestock = {
 		}
 		has_slavery_type = { type = slavery_livestock }
 		is_lithoid = no
+		is_infernal = no
 	}
 
 	resources = {
 		category = planet_livestock_farmers
 		produces = {
 			food = 4
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+		}
+		custom_tooltip = evolutionary_predators_pops_tt
+	}
+
+	weight = {
+		weight = @special_job_weight
+	}
+}
+
+livestock_infernal = {
+	category = worker
+	is_capped_by_modifier = no
+
+	tags = { alloys }
+
+	swappable_data = {
+		default = {
+			icon = livestock
+			building_icon = building_foundry_1
+		}
+	}
+
+	possible_pre_triggers = {
+		is_enslaved = yes
+		is_sapient = yes
+		is_robotic = no
+	}
+
+	possible = {
+		OR = {
+			has_citizenship_type = {
+				type = citizenship_slavery
+				country = owner
+			}
+			has_citizenship_type = {
+				type = citizenship_exploited_drone
+				country = owner
+			}
+		}
+		has_slavery_type = { type = slavery_livestock }
+		is_infernal = yes
+	}
+
+	resources = {
+		category = planet_livestock_metallurgists
+		produces = {
+			alloys = 0.75
 		}
 	}
 
@@ -564,6 +706,7 @@ bio_trophy = {
 			is_pop_category = bio_trophy
 			is_pop_category = bio_trophy_unemployment
 		}
+		planet = { is_cosmogenesis_world = no } # undercoat: moved to scripted trigger
 	}
 
 	promotion = {
@@ -590,6 +733,8 @@ bio_trophy = {
 	weight = {
 		weight = @special_job_weight
 	}
+
+	inline_script = "jobs/automodding_priority_charisma"
 }
 
 bio_trophy_processing = {
@@ -605,6 +750,20 @@ bio_trophy_processing = {
 	}
 
 	promotion = {
+		# Only fires if the pop group has a different stratum/category to that which is required by the job.
+		# Obeys `can_change_category = no` rules of the pop group's current stratum.
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = bio_trophy
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	demotion = {
+		# Should always fire, regardless of pop group's current statum/category.
+		# Ignores `can_change_category = no` rules of the pop group's current stratum.
 		time = 0
 		effect = {
 			pop_amount_change_category = {
@@ -629,6 +788,7 @@ bio_trophy_processing = {
 		owner = {
 			is_servitor_empire = yes # undercoat: moved to scripted trigger
 		}
+		planet = { is_cosmogenesis_world = no } # undercoat: moved to scripted trigger
 	}
 }
 
@@ -668,6 +828,7 @@ bio_trophy_unprocessing = {
 		owner = {
 			is_servitor_empire = no # undercoat: moved to scripted trigger
 		}
+		planet = { is_cosmogenesis_world = no } # undercoat: moved to scripted trigger
 	}
 }
 
@@ -694,7 +855,6 @@ purge = {
 		has_owner = yes
 		is_being_purged = yes
 		is_robotic = no
-		is_being_purged = yes
 	}
 
 	possible = {
@@ -875,7 +1035,7 @@ assimilation = {
 	category = assimilation
 	is_capped_by_modifier = no
 
-	tags = { }
+	tags = { assimilation }
 
 	possible_pre_triggers = {
 		is_sapient = yes
@@ -886,16 +1046,14 @@ assimilation = {
 
 	possible = {
 		exists = owner
-		has_citizenship_type = { type = citizenship_assimilation country = owner }
-		is_lithoid = no
-		is_phototrophic = no
+		has_citizenship_type = {
+			type = citizenship_assimilation
+			country = owner
+		}
 	}
 
 	resources = {
 		category = planet_jobs
-		upkeep = {
-			food = @living_standard_food_normal
-		}
 	}
 
 	weight = {
@@ -939,6 +1097,10 @@ criminal = {
 		owner = {
 			is_gestalt = no
 		}
+	}
+
+	resources = {
+		category = planet_criminals
 	}
 
 	planet_modifier = {
@@ -985,7 +1147,7 @@ deviant_drone = {
 	}
 
 	possible = {
-		planet = { has_modifier = drone_deviancy }
+		planet = { has_drone_deviancy_modifier = yes }
 	}
 
 	resources = {
@@ -1118,7 +1280,14 @@ organic_exhibit = {
 
 livestock_lithoid = {
 	category = worker
+	first_come_first_served = no
 	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_mineral_purification_plant
+		}
+	}
 
 	possible_pre_triggers = {
 		is_enslaved = yes
@@ -1304,6 +1473,11 @@ purge_lithoid = {
 			has_citizenship_type = { type = citizenship_purge country = owner }
 			has_pop_group_flag = event_purge
 		}
+		NOR = {
+			has_purge_type = { type = purge_processing country = owner }
+			has_purge_type = { type = purge_labor_camps country = owner }
+			has_purge_type = { type = purge_matrix country = owner }
+		}
 		is_lithoid = yes
 	}
 
@@ -1391,6 +1565,11 @@ purge_robot = {
 			has_citizenship_type = { type = citizenship_purge country = owner }
 			has_pop_group_flag = event_purge
 		}
+		NOR = {
+			has_purge_type = { type = purge_processing country = owner }
+			has_purge_type = { type = purge_labor_camps country = owner }
+			has_purge_type = { type = purge_matrix country = owner }
+		}
 	}
 
 	resources = {
@@ -1449,147 +1628,6 @@ purge_robot = {
 	}
 }
 
-assimilation_food_photo = {
-	category = assimilation
-	is_capped_by_modifier = no
-
-	possible_pre_triggers = {
-		is_sapient = yes
-		is_robotic = no
-	}
-
-	ignores_sapience = yes
-
-	possible = {
-		exists = owner
-		has_citizenship_type = { type = citizenship_assimilation country = owner }
-		is_phototrophic = yes
-		is_lithoid = no
-	}
-
-	resources = {
-		category = planet_jobs
-		upkeep = {
-			energy = @living_standard_phototrophic_normal
-			food = @living_standard_phototrophic_normal
-		}
-	}
-
-	weight = {
-		weight = @special_job_weight
-
-		modifier = {
-			factor = 200 # brings @special_job_weight up to 2
-			is_being_assimilated = yes
-		}
-	}
-}
-
-assimilation_mineral = {
-	category = assimilation
-	is_capped_by_modifier = no
-
-	possible_pre_triggers = {
-		is_sapient = yes
-		is_robotic = no
-	}
-
-	ignores_sapience = yes
-
-	possible = {
-		exists = owner
-		has_citizenship_type = { type = citizenship_assimilation country = owner }
-		is_phototrophic = no
-		is_lithoid = yes
-	}
-
-	resources = {
-		category = planet_jobs
-		upkeep = {
-			minerals = @living_standard_food_normal
-		}
-	}
-
-	weight = {
-		weight = @special_job_weight
-
-		modifier = {
-			factor = 200 # brings @special_job_weight up to 2
-			is_being_assimilated = yes
-		}
-	}
-}
-assimilation_mineral_photo = {
-	category = assimilation
-	is_capped_by_modifier = no
-
-	possible_pre_triggers = {
-		is_sapient = yes
-		is_robotic = no
-	}
-
-	ignores_sapience = yes
-
-	possible = {
-		exists = owner
-		has_citizenship_type = { type = citizenship_assimilation country = owner }
-		is_phototrophic = yes
-		is_lithoid = no
-	}
-
-	resources = {
-		category = planet_jobs
-		upkeep = {
-			energy = @living_standard_phototrophic_normal
-			minerals = @living_standard_phototrophic_normal
-		}
-	}
-
-	weight = {
-		weight = @special_job_weight
-
-		modifier = {
-			factor = 200 # brings @special_job_weight up to 2
-			is_being_assimilated = yes
-		}
-	}
-}
-assimilation_void = {
-	category = assimilation
-	is_capped_by_modifier = no
-
-	possible_pre_triggers = {
-		is_sapient = yes
-		is_robotic = yes
-	}
-
-	ignores_sapience = yes
-
-	possible = {
-		exists = owner
-		has_citizenship_type = { type = citizenship_assimilation country = owner }
-		is_phototrophic = yes
-		is_lithoid = no
-	}
-
-	resources = {
-		category = planet_jobs
-		upkeep = {
-			energy = @living_standard_phototrophic_normal
-			energy = @living_standard_energy_normal
-		}
-	}
-
-	weight = {
-		weight = @special_job_weight
-
-		modifier = {
-			factor = 200 # brings @special_job_weight up to 2
-			is_being_assimilated = yes
-		}
-	}
-}
-
 purge_processing = {
 	category = purge
 #	purge = purge_processing
@@ -1622,6 +1660,7 @@ purge_processing = {
 			has_pop_group_flag = event_purge
 		}
 		is_lithoid = no
+		is_infernal = no
 	}
 
 	resources = {
@@ -1814,6 +1853,135 @@ purge_processing_lithoid = {
 		}
 	}
 }
+
+purge_processing_infernal = {
+	category = purge
+#	purge = purge_processing
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			icon = purge_processing
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = purge
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	tags = { }
+
+	ignores_sapience = yes
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_robotic = no
+		is_being_purged = yes
+	}
+
+	possible = {
+		OR = {
+			has_purge_type = { type = purge_processing country = owner }
+			has_pop_group_flag = event_purge
+		}
+		is_infernal = yes
+	}
+
+	resources = {
+		category = planet_jobs
+		produces = {
+			alloys = 2
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_fanatic_purifiers }
+			}
+			unity = 2
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_hive_devouring_swarm }
+			}
+			society_research = 2
+		}
+		produces = {
+			trigger = {
+				planet = { has_active_building = building_foundry_1 }
+			}
+			alloys = 1
+		}
+		produces = {
+			trigger = {
+				planet = { has_active_building = building_foundry_2 }
+			}
+			alloys = 2
+		}
+		produces = {
+			trigger = {
+				planet = { has_active_building = building_foundry_3 }
+			}
+			alloys = 3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_evolutionary_predators_empire = yes } # undercoat: moved to scripted trigger
+		}
+		custom_tooltip = evolutionary_predators_pops_tt
+	}
+
+	weight = {
+		weight = @special_job_weight
+
+		modifier = {
+			factor = 200 # brings @special_job_weight up to 2
+			exists = planet
+			exists = planet.controller
+			OR = {
+				has_pop_group_flag = event_purge
+				planet.controller = {
+					OR = {
+						is_country_type = swarm
+						is_country_type = ai_empire
+					}
+				}
+			}
+		}
+
+		modifier = {
+			factor = 9999 # u die when flagged
+			has_pop_group_flag = event_purge
+		}
+
+		modifier = {
+			factor = 9999 # u die when crisis'd
+			exists = planet
+			exists = planet.controller
+			planet.controller = {
+				OR = {
+					is_country_type = swarm
+					is_country_type = ai_empire
+					# extradimensionals just bombard you
+				}
+			}
+		}
+	}
+}
+
+
+
+
 purge_processing_robot = {
 	category = purge
 #	purge = purge_processing
@@ -1845,7 +2013,7 @@ purge_processing_robot = {
 			has_purge_type = { type = purge_processing country = owner }
 			has_pop_group_flag = event_purge
 		}
-		is_lithoid = no
+		is_robotic_species = yes
 	}
 
 	resources = {
@@ -2081,7 +2249,6 @@ purge_matrix = {
 			has_purge_type = { type = purge_matrix country = owner }
 			has_pop_group_flag = event_purge
 		}
-		is_lithoid = no
 	}
 
 	resources = {
@@ -2160,5 +2327,181 @@ purge_matrix = {
 				}
 			}
 		}
+	}
+}
+
+purge_sacrifice = {
+	category = purge
+#	purge = purge_sacrifice
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = purge
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+	tags = { }
+	ignores_sapience = yes
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = yes
+	}
+
+	possible = {
+		has_purge_type = {
+			type = purge_sacrifice
+			country = owner
+		}
+	}
+
+	resources = {
+		category = pop_category_purge
+		produces = {
+			unity = 5
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = {
+					has_patron_relation = { patron = the_eater_of_worlds }
+				}
+			}
+			sr_zro = 2
+		}
+	}
+
+	weight = {
+		weight = 9999 # Always picked
+	}
+}
+
+presapient_processing = {
+	category = pre_sapients
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_crude_huts
+			icon = primitive_laborer
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = pre_sapients
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = no
+	}
+
+	possible = {
+		NOT = {
+			is_pop_category = pre_sapients
+		}
+		is_sapient = no
+	}
+
+	weight = {
+		weight = 9999
+	}
+}
+
+robot_servant_processing = {
+	category = robot_servant
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_crude_huts
+			icon = primitive_laborer
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = robot_servant
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_robotic = yes
+	}
+
+	possible = {
+		NOT = {
+			is_pop_category = robot_servant
+		}
+		hidden_trigger = { exists = owner }
+		has_citizenship_type = { type = citizenship_robot_servitude country = owner }
+	}
+
+	weight = {
+		weight = 9999
+	}
+}
+
+robot_servant_unprocessing = {
+	category = robot_servant
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_crude_huts
+			icon = primitive_laborer
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = civilian
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_robotic = yes
+	}
+
+	possible = {
+		NOT = {
+			hidden_trigger = { exists = owner }
+			has_citizenship_type = { type = citizenship_robot_servitude country = owner }
+		}
+		is_pop_category = robot_servant
+	}
+
+	weight = {
+		weight = 9999
 	}
 }

@@ -84,7 +84,7 @@ spawning_drone = {
 			trigger = {
 				exists = owner
 				owner = {
-					is_lithoid_empire = no
+					is_lithoid_or_infernal_empire = no
 				}
 			}
 			food = 5
@@ -97,6 +97,15 @@ spawning_drone = {
 				}
 			}
 			minerals = 5
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_infernal_empire = yes
+				}
+			}
+			alloys = 2
 		}
 		# Job Swap - Genomic Drone
 		produces = {
@@ -129,7 +138,7 @@ spawning_drone = {
 				}
 				exists = owner
 				owner = {
-					is_lithoid_empire = no
+					is_lithoid_or_infernal_empire = no
 				}
 			}
 			food = 5
@@ -151,11 +160,24 @@ spawning_drone = {
 			trigger = {
 				exists = planet
 				planet = {
+					healthcare_is_genomic_researcher_trigger = yes
+				}
+				exists = owner
+				owner = {
+					is_infernal_empire = yes
+				}
+			}
+			alloys = 2
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
 					spawning_drone_is_bath_attendant_hive_trigger = yes
 				}
 				exists = owner
 				owner = {
-					is_lithoid_empire = no
+					is_lithoid_or_infernal_empire = no
 				}
 			}
 			food = 5
@@ -173,6 +195,19 @@ spawning_drone = {
 			}
 			minerals = 5
 		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					spawning_drone_is_bath_attendant_hive_trigger = yes
+				}
+				exists = owner
+				owner = {
+					is_infernal_empire = yes
+				}
+			}
+			alloys = 2
+		}
 	}
 
 	triggered_planet_pop_group_modifier_for_species = {
@@ -189,7 +224,7 @@ spawning_drone = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_necrophage_empire = yes } # undercoat: moved to scripted trigger
+			owner = { is_current_or_former_necrophage_empire = yes } # undercoat: moved to scripted trigger
 			exists = planet.growing_species
 			planet.growing_species = {
 				NOT = { has_trait = trait_hive_mind }
@@ -214,8 +249,8 @@ spawning_drone = {
 		potential = {
 			spawning_drone_is_bath_attendant_hive_trigger = yes
 		}
-		bonus_pop_growth_mult = 0.02
-		pop_environment_tolerance = -0.0075
+		bonus_pop_growth_mult = 0.01
+		pop_environment_tolerance = -0.015
 		mult = planet.value:toxic_attendant_growth
 	}
 
@@ -232,6 +267,14 @@ spawning_drone = {
 	weight = {
 		weight = @spawner_drone_job_weight
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		mult = value:scripted_job_weight_shroud_forged_mult
+		modifier = {
+			add = 20
+			exists = owner
+			owner = {
+				is_progenitor_hive_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
 		modifier = {
 			factor = 0.5 # job is less useful if pop control is active, but still gives amenities
 			planet = {
@@ -250,8 +293,6 @@ spawning_drone = {
 			}
 		}
 	}
-
-	inline_script = "jobs/automodding_priority_amenities"
 
 	promotion = {
 		time = @standard_promotion_time
@@ -333,8 +374,8 @@ replicator = {
 		potential = {
 			replicator_is_bath_attendant_machine = yes
 		}
-		planet_pop_assembly_mult = 0.015
-		pop_amenities_usage_mult = 0.015
+		planet_pop_assembly_mult = 0.0075
+		pop_amenities_usage_mult = 0.03
 		mult = planet.value:toxic_attendant_growth
 	}
 
@@ -357,6 +398,7 @@ replicator = {
 
 	weight = {
 		weight = @spawner_drone_job_weight
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.01 # crisis purge
 			exists = planet
@@ -431,6 +473,7 @@ gestation_drone = {
 					exists = growing_species
 					growing_species = {
 						is_lithoid = no
+						NOT = { has_trait = trait_infernal }
 					}
 				}
 			}
@@ -447,6 +490,18 @@ gestation_drone = {
 				}
 			}
 			minerals = 5
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					exists = growing_species
+					growing_species = {
+						has_trait = trait_infernal
+					}
+				}
+			}
+			alloys = @drone_alloy_upkeep_normal
 		}
 		produces = {
 			society_research = 2
@@ -469,8 +524,6 @@ gestation_drone = {
 		}
 	}
 
-	inline_script = "jobs/automodding_priority_amenities"
-
 	promotion = {
 		time = @standard_promotion_time
 		effect = {
@@ -482,7 +535,7 @@ gestation_drone = {
 	}
 }
 
-##CW for Machines - Unused as of 4.0
+## Special job for Gestalts
 evaluator = {
 	category = complex_drone
 
@@ -490,6 +543,17 @@ evaluator = {
 		default = {
 			condition_string = DRONE_JOB_TRIGGER
 			building_icon = building_simulation_1
+		}
+		# Curator Drone
+		swap_type = {
+			trigger = {
+				entertainer_is_curator_trigger = yes
+			}
+			name = curator_drone
+			desc = curator_drone
+			icon = historical_curator
+			building_icon = aesthetic_wonders_holomuseum
+			weight = 10
 		}
 	}
 
@@ -518,18 +582,6 @@ evaluator = {
 	}
 
 	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				has_active_tradition = tr_synchronicity_integrated_preservation
-			}
-		}
-		modifier = {
-			planet_crime_no_happiness_add = -3
-		}
-	}
-
-	triggered_planet_modifier = {
 		planet_amenities_no_happiness_add = 300
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
@@ -537,6 +589,7 @@ evaluator = {
 	weight = {
 		weight = @synapse_drone_job_weight
 		mult = value:job_weights_modifier|JOB|evaluator|RESOURCE|unity|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -610,6 +663,8 @@ coordinator = {
 		}
 	}
 
+	tags = { unity }
+
 	possible_pre_triggers = {
 		has_owner = yes
 		is_enslaved = no
@@ -641,7 +696,7 @@ coordinator = {
 				exists = owner
 				owner = {
 					is_hive_empire = yes
-					is_lithoid = no
+					is_lithoid_or_infernal_empire = no
 				}
 			}
 			food = 2
@@ -652,7 +707,7 @@ coordinator = {
 				exists = owner
 				owner = {
 					is_hive_empire = yes
-					is_lithoid = yes
+					is_lithoid_or_infernal_empire = yes
 				}
 			}
 			minerals = 2
@@ -694,9 +749,9 @@ coordinator = {
 	triggered_planet_modifier = {
 		potential = {
 			OR = {
-					has_modifier = planet_artifact_relays_machine
-					has_modifier = planet_artifact_relays_hivemind
-				}
+				has_modifier = planet_artifact_relays_machine
+				has_modifier = planet_artifact_relays_hivemind
+			}
 		}
 		modifier = {
 			planet_stability_add = 2
@@ -719,6 +774,7 @@ coordinator = {
 	weight = {
 		weight = @synapse_drone_job_weight
 		mult = value:job_weights_modifier|JOB|coordinator|RESOURCE|unity|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -783,6 +839,7 @@ calculator_physicist = {
 		default = {
 			condition_string = DRONE_JOB_TRIGGER
 			building_icon = building_research_lab_1
+			icon = physicist
 		}
 		# Machine Astrometeorologists
 		swap_type = {
@@ -830,6 +887,15 @@ calculator_physicist = {
 			building_icon = building_astrometeorology_observation_center
 			weight = 55
 		}
+		# Dimension Portal Researcher
+		swap_type = {
+			trigger = {
+				physicist_is_dimensional_portal_researcher_trigger = yes
+			}
+			name = dimensional_portal_researcher_gestalt
+			desc = dimensional_portal_researcher_gestalt
+			weight = 60
+		}
 		swap_type = {
 			trigger = {
 				exists = owner
@@ -844,7 +910,20 @@ calculator_physicist = {
 			condition_string = DRONE_JOB_TRIGGER
 			weight = 100
 		}
+		swap_type = {
+			trigger = {
+				physicist_is_extradimensional_research_unit_trigger = yes
+			}
+			name = extradimensional_research_unit
+			desc = job_extradimensional_research_unit_desc
+			icon = extradimensional_research_unit
+			building_icon = building_materiality_engine
+			condition_string = DRONE_JOB_TRIGGER
+			weight = 100
+		}
 	}
+
+	tags = { research }
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -861,6 +940,12 @@ calculator_physicist = {
 	resources = {
 		category = planet_physicists
 		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					physicist_is_extradimensional_research_unit_trigger = no
+				}
+			}
 			physics_research = 6
 		}
 		produces = {
@@ -878,11 +963,27 @@ calculator_physicist = {
 			}
 			physics_research = 4
 		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					physicist_is_extradimensional_research_unit_trigger = yes
+				}
+			}
+			alloys = 2
+			minerals = 4
+			physics_research = 6
+			multiplier = planet.value:materiality_engine_produces_mult
+		}
 		upkeep = {
 			trigger = {
 				exists = owner
 				owner = {
 					is_hive_empire = no
+				}
+				exists = planet
+				planet = {
+					physicist_is_extradimensional_research_unit_trigger = no
 				}
 			}
 			energy = 3
@@ -948,6 +1049,16 @@ calculator_physicist = {
 			}
 			energy = 3
 		}
+		# Extradimensional Research Unit
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					physicist_is_extradimensional_research_unit_trigger = yes
+				}
+			}
+			sr_zro = 1
+		}
 	}
 
 	overlord_resources = {
@@ -987,9 +1098,12 @@ calculator_physicist = {
 		mult = planet.modifier:job_researcher_naval_cap_add
 	}
 
+	inline_script = "jobs/inf_navalcap_jobs"
+
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|calculator_physicist|RESOURCE|physics_research|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -1039,6 +1153,7 @@ calculator_biologist = {
 		default = {
 			condition_string = DRONE_JOB_TRIGGER
 			building_icon = building_research_lab_1
+			icon = biologist
 		}
 		#Brain Drone Biologist - auth_hive
 		swap_type = {
@@ -1103,6 +1218,17 @@ calculator_biologist = {
 			condition_string = DRONE_JOB_TRIGGER
 			weight = 10
 		}
+		swap_type = {
+			trigger = {
+				biologist_is_observator_trigger = yes
+			}
+			name = observator_drone
+			desc = job_observator_drone_desc
+			icon = observator_drone
+			building_icon = building_shroud_observatory_1
+			condition_string = DRONE_JOB_TRIGGER
+			weight = 10
+		}
 	}
 
 	possible_pre_triggers = {
@@ -1122,11 +1248,25 @@ calculator_biologist = {
 		produces = {
 			society_research = 6
 		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					biologist_is_observator_trigger = yes
+				}
+			}
+			physics_research = 9
+			society_research = 3
+		}
 		upkeep = {
 			trigger = {
 				exists = owner
 				owner = {
 					is_hive_empire = no
+				}
+				exists = planet
+				planet = {
+					biologist_is_observator_trigger = no
 				}
 			}
 			energy = 3
@@ -1164,6 +1304,14 @@ calculator_biologist = {
 			}
 			minerals = 1.5
 		}
+		upkeep = {
+			trigger = {
+				planet = {
+					biologist_is_observator_trigger = yes
+				}
+			}
+			sr_zro = 1
+		}
 	}
 
 	overlord_resources = {
@@ -1188,9 +1336,12 @@ calculator_biologist = {
 		mult = planet.modifier:job_researcher_naval_cap_add
 	}
 
+	inline_script = "jobs/inf_navalcap_jobs"
+
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|calculator_biologist|RESOURCE|society_research|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -1270,6 +1421,7 @@ calculator_engineer = {
 		default = {
 			condition_string = DRONE_JOB_TRIGGER
 			building_icon = building_research_lab_1
+			icon = engineer
 		}
 		#Brain Drone Engineer - auth_hive
 		swap_type = {
@@ -1301,6 +1453,16 @@ calculator_engineer = {
 			condition_string = DRONE_JOB_TRIGGER
 			weight = 10
 		}
+		# Nanotech Researcher
+		swap_type = {
+			trigger = {
+				engineer_is_nanotech_researcher_trigger = yes
+			}
+			name = nanotech_research_unit
+			desc = nanotech_research_unit
+			building_icon = building_nanolab_1
+			weight = 15
+		}
 	}
 
 	possible_pre_triggers = {
@@ -1319,6 +1481,12 @@ calculator_engineer = {
 		category = planet_engineers
 		produces = {
 			engineering_research = 6
+		}
+		produces = {
+			trigger = {
+				engineer_is_nanotech_researcher_trigger = yes
+			}
+			engineering_research = 2
 		}
 		upkeep = {
 			trigger = {
@@ -1362,6 +1530,12 @@ calculator_engineer = {
 			}
 			minerals = 1.5
 		}
+		upkeep = {
+			trigger = {
+				engineer_is_nanotech_researcher_trigger = yes
+			}
+			nanites = 1
+		}
 	}
 
 	triggered_country_modifier = {
@@ -1374,9 +1548,12 @@ calculator_engineer = {
 		mult = planet.modifier:job_researcher_naval_cap_add
 	}
 
+	inline_script = "jobs/inf_navalcap_jobs"
+
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|calculator_engineer|RESOURCE|engineering_research|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -1447,7 +1624,17 @@ artisan_drone = {
 		}
 
 		upkeep = {
+			trigger = {
+				industrial_jobs_are_catalytic_trigger = no
+			}
 			minerals = 10
+		}
+
+		upkeep = {
+			trigger = {
+				industrial_jobs_are_catalytic_trigger = yes
+			}
+			food = 15
 		}
 
 		produces = {
@@ -1479,6 +1666,7 @@ artisan_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|artisan_drone|RESOURCE|consumer_goods|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -1546,17 +1734,6 @@ fabricator = {
 			condition_string = DRONE_JOB_TRIGGER
 			weight = 3
 		}
-		#Transmuter Drone - d_bluelotus
-		swap_type = {
-			trigger = {
-				has_deposit = d_bluelotus
-			}
-			name = bluelotus_drone
-			desc = bluelotus_drone
-			building_icon = building_illicit_research_labs
-			condition_string = DRONE_JOB_TRIGGER
-			weight = 4
-		}
 		swap_type = {
 			trigger = {
 				exists = owner
@@ -1589,111 +1766,7 @@ fabricator = {
 
 	resources = {
 		category = planet_metallurgists
-		produces = {
-			alloys = 3
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_machine_empire = yes
-				}
-			}
-			alloys = 1
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_catalytic_empire = yes
-				}
-			}
-			alloys = 0.75
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_robot_empire = yes
-					is_catalytic_empire = yes
-				}
-			}
-			alloys = 1.25
-		}
-		produces = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_material_requisitorium
-				}
-			}
-			alloys = @requisitorium_alloys_reduction
-		}
-		upkeep = {
-			minerals = 6
-		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_catalytic_empire = yes
-				}
-			}
-			minerals = -6
-			food = 9
-		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_machine_empire = yes
-					is_catalytic_empire = no
-				}
-			}
-			minerals = 2
-		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_machine_empire = yes
-					is_catalytic_empire = yes
-				}
-			}
-		}
-		upkeep = {
-			trigger = {
-				exists = planet
-				planet = {
-					has_deposit = d_bluelotus
-				}
-				exists = owner
-				owner = {
-					is_catalytic_empire = no
-				}
-			}
-			minerals = -3
-		}
-		upkeep = {
-			trigger = {
-				exists = planet
-				planet = {
-					has_deposit = d_bluelotus
-				}
-				exists = owner
-				owner = {
-					is_catalytic_empire = yes
-				}
-			}
-			food = -5
-		}
-		upkeep = {
-			trigger = {
-				planet = {
-					has_planet_flag = has_material_requisitorium
-				}
-			}
-			minerals = 2
-		}
+		inline_script = "output/foundry_output"
 	}
 
 	overlord_resources = {
@@ -1711,6 +1784,7 @@ fabricator = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|fabricator|RESOURCE|alloys|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -1761,56 +1835,6 @@ catalytic_drone = {
 
 	possible = {
 		always = no
-	}
-}
-
-#Swap for d_bluelotus
-bluelotus_drone = {
-	category = complex_drone
-	is_capped_by_modifier = yes
-
-	swappable_data = {
-		default = {
-			condition_string = DRONE_JOB_TRIGGER
-			building_icon = building_illicit_research_labs
-			icon = foundry
-		}
-	}
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_drone_job
-
-	possible = { can_think = yes }
-
-	resources = {
-		category = planet_metallurgists
-		produces = {
-			alloys = 4
-		}
-		 upkeep = {
-		 	minerals = @living_standard_food_normal
-		}
-	}
-
-	weight = {
-		weight = @complex_drone_job_weight
-		mult = value:job_weights_modifier|JOB|bluelotus_drone|RESOURCE|alloys|
-	}
-
-	promotion = {
-		time = @standard_promotion_time
-		effect = {
-			pop_amount_change_category = {
-				CATEGORY = complex_drone
-				AMOUNT = local_pop_amount
-			}
-		}
 	}
 }
 
@@ -1896,6 +1920,7 @@ chemist_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|chemist_drone|RESOURCE|volatile_motes|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -1997,6 +2022,7 @@ translucer_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|translucer_drone|RESOURCE|rare_crystals|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -2098,6 +2124,7 @@ gas_refiner_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|gas_refiner_drone|RESOURCE|exotic_gases|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 0.9
 			exists = owner
@@ -2134,9 +2161,9 @@ patrol_drone = {
 					is_wilderness_empire = yes
 				}
 			}
-			name = tamersymbiont
-			desc = tamersymbiont
-			building_icon = planetary_carapace_1
+			name = immunosymbiont
+			desc = immunosymbiont
+			building_icon = capital_wilderness_3
 			condition_string = DRONE_JOB_TRIGGER
 			weight = 10
 		}
@@ -2171,6 +2198,7 @@ patrol_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|patrol_drone|RESOURCE|unity|FACTOR|0.25|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 50
 		}
@@ -2271,6 +2299,7 @@ mote_harvesting_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|mote_harvesting_drone|RESOURCE|volatile_motes|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 1.1
 			exists = owner
@@ -2315,6 +2344,8 @@ crystal_mining_drone = {
 		}
 	}
 
+	tags = { strategic_resource rare_crystals }
+
 	possible_pre_triggers = {
 		has_owner = yes
 		is_enslaved = no
@@ -2340,6 +2371,7 @@ crystal_mining_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|crystal_mining_drone|RESOURCE|rare_crystals|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 1.1
 			exists = owner
@@ -2411,6 +2443,7 @@ gas_extraction_drone = {
 	weight = {
 		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|gas_extraction_drone|RESOURCE|exotic_gases|
+		mult = value:scripted_job_weight_shroud_forged_mult
 		modifier = {
 			factor = 1.1
 			exists = owner
@@ -2471,7 +2504,25 @@ logistics_drone = {
 	resources = {
 		category = planet_traders
 		produces = {
-			trade = 4
+			trade = 6
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_machine_empire = yes
+				}
+			}
+			energy = 2
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					is_hive_empire = yes
+				}
+			}
+			minerals = 2
 		}
 	}
 
@@ -2479,7 +2530,7 @@ logistics_drone = {
 		potential = {
 			always = yes
 		}
-		planet_amenities_no_happiness_add = 250
+		planet_amenities_no_happiness_add = 500
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
@@ -2503,8 +2554,15 @@ logistics_drone = {
 	}
 
 	weight = {
-		weight = @simple_drone_job_weight
+		weight = @complex_drone_job_weight
 		mult = value:job_weights_modifier|JOB|logistics_drone|RESOURCE|trade|
+		modifier = {
+			factor = 10
+			planet = {
+				free_amenities < 0
+				has_available_jobs = logistics_drone
+			}
+		}
 	}
 
 	inline_script = "jobs/automodding_priority_trade"
@@ -2546,6 +2604,16 @@ mining_drone = {
 		}
 		swap_type = {
 			trigger = {
+				miner_is_crystal_miner_trigger = yes
+			}
+			icon = crystal_mining_drone
+			name = crystal_mining_drone
+			desc = crystal_mining_drone
+			building_icon = building_crystal_mines
+			weight = 5
+		}
+		swap_type = {
+			trigger = {
 				exists = owner
 				owner = {
 					is_wilderness_empire = yes
@@ -2557,6 +2625,15 @@ mining_drone = {
 			building_icon = churning_tunnels_3
 			condition_string = DRONE_JOB_TRIGGER
 			weight = 10
+		}
+		swap_type = {
+			trigger = {
+				miner_is_thermoforger_trigger = yes
+			}
+			icon = mining_drone
+			name = melt_extractor_drone
+			desc = melt_extractor_drone
+			weight = 15
 		}
 	}
 
@@ -2571,6 +2648,7 @@ mining_drone = {
 	}
 
 	possible_precalc = can_fill_drone_job
+	possible = { simple_drone_trigger = yes }
 
 	resources = {
 		category = planet_miners
@@ -2606,6 +2684,26 @@ mining_drone = {
 				}
 			}
 			minerals = @requisitorium_minerals_reduction
+		}
+		# Job Swap - Thermoforger
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					miner_is_thermoforger_trigger = yes
+				}
+			}
+			minerals = 1
+			alloys = 0.5
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					miner_is_thermoforger_trigger = yes
+				}
+			}
+			energy = 1
 		}
 	}
 
@@ -2669,40 +2767,6 @@ scrap_miner_drone = {
 	possible = {
 		always = no
 	}
-
-	possible_precalc = can_fill_drone_job
-
-	resources = {
-		category = planet_miners
-		produces = {
-			minerals = 2
-			alloys = 1
-		}
-	}
-
-	weight = {
-		weight = @simple_drone_job_weight
-		mult = value:job_weights_multiple_resources_modifier|JOB|scrap_miner_drone|RESOURCE1|minerals|WEIGHT1|0.7|RESOURCE2|alloys|WEIGHT2|0.3|
-		modifier = {
-			factor = 1.1
-			exists = owner
-			years_passed < 1
-			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
-			has_trait = trait_cybernetic
-		}
-	}
-
-	inline_script = "jobs/automodding_priority_minerals"
-
-	promotion = {
-		time = @standard_promotion_time
-		effect = {
-			pop_amount_change_category = {
-				CATEGORY = simple_drone
-				AMOUNT = local_pop_amount
-			}
-		}
-	}
 }
 
 ##Farming Jobs
@@ -2722,6 +2786,16 @@ agri_drone = {
 			desc = puddle_technician_drone
 			icon = puddle_technician_drone
 			weight = 10
+		}
+		swap_type = {
+			trigger = {
+				farmer_is_gas_extractor_trigger = yes
+			}
+			name = gas_extraction_drone
+			desc = gas_extraction_drone
+			icon = gas_extraction_drone
+			building_icon = building_gas_extractors
+			weight = 20
 		}
 		swap_type = {
 			trigger = {
@@ -2750,6 +2824,7 @@ agri_drone = {
 	}
 
 	possible_precalc = can_fill_drone_job
+	possible = { simple_drone_trigger = yes }
 
 	resources = {
 		category = planet_farmers
@@ -2834,6 +2909,19 @@ agri_drone = {
 				}
 			}
 		}
+		modifier = {
+			factor = 0.5
+			has_trait = trait_infernal
+
+			owner = {
+				is_infernal_empire = yes
+				country_uses_food = no
+				has_monthly_income = {
+					resource = food
+					value >= 0
+				}
+			}
+		}
 	}
 
 	inline_script = "jobs/automodding_priority_food"
@@ -2857,6 +2945,16 @@ technician_drone = {
 		default = {
 			condition_string = DRONE_JOB_TRIGGER
 			building_icon = building_energy_grid
+		}
+		swap_type = {
+			trigger = {
+				technician_is_mote_harvester_trigger = yes
+			}
+			icon = mote_harvesting_drone
+			name = mote_harvesting_drone
+			desc = mote_harvesting_drone
+			building_icon = building_mote_harvesting_traps
+			weight = 5
 		}
 		swap_type = {
 			trigger = {
@@ -2885,6 +2983,7 @@ technician_drone = {
 	}
 
 	possible_precalc = can_fill_drone_job
+	possible = { simple_drone_trigger = yes }
 
 	resources = {
 		category = planet_technician
@@ -3083,7 +3182,7 @@ maintenance_drone = {
 		}
 	}
 
-	inline_script = "jobs/automodding_priority_amenities"
+	inline_script = "jobs/automodding_priority_charisma"
 }
 
 wilderness_maintenance_drone = {
@@ -3154,7 +3253,6 @@ warrior_drone = {
 	}
 	resources = {
 		category = planet_soldiers
-		inline_script = "output/soldier_output"
 	}
 
 	inline_script = "output/soldier_triggered_modifiers"
@@ -3168,6 +3266,7 @@ warrior_drone = {
 	}
 
 	possible_precalc = can_fill_drone_job
+	possible = { simple_drone_trigger = yes }
 
 	weight = {
 		weight = 5
@@ -3264,5 +3363,89 @@ bath_attendant_hive = {
 
 	possible = {
 		always = no
+	}
+}
+
+polytechnic_drone = {
+	category = complex_drone
+	auto_generate_description = no
+
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_research_lab_1
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+	possible_precalc = can_fill_drone_job
+	possible = { can_think = yes }
+
+	resources = {
+		category = planet_bureaucrats
+		upkeep = { minerals = 7 }
+	}
+
+	planet_modifier = {
+		planet_miners_unity_produces_add = @polytechnic_output
+		planet_technician_physics_research_produces_add = @polytechnic_output
+		planet_metallurgists_engineering_research_produces_add = @polytechnic_output
+		planet_artisans_engineering_research_produces_add = @polytechnic_output
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_research_modifier|JOB|polytechnic_drone|
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { is_machine_assimilator = yes } # undercoat: moved to scripted trigger
+			has_trait = trait_cybernetic
+		}
+	}
+}
+
+offworld_prospector_drone = {
+	category = complex_drone
+
+	swappable_data = {
+		default = {
+			condition_string = DRONE_JOB_TRIGGER
+			building_icon = building_offworld_expedition_hub
+		}
+	}
+
+	tags = { strategic_resource sr_living_metal volatile_motes }
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+	possible_precalc = can_fill_drone_job
+	possible = { can_think = yes }
+
+	resources = {
+		category = planet_sr_miners
+		upkeep = {
+			energy = @offworld_prospector_upkeep
+		}
+		produces = {
+			sr_living_metal = @offworld_prospector_lm
+			volatile_motes = @offworld_prospector_vm
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
 	}
 }

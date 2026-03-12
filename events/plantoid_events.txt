@@ -17,6 +17,9 @@ planet_event = {
 		# Turn planet into Gaia world.
 		change_pc = pc_gaia
 		set_planet_flag = gaia_seeder_bloom
+		planet_event = {
+			id = shroud.10010 		# Patron Objective Counter: po_terraform_planet
+		}
 	}
 
 	option = {
@@ -61,7 +64,6 @@ planet_event = {
 	id = plant.101
 	hide_window = yes
 	is_triggered_only = yes
-
 
 	trigger = {
 		last_building_changed = building_gaiaseeders_pc_gaia
@@ -134,6 +136,23 @@ country_event = {
 			remove_holding = {
 				holding = holding_idyllic_bloom
 				owner = root
+			}
+			# Effectively the same checks as shroud.10010 but we need to change the scopes.
+			if = {
+				limit = {
+					exists = root
+					NOT = { has_planet_flag = terraformed_by@root }
+					root = {
+						can_access_shroud = yes
+					}
+				}
+				set_planet_flag = terraformed_by@root
+				root = {
+					add_patron_objective_counter = {
+						counter = po_terraform_planet
+						amount = 1
+					}
+				}
 			}
 		}
 	}

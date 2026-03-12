@@ -124,6 +124,7 @@ country_event = {
 				}
 				create_leader = {
 					class = commander
+					tier = leader_tier_legendary
 					species = event_target:sharpbeak_species
 					name = "NAME_Skrand_Sharpbeak"
 					skill = 8
@@ -143,7 +144,6 @@ country_event = {
 						5 = leader_trait_unyielding
 					}
 					effect = {
-						set_leader_flag = legendary_leader
 						set_leader_flag = skrand
 						set_leader_flag = immune_to_negative_traits
 						save_global_event_target_as = admiral_sharpbeak
@@ -249,7 +249,7 @@ country_event = { #project finished
 		trigger = {
 			NOR = {
 				is_gestalt = yes
-				has_ethic = ethic_fanatic_xenophobe
+				is_fanatic_xenophobe = yes
 			}
 		}
 		enable_special_project = {
@@ -261,7 +261,7 @@ country_event = { #project finished
 	option = {
 		name = "paragon.3003.b"
 		trigger = {
-			NOT = { has_ethic = ethic_fanatic_xenophile }
+			is_fanatic_xenophile = no
 		}
 		hidden_effect = {
 			random_list = {
@@ -494,7 +494,7 @@ country_event = {
 			country_event = {
 				id = paragon.3095 days = 3600
 			}
-			random_owned_planet = {
+			if = {
 				limit = {
 					is_variable_set = paragon_memory_vault
 				}
@@ -2028,6 +2028,7 @@ country_event = { # Create Exakeides - 20 yo
 			}
 			create_leader = {
 				class = scientist
+				tier = leader_tier_legendary
 				species = event_target:exakeides_species
 				name = "NAME_Exakeides"
 				skill = 1
@@ -2038,11 +2039,13 @@ country_event = { # Create Exakeides - 20 yo
 				custom_description = desc_exakeides
 				set_age = 20
 				effect = {
-					set_leader_flag = legendary_leader
 					set_leader_flag = exakeides
 					set_leader_flag = immune_to_negative_traits
 					save_global_event_target_as = legendary_lost_leader
-					add_trait_no_notify = leader_trait_legendary_far_from_home
+					add_trait = {
+						trait = leader_trait_legendary_far_from_home
+						show_message = no
+					}
 					set_owner = root
 					exile_leader_as = legendary_lost_leader
 				}
@@ -2091,13 +2094,16 @@ country_event = { # HIRE/DISMISS Exakeides
 		hidden_effect = {
 			clone_leader = {
 				target = event_target:legendary_lost_leader
+				tier = leader_tier_legendary
 			}
 			last_created_leader = {
 				set_leader_flag = exakeides
-				set_leader_flag = legendary_leader
 				save_global_event_target_as = legendary_lost_leader
 				set_leader_flag = immune_to_negative_traits
-				add_trait_no_notify = leader_trait_legendary_far_from_home
+				add_trait = {
+					trait = leader_trait_legendary_far_from_home
+					show_message = no
+				}
 				set_owner = root
 			}
 			switch = {
@@ -2128,7 +2134,7 @@ country_event = { # HIRE/DISMISS Exakeides
 				}
 			}
 
-			random_owned_planet = {
+			if = {
 				limit = {
 					is_variable_set = paragon_memory_vault
 				}
@@ -3276,7 +3282,7 @@ country_event = { #End The Story
 	#	event_target:legendary_lost_leader = {
 	#		hidden_effect = { unassign_leader = this }
 	#		remove_all_traits = yes
-	#		change_leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+	#		change_leader_class = commander
 	#		set_skill = 1
 	#		add_experience = 54000
 	#	}
@@ -3285,7 +3291,9 @@ country_event = { #End The Story
 	#}
 	after = {
 		event_target:legendary_lost_leader = {
-			add_trait = leader_trait_legendary_ancestors_knowledge
+			add_trait = {
+				trait = leader_trait_legendary_ancestors_knowledge
+			}
 		}
 	}
 }

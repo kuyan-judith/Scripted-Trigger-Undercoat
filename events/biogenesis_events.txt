@@ -1367,7 +1367,7 @@ situation_event = {
 	trigger = {
 		owner = {
 			NOR = {
-				has_origin = origin_legendary_leader
+				has_legendary_leader_origin_not_set = yes # undercoat: moved to scripted trigger
 				is_clone_army_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -1400,7 +1400,9 @@ situation_event = {
 	option = {
 		name = bio.70.a
 		event_target:two_for_one_leader = {
-			add_trait = leader_trait_has_backup_clone
+			add_trait = {
+				trait = leader_trait_has_backup_clone
+			}
 		}
 		ai_chance = {
 			factor = 1
@@ -2032,7 +2034,7 @@ situation_event = {
 					save_event_target_as = source_pop_group
 					prev = {
 						create_pop_group = {
-							pop_group = event_target:source_pop_group 
+							pop_group = event_target:source_pop_group
 							# Create a new Pop Group with the species we just created
 							species = event_target:target_species
 							size = 0
@@ -2502,13 +2504,17 @@ situation_event = {
 							}
 						}
 					}
-					add_trait = trait_ruler_feedback_loop
+					add_trait = {
+						trait = trait_ruler_feedback_loop
+					}
 				}
 				else_if = {
 					limit = {
 						has_trait = trait_ruler_feedback_loop
 					}
-					add_trait = trait_ruler_feedback_loop_2
+					add_trait = {
+						trait = trait_ruler_feedback_loop_2
+					}
 				}
 				else = {
 					add_experience = 200
@@ -3085,13 +3091,19 @@ country_event = {
 					limit = {
 						is_same_species = root.ruler
 					}
-					add_trait_no_notify = trait_imperial_heir
+					add_trait = {
+						trait = trait_imperial_heir
+						show_message = no
+					}
 				}
 				every_pool_leader = {
 					limit = {
 						is_same_species = root.ruler
 					}
-					add_trait_no_notify = trait_imperial_heir
+					add_trait = {
+						trait = trait_imperial_heir
+						show_message = no
+					}
 				}
 			}
 			else_if = {
@@ -3307,7 +3319,9 @@ country_event = {
 						is_dictatorial_authority = yes
 					}
 					ruler = {
-						add_trait = trait_ruler_apex_predator
+						add_trait = {
+							trait = trait_ruler_apex_predator
+						}
 					}
 				}
 				else_if = {
@@ -3352,6 +3366,12 @@ country_event = {
 						set_ruler_title_male = "eternal_ancestor_male"
 						set_ruler_title_female = "eternal_ancestor_female"
 					}
+				}
+				if = {
+					limit = {
+						has_mutation_environmental_integration_tradition = yes
+					}
+					custom_tooltip = empowered_environmental_integration_tradition_tt
 				}
 				advanced_authority_refresh = yes
 			}
@@ -3471,6 +3491,12 @@ country_event = {
 						}
 						set_species_traits_evopred_count_variable = yes
 					}
+				}
+				if = {
+					limit = {
+						has_mutation_environmental_integration_tradition = yes
+					}
+					custom_tooltip = empowered_environmental_integration_tradition_tt
 				}
 			}
 		}
@@ -4115,7 +4141,9 @@ situation_event = {
 							has_trait = leader_trait_eager
 						}
 					}
-					add_trait = leader_trait_eager
+					add_trait = {
+						trait = leader_trait_eager
+					}
 				}
 			}
 		}
@@ -4320,7 +4348,9 @@ situation_event = {
 						has_trait = leader_trait_butcher
 					}
 				}
-				add_trait = leader_trait_butcher
+				add_trait = {
+					trait = leader_trait_butcher
+				}
 			}
 		}
 		hidden_effect = {
@@ -4448,7 +4478,9 @@ situation_event = {
 	option = {
 		name = bio.300.a
 		event_target:genius_geneticist = {
-			add_trait = leader_trait_spark_of_genius
+			add_trait = {
+				trait = leader_trait_spark_of_genius
+			}
 			add_experience = 250
 		}
 		ai_chance = {
@@ -4520,6 +4552,12 @@ situation_event = {
 	trigger = {
 		NOT = { has_situation_flag = biogenesis_310_fire }
 		has_situation_flag = purity_approach_selected
+		owner = {
+			any_owned_pop_group = {
+				is_same_species = prev.species
+				pop_group_size > 100
+			}
+		}
 	}
 
 	immediate = {
@@ -4533,7 +4571,10 @@ situation_event = {
 			while = {
 				count = 1
 				weighted_random_owned_pop_group = {
-					limit = { is_same_species = prev.species }
+					limit = {
+						is_same_species = prev.species
+						pop_group_size > 100
+					}
 					kill_single_pop = yes
 				}
 			}
@@ -5065,13 +5106,17 @@ situation_event = {
 							has_trait = leader_trait_principled
 						}
 					}
-					add_trait = leader_trait_principled
+					add_trait = {
+						trait = leader_trait_principled
+					}
 				}
 				else_if = {
 					limit = {
 						has_trait = leader_trait_principled
 					}
-					add_trait = leader_trait_principled_2
+					add_trait = {
+						trait = leader_trait_principled_2
+					}
 				}
 				else = {
 					add_experience = 200
@@ -5643,6 +5688,7 @@ fleet_event = {
 		exists = orbit.controller
 		controller = { is_aerospace_adaptation_empire = yes } # undercoat: moved to scripted trigger
 		orbit = {
+			is_scope_type = planet
 			is_colony = yes
 			controller = { NOT = { is_hostile = prevprev.controller } }
 		}
@@ -5732,41 +5778,19 @@ planet_event = {
 		fromfrom = {
 			has_trait = trait_nascent_stage
 		}
+		check_variable = {
+			which = local_pop_amount
+			value > 0
+		}
 	}
 
 	immediate = {
 		fromfrom = {
-			species = {
-				save_event_target_as = nascent_stage_source_species
-			}
-		}
-		if = {
-			limit = {
-				NOT = { exists = event_target:nascent_stage_species@fromfrom.species }
-			}
-			fromfrom = {
-				modify_species = {
-					species = species
-					add_trait = trait_presapient_stage
-					inherit_parent_rights = yes
-					sapient = no
-					change_scoped_species = no
-					effect = {
-						save_global_event_target_as = nascent_stage_species@event_target:nascent_stage_source_species
-					}
-				}
-			}
-		}
-		create_pop_group = {
-			pop_group = fromfrom
-			species = event_target:nascent_stage_species@event_target:nascent_stage_source_species
-			size = 0
-			effect = {
-				transfer_pop_amount = {
-					source = root.fromfrom
-					target = this
-					amount = root.local_pop_amount
-				}
+			modify_species = {
+				species = species
+				add_trait = trait_presapient_stage
+				inherit_parent_rights = yes
+				sapient = no
 			}
 		}
 	}
@@ -5813,6 +5837,7 @@ country_event = {
 			NOR = {
 				has_trait = trait_leader_second_chanced
 				leader_backup_clone_can_activate = yes
+				leader_is_envoy_stu = yes # undercoat: moved to scripted trigger
 			}
 			is_pool_leader = no
 		}
@@ -8324,6 +8349,32 @@ country_event = {
 			}
 		}
 	}
+	option = {
+		trigger = { has_country_flag = boring_infernal_choice }
+		name = bio.3220.infernal
+		custom_tooltip = fallen_empire_happy_tooltip
+
+		hidden_effect = {
+			add_random_trait_by_tag = { SPECIES = event_target:boring_species TAG = infernal NOTTAG = special }
+			event_target:fallen_empire_hive_growth = {
+				add_opinion_modifier = { who = root modifier = opinion_accepted_fallen_empire_request }
+				increase_fe_influence = yes
+			}
+		}
+	}
+	option = {
+		trigger = { has_country_flag = boring_psionic_choice }
+		name = bio.3220.psionic
+		custom_tooltip = fallen_empire_happy_tooltip
+
+		hidden_effect = {
+			add_random_trait_by_tag = { SPECIES = event_target:boring_species TAG = psionic NOTTAG = special }
+			event_target:fallen_empire_hive_growth = {
+				add_opinion_modifier = { who = root modifier = opinion_accepted_fallen_empire_request }
+				increase_fe_influence = yes
+			}
+		}
+	}
 	option = { #EvoPred get situation progress if they get the event
 		exclusive_trigger = {
 			is_evolutionary_predators_empire = yes # undercoat: moved to scripted trigger
@@ -8359,6 +8410,24 @@ country_event = {
 		custom_tooltip = fallen_empire_unhappy_tooltip
 
 		hidden_effect = { event_target:fallen_empire_hive_growth = { add_opinion_modifier = { who = root modifier = opinion_refused_fallen_empire_request } } }
+	}
+
+	after = {
+		hidden_effect = {
+			remove_country_flag = boring_humanoid_choice
+			remove_country_flag = boring_mammalian_choice
+			remove_country_flag = boring_reptilian_choice
+			remove_country_flag = boring_avian_choice
+			remove_country_flag = boring_arthropoid_choice
+			remove_country_flag = boring_molluscoid_choice
+			remove_country_flag = boring_fungoid_choice
+			remove_country_flag = boring_plantoid_choice
+			remove_country_flag = boring_lithoid_choice
+			remove_country_flag = boring_necroid_choice
+			remove_country_flag = boring_aquatic_choice
+			remove_country_flag = boring_toxoid_choice
+			remove_country_flag = boring_infernal_choice
+		}
 	}
 }
 
@@ -8862,6 +8931,7 @@ country_event = {
 	immediate = {
 		weighted_random_owned_pop_group = {
 			limit = {
+				pop_group_size > 1
 				species = { is_organic_species = yes }
 				NOT = {
 					event_target:fallen_empire_hive_control = {
@@ -8900,7 +8970,7 @@ country_event = {
 				resettle_pop_group = {
 					POP_GROUP = event_target:target_pop
 					PLANET = capital_scope
-					AMOUNT = 100
+					AMOUNT = 1
 				}
 				event_target:fallen_empire_hive_control.capital_scope = {
 					while = {
@@ -9199,6 +9269,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		years_passed > 20
 		is_ai = no
 		is_playable = yes # undercoat: moved to scripted trigger
 		is_at_war = no
@@ -9830,7 +9901,9 @@ leader_event = {
 		set_leader_flag = ignore_country_clone_pulse
 		random_list = {
 			1 = {		# 33% chance to gain a backup clone
-				add_trait = leader_trait_has_backup_clone
+				add_trait = {
+					trait = leader_trait_has_backup_clone
+				}
 			}
 			2 = {		# 67% chance to reroll in 3-5 years
 				leader_event = {

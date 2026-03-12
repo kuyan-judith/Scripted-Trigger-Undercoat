@@ -1,0 +1,1604 @@
+# Crisis Ascension Perk "Galactic Hyperthermia"
+
+namespace = infernals
+
+# Picking the AP
+country_event = {
+	id = infernals.1000
+	title = infernals.1000.name
+	desc = infernals.1000.desc #GetHyperthermiaIntroIfRedGiant
+	picture = GFX_evt_inf_red_giant_growth
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = { # Can happen if infernals.1051 happens before
+			limit = { has_modifier = crisis_conduit_stop }
+			remove_modifier = crisis_conduit_stop
+		}
+		set_variable = { which = hyperthermia_red_var value = 0 }
+		set_variable = { which = hyperthermia_volcanic_var value = 0 }
+		set_variable = { which = hyperthermia_systems_var value = value:gh_critical_mass_value }
+		set_variable = { which = hyperthermia_giant_var value = 0 }
+		export_trigger_value_to_variable = { # Used for the UI to show the current progress
+			trigger = controlled_systems
+			variable = hyperthermia_own_systems_var
+		}
+		add_timeline_event = {
+			type = timeline_crisis
+			override_id = timeline_galactic_hyperthermia_start
+			override_tooltip = "TIMELINE_EVENT_GH_START_TOOLTIP"
+			override_types = { country }
+			override_text = { "text:TIMELINE_EVENT_GH_START" }
+			override_texture = { "background:GFX_evt_inf_crisis_crucible_construction" }
+			targets = { root }
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { is_gestalt = no }
+			NOT = { has_country_flag = red_giant_discovered_crystallized_entropy }
+		}
+		enable_special_project = {
+			name = INF_CRISIS_ENTROPY
+			location = this
+			owner = root
+		}
+	}
+	option = {
+		name = ACKNOWLEDGED
+		trigger = {
+			owner = { is_gestalt = yes }
+			NOT = { has_country_flag = red_giant_discovered_crystallized_entropy }
+		}
+		enable_special_project = {
+			name = INF_CRISIS_ENTROPY
+			location = this
+			owner = root
+		}
+	}
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { is_gestalt = no }
+			has_country_flag = red_giant_discovered_crystallized_entropy
+		}
+		set_country_flag = Hyperthermia_Lv1_unlocked
+	}
+	option = {
+		name = ACKNOWLEDGED
+		trigger = {
+			owner = { is_gestalt = yes }
+			has_country_flag = red_giant_discovered_crystallized_entropy
+		}
+		set_country_flag = Hyperthermia_Lv1_unlocked
+	}
+    after = {
+        begin_event_chain = { event_chain = galactic_hyperthermia_chain target = root }
+    }
+}
+
+# Unlocking Level 1
+country_event = {
+	id = infernals.1005
+	title = infernals.1005.name
+	
+	desc = {
+		trigger = {
+			owner = { NOT = { has_country_flag = red_giant_discovered_crystallized_entropy } }
+		}
+		text = infernals.1005.desc1
+		
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = red_giant_discovered_crystallized_entropy }
+		}
+		text = infernals.1005.desc2
+	}
+	picture = GFX_evt_inf_overheating_intensifies
+	show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+	option = {
+		name = infernals.1005.a
+        custom_tooltip = infernals.1005.a.tt
+		trigger = { is_gestalt = no }
+	}
+	option = {
+		name = infernals.1005.b
+        custom_tooltip = infernals.1005.b.tt
+		trigger = { is_gestalt = yes }
+	}
+	after = {
+		hidden_effect = {
+			if = {
+				limit = { #if we are not an infernal empire we will need to adapt
+					is_infernal_empire = no
+				}
+				country_event = { id = infernals.1006 days = 90 }
+			}
+		}
+	}
+}
+
+# Unlocking Special project for non-infernals to adapt
+country_event = {
+	id = infernals.1006
+	title = infernals.1006.name
+	desc = infernals.1006.desc
+	picture = GFX_evt_inf_red_giant_growth
+	show_sound = event_mystic_reveal
+	event_chain = galactic_hyperthermia_chain
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACKNOWLEDGED
+		enable_special_project = {
+			name = "INF_THERMOPHILE_ADAPTATION"
+			location = this
+			owner = root
+		}
+	}
+}
+
+# A non-Infernal empire adapts to fire for the Hyperthermia crisis
+country_event = {
+	id = infernals.1007
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = { modifier = crisis_thermophile_adaptation }
+	}
+}
+
+# Unlocking Level 2
+country_event = {
+	id = infernals.1010
+	title = infernals.1010.name
+	desc = infernals.1010.desc
+	picture = GFX_evt_inf_crisis_crucible_construction
+	show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+	option = {
+		name = infernals.1010.a
+        trigger = { is_gestalt = no }
+	}
+	option = {
+		name = infernals.1010.b
+        trigger = { is_gestalt = yes }
+	}
+}
+
+# Unlocking Level 3 + Decision
+country_event = {
+	id = infernals.1015
+	title = infernals.1015.name
+	desc = infernals.1015.desc
+	picture = GFX_evt_inf_overheating_intensifies
+	show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+    immediate = {
+        set_country_flag = allow_terraforming_into_volcanic
+        activate_fog_machine = crisis_firestorm_S
+    }
+
+    option = {
+		name = infernals.1015.a # Become evil
+        custom_tooltip = infernals.1015.a.desc
+		enable_special_project = {
+			name = INF_CRISIS_ENTROPY_EVIL
+			location = this
+			owner = root
+		}
+		hidden_effect = {
+			if = {
+				# In case multiple empires attempt this option
+				limit = { NOT = { has_global_flag = Hyperthermia_Systems_Spawned } }
+				set_global_flag = Hyperthermia_Systems_Spawned
+				spawn_hyperthermia_systems = yes
+			}
+		}
+	}
+	option = {
+		name = infernals.1015.b # Back to Level 3
+        custom_tooltip = infernals.1015.b.desc
+        hidden_effect = { 
+            enable_special_project = {
+                name = INF_CRISIS_ENTROPY_GOOD
+                location = this
+                owner = root
+            }
+            set_country_flag = Hyperthermia_Lv4_denied
+        }
+    }
+}
+
+# Finishing special project for the evil path
+country_event = {
+	id = infernals.1020
+	title = infernals.1020.name
+	desc = infernals.1020.desc
+	picture = GFX_evt_inf_entropy_conduit_in_space
+	show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+	option = {
+		name = infernals.1020.a
+		custom_tooltip = infernals.1020.a.tt
+		trigger = { is_gestalt = no }
+	}
+	option = {
+		name = infernals.1020.b
+		custom_tooltip = infernals.1020.b.tt
+		trigger = { is_gestalt = yes }
+	}
+}
+
+# Finishing special project for the peaceful path
+country_event = {
+    id = infernals.1021
+    title = infernals.1021.name
+    desc = infernals.1021.desc
+    picture = GFX_evt_inf_science_ship
+    show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+    option = {
+        name = infernals.1021.a
+        trigger = { is_gestalt = no }
+    }
+    option = {
+        name = infernals.1021.b
+        trigger = { is_gestalt = yes }
+    }
+}
+
+# Unlocking Level 4
+country_event = {
+    id = infernals.1025
+    title = infernals.1025.name
+    desc = infernals.1025.desc
+    picture = GFX_evt_inf_subspace_interference
+    show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+    option = {
+        name = infernals.1025.a
+		custom_tooltip = infernals.1025.a.tt
+        trigger = { is_gestalt = no }
+    }
+    option = {
+        name = infernals.1025.b
+		custom_tooltip = infernals.1025.b.tt
+        trigger = { is_gestalt = yes }
+    }
+}
+
+# Unlocking Level 5
+country_event = {
+	id = infernals.1030
+	title = infernals.1030.name
+	desc = infernals.1030.desc
+	picture = GFX_evt_inf_overheating_intensifies
+	show_sound = event_mystic_reveal
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+    immediate = {
+        every_system_within_border = {
+            limit = { has_star_flag = gh_crisis_star }
+            star = {
+                set_planet_entity = { entity = infernal_system_crisis_star_entity }
+            }
+        }
+        random_owned_megastructure = {
+            limit = { has_megastructure_flag = galactic_crucible }
+            solar_system = { spawn_hyperthermia_wormholes = yes }
+        }
+        every_system = {
+            limit = { has_star_flag = hyperthermia_system }
+            set_surveyed = {
+                surveyed = yes
+                surveyor = root
+            }
+        }
+        add_seen_bypass_type = entropy_wormhole
+        set_variable = { which = gh_crisis_difficulty_var value = value:gh_crisis_difficulty_value }
+        set_variable = { which = gh_crisis_opponent_var value = value:gh_crisis_opponent_value }
+        if = { # Should never go too low
+            limit = { check_variable = { which = gh_crisis_opponent_value value < -2.5 } }
+            set_variable = { which = gh_crisis_opponent_value value = -2.5 }
+        }
+        start_situation = {
+            type = situation_galactic_hyperthermia_timer
+            target = root
+        }
+    }
+
+    option = {
+        name = infernals.1030.a
+		custom_tooltip = infernals.1030.a.tt
+        trigger = { is_gestalt = no }
+    }
+    option = {
+        name = infernals.1030.b
+		custom_tooltip = infernals.1030.b.tt
+        trigger = { is_gestalt = yes }
+    }
+}
+
+# Connects the Core systems with the galaxy after x years
+country_event = {
+	id = infernals.1035
+	title = infernals.1035.name
+	desc = infernals.1035.desc
+	picture = GFX_evt_inf_early_warm_galaxy
+	show_sound = event_mystic_reveal
+	event_chain = galactic_hyperthermia_chain
+
+	is_triggered_only = yes
+
+	immediate = {
+		deactivate_fog_machine = yes
+		if = {
+			limit = { NOT = { has_global_flag = Hyperthermia_lanes_spawned } }
+			set_global_flag = Hyperthermia_lanes_spawned
+			event_target:hyperthermia_system1 = {
+				spawn_hyperthermia_lanes = yes
+			}
+			event_target:hyperthermia_system3 = {
+				spawn_hyperthermia_lanes = yes
+			}
+			event_target:hyperthermia_system5 = {
+				spawn_hyperthermia_lanes = yes
+			}
+		}
+		save_global_event_target_as = hyperthermia_empire
+		every_playable_country = {
+			limit = { NOT = { is_same_value = root } }
+			country_event = { id = infernals.1040 }
+		}
+		# Not all FEs should attack on lower difficulty, starting with 3
+		switch = {
+			trigger = is_difficulty
+			3 = {
+				hyperthermia_fe_effect = yes
+			}
+			4 = {
+				while = {
+					count = 2
+					hyperthermia_fe_effect = yes
+				}
+			}
+			5 = {
+				while = {
+					count = 4
+					hyperthermia_fe_effect = yes
+				}
+			}
+			6 = {
+				while = {
+					count = 6
+					hyperthermia_fe_effect = yes
+				}
+			}
+		}
+		activate_fog_machine = crisis_firestorm_L
+	}
+
+	option = {
+		name = infernals.1035.a
+		trigger = { is_gestalt = no }
+	}
+	option = {
+		name = infernals.1035.b
+		trigger = { is_gestalt = yes }
+	}
+}
+
+# Other empires learn about the opened Galactic Core
+# Creates a coalition of opposing countries against the crisis
+country_event = {
+    id = infernals.1040
+    title = infernals.1040.name
+    desc = infernals.1040.desc
+    picture = GFX_evt_announcement
+    show_sound = event_sensor_ping
+    location = event_target:hyperthermia_empire
+
+    is_triggered_only = yes
+
+    # Coalition war
+    option = {
+        name = infernals.1040.a
+        custom_tooltip = infernals.1040.a.tt
+        trigger = {
+            is_player_crisis = no
+            is_homicidal = no
+        }
+        ai_chance = {
+            modifier = {
+                add = 5
+                is_xenophobe = yes # No one should become stronger than us
+            }
+            modifier = {
+                add = 5
+                is_xenophile = yes # We have to protect the weak
+            }
+            modifier = {
+                add = 5
+                is_militarist = yes
+            }
+            modifier = {
+                add = 15
+                has_ascension_perk = ap_defender_of_the_galaxy
+            }
+            modifier = {
+                add = 5
+                is_galactic_community_member = yes
+            }
+            modifier = {
+                add = 25
+                is_fallen_empire = yes
+                is_infernal_empire = no
+            }
+			modifier = {
+				add = 10
+				any_neighbor_country = {
+					is_same_empire = event_target:hyperthermia_empire
+				}
+			}
+            modifier = {
+                add = 10
+                OR = {
+                    is_galactic_custodian = yes
+                    is_galactic_emperor = yes
+                }
+            }
+        }
+        hidden_effect = { set_country_flag = anti_hyperthermia_coalition }
+    }
+
+    # Genocidals
+    option = {
+        name = infernals.1040.b
+        custom_tooltip = infernals.1040.b.tt
+        trigger = {
+            is_homicidal = yes
+        }
+    }
+
+    # Infernals (neutral)
+    option = {
+        name = infernals.1040.c
+        custom_tooltip = infernals.1040.c.tt
+        trigger = {
+            is_infernal_empire = yes
+            is_homicidal = no
+        }
+        ai_chance = {
+            modifier = {
+                add = 10
+                is_xenophile = yes
+            }
+            modifier = {
+                add = 10
+                is_pacifist = yes
+            }
+            modifier = {
+                add = 25
+                is_inwards_perfection_empire = yes # undercoat: moved to scripted trigger
+            }
+            modifier = {
+                add = 5
+                is_galactic_community_member = no
+            }
+        }
+    }
+
+    # Neutral
+    option = {
+        name = infernals.1040.d
+        custom_tooltip = infernals.1040.d.tt
+        trigger = {
+            is_infernal_empire = no
+            is_homicidal = no
+        }
+        ai_chance = {
+            modifier = {
+                add = 10
+                is_pacifist = yes
+            }
+            modifier = {
+                add = 25
+                is_inwards_perfection_empire = yes # undercoat: moved to scripted trigger
+            }
+            modifier = {
+                add = 5
+                is_galactic_community_member = no
+            }
+        }
+    }
+}
+
+# Starts the crisis war (hidden)
+country_event = {
+	id = infernals.1041
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# Kick the Crisis out of Alliances.
+		if = {
+			limit = { has_federation = yes }
+			leave_alliance = { override_requirements = yes }
+		}
+		if = {
+			limit = {
+				is_galactic_community_formed = yes
+				is_galactic_community_member = yes
+			}
+			remove_from_galactic_community = yes
+		}
+		awaken_guardians_of_the_galaxy = yes
+
+		every_playable_country = {
+			start_situation = {
+				type = situation_galactic_hyperthermia
+				target = root
+				effect = {
+					set_situation_flag = hyperthermia_counter
+					set_situation_progress = 10
+				}
+			}
+		}
+
+		# Will add the GalCom leaders as war_leader, otherwise the strongest opponent
+		if = {
+			limit = {
+				has_galactic_emperor = yes
+				galactic_emperor = { has_country_flag = anti_hyperthermia_coalition }
+			}
+			galactic_emperor = { save_event_target_as = war_leader }
+		}
+		else_if = {
+			limit = {
+				has_galactic_emperor = no
+				has_galactic_custodian = yes
+				galactic_custodian = { has_country_flag = anti_hyperthermia_coalition }
+			}
+			galactic_custodian = { save_event_target_as = war_leader }
+		}
+
+		# An FE will take the lead
+		else_if = {
+			limit = {
+				any_country = {
+					is_fallen_empire = yes
+					has_country_flag = anti_hyperthermia_fe
+				}
+			}
+			random_country = {
+				limit = {
+					is_fallen_empire = yes
+					has_country_flag = anti_hyperthermia_fe
+				}
+				save_event_target_as = war_leader
+			}
+		}
+
+		# Will otherwise select the strongest
+		else_if = {
+			limit = {
+				any_playable_country = {
+					is_subject = no
+					has_country_flag = anti_hyperthermia_coalition
+					relative_power = {
+						who = prev
+						value >= superior
+						category = fleet
+					}
+				}
+			}
+			random_playable_country = {
+				limit = {
+					is_subject = no
+					has_country_flag = anti_hyperthermia_coalition
+					relative_power = {
+						who = prev
+						value >= superior
+						category = fleet
+					}
+				}
+				save_event_target_as = war_leader
+			}
+		}
+		else_if = {
+			limit = {
+				any_playable_country = {
+					is_subject = no
+					has_country_flag = anti_hyperthermia_coalition
+					relative_power = {
+						who = prev
+						value >= equivalent
+						category = all
+					}
+				}
+			}
+			random_playable_country = {
+				limit = {
+					is_subject = no
+					has_country_flag = anti_hyperthermia_coalition
+					relative_power = {
+						who = prev
+						value >= equivalent
+						category = all
+					}
+				}
+				save_event_target_as = war_leader
+			}
+		}
+		else = {
+			random_playable_country = {
+				limit = {
+					has_country_flag = anti_hyperthermia_coalition
+					is_subject = no
+				}
+				save_event_target_as = war_leader
+			}
+		}
+
+		# WAR!
+		event_target:war_leader = {
+			declare_war = {
+				target = event_target:hyperthermia_empire
+				name = {
+					key = "NAME_Declared_Crisis_War"
+					variable_string = "[This.MainDefender.GetAdj]"
+				}
+				attacker_war_goal = "wg_declared_crisis"
+				effect = { save_event_target_as = hyperthermia_war }
+			}
+		}
+		every_country = {
+			limit = {
+				has_country_flag = anti_hyperthermia_coalition
+				NOR = {
+					is_same_value = event_target:war_leader
+					has_subject = root
+				}
+			}
+			join_war = event_target:war_leader
+		}
+
+		# Subjects
+		every_subject = {
+			if = {
+				limit = { has_federation = yes }
+				leave_alliance = { override_requirements = yes }
+			}
+			if = {
+				limit = {
+					is_galactic_community_formed = yes
+					is_galactic_community_member = yes
+				}
+				remove_from_galactic_community = yes
+			}
+		}
+
+		# Notifications
+		every_playable_country = {
+			limit = {
+				has_crisis_level = crisis_hyperthermia_level_5
+			}
+			country_event = { id = infernals.1042 }
+		}
+		every_playable_country = {
+			limit = {
+				NOT = { has_crisis_level = crisis_hyperthermia_level_5 }
+			}
+			country_event = { id = infernals.1043 }
+		}
+	}
+}
+
+# Crisis war - crisis
+country_event = {
+    id = infernals.1042
+    title = infernals.1042.name
+    desc = infernals.1042.desc
+    picture = GFX_evt_crisis_declared
+    show_sound = event_death_cult
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+    option = { name = infernals.1042.a }
+}
+
+# Crisis war - others
+country_event = {
+    id = infernals.1043
+    title = infernals.1043.name
+    desc = infernals.1043.desc
+    picture = GFX_evt_crisis_declared
+    show_sound = event_announcement
+
+    is_triggered_only = yes
+
+    option = { name = infernals.1043.a }
+}
+
+# Reaching the last situation stage (first time)
+situation_event = {
+    id = infernals.1045
+    title = infernals.1045.name
+    desc = {
+        trigger = {
+            owner = { has_crisis_level = crisis_hyperthermia_level_5 }
+        }
+        text = infernals.1045.desc1
+    }
+    desc = {
+        trigger = {
+            owner = { NOT = { has_crisis_level = crisis_hyperthermia_level_5 } }
+        }
+        text = infernals.1045.desc2
+    }
+    picture = GFX_evt_clocks
+    show_sound = event_worrying_signal
+    situation = this
+
+    is_triggered_only = yes
+
+    option = {
+        name = infernals.1045.a
+        custom_tooltip = infernals.1045.a.tooltip
+        trigger = {
+            owner = { has_crisis_level = crisis_hyperthermia_level_5 }
+        }
+    }
+    option = {
+        name = infernals.1045.a
+        custom_tooltip = infernals.1045.a.tooltip
+        trigger = {
+            owner = { NOT = { has_crisis_level = crisis_hyperthermia_level_5 } }
+        }
+    }
+}
+
+# If the crisis dies - the situation disappers
+# on_country_destroyed
+country_event = {
+	id = infernals.1050
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_crisis_level = crisis_hyperthermia_level_5
+	}
+
+	immediate = {
+		clear_global_event_target = hyperthermia_empire
+		remove_global_flag = Hyperthermia_ongoing
+		every_playable_country = {
+			random_situation = {
+				limit = { has_situation_flag = hyperthermia_counter }
+				abort_situation = this
+			}
+		}
+	}
+}
+
+# Conquering a Crucible - after a war (trigger)
+country_event = {
+	id = infernals.1051
+	hide_window = yes
+
+	is_triggered_only = yes
+	trigger = {
+		any_owned_megastructure = {
+			has_megastructure_flag = galactic_crucible
+			NOR = {
+				has_megastructure_flag = galactic_crucible@root
+				is_megastructure_type = galactic_crucible_5
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_megastructure = {
+			limit = {
+				has_megastructure_flag = galactic_crucible
+				NOR = {
+					has_megastructure_flag = galactic_crucible@root
+					is_megastructure_type = galactic_crucible_5
+				}
+			}
+			solar_system = { save_event_target_as = crucible_system }
+			set_halted = -1
+			if = {
+				limit = { is_megastructure_type = galactic_crucible_4 }
+				remove_global_flag = Hyperthermia_ongoing
+				every_playable_country = {
+					random_situation = {
+						limit = { has_situation_flag = hyperthermia_counter }
+						abort_situation = this
+					}
+				}
+			}
+		}
+		country_event = { id = infernals.1052 }
+	}
+}
+
+# Conquering a Crucible - after a war (notification)
+country_event = {
+	id = infernals.1052
+	title = infernals.1052.name
+	desc = infernals.1052.desc
+	show_sound = event_spy_orb_build_upgrade
+	picture = GFX_evt_inf_crisis_crucible_construction
+	location = event_target:crucible_system
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { NOT = { has_ascension_perk = ap_galactic_hyperthermia } }
+			add_modifier = { modifier = crisis_conduit_stop }
+		}
+	}
+
+	option = {
+		name = infernals.1052.a
+		custom_tooltip = infernals.1052.a.tt
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+		add_monthly_resource_mult = {
+			resource = sr_dark_matter
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		hidden_effect = {
+			event_target:crucible_system = {
+				spawn_megastructure = {
+					type = galactic_crucible_ruined
+				}
+				random_system_megastructure = {
+					limit = { has_megastructure_flag = galactic_crucible }
+					remove_megastructure = this
+				}
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 0
+				is_infernal_empire = no
+			}
+		}
+	}
+	option = {
+		name = infernals.1052.b
+		custom_tooltip = infernals.1052.b.tt
+		hidden_effect = {
+			event_target:crucible_system = {
+				spawn_megastructure = {
+					type = galactic_crucible_5
+					owner = root
+				}
+				random_system_megastructure = {
+					limit = { has_megastructure_flag = galactic_crucible }
+					remove_megastructure = this
+				}
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 2
+				is_infernal_empire = yes
+			}
+		}
+	}
+}
+
+# Conquering a Crucible - ongoing war (trigger)
+country_event = {
+	id = infernals.10530
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		is_at_war = yes
+		from = {
+			has_megastructure_flag = galactic_crucible
+			NOT = { is_megastructure_type = galactic_crucible_5 }
+		}
+		NOT = { has_country_flag = discovered_crucible }
+		if = {
+			limit = { has_ascension_perk = ap_galactic_hyperthermia }
+			NOT = { from = { has_megastructure_flag = galactic_crucible@root } }
+		}
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				is_at_war_with = root
+				has_ascension_perk = ap_galactic_hyperthermia
+			}
+			save_event_target_as = crucible_builders
+		}
+		from = {
+			solar_system = { save_event_target_as = crucible_system }
+			set_halted = -1
+		}
+		set_timed_country_flag = { flag = discovered_crucible days = 180 }
+		if = {
+			limit = { NOT = { has_ascension_perk = ap_galactic_hyperthermia } }
+			add_modifier = { modifier = crisis_conduit_stop }
+		}
+		# Delay so wars can finish before the event is triggered (sometimes you conquer+finish)
+		country_event = { id = infernals.1053 days = 1 }
+	}
+}
+
+# Conquering a Crucible - ongoing war (info)
+country_event = {
+	id = infernals.1053
+	title = infernals.1053.name
+	desc = infernals.1053.desc
+	show_sound = event_super_explosion
+	picture = GFX_evt_inf_crisis_crucible_construction
+	location = event_target:crucible_system
+
+	is_triggered_only = yes
+	trigger = {
+		is_at_war = yes
+		exists = event_target:crucible_builders
+		is_at_war_with = event_target:crucible_builders
+	}
+
+	option = { # Thats evil!
+		name = infernals.1053.a
+	}
+	option = { # After all, it could still benefit them!
+		name = infernals.1053.b
+		trigger = {
+			is_infernal_empire = yes
+			NOR = {
+				is_xenophile = yes
+				is_pacifist = yes
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		ai_chance = { factor = 2 }
+	}
+}
+
+# Conquering a Crucible - ongoing war (recapture)
+country_event = {
+	id = infernals.1054
+	hide_window = yes
+	is_triggered_only = yes
+	location = from
+	trigger = { from = { has_megastructure_flag = galactic_crucible@root } }
+	immediate = {
+		from = { set_halted = 1 }
+		remove_modifier = crisis_conduit_stop
+	}
+}
+
+# Crisis wins!
+country_event = {
+    id = infernals.1055
+    title = infernals.1055.name
+    desc = infernals.1055.desc
+    picture = GFX_evt_cosmic_storms_solar_storm
+    show_sound = event_the_great_awakening
+    event_chain = galactic_hyperthermia_chain
+
+    is_triggered_only = yes
+
+	immediate = {
+        set_update_modifiers_batch = begin
+        remove_global_flag = Hyperthermia_ongoing
+        set_global_flag = Hyperthermia_happened
+        set_timed_country_flag = { flag = hyperthermia_effect_wave days = 3 } # Achievement infernals.3230
+        if = {
+            limit = { owner_main_species = { has_trait = trait_organic } }
+            species = {
+                change_species_characteristics = {
+                    remove_trait = trait_organic
+                    add_trait = trait_infernal
+                }
+            }
+        }
+        every_system = { hyperthermia_galaxy_effect = yes }
+        set_update_modifiers_batch = end
+        win = yes
+        add_timeline_event = {
+            type = timeline_crisis
+            override_id = timeline_galactic_hyperthermia_end
+            override_tooltip = "TIMELINE_EVENT_GH_END_TOOLTIP"
+            override_types = { country }
+            override_text = { "text:TIMELINE_EVENT_GH_END" }
+            override_texture = { "background:GFX_evt_inf_overheating_intensifies" }
+            targets = { root }
+        }
+    }
+
+    option = {
+        name = infernals.1055.a
+        trigger = { is_gestalt = no }
+    }
+    option = {
+        name = infernals.1055.b
+        trigger = { is_gestalt = yes }
+    }
+    option = { #Scorched world heralds
+        name = infernals.1055.c
+        trigger = { is_genocidal_infernal = yes }
+    }
+    option = { #Infernal Fire Cult
+        name = infernals.1055.d
+        trigger = { is_pyrolatry_empire = yes } # undercoat: moved to scripted trigger
+    }
+	option = { # Other Infernals only
+        name = infernals.1055.e
+        trigger = { 
+            is_infernal_empire = yes 
+            NOR = {
+                is_pyrolatry_empire = yes # undercoat: moved to scripted trigger
+                is_genocidal_infernal = yes
+            }
+        }
+    }
+	option = { #Generic Genocidal response
+        name = infernals.1055.f 
+        trigger = { 
+			has_homicidal_civic = yes # undercoat: moved to scripted trigger
+		}
+	}
+	after = { add_relic = r_crystallized_singularity }
+}
+
+# Another crisis wins!
+country_event = {
+	id = infernals.1056
+	title = infernals.1056.name
+	desc = infernals.1056.desc
+	picture = GFX_evt_cosmic_storms_solar_storm
+	show_sound = event_the_great_awakening
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.1056.a
+		trigger = { is_gestalt = no }
+	}
+	option = {
+		name = infernals.1056.b
+		trigger = { is_gestalt = yes }
+	}
+	option = {
+		name = infernals.1056.c
+		trigger = { is_infernal_empire = yes }
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier4unityreward
+			min = @tier4unitymin
+			max = @tier4unitymax
+		}
+	}
+}
+
+# Monthly crisis event
+# Completes objective & controls Conduits spawn/movement behavior
+country_event = {
+	id = infernals.2000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_ascension_perk = ap_galactic_hyperthermia
+	}
+
+	immediate = {
+
+	# Shows progress for "Critical Mass"
+	export_trigger_value_to_variable = {
+		trigger = controlled_systems
+		variable = hyperthermia_own_systems_var
+	}
+
+	# Cycle interval
+	if = {
+		limit = { has_modifier = crisis_conduit_stop }
+		hyperthermia_target_effect = yes
+		if = {
+			limit = {
+				OR = {
+					exists = event_target:friendly_target
+					exists = event_target:hostile_target
+				}
+			}
+			country_event = { id = infernals.2004 }
+			remove_modifier = crisis_conduit_stop
+		}
+	}
+
+	# Idle Conduits
+	random_owned_fleet = {
+		limit = {
+			is_fleet_idle = yes
+			is_ship_size = entropy_conduit
+		}
+		fleet_event = { id = infernals.2006 }
+	}
+
+    # Red Star objective - reward scales by system count
+        if = {
+            limit = { has_crisis_level = crisis_hyperthermia_level_1 }
+            export_trigger_value_to_variable = {
+                trigger = count_planet_within_border
+                parameters = {
+                    limit = {
+                        OR = {
+                            is_planet_class = pc_m_star
+                            is_planet_class = pc_m_giant_star
+                        }
+                    }
+                }
+                variable = hyperthermia_red_var
+            }
+            if = {
+                limit = {
+                    check_variable = { which = hyperthermia_red_var value > 0 }
+                }
+                complete_crisis_objective = crisobj_own_red_stars
+            }
+        }
+
+    # Centrifuges objective
+        export_trigger_value_to_variable = {
+            trigger = count_owned_starbase
+            parameters = {
+                limit = { has_starbase_building = gravitational_centrifuge }
+            }
+            variable = hyperthermia_starbase_var
+        }
+        while = {
+            count = hyperthermia_starbase_var
+            complete_crisis_objective = crisobj_entropy_starbase 
+        }
+
+    # Situation Progress
+        if = {
+            limit = {
+                has_crisis_level = crisis_hyperthermia_level_5
+            }
+            export_trigger_value_to_variable = {
+                trigger = count_system_within_border
+                parameters = {
+                    limit = {
+                        has_star_flag = hyperthermia_system
+                        any_ship_in_system = { has_ship_flag = entropy_conduit }
+                    }
+                }
+                variable = gh_crisis_core_var
+            }
+            if = {
+                limit = { check_variable = { which = gh_crisis_core_var value > 3 } }
+                set_variable = { which = gh_crisis_monthly_var value = 3 }
+            }
+            else_if = {
+                limit = { check_variable = { which = gh_crisis_core_var value = 3 } }
+                set_variable = { which = gh_crisis_monthly_var value = 0 }
+            }
+            else_if = {
+                limit = { check_variable = { which = gh_crisis_core_var value < 3 } }
+                set_variable = { which = gh_crisis_monthly_var value = -3 }
+                if = { # The situation should never reach 0 or less
+                    limit = {
+                        any_situation = {
+                            is_situation_type = situation_galactic_hyperthermia
+                            current_stage = stage_1
+                        }
+                    }
+                    set_variable = { which = gh_crisis_monthly_var value = 0 }
+                }
+            }
+            random_situation = {
+                limit = { is_situation_type = situation_galactic_hyperthermia }
+                export_trigger_value_to_variable = {
+                    trigger = situation_progress
+                    variable = gh_crisis_progress_var
+                }
+                owner = {
+                    set_variable = { which = gh_crisis_progress_var value = prev.gh_crisis_progress_var } 
+                }
+            }
+            # Security mechanism in case anything (lag/monthly tick) goes wrong
+            every_playable_country = {
+                limit = {
+                    NOT = { is_same_value = root }
+                }
+                random_situation = {
+                    limit = { is_situation_type = situation_galactic_hyperthermia }
+                    set_situation_progress = root.gh_crisis_progress_var
+                }
+            }
+        }
+
+    # Conduits buff owned colonies
+        every_owned_planet = {
+            limit = {
+                solar_system = {
+                    any_ship_in_system = { has_ship_flag = entropy_conduit }
+                }
+            }
+            add_modifier = {
+                modifier = crisis_conduit_buff
+                days = 31 # tempory in case the Conduit is destroyed or moved away
+            }
+        }
+    }
+}
+
+# Conduits turn into a station
+planet_event = {
+    id = infernals.2001
+    hide_window = yes
+    is_triggered_only = yes
+
+    trigger = {
+        is_star = yes
+        any_fleet_in_orbit = {
+            is_ship_size = entropy_conduit
+            has_fleet_order = terraform_fleet_order
+        }
+        solar_system = {
+            NOT = { any_fleet_in_system = { is_ship_size = conduit_station } }
+        }
+    }
+
+    immediate = {
+        random_fleet_in_orbit = {
+            limit = {
+                is_ship_size = entropy_conduit
+                has_fleet_order = terraform_fleet_order
+            }
+            owner = {
+                complete_crisis_objective = crisobj_create_red_stars
+                save_event_target_as = fire_crisis
+                # Blazing Domain achievement
+                change_variable = { which = hyperthermia_giant_var value = 1 }
+                if = {
+                    limit = { check_variable = { which = hyperthermia_giant_var value = 100 } }
+                    set_country_flag = INF_A_100_red_giants
+                }
+            }
+        }
+        # Needs a delay to set the correct entity
+        planet_event = { id = infernals.2002 days = 1 }
+    }
+}
+
+# Fired by infernals.2001
+planet_event = {
+    id = infernals.2002
+    hide_window = yes
+    is_triggered_only = yes
+
+    immediate = {
+        event_target:fire_crisis = {
+            if = {
+                limit = { NOT = { has_crisis_level = crisis_hyperthermia_level_5 } }
+                root = {
+                    set_planet_entity = { entity = "infernal_small_crisis_star_entity" }
+                    hyperthermia_deposit_effect = yes
+                    solar_system = { set_star_flag = gh_crisis_star }
+                }
+            }
+            else = {
+                root = {
+                    set_planet_entity = { entity = "infernal_system_crisis_star_entity" }
+                    hyperthermia_deposit_effect = yes
+                    solar_system = { set_star_flag = gh_crisis_star }
+                }
+            }
+        }
+    }
+}
+
+# on_system_controller_changed - Resets Starforging progress
+# Removes starbase building
+system_event = {
+    id = infernals.2003
+    hide_window = yes
+    is_triggered_only = yes
+
+    trigger = {
+        from = { NOT = { has_ascension_perk = ap_galactic_hyperthermia } }
+    }
+
+    immediate = {
+        every_system_planet = {
+            limit = {
+                is_star = yes
+                is_scripted_terraforming = yes
+            }
+            stop_terraform_process = yes
+        }
+        starbase = {
+            if = {
+                limit = { has_starbase_building = gravitational_centrifuge }
+                remove_starbase_building = { building = gravitational_centrifuge }
+            }
+        }
+    }
+}
+
+# Fired by the Crucible
+country_event = {
+	id = infernals.2004
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { has_ascension_perk = ap_galactic_hyperthermia }
+
+	immediate = {
+		# Find a valid target first
+		if = {
+			limit = { NOT = { has_modifier = crisis_conduit_stop } }
+			hyperthermia_target_effect = yes
+		}
+		if = {
+			limit = {
+				exists = event_target:friendly_target
+			}
+			event_target:friendly_target = {
+				set_timed_star_flag = { flag = conduit_target days = 180 }
+			}
+			set_friendly_conduit_spawn = yes
+		}
+		else_if = {
+			limit = {
+				exists = event_target:hostile_target
+			}
+			event_target:hostile_target = {
+				set_timed_star_flag = { flag = conduit_target days = 180 }
+			}
+			set_hostile_conduit_spawn = yes
+		}
+		else = {
+			add_modifier = { modifier = crisis_conduit_stop }
+		}
+	}
+}
+
+# Destroying a planet with Firestorm rewards Entropy Crystals
+# on_planet_bombarded, daily
+planet_event = {
+    id = infernals.2005
+    hide_window = yes
+
+    is_triggered_only = yes
+    trigger = {
+        has_orbital_bombardment_stance = firestorm
+        NOT = { has_planet_flag = crisobj_planet_firestorm }
+        from = { has_menace_perk = menp_hyperthermia_flames }
+        planet_devastation >= 100
+    }
+
+    immediate = {
+        from = {
+            complete_crisis_objective = crisobj_planet_firestorm
+        }
+        set_timed_planet_flag = { flag = crisobj_planet_firestorm days = 1080 }
+    }
+}
+
+# Idle Conduits search a new target
+fleet_event = {
+	id = infernals.2006
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		owner = { hyperthermia_target_effect = yes }
+		if = {
+			limit = {
+				exists = event_target:friendly_target
+			}
+			event_target:friendly_target = {
+				set_timed_star_flag = { flag = conduit_target days = 180 }
+			}
+			queue_actions = {
+				find_closest_system = {
+				trigger = {
+					id = conduit.nft1@root
+					is_same_value = event_target:friendly_target
+				}
+				found_system = {
+					move_to = this
+						find_closest_planet = {
+							trigger = {
+								id = conduit.nft2@root
+								is_star = yes
+							}
+							found_planet = {
+								move_to = this
+								orbit_planet = this
+								terraform_fleet = this
+							}
+						}
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				exists = event_target:hostile_target
+			}
+			event_target:hostile_target = {
+				set_timed_star_flag = { flag = conduit_target days = 180 }
+			}
+			queue_actions = {
+				find_closest_system = {
+				trigger = {
+					id = conduit.nht1@root
+					is_same_value = event_target:friendly_target
+				}
+				found_system = {
+					move_to = this
+						find_closest_planet = {
+							trigger = {
+								id = conduit.nht2@root
+								is_star = yes
+							}
+							found_planet = {
+								move_to = this
+								orbit_planet = this
+								terraform_fleet = this
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Yearly crisis event
+# Completes objective - Entropy for owned Volcanic Worlds
+country_event = {
+	id = infernals.2010
+	hide_window = yes
+	is_triggered_only = yes
+
+    trigger = {
+        has_ascension_perk = ap_galactic_hyperthermia
+        has_crisis_level = crisis_hyperthermia_level_1
+    }
+
+    immediate = {
+        export_trigger_value_to_variable = {
+            trigger = count_owned_planet
+            parameters = { limit = { is_volcanic_world = yes } } # undercoat: moved to scripted trigger
+            variable = hyperthermia_volcanic_var
+        }
+        complete_crisis_objective = crisobj_own_volcanics
+    }
+}
+
+# Crisis objective - terraform into a Volcanic World
+planet_event = {
+    id = infernals.2015
+    hide_window = yes
+    is_triggered_only = yes
+
+    trigger = {
+        from = {
+            has_ascension_perk = ap_galactic_hyperthermia
+            has_crisis_level = crisis_hyperthermia_level_1
+        }
+        is_volcanic_world = yes # undercoat: moved to scripted trigger
+    }
+
+    immediate = {
+        from = {
+            complete_crisis_objective = crisobj_create_volcanics
+        }
+    }
+}
+
+# Conduits do damage to hostile ships
+country_event = {
+	id = infernals.2020
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_menace_perk = menp_hyperthermia_coronal
+	}
+
+	immediate = {
+		every_owned_fleet = {
+			limit = { is_ship_size = conduit_station }
+			solar_system = {
+				every_ship_in_system = {
+					limit = {
+						owner = { is_hostile = root }
+					}
+					damage_ship = @inf_conduit_ship_damage # armor
+					reduce_shield = @inf_conduit_ship_damage
+				}
+				if = {
+					limit = {
+						root = {
+							has_menace_perk = menp_hyperthermia_critical_mass
+							controlled_systems >= value:gh_critical_mass_value
+						}
+					}
+					every_system_colony = {
+						limit = {
+							owner = {
+								NOR = {
+									is_infernal_empire = yes
+									has_ascension_perk = ap_galactic_hyperthermia
+								}
+							}
+						}
+						add_planet_devastation = @inf_conduit_col_damage
+						random_owned_pop_group = {
+							kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+								pop_group = this
+								amount = 100
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

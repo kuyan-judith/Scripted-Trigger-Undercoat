@@ -2,7 +2,6 @@
 # Fancy Jobs
 ###################
 
-
 politician = {
 	category = ruler
 
@@ -68,6 +67,60 @@ politician = {
 		}
 		swap_type = {
 			trigger = {
+				politician_is_fire_oracle = yes
+			}
+			name = fire_oracle
+			icon = fire_oracle
+			desc = job_fire_oracle_desc
+			weight = 25
+		}
+		swap_type = {
+			trigger = {
+				politician_is_blazewright = yes
+			}
+			name = blazewright
+			icon = blazewright
+			desc = job_blazewright_desc
+			weight = 26
+		}
+		swap_type = {
+			trigger = {
+				politician_is_radiant_priest = yes
+			}
+			name = radiant_priest
+			icon = radiant_priest
+			desc = job_radiant_priest_desc
+			weight = 26
+		}
+		swap_type = {
+			trigger = {
+				politician_is_pyrocrat = yes
+			}
+			name = pyrocrat
+			icon = pyrocrat
+			desc = job_pyrocrat_desc
+			weight = 26
+		}
+		swap_type = {
+			trigger = {
+				politician_is_ashbroker = yes
+			}
+			name = ashbroker
+			icon = ashbroker
+			desc = job_ashbroker_desc
+			weight = 26
+		}
+		swap_type = {
+			trigger = {
+				politician_is_blazing_harbinger = yes
+			}
+			name = blazing_harbinger
+			icon = pyrocrat
+			desc = job_blazing_harbinger_desc
+			weight = 27
+		}
+		swap_type = {
+			trigger = {
 				politician_is_planetary_warden = yes
 			}
 			name = warden
@@ -104,9 +157,53 @@ politician = {
 			desc = job_augmentation_merchant_desc
 			weight = 20
 		}
+		swap_type = {
+			trigger = {
+				politician_is_superstitious_beliefs_high_priest = yes
+			}
+			name = superstitious_beliefs_high_priest
+			desc = superstitious_beliefs_high_priest
+			icon = superstitious_beliefs_priest
+			weight = 20
+		}
+		swap_type = {
+			trigger = {
+				politician_is_superstitious_beliefs_high_priest_corporate = yes
+			}
+			name = superstitious_beliefs_high_priest_corporate
+			desc = superstitious_beliefs_high_priest_corporate
+			icon = superstitious_beliefs_priest
+			weight = 20
+		}
+		swap_type = {
+			trigger = {
+				politician_is_visionary = yes
+			}
+			name = visionary
+			desc = visionary
+			icon = executive
+			weight = 20
+		}
 	}
 
 	tags = { unity amenities }
+	triggered_tags = {
+		trigger = {
+			OR = {
+				politician_is_high_priest = yes
+				politician_is_technophant = yes
+				politician_is_superstitious_beliefs_high_priest = yes
+				politician_is_superstitious_beliefs_high_priest_corporate = yes
+				politician_is_fire_oracle = yes
+				politician_is_blazewright = yes
+				politician_is_radiant_priest = yes
+				politician_is_pyrocrat = yes
+				politician_is_ashbroker = yes
+				politician_is_blazing_harbinger = yes
+			}
+		}
+		tags = { psionic_aura }
+	}
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -141,6 +238,7 @@ politician = {
 					OR = {
 						politician_is_merchant = yes
 						politician_is_augmentation_merchant = yes
+						politician_is_ashbroker = yes
 					}
 				}
 			}
@@ -165,7 +263,10 @@ politician = {
 			trigger = {
 				exists = planet
 				planet = {
-					politician_is_high_priest = yes
+					OR = {
+						politician_is_high_priest = yes
+						politician_is_fire_oracle = yes
+					}
 				}
 			}
 			unity = 2
@@ -180,6 +281,46 @@ politician = {
 			}
 			engineering_research = 4
 		}
+		## Fire Cult swaps
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					politician_is_blazewright = yes
+					politician_is_radiant_priest = yes
+				}
+			}
+			unity = 3
+		}
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					politician_is_blazing_harbinger = yes
+				}
+			}
+		unity = 4
+		}
+		##High Astrologist
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					politician_is_superstitious_beliefs_high_priest = yes
+				}
+			}
+			unity = 2
+		}
+		##Fortune Broker
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					politician_is_superstitious_beliefs_high_priest_corporate = yes
+				}
+			}
+			trade = 6
+		}
 	}
 
 	triggered_planet_modifier = {
@@ -188,6 +329,27 @@ politician = {
 		}
 		planet_amenities_add = 300
 		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			OR = {
+				politician_is_fire_oracle = yes
+				politician_is_blazewright = yes
+				politician_is_blazing_harbinger = yes
+				politician_is_radiant_priest = yes
+				politician_is_pyrocrat = yes
+				politician_is_ashbroker = yes
+			}
+		}
+		planet_amenities_add = 400
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+	triggered_planet_modifier = {
+		potential = {
+			politician_is_blazing_harbinger = yes
+		}
+		planet_stability_add = @inf_dancer_stability
 	}
 
 	inline_script = "output/politician_output_modifier"
@@ -215,7 +377,7 @@ politician = {
 		}
 	}
 
-	inline_script = "jobs/automodding_priority_unity"
+	inline_script = "jobs/automodding_priority_charisma"
 
 	promotion = {
 		time = @standard_promotion_time
@@ -303,7 +465,7 @@ knight_commander = {
 		mult = value:job_weights_research_modifier|JOB|knight_commander|
 	}
 
-	inline_script = "jobs/automodding_priority_unity"
+	inline_script = "jobs/automodding_priority_charisma"
 
 	promotion = {
 		time = @standard_promotion_time

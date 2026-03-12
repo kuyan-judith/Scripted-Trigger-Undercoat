@@ -164,7 +164,10 @@ planet_event = { #titanic life
 
 	trigger = {
 		has_modifier = "titanic_life"
-		NOT = { has_planet_flag = titanic_life_colony_flag }
+		NOR = {
+			has_planet_flag = titanic_life_colony_flag
+			is_volcanic_world = yes # undercoat: moved to scripted trigger
+		}
 		pop_amount > 0
 	}
 
@@ -192,7 +195,7 @@ planet_event = { #titanic life
 	option = {
 		name = colony_mod.2.c
 		trigger = {
-			owner = { OR = { has_ethic = ethic_xenophile has_ethic = ethic_fanatic_xenophile } #nice, for xenophiles
+			owner = { is_xenophile = yes #nice, for xenophiles
 			}
 		}
 		# study them, bad outcome less likely but takes longer.
@@ -212,8 +215,7 @@ planet_event = { #titanic life
 		trigger = {
 			owner = {
 				OR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
+					is_xenophobe = yes
 					is_hive_empire = yes
 				} #mean, for xenophobe
 			}
@@ -325,6 +327,7 @@ planet_event = {
 			species = last_created_species
 			type = "titanic_guardian_army"
 		}
+		set_planet_purge_type = purge_displacement
 	}
 
 	option = {
@@ -1270,8 +1273,8 @@ planet_event = { #hell
 					species = owner_main_species
 					name = random
 					traits = {
-						trait = leader_trait_chosen
-						trait = leader_trait_butcher
+						0 = leader_trait_chosen
+						1 = leader_trait_butcher
 					}
 				}
 				last_created_leader = {
@@ -1374,6 +1377,16 @@ planet_event = { #prayer
 		trigger = {
 			owner = {
 				has_technology = tech_psionic_theory
+				is_robot_empire = no
+			}
+		}
+	}
+	desc = {
+		text = colony.3011.psi_robot.desc
+		trigger = {
+			owner = {
+				has_technology = tech_psionic_theory
+				is_robot_empire = yes
 			}
 		}
 	}
@@ -2466,7 +2479,9 @@ country_event = {
 				set_leader = doomslayer_knight
 				event_target:doomslayer_knight@root  = {
 					set_skill = 5
-					add_trait = trait_ruler_warlike
+					add_trait = {
+						trait = trait_ruler_warlike
+					}
 					remove_trait = leader_trait_butcher
 				}
 
@@ -2482,6 +2497,15 @@ country_event = {
 						tech_akx_worm_2
 						tech_akx_worm_3
 					}
+				}
+				IF = {
+					limit = {
+						from = {
+							has_technology = tech_maulers
+						}
+					}
+					give_technology = { tech = tech_corvettes }
+					give_technology = { tech = tech_torpedoes_1 }
 				}
 				IF = {
 					limit = {
@@ -3433,10 +3457,10 @@ planet_event = {
 		}
 		random_owned_pop_job = {
 			limit = {
-				has_job_type = alloy_drone
+				has_job_type = fabricator
 			}
 			kill_assigned_pop_amount = {
-				percentage = 1
+				amount = @building_static_jobs_low
 			}
 		}
 		hidden_effect = {
@@ -3463,7 +3487,6 @@ planet_event = {
 		name = UNFORTUNATE
 		remove_deposit = d_bluelotus #Also removes job
 		owner = {
-			# add_resource = { alloys = 150 }
 			add_monthly_resource_mult = {
 				resource = alloys
 				value = @tier1materialreward
@@ -3489,7 +3512,12 @@ planet_event = {
 		name = GOOD
 		remove_deposit = d_bluelotus #Also removes job
 		owner = {
-			add_resource = { alloys = 150 }
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
 		}
 	}
 }
@@ -3540,10 +3568,21 @@ planet_event = {
 	option = {
 		name = colony_fed.111.a
 		add_deposit = d_ruin_bluelotus
+		random_owned_pop_job = {
+			limit = {
+				OR = {
+					has_job_type = foundry
+					has_job_type = fabricator
+				}
+			}
+			kill_assigned_pop_amount = {
+				amount = @building_static_jobs_low
+			}
+		}
 	}
 }
 
-#The lab is reformed, and starts improving alloy production empire-wide
+#The lab is reformed, and starts improving alloy production planet-wide
 planet_event = {
 	id = colony_fed.115
 	title = colony_fed.115.name
@@ -3559,22 +3598,13 @@ planet_event = {
 		remove_deposit = d_bluelotus
 		add_deposit = d_bluelotus2
 		hidden_effect = {
-			planet_event = {
-				id = colony_fed.120
-				days = 220
-				random = 60
-			}
-		}
-	}
-	option = {
-		name = colony_fed.115.b
-		remove_deposit = d_bluelotus
-		add_deposit = d_bluelotus2
-		hidden_effect = {
-			planet_event = {
-				id = colony_fed.120
-				days = 420
-				random = 60
+			random = {
+				chance = 50
+				planet_event = {
+					id = colony_fed.120
+					days = 1800
+					random = 360
+				}
 			}
 		}
 	}
@@ -3594,10 +3624,13 @@ planet_event = {
 	immediate = {
 		random_owned_pop_job = {
 			limit = {
-				has_job_type = bluelotus_technician
+				OR = {
+					has_job_type = foundry
+					has_job_type = fabricator
+				}
 			}
 			kill_assigned_pop_amount = {
-				percentage = 1
+				amount = @building_static_jobs
 			}
 		}
 	}
@@ -3787,8 +3820,7 @@ planet_event = {
 		trigger = {
 			owner = {
 				NOR = {
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
+					is_egalitarian = yes
 					has_civic = civic_hive_empath
 					AND = {
 						is_machine_empire = yes
@@ -3808,8 +3840,7 @@ planet_event = {
 		trigger = {
 			owner = {
 				NOR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
+					is_xenophile = yes
 					has_civic = civic_hive_empath
 					is_servitor_empire = yes # undercoat: moved to scripted trigger
 				}
@@ -4025,8 +4056,7 @@ planet_event = {
 					owner = {
 						NOR = {
 							is_gestalt = yes # undercoat: moved to scripted trigger
-							has_ethic = ethic_authoritarian
-							has_ethic = ethic_fanatic_authoritarian
+							is_authoritarian = yes
 						}
 					}
 				}
@@ -4629,7 +4659,10 @@ planet_event = {
 		name = colony.9055.b
 		trigger = {
 			owner = {
-				is_subterranean_empire = no
+				NOR = {
+					is_subterranean_empire = yes
+					is_cosmic_dawn_empire = yes # undercoat: moved to scripted trigger
+				}
 			}
 		}
 		allow = {
@@ -4651,7 +4684,10 @@ planet_event = {
 		name = colony.9055.b
 		trigger = {
 			owner = {
-				is_subterranean_empire = yes
+				OR = {
+					is_subterranean_empire = yes
+					is_cosmic_dawn_empire = yes # undercoat: moved to scripted trigger
+				}
 			}
 		}
 		allow = {
@@ -4800,6 +4836,7 @@ planet_event = {
 		}
 		#Spawn Crystal Kraken
 		hidden_effect = {
+			set_planet_purge_type = purge_normal
 			root = {
 				save_global_event_target_as = crystal_kraken_planet
 			}
@@ -4808,8 +4845,8 @@ planet_event = {
 				type = faction
 				flag = {
 					icon = {
-						category = "special"
-						file = "unknown.dds"
+						category = "aquatic"
+						file = "aquatic_04.dds"
 					}
 					background = {
 						category = "backgrounds"
@@ -4881,6 +4918,7 @@ country_event = {
 		event_target:crystal_kraken_planet = {
 			add_deposit = d_crystal_kraken_body
 			hidden_effect = {
+				clear_planet_purge_type = yes
 				remove_modifier = "crystal_kraken"
 				every_owned_pop_group = {
 					remove_pop_group_flag = event_purge
@@ -4914,6 +4952,7 @@ country_event = {
 		from.planet = {
 			add_deposit = d_crystal_kraken_body_bombed
 			hidden_effect = {
+				clear_planet_purge_type = yes
 				remove_modifier = "crystal_kraken"
 				every_owned_pop_group = {
 					remove_pop_group_flag = event_purge
@@ -4971,6 +5010,7 @@ planet_event = {
 		name = BATTLESTATIONS
 		#Spawn Crystal Kraken
 		hidden_effect = {
+			set_planet_purge_type = purge_normal
 			create_country = {
 				name = "NAME_Crystal_Kraken"
 				type = faction
@@ -4980,8 +5020,8 @@ planet_event = {
 						file = "unknown.dds"
 					}
 					background = {
-						category = "backgrounds"
-						file = "00_solid.dds"
+						category = "aquatic"
+						file = "aquatic_04.dds"
 					}
 					colors = {
 						"light_orange"
@@ -5027,6 +5067,7 @@ planet_event = {
 				kill_single_pop = yes
 			}
 		}
+		clear_planet_purge_type = yes
 		add_modifier = {
 			modifier = "crystal_kraken"
 			days = -1
@@ -5223,10 +5264,7 @@ planet_event = { # first problem - pop death potential
 		custom_tooltip = colony.9210.b.desc
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
+				is_egalitarian = yes
 			}
 		}
 		hidden_effect = {
@@ -5242,10 +5280,7 @@ planet_event = { # first problem - pop death potential
 		custom_tooltip = colony.9210.c.desc
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_authoritarian
-					has_ethic = ethic_fanatic_authoritarian
-				}
+				is_authoritarian = yes
 			}
 		}
 		hidden_effect = {
@@ -5514,7 +5549,11 @@ planet_event = { # first opportunity - might add unity to the pop job
 			owner = {
 				OR = {
 					AND = {
-						is_crafter_empire = yes # undercoat: moved to scripted trigger
+						has_civic = civic_crafters
+						is_subterranean_empire = yes
+					}
+					AND = {
+						has_civic = civic_corporate_crafters
 						is_subterranean_empire = yes
 					}
 				}
@@ -5817,10 +5856,7 @@ planet_event = { # third problem - guardians - potential pop death or less produ
 		custom_tooltip = colony.9240.c.desc
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_spiritualist
-					has_ethic = ethic_fanatic_spiritualist
-				}
+				is_spiritualist = yes
 			}
 		}
 		hidden_effect = {
@@ -8263,7 +8299,7 @@ country_event = {
 							set_owner = root
 							set_controller = root
 							prevent_anomaly = yes
-							clear_deposits_stu = yes
+							clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 							remove_all_buildings = yes
 							generate_start_buildings_and_districts = yes
 							set_planet_flag = colony_event
@@ -9176,19 +9212,13 @@ planet_event = {
 					modifier = {
 						add = -15
 						owner = {
-							OR = {
-								has_ethic = ethic_xenophile
-								has_ethic = ethic_fanatic_xenophile
-							}
+							is_xenophile = yes
 						}
 					}
 					modifier = {
 						add = 15
 						owner = {
-							OR = {
-								has_ethic = ethic_xenophobe
-								has_ethic = ethic_fanatic_xenophobe
-							}
+							is_xenophobe = yes
 						}
 					}
 					planet_event = { id = colony.9920 days = 60 random = 60 }
@@ -9200,19 +9230,13 @@ planet_event = {
 					modifier = {
 						add = 15
 						owner = {
-							OR = {
-								has_ethic = ethic_xenophile
-								has_ethic = ethic_fanatic_xenophile
-							}
+							is_xenophile = yes
 						}
 					}
 					modifier = {
 						add = -15
 						owner = {
-							OR = {
-								has_ethic = ethic_xenophobe
-								has_ethic = ethic_fanatic_xenophobe
-							}
+							is_xenophobe = yes
 						}
 					}
 					planet_event = { id = colony.9930 days = 60 random = 60 }
@@ -9226,10 +9250,8 @@ planet_event = {
 		trigger = {
 			owner = {
 				OR = {
-					has_ethic = ethic_pacifist
-					has_ethic = ethic_fanatic_pacifist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
+					is_pacifist = yes
+					is_egalitarian = yes
 					has_civic = civic_police_state
 				}
 			}
@@ -9259,6 +9281,29 @@ planet_event = {
 					trait = trait_communal
 				}
 				homeworld = root
+				effect = {
+					if = {
+						limit = {
+							is_species_class = LITHOID
+						}
+						change_species_characteristics = {
+							add_trait = trait_lithoid
+						}
+					}
+					else_if = {
+						limit = {
+							is_species_class = INF
+						}
+						change_species_characteristics = {
+							add_trait = trait_infernal
+						}
+					}
+					else = {
+						change_species_characteristics = {
+							add_trait = trait_organic
+						}
+					}
+				}
 			}
 			while = {
 				count = 2
@@ -10469,5 +10514,1095 @@ planet_event = {
 	option = {
 		name = GOOD
 		# no effect
+	}
+}
+
+## A Court of Blossoms
+planet_event = {
+	id = colony.10000
+	title = "colony.10000.name"
+	desc = "colony.10000.desc"
+	picture = GFX_evt_alien_wildlife
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
+		owner = {
+			is_individual_machine = no
+			is_gestalt = no
+			is_xenophobe = no
+			is_homicidal = no
+			NOT = { species_portrait = humanoid_hp_01 }
+		}
+		pop_amount > 0
+		OR = {
+			is_continental_world = yes # undercoat: moved to scripted trigger
+			is_tropical_world = yes # undercoat: moved to scripted trigger
+			is_savannah_world = yes # undercoat: moved to scripted trigger
+		}
+		OR = {
+			has_any_capped_planet_farming_district = yes
+		}
+		NOR = {
+			has_global_flag = court_of_blossoms
+			has_planet_flag = colony_event
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_global_flag = court_of_blossoms
+		}
+		set_planet_flag = colony_event
+	}
+	option = { #investigating further
+		name = colony.10000.a
+		hidden_effect = {
+			planet_event = { id = colony.10005 days = 15 random = 10 }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 100
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -100
+			}
+		}
+	}
+	option = { #ignore
+		name = colony.10000.b
+		hidden_effect = {
+			planet_event = { id = colony.10010 days = 35 random = 40 }
+		}
+	}
+}
+
+## A Dead Monster
+planet_event = {
+	id = colony.10005
+	title = "colony.10005.name"
+	desc = "colony.10005.desc"
+	picture = GFX_evt_astral_rift_tropical_habitat
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			create_species = {
+				name = NAME_anathari
+				plural = NAME_anathari_plural
+				class = HUM
+				portrait = humanoid_hp_01
+				traits = random
+				homeworld = root
+				effect = {
+					save_global_event_target_as = species_tamperion
+				}
+			}
+			create_leader = {
+				class = commander
+				species = event_target:species_tamperion
+				name = NAME_Tamperion
+			}
+			last_created_leader = {
+				exile_leader_as = tamperion
+				save_event_target_as = tamperion
+			}
+		}
+	}
+	option = {
+		name = colony.10005.a
+		hidden_effect = {
+			planet_event = { id = colony.10015 days = 120 random = 40 }
+		}
+	}
+}
+
+## Continued Disappearances
+planet_event = {
+	id = colony.10010
+	title = "colony.10010.name"
+	desc = "colony.10010.desc"
+	picture = GFX_evt_liquid_darkness
+	show_sound = event_alien_nature
+	location = ROOT
+
+	is_triggered_only = yes
+
+	option = { #investigating further
+		name = colony.10010.a
+		hidden_effect = {
+			planet_event = { id = colony.10005 days = 35 random = 40 }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 150
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -150
+			}
+		}
+	}
+
+	option = { #Getting either a good or bad final ending
+		name = colony.10010.b
+		hidden_effect = {
+			random_list = { #60/40 chance for outcome, higher chance of bad ending because player chose to ignore
+				60 = { planet_event = { id = colony.10090 days = 90 random = 50 } } #Bad ending
+				40 = { planet_event = { id = colony.10095 days = 90 random = 50 } } #Good ending
+			}
+		}
+	}
+}
+
+#Talking to King Tamperion first time
+planet_event = {
+	id = colony.10015
+	title = "colony.10015.name"
+	desc = "colony.10015.desc"
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = event_target:tamperion
+		room = wilderness_room
+		planet_background = root
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10015.a.question
+		is_dialog_only = yes
+		response_text = colony.10015.a.answer
+	}
+	option = {
+		name = colony.10015.b.question
+		is_dialog_only = yes
+		response_text = colony.10015.b.answer
+	}
+	option = {
+		name = colony.10015.c.question
+		is_dialog_only = yes
+		response_text = colony.10015.c.answer
+	}
+	option = { #Sending colonist to learn
+		name = colony.10015.a
+		hidden_effect = {
+			planet_event = { id = colony.10016 }
+		}
+	}
+	option = { #Do not send anyone
+		name = colony.10015.b
+		hidden_effect = {
+			planet_event = { id = colony.10017 }
+		}
+	}
+}
+
+#Tamperion approves
+planet_event = {
+	id = colony.10016
+	title = "colony.10016.name"
+	desc = "colony.10016.desc"
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = event_target:tamperion
+		room = wilderness_room
+		planet_background = root
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10016.a
+		hidden_effect = {
+			planet_event = { id = colony.10025 days = 150 random = 40 }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+#Tamperion disapproves
+planet_event = {
+	id = colony.10017
+	title = "colony.10017.name"
+	desc = "colony.10017.desc"
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = event_target:tamperion
+		room = wilderness_room
+		planet_background = root
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10017.a
+		hidden_effect = {
+			planet_event = { id = colony.10020 days = 150 random = 40 }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+## Tamperion attacks
+planet_event = {
+	id = colony.10020
+	title = "colony.10020.name"
+	desc = "colony.10020.desc"
+	picture = GFX_evt_aggressive_flora
+	show_sound = event_super_explosion
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		every_owned_pop_group = {
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+				pop_group = this
+				percentage = 0.10
+			}
+		}
+	}
+
+	option = {
+		name = colony.10020.a
+		custom_tooltip = tamperion_kills_pops_tt
+		hidden_effect = {
+			random_list = { #60/40 chance for outcome, slightly higher chance of bad ending because player breaks the law of Anathari
+				60 = { planet_event = { id = colony.10090 days = 90 random = 50 } } #Bad ending
+				40 = { planet_event = { id = colony.10095 days = 90 random = 50 } } #Good ending
+			}
+		}
+	}
+}
+
+## Sending colonist
+planet_event = {
+	id = colony.10025
+	title = "colony.10025.name"
+	desc = "colony.10025.desc"
+	picture = GFX_evt_habitat
+	show_sound = event_ship_thrusters
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10025.a
+		hidden_effect = {
+			planet_event = { id = colony.10026 days = 15 random = 5 }
+		}
+	}
+}
+
+#Talking to King Tamperion second time
+planet_event = {
+	id = colony.10026
+	title = "colony.10026.name"
+	desc = "colony.10026.desc"
+	diplomatic = yes
+	diplomatic_title = BLANK_STRING
+	picture_event_data = {
+		portrait = event_target:tamperion
+		room = wilderness_room
+		planet_background = root
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10026.a.question
+		is_dialog_only = yes
+		response_text = colony.10026.a.answer
+	}
+
+	option = {
+		name = colony.10026.b.question
+		is_dialog_only = yes
+		response_text = colony.10026.b.answer
+	}
+
+	option = {
+		name = colony.10026.c.question
+		is_dialog_only = yes
+		response_text = colony.10026.c.answer
+	}
+
+	option = { #Issue special project
+		name = colony.10026.a
+		enable_special_project = {
+			name = "A_CRYPTIC_ESSENCE_PROJECT"
+			location = this
+			owner = root
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+
+	option = { #Distrust Tamperion
+		name = colony.10026.b
+		hidden_effect = {
+			planet_event = { id = colony.10027 }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+## A Seedling of Doubt
+planet_event = {
+	id = colony.10027
+	title = "colony.10027.name"
+	desc = "colony.10027.desc"
+	picture = GFX_evt_alien_planet
+	show_sound = event_custodian_greeting
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = { #Issue special project with higher cost
+		name = colony.10027.a
+		enable_special_project = {
+			name = "THE_CRYPTIC_ESSENCE_PROJECT"
+			location = this
+			owner = root
+		}
+	}
+	option = {
+		name = colony.10027.b
+		hidden_effect = {
+			planet_event = { id = colony.10030 days = 5 random = 10 }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 250
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -250
+			}
+		}
+	}
+}
+
+## Colonists attack Tamperion
+planet_event = {
+	id = colony.10030
+	title = "colony.10030.name"
+	desc = "colony.10030.desc"
+	picture = GFX_evt_big_landing_ship
+	show_sound = event_super_explosion
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10030.a
+		custom_tooltip = tamperion_kills_pops_tt
+		hidden_effect = {
+			every_owned_pop_group = {
+				kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+					pop_group = this
+					percentage = 0.10
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		hidden_effect = {
+			random_list = { #50/50 chance for outcome
+				50 = { planet_event = { id = colony.10090 days = 90 random = 50 } } #Bad ending
+				50 = { planet_event = { id = colony.10095 days = 90 random = 50 } } #Good ending
+			}
+		}
+	}
+}
+
+
+## The Dark Immortal
+planet_event = {
+	id = colony.10035
+	title = "colony.10035.name"
+	desc = "colony.10035.desc"
+	picture = GFX_evt_conclave
+	show_sound = relic_activation_the_galatron
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10035.a
+		custom_tooltip = colony.10035.a.tt
+		hidden_effect = {
+			planet_event = { id = colony.10040 days = 15 random = 20 }
+		}
+	}
+	option = {
+		name = colony.10035.b
+		hidden_effect = {
+			planet_event = { id = colony.10086 days = 15 random = 20 }
+		}
+	}
+}
+
+## Trial of Bravery
+planet_event = {
+	id = colony.10040
+	title = "colony.10040.name"
+	desc = "colony.10040.desc"
+	picture = GFX_evt_hidden_door
+	show_sound = relic_activation_scales_of_the_worm
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10040.a
+		trigger = {
+			owner = { is_militarist = no }
+		}
+		hidden_effect = {
+			random_list = {
+				70 = { planet_event = { id = colony.10045 days = 1 random = 3 } } #Success
+				30 = { planet_event = { id = colony.10047 days = 1 random = 3 } } #Failure
+			}
+		}
+	}
+	option = {
+		name = colony.10040.a.militarist
+		trigger = {
+			owner = { is_militarist = yes }
+		}
+		hidden_effect = {
+			random_list = {
+				95 = { planet_event = { id = colony.10045 days = 1 random = 3 } } #Success
+				5 = { planet_event = { id = colony.10047 days = 1 random = 3 } } #Failure
+			}
+		}
+	}
+	option = {
+		name = colony.10040.b
+		hidden_effect = {
+			random_list = {
+				70 = { planet_event = { id = colony.10046 days = 1 random = 3 } } #Success
+				30 = { planet_event = { id = colony.10047 days = 1 random = 3 } } #Failure
+			}
+		}
+	}
+}
+
+
+## Succeeding the trial of bravery by trying to kill it
+planet_event = {
+	id = colony.10045
+	title = "colony.10045.name"
+	desc = "colony.10045.desc"
+	picture = GFX_evt_hidden_door
+	show_sound = relic_activation_scales_of_the_worm
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10045.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = consumer_goods
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		custom_tooltip = colony.10045.a.tt
+		hidden_effect = {
+			planet_event = { id = colony.10050 days = 10 random = 20 }
+		}
+	}
+}
+
+## Succeeding the trial of bravery by trying to trick
+planet_event = {
+	id = colony.10046
+	title = "colony.10046.name"
+	desc = "colony.10046.desc"
+	picture = GFX_evt_hidden_door
+	show_sound = relic_activation_scales_of_the_worm
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10045.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = consumer_goods
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		custom_tooltip = colony.10045.a.tt
+		hidden_effect = {
+			planet_event = { id = colony.10050 days = 30 random = 20 }
+		}
+	}
+}
+
+## Failing the Trial of Bravery
+planet_event = {
+	id = colony.10047
+	title = "colony.10047.name"
+	desc = "colony.10047.desc"
+	picture = GFX_evt_hidden_door
+	show_sound = event_screams
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10047.a
+		hidden_effect = {
+			planet_event = { id = colony.10085 days = 10 random = 20 }
+		}
+	}
+}
+
+## The Trial of Wisdom
+planet_event = {
+	id = colony.10050
+	title = "colony.10050.name"
+	desc = "colony.10050.desc"
+	picture = GFX_evt_ancient_records
+	show_sound = event_sensor_ping
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = { #failure
+		name = colony.10050.a
+		hidden_effect = {
+			planet_event = { id = colony.10055 days = 10 random = 20 }
+		}
+	}
+	option = { #success
+		name = colony.10050.b
+		hidden_effect = {
+			planet_event = { id = colony.10060 days = 10 random = 20 }
+		}
+	}
+}
+
+## Failing the Trial of Wisdom
+planet_event = {
+	id = colony.10055
+	title = "colony.10055.name"
+	desc = "colony.10055.desc"
+	picture = GFX_evt_ancient_records
+	show_sound = event_sensor_ping
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10047.a
+		hidden_effect = {
+			planet_event = { id = colony.10085 days = 10 random = 20 }
+		}
+	}
+}
+
+## Succeeding the Trial of Wisdom
+planet_event = {
+	id = colony.10060
+	title = "colony.10060.name"
+	desc = "colony.10060.desc"
+	picture = GFX_evt_ancient_records
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10060.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+		custom_tooltip = colony.10060.a.tt
+		hidden_effect = {
+			planet_event = { id = colony.10065 days = 10 random = 20 }
+		}
+	}
+}
+
+## The Trial of Sacrifice
+planet_event = {
+	id = colony.10065
+	title = "colony.10065.name"
+	desc = "colony.10065.desc"
+	picture = GFX_evt_necrophage
+	show_sound = relic_activation_blade_of_the_huntress
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = { #success
+		name = colony.10065.a
+		hidden_effect = {
+			planet_event = { id = colony.10070 days = 10 random = 20 }
+		}
+	}
+	option = { #failure
+		name = colony.10065.b
+		hidden_effect = {
+			planet_event = { id = colony.10075 days = 10 random = 20 }
+		}
+	}
+}
+
+## Succeeding the Trial of Sacrifice
+planet_event = {
+	id = colony.10070
+	title = "colony.10070.name"
+	desc = "colony.10070.desc"
+	picture = GFX_evt_necrophage
+	show_sound = relic_activation_blade_of_the_huntress
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10070.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.10080 days = 5 random = 10 }
+		}
+	}
+}
+
+## Failing the Trial of Sacrifice
+planet_event = {
+	id = colony.10075
+	title = "colony.10075.name"
+	desc = "colony.10075.desc"
+	picture = GFX_evt_necrophage
+	show_sound = event_structural_collapse
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10047.a
+		hidden_effect = {
+			planet_event = { id = colony.10085 days = 5 random = 10 }
+		}
+	}
+}
+
+## Best ending, succeeding all trials
+planet_event = {
+	id = colony.10080
+	title = "colony.10080.name"
+	desc = "colony.10080.desc"
+	picture = GFX_evt_treasure_pile
+	show_sound = relic_activation_miniature_galaxy
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10080.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.10081 days = 90 random = 40 }
+		}
+	}
+
+	option = {
+		name = colony.10080.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.10082 days = 90 random = 40 }
+		}
+	}
+}
+
+## A grandiose success
+planet_event = {
+	id = colony.10081
+	title = "colony.10081.name"
+	desc = "colony.10081.desc"
+	picture = GFX_evt_treasure_pile
+	show_sound = relic_activation_miniature_galaxy
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10081.a
+		add_modifier = {
+			modifier = happy_anathari days = -1
+		}
+		create_pop_group = {
+			species = event_target:species_tamperion
+			size = 500
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+## A Rain of Golden Petals
+planet_event = {
+	id = colony.10082
+	title = "colony.10082.name"
+	desc = "colony.10082.desc"
+	picture = GFX_evt_in_the_dark
+	show_sound = relic_activation_miniature_galaxy
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10082.a
+	}
+}
+
+## Failing at least one of the trials
+planet_event = {
+	id = colony.10085
+	title = "colony.10085.name"
+	desc = "colony.10085.desc"
+	picture = GFX_evt_colony_settlement
+	show_sound = event_structural_collapse
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = { #attacking the dark immortal
+		name = colony.10085.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.10086 days = 90 random = 40 }
+		}
+		owner = {
+			add_resource = {
+				energy = -1000
+			}
+		}
+	}
+	option = { #becoming thralls
+		name = colony.10085.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier4unityreward
+				min = @tier4unitymin
+				max = @tier4unitymax
+			}
+		}
+		hidden_effect = {
+			planet_event = { id = colony.10087 days = 90 random = 40 }
+		}
+	}
+	option = { #retreat back to colony
+		name = colony.10085.c
+		hidden_effect = {
+			random_list = { #chances of getting a good ending is higher since the player has at least tried to help the Anathari
+				30 = { planet_event = { id = colony.10090 days = 90 random = 50 } } #Bad ending
+				70 = { planet_event = { id = colony.10095 days = 90 random = 50 } } #Good ending
+			}
+		}
+	}
+}
+
+## War is the only answer
+planet_event = {
+	id = colony.10086
+	title = "colony.10086.name"
+	desc = "colony.10086.desc"
+	picture = GFX_evt_interior_battle
+	show_sound = relic_activation_miniature_galaxy
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10086.a
+		create_pop_group = {
+			species = event_target:species_tamperion
+			size = 500
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+}
+
+## The way of the thralls
+planet_event = {
+	id = colony.10087
+	title = "colony.10087.name"
+	desc = "colony.10087.desc"
+	picture = GFX_evt_necromancy
+	show_sound = relic_activation_miniature_galaxy
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = colony.10087.a
+			add_planet_devastation = 50
+			add_modifier = { modifier = dark_immortal_control days = -1 }
+	}
+}
+
+
+## Bad final ending, 50% of population is being killed
+planet_event = {
+	id = colony.10090
+	title = "colony.10090.name"
+	desc = "colony.10090.desc"
+	picture = GFX_evt_burning_settlement
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_planet_devastation = 50
+		every_owned_pop_group = {
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+				pop_group = this
+				percentage = 0.50
+			}
+		}
+	}
+
+
+	option = {
+		name = colony.10090.a
+		custom_tooltip = dark_immortal_kills_pops_tt
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+## Good final ending
+planet_event = {
+	id = colony.10095
+	title = "colony.10095.name"
+	desc = "colony.10095.desc"
+	picture = GFX_evt_scanning_remains
+	show_sound = event_alien_nature
+	location = ROOT
+	trackable = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		add_planet_devastation = 10
+	}
+
+	option = {
+		name = colony.10095.a
+		tooltip = {
+			add_planet_devastation = 10
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		add_modifier = { modifier = remnants_of_court_of_blossoms days = -1 }
 	}
 }

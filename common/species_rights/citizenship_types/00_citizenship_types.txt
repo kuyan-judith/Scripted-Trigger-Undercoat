@@ -64,10 +64,7 @@ citizenship_full = {
 					}
 				}
 				from = {
-					NOR = {
-						has_ethic = ethic_xenophobe
-						has_ethic = ethic_fanatic_xenophobe
-					}
+					is_xenophobe = no
 				}
 				from = {
 					is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
@@ -133,6 +130,10 @@ citizenship_full_machine = {
 		}
 		exists = from
 		from = { is_machine_empire = yes }
+		OR = {
+			NOT = { from = { is_shroud_forged_empire = yes } } # undercoat: moved to scripted trigger
+			NOT = { has_trait = trait_shroud_forged }
+		}
 	}
 
 	allow = {
@@ -181,6 +182,7 @@ citizenship_assimilation = {
 			has_utopia = yes
 			has_machine_age_dlc = yes
 			has_biogenesis_dlc = yes
+			has_shroud_dlc = yes
 		}
 		exists = from
 		from = {
@@ -247,7 +249,16 @@ citizenship_assimilation = {
 					has_country_flag = synth_assimilation # synth assimilation
 					is_machine_empire = no
 				}
-				has_active_tradition = tr_psionics_psionic_assimilation # psionic assimilation
+				AND = {
+					OR = {
+						has_active_tradition = tr_psionics_psionic_assimilation # psionic assimilation
+						has_active_tradition = tr_psionics_shroud_great_awakening # psionic assimilation (shroud)
+					}
+					OR = {
+						is_machine_empire = no
+						ROOT = { is_robotic_species = yes }
+					}
+				}
 				AND = {
 					is_individual_machine = yes
 					ROOT = { is_robotic_species = yes }
@@ -285,6 +296,10 @@ citizenship_assimilation = {
 					}
 				}
 			}
+		}
+		custom_tooltip = {
+			fail_text = "assimilate_shroud_forged_tt"
+			NOT = { has_trait = trait_shroud_forged }
 		}
 		custom_tooltip = {
 			fail_text = "disconnected_machine_pops_collapse_citizenship"
@@ -397,7 +412,9 @@ citizenship_assimilation = {
 		}
 		else_if = {
 			limit = {
-				from = { has_active_tradition = tr_psionics_psionic_assimilation }
+				from = {
+					has_active_tradition = tr_psionics_psionic_assimilation
+				}
 			}
 			custom_tooltip = { # species must be organic to transcend
 				fail_text = TRANSCENDING_SPECIES_MUST_BE_ORGANIC
@@ -405,11 +422,21 @@ citizenship_assimilation = {
 			}
 			custom_tooltip = { # species already has psionic trait
 				fail_text = TRANSCENDING_SPECIES_IS_ALREADY_PSIONIC
-				NOT = { has_trait = trait_psionic }
+				is_psionic_species = no
 			}
 			custom_tooltip = { # transcending species cannot be gestalt consciousness
 				fail_text = TRANSCENDING_SPECIES_CANT_BE_HIVE
 				NOT = { has_trait = trait_hive_mind }
+			}
+		}
+		else_if = {
+			limit = {
+				from = { has_active_tradition = tr_psionics_shroud_great_awakening }
+			}
+			# non organic and gestalt species are allowed in Shroud
+			custom_tooltip = { # species already has psionic trait
+				fail_text = TRANSCENDING_SPECIES_IS_ALREADY_PSIONIC
+				is_psionic_species = no
 			}
 		}
 		else_if = {
@@ -432,11 +459,35 @@ citizenship_assimilation = {
 			}
 		}
 		modifier = {
+			factor = 0
+			has_species_flag = original_main_species
+			from = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+		}
+		modifier = {
 			factor = 0.3
 			from = {
 				is_individual_machine = yes
 			}
 		}
+	}
+}
+
+citizenship_shroud_touched = {
+	potential = {
+		exists = from
+		from = {
+			is_machine_empire = yes # undercoat: moved to scripted trigger
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		exists = this
+		has_trait = trait_shroud_forged
+	}
+
+	allow = {
+
+	}
+	ai_will_do = {
+		factor = 100
 	}
 }
 
@@ -601,10 +652,7 @@ citizenship_limited = {
 			factor = 0
 			from = {
 				has_valid_ai_personality = no
-				OR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-				}
+				is_xenophile = yes
 			}
 		}
 	}
@@ -718,10 +766,7 @@ citizenship_slavery = {
 		custom_tooltip = {
 			fail_text = empire_xenophile
 			from = {
-				NOR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-				}
+				is_xenophile = no
 			}
 		}
 		custom_tooltip = {
@@ -736,10 +781,8 @@ citizenship_slavery = {
 			from = {
 				allows_slavery = yes
 				OR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-					has_ethic = ethic_authoritarian
-					has_ethic = ethic_fanatic_authoritarian
+					is_xenophobe = yes
+					is_authoritarian = yes
 					is_gestalt = yes # undercoat: moved to scripted trigger
 				}
 			}

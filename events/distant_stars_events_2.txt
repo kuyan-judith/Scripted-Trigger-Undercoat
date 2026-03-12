@@ -246,6 +246,7 @@ country_event = { #Atomic Clock follow-up: Selection
 							NOR = {
 								is_broken_world = yes # undercoat: moved to scripted trigger
 								is_planet_class = "pc_astral_scar"
+								has_planet_flag = has_megastructure
 							}
 							is_star = no
 						}
@@ -330,6 +331,7 @@ country_event = { #Atomic Clock follow-up: A system planet is terraformed
 					NOR = {
 						is_broken_world = yes # undercoat: moved to scripted trigger
 						is_planet_class = "pc_astral_scar"
+						has_planet_flag = has_megastructure
 					}
 					is_star = no
 				}
@@ -420,7 +422,7 @@ country_event = { #A system planet is gray gooed
 		event_target:atomic_clock_planet = {
 			if = {
 				limit = { has_deposit_for = shipclass_mining_station }
-				clear_deposits_stu = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 			}
 			if = {
 				limit = { has_mining_station = yes }
@@ -567,7 +569,7 @@ country_event = { #An unmanned computer network is built
 				}
 				if = {
 					limit = { has_deposit_for = shipclass_mining_station }
-					clear_deposits_stu = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 				}
 				if = {
 					limit = { has_mining_station = yes }
@@ -620,8 +622,7 @@ country_event = { #A primitive planet is nuked
 		exclusive_trigger = {
 			OR = {
 				has_ai_personality = exterminators
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -631,10 +632,7 @@ country_event = { #A primitive planet is nuked
 	option = {
 		name = distar.330.a.phile
 		exclusive_trigger = {
-			OR = {
-				has_ethic = ethic_xenophile
-				has_ethic = ethic_fanatic_xenophile
-			}
+			is_xenophile = yes
 		}
 	}
 }
@@ -979,6 +977,10 @@ country_event = {
 				create_pop_group = {
 					species = last_created_species
 				}
+			}
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
 			}
 			add_building = building_crude_huts
 			add_building = building_crude_huts
@@ -1827,7 +1829,7 @@ country_event = {
 					distance = 20
 				}
 			}
-			clear_deposits_stu = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 		}
 	}
 
@@ -1978,10 +1980,7 @@ country_event = {
 			NOT = {
 				is_species_class = MOL
 			}
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		event_target:star_lifting_star = {
 			add_deposit = d_physics_3
@@ -2037,10 +2036,7 @@ country_event = {
 	option = {
 		name = distar.1031.a
 		exclusive_trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		hidden_effect = {
 			set_country_flag = lcluster_clue_desc_2
@@ -2201,6 +2197,7 @@ ship_event = {
 			NOR = {
 				is_same_value = root.owner
 				has_country_flag = lost_colony_parent
+				has_country_flag = chosen_empire
 				is_machine_empire = yes
 				is_synthetic_empire = yes
 				owner_species = {
@@ -2219,6 +2216,7 @@ ship_event = {
 				NOR = {
 					is_same_value = root.owner
 					has_country_flag = lost_colony_parent
+					has_country_flag = chosen_empire
 					is_machine_empire = yes
 					is_synthetic_empire = yes
 					owner_species = {
@@ -2370,10 +2368,7 @@ ship_event = {
 		name = distar.1060.a
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-				}
+				is_xenophile = yes
 			}
 		}
 		owner = {
@@ -2393,10 +2388,7 @@ ship_event = {
 		name = distar.1060.b
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-				}
+				is_xenophobe = yes
 			}
 		}
 		owner = {
@@ -2418,10 +2410,8 @@ ship_event = {
 			hidden_trigger = {
 				owner = {
 					OR = {
-						has_ethic = ethic_xenophile
-						has_ethic = ethic_fanatic_xenophile
-						has_ethic = ethic_xenophobe
-						has_ethic = ethic_fanatic_xenophobe
+						is_xenophile = yes
+						is_xenophobe = yes
 					}
 				}
 			}
@@ -2440,10 +2430,8 @@ ship_event = {
 		trigger = {
 			owner = {
 				NOR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
+					is_xenophile = yes
+					is_xenophobe = yes
 				}
 			}
 		}
@@ -2461,10 +2449,8 @@ ship_event = {
 		trigger = {
 			owner = {
 				NOR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
+					is_xenophile = yes
+					is_xenophobe = yes
 				}
 			}
 		}
@@ -2794,14 +2780,16 @@ country_event = {
 	option = {
 		name = distar.1072.a
 		from.leader = {
-			add_trait = leader_trait_meticulous
+			add_trait = {
+				trait = leader_trait_meticulous
+			}
 			add_experience = 200
 		}
 		event_target:anomalous_star = {
 			hidden_effect = {
 				if = {
 					limit = { NOT = { has_deposit_for = shipclass_mining_station } }
-					clear_deposits_stu = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 				}
 			}
 			add_deposit = d_energy_8
@@ -3716,7 +3704,7 @@ ship_event = {
 	immediate = {
 		owner = { country_event = { id = story.5 days = 30 } }
 		from = {
-			clear_deposits_stu = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 			solar_system = {
 				random_system_planet = {
 					limit = {
@@ -3760,10 +3748,7 @@ ship_event = {
 		if = {
 			limit = {
 				owner = {
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_fanatic_materialist
-					}
+					is_materialist = yes
 				}
 			}
 			#custom_tooltip = distar.2030.a.tooltip.mat
@@ -3771,10 +3756,7 @@ ship_event = {
 		else_if = {
 			limit = {
 				owner = {
-					NOR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_fanatic_materialist
-					}
+					is_materialist = no
 				}
 			}
 			custom_tooltip = distar.2030.a.tooltip
@@ -3828,7 +3810,7 @@ country_event = {
 
 	immediate = {
 		event_target:time_loop_world = {
-			clear_deposits_stu = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 			set_planet_flag = repaired_time_loop_shield
 			planet_event = { id = distar.2034 days = 7200 random = 14400 }
 		}
@@ -3850,7 +3832,7 @@ planet_event = {
 
 	immediate = {
 		set_planet_flag = time_loop_lizards_dead
-		clear_deposits_stu = yes
+		clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 		if = {
 			limit = {
 				exists = orbital_station
@@ -4117,6 +4099,16 @@ country_event = {
 					}
 					IF = {
 						limit = {
+							from = {
+								has_technology = tech_maulers
+							}
+						}
+						give_technology = { tech = tech_corvettes }
+						give_technology = { tech = tech_torpedoes_1 }
+
+					}
+					IF = {
+						limit = {
 							event_target:tech_country = {
 								has_technology = tech_weavers
 							}
@@ -4246,6 +4238,10 @@ country_event = {
 				}
 			}
 			set_owner = event_target:time_loop_country
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
+			}
 			set_capital = yes
 			while = {
 				count = 52
@@ -4518,6 +4514,16 @@ country_event = {
 					}
 					IF = {
 						limit = {
+							from = {
+								has_technology = tech_maulers
+							}
+						}
+						give_technology = { tech = tech_corvettes }
+						give_technology = { tech = tech_torpedoes_1 }
+
+					}
+					IF = {
+						limit = {
 							event_target:tech_country = {
 								has_technology = tech_weavers
 							}
@@ -4648,6 +4654,10 @@ country_event = {
 			}
 
 			set_owner = event_target:time_loop_country
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
+			}
 			set_capital = yes
 			while = {
 				count = 52
@@ -4699,10 +4709,60 @@ country_event = {
 				}
 			}
 			solar_system = {
-				create_starbase = {
-					size = starbase_citadel
-					module = shipyard
-					owner = event_target:time_loop_country
+				event_target:time_loop_country = {
+					inverted_switch = {
+						trigger = has_technology
+						tech_starbase_3 = {
+							prev = {
+								create_starbase = {
+									size = starbase_starport
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+						tech_starbase_4 = {
+							prev = {
+								create_starbase = {
+									size = starbase_starhold
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+						tech_starbase_5 = {
+							prev = {
+								create_starbase = {
+									size = starbase_starfortress
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+						default = {
+							prev = {
+								create_starbase = {
+									size = starbase_citadel
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									module = shipyard
+									owner = event_target:time_loop_country
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -4957,18 +5017,12 @@ planet_event = {
 		if = {
 			limit = {
 				root.owner = {
-					OR = {
-						has_ethic = ethic_fanatic_xenophobe
-						has_ethic = ethic_xenophobe
-					}
+					is_xenophobe = yes
 				}
 			}
 			every_owned_pop_group = {
 				limit = {
-					OR = {
-						has_ethic = ethic_fanatic_xenophobe
-						has_ethic = ethic_xenophobe
-					}
+					is_xenophobe = yes
 				}
 				add_modifier = {
 					modifier = enigmatic_cache_in_orbit_phobe
@@ -6890,7 +6944,7 @@ ship_event = {
 		fromfrom = {
 			save_event_target_as = trojan_asteroid
 			# clear deposits so as not to conflict with energy added later
-			clear_deposits_stu = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 		}
 	}
 
@@ -7096,7 +7150,7 @@ ship_event = {
 			# clear deposits so as not to conflict with resources added later
 			if = {
 				limit = { has_deposit_for = shipclass_mining_station }
-				clear_deposits_stu = yes
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 			}
 		}
 
@@ -7137,10 +7191,7 @@ country_event = { # Organism growing fast
 	option = { # Amazing. Proceed.
 		name = distar.3011.a
 		trigger = {
-			NOR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = no
 		}
 		enable_special_project = {
 			name = "impossible_organism_project_2"
@@ -7152,10 +7203,7 @@ country_event = { # Organism growing fast
 	option = { # Phobe
 		name = distar.3011.a.phobe
 		trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		enable_special_project = {
 			name = "impossible_organism_project_2"
@@ -7273,10 +7321,7 @@ country_event = { # First words
 
 	option = { # Astonishing. Every species-X should have one!
 		trigger = {
-			OR = {
-				has_ethic = ethic_xenophile
-				has_ethic = ethic_fanatic_xenophile
-			}
+			is_xenophile = yes
 		}
 
 		allow = {
@@ -7305,8 +7350,7 @@ country_event = { # First words
 	option = { # Excellent. Species-X society could use them.
 		trigger = {
 			NOR = {
-				has_ethic = ethic_xenophile
-				has_ethic = ethic_fanatic_xenophile
+				is_xenophile = yes
 				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -7517,6 +7561,10 @@ country_event = { # Planetfall on planet X after being shoot into deep space. Re
 				}
 			}
 			set_owner = event_target:nivlac_country
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
+			}
 			set_capital = yes
 			clear_blockers = yes
 			solar_system = {
@@ -7672,6 +7720,10 @@ country_event = { # Helpful relocation was a success
 				}
 			}
 			set_owner = event_target:nivlac_country
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
+			}
 			set_capital = yes
 			clear_blockers = yes
 			while = {
@@ -7841,10 +7893,22 @@ ship_event = {
 			}
 		}
 		last_created_leader = {
-			add_trait = trait_ruler_eye_for_talent
-			add_trait = leader_trait_spark_of_genius_2
-			add_trait = subclass_scientist_councilor
-			add_trait = leader_trait_expertise_computing_2
+			add_trait = {
+				trait = trait_ruler_eye_for_talent
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_spark_of_genius_2
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = subclass_scientist_councilor
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_expertise_computing_2
+				consume_selection = yes
+			}
 			set_gender = female
 			save_global_event_target_as = stranded_scientist_leader
 			exile_leader_as = stranded_scientist_leader
@@ -7881,10 +7945,18 @@ ship_event = {
 
 		random_list = {
 			1 = {
-				leader = { add_trait = leader_trait_adaptable }
+				leader = {
+					add_trait = {
+						trait = leader_trait_adaptable
+					}
+				}
 			}
 			1 = {
-				leader = { add_trait = leader_trait_paranoid }
+				leader = {
+					add_trait = {
+						trait = leader_trait_paranoid
+					}
+				}
 			}
 		}
 
@@ -8007,10 +8079,7 @@ ship_event = {
 			}
 			IF = {
 				limit = {
-					OR = {
-						has_ethic = ethic_fanatic_xenophile
-						has_ethic = ethic_xenophile
-					}
+					is_xenophile = yes
 				}
 				add_modifier = {
 					modifier = disregard_for_alien_life
@@ -8076,10 +8145,7 @@ country_event = { # More info about the molluscs
 		}
 		IF = {
 			limit = {
-				OR = {
-					has_ethic = ethic_fanatic_xenophile
-					has_ethic = ethic_xenophile
-				}
+				is_xenophile = yes
 			}
 			add_modifier = {
 				modifier = disregard_for_alien_life
@@ -8188,7 +8254,7 @@ ship_event = {
 	immediate = {
 		from = { save_event_target_as = asteroid_target }
 		event_target:asteroid_target = {
-			clear_deposits_stu = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 		}
 		save_event_target_as = unknown_machine_science_ship
 		solar_system = { save_event_target_as = sol_sys }
@@ -8527,6 +8593,9 @@ country_event = { # Alien Box opened
 	specimen = centrifugal_container
 
 	option = { # Use the red solution
+		allow = {
+			is_natural_design_empire = no
+		}
 		name = distar.3055.a
 		custom_tooltip = distar.3055.a.tooltip
 		hidden_effect = {
@@ -8536,6 +8605,9 @@ country_event = { # Alien Box opened
 	}
 
 	option = { # Use the green solution
+		allow = {
+			is_natural_design_empire = no
+		}
 		name = distar.3055.b
 		custom_tooltip = distar.3055.b.tooltip
 		hidden_effect = {
@@ -8545,6 +8617,9 @@ country_event = { # Alien Box opened
 	}
 
 	option = { # Use the blue solution
+		allow = {
+			is_natural_design_empire = no
+		}
 		name = distar.3055.c
 		custom_tooltip = distar.3055.c.tooltip
 		hidden_effect = {
@@ -8554,6 +8629,9 @@ country_event = { # Alien Box opened
 	}
 
 	option = {
+		allow = {
+			is_natural_design_empire = no
+		}
 		name = distar.3055.d.evopred
 		custom_tooltip = distar.3055.d.evopred.tooltip
 		hidden_effect = {

@@ -216,6 +216,7 @@ technophant = {
 
 neural_chip = {
 	category = chip_slave
+	first_come_first_served = yes
 	purge = purge_cosmogenesis
 	is_capped_by_modifier = no
 
@@ -226,27 +227,7 @@ neural_chip = {
 		}
 	}
 
-	demotion = {
-		time = 0
-		effect = {
-			pop_amount_change_category = {
-				CATEGORY = chip_slave
-				AMOUNT = local_pop_amount
-			}
-		}
-	}
-
 	tags = { research }
-
-	demotion = {
-		time = 60
-		effect = {
-			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
-				pop_group = this
-				percentage = 0.04
-			}
-		}
-	}
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -255,7 +236,7 @@ neural_chip = {
 	}
 	possible = {
 		owner = { has_ascension_perk = ap_cosmogenesis }
-		planet = { has_designation = col_cosmogenesis_world }
+		planet = { is_cosmogenesis_world = yes } # undercoat: moved to scripted trigger
 		has_virtual_species_trait = no
 	}
 
@@ -275,10 +256,143 @@ neural_chip = {
 	}
 
 	weight = {
-		weight = 99999
+		weight = 90000
 	}
 
 	inline_script = "jobs/automodding_priority_research"
+}
+
+neural_chip_processing = {
+	category = chip_slave
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_lathe_capital
+			icon = organic_battery
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = chip_slave
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	promotion = {
+		time = 0
+		effect = {
+			pop_amount_change_category = {
+				CATEGORY = chip_slave
+				AMOUNT = local_pop_amount
+			}
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		has_planet = yes
+		is_sapient = yes
+	}
+
+	possible = {
+		owner = { has_ascension_perk = ap_cosmogenesis }
+		NOT = { is_pop_category = chip_slave }
+		planet = { is_cosmogenesis_world = yes } # undercoat: moved to scripted trigger
+		has_virtual_species_trait = no
+	}
+
+	weight = {
+		weight = 99999
+	}
+}
+
+neural_chip_unprocessing = {
+	category = chip_slave
+	first_come_first_served = yes
+	is_capped_by_modifier = no
+
+	swappable_data = {
+		default = {
+			building_icon = building_lathe_capital
+			icon = organic_battery
+		}
+	}
+
+	demotion = {
+		time = 0
+		effect = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = no
+					}
+				}
+				pop_amount_change_category = {
+					CATEGORY = civilian
+					AMOUNT = local_pop_amount
+				}
+			}
+			else_if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+						is_servitor_empire = yes # undercoat: moved to scripted trigger
+					}
+					species = { is_robotic = no }
+				}
+				pop_amount_change_category = {
+					CATEGORY = bio_trophy
+					AMOUNT = local_pop_amount
+				}
+			}
+			else_if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+						is_wilderness_empire = no
+					}
+				}
+				pop_amount_change_category = {
+					CATEGORY = maintenance_drone
+					AMOUNT = local_pop_amount
+				}
+			}
+			else_if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+						is_wilderness_empire = yes
+					}
+				}
+				pop_amount_change_category = {
+					CATEGORY = wilderness_heart_strata
+					AMOUNT = local_pop_amount
+				}
+			}
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		has_planet = yes
+		is_sapient = yes
+	}
+
+	possible = {
+		hidden_trigger = { exists = owner }
+		is_pop_category = chip_slave
+		planet = { is_cosmogenesis_world = no } # undercoat: moved to scripted trigger
+	}
+
+	weight = {
+		weight = 90000
+	}
 }
 
 augmentor = { # Normal empire
@@ -670,7 +784,7 @@ cyberdome_duelist = {
 		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
 	}
 
-	inline_script = "jobs/automodding_priority_amenities"
+	inline_script = "jobs/automodding_priority_charisma"
 
 	promotion = {
 		time = @standard_promotion_time

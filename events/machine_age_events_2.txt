@@ -27,8 +27,7 @@ country_event = {
 					}
 					save_event_target_as = target_planet
 					remove_trade_deposits = yes
-					add_deposit = d_minerals_1
-
+					add_deposit = d_arc_furnace_1
 					add_modifier = {
 						modifier = orbital_arc_furnace_1_mod
 						days = -1
@@ -59,7 +58,8 @@ country_event = {
 					}
 					save_event_target_as = target_planet
 					remove_trade_deposits = yes
-					add_deposit = d_minerals_1
+					remove_deposit = d_arc_furnace_1
+					add_deposit = d_arc_furnace_2
 					remove_modifier = orbital_arc_furnace_1_mod
 					add_modifier = {
 						modifier = orbital_arc_furnace_2_mod
@@ -91,7 +91,8 @@ country_event = {
 					}
 					save_event_target_as = target_planet
 					remove_trade_deposits = yes
-					add_deposit = d_alloys_1
+					remove_deposit = d_arc_furnace_2
+					add_deposit = d_arc_furnace_3
 					remove_modifier = orbital_arc_furnace_2_mod
 					add_modifier = {
 						modifier = orbital_arc_furnace_3_mod
@@ -122,8 +123,8 @@ country_event = {
 					}
 					save_event_target_as = target_planet
 					remove_trade_deposits = yes
-					remove_deposit = d_minerals_1
-					add_deposit = d_alloys_1
+					remove_deposit = d_arc_furnace_3
+					add_deposit = d_arc_furnace_4
 					remove_modifier = orbital_arc_furnace_3_mod
 					add_modifier = {
 						modifier = orbital_arc_furnace_4_mod
@@ -155,11 +156,7 @@ country_event = {
 					}
 					save_event_target_as = target_planet
 					remove_trade_deposits = yes
-					add_deposit = d_minerals_1
-					add_deposit = d_minerals_1
-					add_deposit = d_minerals_1
-					add_deposit = d_alloys_1
-					add_deposit = d_alloys_1
+					add_deposit = d_arc_furnace_4
 					remove_modifier = orbital_arc_furnace_3_mod
 					add_modifier = {
 						modifier = orbital_arc_furnace_4_mod
@@ -201,24 +198,16 @@ ship_event = {
 				switch = {
 					trigger = has_modifier
 					orbital_arc_furnace_1_mod = {
-						add_deposit = d_minerals_1
+						add_deposit = d_arc_furnace_1
 					}
 					orbital_arc_furnace_2_mod = {
-						add_deposit = d_minerals_1
-						add_deposit = d_minerals_1
+						add_deposit = d_arc_furnace_2
 					}
 					orbital_arc_furnace_3_mod = {
-						add_deposit = d_minerals_1
-						add_deposit = d_minerals_1
-						add_deposit = d_minerals_1
-						add_deposit = d_alloys_1
+						add_deposit = d_arc_furnace_3
 					}
 					orbital_arc_furnace_4_mod = {
-						add_deposit = d_minerals_1
-						add_deposit = d_minerals_1
-						add_deposit = d_minerals_1
-						add_deposit = d_alloys_1
-						add_deposit = d_alloys_1
+						add_deposit = d_arc_furnace_4
 					}
 				}
 			}
@@ -416,15 +405,7 @@ country_event = {
 			country_event = { id = cyber.5005 }
 			remove_modifier = paperclip_failure
 		}
-		IF = {
-			limit = {
-				owner = {
-					resource_stockpile_compare = {
-						resource = consumer_goods
-						value < paperclips_once_again
-					}
-				}
-			}
+		else = {
 			country_event = { id = cyber.5006 }
 		}
 	}
@@ -833,26 +814,40 @@ planet_event = {
 			value = value:num_free_virtual_jobs
 		}
 		# Create pops for every free job
-		while = {
-			count = pop_amount
-			create_pop_group = {
-				species = owner_main_species
-			}
+		create_pop_group = {
+			species = owner_main_species
+			size = pop_amount
 		}
 		# Kill pops generated in excess (e.g. from forbidden jobs)
 		if = {
 			limit = {
-				any_owned_pop_group = {
-					is_unemployed = yes
-					is_robotic_species = yes
-					has_virtual_species_trait = yes
+				OR = {
+					any_owned_pop_group = {
+						is_unemployed = yes
+						is_robotic_species = yes
+						has_virtual_species_trait = yes
+					}
+					any_owned_pop_group = {
+						is_robotic_species = yes
+						has_virtual_species_trait = yes
+						is_pop_category = civilian
+					}
 				}
 			}
 			every_owned_pop_group = {
 				limit = {
-					is_unemployed = yes
-					is_robotic_species = yes
-					has_virtual_species_trait = yes
+					OR = {
+						AND = {
+							is_unemployed = yes
+							is_robotic_species = yes
+							has_virtual_species_trait = yes
+						}
+						AND = {
+							is_robotic_species = yes
+							has_virtual_species_trait = yes
+							is_pop_category = civilian
+						}
+					}
 				}
 				kill_pops_stu = { # undercoat: moved to scripted effect with on_action
 					pop_group = this
@@ -882,6 +877,11 @@ country_event = {
 					is_robotic_species = yes
 					has_virtual_species_trait = yes
 				}
+				any_owned_pop_group = {
+					is_robotic_species = yes
+					has_virtual_species_trait = yes
+					is_pop_category = civilian
+				}
 				any_owned_pop_job = {
 					has_job_type = maintenance_drone
 				}
@@ -898,6 +898,11 @@ country_event = {
 						is_robotic_species = yes
 						has_virtual_species_trait = yes
 					}
+					any_owned_pop_group = {
+						is_robotic_species = yes
+						has_virtual_species_trait = yes
+						is_pop_category = civilian
+					}
 					any_owned_pop_job = {
 						has_job_type = maintenance_drone
 					}
@@ -905,9 +910,18 @@ country_event = {
 			}
 			every_owned_pop_group = {
 				limit = {
-					is_unemployed = yes
-					is_robotic_species = yes
-					has_virtual_species_trait = yes
+					OR = {
+						AND = {
+							is_unemployed = yes
+							is_robotic_species = yes
+							has_virtual_species_trait = yes
+						}
+						AND = {
+							is_robotic_species = yes
+							has_virtual_species_trait = yes
+							is_pop_category = civilian
+						}
+					}
 				}
 				kill_pops_stu = { # undercoat: moved to scripted effect with on_action
 					pop_group = this
@@ -943,19 +957,35 @@ planet_event = {
 			is_fallen_empire = no
 			has_active_tradition = tr_virtuality_finish
 		}
-		any_owned_pop_group = {
-			is_unemployed = yes
-			is_robotic_species = yes
-			has_virtual_species_trait = yes
+		OR = {
+			any_owned_pop_group = {
+				is_unemployed = yes
+				is_robotic_species = yes
+				has_virtual_species_trait = yes
+			}
+			any_owned_pop_group = {
+				is_robotic_species = yes
+				has_virtual_species_trait = yes
+				is_pop_category = civilian
+			}
 		}
 	}
 
 	immediate = {
 		every_owned_pop_group = {
 			limit = {
-				is_unemployed = yes
-				is_robotic_species = yes
-				has_virtual_species_trait = yes
+				OR = {
+					AND = {
+						is_unemployed = yes
+						is_robotic_species = yes
+						has_virtual_species_trait = yes
+					}
+					AND = {
+						is_robotic_species = yes
+						has_virtual_species_trait = yes
+						is_pop_category = civilian
+					}
+				}
 			}
 			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
 				pop_group = this
@@ -1051,20 +1081,25 @@ country_event = {
 				}
 				NOR = {
 					has_trait = leader_trait_virtual
-					has_leader_flag = renowned_leader
-					has_leader_flag = legendary_leader
 				}
+				is_leader_tier = leader_tier_default
 				is_gestalt_node = no
 			}
 			if = {
 				limit = {
 					has_trait = trait_machine_unit
 				}
-				add_trait_no_notify = leader_trait_virtual
+				add_trait = {
+					trait = leader_trait_virtual
+					show_message = no
+				}
 			}
 			else = {
 				remove_trait = leader_trait_synthetic
-				add_trait_no_notify = leader_trait_virtual
+				add_trait = {
+					trait = leader_trait_virtual
+					show_message = no
+				}
 			}
 		}
 		every_pool_leader = {
@@ -1081,11 +1116,17 @@ country_event = {
 				limit = {
 					has_trait = trait_machine_unit
 				}
-				add_trait_no_notify = leader_trait_virtual
+				add_trait = {
+					trait = leader_trait_virtual
+					show_message = no
+				}
 			}
 			else = {
 				remove_trait = leader_trait_synthetic
-				add_trait_no_notify = leader_trait_virtual
+				add_trait = {
+					trait = leader_trait_virtual
+					show_message = no
+				}
 			}
 		}
 		create_message = {
@@ -1137,11 +1178,17 @@ country_event = {
 				limit = {
 					has_trait = trait_machine_unit
 				}
-				add_trait_no_notify = leader_trait_virtual
+				add_trait = {
+					trait = leader_trait_virtual
+					show_message = no
+				}
 			}
 			else = {
 				remove_trait = leader_trait_synthetic
-				add_trait_no_notify = leader_trait_virtual
+				add_trait = {
+					trait = leader_trait_virtual
+					show_message = no
+				}
 			}
 		}
 	}
@@ -1477,19 +1524,24 @@ country_event = {
 				species = { has_trait = trait_machine_unit }
 				NOR = {
 					has_trait = leader_trait_synthetic
-					has_leader_flag = renowned_leader
-					has_leader_flag = legendary_leader
 				}
+				is_leader_tier = leader_tier_default
 				is_gestalt_node = no
 			}
-			add_trait_no_notify = leader_trait_synthetic
+			add_trait = {
+				trait = leader_trait_synthetic
+				show_message = no
+			}
 		}
 		every_pool_leader = {
 			limit = {
 				species = { has_trait = trait_machine_unit }
 				NOT = { has_trait = leader_trait_synthetic }
 			}
-			add_trait_no_notify = leader_trait_synthetic
+			add_trait = {
+				trait = leader_trait_synthetic
+				show_message = no
+			}
 		}
 		create_message = {
 			type = MESSAGE_ALL_GAINED_TRAIT

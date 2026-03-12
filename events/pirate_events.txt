@@ -94,12 +94,15 @@ country_event = {
 			is_gestalt = yes # undercoat: moved to scripted trigger
 		}
 		exists = capital_scope
+		has_monthly_income = {
+			resource = trade
+			value > 300
+		}
 		any_system_within_border = {
-			any_system_planet = {
-				planet_resource_compare = {
-					resource = trade
-					value > 1000
-				}
+			is_on_border = yes
+			any_neighbor_system = {
+				has_owner = no
+				NOT = { has_star_flag = guardian }
 			}
 		}
 	}
@@ -123,10 +126,11 @@ country_event = {
 			random_neighbor_system = {
 				limit = {
 					has_owner = no
+					NOT = { has_star_flag = guardian }
 				}
-			save_event_target_as = pirate_system
-			create_normal_pirate_country = yes
-			create_pirate_fleet = yes
+				save_event_target_as = pirate_system
+				create_normal_pirate_country = yes
+				create_pirate_fleet = yes
 			}
 		}
 	}
@@ -533,7 +537,14 @@ country_event = {
 		exists = capital_scope
 		has_monthly_income = {
 			resource = trade
-			value > 100
+			value > 300
+		}
+		any_system_within_border = {
+			is_on_border = yes
+			any_neighbor_system = {
+				has_owner = no
+				NOT = { has_star_flag = guardian }
+			}
 		}
 	}
 
@@ -557,10 +568,11 @@ country_event = {
 			random_neighbor_system = {
 				limit = {
 					has_owner = no
+					NOT = { has_star_flag = guardian }
 				}
-			save_event_target_as = pirate_system
-			create_normal_pirate_country = yes
-			create_pirate_fleet = yes
+				save_event_target_as = pirate_system
+				create_normal_pirate_country = yes
+				create_pirate_fleet = yes
 			}
 		}
 	}
@@ -597,7 +609,10 @@ country_event = {
 
 	trigger = {
 		is_playable = yes # undercoat: moved to scripted trigger
-		NOT = { has_country_flag = birth_of_piracy }
+		NOR = {
+			has_country_flag = birth_of_piracy
+			has_country_flag = finish_shroud_forged_control_flag
+		}
 		exists = capital_scope
 		has_monthly_income = {
 			resource = trade
@@ -1375,13 +1390,17 @@ event = {
 			limit = {
 				has_country_flag = birth_of_piracy
 				NOT = { has_country_flag = pirates_spawned }
-				any_system_within_border = {
-					any_system_planet = {
-						planet_resource_compare = {
-							resource = trade
-							value > 100
-						}
+			}
+			random_system_within_border = {
+				limit = {
+					is_on_border = yes
+				}
+				random_neighbor_system = {
+					limit = {
+						has_owner = no
+						NOT = { has_star_flag = guardian }
 					}
+					save_event_target_as = pirate_system
 				}
 			}
 			country_event = { id = pirate.49 }
@@ -1393,7 +1412,6 @@ event = {
 country_event = {
 	id = pirate.49
 	hide_window = yes
-
 	is_triggered_only = yes
 
 	trigger = {
@@ -1408,6 +1426,7 @@ country_event = {
 				}
 			}
 		}
+		exists = event_target:pirate_system
 	}
 
 	immediate = {
@@ -1415,36 +1434,6 @@ country_event = {
 			200 = {}
 			10 = {
 				set_timed_country_flag = { flag = pirates_spawned days = 3600 }
-				random_system_within_border = {
-					limit = {
-						any_system_planet = {
-							planet_resource_compare = {
-								resource = trade
-								value > 100
-							}
-						}
-					}
-					weights = {
-						base = 1
-						modifier = {
-							factor = 1600
-							#trade_intercepted_percentage >= 80
-						}
-						modifier = {
-							factor = 800
-							#trade_intercepted_percentage >= 60
-						}
-						modifier = {
-							factor = 400
-							#trade_intercepted_percentage >= 40
-						}
-						modifier = {
-							factor = 100
-							#trade_intercepted_percentage >= 20
-						}
-					}
-					save_event_target_as = pirate_system
-				}
 				if = {
 					limit = { is_gestalt = no } # undercoat: moved to scripted trigger
 					country_event = { id = pirate.50 }
@@ -1481,8 +1470,10 @@ country_event = {
 		}
 		owner_species = { save_event_target_as = owner_species }
 		save_event_target_as = pirate_target
-		create_normal_pirate_country = yes
-		create_pirate_fleet = yes
+		event_target:pirate_system = {
+			create_normal_pirate_country = yes
+			create_pirate_fleet = yes
+		}
 	}
 
 	option = {

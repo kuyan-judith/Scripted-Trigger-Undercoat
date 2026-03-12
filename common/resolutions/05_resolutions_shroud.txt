@@ -1,0 +1,200 @@
+resolution_galactic_focus_crisis_malevolent_aura = {
+	icon = "GFX_resolution_emergency_measure"
+	
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t1
+		}
+	}
+	
+	target = yes
+	harmful = yes
+	
+	valid_target = {
+		has_covenant_with_end_of_the_cycle = yes 
+		NOT = { is_same_value = from }
+	}
+
+	effect = {
+		custom_tooltip = resolution_galactic_focus_crisis_malevolent_aura_effect_success
+
+		hidden_effect = {
+			set_country_flag = malevolent_aura_empire
+			set_timed_country_flag = { flag = galactic_community_resolution_passed_general days = @resolution_flag_timer }
+			add_modifier = {
+				modifier = resolution_passed_diplomatic_weight
+				days = 2200
+			}
+			
+			country_event = { id = shroud.12160 }
+
+			save_event_target_as = malevolent_aura_empire		
+			if = {
+				limit = { has_galactic_custodian = yes }
+				galactic_custodian = {
+					save_event_target_as = community_war_leader
+					if = {
+						limit = { is_in_federation_with = event_target:malevolent_aura_empire }
+						event_target:malevolent_aura_empire = {
+							leave_alliance = { override_requirements = yes }
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = { has_galactic_emperor = yes }
+				galactic_emperor = {
+					save_event_target_as = community_war_leader
+				}
+			}
+			else = {
+				random_playable_country = {
+					limit = {
+						is_galactic_community_member = yes
+						NOT = { 
+							is_same_value = event_target:malevolent_aura_empire
+							is_in_federation_with = event_target:malevolent_aura_empire 
+						}
+					}
+					weights = {
+						base = 1
+						modifier = {
+							add = 10000
+							galactic_community_rank = 1
+						}
+						modifier = {
+							add = 1000
+							galactic_community_rank = 2
+						}
+						modifier = {
+							add = 100
+							galactic_community_rank = 3
+						}
+						modifier = {
+							add = 10
+							is_galactic_council_established = yes
+							is_part_of_galactic_council = yes
+						}
+					}
+					save_event_target_as = community_war_leader
+				}
+			}
+			declare_malevolent_aura_focus = yes
+		}
+	}
+		
+	fail_effects = {
+		hidden_effect = {
+			set_timed_country_flag = { flag = galactic_community_resolution_failed_general days = @resolution_flag_timer }
+			add_modifier = {
+				modifier = resolution_failed_diplomatic_weight
+				days = 2200
+			}
+		}
+	}
+
+	potential = {
+		has_shroud_dlc = yes
+		any_country = {
+			is_galactic_community_member = yes
+			has_country_flag = end_aura_encountered
+		}
+
+		any_country = {
+			is_galactic_community_member = yes
+			has_technology = tech_psionic_suppression
+		}
+		NOT = { has_global_flag = galactic_focus_crisis_malevolent_aura }
+	}
+
+	ai_weight = {
+		base = @resolution_weight_normal
+
+		modifier = {
+			factor = 10
+			has_ascension_perk = ap_defender_of_the_galaxy
+			desc = ap_defender_of_the_galaxy_desc
+		}
+
+		modifier = {
+			factor = 5
+			NOT = { is_same_value = from }
+			any_system_within_border = {
+				has_psionic_aura = end_aura
+			}
+			desc = gal_com_aura_spread_victim
+		}
+
+		modifier = {
+			factor = 0
+			is_same_value = from
+			desc = gal_com_aura_spread_empire
+		}
+	}
+}
+
+resolution_galactic_focus_repeal_crisis_malevolent_aura = {
+	icon = "GFX_resolution_repeal_red"
+
+	resources = {
+		category = resolutions
+		cost = {
+			influence = @resolution_cost_t5
+		}
+	}
+
+	target = yes
+	harmful = no
+
+	valid_target = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		has_country_flag = malevolent_aura_empire
+	}
+
+	effect = {
+		hidden_effect = {
+			remove_country_flag = malevolent_aura_empire
+			save_event_target_as = former_malevolent_aura
+			random_war = {
+				limit = {
+					using_war_goal = {
+						type = wg_declared_crisis
+						owner = event_target:former_malevolent_aura
+					}
+				}
+				every_war_participant = {
+					limit = {
+						NOT = { is_same_value = event_target:former_malevolent_aura }
+					}
+					country_event = { id = shroud.8480 }
+				}
+				every_war_participant = {
+					prev = {
+						remove_war_participant = prev
+					}
+				}
+			}
+			country_event = { id = shroud.8481 }
+		}
+	}
+
+	potential = {
+		has_galactic_emperor = no
+		has_shroud_dlc = yes
+	}
+
+	ai_weight = {
+		base = @resolution_weight_hated
+
+		# Should be less likely to repeal if the aura still affects the country
+		modifier = {
+			factor = 0.25
+			NOT = { is_same_value = from }
+			any_system_within_border = {
+				has_psionic_aura = end_aura
+			}
+			desc = gal_com_aura_spread_victim
+		}
+	}
+}

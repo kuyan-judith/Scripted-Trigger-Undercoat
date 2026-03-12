@@ -22,6 +22,7 @@ country_event = {
 	immediate = {
 		set_global_flag = prethoryn_invasion_happened
 		set_global_flag = prethoryn_transmission
+		set_global_flag = galactic_crisis_happened
 		begin_event_chain = {
 			event_chain = "coming_storm_chain"
 			target = ROOT
@@ -309,7 +310,7 @@ country_event = {
 	desc = {
 		text = "crisis.16.b.desc"
 		trigger = {
-			owner_species = { has_trait = trait_psionic }
+			owner_species = { is_psionic_species = yes }
 		}
 	}
 	desc = {
@@ -1379,10 +1380,7 @@ country_event = {
 	option = {
 		name = crisis.30.c
 		trigger = {
-			OR = {
-				has_ethic = "ethic_militarist"
-				has_ethic = "ethic_fanatic_militarist"
-			}
+			is_militarist = yes
 			can_talk_to_prethoryn = no
 		}
 		response_text = crisis.30.c.response
@@ -1390,10 +1388,7 @@ country_event = {
 	option = {
 		name = crisis.30.d
 		trigger = {
-			OR = {
-				has_ethic = "ethic_xenophobe"
-				has_ethic = "ethic_fanatic_xenophobe"
-			}
+			is_xenophobe = yes
 			can_talk_to_prethoryn = no
 		}
 		response_text = crisis.30.d.response
@@ -1796,8 +1791,8 @@ country_event = {
 	}
 
 	trigger = {
-		is_playable = yes # undercoat: moved to scripted trigger
 		has_global_flag = sentinels_founded
+		is_playable = yes # undercoat: moved to scripted trigger
 		NOT = { has_country_flag = sentinel_donation }
 		check_variable = {
 			which = "swarm_fleet_kills"
@@ -2291,6 +2286,7 @@ fleet_event = {
 	hide_window = yes
 
 	trigger = {
+		has_global_flag = prethoryn_main_invasion
 		has_fleet_flag = pet_queen
 		num_ships < 30
 		is_ship_size = queen_swarm
@@ -2797,15 +2793,13 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		fromfrom = {
-			pop_group_size > 1	# Last Pop is still alive when this event is fired
-		}
+		pop_amount <= 100
 		exists = controller
 		controller = { is_country_type = "swarm" }
 	}
 
 	immediate = {
-		controller = { save_event_target_as = swarm }
+		from = { save_event_target_as = swarm }
 		if = {
 			limit = {
 				is_artificial = no
@@ -3628,17 +3622,34 @@ country_event = {
 	}
 }
 
+# Captured Queens Grows restless
 country_event = {
 	id = crisis.234
 	title = "crisis.234.name"
-	desc = "crisis.234.desc"
+	desc = {
+		trigger = {
+			is_robot_empire = no
+			is_gestalt = no
+		}
+		text = crisis.234.desc.organic_non_gestalt
+	}
+	desc = {
+		trigger = {
+			OR = {
+				is_robot_empire = yes
+				is_gestalt = yes
+			}
+		}
+		text = crisis.234.desc.machine_or_gestalt
+	}
 	picture = GFX_evt_physics_research
 	show_sound = event_alien_nature
 
 	trigger = {
+		has_global_flag = prethoryn_main_invasion
 		is_playable = yes # undercoat: moved to scripted trigger
 		has_crisis = no
-		owner_species = { has_trait = trait_psionic }
+		owner_species = { is_psionic_species = yes }
 		any_owned_leader = {
 			has_leader_flag = captured_queen
 		}
@@ -3650,7 +3661,20 @@ country_event = {
 	}
 
 	option = {
-		name = crisis.234.a
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						is_robot_empire = no
+						is_gestalt = no
+					}
+					text = crisis.234.a.organic_non_gestalt
+				}
+				else = {
+					text = crisis.234.a.machine_or_gestalt
+				}
+			}
+		}
 		set_country_flag = crisis.234
 		add_monthly_resource_mult = {
 			resource = physics_research
@@ -3794,6 +3818,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		has_global_flag = prethoryn_main_invasion
 		NOT = { has_global_flag = brood_queen_captured }
 		is_country_type = swarm
 		exists = from
@@ -3954,6 +3979,63 @@ country_event = {
 					orbital_station = { dismantle = yes }
 				}
 			}
+		}
+	}
+}
+
+# Crisis faction gains control of a planet, starts purging it
+# A planets controller becomes a country not the same as the owner.
+# Root = Planet
+# From = Planet Owner
+# FromFrom = Planet Controller (the one occupying)
+planet_event = {
+	id = crisis.300
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		FromFrom = {
+			OR = {
+				is_country_type = swarm
+				is_country_type = ai_empire
+			}
+		}
+	}
+
+	immediate = {
+		set_planet_purge_type = purge_normal
+	}
+}
+
+# Crisis faction loses control of a planet, stops purging it
+# A planets controller becomes the owner of the planet.
+# Root = Planet
+# From = Planet Owner
+# FromFrom = Previous Planet Controller (the one who was occupying)
+planet_event = {
+	id = crisis.301
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		FromFrom = {
+			OR = {
+				is_country_type = swarm
+				is_country_type = ai_empire
+				is_country_type = faction
+				is_country_type = mechanocalibrator
+			}
+		}
+	}
+
+	immediate = {
+		# this may clear the purge type on planets that should have one, hence the if
+		if = {
+			limit = { is_cosmogenesis_world = yes } # undercoat: moved to scripted trigger
+			set_planet_purge_type = purge_cosmogenesis
+		}
+		else = {
+			clear_planet_purge_type = yes
 		}
 	}
 }

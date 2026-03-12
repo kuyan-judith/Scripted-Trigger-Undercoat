@@ -40,6 +40,10 @@ country_event = {
 	hide_window = yes
 	is_triggered_only = yes
 
+	trigger = {
+		is_wilderness_empire = yes
+	}
+
 	immediate = {
 		set_resource = {
 			resource = biomass
@@ -86,7 +90,6 @@ country_event = {
 				root = { set_country_flag = started_cold }
 			}
 			remove_deposit = d_decrepit_dwellings
-			add_district = district_photosynthesis_fields
 		}
 	}
 }
@@ -208,30 +211,18 @@ planet_event = {
 
 		if = {
 			limit = {
-				OR = {
-					num_districts = {
-						type = district_orchard_forests
-						value >= 4
-					}
-					num_districts = {
-						type = district_orchard_forests_uncapped
-						value >= 4
-					}
+				num_districts = {
+					type = district_orchard_forests
+					value >= 4
 				}
 			}
 			add_deposit = d_wilderness_farming_2
 		}
 		else_if = {
 			limit = {
-				OR = {
-					num_districts = {
-						type = district_orchard_forests
-						value > 0
-					}
-					num_districts = {
-						type = district_orchard_forests_uncapped
-						value > 0
-					}
+				num_districts = {
+					type = district_orchard_forests
+					value > 0
 				}
 			}
 			add_deposit = d_wilderness_farming
@@ -338,7 +329,22 @@ planet_event = {
 	}
 
 	immediate = {
-		add_building = building_capital_wilderness
+		if = {
+			limit = {
+				NOR = {
+					has_building = building_colony_shelter_wilderness
+					has_building = building_capital_wilderness
+					has_building = building_major_capital_wilderness
+					has_building = building_system_capital_wilderness
+					has_building = building_imperial_capital_wilderness
+				}
+			}
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
+			}
+			add_building = building_capital_wilderness
+		}
 		# NOTE: effect should run twice if the empire has both 'Mind of Many Worlds' and the Yuht Cryo Core
 		if = {
 			limit = {
@@ -742,7 +748,6 @@ espionage_operation_event = {
 				save_event_target_as = roots_planet
 			}
 		}
-		# TODO have desc respond to the type of Blocker chosen
 	}
 
 	option = {

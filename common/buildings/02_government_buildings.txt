@@ -64,10 +64,6 @@ building_noble_estates = {
 			energy = 2
 		}
 	}
-
-	triggered_desc = {
-		text = job_noble_effect_desc
-	}
 }
 
 building_slave_processing = {
@@ -125,7 +121,7 @@ building_slave_processing = {
 	}
 
 	planet_modifier = {
-		planet_jobs_slave_produces_mult = 0.05
+		pop_slave_bonus_workforce_mult = 0.05
 		pop_cat_slave_political_power = -0.25
 		planet_resettlement_unemployed_mult = -0.50
 	}
@@ -146,10 +142,6 @@ building_slave_processing = {
 
 	triggered_desc = {
 		text = building_slave_processing_slave_army_effect_desc
-	}
-
-	triggered_desc = {
-		text = building_slave_processing_migrate_effect_desc
 	}
 }
 
@@ -310,6 +302,7 @@ building_state_academy = {
 	}
 
 	potential = {
+		exists = owner
 		owner = { is_civil_education_empire = yes } # undercoat: moved to scripted trigger
 		NOT = { has_modifier = slave_colony }
 	}
@@ -582,14 +575,6 @@ building_order_keep = {
 	triggered_desc = {
 		text = building_order_keep_effect
 	}
-
-	triggered_desc = {
-		text = job_knight_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_squire_effect_desc
-	}
 }
 
 building_order_castle = {
@@ -633,14 +618,6 @@ building_order_castle = {
 	triggered_desc = {
 		text = building_order_keep_effect
 	}
-
-	triggered_desc = {
-		text = job_knight_effect_desc
-	}
-
-	triggered_desc = {
-		text = job_squire_effect_desc
-	}
 }
 
 #############
@@ -661,14 +638,26 @@ building_psi_corps = {
 	planet_limit = 1
 
 	potential = {
-		host_has_dlc = "Utopia"
-		owner = { has_tradition = tr_psionics_psi_corps }
-		NOT = { has_modifier = resort_colony }
-		NOT = { has_modifier = slave_colony }
+		owner = {
+			OR = {
+				has_tradition = tr_psionics_psi_corps
+				has_tradition = tr_psionics_shroud_psi_corps
+			}
+			is_endbringer_empire = no # undercoat: moved to scripted trigger
+		}
+		OR = {
+			NOR = {
+				has_modifier = resort_colony
+				has_modifier = slave_colony
+			}
+			AND = { # Allow PSI Corps on pleasure worlds
+				has_modifier = resort_colony
+				has_designation = col_pleasure
+			}
+		}
 	}
 
 	allow = {
-		has_major_upgraded_capital = yes
 		if = {
 			limit = {
 				exists = orbital_defence
@@ -687,19 +676,46 @@ building_psi_corps = {
 
 	destroy_trigger = {
 		exists = owner
-		NOT = {
-			owner = { has_tradition = tr_psionics_psi_corps }
+		owner = {
+			NOR = {
+				has_tradition = tr_psionics_psi_corps
+				has_tradition = tr_psionics_shroud_psi_corps
+			}
 		}
 	}
 
+	inline_script = {
+		script = jobs/telepaths_add
+		AMOUNT = 200
+	}
 	planet_modifier = {
-		job_telepath_add = 200
 		planet_stability_add = 5
 	}
 
 	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				num_assigned_jobs = {
+					job = telepath
+					value > 0
+				}
+			}
+		}
 		psionic_pop_bonus_workforce_mult = 1
 		mult = value:psionic_workforce_from_telepaths
+		# This is on the building instead of the jobs to prevent an infinite workforce loop
+	}
+	triggered_planet_modifier = {
+		potential = {
+			planet = {
+				num_assigned_jobs = {
+					job = telepath_drone
+					value > 0
+				}
+			}
+		}
+		psionic_pop_bonus_workforce_mult = 1
+		mult = value:psionic_workforce_from_telepath_drones
 		# This is on the building instead of the jobs to prevent an infinite workforce loop
 	}
 
@@ -714,12 +730,19 @@ building_psi_corps = {
 	}
 
 	triggered_desc = {
-		text = job_telepath_effect_desc
-	}
-
-	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				OR = {
+					is_imperial_authority = no
+					is_corporeal_authority = no
+				}
+			}
+		}
 		text = psionic_bonus_workforce_from_telepaths_tt
 	}
+
+	is_essential = yes
 }
 
 building_embassy = {
@@ -861,10 +884,6 @@ building_grand_embassy = {
 	inline_script = {
 		script = "jobs/politician_add"
 		AMOUNT = @building_static_jobs
-	}
-
-	triggered_desc = {
-		text = job_politician_effect_desc
 	}
 
 	resources = {
@@ -1265,4 +1284,166 @@ building_gaiaseeders_pc_gaia = {
 			has_planet_flag = gaia_seeder_bloom_timer
 		}
 	}
+}
+
+#############
+# Infernals
+#############
+
+building_volcanic_forge_1 = {
+	base_buildtime = @b1_time
+	base_cap_amount = 1
+	category = government
+	building_sets = {
+		government
+		urban
+	}
+	potential = {
+		exists = owner
+		owner = { is_world_forger_empire = yes }
+		NOR = {
+			is_city_world = yes # undercoat: moved to scripted trigger
+			is_machine_world = yes # undercoat: moved to scripted trigger
+			is_hive_world = yes # undercoat: moved to scripted trigger
+			is_artificial = yes
+			AND = {
+				is_terraforming = yes
+				is_scripted_terraforming = no
+			}
+		}
+	}
+	allow = { num_uncleared_blockers = 0 }
+	destroy_trigger = {
+		OR = {
+			is_city_world = yes # undercoat: moved to scripted trigger
+			is_machine_world = yes # undercoat: moved to scripted trigger
+			is_hive_world = yes # undercoat: moved to scripted trigger
+			AND = {
+				exists = owner
+				owner = { is_world_forger_empire = no }
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = { minerals = @b1_minerals }
+		upkeep = { energy = @b2_upkeep }
+	}
+
+	triggered_planet_modifier = {
+		potential = { owner = { is_gestalt = no } }
+		job_polytechnic_mentor_add = @building_static_jobs
+	}
+	triggered_planet_modifier = {
+		potential = { owner = { is_gestalt = yes } }
+		job_polytechnic_drone_add = @building_static_jobs
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_polytechnic_mentor_effect
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_polytechnic_drone_effect
+	}
+	triggered_desc = {
+		text = building_volcanic_forge_1_effect
+	}
+	auto_generate_description = no
+
+	on_destroy = {
+		planet_event = { id = infernals.32 }
+	}
+
+	prerequisites = { "tech_volcanic_forge" }
+	upgrades = { building_volcanic_forge_2 }
+	ai_weight_coefficient = 1.25
+}
+
+building_volcanic_forge_2 = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+	can_build = no
+	category = government
+	building_sets = {
+		government
+		urban
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_world_forger_empire = yes }
+		NOR = {
+			is_city_world = yes # undercoat: moved to scripted trigger
+			AND = {
+				is_terraforming = yes
+				is_scripted_terraforming = no
+			}
+		}
+	}
+	allow = { has_upgraded_capital = yes }
+	destroy_trigger = {
+		OR = {
+			is_city_world = yes # undercoat: moved to scripted trigger
+			is_machine_world = yes # undercoat: moved to scripted trigger
+			is_hive_world = yes # undercoat: moved to scripted trigger
+			AND = {
+				exists = owner
+				owner = { is_world_forger_empire = no }
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b2_minerals
+			exotic_gases = @b2_rare_cost
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			exotic_gases = @b2_rare_upkeep
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = { owner = { is_gestalt = no } }
+		job_polytechnic_mentor_add = @building_static_jobs_high
+	}
+	triggered_planet_modifier = {
+		potential = { owner = { is_gestalt = yes } }
+		job_polytechnic_drone_add = @building_static_jobs_high
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_polytechnic_mentor_effect
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_polytechnic_drone_effect
+	}
+	triggered_desc = {
+		text = building_volcanic_forge_2_effect
+	}
+	auto_generate_description = no
+
+	on_destroy = {
+		planet_event = { id = infernals.32 }
+	}
+
+	prerequisites = { "tech_volcanic_forge" }
+	ai_weight_coefficient = 1.25
 }

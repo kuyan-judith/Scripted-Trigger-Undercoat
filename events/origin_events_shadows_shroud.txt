@@ -1,0 +1,5281 @@
+#==================================
+# 6000-6899 Mindwardens
+#==================================
+
+namespace = shroud
+
+# Mindwardens origin setup event
+country_event = {
+	id = shroud.6000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# Setup timed events
+		country_event = { id = shroud.6050 months = 3 }
+		country_event = { id = shroud.6125 years = 12 }
+		save_event_target_as = current_mindwarden_country
+
+		# Spawn Exiled
+		create_exiled_country = yes
+
+		# Handle starting systems
+		solar_system = {
+			save_event_target_as = mindwarden_system
+
+			# flag cleanup
+			every_neighbor_system = {
+				remove_star_flag = empire_cluster
+				every_neighbor_system = {
+					remove_star_flag = empire_cluster
+				}
+			}
+
+			if = {
+				limit = {
+					OR = {
+						is_rim_system = no
+						any_neighbor_system = {
+							OR = {
+								has_special_star_flag_trigger = yes
+								has_natural_wormhole = yes
+								any_system_planet = {
+									is_colonizable = yes
+								}
+							}
+						}
+					}
+				}
+				closest_system = {
+					limit = {
+						is_rim_system = yes
+						has_special_star_flag_trigger = no
+						has_natural_wormhole = no
+						NOT = { has_star_flag = mindwarden_target_system }
+						NOT = {
+							any_system_planet = {
+								is_colonizable = yes
+							}
+						}
+						count_neighbor_system = {
+							count > 0
+						}
+						any_neighbor_system = {
+							distance = {
+								source = prev
+								max_distance < 60
+								type = euclidean
+							}
+						}
+					}
+					set_star_flag = mindwarden_target_system
+					save_event_target_as = target_system
+				}
+			}
+			else = {
+				save_event_target_as = target_system
+			}
+
+			set_spawn_system_batch = begin
+			if = {
+				limit = {
+					has_star_flag = sol
+				}
+				event_target:target_system = {
+					spawn_system = {
+						min_distance >= 20
+						max_distance <= 25
+						direction = rimwards
+						initializer = "mindwarden_sol_buffer_system"
+						hyperlane = no
+						is_discovered = no
+						effect = {
+							save_event_target_as = mindwarden_buffer_system@root
+						}
+					}
+				}
+				else = {
+					event_target:target_system = {
+						spawn_system = {
+							min_distance >= 20
+							max_distance <= 25
+							direction = rimwards
+							initializer = "mindwarden_buffer_system"
+							hyperlane = no
+							is_discovered = no
+							effect = {
+								save_event_target_as = mindwarden_buffer_system@root
+							}
+						}
+					}
+				}
+			}
+			set_spawn_system_batch = end
+
+			# System must be moved AFTER spawning Exiled systems, so resetting TI works correctly
+			if = {
+				limit = {
+					event_target:target_system = {
+						NOT = { is_same_value = event_target:mindwarden_system }
+					}
+				}
+				move_system = {
+					target = event_target:target_system
+					min_distance >= 10
+					max_distance <= 15
+					direction = rimwards
+					max_jumps = 0
+					hyperlane = yes
+					reset_terra_incognita = yes
+				}
+				every_neighbor_system_euclidean = {
+					limit = {
+						NOR = {
+							has_star_flag = surveillance_supercomputer_system
+							has_special_star_flag_trigger = yes
+							has_natural_wormhole = yes
+							any_system_planet = {
+								is_colonizable = yes
+							}
+						}
+						NOT = { has_hyperlane_to = prev }
+						distance = {
+							source = prev
+							max_distance < 60
+							type = euclidean
+						}
+					}
+					add_hyperlane = {
+						from = prev
+						to = this
+					}
+				}
+			}
+			if = {
+				limit = {
+					count_neighbor_system = {
+						count = 0
+					}
+				}
+				# Safekeep
+				random_neighbor_system_euclidean = {
+					limit = {
+						NOR = {
+							has_star_flag = surveillance_supercomputer_system
+							has_star_flag = exiled_system
+						}
+						distance = {
+							source = prev
+							max_distance < 80
+							type = euclidean
+						}
+					}
+					add_hyperlane = {
+						from = prev
+						to = this
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_hyperlane_to = event_target:mindwarden_buffer_system@root }
+				}
+				add_hyperlane = {
+					from = event_target:mindwarden_buffer_system@root
+					to = this
+				}
+			}
+
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+				every_neighbor_system = {
+					set_star_flag = empire_cluster
+				}
+			}
+
+			event_target:current_exiled_country = {
+				every_system_within_border = {
+					spawn_psionic_aura = {
+						owner = prev
+						type = exiled_aura
+						update_type = no
+					}
+					set_aura_intensity = 999 # So it can trigger on_progress_complete only when it can increase
+				}
+			}
+
+			random_system_planet = {
+				limit = {
+					NOT = { has_planet_flag = starting_deposit }
+					NOT = { has_planet_flag = ignore_startup_effect }
+					OR = {
+						is_gas_giant = yes # undercoat: moved to scripted trigger
+						is_toxic_world = yes # undercoat: moved to scripted trigger
+						is_frozen_world = yes # undercoat: moved to scripted trigger
+						is_barren_cold_world = yes # undercoat: moved to scripted trigger
+						is_barren_dry_world = yes # undercoat: moved to scripted trigger
+						is_rocky_asteroid = yes # undercoat: moved to scripted trigger
+					}
+				}
+				set_planet_flag = starting_deposit
+				add_deposit = d_zro_deposit_1
+				save_event_target_as = zro_deposit_planet
+			}
+		}
+
+		if = {
+			limit = { exists = event_target:zro_deposit_planet }
+			# To set zro as discovered
+			random_owned_ship = {
+				ship_event = {
+					id = action.941
+					days = 1
+					scopes = {
+						from = event_target:zro_deposit_planet
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6010
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_country_type = exiled
+			exists = event_target:exiled_country@root
+			is_same_value = event_target:exiled_country@root
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { has_country_flag = spoken_to_exiled }
+			}
+			country_event = { id = shroud.6020 }
+		}
+		else = {
+			country_event = { id = shroud.6030 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6020
+	title = shroud.6020.name
+	diplomatic_title = BLANK_STRING
+	desc = shroud.6020.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	location = event_target:exiled_capital@root
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = event_mindwardens_exiled
+
+	option = {
+		name = OK
+		default_hide_option = yes
+	}
+}
+
+country_event = {
+	id = shroud.6030
+	title = shroud.6030.name
+	diplomatic_title = BLANK_STRING
+	desc = shroud.6030.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+	location = event_target:exiled_capital@root
+
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+	show_sound = event_encrypted_comms
+
+	option = {
+		name = END_TRANSMISSION
+		default_hide_option = yes
+	}
+
+	immediate = {
+		event_target:exiled_country@root = {
+			save_event_target_as = exiled_country
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6050
+	title = shroud.6050.name
+	desc = shroud.6050.desc
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_administrative_work
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = mindwarden_visit_border }
+	}
+
+	immediate = {
+		event_target:exiled_system_border@root = {
+			save_event_target_as = exiled_system_border
+		}
+	}
+
+	option = {
+		name = shroud.6050.a
+		enable_special_project = {
+			name = EXPLORE_BORDER_SYSTEM
+			location = event_target:exiled_system_border
+			owner = root
+		}
+	}
+}
+
+#====================
+# 61XX Step 0 events
+#====================
+
+# A fleet has entered a system
+# Scope = Fleet
+# From = System
+fleet_event = {
+	id = shroud.6100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		controller = {
+			is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = mindwarden_visit_border }
+		}
+		from = {
+			has_star_flag = mindwarden_buffer_system
+			is_same_value = event_target:exiled_system_border@root.controller
+		}
+	}
+
+	immediate = {
+		controller = {
+			if = {
+				limit = { has_special_project = EXPLORE_BORDER_SYSTEM }
+				abort_special_project = { type = EXPLORE_BORDER_SYSTEM }
+			}
+			set_country_flag = mindwarden_visit_border
+			set_visited = event_target:exiled_center_system@this
+		}
+		fleet_event = {
+			id = shroud.6101
+			days = 1
+			scopes = { from = from }
+		}
+	}
+}
+
+fleet_event = {
+	id = shroud.6101
+	title = shroud.6100.name
+	desc = {
+		text = shroud.6100.desc.no_border_aura
+		trigger = {
+			controller = {
+				NOT = { has_country_flag = mindwarden_border_aura }
+			}
+		}
+	}
+	desc = {
+		text = shroud.6100.desc.border_aura
+		trigger = {
+			controller = {
+				has_country_flag = mindwarden_border_aura
+			}
+		}
+	}
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_mindwardens_torment
+
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		controller = { is_mindwarden_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		event_target:exiled_center_system@controller = {
+			save_event_target_as = exiled_center_system
+		}
+		controller = {
+			set_country_flag = has_encountered_psionic_auras
+			if = {
+				limit = {
+					has_country_flag = mindwarden_border_aura
+				}
+				set_country_flag = mindwarden_ship_aura
+			}
+		}
+	}
+
+	option = {
+		name = INCREDIBLE
+		controller = {
+			custom_tooltip = shroud.6100.tt
+			hidden_effect = {
+				set_country_flag = can_contact_exiled
+				establish_contact = {
+					who = event_target:exiled_country@this
+					location = event_target:exiled_center_system@this
+				}
+				remove_country_flag = can_contact_exiled
+			}
+		}
+	}
+}
+
+# A fleet has entered a system
+# Scope = Fleet
+# From = System
+fleet_event = {
+	id = shroud.6105
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:exiled_country@controller
+		controller = {
+			is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = mindwarden_visit_border }
+		}
+		from = {
+			has_star_flag = exiled_system
+			exists = owner
+			owner = {
+				is_same_value = event_target:exiled_country@root.controller
+			}
+		}
+	}
+
+	immediate = {
+		fleet_event = {
+			id = shroud.6106
+			days = 1
+		}
+	}
+}
+
+fleet_event = {
+	id = shroud.6106
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_mia = mia_return_home
+	}
+}
+
+# Exiled standard First Contact first event
+first_contact_event = {
+	id = shroud.6110
+	title = shroud.6110.name
+	desc = shroud.6110.desc
+	picture = GFX_evt_unknown_ships
+	show_sound = event_scanner
+	is_triggered_only = yes
+	location = event_target:exiled_center_system@owner
+	first_contact = yes
+
+	abort_trigger = {
+		OR = {
+			NOT = { exists = owner }
+			NOT = { exists = contact_country }
+			owner = { has_communications = root.contact_country }
+		}
+	}
+
+	immediate = {
+		set_first_contact_starting_stage = yes
+	}
+
+	after = {
+		hidden_effect = {
+			fire_on_action = {
+				on_action = on_first_contact_started
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		tooltip = {
+			set_first_contact_starting_stage = yes
+		}
+	}
+}
+
+# Exiled First Contact
+first_contact_event = {
+	id = shroud.6115
+	title = shroud.6115.name
+	desc = shroud.6115.desc
+	picture = GFX_evt_physics_research
+	show_sound = event_administrative_work
+
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+		owner = {
+			clone_leader = {
+				target = prev.leader
+				effect = {
+					save_event_target_as = exiled_envoy
+					exile_leader_as = exiled_envoy_1@owner
+				}
+			}
+		}
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = shroud.6115.a
+		set_first_contact_stage = exiled_stage_2
+	}
+}
+
+# Exiled First Contact
+first_contact_event = {
+	id = shroud.6120
+	title = shroud.6120.name
+	desc = shroud.6120.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_comms_cutoff
+
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+		owner = {
+			clone_leader = {
+				target = prev.leader
+				effect = {
+					save_event_target_as = exiled_envoy
+					exile_leader_as = exiled_envoy_2@owner
+				}
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			leader = {
+				kill_leader = {
+					show_notification = no
+					fire = no
+				}
+			}
+			owner = {
+				country_event = { id = shroud.6125 days = 30 }
+				set_country_flag = exiled_partial_contact
+			}
+		}
+	}
+
+	option = {
+		name = DISTURBING
+		tooltip = {
+			leader = {
+				exile_leader_as = void
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+		}
+	}
+}
+
+# remove first contact and send notification
+first_contact_event = {
+	id = shroud.6121
+	hide_window = yes
+
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		contact_country = {
+			remove_country_flag = exiled_partial_contact
+			set_country_flag = exiled_contact
+		}
+		create_message = {
+			type = MESSAGE_FIRST_CONTACT_ABORTED
+			localization = MESSAGE_FIRST_CONTACT_ABORTED_EXILED_DESC
+			days = 30
+			target = root.solar_system
+			variable = {
+				type = name
+				localization = COUNTRY
+				scope = root
+			}
+		}
+		finish_first_contact = yes
+	}
+}
+
+country_event = {
+	id = shroud.6122
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = mindwarden_exiled
+	}
+
+	immediate = {
+		set_country_flag = exiled_aura_should_expand
+	}
+}
+
+country_event = {
+	id = shroud.6125
+	title = UNKNOWN_LONG
+	diplomatic_title = BLANK_STRING
+	desc = shroud.6125.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+
+	show_sound = event_mindwardens_exiled
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = exiled_leader_found }
+	}
+
+	immediate = {
+		set_country_flag = exiled_leader_found
+		event_target:exiled_country@root = {
+			country_event = {
+				id = shroud.6122
+				days = 30
+			}
+		}
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+#====================
+# 62XX Step 1 events
+#====================
+
+country_event = {
+	id = shroud.6200
+	title = shroud.6200.name
+	desc = {
+		text = shroud.6200.desc.no_visit
+		trigger = {
+			NOT = { has_country_flag = mindwarden_visit_border }
+		}
+	}
+	desc = {
+		text = shroud.6200.desc.visit_no_ship
+		trigger = {
+			has_country_flag = mindwarden_visit_border
+			NOT = {
+				event_target:exiled_system_border@root = {
+					any_ship_in_system = {
+						controller = { is_same_value = root }
+						OR = {
+							is_ship_class = shipclass_military
+							is_ship_class = shipclass_constructor
+							is_ship_class = shipclass_science_ship
+							is_ship_class = shipclass_colonizer
+						}
+					}
+				}
+			}
+		}
+	}
+	desc = {
+		text = shroud.6200.desc.visit_and_ship
+		trigger = {
+			has_country_flag = mindwarden_visit_border
+			event_target:exiled_system_border@root = {
+				any_ship_in_system = {
+					controller = { is_same_value = root }
+				}
+			}
+		}
+	}
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_mindwardens_torment
+
+	is_triggered_only = yes
+	location = event_target:exiled_system_border@root
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = homeworld_destroyed }
+	}
+
+	immediate = {
+		event_target:exiled_system_border@root = {
+			save_event_target_as = exiled_system_border
+		}
+		set_country_flag = mindwarden_border_aura
+		set_country_flag = has_encountered_psionic_auras
+		if = {
+			limit = {
+				event_target:exiled_system_border = {
+					any_ship_in_system = {
+						controller = { is_same_value = root }
+					}
+				}
+			}
+			set_country_flag = mindwarden_ship_aura
+			event_target:exiled_system_border = {
+				random_ship_in_system = {
+					limit = {
+						controller = { is_same_value = root }
+					}
+					save_event_target_as = ship_in_border
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud.6200.a
+		enable_special_project = {
+			name = "PSI_RADIATION_PROJECT"
+			location = event_target:exiled_system_border@root
+			owner = root
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6205
+	title = shroud.6205.name
+	desc = {
+		trigger = {
+			if = {
+				limit = { has_country_flag = mindwarden_aura_home_system }
+				text = shroud.6205.desc.aura_home
+			}
+			else = {
+				text = shroud.6205.desc.no_aura_home
+			}
+		}
+	}
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_mindwardens_torment
+
+	is_triggered_only = yes
+	location = event_target:exiled_center_system@this
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = homeworld_destroyed }
+	}
+
+	immediate = {
+		event_target:exiled_system_border@root = {
+			save_event_target_as = exiled_system_border
+		}
+		event_target:exiled_center_system@root = {
+			save_event_target_as = exiled_center_system
+		}
+		set_country_flag = mindwarden_know_aura
+	}
+
+	option = {
+		name = shroud.6205.a
+		enable_special_project = {
+			name = "PSIONIC_AURA_RESISTANCE_PROJECT"
+			owner = root
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6210
+	title = shroud.6210.name
+	desc = shroud.6210.desc
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_mindwardens_torment
+
+	is_triggered_only = yes
+	location = home_planet
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOR = {
+			has_country_flag = homeworld_destroyed
+			has_country_flag = unlocked_ancient_ward_upgrade
+		}
+	}
+
+	immediate = {
+		set_country_flag = unlocked_ancient_ward_upgrade
+	}
+
+	option = {
+		name = shroud.6210.a
+		custom_tooltip = shroud.6210.a.tt
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = psionic_war_ended }
+				}
+				begin_event_chain = {
+					event_chain = "ancient_ward_upgrade_chain"
+					target = this
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6211
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = yes
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		has_country_flag = unlocked_ancient_ward_upgrade
+		NOT = { has_country_flag = mindwarden_ward_upgraded }
+		has_event_chain = ancient_ward_upgrade_chain
+	}
+
+	immediate = {
+		capital_scope = {
+			if = {
+				limit = { has_building = building_ancient_ward_1 }
+				remove_building = building_ancient_ward_1
+			}
+			add_grand_ward = yes
+		}
+		add_event_chain_counter = {
+			event_chain = ancient_ward_upgrade_chain
+			counter = ancient_ward_upgraded
+			amount = 1
+		}
+		if = {
+			limit = {
+				has_completed_event_chain_counter = {
+					event_chain = ancient_ward_upgrade_chain
+					counter = ancient_ward_upgraded
+				}
+			}
+			country_event = { id = shroud.6215 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6215
+	title = shroud.6215.name
+	desc = {
+		trigger = {
+			if = {
+				limit = { has_country_flag = mindwarden_aura_home_system }
+				text = shroud.6215.desc.aura_home
+			}
+			else = {
+				text = shroud.6215.desc.no_aura_home
+			}
+			text = newline
+			text = shroud.6215.desc.end
+		}
+	}
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_psionic_aura
+
+	is_triggered_only = yes
+	location = home_planet
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = homeworld_destroyed }
+		NOT = { has_country_flag = psionic_war_ended }
+	}
+
+	immediate = {
+		event_target:exiled_system_border@root = {
+			save_event_target_as = exiled_system_border
+		}
+		set_country_flag = mindwarden_ward_upgraded
+	}
+
+	option = {
+		name = shroud.6215.a
+		end_event_chain =  ancient_ward_upgrade_chain
+		begin_event_chain = {
+			event_chain = "shroud_seal_construction_chain"
+			target = this
+		}
+		add_tech_progress = {
+			tech = tech_psionic_suppression
+			progress = 0.1
+		}
+		hidden_effect = {
+			create_point_of_interest = {
+				id = shroud.6216
+				name = "shroud_6216_poi"
+				desc = shroud_6216_poi_desc
+				event_chain = shroud_seal_construction_chain
+				location = event_target:exiled_system_border@root
+			}
+			if = {
+				limit = {
+					has_technology = tech_psionic_suppression
+				}
+				add_event_chain_counter = {
+					event_chain = shroud_seal_construction_chain
+					counter = tech_psionic_suppression_researched
+					amount = 1
+				}
+			}
+			set_timed_country_flag = {
+				flag = psionic_war_shroud_seal
+				days = 9000 # 25 years
+			}
+			country_event = {
+				id = shroud.6505
+				years = 25
+			}
+		}
+	}
+}
+
+# A fleet has entered a system
+# Scope = Fleet
+# From = System
+fleet_event = {
+	id = shroud.6220
+	title = shroud.6220.name
+	desc = shroud.6220.desc
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_mindwardens_torment
+
+	is_triggered_only = yes
+	location = from
+
+	trigger = {
+		controller = {
+			is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			has_country_flag = mindwarden_visit_border
+			has_country_flag = mindwarden_border_aura
+			NOR = {
+				has_country_flag = mindwarden_ship_aura
+				has_country_flag = homeworld_destroyed
+			}
+		}
+		from = { has_star_flag = mindwarden_buffer_system }
+	}
+
+	immediate = {
+		event_target:exiled_system_border@controller = {
+			save_event_target_as = exiled_system_border
+		}
+		controller = {
+			set_country_flag = mindwarden_ship_aura
+		}
+	}
+
+	option = {
+		name = DISTURBING
+	}
+}
+
+country_event = {
+	id = shroud.6225
+	title = shroud.6225.name
+	desc = {
+		trigger = {
+			has_country_flag = mindwarden_know_aura
+		}
+		text = shroud.6225.desc.know_aura
+	}
+	desc = {
+		trigger = {
+			NOT = {
+				has_country_flag = mindwarden_know_aura
+			}
+		}
+		text = shroud.6225.desc.no_know_aura
+	}
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOR = {
+			has_country_flag = mindwarden_aura_home_system
+			has_country_flag = homeworld_destroyed
+			has_country_flag = mindwarden_ward_upgraded
+		}
+	}
+
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_mindwardens_torment
+
+	is_triggered_only = yes
+	location = home_planet.solar_system
+
+	immediate = {
+		event_target:exiled_country@root = {
+			save_event_target_as = exiled_country
+		}
+		set_country_flag = mindwarden_aura_home_system
+	}
+
+	option = {
+		name = shroud.6225.a
+		if = {
+			limit = { has_country_flag = mindwarden_know_aura }
+			custom_tooltip = shroud.6225.a.know_aura.tt
+		}
+		else = {
+			custom_tooltip = shroud.6225.a.no_know_aura.tt
+		}
+	}
+}
+
+# Mindwardens - Homeworld lost
+# fromfrom = planet lost
+country_event = {
+	id = shroud.6230
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		fromfrom = {
+			is_same_value = root.home_planet
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				fromfrom = { has_building = building_ancient_ward_1 }
+			}
+			set_country_flag = had_ancient_ward
+		}
+		else_if = {
+			limit = {
+				fromfrom = { has_building = building_ancient_ward_2 }
+			}
+			set_country_flag = had_grand_ward
+		}
+		if = {
+			limit = {
+				has_country_flag = shroud_seal_dismantled
+			}
+			export_trigger_value_to_variable = {
+				trigger = timed_flag_days_left
+				parameters = {
+					flag = psionic_war_no_shroud_seal
+				}
+				variable = time_left_before_psionic_war
+			}
+		}
+		else = {
+			export_trigger_value_to_variable = {
+				trigger = timed_flag_days_left
+				parameters = {
+					flag = psionic_war_with_shroud_seal
+				}
+				variable = time_left_before_psionic_war
+			}
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = time_left_before_psionic_war
+					value > 0
+				}
+			}
+			set_country_flag = block_psionic_war
+		}
+		if = {
+			limit = {
+				NOT = { has_country_flag = mindwarden_ward_upgraded }
+			}
+			country_event = { id = shroud.6231 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6231
+	title = shroud.6231.name
+	desc = shroud.6231.desc
+
+	picture = GFX_evt_star_chart
+	show_sound = event_bad_omen
+
+	is_triggered_only = yes
+	location = fromfromfrom
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.6231.a
+		fromfromfrom = {
+			begin_event_chain = {
+				event_chain = "shroud_reclaim_homeworld_chain"
+				target = root
+			}
+		}
+		hidden_effect = {
+			create_point_of_interest = {
+				id = shroud.6231
+				name = "shroud_6231_poi"
+				desc = shroud_6231_poi_desc
+				event_chain = shroud_reclaim_homeworld_chain
+				location = fromfromfrom
+			}
+		}
+	}
+}
+
+# Mindwardens - Homeworld reclaimed
+# fromfrom = planet conquered
+country_event = {
+	id = shroud.6240
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		fromfrom = {
+			is_same_value = root.home_planet
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { has_event_chain = shroud_reclaim_homeworld_chain }
+			add_event_chain_counter = {
+				event_chain = shroud_reclaim_homeworld_chain
+				counter = homeworld_reclaimed
+				amount = 1
+			}
+			country_event = { id = shroud.6241 }
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				NOT = { has_country_flag = psionic_war_ended }
+			}
+			if = {
+				limit = { has_country_flag = had_ancient_ward }
+				fromfrom = {
+					add_building = building_ancient_ward_1
+				}
+			}
+			else_if = {
+				limit = { has_country_flag = had_grand_ward }
+				fromfrom = {
+					add_grand_ward = yes
+				}
+			}
+		}
+		remove_country_flag = had_ancient_ward
+		remove_country_flag = had_grand_ward
+		if = {
+			limit = {
+				check_variable = {
+					which = time_left_before_psionic_war
+					value > 0
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = shroud_seal_dismantled
+				}
+				if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 8
+						}
+					}
+					country_event = {
+						id = shroud.6569
+						years = 10
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 8
+						}
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 6
+						}
+					}
+					country_event = {
+						id = shroud.6569
+						years = 8
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 6
+						}
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 4
+						}
+					}
+					country_event = {
+						id = shroud.6569
+						years = 6
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 4
+						}
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 2
+						}
+					}
+					country_event = {
+						id = shroud.6569
+						years = 4
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 2
+						}
+					}
+					country_event = {
+						id = shroud.6569
+						years = 2
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 20
+						}
+					}
+					country_event = {
+						id = shroud.6504
+						years = 25
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 20
+						}
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 15
+						}
+					}
+					country_event = {
+						id = shroud.6504
+						years = 20
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 15
+						}
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 10
+						}
+					}
+					country_event = {
+						id = shroud.6504
+						years = 15
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 10
+						}
+						check_variable = {
+							which = time_left_before_psionic_war
+							value >= 5
+						}
+					}
+					country_event = {
+						id = shroud.6504
+						years = 10
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = {
+							which = time_left_before_psionic_war
+							value < 5
+						}
+					}
+					country_event = {
+						id = shroud.6504
+						years = 5
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6241
+	title = shroud.6241.name
+	desc = shroud.6241.desc
+
+	picture = GFX_evt_crisis_defeated
+	show_sound = event_mindwardens_victory
+
+	is_triggered_only = yes
+	location = fromfromfrom
+
+	option = {
+		name = shroud.6241.a
+		end_event_chain = shroud_reclaim_homeworld_chain
+	}
+}
+
+planet_event = {
+	id = shroud.6250
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = mindwarden_ward_upgraded }
+			home_planet = {
+				is_same_value = root
+			}
+		}
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+				home_planet = {
+					is_same_value = root
+				}
+			}
+			if = {
+				limit = {
+					root = {
+						habitable_planet = no
+					}
+				}
+				set_country_flag = homeworld_destroyed
+				if = {
+					limit = {
+						has_event_chain = ancient_ward_upgrade_chain
+					}
+					end_event_chain = ancient_ward_upgrade_chain
+				}
+			}
+		}
+	}
+}
+
+#====================
+# 63XX Step 2 events
+#====================
+
+# on tech_psionic_suppression unlock
+country_event = {
+	id = shroud.6300
+	title = shroud.6300.name
+	desc = shroud.6300.desc
+
+	picture = GFX_evt_shroud_shroud_seal
+	show_sound = event_psionic_aura
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		has_event_chain = shroud_seal_construction_chain
+		last_increased_tech = tech_psionic_suppression
+	}
+
+	immediate = {
+		set_country_flag = mindwarden_shroud_seal_construction_suggestion
+		add_event_chain_counter = {
+			event_chain = shroud_seal_construction_chain
+			counter = tech_psionic_suppression_researched
+			amount = 1
+		}
+		initialize_psionic_war_chain_scope = yes
+	}
+
+	option = {
+		name = shroud.6300.a
+		if = {
+			limit = {
+				has_country_flag = pending_psionic_event_chain_start
+				NOT = { has_event_chain = the_psionic_war_chain }
+				NOT = { has_country_flag = psionic_war_ended }
+			}
+			start_psionic_war_chain = yes
+		}
+	}
+}
+
+# on shroud seal built in border system
+country_event = {
+	id = shroud.6305
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		has_event_chain = shroud_seal_construction_chain
+		exists = from
+		from = { is_megastructure_type = shroud_seal }
+		from.solar_system = {
+			is_same_value = event_target:exiled_system_border@root
+		}
+	}
+
+	immediate = {
+		end_event_chain = shroud_seal_construction_chain
+		country_event = {
+			id = shroud.6500
+		}
+	}
+}
+
+#====================
+# 65XX Step 4 events
+#====================
+
+country_event = {
+	id = shroud.6500
+	title = shroud.6500.name
+	desc = shroud.6500.desc
+	picture = GFX_evt_communication_event
+	show_sound = event_radio_chatter
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = received_mindwarden_unexpected_transmission }
+	}
+
+	immediate = {
+		event_target:exiled_system_border@this = {
+			save_event_target_as = exiled_system_border
+		}
+		event_target:exiled_country@this = {
+			save_event_target_as = exiled_country
+		}
+		set_country_flag = received_mindwarden_unexpected_transmission
+		every_active_first_contact = {
+			limit = {
+				contact_country = { is_same_value = event_target:exiled_country@root }
+			}
+			first_contact_event = { id = shroud.6121 }
+		}
+	}
+
+	option = {
+		name = ONSCREEN
+		hidden_effect = {
+			country_event = { id = shroud.6510 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6504
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = block_psionic_war
+		country_event = { id = shroud.6505 }
+	}
+}
+
+country_event = {
+	id = shroud.6505
+	title = shroud.6505.name
+	desc = shroud.6505.desc
+	picture = GFX_evt_communication_event
+	show_sound = event_radio_chatter
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOR = {
+			has_country_flag = received_mindwarden_unexpected_transmission
+			has_country_flag = shroud_seal_dismantled
+			has_country_flag = block_psionic_war
+			has_country_flag = psionic_war_ended
+		}
+	}
+
+	immediate = {
+		set_country_flag = received_mindwarden_unexpected_transmission
+		every_active_first_contact = {
+			limit = {
+				contact_country = { is_same_value = event_target:exiled_country@root }
+			}
+			first_contact_event = { id = shroud.6121 }
+		}
+	}
+
+	option = {
+		name = ONSCREEN
+		hidden_effect = {
+			country_event = { id = shroud.6560 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6510
+	title = shroud.6510.name
+	desc = shroud.6510.desc
+	show_sound = event_mindwardens_exiled
+
+	diplomatic = yes
+	is_triggered_only = yes
+	location = event_target:exiled_capital@root
+
+	picture_event_data = {
+		portrait = event_target:exiled_country@root
+		room = psionic_room
+	}
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = psionic_war_ended }
+	}
+
+	immediate = {
+		event_target:exiled_country@root = {
+			save_event_target_as = exiled_country
+		}
+		event_target:exiled_system_border@root = {
+			save_event_target_as = exiled_system_border
+		}
+		set_country_flag = spoken_to_exiled
+		set_country_flag = exiled_contact
+	}
+
+	option = {
+		name = shroud.6510.a
+		hidden_effect = {
+			country_event = {
+				id = shroud.6515
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6515
+	base = shroud.6510
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6515.desc
+
+	option = {
+		name = shroud.6515.a
+		hidden_effect = {
+			country_event = {
+				id = shroud.6520
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6520
+	base = shroud.6510
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6520.desc
+
+	option = {
+		name = shroud.6520.a
+		hidden_effect = {
+			country_event = {
+				id = shroud.6525
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6525
+	base = shroud.6510
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6525.desc
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		initialize_psionic_war_chain_scope = yes
+	}
+
+	option = {
+		name = {
+			text = shroud.6525_heritage.a
+			trigger = {
+				has_country_flag = from_ancient_ward_dialog
+			}
+		}
+		name = {
+			text = shroud.6525.a
+			trigger = {
+				NOT = { has_country_flag = from_ancient_ward_dialog }
+			}
+		}
+
+		start_mindwarden_psionic_war = yes
+		hidden_effect = {
+			country_event = {
+				id = shroud.6530
+			}
+		}
+	}
+	option = {
+		trigger = {
+			NOT = { has_country_flag = from_ancient_ward_dialog }
+		}
+		name = shroud.6525.b
+		custom_tooltip = shroud_seal_dismantled
+		hidden_effect = {
+			every_owned_megastructure = {
+				limit = {
+					is_megastructure_type = shroud_seal
+					solar_system = {
+						is_same_value = event_target:exiled_system_border@root
+					}
+				}
+				delete_megastructure = this
+			}
+
+			begin_event_chain = {
+				event_chain = shroud_seal_reconstruction_chain
+				target = this
+			}
+			create_point_of_interest = {
+				id = shroud_seal_reconstruction_chain_poi_1
+				name = shroud_seal_reconstruction_chain_poi_1
+				desc = shroud_seal_reconstruction_chain_poi_1_desc
+				event_chain = shroud_seal_reconstruction_chain
+				location = event_target:exiled_system_border@root
+			}
+
+			set_country_flag = shroud_seal_dismantled
+			country_event = {
+				id = shroud.6535
+			}
+			set_timed_country_flag = {
+				flag = psionic_war_no_shroud_seal
+				days = 3600 # 10 years
+			}
+			country_event = {
+				id = shroud.6570
+				years = 10
+			}
+		}
+	}
+
+	after = {
+		remove_country_flag = from_ancient_ward_dialog
+	}
+}
+
+country_event = {
+	id = shroud.6530
+	base = shroud.6510
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6530.desc
+
+	option = {
+		name = END_TRANSMISSION
+	}
+}
+
+country_event = {
+	id = shroud.6535
+	base = shroud.6510
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6535.desc
+
+	option = {
+		name = END_TRANSMISSION
+		hidden_effect = {
+			country_event = {
+				id = shroud.6550
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6540
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		has_point_of_interest = { poi = the_psionic_war_chain_poi_1 }
+		exists = from
+		from = { is_megastructure_type = shroud_seal }
+		from.solar_system = {
+			is_same_value = event_target:exiled_center_system@root
+		}
+	}
+
+	immediate = {
+		remove_point_of_interest = the_psionic_war_chain_poi_1
+		country_event = { id = shroud.6580 }
+	}
+}
+
+planet_event = {
+	id = shroud.6544
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		OR = {
+			has_planet_flag = exiled_planet_1
+			has_planet_flag = exiled_planet_2
+		}
+	}
+
+	immediate = {
+		save_event_target_as = colonized_exiled_planet
+		planet_event = { id = shroud.6545 }
+	}
+}
+
+# This = Planet scope
+planet_event = {
+	id = shroud.6545
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		exists = owner
+		OR = {
+			AND = {
+				has_planet_flag = exiled_planet_1
+				event_target:matching_mindwarden_country@this = {
+					has_point_of_interest = { poi = the_psionic_war_chain_poi_2 }
+				}
+			}
+			AND = {
+				has_planet_flag = exiled_planet_2
+				event_target:matching_mindwarden_country@this = {
+					has_point_of_interest = { poi = the_psionic_war_chain_poi_3 }
+				}
+			}
+		}
+		OR = {
+			# don't run this when coming from on_planet_transfer while colonizing
+			exists = fromfrom
+			exists = event_target:colonized_exiled_planet
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_planet_flag = exiled_planet_1
+			}
+			event_target:matching_mindwarden_country@this = {
+				remove_point_of_interest = the_psionic_war_chain_poi_2
+				event_target:exiled_planet_1@this = {
+					save_event_target_as = current_planet
+				}
+				event_target:exiled_planet_2@this = {
+					save_event_target_as = other_planet
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_planet_flag = exiled_planet_2
+			}
+			event_target:matching_mindwarden_country@this = {
+				remove_point_of_interest = the_psionic_war_chain_poi_3
+				event_target:exiled_planet_2@this = {
+					save_event_target_as = current_planet
+				}
+				event_target:exiled_planet_1@this = {
+					save_event_target_as = other_planet
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				event_target:matching_mindwarden_country@this = {
+					is_same_value = root.owner # if it's the matching mindwardens who took the planet
+				}
+			}
+			owner = {
+				if = {
+					limit = {
+						NOR = {
+							has_point_of_interest = { poi = the_psionic_war_chain_poi_2 }
+							has_point_of_interest = { poi = the_psionic_war_chain_poi_3 }
+						}
+					}
+					remove_point_of_interest = the_psionic_war_chain_poi_1
+					end_event_chain = the_psionic_war_chain
+					country_event = { id = shroud.6700 }
+				}
+				else = {
+					root = {
+						event_target:matching_mindwarden_country@this = {
+							event_target:exiled_country@this = {
+								save_event_target_as = exiled_country
+							}
+						}
+					}
+					if = {
+						limit = {
+							exists = event_target:colonized_exiled_planet
+						}
+						country_event = { id = shroud.6601 }
+					}
+					else = {
+						country_event = { id = shroud.6600 }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Mindwarden exiled are destroyed
+# This = destroyed country
+# From = optional, destroyer (country)
+country_event = {
+	id = shroud.6546
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		has_country_flag = mindwarden_exiled
+	}
+
+	immediate = {
+		event_target:mindwarden_country@this = {
+			set_country_flag = psionic_war_ended
+
+			if = {
+				limit = {
+					has_event_chain = the_psionic_war_chain
+				}
+				end_event_chain = the_psionic_war_chain
+			}
+			if = {
+				limit = {
+					has_event_chain = shroud_seal_construction_chain
+				}
+				end_event_chain = shroud_seal_construction_chain
+			}
+			if = {
+				limit = {
+					has_event_chain = shroud_seal_reconstruction_chain
+				}
+				end_event_chain = shroud_seal_reconstruction_chain
+			}
+			if = {
+				limit = {
+					has_event_chain = ancient_ward_upgrade_chain
+				}
+				end_event_chain = ancient_ward_upgrade_chain
+			}
+
+			if = {
+				limit = { has_special_project = PSIONIC_AURA_RESISTANCE_PROJECT }
+				abort_special_project = { type = PSIONIC_AURA_RESISTANCE_PROJECT }
+			}
+			if = {
+				limit = { has_special_project = PSI_RADIATION_PROJECT }
+				abort_special_project = { type = PSI_RADIATION_PROJECT }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6550
+	title = shroud.6550.name
+	desc = shroud.6550.desc
+	picture = GFX_evt_megastructure_construction
+	show_sound = event_construction
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.6550.a
+	}
+
+	immediate = {
+		event_target:exiled_system_border@root = {
+			save_event_target_as = exiled_system_border
+		}
+		event_target:exiled_country@root = {
+			save_event_target_as = exiled_country
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6560
+	title = shroud.6560.name
+	desc = shroud.6560.desc
+	show_sound = event_mindwardens_exiled
+
+	diplomatic = yes
+	is_triggered_only = yes
+	location = event_target:exiled_capital@root
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = {
+			has_country_flag = shroud_seal_dismantled
+			has_country_flag = started_psionic_war
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:exiled_country@root
+		room = psionic_room
+	}
+
+	immediate = {
+		event_target:exiled_country@root = {
+			save_event_target_as = exiled_country
+		}
+		set_country_flag = spoken_to_exiled
+	}
+
+	option = {
+		name = shroud.6560.a
+		hidden_effect = {
+			set_country_flag = from_ancient_ward_dialog
+			country_event = {
+				id = shroud.6515
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6569
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		remove_country_flag = block_psionic_war
+		country_event = { id = shroud.6570 }
+	}
+}
+
+country_event = {
+	id = shroud.6570
+	title = shroud.6570.name
+	desc = shroud.6570.desc
+	show_sound = event_mindwardens_exiled
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		has_country_flag = shroud_seal_dismantled
+		NOR = {
+			has_country_flag = started_psionic_war
+			has_country_flag = block_psionic_war
+			has_country_flag = psionic_war_ended
+		}
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+	location = event_target:exiled_capital@root
+
+	picture_event_data = {
+		portrait = event_target:exiled_country@root
+		room = psionic_room
+	}
+
+	immediate = {
+		initialize_psionic_war_chain_scope = yes
+	}
+
+	option = {
+		name = shroud.6570.a
+		start_mindwarden_psionic_war = yes
+	}
+}
+
+country_event = {
+	id = shroud.6575
+	title = shroud.6575.name
+	desc = shroud.6575.desc
+	show_sound = event_mindwardens_exiled
+
+	diplomatic = yes
+	is_triggered_only = yes
+	location = event_target:exiled_capital@root
+
+	picture_event_data = {
+		portrait = event_target:exiled_country@root
+		room = psionic_room
+	}
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = psionic_war_ended }
+	}
+
+	immediate = {
+		initialize_psionic_war_chain_scope = yes
+	}
+
+	option = {
+		name = shroud.6575.a
+		start_mindwarden_psionic_war = yes
+	}
+}
+
+country_event = {
+	id = shroud.6580
+	title = shroud.6580.name
+	desc = shroud.6580.desc
+	picture = GFX_evt_shroud_shroud_seal
+	show_sound = event_psionic_aura
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = psionic_war_ended }
+	}
+
+	option = {
+		name = shroud.6580.a
+	}
+
+	immediate = {
+		event_target:exiled_center_system@root = {
+			save_event_target_as = exiled_center_system
+		}
+		event_target:exiled_country@root = {
+			save_event_target_as = exiled_country
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6585
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		has_point_of_interest = { poi = shroud_seal_reconstruction_chain_poi_1 }
+		exists = from
+		from = { is_megastructure_type = shroud_seal }
+		from.solar_system = {
+			is_same_value = event_target:exiled_system_border@root
+		}
+	}
+
+	immediate = {
+		remove_point_of_interest = shroud_seal_reconstruction_chain_poi_1
+		end_event_chain = shroud_seal_reconstruction_chain
+		country_event = { id = shroud.6575 }
+	}
+}
+
+#====================
+# 66XX Step 5 events
+#====================
+
+country_event = {
+	id = shroud.6600
+	title = shroud.6600.name
+	desc = shroud.6600.desc
+
+	picture = GFX_evt_shroudwalker_enclave
+	show_sound = event_ground_battle
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.6600.a
+	}
+}
+
+country_event = {
+	id = shroud.6601
+	title = shroud.6601.name
+	desc = shroud.6601.desc
+
+	picture = GFX_evt_colony_settlement
+	show_sound = event_burning_city
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.6601.a
+	}
+}
+
+#====================
+# 67XX Step 6 events
+#====================
+
+country_event = {
+	id = shroud.6700
+	title = shroud.6700.name
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					has_country_flag = spoken_to_exiled
+					exists = event_target:exiled_country@root
+				}
+				text = shroud.6700.desc.contact
+			}
+			else_if = {
+				limit = {
+					exists = event_target:exiled_country@root
+				}
+				text = shroud.6700.desc.no_contact
+			}
+			else = {
+				text = shroud.6700.desc.no_exiled # In certain cases, this event can fire after the exiled_country is destroyed
+			}
+		}
+	}
+	picture = GFX_evt_sanctum_of_the_lost
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		NOT = { exists = event_target:sanctum_of_the_lost_planet@root }
+	}
+
+	immediate = {
+		event_target:current_planet = {
+			save_global_event_target_as = sanctum_of_the_lost_planet@root
+			save_event_target_as = sanctum_of_the_lost_planet
+		}
+		if = {
+			limit = { exists = event_target:exiled_country }
+			event_target:exiled_country@root = {
+				save_event_target_as = exiled_country
+			}
+		}
+		set_country_flag = psionic_war_ended
+	}
+
+	option = {
+		name = shroud.6700.a
+		enable_special_project = {
+			name = SANCTUM_OF_THE_LOST
+			location = event_target:sanctum_of_the_lost_planet
+			owner = ROOT
+		}
+		event_target:sanctum_of_the_lost_planet = {
+			add_blocker = {
+				type = d_ruined_sanctum_of_the_lost
+			}
+			set_planet_flag = has_sanctum_of_the_lost@root
+		}
+	}
+}
+
+# Fired by on_planet_returned, on_planet_transfer
+# Abort / Restart the "Sanctum of the lost" situation
+planet_event = {
+	id = shroud.6701
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				exists = fromfrom
+				has_planet_flag = has_sanctum_of_the_lost@fromfrom
+			}
+			AND = {
+				exists = from
+				has_planet_flag = has_sanctum_of_the_lost@from
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { # Mindwardens lost the sanctum
+				exists = fromfrom
+				has_planet_flag = has_sanctum_of_the_lost@fromfrom
+			}
+			fromfrom = { country_event = { id = shroud.6702 } }
+		}
+		else_if = {
+			limit = { exists = from }
+			from = { country_event = { id = shroud.6703 } } # Mindwardens regained the sanctum
+		}
+	}
+}
+
+# Abort the "Sanctum of the Lost" situation
+country_event = {
+	id = shroud.6702
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { has_special_project = SANCTUM_OF_THE_LOST }
+
+	immediate = {
+		abort_special_project = { type = SANCTUM_OF_THE_LOST }
+		event_target:sanctum_of_the_lost_planet@this = {
+			every_deposit = {
+				limit = { is_deposit_type = d_ruined_sanctum_of_the_lost }
+				clear_blocker = yes
+			}
+		}
+	}
+}
+
+# Restart the "Sanctum of the Lost" situation
+country_event = {
+	id = shroud.6703
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { NOT = { has_special_project = SANCTUM_OF_THE_LOST } }
+
+	immediate = {
+		enable_special_project = {
+			name = SANCTUM_OF_THE_LOST
+			location = event_target:sanctum_of_the_lost_planet@this
+			owner = this
+		}
+		event_target:sanctum_of_the_lost_planet@this = {
+			add_blocker = {
+				type = d_ruined_sanctum_of_the_lost
+			}
+		}
+	}
+}
+
+# The 2nd Exiled planet was bombed to death, give consolation prize for not getting the relic by planet invasion
+planet_event = {
+	id = shroud.6704
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_shroud_dlc = yes
+		exists = owner
+		OR = {
+			has_planet_flag = exiled_planet_1
+			has_planet_flag = exiled_planet_2
+		}
+		event_target:matching_mindwarden_country@this = {
+			OR = {
+				AND = {
+					has_established_contact = event_target:exiled_country@this
+					has_technology = tech_psionic_suppression
+				}
+				has_country_flag = spoken_to_exiled
+			}
+		}
+		OR = {
+			AND = {
+				event_target:matching_mindwarden_country@this = {
+					has_point_of_interest = { poi = the_psionic_war_chain_poi_2 }
+					NOT = { has_point_of_interest = { poi = the_psionic_war_chain_poi_3 } }
+				}
+			}
+			AND = {
+				event_target:matching_mindwarden_country@this = {
+					has_point_of_interest = { poi = the_psionic_war_chain_poi_3 }
+					NOT = { has_point_of_interest = { poi = the_psionic_war_chain_poi_2 } }
+				}
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = current_planet
+		owner = {
+			save_event_target_as = exiled_country
+		}
+		event_target:matching_mindwarden_country@this = {
+			country_event = { id = shroud.6705 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6705
+	title = shroud.6705.name
+	desc = {
+		trigger = {
+			if = {
+				limit = { has_country_flag = spoken_to_exiled }
+				text = shroud.6705.desc.contact
+			}
+			else = {
+				text = shroud.6705.desc.no_contact
+			}
+		}
+	}
+	picture = GFX_evt_burning_settlement
+	show_sound = event_mindwardens_victory
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		country_event = {
+			id = shroud.6800
+			years = 2
+		}
+	}
+
+	option = {
+		name = shroud.6705.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+		add_monthly_resource_mult = {
+			resource = influence
+			value = @tier5influencereward
+			min = @tier5influencemin
+			max = @tier5influencemax
+		}
+		add_modifier = {
+			modifier = psionic_threat_eliminated
+		}
+	}
+}
+
+# Fired by on_planet_occupied
+# Same as shroud.6701 with from and fromfrom swapped
+planet_event = {
+	id = shroud.6706
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				exists = fromfrom
+				has_planet_flag = has_sanctum_of_the_lost@fromfrom
+			}
+			AND = {
+				exists = from
+				has_planet_flag = has_sanctum_of_the_lost@from
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { # Mindwardens regained the sanctum
+				exists = fromfrom
+				has_planet_flag = has_sanctum_of_the_lost@fromfrom
+			}
+			fromfrom = { country_event = { id = shroud.6703 } }
+		}
+		else_if = {
+			limit = { exists = from }
+			from = { country_event = { id = shroud.6702 } } # Mindwardens lost the sanctum
+		}
+	}
+}
+
+# Fired by on_colony_destroyed, on_rebels_take_planet
+planet_event = {
+	id = shroud.6707
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		has_planet_flag = has_sanctum_of_the_lost@owner
+		owner = {
+			is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			has_special_project = SANCTUM_OF_THE_LOST
+		}
+	}
+
+	immediate = {
+		owner = {
+			abort_special_project = { type = SANCTUM_OF_THE_LOST }
+		}
+		every_deposit = {
+			limit = { is_deposit_type = d_ruined_sanctum_of_the_lost }
+			clear_blocker = yes
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6710
+	title = shroud.6710.name
+	desc = shroud.6710.desc
+	picture = GFX_evt_sanctum_of_the_lost
+	show_sound = ap_rift_event_32_psionic_comms
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+		hidden_effect = {
+			country_event = { id = shroud.6720 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6720
+	title = shroud.6720.name
+	desc = shroud.6720.desc
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.6720.a
+		hidden_effect = {
+			country_event = { id = shroud.6723 }
+		}
+	}
+	option = {
+		name = shroud.6720.b
+		hidden_effect = {
+			country_event = { id = shroud.6725 }
+		}
+	}
+	option = {
+		name = shroud.6720.c
+		hidden_effect = {
+			country_event = { id = shroud.6735 }
+		}
+	}
+	option = {
+		name = shroud.6720.d
+		hidden_effect = {
+			country_event = { id = shroud.6750 }
+		}
+	}
+	option = {
+		trigger = {
+			has_country_flag = shroud_6720_wheel_flag
+		}
+		name = shroud.6720.e
+		hidden_effect = {
+			country_event = { id = shroud.6763 }
+		}
+	}
+	option = {
+		trigger = {
+			has_country_flag = shroud_6720_wheel_flag
+		}
+		name = shroud.6720.f
+		hidden_effect = {
+			country_event = { id = shroud.6770 }
+		}
+		default_hide_option = yes
+	}
+}
+
+country_event = {
+	id = shroud.6723
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6723.desc
+}
+
+country_event = {
+	id = shroud.6725
+	base = shroud.6720
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6725.desc
+
+	option = {
+		name = shroud.6725.a
+		hidden_effect = {
+			country_event = { id = shroud.6730 }
+		}
+	}
+	option = {
+		name = shroud.6725.b
+		hidden_effect = {
+			country_event = { id = shroud.6720 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6730
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6730.desc
+
+	immediate = {
+		set_country_flag = shroud_6720_wheel_flag
+	}
+}
+
+country_event = {
+	id = shroud.6735
+	base = shroud.6720
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6735.desc
+
+	option = {
+		name = shroud.6735.a
+		hidden_effect = {
+			country_event = { id = shroud.6740 }
+		}
+	}
+	option = {
+		name = shroud.6735.b
+		hidden_effect = {
+			country_event = { id = shroud.6745 }
+		}
+	}
+	option = {
+		name = shroud.6735.c
+		hidden_effect = {
+			country_event = { id = shroud.6720 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6740
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6740.desc
+}
+
+country_event = {
+	id = shroud.6745
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6745.desc
+}
+
+country_event = {
+	id = shroud.6750
+	base = shroud.6720
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6750.desc
+
+	option = {
+		name = shroud.6750.a
+		hidden_effect = {
+			country_event = { id = shroud.6755 }
+		}
+	}
+	option = {
+		name = shroud.6750.b
+		hidden_effect = {
+			country_event = { id = shroud.6720 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6755
+	base = shroud.6720
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6755.desc
+
+	option = {
+		name = shroud.6755.a
+		hidden_effect = {
+			country_event = { id = shroud.6760 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6760
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6760.desc
+}
+
+country_event = {
+	id = shroud.6763
+	base = shroud.6720
+	desc_clear = yes
+	option_clear = yes
+	desc = shroud.6763.desc
+
+	option = {
+		name = shroud.6763.a
+		hidden_effect = {
+			country_event = { id = shroud.6765 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6765
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6765.desc
+}
+
+country_event = {
+	id = shroud.6770
+	title = shroud.6770.name
+	desc = shroud.6770.desc
+	picture = GFX_evt_sanctum_of_the_lost
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		event_target:sanctum_of_the_lost_planet@root = {
+			save_event_target_as = sanctum_of_the_lost_planet
+		}
+		hidden_effect = {
+			country_event = {
+				id = shroud.6800
+				years = 2
+			}
+		}
+	}
+
+	option = {
+		name = shroud.6770.a
+		add_resource = { energy = 25000 }
+		add_modifier = { modifier = destroyers_of_the_lost_modifier }
+	}
+	option = {
+		name = shroud.6770.b
+		add_modifier = {
+			modifier = psionic_heresy
+			years = 10
+		}
+		add_relic = r_the_lost_patron
+	}
+}
+
+country_event = {
+	id = shroud.6780
+	base = shroud.6720
+	title = shroud.6780.name
+	desc_clear = yes
+	desc = shroud.6780.desc
+	option_clear = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		while = {
+			count = 3
+			random_system_within_border = {
+				limit = {
+					NOT = {
+						any_system_planet = {
+							is_shrouded_world = yes # undercoat: moved to scripted trigger
+						}
+					}
+				}
+				spawn_planet = {
+					class = pc_shrouded
+					location = prev
+					generate_random_name = yes
+					orbit_angle_offset = 68
+					orbit_distance_offset = 140
+					size = 30
+					init_effect = {
+						set_surveyed = {
+							surveyed = yes
+							surveyor = root
+						}
+						fire_on_action = { on_action = on_planet_spawned } # Undercoat
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud.6780.a
+		hidden_effect = {
+			country_event = { id = shroud.6785 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6785
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6785.desc
+	option_clear = yes
+
+	option = {
+		name = shroud.6785.a
+		hidden_effect = {
+			country_event = { id = shroud.6790 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6790
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6790.desc
+	option_clear = yes
+
+	option = {
+		name = shroud.6790.a
+		hidden_effect = {
+			country_event = { id = shroud.6795 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6795
+	base = shroud.6720
+	desc_clear = yes
+	desc = shroud.6795.desc
+	option_clear = yes
+
+	option = {
+		name = shroud.6795.a
+		custom_tooltip = shroud.6795.a.tt
+	}
+}
+
+#====================
+# 68XX Step 7 events
+#====================
+
+# 7.1
+country_event = {
+	id = shroud.6800
+	title = "shroud.6800.name"
+	desc = "shroud.6800.desc"
+	picture = GFX_evt_mindwardens
+	show_sound = event_ship_bridge
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.6800.a
+		custom_tooltip = "shroud.6800.a.tt"
+		enable_special_project = {
+			name = "MINDWARDENS_THE_FIRST_ENCLAVE"
+			location = capital_scope
+			owner = this
+		}
+		add_modifier = {
+			modifier = mindwarden_enclave_capacity
+			multiplier = 2
+		}
+		hidden_effect = {
+			set_country_flag = can_found_mindwarden_enclave
+			set_variable = {
+				which = mindwarden_enclave_capacity_count
+				value = 2
+			}
+		}
+	}
+}
+
+# 7.2
+fleet_event = {
+	id = shroud.6825
+	title = "shroud.6825.name"
+	desc = {
+		trigger = {
+			owner = {
+				NOT = { has_country_flag = first_mindwarden_enclave_founded }
+			}
+		}
+		text = shroud.6825.desc_first
+	}
+	desc = {
+		trigger = {
+			owner = {
+				has_country_flag = first_mindwarden_enclave_founded
+			}
+		}
+		text = shroud.6825.desc_default
+	}
+	picture = GFX_evt_mindwardens
+	show_sound = event_ship_bridge
+	is_triggered_only = yes
+
+	trigger = {
+		exists = controller
+		controller = {
+			is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		}
+		is_mindwarden_enclave_founding_allowed = yes
+	}
+
+	immediate = {
+		set_event_locked = yes
+	}
+
+	option = {
+		name = shroud.6825.a
+		custom_tooltip = "shroud.6825.a.tt"
+
+		allow = {
+			is_mindwarden_enclave_founding_allowed = yes
+			controller = {
+				if = {
+					limit = {
+						country_uses_bio_ships = yes
+					}
+					resource_stockpile_compare = { resource = food value >= 1500 }
+				}
+				else = {
+					resource_stockpile_compare = { resource = energy value >= 1500 }
+				}
+				resource_stockpile_compare = { resource = alloys value >= 2000 }
+				resource_stockpile_compare = { resource = influence value >= 100 }
+			}
+		}
+		controller = {
+			if = {
+				limit = {
+					country_uses_bio_ships = yes
+				}
+				add_resource = {
+					food = -1500
+				}
+			}
+			else = {
+				add_resource = {
+					energy = -1500
+				}
+			}
+			add_resource = {
+				alloys = -2000
+				influence = -100
+			}
+		}
+
+		hidden_effect = {
+			fleet_event = { id = shroud.6827 }
+		}
+	}
+
+	option = {
+		name = shroud.6825.b
+	}
+
+	abort_trigger = {
+		controller = {
+			is_mindwarden_empire = no # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_event_locked = no
+		}
+	}
+}
+
+fleet_event = {
+	id = shroud.6827
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		create_enclave_with_country = {
+			PREFIX = mindwarden
+			EFFECT = create_mercenary_mindwarden_enclave_country
+			TRUST = 100
+		}
+	}
+
+	after = {
+		event_target:mindwarden_enclave_creator = {
+			if = {
+				limit = {
+					NOT = { has_event_chain = mindwarden_enclave_chain }
+				}
+				begin_event_chain = {
+					event_chain = mindwarden_enclave_chain
+					target = this
+				}
+			}
+			add_event_chain_counter = {
+				event_chain = mindwarden_enclave_chain
+				counter = enclaves_built
+				amount = 1
+			}
+			set_country_flag = mindwarden_enclave_founded
+			country_event = { id = shroud.4201 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.6830
+	title = "shroud.6830.name"
+	desc = "shroud.6830.desc"
+	picture = GFX_evt_mindwardens
+	show_sound = event_mindwardens_victory
+	is_triggered_only = yes
+
+	trigger = {
+		is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+		has_country_flag = should_fire_shroud.6830
+	}
+
+	immediate = {
+		remove_country_flag = should_fire_shroud.6830
+	}
+
+	option = {
+		name = shroud.6830.a
+	}
+}
+
+# Enclave pays back the Patron
+country_event = {
+	id = shroud.6840
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				prev = {
+					has_country_flag = created_by@prev
+				}
+			}
+			save_event_target_as = mercenary_patron
+		}
+		save_event_target_as = mindwarden_enclave_country
+		if = {
+			limit = {
+				exists = event_target:mercenary_patron
+			}
+			event_target:mercenary_patron = {
+				if = {
+					limit = {
+						has_event_chain = mindwarden_enclave_chain
+					}
+					add_event_chain_counter = {
+						event_chain = mindwarden_enclave_chain
+						counter = dividends_received
+						amount = 1
+					}
+				}
+				random_list = {
+					32 = { country_event = { id = shroud.6841 } }
+					32 = { country_event = { id = shroud.6842 } }
+					32 = { country_event = { id = shroud.6843 } }
+					4 = { country_event = { id = shroud.6844 } }
+				}
+			}
+		}
+	}
+
+	after = {
+		start_situation = {
+			type = mindwardens_dividends
+			target = root
+		}
+		destroy_situation = from
+	}
+}
+
+# Tech Reward
+country_event = {
+	id = shroud.6841
+	title = shroud.6841.name
+	desc = enclave.2000.desc
+	picture = GFX_evt_mindwardens
+	show_sound = evn_ove_mercenary_enclave
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_2 }
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_4 }
+				has_country_flag = mindwardens_upgrade_2
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				has_country_flag = mindwardens_upgrade_4
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+}
+
+# Raw Resources Reward
+country_event = {
+	id = shroud.6842
+	title = shroud.6841.name
+	desc = enclave.2005.desc
+	picture = GFX_evt_mindwardens
+	show_sound = evn_ove_mercenary_enclave
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_2 }
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_4 }
+				has_country_flag = mindwardens_upgrade_2
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier4materialreward
+			min = @tier4materialmin
+			max = @tier4materialmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				has_country_flag = mindwardens_upgrade_4
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+	}
+}
+
+# Cash Reward
+country_event = {
+	id = shroud.6843
+	title = shroud.6841.name
+	desc = enclave.2010.desc
+	picture = GFX_evt_mindwardens
+	show_sound = evn_ove_mercenary_enclave
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_2 }
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_4 }
+				has_country_flag = mindwardens_upgrade_2
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				has_country_flag = mindwardens_upgrade_4
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier4materialreward
+			min = @tier4materialmin
+			max = @tier4materialmax
+		}
+	}
+}
+
+# Special Reward
+country_event = {
+	id = shroud.6844
+	title = shroud.6841.name
+	desc = enclave.2020.desc
+	picture = GFX_evt_mindwardens
+	show_sound = evn_ove_mercenary_enclave
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_2 }
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				NOT = { has_country_flag = mindwardens_upgrade_4 }
+				has_country_flag = mindwardens_upgrade_2
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			event_target:mindwarden_enclave_country = {
+				has_country_flag = mindwardens_upgrade_4
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+}
+
+# See shroud_events.txt
+
+#==================================
+# 8XXX Endbringers
+#==================================
+
+#====================
+# 80XX Step 0 events
+#====================
+
+# Start screen event spawns a shrouded world
+country_event = {
+	id = shroud.8000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		random_planet_within_border = {
+			limit = {
+				is_capital = no
+				is_moon = no
+				is_star = no
+				is_asteroid = no
+				is_artificial = no
+				solar_system = {
+					count_system_planet = {
+						limit = {
+							NOT = { is_same_value = prev }
+							is_capital = no
+							is_moon = no
+							is_star = no
+							is_asteroid = no
+							is_artificial = no
+							root.capital_scope = {
+								compare_distance = {
+									closer_object = prev
+									further_object = prevprevprev
+								}
+							}
+						}
+						count = 0
+					}
+				}
+			}
+			save_event_target_as = closest_shrouded_planet
+		}
+		if = {
+			limit = { exists = event_target:closest_shrouded_planet }
+			event_target:closest_shrouded_planet = {
+				save_global_event_target_as = shrouded_planet@root
+				change_pc = pc_shrouded
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+				add_deposit = d_zro_deposit_1
+				# Shrouded Worlds can't be terraforming candidates.
+				remove_modifier = terraforming_candidate
+				remove_modifier = frozen_terraforming_candidate
+				remove_modifier = toxic_terraforming_candidate
+			}
+		}
+
+		refresh_endbringers_paranoia_modifier = yes
+
+		country_event = {
+			id = shroud.8010
+			days = 30
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8010
+	title = shroud.8010.title
+	desc = shroud.8010.desc
+
+	picture = GFX_evt_surreal_visions
+	show_sound = event_inhabited_solar_system
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		event_target:shrouded_planet@root = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = shroud.8010.a
+		event_target:shrouded_planet@root = {
+			create_archaeological_site = the_shrouded_world_site
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8020
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		has_modifier = endbringers_paranoia
+		years_passed <= 50
+	}
+
+	immediate = {
+		refresh_endbringers_paranoia_modifier = yes
+	}
+}
+
+# Chamber of Silence removed
+planet_event = {
+	id = shroud.8030
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = { is_endbringer_empire = yes } # undercoat: moved to scripted trigger
+		last_building_changed = building_chamber_of_silence
+	}
+
+	immediate = {
+		# Building here is removed on next tick
+		owner = {
+			if = {
+				limit = { is_variable_set = num_chambers_of_silence }
+				subtract_variable = {
+					which = num_chambers_of_silence
+					value = 1
+				}
+			}
+			refresh_endbringers_paranoia_modifier = yes
+			refresh_endbringers_madness_modifier = yes
+		}
+	}
+}
+
+#====================
+# 81XX Step 1 events
+#====================
+
+#8100 Story Dig Site
+fleet_event = {
+	id = shroud.8100
+	title = shroud.8100.name
+	desc = shroud.8100.desc
+	picture = GFX_evt_endbringers
+	show_sound = event_wind_ruins
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		event_target:shrouded_planet@controller = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = shroud.8100.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+			add_modifier = {
+				modifier = the_end_is_nigh
+				years = 10
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {
+	id = shroud.8105
+	title = shroud.8105.name
+	desc = shroud.8105.desc
+	picture = GFX_evt_shrouded_planet
+	show_sound = event_dig_site
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		event_target:shrouded_planet@controller = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = KEEP_SEARCHING
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {
+	id = shroud.8110
+	title = shroud.8110.name
+	desc = shroud.8110.desc
+	picture = GFX_evt_shrouded_planet
+	show_sound = event_mystic_reveal
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		event_target:shrouded_planet@controller = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = shroud.8110.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				small_artifact_reward = yes
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {
+	id = shroud.8115
+	title = shroud.8115.name
+	desc = shroud.8115.desc
+	picture = GFX_evt_shrouded_planet
+	show_sound = event_encrypted_comms
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		event_target:shrouded_planet@controller = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = shroud.8115.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				medium_artifact_reward = yes
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+fleet_event = {
+	id = shroud.8120
+	title = shroud.8120.name
+	desc = shroud.8120.desc
+	picture = GFX_evt_shrouded_planet
+	show_sound = {
+		trigger = { controller = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { controller = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		event_target:shrouded_planet@controller = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = shroud.8120.a
+		controller = {
+			set_country_flag = has_completed_reckoning_dig_site
+			if = {
+				limit = { has_grand_archive_dlc = yes }
+				give_specimen = { key = fragment_of_reckoning origin = the_shrouded_world_site }
+			}
+			if = {
+				limit = {
+					NOT = { has_technology = tech_psionic_theory }
+					can_research_technology = tech_psionic_theory
+				}
+				if = {
+					limit = { NOT = { has_tech_option = tech_psionic_theory } }
+					add_research_option = tech_psionic_theory
+				}
+				add_tech_progress = {
+					tech = tech_psionic_theory
+					progress = 0.5
+				}
+			}
+			enable_special_project = {
+				name = "ENDBRINGERS_RESEARCH_PSIONIC_THEORY"
+				owner = this
+			}
+			if = {
+				limit = { has_ancrel = yes }
+				large_artifact_reward = yes
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+#====================
+# 82XX Step 2 events
+#====================
+
+country_event = {
+	id = shroud.8200
+	title = shroud.8200.title
+	desc = shroud.8200.desc
+
+	picture = GFX_evt_shroud_spacemadness
+	show_sound = event_endbringers_madness
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		enable_special_project = {
+			name = "ENDBRINGERS_ADOPT_PSIONICS_TRADITION"
+			location = this.capital_scope
+			owner = this
+		}
+	}
+
+	option = {
+		name = shroud.8200.a
+		custom_tooltip = shroud.8200.a.tt
+		add_modifier = {
+			modifier = endbringers_madness_1
+			multiplier = value:chamber_of_silence_reduce_percent
+			days = -1
+		}
+		if = {
+			limit = { NOT = { has_technology = tech_mine_zro } }
+			add_tech_progress = {
+				tech = tech_mine_zro
+				progress = 0.25
+			}
+		}
+	}
+}
+
+#====================
+# 83XX Step 3 events
+#====================
+
+planet_event = {
+	id = shroud.8300
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				has_building = building_chamber_of_silence
+			}
+			remove_building = building_chamber_of_silence
+		}
+	}
+}
+
+# Endbringers psionic ascension
+# Variant of shroud.2750
+country_event = {
+	id = shroud.8310
+	title = shroud.8310.name
+	desc = shroud.8310.desc
+	is_triggered_only = yes
+
+	picture = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			is_hive_empire = no
+		}
+		picture = GFX_evt_endbringers
+	}
+	show_sound = event_mind_over_matter
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		is_psionic = yes
+	}
+
+	immediate = {
+		mind_over_matter_immediate = yes
+
+		if = {
+			limit = {
+				has_special_project = ENDBRINGERS_ADOPT_PSIONICS_TRADITION
+			}
+			complete_special_project = {
+				type = "ENDBRINGERS_ADOPT_PSIONICS_TRADITION"
+				location = capital_scope
+			}
+		}
+	}
+
+	option = {
+		name = shroud.8310.a
+		tooltip = {
+			modify_species = {
+				species = this
+				add_trait = trait_latent_psionic
+			}
+		}
+		custom_tooltip = shroud.8310.a.tt
+		hidden_effect = {
+			every_owned_planet = {
+				random_list = {
+					33 = {
+						random_owned_pop_group = {
+							limit = {
+								pop_group_size >= 100
+							}
+							kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+								pop_group = this
+								amount = 100
+							}
+						}
+					}
+					33 = {
+						random_owned_pop_group = {
+							limit = {
+								pop_group_size >= 200
+							}
+							kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+								pop_group = this
+								amount = 200
+							}
+						}
+					}
+					33 = {
+						random_owned_pop_group = {
+							limit = {
+								pop_group_size >= 300
+							}
+							kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+								pop_group = this
+								amount = 300
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		set_country_flag = breach_shroud_endbringers_first_approach
+		start_situation = {
+			type = situation_breach_shroud_endbringers
+			target = root
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8320
+	title = shroud.8320.name
+	desc = shroud.8320.desc
+	picture = GFX_evt_alien_propaganda
+	show_sound = event_mind_over_matter
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		# Choose a scientist to apply the blinded trait if possible
+		random_owned_leader = {
+			limit = {
+				is_same_species = prev.species
+				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+			}
+			save_event_target_as = blinded_leader
+		}
+		# Choose anyone otherwise
+		if = {
+			limit = {
+				NOT = { exists = event_target:blinded_leader }
+			}
+			random_owned_leader = {
+				limit = {
+					is_same_species = prev.species
+				}
+				save_event_target_as = blinded_leader
+			}
+		}
+	}
+
+	option = {
+		name = shroud.8320.a
+
+		event_target:blinded_leader = {
+			add_trait = {
+				trait = leader_trait_blinded
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8330
+	title = shroud.8330.name
+	desc = shroud.8330.desc
+	picture = GFX_evt_alien_propaganda
+	show_sound = event_mind_over_matter
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		any_owned_leader = {
+			species = {
+				NOR = {
+					has_trait = trait_cybernetic
+					has_trait = trait_mechanical
+					has_trait = trait_machine_unit
+					is_species_class = MACHINE
+					is_species_class = ROBOT
+					is_species_class = AI
+				}
+			}
+		}
+	}
+
+	immediate = {
+		random_owned_leader = {
+			limit = {
+				is_ruler = no
+				is_heir = no
+				is_gestalt_node = no
+				is_exploring_astral_rift = no
+				species = {
+					NOR = {
+						has_trait = trait_cybernetic
+						has_trait = trait_mechanical
+						has_trait = trait_machine_unit
+						is_species_class = MACHINE
+						is_species_class = ROBOT
+						is_species_class = AI
+					}
+				}
+				NOT = { has_leader_flag = leader_death_events_blocked }
+			}
+			save_event_target_as = forsaken_leader
+		}
+	}
+
+	option = {
+		name = shroud.8330.a
+
+		event_target:forsaken_leader = {
+			kill_leader = { show_notification = yes }
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier5unityreward
+			min = @tier5unitymin
+			max = @tier5unitymax
+		}
+		add_monthly_resource_mult = {
+			resource = sr_zro
+			value = @tier5materialreward
+			min = @tier5materialmin
+			max = @tier5materialmax
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.8340
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		current_situation_approach = approach_situation_breach_shroud_endbringers_blind
+	}
+
+	immediate = {
+		owner = {
+			# Find a pop group without the blindness trait
+			random_owned_pop_group = {
+				limit = {
+					NOT = { has_trait = trait_blindness }
+				}
+				# Save the pop group as an event target
+				save_event_target_as = old_pop_group
+				# Save their species as an event target
+				species = {
+					save_event_target_as = old_species
+				}
+				# If a modified species hasn't been created, create one
+				# and save them as an event target
+				if = {
+					limit = {
+						NOT = {
+							any_galaxy_species = {
+								has_species_flag = blinded_species_of_species@event_target:old_species
+								has_species_flag = blinded_species_of_empire@root.owner
+							}
+						}
+					}
+					create_species = {
+						is_mod = yes
+						name = this
+						plural = this
+						class = this
+						portrait = this
+						traits = this
+						can_be_modified = this
+						homeworld = this
+						namelist = this
+						gender = this
+						effect = {
+							modify_species = {
+								species = this
+								add_trait = trait_blindness
+								change_scoped_species = no
+
+								effect = {
+									set_species_flag = blinded_species_of_species@event_target:old_species
+									set_species_flag = blinded_species_of_empire@root.owner
+									save_event_target_as = target_species
+								}
+							}
+						}
+					}
+				}
+				# If a modified species does exist, save them as the event target
+				else = {
+					random_galaxy_species = {
+						limit = {
+							has_species_flag = blinded_species_of_species@event_target:old_species
+							has_species_flag = blinded_species_of_empire@root.owner
+						}
+						save_event_target_as = target_species
+					}
+				}
+				# Scope back to the planet
+				# Create the empty pop group
+				# and move pops into it
+				planet = {
+					create_pop_group = {
+						pop_group = event_target:old_pop_group
+						species = event_target:target_species
+						size = 0
+						effect = {
+							transfer_pop_amount = {
+								source = event_target:old_pop_group
+								target = this
+								amount = @nb_blinded_pop
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.8345
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		current_situation_approach = approach_situation_breach_shroud_endbringers_forsake_flesh
+	}
+
+	immediate = {
+		owner = {
+			random_owned_pop_group = {
+				limit = {
+					pop_group_size >= @nb_forsaken_pop
+				}
+				kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+					pop_group = this
+					amount = @nb_forsaken_pop
+				}
+			}
+		}
+	}
+}
+
+# Mid-Stage Events
+situation_event = {
+	id = shroud.8350
+	title = shroud.8350.name
+	desc = shroud.8350.desc
+	picture = GFX_evt_emergency_workers
+	show_sound = event_endbringers_madness
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		NOT = { has_situation_flag = breach_shroud_mid_stage_event_1_triggered }
+		has_situation_flag = breach_shroud_stage_1_started
+		situation_progress >= @[ ( breach_shroud_stage_1_end - breach_shroud_start_value ) * 0.33 + breach_shroud_start_value ]
+	}
+
+	immediate = {
+		set_situation_flag = breach_shroud_mid_stage_event_1_triggered
+	}
+
+	option = {
+		name = shroud.8350.a
+		add_situation_progress = -50
+	}
+
+	option = {
+		name = shroud.8350.b
+		add_situation_progress = 100
+		owner = {
+			add_modifier = {
+				modifier = endbringers_voice_plague
+				years = 5
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.8360
+	title = shroud.8360.name
+	desc = shroud.8360.desc
+	picture = GFX_evt_scientific_experiments
+	show_sound = event_laboratory_sound
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		NOT = { has_situation_flag = breach_shroud_mid_stage_event_2_triggered }
+		has_situation_flag = breach_shroud_stage_1_started
+		situation_progress >= @[ ( breach_shroud_stage_1_end - breach_shroud_start_value ) * 0.66 + breach_shroud_start_value ]
+	}
+
+	immediate = {
+		set_situation_flag = breach_shroud_mid_stage_event_2_triggered
+	}
+
+	option = {
+		name = shroud.8360.a
+		add_situation_progress = 50
+		owner = {
+			add_modifier = {
+				modifier = psionic_experimentation_modifier
+				years = 10
+			}
+		}
+	}
+
+	option = {
+		name = shroud.8360.b
+		owner = {
+			add_modifier = {
+				modifier = self_experimentation_controls_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.8370
+	title = shroud.8370.name
+	desc = shroud.8370.desc
+	picture = GFX_evt_zro_3
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		NOT = { has_situation_flag = breach_shroud_mid_stage_event_3_triggered }
+		has_situation_flag = breach_shroud_stage_2_started
+		situation_progress >= @[ ( breach_shroud_stage_2_end - breach_shroud_stage_1_end ) * 0.5 + breach_shroud_stage_1_end ]
+	}
+
+	immediate = {
+		set_situation_flag = breach_shroud_mid_stage_event_3_triggered
+	}
+
+	option = {
+		name = shroud.8370.a
+		owner = {
+			add_modifier = {
+				modifier = endbringers_apocalyptic_nightmares
+				years = 5
+			}
+		}
+	}
+
+	option = {
+		name = shroud.8370.b
+		add_situation_progress = -100
+		owner = {
+			add_modifier = {
+				modifier = endbringers_nightmare_shelter
+				years = 5
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.8380
+	title = shroud.8380.name
+	desc = shroud.8380.desc
+	picture = GFX_evt_shroud_spacemadness
+	show_sound = event_endbringers_madness
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		NOT = { has_situation_flag = breach_shroud_mid_stage_event_4_triggered }
+		has_situation_flag = breach_shroud_stage_3_started
+		situation_progress >= @[ ( breach_shroud_end_value - breach_shroud_stage_2_end ) * 0.5 + breach_shroud_stage_2_end ]
+	}
+
+	immediate = {
+		set_situation_flag = breach_shroud_mid_stage_event_4_triggered
+	}
+
+	option = {
+		name = shroud.8380.a
+		custom_tooltip = shroud.8380.a.tt
+
+		# Add Marked Trait to half the population
+		hidden_effect = {
+			owner = {
+				every_owned_pop_group = {
+					limit = {
+						NOT = { has_trait = trait_marked }
+						pop_group_size > 1
+					}
+					# Save the pop group as an event target
+					save_event_target_as = old_pop_group
+					# Save their species as an event target
+					species = {
+						save_event_target_as = old_species
+					}
+					# If a modified species hasn't been created, create one
+					# and save them as an event target
+					if = {
+						limit = {
+							NOT = {
+								any_galaxy_species = {
+									has_species_flag = marked_species_of_species@event_target:old_species
+									has_species_flag = marked_species_of_empire@root.owner
+								}
+							}
+						}
+						create_species = {
+							is_mod = yes
+							name = this
+							plural = this
+							class = this
+							portrait = this
+							traits = this
+							can_be_modified = this
+							homeworld = this
+							namelist = this
+							gender = this
+							effect = {
+								modify_species = {
+									species = this
+									add_trait = trait_marked
+									change_scoped_species = no
+
+									effect = {
+										set_species_flag = marked_species_of_species@event_target:old_species
+										set_species_flag = marked_species_of_empire@root.owner
+										save_event_target_as = target_species
+									}
+								}
+							}
+						}
+					}
+					# If a modified species does exist, save them as the event target
+					else = {
+						random_galaxy_species = {
+							limit = {
+								has_species_flag = marked_species_of_species@event_target:old_species
+								has_species_flag = marked_species_of_empire@root.owner
+							}
+							save_event_target_as = target_species
+						}
+					}
+					# Scope back to the planet
+					# Create the empty pop group
+					# and move pops into it
+					planet = {
+						create_pop_group = {
+							pop_group = event_target:old_pop_group
+							species = event_target:target_species
+							size = 0
+							effect = {
+								transfer_pop_amount = {
+									source = event_target:old_pop_group
+									target = this
+									percentage = 0.5
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud.8380.b
+
+		allow = {
+			custom_tooltip = {
+				fail_text = approach_blind_selected_tt
+				owner = {
+					NOT = { has_country_flag = breach_shroud_endbringers_select_blind }
+				}
+			}
+			custom_tooltip = {
+				fail_text = approach_forsake_selected_tt
+				owner = {
+					NOT = { has_country_flag = breach_shroud_endbringers_select_forsake }
+				}
+			}
+		}
+
+		owner = {
+			add_modifier = {
+				modifier = endbringers_sanity
+			}
+		}
+	}
+}
+
+#====================
+# 84XX Step 4 events
+#====================
+
+# Fired by on_shroud_delve - Update delve count
+country_event = {
+	id = shroud.8400
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		if = {
+			limit = { is_variable_set = endbringers_delve_count_variable }
+			check_variable = {
+				which = endbringers_delve_count_variable
+				value <= 3
+			}
+		}
+	}
+
+	immediate = {
+		change_variable = {
+			which = endbringers_delve_count_variable
+			value = 1
+		}
+	}
+}
+
+# Endbringers - Delve Events
+# Fired by on_shroud_delve
+country_event = {
+	id = shroud.8410
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		check_variable = {
+			which = endbringers_delve_count_variable
+			value <= 3
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				check_variable = {
+					which = endbringers_delve_count_variable
+					value = 1
+				}
+			}
+			country_event = { id = shroud.8420 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = endbringers_delve_count_variable
+					value = 2
+				}
+			}
+			country_event = { id = shroud.8430 }
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = endbringers_delve_count_variable
+					value = 3
+				}
+			}
+			country_event = { id = shroud.8440 }
+		}
+	}
+}
+
+# The Trial of Silence
+country_event = {
+	id = shroud.8420
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8420.title
+	desc = shroud.8420.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.8420.a
+		hidden_effect = {
+			country_event = { id = shroud.8421 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8421
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8420.title
+	desc = shroud.8420.a.reply
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	option = {
+		name = LEAVE
+		custom_tooltip = shroud.8420.a.tooltip
+
+		hidden_effect = {
+			if = {
+				limit = { has_modifier = endbringers_madness_1 }
+				remove_modifier = endbringers_madness_1
+			}
+			add_modifier = {
+				modifier = endbringers_madness_2
+				multiplier = value:chamber_of_silence_reduce_percent
+				days = -1
+			}
+		}
+	}
+}
+
+# The Trial of Purity
+country_event = {
+	id = shroud.8430
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8430.title
+	desc = shroud.8430.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.8430.a
+		hidden_effect = {
+			country_event = { id = shroud.8431 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8431
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8430.title
+	desc = shroud.8430.a.reply
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	option = {
+		name = LEAVE
+		custom_tooltip = shroud.8430.a.tooltip
+
+		hidden_effect = {
+			if = {
+				limit = { has_modifier = endbringers_madness_2 }
+				remove_modifier = endbringers_madness_2
+			}
+			add_modifier = {
+				modifier = endbringers_madness_3
+				multiplier = value:chamber_of_silence_reduce_percent
+				days = -1
+			}
+		}
+	}
+}
+
+# The Trial of Flames
+country_event = {
+	id = shroud.8440
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8440.title
+	desc = shroud.8440.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.8440.a
+		hidden_effect = {
+			country_event = { id = shroud.8441 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8441
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8440.title
+	desc = shroud.8440.a.reply
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	option = {
+		name = LEAVE
+		if = {
+			limit = { has_modifier = endbringers_madness_3 }
+			remove_modifier = endbringers_madness_3
+		}
+
+		hidden_effect = {
+			country_event = {
+				id = shroud.8450
+				days = 15
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8450
+	diplomatic_title = shroud.3.diplo_title
+	title = shroud.8450.title
+	desc = shroud.8450.desc
+
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		set_patron_first_contact_state = { patron = end_of_the_cycle state = in_progress }
+	}
+
+	option = { # Form a covenant with the End of the Cycle
+		name = {
+			trigger = {
+				if = {
+					limit = { is_homicidal = yes }
+					text = shroud.8450.a.homicidal
+				}
+				else = {
+					text = shroud.8450.a
+				}
+			}
+		}
+		custom_tooltip = shroud.8450.a.tech_tooltip
+		accept_end_of_the_cycle = yes
+		if = {
+			limit = { has_modifier = endbringers_paranoia }
+			remove_modifier = endbringers_paranoia
+		}
+		add_modifier = {
+			modifier = embracing_the_end
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8460
+	title = shroud.8460.title
+	desc = shroud.8460.desc
+	picture = GFX_evt_shroud_end_of_the_cycle
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.8460.a
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier3materialreward
+			min = @tier3materialmin
+			max = @tier3materialmax
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8470
+	title = shroud.8470.title
+	desc = shroud.8470.desc
+	picture = GFX_evt_shroud_end_of_the_cycle
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.8470.a
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier4materialreward
+			min = @tier4materialmin
+			max = @tier4materialmax
+		}
+	}
+}
+
+# Crisis Repealed - Malevolent Aura (Galactic Community)
+country_event = {
+	id = shroud.8480
+	title = shroud.8480.title
+	desc = shroud.8480.desc
+	picture = GFX_evt_diplomatic_visit
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = crisis.4110.a
+	}
+}
+
+# Crisis Repealed - Malevolent Aura (Former Crisis)
+country_event = {
+	id = shroud.8481
+	title = shroud.8480.title
+	desc = {
+		trigger = { is_homicidal = no }
+		text = shroud.8481.desc
+	}
+	desc = {
+		trigger = { is_homicidal = yes }
+		text = shroud.8481.homicidal
+	}
+	picture = GFX_evt_diplomatic_visit
+	show_sound = event_announcement
+
+	is_triggered_only = yes
+
+	option = {
+		name = crisis.4111.a
+		trigger = { is_homicidal = no }
+	}
+	option = {
+		name = crisis.4111.b
+		 trigger = { is_homicidal = yes }
+	}
+}
+
+#====================
+# 85XX Step 5 events
+#====================
+
+country_event = {
+	id = shroud.8500
+	title = shroud.8500.title
+	desc = {
+		trigger = {
+			if = {
+				limit = { is_homicidal = yes }
+				text = shroud.8500.desc.homicidal
+			}
+			else = {
+				text = shroud.8500.desc.default
+			}
+		}
+	}
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud.8500.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+#====================
+# 86XX Step 6 events
+#====================
+
+country_event = {
+	id = shroud.8600
+	title = shroud.8600.title
+	desc = {
+		trigger = {
+			if = {
+				limit = { is_homicidal = yes }
+				text = shroud.8600.desc.homicidal
+			}
+			else = {
+				text = shroud.8600.desc.default
+			}
+		}
+	}
+	picture = GFX_evt_shroud_psionic_aura
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_country_flag = eotc_wincon_triggered }
+	}
+
+	immediate = {
+		set_country_flag = eotc_wincon_triggered
+		add_victory_score = {
+			source = destroyed_galaxy_score
+			score = 500000
+		}
+		hidden_effect = {
+			country_event = { id = timeline.34 } # Milestone Destroyed Galaxy
+		}
+		country_event = { id = shroud.4972 days = 1 } # win delay
+	}
+
+	option = {
+		name = shroud.8600.a
+		custom_tooltip = shroud.4970.a.tooltip
+		tooltip = { win = yes }
+	}
+}
+
+country_event = {
+	id = shroud.8610
+	title = shroud.8610.title
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = exile_world }
+		}
+		text = shroud.8610.desc.a
+	}
+	desc = {
+		trigger = {
+			has_country_flag = exile_world
+		}
+		text = shroud.8610.desc.b
+	}
+	picture = GFX_evt_shroud_end_of_the_cycle
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		reckoning_spawn = yes
+	}
+
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						NOT = { has_country_flag = exile_world }
+					}
+					text = shroud.8610.a
+				}
+				else = {
+					text = shroud.8610.b
+				}
+			}
+		}
+		enable_special_project = {
+			name = "RECKONING_ARRIVAL_PROJECT"
+			location = capital_scope
+			owner = ROOT
+		}
+	}
+}
+
+#====================
+# 87XX Step 7 events
+#====================
+
+# The Reckoning is destroyed
+country_event = {
+	id = shroud.8700
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		any_playable_country = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+			exists = event_target:the_end_of_the_cycle@this
+			root.fromfromfrom = {
+				is_same_value = event_target:the_end_of_the_cycle@prev
+			}
+		}
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				is_endbringer_empire = yes # undercoat: moved to scripted trigger
+				root.fromfromfrom = {
+					is_same_value = event_target:the_end_of_the_cycle@prev
+				}
+			}
+			country_event = { id = shroud.8710 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud.8710
+	title = shroud.8710.title
+	desc = shroud.8710.desc
+	picture = GFX_evt_shroud_end_of_the_cycle
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		event_target:shrouded_planet@root = {
+			save_event_target_as = shrouded_planet
+		}
+	}
+
+	option = {
+		name = shroud.8710.a
+		add_relic = r_core_of_the_reckoning
+	}
+}
+
+#====================
+# 88XX Misc events
+#====================
+
+# This event is fired when a player takes over an AI-controlled endbringer empire
+# This ensures the modifiers are active
+country_event = {
+	id = shroud.8800
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		is_ai = no
+		is_endbringer_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		refresh_endbringers_paranoia_modifier = yes
+		refresh_endbringers_madness_modifier = yes
+	}
+}

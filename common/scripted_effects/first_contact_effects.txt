@@ -63,13 +63,17 @@ set_first_contact_starting_stage = {
 			}
 			set_first_contact_stage = default_stage_1
 		}
-		
+
 		else = {
 			contact_country = {
 				switch = {
 					trigger = is_country_type
 					# Enclaves
 					enclave = {
+						setup_first_contact_path = { TYPE = enclave }
+						country_event = { id = leviathans.97 days = 720 random = 360 } #they'll establish contact if you aren't quick enough
+					}
+					mindwarden_enclave = {
 						setup_first_contact_path = { TYPE = enclave }
 						country_event = { id = leviathans.97 days = 720 random = 360 } #they'll establish contact if you aren't quick enough
 					}
@@ -93,6 +97,20 @@ set_first_contact_starting_stage = {
 					voidworms_crisis = { setup_first_contact_path = { TYPE = voidworms } }
 					voidworms_treasure_hunters = { setup_first_contact_path = { TYPE = voidworms } }
 					cutholoids = { setup_first_contact_path = { TYPE = cutholoids } }
+					exiled = {
+						if = {
+							limit = {
+								root.owner = {
+									is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+									is_same_value = event_target:mindwarden_country@prev
+								}
+							}
+							setup_first_contact_path = { TYPE = exiled }
+						}
+						else = {
+							root = { set_first_contact_stage = default_stage_1 }
+						}
+					}
 					# NPC factions
 					dormant_marauders = { setup_first_contact_path = { TYPE = marauders } }
 					pirate = { setup_first_contact_path = { TYPE = pirates } }
@@ -693,6 +711,7 @@ finish_first_contact_effect = {
 							mercenary_enclave_country = { country_event = { id = enclave.204 scopes = { from = root.owner } } }
 							salvager_enclave_country = { country_event = { id = enclave.304 scopes = { from = root.owner } } }
 							shroudwalker_enclave_country = { country_event = { id = enclave.404 scopes = { from = root.owner } } }
+							mindwarden_enclave_country = { country_event = { id = shroud.4199 scopes = { from = root.owner } } }
 							default = { log_error = "Unexpected enclave type or missing script flag" }
 						}
 					}
@@ -1492,7 +1511,7 @@ late_fc_random_events = {
 					OR = {
 						is_gestalt = yes
 						is_xenophile = yes
-						has_ethic = ethic_fanatic_pacifist
+						is_fanatic_pacifist = yes
 					}
 				}
 			}

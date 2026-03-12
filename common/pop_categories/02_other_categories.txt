@@ -77,20 +77,10 @@ civilian = {
 
 		produces = {
 			trigger = {
-				OR = {
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_spiritualist
-				}
+				is_spiritualist = yes
 				owner = { is_megachurch_empire = yes } # undercoat: moved to scripted trigger
 			}
 			trade = @trade_value_prosperity_gospel
-		}
-
-		produces = {
-			trigger = {
-				has_trait = trait_inner_darkness
-			}
-			sr_dark_matter = @inner_darkness_dark_matter_production
 		}
 
 		produces = {
@@ -125,6 +115,9 @@ civilian = {
 
 purge = {
 	rank = 0
+	can_change_category = {
+		is_being_purged = no
+	}
 
 	weight = {
 		weight = 20
@@ -157,6 +150,7 @@ purge = {
 
 robot_servant = {
 	rank = 0
+	can_change_category = no
 	display_category = worker
 
 	change_job_threshold = 1.15
@@ -180,21 +174,12 @@ robot_servant = {
 		energy = 100
 	}
 
-	# Triggered Modifiers
-	# Undercoat
-	inline_script = pop_categories/standard_pop_modifiers
-
-	resources = {
-		category = pop_category_robot
-
-		upkeep = {
-			energy = @living_standard_energy_normal
-		}
-	}
+	inline_script = "pop_categories/social_classes_triggered_modifiers_no_happiness"
 }
 
 slave = {
-	rank = 0
+	rank = 2
+	can_change_category = no
 	display_category = worker
 	change_job_threshold = 1.15
 
@@ -241,6 +226,116 @@ slave = {
 	inline_script = "pop_categories/social_classes_triggered_modifiers"
 	# Undercoat
 	inline_script = pop_categories/standard_pop_modifiers
+
+	resources = {
+		category = pop_category_slave
+		produces = {
+			trigger = {
+				owner = {
+					has_councilor = { COUNCILOR = "councilor_indentured_assets" }
+				}
+			}
+			trade = @councilor_indentured_assets_trade_value
+			mult = value:councilor_level|TYPE|councilor_indentured_assets|
+		}
+
+		produces = {
+			trigger = {
+				planet = {
+					has_modifier = pm_gaseous_fauna
+				}
+			}
+			exotic_gases = @gaseous_fauna_exotic_gases_production
+		}
+	}
+}
+
+slave_unemployment = {
+	rank = 2
+	change_job_threshold = 0.1
+
+	custom_demotion_loc = "" # empty to use default loc that doesn't show demotion
+	custom_demotion_icon = "" # empty to show no icon
+	custom_promotion_loc = "" # empty to use default loc that doesn't show demotion
+	custom_promotion_icon = "" # empty to show no icon
+
+	display_category = worker
+
+	weight = {
+		weight = 0
+	}
+
+	# scope: pop to be resettled
+	allow_resettlement = {
+		always = yes
+	}
+
+	resettlement_cost = {
+		energy = 50
+	}
+
+	# Triggered Modifiers
+	inline_script = "pop_categories/social_classes_triggered_modifiers"
+	inline_script = "pop_categories/social_classes_triggered_modifiers_no_happiness"
+
+	pop_group_modifier = {
+		pop_political_power = -0.75
+		pop_housing_usage_base = 0.75
+		pop_amenities_usage_base = 0.75
+	}
+
+	resources = {
+		category = pop_category_slave
+		produces = {
+			trigger = {
+				owner = {
+					has_councilor = { COUNCILOR = "councilor_indentured_assets" }
+				}
+			}
+			trade = @councilor_indentured_assets_trade_value
+			mult = value:councilor_level|TYPE|councilor_indentured_assets|
+		}
+
+		produces = {
+			trigger = {
+				planet = {
+					has_modifier = pm_gaseous_fauna
+				}
+			}
+			exotic_gases = @gaseous_fauna_exotic_gases_production
+		}
+	}
+}
+
+slave_unemployment2 = {
+	rank = 5
+	change_job_threshold = 0.1
+
+	custom_demotion_loc = "" # empty to use default loc that doesn't show demotion
+	custom_demotion_icon = "" # empty to show no icon
+	custom_promotion_loc = "" # empty to use default loc that doesn't show demotion
+	custom_promotion_icon = "" # empty to show no icon
+
+	display_category = worker
+
+	# scope: pop to be resettled
+	allow_resettlement = {
+		always = yes
+	}
+
+	resettlement_cost = {
+		energy = 50
+	}
+
+	# Triggered Modifiers
+	inline_script = "pop_categories/social_classes_triggered_modifiers"
+	inline_script = "pop_categories/social_classes_triggered_modifiers_no_happiness"
+
+	pop_group_modifier = {
+		pop_political_power = -0.75
+		pop_housing_usage_base = 0.75
+		pop_amenities_usage_base = 0.75
+	}
 
 	resources = {
 		category = pop_category_slave
@@ -414,6 +509,10 @@ criminal = {
 	resources = {
 		category = pop_category_workers
 		upkeep = {
+			trigger = {
+				exists = owner
+				owner = { is_twisted_experimenters_empire = yes }
+			}
 			trade = 5
 		}
 	}
@@ -421,6 +520,7 @@ criminal = {
 
 assimilation = {
 	rank = 0
+	can_change_category = no
 
 	weight = {
 		weight = 15
@@ -561,153 +661,12 @@ precursor = {
 			}
 			consumer_goods = 1.0
 		}
-
-		# Food Upkeep
-		upkeep = {
-			trigger = {
-				has_food_upkeep = yes
-				is_phototrophic = no
-				exists = owner
-				owner = {
-					is_spiritualist = no
-				}
-			}
-			food = 2.0
-		}
-		upkeep = {
-			trigger = {
-				has_food_upkeep = yes
-				is_phototrophic = no
-				exists = owner
-				owner = {
-					is_spiritualist = yes
-				}
-			}
-			food = 1.0
-		}
-		upkeep = {
-			trigger = {
-				has_food_upkeep = yes
-				is_phototrophic = yes
-				exists = owner
-				owner = {
-					is_spiritualist = no
-				}
-			}
-			food = 1.0
-		}
-		upkeep = {
-			trigger = {
-				has_food_upkeep = yes
-				is_phototrophic = yes
-				exists = owner
-				owner = {
-					is_spiritualist = yes
-				}
-			}
-			food = 0.5
-		}
-
-		# Mineral Upkeep
-		upkeep = {
-			trigger = {
-				has_mineral_upkeep = yes
-				is_phototrophic = no
-				exists = owner
-				owner = {
-					is_spiritualist = no
-				}
-			}
-			minerals = 2.0
-		}
-		upkeep = {
-			trigger = {
-				has_mineral_upkeep = yes
-				is_phototrophic = no
-				exists = owner
-				owner = {
-					is_spiritualist = yes
-				}
-			}
-			minerals = 1.0
-		}
-		upkeep = {
-			trigger = {
-				has_mineral_upkeep = yes
-				is_phototrophic = yes
-				exists = owner
-				owner = {
-					is_spiritualist = no
-				}
-			}
-			minerals = 1.0
-		}
-		upkeep = {
-			trigger = {
-				has_mineral_upkeep = yes
-				is_phototrophic = yes
-				exists = owner
-				owner = {
-					is_spiritualist = yes
-				}
-			}
-			minerals = 0.5
-		}
-
-		# Energy Upkeep
-		upkeep = {
-			trigger = {
-				has_phototrophic_energy_upkeep = yes
-				exists = owner
-				owner = {
-					is_spiritualist = no
-				}
-			}
-			energy = 1.0
-		}
-				upkeep = {
-			trigger = {
-				has_phototrophic_energy_upkeep = yes
-				exists = owner
-				owner = {
-					is_spiritualist = yes
-				}
-			}
-			energy = 0.5
-		}
-		upkeep = {
-			trigger = {
-				is_robotic_species = yes
-			}
-			energy = @living_standard_energy_normal
-		}
-		upkeep = {
-			trigger = {
-				is_organic_species = yes
-				has_energy_upkeep = yes
-				exists = owner
-				owner = {
-					is_spiritualist = yes
-				}
-			}
-			energy = 1.0
-		}
-		upkeep = {
-			trigger = {
-				is_organic_species = yes
-				has_energy_upkeep = yes
-				exists = owner
-				owner = {
-					is_spiritualist = no
-				}
-			}
-			energy = 2.0
-		}
 	}
 }
 
 xeno_ward = {
 	rank = 0
+	can_change_category = no
 	change_job_threshold = 2
 
 	pop_group_modifier = {
@@ -757,6 +716,7 @@ xeno_ward = {
 
 pre_sapients = {
 	rank = 0
+	can_change_category = no
 	change_job_threshold = 1.25
 
 	weight = {
@@ -808,6 +768,7 @@ pre_sapients = {
 
 chip_slave = {
 	rank = 0
+	can_change_category = no
 	change_job_threshold = 1.25
 
 	custom_demotion_loc = "" # empty to use default loc that doesn't show demotion
@@ -815,6 +776,11 @@ chip_slave = {
 
 	weight = {
 		weight = 1000
+
+		modifier = {
+			factor = 0.001
+			planet = { is_cosmogenesis_world = no  } # undercoat: moved to scripted trigger
+		}
 	}
 
 	# Triggered Modifiers
@@ -843,6 +809,7 @@ chip_slave = {
 
 wilderness_heart_strata = {
 	rank = 0
+	can_change_category = no
 	change_job_threshold = 1.15
 
 	pop_group_modifier = {

@@ -1,0 +1,182 @@
+# site_type_name = {				# Key of the site, used for name and desc lookup etc.
+#	max_instances = <int>			# Max instances of this type a galaxy can have, only checked when using `create_archaeological_site = random`
+#	weight = <scriptable value>		# Weight used for random weight, only used when using `create_archaeological_site = random`. scriptable value type is defined either by '<int>' or `<mean time to happen>`.
+#	stages = <int>					# Should match number of defined stages below.
+#	potential = <trigger>			# Trigger checking if a scope with this=fleet ,prev=archaeological site is potential to excavate (this will add/remove this option without giving the player a reason).
+#	allow = <trigger>				# Trigger checking if a scope with this=fleet ,prev=archaeological site is allowed to excavate (this will toggle enable/disabled mode on buttons etc).
+#	stage = {						# Stage definition, order dependent.
+#		difficulty = <intervall int> 	# min max intervall type. intervall is defined either by '<int>' or '{ min = <int> max=<int> }' where the later will randomize a value between min and max.
+#		icon = <string>			# rune icon gfx type.
+#		event = <string>			# event to fire when finished the state.
+#	}
+#	stage = {...}					# Second stage
+#	on_roll_failed = <effect>			# effect to fire when a roll fails, with scope this=fleet ,from=archaeological site
+#}
+
+# Slingshot to the Stars Origin
+slingshot_digsite = {
+	desc = slingshot_digsite_desc
+	picture = GFX_evt_slingshot_stars
+	stages = 6
+	weight = 0
+	max_instances = 999
+
+	allow = {
+		is_ship_class = shipclass_science_ship
+		exists = leader
+	}
+
+	potential = {
+		hidden_trigger = {
+			owner = {
+				has_country_flag = slingshot_origin_arcsite_owner
+			}
+		}
+	}
+
+	visible = {
+		owner = {
+			has_country_flag = slingshot_origin_arcsite_owner
+		}
+		default_site_visible_trigger = yes
+	}
+
+	stage = {
+		difficulty = 1
+		icon = GFX_archaeology_runes_A2
+		event = origin.3515
+	}
+
+	stage = {
+		difficulty = 2
+		icon = GFX_archaeology_runes_A2
+		event = origin.3520
+	}
+
+	stage = {
+		difficulty = 2
+		icon = GFX_archaeology_runes_A3
+		event = origin.3525
+	}
+
+	stage = {
+		difficulty = 2
+		icon = GFX_archaeology_runes_A3
+		event = origin.3530
+	}
+
+	stage = {
+		difficulty = 3
+		icon = GFX_archaeology_runes_A3
+		event = origin.3535
+	}
+
+	stage = {
+		difficulty = 3
+		icon = GFX_archaeology_runes_A3
+		event = origin.3540
+	}
+
+	on_roll_failed = {
+		from = {
+			standard_archaeological_site_on_roll_failed = { RANDOM_EVENTS = all_random_events }
+		}
+	}
+}
+
+# Unique System Arc Sites
+larion_digsite = {
+	desc = larion_digsite_desc
+	picture = GFX_evt_landing_ship
+	stages = 3
+	weight = 0
+
+	allow = {
+		is_ship_class = shipclass_science_ship
+		exists = leader
+	}
+
+	potential = {}
+
+	visible = {
+		default_site_visible_trigger = yes
+	}
+
+	stage = {
+		difficulty = 2
+		icon = GFX_archaeology_runes_A2
+		event = unique.1
+	}
+
+	stage = {
+		difficulty = 3
+		icon = GFX_archaeology_runes_B2
+		event = unique.5
+	}
+
+	stage = {
+		difficulty = 4
+		icon = GFX_archaeology_runes_C2
+		event = unique.10
+	}
+
+	on_roll_failed = {
+		from = {
+			standard_archaeological_site_on_roll_failed = { RANDOM_EVENTS = all_random_events }
+		}
+	}
+}
+
+zevox_digsite = {
+	desc = zevox_digsite_desc
+	picture = GFX_evt_landing_ship_2
+	stages = 4
+	weight = 0
+
+	allow = {
+		is_ship_class = shipclass_science_ship
+		exists = leader
+	}
+
+	potential = {
+		NOT = {
+			any_country = {
+				is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+
+	visible = {
+		default_site_visible_trigger = yes
+	}
+
+	stage = {
+		difficulty = 4
+		icon = GFX_archaeology_runes_D3
+		event = unique.50
+	}
+
+	stage = {
+		difficulty = 3
+		icon = GFX_archaeology_runes_D2
+		event = unique.55
+	}
+
+	stage = {
+		difficulty = 2
+		icon = GFX_archaeology_runes_D5
+		event = unique.60
+	}
+
+	stage = {
+		difficulty = 1
+		icon = GFX_archaeology_runes_D6
+		event = unique.65
+	}
+
+	on_roll_failed = {
+		from = {
+			standard_archaeological_site_on_roll_failed = { RANDOM_EVENTS = all_random_events }
+		}
+	}
+}

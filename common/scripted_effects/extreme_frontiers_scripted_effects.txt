@@ -1,0 +1,751 @@
+create_pop_slimeborn = {
+	create_species = {
+		name = "NAME_slimeborn"
+		plural = "NAME_slimeborn_plural"
+		class = TOX
+		namelist = TOX3
+		portrait = $PORTRAIT$
+		traits = {
+			trait = trait_slimeborn
+			trait = trait_inorganic_breath
+			trait = trait_humanoid_psychological_infertility
+			trait = trait_weak
+		}
+	}
+}
+
+spawn_invisible_planet = {
+	spawn_planet = {
+		generate_random_name = yes
+		class = $PLANET_CLASS$
+		orbit_distance = { min = 50 max = 110}
+		orbit_location = yes
+		init_effect = {
+			set_surveyed = {
+				surveyed = yes
+				surveyor = root.controller
+			}
+			every_country = {
+				limit = {
+					has_communications = root.controller
+				}
+				prev = {
+					set_surveyed = {
+						surveyed = yes
+						surveyor = prev
+					}
+				}
+			}
+			add_modifier = {
+				modifier = carbon_world
+			}
+			save_event_target_as = invisible_planet
+			$SHIP_SCOPE$ = {
+				ship_event = {
+					id = anomaly.6662 # add the minerals deposit
+					scopes = {
+						from = event_target:invisible_planet
+					}
+				}
+			}
+			fire_on_action = { on_action = on_planet_spawned } # Undercoat
+		}
+	}
+}
+
+create_survivalist_scru_leader = {
+	create_country = {
+		name = "NAME_Unknown"
+		type = global_event
+		auto_delete = yes
+		flag = {
+			icon = {
+				category = "special"
+				file = "unknown.dds"
+			}
+			background = {
+				category = "backgrounds"
+				file = "00_solid.dds"
+			}
+			colors = {
+				"red"
+				"red"
+				"null"
+				"null"
+			}
+		}
+		effect = {
+			save_event_target_as = scru_country
+		}
+	}
+	event_target:scru_country = {
+		create_species = {
+			class = $SPECIES$
+			effect = {
+				save_event_target_as = scru_species
+			}
+		}
+		create_leader = {
+			class = scientist
+			tier = leader_tier_renowned
+			species = event_target:scru_species
+			name = NAME_survivalist_scru
+			skill = 8
+			event_leader = yes
+			randomize_traits = no
+			skip_background_generation = yes
+			background_ethic = ethic_materialist
+			custom_description = survivalist_scru_desc
+			gender = female
+			set_age = 40
+			traits = {
+				1 = subclass_scientist_explorer
+				2 = leader_trait_roamer_2
+				3 = leader_trait_carefree
+				4 = leader_trait_prospector_2
+				5 = leader_trait_expertise_new_worlds_2
+				6 = leader_trait_slippery
+				7 = leader_trait_hardened_survivalist
+				8 = leader_trait_gullible
+			}
+			effect = {
+				save_global_event_target_as = survivalist_scru
+			}
+		}
+		event_target:survivalist_scru = {
+			set_owner = event_target:scru_country
+			exile_leader_as = survivalist_scru_exiled
+		}
+	}
+}
+
+create_sidni_species = {
+	create_country = {
+		name = "NAME_Unknown"
+		type = global_event
+		auto_delete = yes
+		flag = {
+			icon = {
+				category = "special"
+				file = "unknown.dds"
+			}
+			background = {
+				category = "backgrounds"
+				file = "00_solid.dds"
+			}
+			colors = {
+				"red"
+				"red"
+				"null"
+				"null"
+			}
+		}
+		effect = {
+			save_event_target_as = sidni_country
+		}
+	}
+	event_target:sidni_country = {
+		create_species = {
+			class = MACHINE
+			portrait = default_robot
+			effect = {
+				save_event_target_as = sidni_species
+			}
+		}
+	}
+	root.from.from.planet = { save_global_event_target_as = sidni_origin_planet }
+}
+
+create_official_sidni_leader = {
+	create_sidni_species = yes
+	event_target:sidni_country = {
+		create_leader = {
+			class = official
+			tier = leader_tier_renowned
+			species = event_target:sidni_species
+			name = NAME_leader_sidni
+			skill = 8
+			immortal = yes
+			event_leader = yes
+			randomize_traits = no
+			skip_background_generation = yes
+			background_ethic = ethic_gestalt_consciousness
+			custom_description = official_sidni_desc
+			gender = indeterminable
+			hide_age = yes
+			traits = {
+				1 = subclass_official_governor
+				2 = leader_trait_principled_2
+				3 = leader_trait_spycraft
+				4 = leader_trait_forge_focus_2
+				5 = leader_trait_pop_focused_2
+				6 = leader_trait_distribution_lines
+				7 = leader_trait_architectural_interest
+				8 = leader_trait_judicial_subjugation
+			}
+			effect = {
+				save_global_event_target_as = leader_sidni
+			}
+		}
+		event_target:leader_sidni = {
+			set_owner = event_target:sidni_country
+			exile_leader_as = leader_sidni_exiled
+		}
+	}
+}
+
+create_commander_sidni_leader = {
+	create_sidni_species = yes
+	event_target:sidni_country = {
+		create_leader = {
+			class = commander
+			tier = leader_tier_renowned
+			species = event_target:sidni_species
+			name = NAME_leader_sidni
+			skill = 8
+			immortal = yes
+			event_leader = yes
+			randomize_traits = no
+			skip_background_generation = yes
+			background_ethic = ethic_gestalt_consciousness
+			custom_description = commander_sidni_desc
+			gender = indeterminable
+			hide_age = yes
+			traits = {
+				1 = subclass_commander_governor
+				2 = leader_trait_enlister
+				3 = leader_trait_aggressive
+				4 = leader_trait_mining_focus_3
+				5 = leader_trait_private_mines_2
+				6 = leader_trait_venerated
+				7 = leader_trait_judicial_execution
+				8 = leader_trait_sadistic
+			}
+			effect = {
+				save_global_event_target_as = leader_sidni
+			}
+		}
+		event_target:leader_sidni = {
+			set_owner = event_target:sidni_country
+			exile_leader_as = renowned_leader
+		}
+	}
+}
+
+spawn_new_bratulla_system = {
+	solar_system = {
+		spawn_system = {
+			min_distance = 10
+			max_distance = 30
+			initializer = "new_bratulla_initializer"
+			hyperlane = no
+			effect = {
+				add_hyperlane = {
+					from = this
+					to = prev
+				}
+			}
+		}
+	}
+}
+
+create_dendritians = {
+	event_target:new_bratulla = {
+		create_species = {
+			name = "NAME_dendritian"
+			plural = "NAME_dendritian_plural"
+			class = PLANT
+			namelist = PLANT3
+			portrait = $PORTRAIT$
+			homeworld = event_target:new_bratulla
+			traits = {
+				trait = trait_organic
+				trait = trait_plantoid_phototrophic
+				trait = trait_plantoid_budding
+				trait = trait_agrarian
+				trait = trait_conservational
+				trait = trait_slow_breeders
+			}
+			effect = {
+				save_event_target_as = dendrus_species
+			}
+		}
+		create_country = {
+			name = "NAME_buds_of_dendrus"
+			adjective = ADJECTIVE_dendritian
+			type = default
+			species = event_target:dendrus_species
+			origin = "origin_life_seeded"
+			ethos = {
+				ethic = ethic_pacifist
+				ethic = ethic_egalitarian
+				ethic = ethic_spiritualist
+			}
+			authority = auth_democratic
+			civics = {
+				civic = civic_environmentalist
+				civic = civic_idyllic_bloom
+			}
+			effect = {
+				save_event_target_as = dendrus_country
+				set_country_flag = Story7 # disable all contact report events
+
+				##Meet Creators
+				establish_communications_no_message = root
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_dendrus
+				}
+				set_closed_borders = {
+					who = root
+					status = no
+				}
+				root = {
+					if = {
+						limit = { is_xenophobe = no }
+						add_opinion_modifier = {
+							who = event_target:dendrus_country
+							modifier = opinion_to_dendrus
+						}
+					}
+				}
+
+				##Copy techs
+				copy_techs_from = {
+					target = root
+				}
+
+				##Add resources
+				add_resource = { minerals = 10000 }
+				add_resource = { energy = 10000 }
+				add_resource = { food = 3000 }
+				add_resource = { consumer_goods = 3000 }
+				add_resource = { alloys = 7000 }
+				add_resource = { influence = 1000 }
+				add_resource = { unity = 27000 }
+			}
+		}
+
+		set_owner = event_target:dendrus_country
+		set_capital = yes
+		create_pop_group = {
+			size = 500
+			species = event_target:dendrus_species
+		}
+
+		solar_system = {
+			create_starbase = {
+				size = starbase_starport
+				module = shipyard
+				module = shipyard
+				owner = event_target:dendrus_country
+			}
+		}
+	}
+}
+
+spawn_georadiation_project = {
+	closest_system = {
+		limit = {
+			NOT = { has_star_flag = $FILTER_TAG$_star }
+			OR = {
+				has_owner = no
+				owner = { is_same_value = root.controller }
+			}
+			any_system_planet = {
+				is_toxic_world = yes # undercoat: moved to scripted trigger
+				NOT = { has_planet_flag = $FILTER_TAG$_planet }
+				OR = {
+					has_deposit_for = $STATION_TYPE$
+					has_deposit = no
+				}
+			}
+		}
+		min_steps = 1
+		set_star_flag = $GIVEN_TAG$_star
+		random_system_planet = {
+			limit = {
+				is_toxic_world = yes # undercoat: moved to scripted trigger
+				NOT = { has_planet_flag = $FILTER_TAG$_planet }
+				OR = {
+					has_deposit_for = $STATION_TYPE$
+					has_deposit = no
+				}
+			}
+			set_planet_flag = $GIVEN_TAG$_planet
+			enable_special_project = {
+				name = $PROJECT_KEY$
+				location = this
+				owner = root.controller
+			}
+		}
+	}
+}
+
+spawn_undetonated_georadiation_project = {
+	closest_system = {
+		limit = {
+			NOR = {
+				has_star_flag = georadiation_original_star
+				has_star_flag = georadiation_signal_1_star
+				has_star_flag = georadiation_signal_2_star
+			}
+			OR = {
+				has_owner = no
+				owner = { is_same_value = root.controller }
+			}
+			any_system_planet = {
+				has_owner = no
+				NOR = {
+					is_toxic_world = yes # undercoat: moved to scripted trigger
+					is_gas_giant = yes # undercoat: moved to scripted trigger
+				}
+				NOR = {
+					has_planet_flag = georadiation_original_planet
+					has_planet_flag = georadiation_signal_1_planet
+					has_planet_flag = georadiation_signal_2_planet
+				}
+			}
+		}
+		min_steps = 1
+		random_system_planet = {
+			limit = {
+				has_owner = no
+				NOR = {
+					is_toxic_world = yes # undercoat: moved to scripted trigger
+					is_gas_giant = yes # undercoat: moved to scripted trigger
+				}
+				NOR = {
+					has_planet_flag = georadiation_original_planet
+					has_planet_flag = georadiation_signal_1_planet
+					has_planet_flag = georadiation_signal_2_planet
+				}
+			}
+			save_global_event_target_as = georadiation_undetonated_planet@root.controller
+			enable_special_project = {
+				name = "UNDETONATED_GEORADIATION_PROJECT"
+				location = this
+				owner = root.controller
+			}
+		}
+	}
+}
+
+create_geocorp_drone = {
+	if = {
+		limit = { NOT = { exists = event_target:geocorp_drone } }
+		create_country = {
+			name = "NAME_Geocorp"
+			type = global_event
+			auto_delete = no
+			flag = {
+				icon = {
+					category = "corporate"
+					file = "corporate_06.dds"
+				}
+				background = {
+					category = "backgrounds"
+					file = "flag_BG_39.dds"
+				}
+				colors = {
+					"dark_green"
+					"frog_green"
+					"null"
+					"null"
+				}
+			}
+			effect = {
+				save_global_event_target_as = geocorp_country
+			}
+		}
+		event_target:geocorp_country = {
+			create_species = {
+				class = MACHINE
+				portrait = tox_machine
+				effect = {
+					save_global_event_target_as = geocorp_species
+				}
+			}
+			create_leader = {
+				class = commander
+				species = event_target:geocorp_species
+				event_leader = yes
+				randomize_traits = no
+				skip_background_generation = yes
+				effect = {
+					save_global_event_target_as = geocorp_drone
+					set_owner = event_target:geocorp_country
+				}
+			}
+		}
+	}
+}
+
+create_geocorp_fleet = {
+	if = {
+		limit = {
+			exists = event_target:geocorp_country
+		}
+		event_target:geocorp_country = {
+			set_faction_hostility = {
+				target = root
+				set_hostile = yes
+				set_neutral = no
+				set_friendly = no
+			}
+		}
+		create_fleet = {
+			name = "NAME_Geocorp"
+			effect = {
+				set_owner = event_target:geocorp_country
+				create_ship_design = {
+					design = "NAME_Geocorp_Combat_Drone"
+				}
+				while = {
+					count = 4
+					create_ship = {
+						design = last_created_design
+						graphical_culture = "toxoid_01"
+					}
+				}
+				set_location = {
+					target = root.$LOCATION$
+					distance = 80
+					angle = random
+				}
+				set_fleet_stance = aggressive
+				set_aggro_range_measure_from = self
+				set_aggro_range = 800
+				set_fleet_flag = geocorp_fleet
+				set_fleet_flag = is_spawned_for@root
+			}
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				spawn_debris = no
+			}
+		}
+	}
+}
+
+## shortcut scripted effects for toxify world ##
+# this = planet
+add_toxified_resource_big = {
+	space_owner = {
+		add_monthly_resource_mult = {
+			resource = $RESOURCE$
+			value = 2
+			min = 100
+			max = 500
+		}
+	}
+}
+add_toxified_resource_medium = {
+	space_owner = {
+		add_monthly_resource_mult = {
+			resource = $RESOURCE$
+			value = 2
+			min = 100
+			max = 250
+		}
+	}
+}
+add_toxified_resource_small = {
+	space_owner = {
+		add_monthly_resource_mult = {
+			resource = $RESOURCE$
+			value = 2
+			min = 10
+			max = 75
+		}
+	}
+}
+send_toxified_message = {
+	space_owner = {
+		create_message = {
+			type = MESSAGE_TOXIFY_WORLD
+			localization = MESSAGE_TOXIFY_WORLD_$LOC$_TEXT
+			days = 30
+			target = prev
+
+			variable = {
+				type = name
+				localization = PLANET
+				scope = prev
+			}
+		}
+	}
+}
+################################################
+
+toxify_world = {
+	random_deposit = {
+		limit = {
+			NOT = { is_deposit_type = d_georadiation_displacement }
+		}
+		remove_deposit = yes
+	}
+	add_deposit = d_georadiation_displacement
+	set_timed_planet_flag = {
+		days = 180
+		flag = recently_toxified_planet
+	}
+
+	if = {
+		limit = {
+			exists = space_owner
+			space_owner = {
+				is_same_value = root.owner
+			}
+		}
+
+		# Random resources
+		random_list = {
+			10 = {
+				add_toxified_resource_big = { RESOURCE = minerals }
+				send_toxified_message = { LOC = MINERALS }
+			}
+			10 = {
+				add_toxified_resource_medium = { RESOURCE = alloys }
+				send_toxified_message = { LOC = ALLOYS }
+			}
+			10 = {
+				add_toxified_resource_big = { RESOURCE = energy }
+				send_toxified_message = { LOC = ENERGY }
+			}
+			10 = {
+				add_toxified_resource_big = { RESOURCE = food }
+				send_toxified_message = { LOC = FOOD }
+			}
+		}
+
+		# Climate resources
+		if = {
+			limit = { is_dry = yes }
+			add_toxified_resource_medium = { RESOURCE = alloys }
+		}
+		else_if = {
+			limit = { is_wet = yes }
+			add_toxified_resource_big = { RESOURCE = energy }
+		}
+		else_if = {
+			limit = { is_cold = yes }
+			add_toxified_resource_big = { RESOURCE = minerals }
+		}
+
+		# Planet Class resources
+		switch = {
+			trigger = is_planet_class
+			# Exotic Gases
+			pc_desert = {
+				add_toxified_resource_small = { RESOURCE = exotic_gases }
+			}
+			pc_ocean = {
+				add_toxified_resource_small = { RESOURCE = exotic_gases }
+			}
+			pc_tundra = {
+				add_toxified_resource_small = { RESOURCE = exotic_gases }
+			}
+			# Rare Crystals
+			pc_arid = {
+				add_toxified_resource_small = { RESOURCE = rare_crystals }
+			}
+			pc_continental = {
+				add_toxified_resource_small = { RESOURCE = rare_crystals }
+			}
+			pc_arctic = {
+				add_toxified_resource_small = { RESOURCE = rare_crystals }
+			}
+			# Volatile Motes
+			pc_savannah = {
+				add_toxified_resource_small = { RESOURCE = volatile_motes }
+			}
+			pc_tropical = {
+				add_toxified_resource_small = { RESOURCE = volatile_motes }
+			}
+			pc_alpine = {
+				add_toxified_resource_small = { RESOURCE = volatile_motes }
+			}
+		}
+	}
+}
+
+finish_world_toxification = {
+	if = {
+		limit = { exists = owner }
+		every_owned_pop_group = {
+			resettle_pop_group = {
+				POP_GROUP = this
+				PLANET = owner.capital_scope
+				PERCENTAGE = 100
+			}
+		}
+		destroy_colony = yes
+	}
+	clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+	clear_planet_modifiers = yes
+
+	# Climate deposits
+	if = {
+		limit = { is_dry = yes }
+		add_deposit = d_alloys_4
+	}
+	else_if = {
+		limit = { is_wet = yes }
+		add_deposit = d_energy_8
+	}
+	else_if = {
+		limit = { is_cold = yes }
+		add_deposit = d_minerals_8
+	}
+
+	# Planet Class deposits
+	switch = {
+		trigger = is_planet_class
+		# Exotic Gases
+		pc_desert = {
+			add_deposit = d_exotic_gases_2
+		}
+		pc_ocean = {
+			add_deposit = d_exotic_gases_2
+		}
+		pc_tundra = {
+			add_deposit = d_exotic_gases_2
+		}
+		# Rare Crystals
+		pc_arid = {
+			add_deposit = d_rare_crystals_2
+		}
+		pc_continental = {
+			add_deposit = d_rare_crystals_2
+		}
+		pc_arctic = {
+			add_deposit = d_rare_crystals_2
+		}
+		# Volatile Motes
+		pc_savannah = {
+			add_deposit = d_volatile_motes_2
+		}
+		pc_tropical = {
+			add_deposit = d_volatile_motes_2
+		}
+		pc_alpine = {
+			add_deposit = d_volatile_motes_2
+		}
+	}
+
+	change_pc = pc_toxic
+	remove_planet_flag = toxifying_planet
+
+	if = {
+		limit = {
+			always = $SEND_MESSAGE$
+			exists = space_owner
+			space_owner = {
+				is_same_value = root.owner
+			}
+		}
+		send_toxified_message = { LOC = DONE }
+	}
+}

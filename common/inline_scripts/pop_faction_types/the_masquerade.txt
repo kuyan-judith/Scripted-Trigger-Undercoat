@@ -1,0 +1,338 @@
+the_masquerade_$ETHIC$ = {
+	name = "pft_the_masquerade"
+	desc = "pft_the_masquerade_desc"
+	icon = "GFX_faction_icon_the_masquerade"
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_$ETHIC$
+	visual_ethic = $VISUAL_ETHIC$
+
+	persistent_faction = yes
+	use_guiding_ethic_as_pop_filter = no
+	can_rename = no
+	unique = yes
+	support_weight_exponent = 0.7
+
+	country_modifier = {
+		diplo_weight_mult = 0.003
+	}
+
+	extortion_resource = {
+		category = pop_factions
+		produces = {
+			energy = @faction_base_output
+			mult = @faction_extortion_energy_ratio
+		}
+	}
+
+	is_potential = {
+		is_secret_societies_empire = yes
+		has_country_flag = the_masquerade_$ETHIC$_selected
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		can_think = yes
+	}
+
+	attraction = {
+		base = 100
+
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { is_ruler = yes }
+			}
+		}
+
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+	}
+
+	leader = {
+		base = 100
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_SPECIAL_POWERS1"
+		unfulfilled_title = "THE_MASQUERADE_SPECIAL_POWERS1"
+		desc = "THE_MASQUERADE_SPECIAL_POWERS_DESC1"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -0.001
+
+		potential = {
+			is_galactic_council_established = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+			}
+		}
+
+		trigger = {
+			owner = {
+				is_part_of_galactic_council = yes
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_SPECIAL_POWERS2"
+		unfulfilled_title = "THE_MASQUERADE_SPECIAL_POWERS2"
+		desc = "THE_MASQUERADE_SPECIAL_POWERS_DESC2"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			is_galactic_council_established = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+				is_part_of_galactic_council = yes
+			}
+		}
+
+		trigger = {
+			owner = {
+				OR = {
+					is_galactic_custodian = yes
+					is_galactic_emperor = yes
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_SPECIAL_POWERS3"
+		unfulfilled_title = "THE_MASQUERADE_SPECIAL_POWERS3"
+		desc = "THE_MASQUERADE_SPECIAL_POWERS_DESC3"
+
+		fulfilled_effect = 20
+		unfulfilled_effect = -0.001
+
+		potential = {
+			is_galactic_council_established = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+				is_part_of_galactic_council = yes
+				OR = {
+					is_galactic_custodian = yes
+					is_galactic_emperor = yes
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				is_galactic_emperor = yes
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_THANKFUL_FRIENDS"
+		unfulfilled_title = "THE_MASQUERADE_THANKFUL_FRIENDS"
+		desc = "THE_MASQUERADE_THANKFUL_FRIENDS_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			is_galactic_community_formed = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+			}
+		}
+
+		trigger = {
+			any_country = {
+				root.owner = {
+					num_favors = {
+						target = prev
+						value >= @the_masquerade_thankful_friends_favors
+					}
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_CONTROL_OF_THE_LAW"
+		unfulfilled_title = "THE_MASQUERADE_CONTROL_OF_THE_LAW"
+		desc = "THE_MASQUERADE_CONTROL_OF_THE_LAW_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			is_galactic_community_formed = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_passed_resolution = { years = @the_masquerade_control_of_the_law_years }
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_POLITICAL_ACTOR"
+		unfulfilled_title = "THE_MASQUERADE_POLITICAL_ACTOR"
+		desc = "THE_MASQUERADE_POLITICAL_ACTOR_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			is_galactic_community_formed = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_galactic_community_emissary = yes
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_NARRATIVE_CONTROL"
+		unfulfilled_title = "THE_MASQUERADE_NARRATIVE_CONTROL"
+		desc = "THE_MASQUERADE_NARRATIVE_CONTROL_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+				is_galactic_community_formed = yes
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = narrative_control
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_PRICE_SETTER"
+		unfulfilled_title = "THE_MASQUERADE_PRICE_SETTER"
+		desc = "THE_MASQUERADE_PRICE_SETTER_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			has_federations_dlc = yes
+			has_megacorp = yes
+			is_galactic_community_formed = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+			}
+		}
+
+		trigger = {
+			owner = {
+				is_market_leader = yes
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_MASQUERADE_UNITED_PURPOSE"
+		unfulfilled_title = "THE_MASQUERADE_UNITED_PURPOSE"
+		desc = "THE_MASQUERADE_UNITED_PURPOSE_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -0.001
+
+		potential = {
+			is_galactic_community_formed = yes
+			exists = owner
+			owner = {
+				num_communications >= value:get_num_empires_percent|PERC|0.5|
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = united_in_purpose
+			}
+		}
+	}
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "paragon/global_faction_demands"
+		ETHIC = ethic_$ETHIC$
+		ETHIC_FANATIC = ethic_fanatic_$ETHIC$
+		ETHIC_OPPOSED = ethic_$ETHIC_OPPOSED$
+	}
+
+	on_destroy = {
+		remove_country_flag = the_masquerade_$ETHIC$_selected
+		roll_masquerade_secret_faction = yes
+		if = {
+			limit = {
+				has_modifier = promoted_$ETHIC$
+			}
+			remove_modifier = promoted_$ETHIC$
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_$ETHIC$
+			}
+			remove_modifier = suppressed_$ETHIC$
+		}
+	}
+
+	# Undercoat inline_script
+	inline_script = {
+		script = pop_faction_types/standard_action_block
+		faction = the_masquerade_$ETHIC$
+		ethic = $ETHIC$
+		opposite = $ETHIC_OPPOSED$
+		apply_to_other_factions = "always = no"
+		extortion_resource = engineering_research
+		crowdsourced_extortion_tooltip = "crowdsourced_extortion_tt"
+	}
+}

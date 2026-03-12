@@ -128,7 +128,7 @@ armageddon = {
 				}
 			}
 			AND = {
-				owner = { is_country_type = enclave_mercenary }
+				owner = { is_mercenary = yes }
 				controller = {
 					OR = {
 						has_policy_flag = orbital_bombardment_armageddon
@@ -182,7 +182,7 @@ pox = {
 			OR = {
 				has_relic = r_pox_sample
 				AND = {
-					owner = { is_country_type = enclave_mercenary }
+					owner = { is_mercenary = yes }
 					root.controller = {
 						has_relic = r_pox_sample
 					}
@@ -245,7 +245,7 @@ raiding = {
 			owner = { has_origin = origin_khan_successor }
 			owner = { is_country_type = debt_collectors }
 			AND = {
-				owner = { is_country_type = enclave_mercenary }
+				owner = { is_mercenary = yes }
 				controller = {
 					OR = {
 						has_ascension_perk = ap_nihilistic_acquisition
@@ -477,5 +477,76 @@ behemoth_invasion = {
 	# from = planet
 	ai_weight = {
 		weight = 1000
+	}
+}
+
+firestorm = {
+	trigger = {
+		owner = {
+			OR = {
+				has_policy_flag = orbital_bombardment_devastation
+				has_menace_perk = menp_hyperthermia_flames
+			}
+		}
+	}
+
+	default = no
+	stop_when_armies_dead = no
+	abduct_pops = no
+	planet_damage = 1.25
+	army_damage = 1.25
+	kill_pop_chance = { base = 1.00 }
+	min_pops_to_kill_pop = 0
+	kill_pop_amount = { min = 0 max = 200 }
+
+	# root = fleet
+	# from = planet
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0.01
+			exists = from
+			from = {
+				owner = { NOT = { is_hostile = root.owner } }
+				NAND = {
+					controller = { is_crisis_faction = yes }
+					planet_garrison_strength > 0
+				}
+			}
+			exists = owner
+			owner = { is_crisis_faction = no }
+		}
+	}
+}
+
+seismic_bombing = {
+	trigger = { owner = { has_policy_flag = orbital_bombardment_devastation } }
+
+	default = no
+	stop_when_armies_dead = no
+	abduct_pops = no
+	planet_damage = 1.5
+	army_damage = 2.0
+	kill_pop_chance = { base = 1.25 }
+	min_pops_to_kill_pop = 0
+	kill_pop_amount = { min = 0 max = 200 }
+
+	# root = fleet
+	# from = planet
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0.01
+			exists = from
+			from = {
+				owner = { NOT = { is_hostile = root.owner } }
+				NAND = {
+					controller = { is_crisis_faction = yes }
+					planet_garrison_strength > 0
+				}
+			}
+			exists = owner
+			owner = { is_crisis_faction = no }
+		}
 	}
 }

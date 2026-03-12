@@ -93,7 +93,7 @@ event = {
 				}
 			}
 			random_list = {
-				490 = { }	# No Sol
+				450 = { }	# No Sol
 				400 = {		# Pre-FTLs
 					complex_trigger_modifier = {
 						trigger = check_galaxy_setup_value
@@ -122,7 +122,7 @@ event = {
 					}
 					add_extra_hyperlane_to_spawned_system_effect = yes
 				}
-				10 = {		# Geocentric Experiment
+				50 = {		# Geocentric Experiment
 					complex_trigger_modifier = {
 						trigger = check_galaxy_setup_value
 						parameters = {
@@ -171,6 +171,32 @@ event = {
 			}
 			effect = {
 				set_country_flag = suppress_first_contact_comms
+				set_country_flag = shroud_country_flag
+			}
+		}
+
+		create_country = {
+			name = "name_animator"
+			type = shroud
+			flag = {
+				icon = {
+					category = "zoological"
+					file = "flag_zoological_5.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "flag_BG_12.dds"
+				}
+				colors={
+					"purple"
+					"black"
+					"null"
+					"null"
+				}
+			}
+			effect = {
+				set_country_flag = suppress_first_contact_comms
+				set_country_flag = animator_of_clay_country_flag
 			}
 		}
 
@@ -382,6 +408,12 @@ event = {
 			imperial_origin_start_effect = yes
 		}
 
+		# Shroud-Forged
+		every_playable_country = {
+			limit = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+			country_event = { id = shroud_forged.1 }
+		}
+
 		# Payback
 		every_playable_country = {
 			limit = { is_payback_empire = yes } # undercoat: moved to scripted trigger
@@ -392,6 +424,18 @@ event = {
 		every_playable_country = {
 			limit = { is_fruitful_empire = yes } # undercoat: moved to scripted trigger
 			fruitful_start_effect = yes
+		}
+
+		# Mindwarden
+		every_playable_country = {
+			limit = { is_mindwarden_empire = yes } # undercoat: moved to scripted trigger
+			country_event = { id = shroud.6000 }
+		}
+
+		# Endbringers
+		every_playable_country = {
+			limit = { is_endbringer_empire = yes } # undercoat: moved to scripted trigger
+			country_event = { id = shroud.8000 }
 		}
 
 		# Wilderness
@@ -453,7 +497,7 @@ event = {
 
 		# Legendary Leader
 		every_playable_country = {
-			limit = { has_origin = origin_legendary_leader }
+			limit = { has_legendary_leader_origin_not_set = yes } # undercoat: moved to scripted trigger
 			country_event = { id = paragon.5000 }
 		}
 
@@ -477,7 +521,9 @@ event = {
 					is_ruler = yes
 					NOT = { has_trait = leader_trait_cyborg	}
 				}
-				add_trait = leader_trait_ritualistic_implants_cyborg
+				add_trait = {
+					trait = leader_trait_ritualistic_implants_cyborg
+				}
 			}
 		}
 
@@ -582,6 +628,12 @@ event = {
 				days = -1
 				mult = value:count_positive_traits_from_country
 			}
+		}
+
+		# Chosen civic
+		every_playable_country = {
+			limit = { is_chosen_empire = yes }
+			country_event = { id = shroud.5100 }
 		}
 
 		if = { #If someone has Beastmasters civic, spawn amoeba already to give them communication
@@ -824,6 +876,21 @@ event = {
 			}
 			set_planet_flag = ancient_history_planet
 		}
+		# Polytechnic Districts are rare, but shouldnt be > 2
+		every_galaxy_planet = {
+			limit = {
+				is_volcanic_world = yes # undercoat: moved to scripted trigger
+			}
+			if = {
+				limit = {
+					check_modifier_value = {
+						modifier = district_polytechnic_max_add
+						value < 2
+					}
+				}
+				add_deposit = d_volcanic_basalt_plains
+			}
+		}
 		every_system = {
 			limit = {
 				has_owner = no
@@ -1013,6 +1080,22 @@ country_event = {
 			}
 			give_technology = { message = no tech = tech_space_trading }
 		}
+
+		if = {
+			limit = {
+				is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			}
+			give_technology = { message = no tech = tech_mine_zro }
+			add_resource = { sr_zro = 50 }
+		}
+
+		if = {
+			limit = {
+				is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			}
+			give_technology = { message = no tech = tech_starbase_3 }
+		}
+
 		if = {
 			limit = {
 				has_civic = civic_privatized_exploration
@@ -1066,15 +1149,10 @@ country_event = {
 							sub_type = survey
 							name = random
 							species = owner_main_species
-						}
-					}
-					last_created_leader = {
-						if = {
-							limit = {
-								has_base_skill > 1
-								num_traits = 0
+							randomize_traits = no
+							traits = {
+								1 = random_common
 							}
-							add_trait_no_notify = random_common
 						}
 					}
 					set_leader = last_created_leader
@@ -1089,14 +1167,9 @@ country_event = {
 				class = scientist
 				name = random
 				species = owner_main_species
-			}
-			last_created_leader = {
-				if = {
-					limit = {
-						has_base_skill > 1
-						num_traits = 0
-					}
-					add_trait_no_notify = random_common
+				randomize_traits = no
+				traits = {
+					1 = random_common
 				}
 			}
 		}
@@ -1125,14 +1198,9 @@ country_event = {
 								sub_type = survey
 								name = random
 								species = owner_main_species
-							}
-							last_created_leader = {
-								if = {
-									limit = {
-										has_base_skill > 1
-										num_traits = 0
-									}
-									add_trait_no_notify = random_common
+								randomize_traits = no
+								traits = {
+									1 = random_common
 								}
 							}
 						}
@@ -1144,12 +1212,18 @@ country_event = {
 								set_country_flag = created_first_eager_ship
 							}
 							last_created_leader = {
-								add_trait_no_notify = leader_trait_meticulous
+								add_trait = {
+									trait = leader_trait_meticulous
+									show_message = no
+								}
 							}
 						}
 						else = {
 							last_created_leader = {
-								add_trait_no_notify = leader_trait_roamer
+								add_trait = {
+									trait = leader_trait_roamer
+									show_message = no
+								}
 							}
 						}
 						set_leader = last_created_leader
@@ -1175,6 +1249,27 @@ country_event = {
 				set_starbase_module = {
 					slot = 4
 					module = trading_hub
+				}
+				set_starbase_building = {
+					slot = 2
+					building = resource_silo
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			}
+			random_owned_starbase = {
+				set_starbase_size = starbase_starhold
+				set_starbase_module = {
+					slot = 3
+					module = gun_battery
+				}
+				set_starbase_module = {
+					slot = 4
+					module = gun_battery
 				}
 				set_starbase_building = {
 					slot = 2
@@ -1246,15 +1341,10 @@ country_event = {
 							class = commander
 							name = random
 							species = owner_main_species
-						}
-					}
-					last_created_leader = {
-						if = {
-							limit = {
-								has_base_skill > 1
-								num_traits = 0
+							randomize_traits = no
+							traits = {
+								1 = random_common
 							}
-							add_trait_no_notify = random_common
 						}
 					}
 					set_leader = last_created_leader
@@ -1391,15 +1481,10 @@ country_event = {
 							class = commander
 							name = random
 							species = owner_main_species
-						}
-					}
-					last_created_leader = {
-						if = {
-							limit = {
-								has_base_skill > 1
-								num_traits = 0
+							randomize_traits = no
+							traits = {
+								1 = random_common
 							}
-							add_trait_no_notify = random_common
 						}
 					}
 					set_leader = last_created_leader
@@ -1430,15 +1515,10 @@ country_event = {
 							class = commander
 							name = random
 							species = owner_main_species
-						}
-					}
-					last_created_leader = {
-						if = {
-							limit = {
-								has_base_skill > 1
-								num_traits = 0
+							randomize_traits = no
+							traits = {
+								1 = random_common
 							}
-							add_trait_no_notify = random_common
 						}
 					}
 					set_leader = last_created_leader
@@ -1457,14 +1537,9 @@ country_event = {
 				class = commander
 				name = random
 				species = owner_main_species
-			}
-			last_created_leader = {
-				if = {
-					limit = {
-						has_base_skill > 1
-						num_traits = 0
-					}
-					add_trait_no_notify = random_common
+				randomize_traits = no
+				traits = {
+					1 = random_common
 				}
 			}
 		}
@@ -1494,14 +1569,6 @@ country_event = {
 			random_list = {
 				66 = { set_country_flag = fallen_machine_empire_awaken_1 }	# Custodian
 				33 = { set_country_flag = fallen_machine_empire_awaken_2 }	# Berserker
-			}
-		}
-		if = {
-			limit = {
-				is_machine_empire = no
-			}
-			every_owned_pop_group = {
-				set_pop_group_flag = organic_fallen_empire_pop
 			}
 		}
 		# contact other fallen empires & marauders
@@ -1617,6 +1684,10 @@ planet_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		set_timed_planet_flag = {
+			flag = ignore_ai_building_limitations
+			days = 1
+		}
 		if = {
 			limit = { has_building = building_colony_shelter }
 			remove_building = building_colony_shelter
@@ -1669,17 +1740,6 @@ planet_event = {
 
 			if = {
 				limit = {
-					owner = {
-						is_machine_empire = no
-						is_anglers_empire = yes
-					}
-					is_ocean_world = yes # undercoat: moved to scripted trigger
-				}
-				add_district_and_planet_size_if_needed_effect = { district = district_farming_uncapped }
-				add_district_and_planet_size_if_needed_effect = { district = district_farming_uncapped }
-			}
-			else_if = {
-				limit = {
 					owner = { is_machine_empire = no }
 				}
 				add_district_and_planet_size_if_needed_effect = { district = district_farming }
@@ -1693,12 +1753,13 @@ planet_event = {
 				add_district_and_planet_size_if_needed_effect = { district = district_generator }
 			}
 
+			# TODO-CD is this correct? This used to be uncapped, so we now add 2 extra mining ones, not sure if balanced
 			if = {
 				limit = {
 					owner = { is_subterranean_empire = yes }
 				}
-				add_district_and_planet_size_if_needed_effect = { district = district_mining_uncapped }
-				add_district_and_planet_size_if_needed_effect = { district = district_mining_uncapped }
+				add_district_and_planet_size_if_needed_effect = { district = district_mining }
+				add_district_and_planet_size_if_needed_effect = { district = district_mining }
 			}
 		}
 		else_if = {
@@ -1722,7 +1783,7 @@ planet_event = {
 			while = {
 				count = 2
 				add_district_if_possible_effect = {
-					district = district_mining_uncapped
+					district = district_mining
 				}
 			}
 			if = {
@@ -1747,7 +1808,7 @@ planet_event = {
 				}
 				else = {
 					add_district_if_possible_effect = {
-						district = district_farming_uncapped
+						district = district_farming
 					}
 				}
 			}
@@ -1771,7 +1832,7 @@ planet_event = {
 				}
 				else = {
 					add_district_if_possible_effect = {
-						district = district_farming_uncapped
+						district = district_farming
 					}
 				}
 			}
@@ -1801,20 +1862,15 @@ planet_event = {
 			}
 			else = {
 				add_district_and_planet_size_if_needed_effect = { district = district_city }
-				if = {
-					limit = {
-						owner = { is_anglers_empire = yes }
-						is_ocean_world = yes # undercoat: moved to scripted trigger
-					}
-					add_district_and_planet_size_if_needed_effect = { district = district_farming_uncapped }
-				}
-				else = {
-					add_district_and_planet_size_if_needed_effect = { district = district_farming }
-				}
+				add_district_and_planet_size_if_needed_effect = { district = district_farming }
 			}
 
 			if = {
 				limit = { owner = { is_mechanist_empire = yes } } # undercoat: moved to scripted trigger
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
+				}
 				add_building = building_robot_assembly_plant
 			}
 			if = {
@@ -1824,6 +1880,10 @@ planet_event = {
 						NOT = { has_civic = civic_fanatic_purifiers } #purges them instead
 						NOT = { has_ai_personality_behaviour = purger }
 					}
+				}
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
 				}
 				add_building = building_necrophage_elevation_chamber
 			}
@@ -2912,14 +2972,9 @@ country_event = {
 					class = commander
 					name = random
 					species = owner_main_species
-				}
-				last_created_leader = {
-					if = {
-						limit = {
-							has_base_skill > 1
-							num_traits = 0
-						}
-						add_trait_no_notify = random_common
+					randomize_traits = no
+					traits = {
+						1 = random_common
 					}
 				}
 				last_created_leader = {
@@ -2964,18 +3019,15 @@ country_event = {
 					class = scientist
 					name = random
 					species = owner_main_species
-				}
-				last_created_leader = {
-					if = {
-						limit = {
-							has_base_skill > 1
-							num_traits = 0
-						}
-						add_trait_no_notify = random_common
-					}
+					randomize_traits = no
 				}
 				last_created_leader = {
 					set_council_position = councilor_research
+					add_trait = {
+						trait = random_common
+						show_message = no
+						consume_selection = yes
+					}
 				}
 			}
 		}
@@ -3020,18 +3072,15 @@ country_event = {
 						class = official
 						name = random
 						species = owner_main_species
-					}
-					last_created_leader = {
-						if = {
-							limit = {
-								has_base_skill > 1
-								num_traits = 0
-							}
-							add_trait_no_notify = random_common
-						}
+						randomize_traits = no
 					}
 					last_created_leader = {
 						set_council_position = councilor_state
+						add_trait = {
+							trait = random_common
+							show_message = no
+							consume_selection = yes
+						}
 					}
 				}
 			}
@@ -3070,18 +3119,15 @@ country_event = {
 					class = commander
 					name = random
 					species = owner_main_species
-				}
-				last_created_leader = {
-					if = {
-						limit = {
-							has_base_skill > 1
-							num_traits = 0
-						}
-						add_trait_no_notify = random_common
-					}
+					randomize_traits = no
 				}
 				last_created_leader = {
 					set_council_position = councilor_inwards_perfection
+					add_trait = {
+						trait = random_common
+						show_message = no
+						consume_selection = yes
+					}
 				}
 			}
 		}
@@ -3119,69 +3165,62 @@ country_event = {
 					class = commander
 					name = random
 					species = owner_main_species
-				}
-				last_created_leader = {
-					if = {
-						limit = {
-							has_base_skill > 1
-							num_traits = 0
-						}
-						add_trait_no_notify = random_common
-					}
+					randomize_traits = no
 				}
 				last_created_leader = {
 					set_council_position = councilor_fanatic_purifiers
+					add_trait = {
+						trait = random_common
+						show_message = no
+						consume_selection = yes
+					}
 				}
 			}
 		}
-	}
-}
-
-#Add 1 of 3 cyborg trait to species
-country_event = {
-	id = game_start.73
-	hide_window = yes
-	trigger = {
-		has_machine_age_dlc = yes
-		is_augmentation_bazaars_empire = yes # undercoat: moved to scripted trigger
-	}
-
-	is_triggered_only = yes
-
-	immediate = {
-		random_list = {
-			30 = {
-				every_owned_species = {
-					limit = {
-						is_robotic = no
-					}
-					change_species_characteristics = {
-						add_trait = trait_cyborg_power_drills
+		else_if = {
+			limit = {
+				has_valid_civic = civic_scorched_earth
+				has_paragon_dlc = yes
+				NOT = {
+					has_councilor = {
+						COUNCILOR = councilor_infernal_scorcher
 					}
 				}
-				set_country_flag = augmentation_bazaars_power_drills
 			}
-			30 = {
-				every_owned_species = {
-					limit = {
-						is_robotic = no
-					}
-					change_species_characteristics = {
-						add_trait = trait_cyborg_harvesters
+			unlock_council_slots = 1
+			set_council_position_to_council = councilor_infernal_scorcher
+			if = {
+				limit = {
+					any_owned_leader = {
+						leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+						is_councilor = no
+						is_ruler = no
 					}
 				}
-				set_country_flag = augmentation_bazaars_harvesters
+				random_owned_leader = {
+					limit = {
+						leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+						is_councilor = no
+						is_ruler = no
+					}
+					set_council_position = councilor_infernal_scorcher
+				}
 			}
-			30 = {
-				every_owned_species = {
-					limit = {
-						is_robotic = no
-					}
-					change_species_characteristics = {
-						add_trait = trait_cyborg_superconductive
+			else = {
+				create_leader = {
+					class = commander
+					name = random
+					species = owner_main_species
+					randomize_traits = no
+				}
+				last_created_leader = {
+					set_council_position = councilor_infernal_scorcher
+					add_trait = {
+						trait = random_common
+						show_message = no
+						consume_selection = yes
 					}
 				}
-				set_country_flag = augmentation_bazaars_superconductive
 			}
 		}
 	}
@@ -3199,6 +3238,39 @@ country_event = {
 			type = EMPIRE_FOCUS
 			localization = game_start.74.title
 			days = 30
+		}
+	}
+}
+
+country_event = {
+	id = game_start.75
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_owned_pop_group = {
+			limit = {
+				has_citizenship_type = {
+					country = root
+					type = citizenship_slavery
+				}
+			}
+			save_event_target_as = source_pop_group
+			planet = {
+				create_pop_group = {
+					pop_group = event_target:source_pop_group
+					category = slave
+					size = 0
+					effect = {
+						transfer_pop_amount = {
+							source = event_target:source_pop_group
+							target = this
+							percentage = 1
+							growth_category = "GROWTH_CAT_PROMOTION"
+						}
+					}
+				}
+			}
 		}
 	}
 }

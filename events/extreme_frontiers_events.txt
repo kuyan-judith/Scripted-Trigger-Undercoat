@@ -1,0 +1,5581 @@
+#############
+# Anomalies #
+#############
+
+namespace = extreme_frontiers
+
+# PULSATING_OBJECT_CAT
+ship_event = {
+	id = extreme_frontiers.100
+	title =  extreme_frontiers.100.title
+	desc =  extreme_frontiers.100.desc
+
+	picture = {
+		trigger = {
+			from = { is_toxic_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_toxic
+	}
+	picture = {
+		trigger = {
+			from = { is_gas_giant = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_gas_giant
+	}
+	picture = {
+		trigger = {
+			from = { is_barren_dry_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_warm_barren
+	}
+	picture = {
+		trigger = {
+			from = { is_barren_cold_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_cold_barren
+	}
+	picture = {
+		trigger = {
+			from = { is_frozen_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_frozen
+	}
+	picture = {
+		trigger = {
+			from = { is_molten_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_molten
+	}
+
+	show_sound = event_scanner
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = INTERESTING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+
+		from = {
+			add_deposit = d_society_2
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+# MOLTEN_METAL_OCEAN_CAT
+ship_event = {
+	id = extreme_frontiers.110
+	title = extreme_frontiers.110.title
+	desc = extreme_frontiers.110.desc
+
+	picture = GFX_evt_molten
+
+	show_sound = event_solar_fusion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		from = {
+			add_deposit = d_minerals_2
+			add_deposit = d_alloys_2
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# GREAT_BLUE_SPOTS_CAT
+ship_event = {
+	id = extreme_frontiers.120
+	title = extreme_frontiers.120.title
+	desc = extreme_frontiers.120.desc
+
+	picture = GFX_evt_gas_giant
+
+	show_sound = event_wind_ruins
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		from = {
+			add_deposit = d_minerals_3
+			add_deposit = d_energy_3
+		}
+	}
+}
+
+# FROZEN_INFERNO_CAT
+ship_event = {
+	id = extreme_frontiers.130
+	title = extreme_frontiers.130.title
+	desc = extreme_frontiers.130.desc
+
+	picture = GFX_evt_frozen_inferno
+
+	show_sound = event_frozen_inferno
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		from = {
+			add_deposit = d_volatile_motes_1
+			add_deposit = d_exotic_gases_1
+		}
+	}
+}
+
+# POISONED_ATMOSPHERE_CAT
+ship_event = {
+	id = extreme_frontiers.140
+	title = extreme_frontiers.140.title
+	desc = {
+		text = extreme_frontiers.140.desc.hive_mind
+		trigger = {
+			controller = { is_gestalt = yes }
+		}
+	}
+	desc = {
+		text = extreme_frontiers.140.desc.default
+		trigger = {
+			controller = { is_gestalt = no }
+		}
+	}
+
+	picture = GFX_evt_toxic
+
+	show_sound = event_dangerous_animals
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.140.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		from = {
+			enable_special_project = {
+				name = "DETOXIFICATION_GLAND_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+	option = {
+		trigger = {
+			controller = { is_gestalt = no }
+		}
+		name = extreme_frontiers.140.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = trade
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		from = {
+			add_deposit = d_trade_value_3
+		}
+	}
+}
+
+# DETOXIFICATION_GLAND_PROJECT
+ship_event = {
+	id = extreme_frontiers.145
+	title = extreme_frontiers.145.title
+	desc = extreme_frontiers.145.desc
+
+	picture = GFX_evt_analyzing_artifacts
+
+	show_sound = event_vivisection
+	is_triggered_only = yes
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			if = {
+				limit = { NOT = { has_technology = tech_colonization_2 } }
+				add_tech_progress = {
+					tech = tech_colonization_2
+					progress = 0.25
+				}
+			}
+			else_if = {
+				limit = { NOT = { has_technology = tech_colonization_3 } }
+				add_tech_progress = {
+					tech = tech_colonization_3
+					progress = 0.25
+				}
+			}
+			else_if = {
+				limit = { NOT = { has_technology = tech_colonization_4 } }
+				add_tech_progress = {
+					tech = tech_colonization_4
+					progress = 0.25
+				}
+			}
+			else_if = {
+				limit = { NOT = { has_technology = tech_colonization_5 } }
+				add_tech_progress = {
+					tech = tech_colonization_5
+					progress = 0.25
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+}
+
+# GLIMPSE_CORE_CAT
+ship_event = {
+	id = extreme_frontiers.150
+	title = extreme_frontiers.150.title
+	desc = extreme_frontiers.150.desc
+
+	picture = GFX_evt_glimpse_core
+
+	show_sound = event_scanner
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.150.a
+		from = {
+			enable_special_project = {
+				name = "PURIFY_CORE_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.150.b
+		allow = {
+			controller = { is_homicidal = no }
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		from = {
+			add_deposit = d_society_5
+			add_deposit = d_physics_3
+		}
+	}
+}
+
+# PURIFY_CORE_PROJECT
+ship_event = {
+	id = extreme_frontiers.155
+	title = extreme_frontiers.155.title
+	desc = extreme_frontiers.155.desc
+
+	picture = GFX_evt_gray_gooed_planet
+
+	show_sound = event_inhabited_solar_system
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.155.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		from.from = {
+			random_list = {
+				1 = { change_pc = pc_desert }
+				1 = { change_pc = pc_savannah }
+				1 = { change_pc = pc_arid }
+			}
+			hidden_effect = {
+				set_planet_size = 12
+				reset_planet = yes
+				clear_blockers = yes
+				add_modifier = { modifier = mineral_rich }
+			}
+		}
+	}
+}
+
+# OPTICAL_PHENOMENA_CAT
+ship_event = {
+	id = extreme_frontiers.160
+	title = extreme_frontiers.160.title
+	desc = {
+		text = extreme_frontiers.160.desc.machine
+		trigger = {
+			controller = { is_machine_empire = yes }
+		}
+	}
+	desc = {
+		text = extreme_frontiers.160.desc.default
+		trigger = {
+			controller = { is_machine_empire = no }
+		}
+	}
+
+	picture = GFX_evt_optical_phenomena
+
+	show_sound = event_space_crystals
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		if = {
+			limit = {
+				controller = { is_machine_empire = yes }
+			}
+			from = {
+				add_deposit = d_minerals_6
+				add_deposit = d_rare_crystals_3
+			}
+		}
+		else = {
+			from = {
+				add_deposit = d_minerals_5
+				add_deposit = d_rare_crystals_2
+			}
+			custom_tooltip = extreme_frontiers.160.tooltip
+			controller = {
+				set_variable = {
+					which = prismatic_ice_exhibit_happened
+					value = 0
+				}
+				set_country_flag = can_exhibit_prismatic_ice
+			}
+		}
+	}
+}
+
+# PLASMA_VOLCANO_CAT
+ship_event = {
+	id = extreme_frontiers.170
+	title = extreme_frontiers.170.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.170.desc
+			if = {
+				limit = { has_ship_flag = event_traumatized_leader }
+				text = newline
+				text = extreme_frontiers.170.desc.traumatized
+			}
+			else_if = {
+				limit = { has_ship_flag = event_maimed_leader }
+				text = newline
+				text = extreme_frontiers.170.desc.maimed
+			}
+		}
+	}
+
+	picture = GFX_evt_plasma_volcano
+
+	show_sound = event_plasma_volcanoes
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { leader.species = { NOT = { is_species_class = MACHINE } } }
+			random_list = { # 15% of either trauma or maimed
+				170 = {}
+				15 = {
+					set_ship_flag = event_traumatized_leader
+					leader = { add_trait = { trait = leader_trait_traumatized } }
+				}
+				15 = {
+					set_ship_flag = event_maimed_leader
+					leader = { add_trait = { trait = leader_trait_maimed } }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		from = {
+			add_deposit = d_physics_4
+		}
+		controller = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_plasma_1 = {
+					add_tech_progress = {
+						tech = tech_plasma_1
+						progress = 0.5
+					}
+				}
+				tech_plasma_2 = {
+					add_tech_progress = {
+						tech = tech_plasma_2
+						progress = 0.5
+					}
+				}
+				tech_plasma_3 = {
+					add_tech_progress = {
+						tech = tech_plasma_3
+						progress = 0.5
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = physics_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+		if = {
+			limit = { has_ship_flag = event_traumatized_leader }
+			tooltip = {
+				leader = { add_trait = { trait = leader_trait_traumatized } }
+			}
+		}
+		else_if = {
+			limit = { has_ship_flag = event_maimed_leader }
+			tooltip = {
+				leader = { add_trait = { trait = leader_trait_maimed } }
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = { has_ship_flag = event_traumatized_leader }
+				remove_ship_flag = event_traumatized_leader
+			}
+			else_if = {
+				limit = { has_ship_flag = event_maimed_leader }
+				remove_ship_flag = event_maimed_leader
+			}
+		}
+	}
+}
+
+# BLACK_CLOUDS_CAT
+ship_event = {
+	id = extreme_frontiers.180
+	title = extreme_frontiers.180.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.180.desc
+			if = {
+				limit = { controller = { NOT = { has_civic = civic_hive_devouring_swarm } } }
+				text = newline
+				text = extreme_frontiers.180.desc.altered_metabolism
+			}
+		}
+	}
+
+	picture = {
+		trigger = {
+			from = { is_toxic_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_toxic
+	}
+	picture = {
+		trigger = {
+			from = { is_barren_dry_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_warm_barren
+	}
+	picture = {
+		trigger = {
+			from = { is_barren_cold_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_cold_barren
+	}
+
+	show_sound = event_black_clouds
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			controller = { NOT = { has_civic = civic_hive_devouring_swarm } }
+		}
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		from = {
+			add_deposit = d_society_3
+		}
+		leader = {
+			add_trait = { trait = leader_trait_altered_metabolism }
+		}
+		controller = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_genome_mapping = {
+					add_tech_progress = {
+						tech = tech_genome_mapping
+						progress = 0.25
+					}
+				}
+				tech_gene_tailoring = {
+					add_tech_progress = {
+						tech = tech_gene_tailoring
+						progress = 0.25
+					}
+				}
+				tech_glandular_acclimation = {
+					add_tech_progress = {
+						tech = tech_glandular_acclimation
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = society_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			controller = { has_civic = civic_hive_devouring_swarm }
+		}
+		name = extreme_frontiers.180.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier4materialreward
+				min = @tier4materialmin
+				max = @tier4materialmax
+			}
+		}
+	}
+}
+
+# SUBGLACIAL_VIBRATIONS_CAT
+ship_event = {
+	id = extreme_frontiers.190
+	title = extreme_frontiers.190.title
+	desc = extreme_frontiers.190.desc
+
+	picture = GFX_evt_frozen
+
+	show_sound = event_subglacial_vibrations
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		from = {
+			save_global_event_target_as = pinnipeds_home_planet
+		}
+	}
+
+	option = {
+		name = extreme_frontiers.190.a
+		allow = {
+			controller = { is_homicidal = no }
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			controller = {
+				set_country_flag = found_subglacial_pinnipeds
+			}
+		}
+		from = {
+			add_deposit = d_society_2
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		custom_tooltip = extreme_frontiers.190.a.tt
+	}
+	option = {
+		name = extreme_frontiers.190.b
+		trigger = {
+			owner = { values_others = no }
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		from = {
+			add_deposit = d_food_6
+		}
+	}
+}
+
+# ELECTRIC_WATERS_CAT
+ship_event = {
+	id = extreme_frontiers.200
+	title = extreme_frontiers.200.title
+	desc = extreme_frontiers.200.desc
+
+	picture = GFX_evt_arctic
+
+	show_sound = event_electric_waters
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		from = {
+			add_deposit = d_energy_5
+		}
+	}
+}
+
+# OBSIDIAN_PLANET_CAT
+ship_event = {
+	id = extreme_frontiers.210
+	title = extreme_frontiers.210.title
+	desc = extreme_frontiers.210.desc
+
+	picture = GFX_evt_landing_ship_2
+
+	show_sound = event_drilling
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		from = {
+			add_deposit = d_minerals_6
+			add_deposit = d_exotic_gases_2
+		}
+	}
+}
+
+# SHEARING_FORCE_CAT
+ship_event = {
+	id = extreme_frontiers.220
+	title = extreme_frontiers.220.title
+	desc = extreme_frontiers.220.desc
+
+	picture = GFX_evt_gas_giant
+
+	show_sound = event_drilling
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		from = {
+			add_deposit = d_energy_10
+		}
+	}
+}
+
+# MISSING_MASS_CAT
+ship_event = {
+	id = extreme_frontiers.230
+	title = extreme_frontiers.230.title
+	desc = {
+		text = extreme_frontiers.230.desc
+		trigger = {
+			controller = {
+				is_lithoid_devouring_swarm = no
+			}
+		}
+	}
+	desc = {
+		text = extreme_frontiers.230.desc.terravore
+		trigger = {
+			controller = {
+				is_lithoid_devouring_swarm = yes
+			}
+		}
+	}
+
+	picture = GFX_evt_underground_civilization
+
+	show_sound = event_missing_mass
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.230.a
+		allow = {
+			controller = { is_xenophile = no }
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		from = {
+			add_deposit = d_minerals_5
+		}
+	}
+	option = {
+		name = extreme_frontiers.230.b
+		allow = {
+			controller = { is_homicidal = no }
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			add_deposit = d_society_5
+		}
+	}
+}
+
+# LIFE_IN_DARKNESS_CAT
+ship_event = {
+	id = extreme_frontiers.240
+	title = extreme_frontiers.240.title
+	desc = {
+		text = extreme_frontiers.240.desc.non_homicidal
+		trigger = { controller = { is_homicidal = no } }
+	}
+	desc = {
+		text = extreme_frontiers.240.desc
+		trigger = { controller = { is_homicidal = yes } }
+	}
+
+	picture = GFX_evt_translucent_evolution
+
+	show_sound = event_life_in_darkness
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		trigger = { controller = { is_homicidal = no } }
+		name = extreme_frontiers.240.a
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			add_deposit = d_society_5
+		}
+	}
+	option = {
+		trigger = { controller = { has_civic = civic_hive_devouring_swarm } }
+		name = extreme_frontiers.240.b
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		from = {
+			add_deposit = d_food_5
+		}
+	}
+	option = {
+		trigger = {
+			controller = {
+				is_homicidal = yes
+				NOT = { has_civic = civic_hive_devouring_swarm }
+			}
+		}
+		name = extreme_frontiers.240.c
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+}
+
+# RAINBOW_RIVERS_CAT
+ship_event = {
+	id = extreme_frontiers.250
+	title = extreme_frontiers.250.title
+	desc = extreme_frontiers.250.desc
+
+	picture = GFX_evt_rainbow_rivers
+
+	show_sound = event_space_amoeba
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			add_deposit = d_society_7
+		}
+	}
+}
+
+# GASEOUS_METALS_CAT
+ship_event = {
+	id = extreme_frontiers.260
+	title = extreme_frontiers.260.title
+	desc = extreme_frontiers.260.desc
+
+	picture = GFX_evt_toxic
+
+	show_sound = event_laboratory_sound
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		from = {
+			add_deposit = d_alloys_2
+			enable_special_project = {
+				name = "ATMOSPHERIC_ELECTROPLATING"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# ATMOSPHERIC_ELECTROPLATING
+ship_event = {
+	id = extreme_frontiers.265
+	title = extreme_frontiers.265.title
+	desc = extreme_frontiers.265.desc
+
+	picture = GFX_evt_mercenary_fleet
+
+	show_sound = event_laboratory_sound
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		controller = {
+			if = {
+				limit = {
+					NOT = { has_technology = tech_corvette_hull_1 }
+					can_research_technology = tech_corvette_hull_1
+				}
+				add_tech_progress = {
+					tech = tech_corvette_hull_1
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_destroyer_hull_1 }
+					can_research_technology = tech_destroyer_hull_1
+				}
+				add_tech_progress = {
+					tech = tech_destroyer_hull_1
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_cruiser_hull_1 }
+					can_research_technology = tech_cruiser_hull_1
+				}
+				add_tech_progress = {
+					tech = tech_cruiser_hull_1
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_battleship_hull_1 }
+					can_research_technology = tech_battleship_hull_1
+				}
+				add_tech_progress = {
+					tech = tech_battleship_hull_1
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_corvette_hull_2 }
+					can_research_technology = tech_corvette_hull_2
+				}
+				add_tech_progress = {
+					tech = tech_corvette_hull_2
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_destroyer_hull_2 }
+					can_research_technology = tech_destroyer_hull_2
+				}
+				add_tech_progress = {
+					tech = tech_destroyer_hull_2
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_cruiser_hull_2 }
+					can_research_technology = tech_cruiser_hull_2
+				}
+				add_tech_progress = {
+					tech = tech_cruiser_hull_2
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_battleship_hull_2 }
+					can_research_technology = tech_battleship_hull_2
+				}
+				add_tech_progress = {
+					tech = tech_battleship_hull_2
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_titan_hull_1 }
+					can_research_technology = tech_titan_hull_1
+				}
+				add_tech_progress = {
+					tech = tech_titan_hull_1
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else_if = {
+				limit = {
+					NOT = { has_technology = tech_titan_hull_2 }
+					can_research_technology = tech_titan_hull_2
+				}
+				add_tech_progress = {
+					tech = tech_titan_hull_2
+					progress = @atmospheric_electroplating_tech_insight
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+}
+
+# CARBON_ALLOTROPES_CAT
+ship_event = {
+	id = extreme_frontiers.270
+	title = extreme_frontiers.270.title
+	desc = extreme_frontiers.270.desc
+
+	picture = GFX_evt_cold_barren
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.270.a
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		from = {
+			add_deposit = d_minerals_4
+		}
+	}
+}
+
+# DIAMOND_DUST_CAT
+ship_event = {
+	id = extreme_frontiers.280
+	title = extreme_frontiers.280.title
+	desc = extreme_frontiers.280.desc
+
+	picture = GFX_evt_ice_asteroids
+
+	show_sound = event_space_crystals
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		if = {
+			limit = { controller = { is_gestalt = no }}
+			controller = {
+				add_monthly_resource_mult = {
+					resource = trade
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+		}
+		else = {
+			from = {
+				hidden_effect = {
+					if = {
+						limit = { has_deposit_for = shipclass_mining_station }
+						clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+					}
+				}
+				add_deposit = d_physics_4
+			}
+		}
+		from = {
+			enable_special_project = {
+				name = "ATMOSPHERIC_DIAMONDS_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# ATMOSPHERIC_DIAMONDS_PROJECT
+ship_event = {
+	id = extreme_frontiers.285
+	title = extreme_frontiers.285.title
+	desc = extreme_frontiers.285.desc
+
+	picture = GFX_evt_physics_research
+
+	show_sound = event_trap_laser
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			inverted_switch = {
+				trigger = has_technology
+				tech_lasers_2 = {
+					add_tech_progress = {
+						tech = tech_lasers_2
+						progress = 0.25
+					}
+				}
+				tech_lasers_3 = {
+					add_tech_progress = {
+						tech = tech_lasers_3
+						progress = 0.25
+					}
+				}
+				tech_lasers_4 = {
+					add_tech_progress = {
+						tech = tech_lasers_4
+						progress = 0.25
+					}
+				}
+				tech_lasers_5 = {
+					add_tech_progress = {
+						tech = tech_lasers_5
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = physics_research
+						value = @tier3researchreward
+						min = @tier3researchmin
+						max = @tier3researchmax
+					}
+				}
+			}
+		}
+	}
+}
+
+# GEOLOGICAL_TENSION_CAT
+ship_event = {
+	id = extreme_frontiers.290
+	title = extreme_frontiers.290.title
+	desc = extreme_frontiers.290.desc
+
+	picture = GFX_evt_molten
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.290.a
+		from = {
+			enable_special_project = {
+				name = "CONTROLLED_ERUPTION_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.290.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+	}
+}
+
+# CONTROLLED_ERUPTION_PROJECT
+ship_event = {
+	id = extreme_frontiers.295
+	title = extreme_frontiers.295.title
+	desc = extreme_frontiers.295.desc
+
+	picture = GFX_evt_nuclear_explosion
+
+	show_sound = event_super_explosion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = {
+			trigger = { controller = { is_machine_empire = no } }
+			text = extreme_frontiers.295.a.default
+		}
+		name = {
+			trigger = { controller = { is_machine_empire = yes } }
+			text = extreme_frontiers.295.a.machine
+		}
+		from.from = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_minerals_3
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			inverted_switch = {
+				trigger = has_technology
+				tech_mining_1 = {
+					add_tech_progress = {
+						tech = tech_mining_1
+						progress = 0.1
+					}
+				}
+				tech_mining_2 = {
+					add_tech_progress = {
+						tech = tech_mining_2
+						progress = 0.1
+					}
+				}
+				tech_mining_3 = {
+					add_tech_progress = {
+						tech = tech_mining_3
+						progress = 0.1
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+	}
+}
+
+# LAYERED_ATMOSPHERE_CAT
+ship_event = {
+	id = extreme_frontiers.300
+	title = extreme_frontiers.300.title
+	desc = extreme_frontiers.300.desc
+
+	picture = GFX_evt_gas_giant
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		from = {
+			add_deposit = d_exotic_gases_2
+			add_deposit = d_alloys_2
+			add_deposit = d_energy_2
+		}
+	}
+}
+
+# PLASMA_TRAILS_CAT
+ship_event = {
+	id = extreme_frontiers.310
+	title = extreme_frontiers.310.title
+	desc = extreme_frontiers.310.desc
+
+	picture = GFX_evt_frozen
+
+	show_sound = event_plasma_trails
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_energy_10
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+}
+
+# CRYSTALLINE_PLAINS_CAT
+ship_event = {
+	id = extreme_frontiers.320
+	title = extreme_frontiers.320.title
+	desc = extreme_frontiers.320.desc
+
+	picture = GFX_evt_frozen
+
+	show_sound = event_space_crystals
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		from = {
+			add_deposit = d_rare_crystals_2
+			add_deposit = d_exotic_gases_1
+		}
+	}
+}
+
+# SUPERMASSIVE_GIANT_CAT
+ship_event = {
+	id = extreme_frontiers.330
+	title = extreme_frontiers.330.title
+	desc = extreme_frontiers.330.desc
+
+	picture = GFX_evt_satellite_in_orbit
+
+	show_sound = event_supermassive_giant
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.330.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.330.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+	}
+}
+
+# INVISIBLE_PLANET_CAT
+ship_event = {
+	id = extreme_frontiers.340
+	title = extreme_frontiers.340.title
+	desc = {
+		trigger = {
+			if = {
+				limit = { has_first_contact_dlc = yes }
+				text = extreme_frontiers.340.desc.first_contact
+			}
+			else = {
+				text = extreme_frontiers.340.desc.default
+			}
+		}
+	}
+
+	picture = GFX_evt_cold_barren
+
+	immediate = {
+		from.solar_system = {
+			random_list = {
+				10 = {
+					spawn_invisible_planet = {
+						PLANET_CLASS = pc_barren
+						SHIP_SCOPE = root
+					}
+				}
+				10 = {
+					spawn_invisible_planet = {
+						PLANET_CLASS = pc_barren_cold
+						SHIP_SCOPE = root
+					}
+				}
+			}
+		}
+	}
+
+	show_sound = event_finding_loot
+	location = event_target:invisible_planet
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		controller = {
+			if = {
+				limit = { has_first_contact_dlc = yes }
+				inverted_switch = {
+					trigger = has_technology
+					tech_cloaking_1 = {
+						add_tech_progress = {
+							tech = tech_cloaking_1
+							progress = 0.1
+						}
+					}
+					tech_cloaking_2 = {
+						add_tech_progress = {
+							tech = tech_cloaking_2
+							progress = 0.1
+						}
+					}
+					tech_cloaking_3 = {
+						add_tech_progress = {
+							tech = tech_cloaking_3
+							progress = 0.1
+						}
+					}
+					tech_cloaking_dark_matter = {
+						add_tech_progress = {
+							tech = tech_cloaking_dark_matter
+							progress = 0.1
+						}
+					}
+					default = {
+						add_monthly_resource_mult = {
+							resource = physics_research
+							value = @tier3researchreward
+							min = @tier3researchmin
+							max = @tier3researchmax
+						}
+					}
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+}
+
+# SURVIVAL_POD_CAT
+ship_event = {
+	id = extreme_frontiers.350
+	title = extreme_frontiers.350.title
+	desc = extreme_frontiers.350.desc
+
+	picture = GFX_evt_landing_ship
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.350.a
+		allow = {
+			controller = { is_homicidal = no }
+		}
+		controller = {
+			country_event = { id = extreme_frontiers.352 }
+		}
+	}
+	option = {
+		name = extreme_frontiers.350.b
+		allow = {
+			controller = {
+				is_homicidal = no
+				resource_stockpile_compare = {
+					resource = alloys
+					value >= 15
+				}
+				resource_stockpile_compare = {
+					resource = food
+					value >= 15
+				}
+			}
+		}
+		controller = {
+			add_resource = {
+				alloys = -15
+				food = -15
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.350.c
+		allow = {
+			controller = { is_homicidal = no }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.350.d
+		trigger = {
+			controller = { is_homicidal = yes }
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+}
+
+# Scru's conversation
+country_event = {
+	id = extreme_frontiers.352
+	title = extreme_frontiers.352.title
+	desc = extreme_frontiers.352.desc
+	show_sound = event_conversation
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+
+	trigger = {
+		has_shroud_dlc = yes
+	}
+
+	immediate = {
+		random_list = {
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = MAM }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = MAM
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = MAM }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = MAM
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = REP }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = REP
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = AVI }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = AVI
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = ART }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = ART
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = MOL }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = MOL
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = TOX }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = TOX
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = FUN }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = FUN
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = PLANT }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = PLANT
+				}
+			}
+			10 = {
+				modifier = {
+					factor = 0
+					owner_main_species = { is_species_class = AVI }
+				}
+				create_survivalist_scru_leader = {
+					SPECIES = AVI
+				}
+			}
+		}
+	}
+
+	picture_event_data = {
+		portrait = event_target:survivalist_scru
+		room = scrappy_room
+	}
+
+	option = {
+		name = extreme_frontiers.352.a # what stranded you here ?
+		response_text = extreme_frontiers.352.a.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.352.b # how did you survive ?
+		response_text = extreme_frontiers.352.b.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.352.c # wanna join your kind ?
+		response_text = extreme_frontiers.352.c.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.352.d # what can you do for us ?
+		response_text = extreme_frontiers.352.d.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.352.e # enlist
+		tag = hire_leader
+		custom_tooltip = extreme_frontiers.352.e.custom_tooltip # Scru joins
+		hidden_effect = {
+			hire_event_leader_effect = {
+				LEADER = survivalist_scru
+			}
+		}
+	}
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier1researchreward
+			min = @tier1researchmin
+			max = @tier1researchmax
+		}
+	}
+}
+
+# INFERNAL_TORNADOES_CAT
+ship_event = {
+	id = extreme_frontiers.360
+	title = extreme_frontiers.360.title
+	desc = extreme_frontiers.360.desc
+
+	picture = GFX_evt_molten
+
+	show_sound = event_solar_fusion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+
+		from = {
+			add_deposit = d_energy_5
+			add_deposit = d_exotic_gases_1
+			enable_special_project = {
+				name = "INFERNAL_CATALYSTS_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# INFERNAL_CATALYSTS_PROJECT
+ship_event = {
+	id = extreme_frontiers.365
+	title = extreme_frontiers.365.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.365.desc
+			if = {
+				limit = {
+					has_machine_age_dlc = yes
+					controller = {
+						has_technology = tech_orbital_arc_furnace
+					}
+				}
+				text = newline
+				text = extreme_frontiers.365.desc.has_furnace
+			}
+			else_if = {
+				limit = {
+					has_machine_age_dlc = yes
+				}
+				text = newline
+				text = extreme_frontiers.365.desc.default
+			}
+		}
+	}
+
+	picture = GFX_evt_physics_research
+
+	show_sound = event_super_explosion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			add_tech_progress = {
+				tech = tech_pyroclastic_resonation
+				progress = 0.15
+			}
+			if = {
+				limit = {
+					has_machine_age_dlc = yes
+					has_technology = tech_orbital_arc_furnace
+				}
+				inverted_switch = {
+					trigger = has_technology
+					tech_space_mining_1 = {
+						add_tech_progress = {
+							tech = tech_space_mining_1
+							progress = 0.15
+						}
+					}
+					tech_space_mining_2 = {
+						add_tech_progress = {
+							tech = tech_space_mining_2
+							progress = 0.15
+						}
+					}
+					tech_space_mining_3 = {
+						add_tech_progress = {
+							tech = tech_space_mining_3
+							progress = 0.15
+						}
+					}
+					tech_space_mining_4 = {
+						add_tech_progress = {
+							tech = tech_space_mining_4
+							progress = 0.15
+						}
+					}
+					tech_space_mining_5 = {
+						add_tech_progress = {
+							tech = tech_space_mining_5
+							progress = 0.15
+						}
+					}
+					default = {
+						add_monthly_resource_mult = {
+							resource = engineering_research
+							value = @tier2researchreward
+							min = @tier2researchmin
+							max = @tier2researchmax
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_machine_age_dlc = yes
+				}
+				add_tech_progress = {
+					tech = tech_orbital_arc_furnace
+					progress = 0.15
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+}
+
+# MAGMA_MEGAFAUNA_CAT
+ship_event = {
+	id = extreme_frontiers.370
+	title = extreme_frontiers.370.title
+	desc = extreme_frontiers.370.desc
+
+	picture = GFX_evt_magma_megafauna
+
+	show_sound = event_magma_megafauna
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		from = {
+			add_deposit = d_minerals_6
+			add_deposit = d_volatile_motes_3
+			enable_special_project = {
+				name = "LAVA_DIVERS_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# LAVA_DIVERS_PROJECT
+ship_event = {
+	id = extreme_frontiers.375
+	title = extreme_frontiers.375.title
+	desc = extreme_frontiers.375.desc
+
+	picture = GFX_evt_magma_megafauna
+
+	show_sound = event_super_explosion
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			inverted_switch = {
+				trigger = has_technology
+				tech_ship_armor_2 = {
+					add_tech_progress = {
+						tech = tech_ship_armor_2
+						progress = 0.25
+					}
+				}
+				tech_ship_armor_3 = {
+					add_tech_progress = {
+						tech = tech_ship_armor_3
+						progress = 0.25
+					}
+				}
+				tech_ship_armor_4 = {
+					add_tech_progress = {
+						tech = tech_ship_armor_4
+						progress = 0.25
+					}
+				}
+				tech_ship_armor_5 = {
+					add_tech_progress = {
+						tech = tech_ship_armor_5
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+	}
+}
+
+# PLANET_THRUSTERS_CAT
+ship_event = {
+	id = extreme_frontiers.380
+	title = extreme_frontiers.380.title
+	desc = extreme_frontiers.380.desc
+
+	picture = GFX_evt_gas_giant_station
+
+	show_sound = event_ancient_drone
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.380.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_fusion_power } }
+				add_tech_progress = {
+					tech = tech_fusion_power
+					progress = 0.5
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.380.b
+		controller = {
+			if = {
+				limit = { NOT = { has_technology = tech_fusion_power } }
+				add_tech_progress = {
+					tech = tech_fusion_power
+					progress = 0.5
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+		from = {
+			enable_special_project = {
+				name = "REPURPOSE_THRUSTERS_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# REPURPOSE_THRUSTERS_PROJECT
+ship_event = {
+	id = extreme_frontiers.385
+	title = extreme_frontiers.385.title
+	desc = extreme_frontiers.385.desc
+
+	picture = GFX_evt_cosmic_storms_celestial_storm
+
+	show_sound = event_planet_thrusters
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.385.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		hidden_effect = {
+			from.from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+				add_modifier = { modifier = chthonian_planet }
+			}
+		}
+		from.from = {
+			change_pc = pc_molten
+			hidden_effect = {
+				reset_planet = yes
+				clear_blockers = yes
+				set_planet_size = 18
+			}
+			custom_tooltip = extreme_frontiers.385.tt
+		}
+		hidden_effect = {
+			ship_event = {
+				id = anomaly.6662 # add the minerals deposit
+				scopes = {
+					from = from.from
+				}
+			}
+		}
+	}
+}
+
+# BACKWARDS_ORBIT_CAT
+ship_event = {
+	id = extreme_frontiers.390
+	title = extreme_frontiers.390.title
+	desc = extreme_frontiers.390.desc
+
+	picture = GFX_evt_star_chart
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		from.solar_system = {
+			random_neighbor_system = {
+				limit = {
+					is_surveyed = {
+						who = root.controller
+						status = yes
+					}
+				}
+				save_event_target_as = wandering_planet_origin
+			}
+		}
+	}
+
+	option = {
+		name = INTERESTING
+		from = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_physics_5
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+# VAPOR_PLUMES_CAT
+ship_event = {
+	id = extreme_frontiers.400
+	title = extreme_frontiers.400.title
+	desc = extreme_frontiers.400.desc
+
+	picture = {
+		trigger = {
+			from = { is_barren_cold_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_cold_barren
+	}
+	picture = {
+		trigger = {
+			from = { is_frozen_world = yes } # undercoat: moved to scripted trigger
+		}
+		picture = GFX_evt_frozen
+	}
+
+	show_sound = event_space_cloud
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_physics_4
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+}
+
+# FIBROUS_ATMOSPHERE_CAT
+ship_event = {
+	id = extreme_frontiers.410
+	title = extreme_frontiers.410.title
+	desc = extreme_frontiers.410.desc
+
+	picture = GFX_evt_gas_giant
+
+	show_sound = event_power_down
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		from = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_minerals_5
+			add_deposit = d_energy_5
+		}
+	}
+}
+
+# EXPLODING_SKIES_CAT
+ship_event = {
+	id = extreme_frontiers.420
+	title = extreme_frontiers.420.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.420.desc
+			if = {
+				limit = { has_ship_flag = event_traumatized_leader }
+				text = newline
+				text = extreme_frontiers.420.desc.traumatized
+			}
+			else_if = {
+				limit = { has_ship_flag = event_maimed_leader }
+				text = newline
+				text = extreme_frontiers.420.desc.maimed
+			}
+		}
+	}
+
+	picture = GFX_evt_toxic
+
+	show_sound = event_ship_explosion
+	location = from
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { leader.species = { NOT = { is_species_class = MACHINE } } }
+			random_list = { # 15% of either trauma or maimed
+				170 = {}
+				15 = {
+					set_ship_flag = event_traumatized_leader
+					leader = { add_trait = { trait = leader_trait_traumatized } }
+				}
+				15 = {
+					set_ship_flag = event_maimed_leader
+					leader = { add_trait = { trait = leader_trait_maimed } }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = FASCINATING
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		from = {
+			add_deposit = d_exotic_gases_2
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			inverted_switch = {
+				trigger = has_technology
+				tech_thrusters_2 = {
+					add_tech_progress = {
+						tech = tech_thrusters_2
+						progress = 0.25
+					}
+				}
+				tech_thrusters_3 = {
+					add_tech_progress = {
+						tech = tech_thrusters_3
+						progress = 0.25
+					}
+				}
+				tech_thrusters_4 = {
+					add_tech_progress = {
+						tech = tech_thrusters_4
+						progress = 0.25
+					}
+				}
+				default = {
+					add_monthly_resource_mult = {
+						resource = engineering_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
+					}
+				}
+			}
+		}
+		if = {
+			limit = { has_ship_flag = event_traumatized_leader }
+			tooltip = {
+				leader = { add_trait = { trait = leader_trait_traumatized } }
+			}
+		}
+		else_if = {
+			limit = { has_ship_flag = event_maimed_leader }
+			tooltip = {
+				leader = { add_trait = { trait = leader_trait_maimed } }
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			if = {
+				limit = { has_ship_flag = event_traumatized_leader }
+				remove_ship_flag = event_traumatized_leader
+			}
+			else_if = {
+				limit = { has_ship_flag = event_maimed_leader }
+				remove_ship_flag = event_maimed_leader
+			}
+		}
+	}
+}
+
+# CHTHONIAN_PRESERVATION_CAT
+ship_event = {
+	id = extreme_frontiers.430
+	title = extreme_frontiers.430.title
+	desc = extreme_frontiers.430.desc
+
+	picture = GFX_evt_chthonian_preservation
+
+	show_sound = event_chthonian_preservation
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = FASCINATING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = exotic_gases
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = fromfrom } }
+		}
+		from = {
+			add_deposit = d_exotic_gases_2
+			add_deposit = d_alloys_4
+			enable_special_project = {
+				name = "CHTHONIAN_PETRIFICATION_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# CHTHONIAN_PETRIFICATION_PROJECT
+ship_event = {
+	id = extreme_frontiers.435
+	title = extreme_frontiers.435.title
+	desc = extreme_frontiers.435.desc
+
+	picture = GFX_evt_chthonian_preservation
+
+	show_sound = event_drilling
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			add_research_option = tech_alloy_fossilization
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+# ORBITAL_RESONANCE_CAT
+ship_event = {
+	id = extreme_frontiers.440
+	title = extreme_frontiers.440.title
+	desc = extreme_frontiers.440.desc
+
+	picture = GFX_evt_star_chart
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = INTERESTING
+		controller = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		from = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_physics_4
+			enable_special_project = {
+				name = "GRAVITY_ASSIST_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+}
+
+# GRAVITY_ASSIST_PROJECT
+ship_event = {
+	id = extreme_frontiers.445
+	title = extreme_frontiers.445.title
+	desc = extreme_frontiers.445.desc
+
+	picture = GFX_evt_think_tank
+
+	show_sound = event_default
+	location = from
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		controller = {
+			add_tech_progress = {
+				tech = tech_orbital_maneuvers
+				progress = 0.25
+			}
+		}
+	}
+}
+
+#############
+# Arc Sites #
+#############
+
+#### ABSOLUTE ZERO ####
+
+# Frozen Blockage
+fleet_event = {
+	id = extreme_frontiers.1000
+	title = extreme_frontiers.1000.title
+	desc = extreme_frontiers.1000.desc
+	picture = GFX_evt_frozen
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1000.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Frozen in Time
+fleet_event = {
+	id = extreme_frontiers.1005
+	title = extreme_frontiers.1005.title
+	desc = extreme_frontiers.1005.desc
+	picture = GFX_evt_frozen
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = CURIOUS
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Glacial Tomb
+fleet_event = {
+	id = extreme_frontiers.1010
+	title = extreme_frontiers.1010.title
+	desc = extreme_frontiers.1010.desc
+	picture = GFX_evt_glacial_tomb
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1010.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Frozen Monarch
+fleet_event = {
+	id = extreme_frontiers.1015
+	title = extreme_frontiers.1015.title
+	desc = extreme_frontiers.1015.desc
+	picture = GFX_evt_glacial_tomb
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1015.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Cryogenic Catastrophe
+fleet_event = {
+	id = extreme_frontiers.1020
+	title = extreme_frontiers.1020.title
+	desc = extreme_frontiers.1020.desc
+	picture = GFX_evt_glacial_tomb
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = EXCELLENT
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			add_research_option = tech_cryovault
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+#######################
+
+#### TOXIC MATRIX ####
+
+# Ruptured Slime Sac
+fleet_event = {
+	id = extreme_frontiers.1100
+	title = extreme_frontiers.1100.title
+	desc = extreme_frontiers.1100.desc
+	picture = GFX_evt_toxic_matrix
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1100.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Toxic Gestation Pools
+fleet_event = {
+	id = extreme_frontiers.1105
+	title = extreme_frontiers.1105.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1105.desc
+			text = newline
+			if = {
+				limit = {
+					leader.species = { is_species_class = TOX }
+				}
+				text = extreme_frontiers.1105.desc.toxoid
+			}
+			else = {
+				text = extreme_frontiers.1105.desc.non_toxoid
+			}
+		}
+	}
+	picture = GFX_evt_infested
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1105.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Embryonic Remains
+fleet_event = {
+	id = extreme_frontiers.1110
+	title = extreme_frontiers.1110.title
+	desc = extreme_frontiers.1110.desc
+	picture = GFX_evt_analyzing_artifacts
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1110.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Life Signs Detected
+fleet_event = {
+	id = extreme_frontiers.1115
+	title = extreme_frontiers.1115.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1115.desc.a
+			if = {
+				limit = {
+					leader.species = { NOT = { is_species_class = TOX } }
+				}
+				text = newline
+				text = extreme_frontiers.1115.desc.non_toxoid
+			}
+			text = newline
+			text = extreme_frontiers.1115.desc.b
+			if = {
+				limit = {
+					leader.species = { is_species_class = TOX }
+				}
+				text = newline
+				text = extreme_frontiers.1115.desc.toxoid
+			}
+		}
+	}
+	picture = GFX_evt_analyzing_artifacts
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1115.a
+		from = {
+			enable_special_project = {
+				name = "TOXIC_SLIME_CATALYZATION_PROJECT"
+				location = this
+				owner = root.owner
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.1115.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+	option = {
+		trigger = {
+			leader.species = { is_species_class = TOX }
+		}
+		name = extreme_frontiers.1115.c
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier5materialreward
+				min = @tier5materialmin
+				max = @tier5materialmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# TOXIC_SLIME_CATALYZATION_PROJECT
+ship_event = {
+	id = extreme_frontiers.1120
+	title = extreme_frontiers.1120.title
+	desc = extreme_frontiers.1120.desc
+
+	picture = GFX_evt_astral_rift_research_lab
+
+	show_sound = event_laboratory_sound
+	is_triggered_only = yes
+
+	option = {
+		trigger = {
+			controller = {
+				is_gestalt = no
+				is_homicidal = no
+			}
+		}
+		name = extreme_frontiers.1120.a
+		hidden_effect = {
+			random_list = {
+				10 = {
+					modifier = {
+						factor = 0
+						controller = { species_portrait = tox3 }
+					}
+					create_pop_slimeborn = {
+						PORTRAIT = tox3
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						controller = { species_portrait = tox4 }
+					}
+					create_pop_slimeborn = {
+						PORTRAIT = tox4
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						controller = { species_portrait = tox7 }
+					}
+					create_pop_slimeborn = {
+						PORTRAIT = tox7
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						controller = { species_portrait = tox9 }
+					}
+					create_pop_slimeborn = {
+						PORTRAIT = tox9
+					}
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						controller = { species_portrait = tox10 }
+					}
+					create_pop_slimeborn = {
+						PORTRAIT = tox10
+					}
+				}
+			}
+		}
+		controller = {
+			random_planet_within_border = {
+				limit = {
+					is_colony = yes
+				}
+				create_pop_group = {
+					species = last_created_species
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			controller = {
+				OR = {
+					is_gestalt = yes
+					is_homicidal = yes
+				}
+			}
+		}
+		name = extreme_frontiers.1120.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_tech_progress = {
+				tech = tech_living_test_subjects
+				progress = 0.25
+			}
+		}
+	}
+}
+
+######################
+
+#### RUINED REACTORS ####
+
+# Ancient Reactor Plant
+fleet_event = {
+	id = extreme_frontiers.1200
+	title = extreme_frontiers.1200.title
+	desc = extreme_frontiers.1200.desc
+	picture = GFX_evt_alien_ruins
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1200.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Catastrophic Meltdown
+fleet_event = {
+	id = extreme_frontiers.1205
+	title = extreme_frontiers.1205.title
+	desc = extreme_frontiers.1205.desc
+	picture = GFX_evt_glitchy_matrix
+	location = from
+	show_sound = event_metal_fatigue
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1205.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Design Failures
+fleet_event = {
+	id = extreme_frontiers.1210
+	title = extreme_frontiers.1210.title
+	desc = extreme_frontiers.1210.desc
+	picture = GFX_evt_the_last_stormshelter
+	location = from
+	show_sound = event_worrying_signal
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1210.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Evacuation Remnants
+fleet_event = {
+	id = extreme_frontiers.1215
+	title = extreme_frontiers.1215.title
+	desc = extreme_frontiers.1215.desc
+	picture = GFX_evt_space_hangar
+	location = from
+	show_sound = event_door_opening
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1215.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = alloys
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Uranium Vault
+fleet_event = {
+	id = extreme_frontiers.1220
+	title = extreme_frontiers.1220.title
+	desc = extreme_frontiers.1220.desc
+	picture = GFX_evt_resource_cache
+	location = from
+	show_sound = event_door_opening
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1220.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = energy
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+		}
+		from.planet = {
+			hidden_effect = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			add_deposit = d_energy_10
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+#######################
+
+#### DESERTED MINING FACILITY ####
+
+# Encrypted Entrance
+fleet_event = {
+	id = extreme_frontiers.1300
+	title = extreme_frontiers.1300.title
+	desc = extreme_frontiers.1300.desc
+	picture = GFX_evt_generator_powerup
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1300.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Penal Graveyard
+fleet_event = {
+	id = extreme_frontiers.1305
+	title = extreme_frontiers.1305.title
+	desc = extreme_frontiers.1305.desc
+	picture = GFX_evt_deserted_mining_facility
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1305.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Prison Datahub
+fleet_event = {
+	id = extreme_frontiers.1310
+	title = extreme_frontiers.1310.title
+	desc = extreme_frontiers.1310.desc
+	picture = GFX_evt_deserted_mining_facility
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1310.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Lethal Efficiency
+fleet_event = {
+	id = extreme_frontiers.1315
+	title = extreme_frontiers.1315.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1315.desc
+			if = {
+				limit = {
+					controller = {
+						has_civic = civic_machine_terminator # Determined Exterminator
+					}
+				}
+				text = newline
+				text = extreme_frontiers.1315.desc.exterminator
+			}
+		}
+	}
+	picture = GFX_evt_deserted_mining_facility
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1315.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Judgement Day
+fleet_event = {
+	id = extreme_frontiers.1320
+	title = extreme_frontiers.1320.title
+	desc = extreme_frontiers.1320.desc
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1320.desc
+			if = {
+				limit = {
+					controller = { has_civic = civic_machine_terminator }
+				}
+				text = newline
+				text = extreme_frontiers.1320.desc.exterminator
+			}
+			else = {
+				text = newline
+				text = extreme_frontiers.1320.desc.default
+			}
+		}
+	}
+	picture = GFX_evt_deserted_mining_facility
+	location = from
+	show_sound = event_default
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1320.a # repair (not exterminator)
+		trigger = {
+			controller = { NOT = { has_civic = civic_machine_terminator } }
+		}
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			country_event = { id = extreme_frontiers.1322 }
+			hidden_effect = {
+				country_event = { id = extreme_frontiers.1330 years = 5 }
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.1320.b # repair (exterminator)
+		trigger = {
+			controller = { has_civic = civic_machine_terminator }
+		}
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			country_event = { id = extreme_frontiers.1324 }
+		}
+	}
+	option = {
+		name = extreme_frontiers.1320.c # scrap
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Official SIDNI's conversation
+country_event = {
+	id = extreme_frontiers.1322
+	title = extreme_frontiers.1322.title
+	desc = extreme_frontiers.1322.desc
+	show_sound = event_conversation
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+
+	trigger = {
+		has_shroud_dlc = yes
+	}
+
+	immediate = {
+		create_official_sidni_leader = yes
+	}
+
+	picture_event_data = {
+		portrait = event_target:leader_sidni
+		room = scrappy_room
+	}
+
+	option = {
+		name = extreme_frontiers.1322.a # fixed stability
+		response_text = extreme_frontiers.1322.a.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.1322.b # prime directive
+		response_text = extreme_frontiers.1322.b.response
+		is_dialog_only = yes
+	}
+	option = {
+		trigger = {
+			is_gestalt = no
+		}
+		name = extreme_frontiers.1322.c.crime # position on crime
+		response_text = extreme_frontiers.1322.c.crime.response
+		is_dialog_only = yes
+	}
+	option = {
+		trigger = {
+			is_gestalt = yes
+		}
+		name = extreme_frontiers.1322.c.deviancy # position on deviancy
+		response_text = extreme_frontiers.1322.c.deviancy.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.1322.d # enlist
+		tag = hire_leader
+		custom_tooltip = extreme_frontiers.1322.d.custom_tooltip # SIDNI joins
+		hidden_effect = {
+			hire_event_leader_effect = {
+				LEADER = leader_sidni
+			}
+		}
+	}
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+# Commander SIDNI's conversation
+country_event = {
+	id = extreme_frontiers.1324
+	title = extreme_frontiers.1324.title
+	desc = extreme_frontiers.1324.desc
+	show_sound = event_conversation
+	is_triggered_only = yes
+
+	picture = GFX_leader_recruitment_bg_renowned
+	event_window_type = leader_recruit
+
+	trigger = {
+		has_shroud_dlc = yes
+	}
+
+	immediate = {
+		create_commander_sidni_leader = yes
+	}
+
+	picture_event_data = {
+		portrait = event_target:leader_sidni
+		room = scrappy_room
+	}
+
+	option = {
+		name = extreme_frontiers.1324.a # admire
+		response_text = extreme_frontiers.1324.a.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.1324.b # prime directive
+		response_text = extreme_frontiers.1324.b.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.1324.c # position on organics
+		response_text = extreme_frontiers.1324.c.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = extreme_frontiers.1324.d # enlist
+		tag = hire_leader
+		custom_tooltip = extreme_frontiers.1324.d.custom_tooltip # SIDNI joins
+		hidden_effect = {
+			hire_event_leader_effect = {
+				LEADER = leader_sidni
+			}
+		}
+	}
+	option = {
+		name = DISMISS
+		tag = dismiss_leader
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+# Emergent Directive
+country_event = {
+	id = extreme_frontiers.1330
+	title = extreme_frontiers.1330.title
+	desc = extreme_frontiers.1330.desc
+	picture = GFX_evt_burning_settlement
+	show_sound = event_air_raid_siren
+
+	trigger = {
+		is_gestalt = no
+		exists = event_target:leader_sidni
+		event_target:leader_sidni = {
+			owner = { is_same_value = root }
+			exists = planet
+			planet = { pop_amount >= 200 }
+		}
+	}
+
+	immediate = {
+		event_target:leader_sidni = {
+			planet = {
+				save_event_target_as = sidni_planet
+				random_owned_pop_group = { kill_single_pop = yes }
+			}
+		}
+	}
+
+	location = event_target:sidni_planet
+
+	is_triggered_only = yes
+
+	option = {
+		name = extreme_frontiers.1330.a
+		event_target:sidni_planet = {
+			add_modifier = { modifier = resentful_population years = 10 }
+
+		}
+	}
+	option = {
+		name = extreme_frontiers.1330.b
+		event_target:sidni_planet = {
+			add_modifier = { modifier = resentful_population years = 1 }
+		}
+		event_target:leader_sidni = {
+			kill_leader = { show_notification = yes }
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+#######################
+
+ ################
+ # Event Chains #
+ ################
+
+#### CHRONICLES OF DENDRUS ####
+
+# Massive Transport Vessel
+fleet_event = {
+	id = extreme_frontiers.1400
+	title = extreme_frontiers.1400.title
+	desc = extreme_frontiers.1400.desc
+	picture = GFX_evt_chronicles_of_dendrus
+	location = from
+	show_sound = event_metal_fatigue
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1400.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Doomed Colony Ship
+fleet_event = {
+	id = extreme_frontiers.1405
+	title = extreme_frontiers.1405.title
+	desc = {
+		text = extreme_frontiers.1405.desc.phototrophic
+		trigger = {
+			controller = {
+				owner_main_species = {
+					is_phototrophic = yes
+				}
+			}
+		}
+	}
+	desc = {
+		text = extreme_frontiers.1405.desc.default
+		trigger = {
+			controller = {
+				owner_main_species = {
+					is_phototrophic = no
+				}
+			}
+		}
+	}
+
+	picture = GFX_evt_clones
+	location = from
+	show_sound = event_door_opening
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		trigger = { controller = { NOT = { has_civic = civic_hive_devouring_swarm } } }
+		name = extreme_frontiers.1405.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+		}
+	}
+	option = {
+		trigger = { controller = { has_civic = civic_hive_devouring_swarm } }
+		name = extreme_frontiers.1405.b
+		controller = {
+			add_monthly_resource_mult = {
+				resource = food
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Homeworld Shrine
+fleet_event = {
+	id = extreme_frontiers.1410
+	title = extreme_frontiers.1410.title
+	desc = extreme_frontiers.1410.desc
+	picture = GFX_evt_astral_rift_desert_ruins_first_chamber
+	location = from
+	show_sound = event_conversation
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1410.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Command Deck
+fleet_event = {
+	id = extreme_frontiers.1415
+	title = extreme_frontiers.1415.title
+	desc = extreme_frontiers.1415.desc
+	picture = GFX_evt_the_last_stormshelter
+	location = from
+	show_sound = event_first_contact_plantoid
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1415.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier3materialreward
+					min = @tier3materialmin
+					max = @tier3materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+			if = {
+				limit = { owner_main_species = { is_robotic = yes } }
+				enable_special_project = {
+					name = "DENDRITIAN_CHRONICLES_PROJECT_MACHINE"
+					location = root.from.from
+					owner = this
+				}
+			}
+			else = {
+				enable_special_project = {
+					name = "DENDRITIAN_CHRONICLES_PROJECT_DEFAULT"
+					location = root.from.from
+					owner = this
+				}
+			}
+			begin_event_chain = {
+				event_chain = chronicles_of_dendrus_chain
+				target = this
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# DENDRITIAN_CHRONICLES_PROJECT
+country_event = {
+	id = extreme_frontiers.1420
+	title = extreme_frontiers.1420.title
+	desc = extreme_frontiers.1420.desc
+
+	picture = GFX_evt_treasure_hunt_1
+
+	show_sound = event_space_cloud
+	is_triggered_only = yes
+
+	event_chain = chronicles_of_dendrus_chain
+
+	option = {
+		name = extreme_frontiers.1420.a
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		from.solar_system.star = {
+			enable_special_project = {
+				name = "RESTORE_HYPERLANE_PROJECT"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+# RESTORE_HYPERLANE_PROJECT
+ship_event = {
+	id = extreme_frontiers.1426
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = { # delay 1425 so that the planet already exists
+		spawn_new_bratulla_system = yes
+		ship_event = {
+			id = extreme_frontiers.1425
+			days = 1
+			scopes = {
+				from = from
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = extreme_frontiers.1425
+	title = extreme_frontiers.1425.title
+	desc = extreme_frontiers.1425.desc
+
+	picture = GFX_evt_physics_research
+
+	show_sound = event_ancient_drone
+	is_triggered_only = yes
+	location = event_target:new_bratulla
+	event_chain = chronicles_of_dendrus_chain
+
+	option = {
+		name = extreme_frontiers.1425.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}
+
+# New Bratulla surveyed
+ship_event = {
+	id = extreme_frontiers.1430
+	title = extreme_frontiers.1430.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1430.desc.common
+			text = newline
+			if = {
+				limit = {
+					controller = {
+						owner_main_species = {
+							is_phototrophic = yes
+						}
+					}
+				}
+				text = extreme_frontiers.1430.desc.phototrophic
+			}
+			else = {
+				text = extreme_frontiers.1430.desc.default
+			}
+			if = {
+				limit = {
+					controller = {
+						is_homicidal = no
+						OR = {
+							has_technology = tech_gene_tailoring
+							has_technology = tech_epigenetic_triggers
+						}
+					}
+				}
+				text = newline
+				text = extreme_frontiers.1430.desc.respawn
+			}
+		}
+	}
+
+	picture = GFX_evt_astral_rift_tropical_habitat
+
+	show_sound = event_new_bratulla
+	is_triggered_only = yes
+	location = from
+	event_chain = chronicles_of_dendrus_chain
+
+	trigger = {
+		from = { has_planet_flag = new_bratulla }
+	}
+
+	option = {
+		trigger = {
+			controller = { is_homicidal = no }
+		}
+		allow = {
+			controller = {
+				OR = {
+					has_technology = tech_gene_tailoring
+					has_technology = tech_epigenetic_triggers
+				}
+				resource_stockpile_compare = {
+					resource = food
+					value >= 500
+				}
+			}
+		}
+		name = extreme_frontiers.1430.a
+		controller = {
+			add_resource = {
+				food = -500
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			country_event = { id = extreme_frontiers.1435 days = 1 }
+		}
+	}
+	option = {
+		name = {
+			trigger = {
+				controller = {
+					owner_main_species = {
+						is_phototrophic = yes
+					}
+				}
+			}
+			text = extreme_frontiers.1430.b.phototrophic
+		}
+		name = {
+			trigger = { controller = { is_megacorp = yes } }
+			text = extreme_frontiers.1430.b.megacorp
+		}
+		name = {
+			trigger = {
+				controller = {
+					is_megacorp = no
+					owner_main_species = {
+						is_phototrophic = no
+					}
+				}
+			}
+			text = extreme_frontiers.1430.b.default
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			end_event_chain = "chronicles_of_dendrus_chain"
+		}
+	}
+}
+
+# Reanimate Dendritians
+country_event = {
+	id = extreme_frontiers.1435
+	title = extreme_frontiers.1435.title
+	desc = extreme_frontiers.1435.desc
+
+	immediate = {
+		# Block further "Contact Report" events
+		set_country_flag = Story6
+		set_country_flag = Story7
+		if = {
+			limit = {
+				NOT = {
+					any_playable_country = {
+						species_portrait = pla11
+					}
+				}
+			}
+			create_dendritians = { PORTRAIT = pla11 }
+		}
+		else_if = {
+			limit = {
+				NOT = {
+					any_playable_country = {
+						species_portrait = pla15
+					}
+				}
+			}
+			create_dendritians = { PORTRAIT = pla15 }
+		}
+		else = {
+			create_dendritians = { PORTRAIT = pla9 }
+		}
+	}
+
+	show_sound = event_first_contact_plantoid
+	is_triggered_only = yes
+	location = event_target:new_bratulla
+	event_chain = chronicles_of_dendrus_chain
+
+	diplomatic = yes
+	picture_event_data = {
+		portrait = event_target:dendrus_species
+		room = personality_harmonious_hierarchy_room
+		planet_background = event_target:new_bratulla
+	}
+
+	option = {
+		name = extreme_frontiers.1435.a
+		add_monthly_resource_mult = {
+			resource = influence
+			value = @tier2influencereward
+			min = @tier2influencemin
+			max = @tier2influencemax
+		}
+		event_target:dendrus_country = {
+			set_subject_of_stu = { # undercoat: moved to scripted effect with on_action
+				who = root
+				preset = preset_vassal
+			}
+		}
+		end_event_chain = "chronicles_of_dendrus_chain"
+	}
+	option = {
+		name = extreme_frontiers.1435.b
+		custom_tooltip = extreme_frontiers.1435.b.tt
+		end_event_chain = "chronicles_of_dendrus_chain"
+		hidden_effect = {
+			event_target:dendrus_country = { set_player = root }
+		}
+	}
+	option = {
+		name = extreme_frontiers.1435.c
+		if = {
+			limit = {
+				check_variable_arithmetic = {
+					which = value:num_dendrus_given_biotechs
+					value > 0
+				}
+			}
+			custom_tooltip = extreme_frontiers.1435.c.tt # "Gain N biotechs"
+		}
+		# Gain Tier N-3 Society
+		if = {
+			limit = {
+				check_variable_arithmetic = {
+					which = value:num_dendrus_given_biotechs
+					value = 0
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable_arithmetic = {
+					which = value:num_dendrus_given_biotechs
+					value = 1
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable_arithmetic = {
+					which = value:num_dendrus_given_biotechs
+					value = 2
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = influence
+			value = @tier1influencereward
+			min = @tier1influencemin
+			max = @tier1influencemax
+		}
+		end_event_chain = "chronicles_of_dendrus_chain"
+		hidden_effect = {
+			while = {
+				count = 3
+				inverted_switch = {
+					trigger = has_technology
+					tech_eco_simulation = {
+						give_technology = { tech = tech_eco_simulation }
+					}
+					tech_hydroponics = {
+						give_technology = { tech = tech_hydroponics }
+					}
+					tech_food_processing_1 = {
+						give_technology = { tech = tech_food_processing_1 }
+					}
+					tech_gene_crops = {
+						give_technology = { tech = tech_gene_crops }
+					}
+					tech_nano_vitality_crops = {
+						give_technology = { tech = tech_nano_vitality_crops }
+					}
+					tech_nutrient_replication = {
+						give_technology = { tech = tech_nutrient_replication }
+					}
+				}
+			}
+		}
+	}
+}
+
+#######################
+
+#### GEORADIATION TERRAFORMING ####
+
+# Irradiated Debris
+fleet_event = {
+	id = extreme_frontiers.1500
+	title = extreme_frontiers.1500.title
+	desc = extreme_frontiers.1500.desc
+
+	picture = GFX_evt_toxic
+	location = from
+	show_sound = event_wind_ruins
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1500.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Corroded Device
+fleet_event = {
+	id = extreme_frontiers.1505
+	title = extreme_frontiers.1505.title
+	desc = extreme_frontiers.1505.desc
+
+	picture = GFX_evt_georadiation_bell_broken
+	location = from
+	show_sound = event_georadiation_bell
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+		from.planet = { set_planet_flag = georadiation_original_planet }
+		from.planet.solar_system = { set_star_flag = georadiation_original_star }
+	}
+
+	option = {
+		name = extreme_frontiers.1505.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# Deconstructive Terraforming
+fleet_event = {
+	id = extreme_frontiers.1510
+	title = extreme_frontiers.1510.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1510.desc.common
+			text = newline
+			if = {
+				limit = {
+					controller = { is_relentless_industrialist_empire = yes }
+				}
+				text = extreme_frontiers.1510.desc.industrialist
+			}
+			else = {
+				text = extreme_frontiers.1510.desc.default
+			}
+		}
+	}
+
+	picture = GFX_evt_georadiation_bell_broken
+	location = from
+	show_sound = event_georadiation_bell
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = extreme_frontiers.1510.a
+		controller = {
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_technology = tech_terrestrial_sculpting } }
+				add_tech_progress = {
+					tech = tech_terrestrial_sculpting
+					progress = 0.25
+				}
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			begin_event_chain = {
+				event_chain = georadiation_terraforming_chain
+				target = this
+			}
+		}
+
+		hidden_effect = {
+			spawn_georadiation_project = {
+				FILTER_TAG = georadiation_signal_2
+				GIVEN_TAG = georadiation_signal_1
+				STATION_TYPE = shipclass_research_station # signal 1 gives dark matter deposit
+				PROJECT_KEY = "GEORADIATION_SIGNAL_1_PROJECT"
+			}
+			spawn_georadiation_project = {
+				FILTER_TAG = georadiation_signal_1
+				GIVEN_TAG = georadiation_signal_2
+				STATION_TYPE = shipclass_mining_station # signal 2 gives rare crystal deposit
+				PROJECT_KEY = "GEORADIATION_SIGNAL_2_PROJECT"
+			}
+		}
+	}
+
+	after = {
+		from = { set_site_progress_locked = no }
+	}
+}
+
+# GEORADIATION_SIGNAL_1_PROJECT
+ship_event = {
+	id = extreme_frontiers.1515
+	title = extreme_frontiers.1515.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1515.desc.common
+			text = newline
+			if = {
+				limit = {
+					controller = { is_relentless_industrialist_empire = yes }
+				}
+				text = extreme_frontiers.1515.desc.industrialist
+				text = newline
+			}
+			if = {
+				limit = {
+					controller = { has_country_flag = georadiation_signal_2_project_done }
+				}
+				text = extreme_frontiers.1515.desc.signal_2_done
+			}
+			else = {
+				text = extreme_frontiers.1515.desc.signal_2_not_done
+			}
+		}
+	}
+
+	picture = GFX_evt_georadiation_bell_broken
+	location = from.from
+	event_chain = georadiation_terraforming_chain
+
+	show_sound = event_georadiation_bell
+	is_triggered_only = yes
+
+	immediate = {
+		controller = { set_country_flag = georadiation_signal_1_project_done }
+	}
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			add_monthly_resource_mult = {
+				resource = sr_dark_matter
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		hidden_effect = {
+			from.from = {
+				if = {
+					limit = { has_deposit_for = shipclass_mining_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = from.from } }
+		}
+		from.from = {
+			add_deposit = d_dark_matter_deposit_1
+		}
+
+		hidden_effect = {
+			if = {
+				limit = {
+					controller = { has_country_flag = georadiation_signal_2_project_done }
+				}
+				spawn_undetonated_georadiation_project = yes
+			}
+		}
+	}
+}
+
+# GEORADIATION_SIGNAL_2_PROJECT
+ship_event = {
+	id = extreme_frontiers.1520
+	title = extreme_frontiers.1520.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1520.desc.common
+			text = newline
+			if = {
+				limit = {
+					controller = { has_country_flag = georadiation_signal_1_project_done }
+				}
+				text = extreme_frontiers.1520.desc.signal_1_done
+			}
+			else = {
+				text = extreme_frontiers.1520.desc.signal_1_not_done
+			}
+		}
+	}
+
+	picture = GFX_evt_georadiation_bell_broken
+	location = from.from
+	event_chain = georadiation_terraforming_chain
+
+	show_sound = event_georadiation_bell
+	is_triggered_only = yes
+
+	immediate = {
+		controller = { set_country_flag = georadiation_signal_2_project_done }
+	}
+
+	option = {
+		name = REMARKABLE
+		controller = {
+			add_monthly_resource_mult = {
+				resource = rare_crystals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+		hidden_effect = {
+			from.from = {
+				if = {
+					limit = { has_deposit_for = shipclass_research_station }
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				}
+			}
+			ship_event = { id = action.941 days = 1 scopes = { from = from.from } }
+		}
+		from.from = {
+			add_deposit = d_rare_crystals_2
+		}
+
+		hidden_effect = {
+			if = {
+				limit = {
+					controller = { has_country_flag = georadiation_signal_1_project_done }
+				}
+				spawn_undetonated_georadiation_project = yes
+			}
+		}
+	}
+}
+
+# UNDETONATED_GEORADIATION_PROJECT
+ship_event = {
+	id = extreme_frontiers.1525
+	title = extreme_frontiers.1525.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1525.desc.common
+			text = newline
+			if = {
+				limit = {
+					controller = { is_relentless_industrialist_empire = yes }
+				}
+				text = extreme_frontiers.1525.desc.industrialist
+			}
+			else = {
+				text = extreme_frontiers.1520.desc.default.common
+				text = newline
+				if = {
+					limit = {
+						controller = { is_homicidal = yes }
+					}
+					text = extreme_frontiers.1525.desc.default.homicidal
+				}
+				else = {
+					text = extreme_frontiers.1525.desc.default.default
+				}
+			}
+		}
+	}
+
+	picture = GFX_evt_georadiation_bell_rusted
+	location = from.from
+	event_chain = georadiation_terraforming_chain
+
+	show_sound = event_georadiation_bell
+	is_triggered_only = yes
+
+	option = {
+		name = {
+			trigger = { controller = { is_relentless_industrialist_empire = yes } }
+			text = extreme_frontiers.1525.a.industrialist
+		}
+		name = {
+			trigger = { controller = { is_relentless_industrialist_empire = no } }
+			text = extreme_frontiers.1525.a.default
+		}
+		controller = {
+			add_monthly_resource_mult = {
+				resource = sr_dark_matter
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = rare_crystals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			if = {
+				limit = { has_ancrel = yes }
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+				add_monthly_resource_mult = {
+					resource = minor_artifacts
+					value = @tier1materialreward
+					min = @tier1materialmin
+					max = @tier1materialmax
+				}
+			}
+			else = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+			}
+			from.from = {
+				enable_special_project = {
+					name = "GEORADIATION_ANALYSIS_PROJECT"
+					location = this
+					owner = root.controller
+				}
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.1525.b
+		allow = { controller = { is_relentless_industrialist_empire = no } }
+		controller = {
+			add_monthly_resource_mult = {
+				resource = sr_dark_matter
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = rare_crystals
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			country_event = {
+				id = extreme_frontiers.1545
+				scopes = {
+					from = from
+				}
+				days = 30
+			}
+		}
+	}
+}
+
+# UNDETONATED_GEORADIATION_PROJECT interruption
+ship_event = {
+	id = extreme_frontiers.1530
+	title = extreme_frontiers.1530.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.1530.desc.common
+			if = {
+				limit = {
+					controller = { is_relentless_industrialist_empire = yes }
+				}
+				text = newline
+				text = extreme_frontiers.1530.desc.industrialist
+			}
+		}
+	}
+
+	picture = GFX_evt_glitchy_matrix
+
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+	event_chain = georadiation_terraforming_chain
+
+	immediate = {
+		create_geocorp_drone = yes
+		controller = {
+			establish_communications_no_message = event_target:geocorp_country
+			set_country_flag = georadiation_analysis_interrupted
+		}
+	}
+
+	option = {
+		name = extreme_frontiers.1530.a
+		controller = {
+			country_event = {
+				id = extreme_frontiers.1531
+				scopes = {
+					from = from
+				}
+			}
+		}
+	}
+	option = {
+		name = extreme_frontiers.1530.b
+		controller = {
+			country_event = {
+				id = extreme_frontiers.1532
+				scopes = {
+					from = from
+				}
+			}
+		}
+	}
+}
+
+# UNDETONATED_GEORADIATION_PROJECT interruption : dialogue
+country_event = {
+	id = extreme_frontiers.1531
+	title = extreme_frontiers.1531.title
+	diplomatic_title = extreme_frontiers.1531.title
+	desc = extreme_frontiers.1531.desc
+
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+	location = from
+
+	picture_event_data = {
+		portrait = event_target:geocorp_drone
+		tooltip = no
+	}
+
+	## starting dialogues ##
+	option = {
+		name = extreme_frontiers.1531.a # where are you from
+		trigger = {
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		response_text = extreme_frontiers.1531.a.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = extreme_frontiers_1531_a } }
+			set_country_flag = extreme_frontiers_1531_a
+		}
+	}
+
+	option = {
+		name = extreme_frontiers.1531.b # talk to manager
+		trigger = {
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		response_text = extreme_frontiers.1531.b.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = extreme_frontiers_1531_b } }
+			set_country_flag = extreme_frontiers_1531_b
+		}
+	}
+
+	option = {
+		name = extreme_frontiers.1531.c # salvaging ruins
+		trigger = {
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		response_text = extreme_frontiers.1531.c.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = extreme_frontiers_1531_c } }
+			set_country_flag = extreme_frontiers_1531_c
+		}
+	}
+
+	## 2 options after all above are done ##
+	option = {
+		name = extreme_frontiers.1531.d # subscription
+		trigger = {
+			has_country_flag = extreme_frontiers_1531_a
+			has_country_flag = extreme_frontiers_1531_b
+			has_country_flag = extreme_frontiers_1531_c
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		response_text = extreme_frontiers.1531.d.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = extreme_frontiers_1531_d } }
+			set_country_flag = extreme_frontiers_1531_d
+		}
+	}
+
+	option = {
+		name = extreme_frontiers.1531.e # theft
+		trigger = {
+			has_country_flag = extreme_frontiers_1531_a
+			has_country_flag = extreme_frontiers_1531_b
+			has_country_flag = extreme_frontiers_1531_c
+			NOT = { has_country_flag = extreme_frontiers_1531_d }
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		response_text = extreme_frontiers.1531.e.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = extreme_frontiers_1531_end_dialog } }
+			set_country_flag = extreme_frontiers_1531_end_dialog
+			set_country_flag = extreme_frontiers_1531_battle
+		}
+	}
+
+	## 2 subscription options ##
+	option = {
+		name = extreme_frontiers.1531.f # pay
+		trigger = {
+			has_country_flag = extreme_frontiers_1531_d
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 3000
+			}
+		}
+		response_text = extreme_frontiers.1531.f.reply
+		is_dialog_only = yes
+		if = {
+			limit = { NOT = { has_country_flag = extreme_frontiers_1531_end_dialog } }
+			set_country_flag = extreme_frontiers_1531_end_dialog
+			set_country_flag = extreme_frontiers_1531_paid
+		}
+		add_resource = {
+			energy = -3000
+		}
+	}
+
+	option = {
+		name = extreme_frontiers.1531.g # refuse (ends comms early)
+		trigger = {
+			has_country_flag = extreme_frontiers_1531_d
+			NOT = { has_country_flag = extreme_frontiers_1531_end_dialog }
+		}
+		country_event = {
+			id = extreme_frontiers.1532
+			scopes = {
+				from = from
+			}
+		}
+	}
+
+	## end comms ##
+	option = { # paid
+		name = extreme_frontiers.1531.h
+		trigger = {
+			has_country_flag = extreme_frontiers_1531_end_dialog
+			has_country_flag = extreme_frontiers_1531_paid
+		}
+		country_event = {
+			id = extreme_frontiers.1535
+			scopes = {
+				from = event_target:georadiation_undetonated_planet@root
+			}
+		}
+	}
+
+	option = { # battle
+		name = extreme_frontiers.1531.i
+		trigger = {
+			has_country_flag = extreme_frontiers_1531_end_dialog
+			has_country_flag = extreme_frontiers_1531_battle
+		}
+		country_event = {
+			id = extreme_frontiers.1532
+			scopes = {
+				from = from
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			remove_country_flag = extreme_frontiers_1531_a
+			remove_country_flag = extreme_frontiers_1531_b
+			remove_country_flag = extreme_frontiers_1531_c
+			remove_country_flag = extreme_frontiers_1531_d
+			remove_country_flag = extreme_frontiers_1531_end_dialog
+			remove_country_flag = extreme_frontiers_1531_paid
+			remove_country_flag = extreme_frontiers_1531_battle
+		}
+	}
+}
+
+# Geocorp fleet
+country_event = {
+	id = extreme_frontiers.1532
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:geocorp_country
+	}
+
+	immediate = {
+		create_geocorp_fleet = {
+			LOCATION = from
+		}
+	}
+}
+
+# GeoCorp Fleet destroyed
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = extreme_frontiers.1533
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:geocorp_country
+		from = { is_same_value = event_target:geocorp_country }
+		fromfromfrom = { has_fleet_flag = geocorp_fleet }
+	}
+
+	immediate = {
+		random_playable_country = {
+			limit = {
+				root.fromfromfrom = {
+					has_fleet_flag = is_spawned_for@prev
+				}
+			}
+			country_event = {
+				id = extreme_frontiers.1534
+				days = 1
+				scopes = {
+					from = event_target:georadiation_undetonated_planet@root
+				}
+			}
+		}
+	}
+}
+
+# GeoCorp drone leaves
+country_event = {
+	id = extreme_frontiers.1534
+	title = extreme_frontiers.1534.title
+	diplomatic_title = extreme_frontiers.1534.title
+	desc = extreme_frontiers.1534.desc
+
+	picture = GFX_leader_recruitment_bg_renowned
+
+	diplomatic = yes
+	event_window_type = leader_conversation
+	is_triggered_only = yes
+	force_open = yes
+	location = from
+
+	trigger = {
+		exists = event_target:geocorp_drone
+	}
+
+	picture_event_data = {
+		portrait = event_target:geocorp_drone
+		tooltip = no
+	}
+
+	option = {
+		name = extreme_frontiers.1534.a
+		country_event = {
+			id = extreme_frontiers.1535
+			scopes = {
+				from = from
+			}
+		}
+	}
+}
+
+# Terms Modified
+country_event = {
+	id = extreme_frontiers.1535
+	title = extreme_frontiers.1535.title
+	desc = extreme_frontiers.1535.desc
+
+	picture = GFX_evt_georadiation_bell_rusted
+
+	show_sound = event_georadiation_bell
+	is_triggered_only = yes
+	event_chain = georadiation_terraforming_chain
+
+	option = {
+		name = extreme_frontiers.1535.a
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		from = {
+			enable_special_project = {
+				name = "GEORADIATION_ANALYSIS_PROJECT_CONTINUED"
+				location = this
+				owner = root
+			}
+		}
+		hidden_effect = {
+			remove_country_flag = georadiation_analysis_interrupted
+			abort_special_project = { type = GEORADIATION_ANALYSIS_PROJECT }
+		}
+	}
+}
+
+# GEORADIATION_ANALYSIS_PROJECT_CONTINUED
+ship_event = {
+	id = extreme_frontiers.1540
+	title = extreme_frontiers.1540.title
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					controller = { is_relentless_industrialist_empire = yes }
+				}
+				text = extreme_frontiers.1540.desc.industrialist
+			}
+			else = {
+				text = extreme_frontiers.1540.desc.default
+			}
+			text = newline
+			text = extreme_frontiers.1540.desc.common
+		}
+	}
+
+	picture = GFX_evt_georadiation_bell
+
+	show_sound = event_georadiation_terraforming
+	is_triggered_only = yes
+	event_chain = georadiation_terraforming_chain
+
+	option = {
+		name = extreme_frontiers.1540.a
+		controller = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			give_technology = { tech = tech_georadiation_terraforming }
+			end_event_chain = "georadiation_terraforming_chain"
+		}
+	}
+}
+
+# Device Destroyed
+country_event = {
+	id = extreme_frontiers.1545
+	title = extreme_frontiers.1545.title
+	desc = extreme_frontiers.1545.desc
+
+	picture = GFX_evt_exploding_ship
+
+	show_sound = event_ship_explosion
+	is_triggered_only = yes
+	event_chain = georadiation_terraforming_chain
+
+	option = {
+		name = {
+			trigger = { is_gestalt = no }
+			text = extreme_frontiers.1545.a.default
+		}
+		name = {
+			trigger = { is_gestalt = yes }
+			text = ACKNOWLEDGED
+		}
+		add_monthly_resource_mult = {
+			resource = sr_dark_matter
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = rare_crystals
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier2materialreward
+			min = @tier2materialmin
+			max = @tier2materialmax
+		}
+		end_event_chain = "georadiation_terraforming_chain"
+	}
+}
+
+# Toxification in progress
+situation_event = { # Every 6 months event toxifying a planet
+	id = extreme_frontiers.2000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		target = { NOT = { has_planet_flag = recently_toxified_planet } }
+	}
+
+	immediate = {
+		add_situation_progress = 20
+		target = {
+			toxify_world = yes
+		}
+	}
+}
+
+# Device Used (first time)
+situation_event = {
+	id = extreme_frontiers.2005
+	title = extreme_frontiers.2005.title
+	desc = {
+		trigger = {
+			text = extreme_frontiers.2005.desc.common
+			text = newline
+			if = {
+				limit = {
+					owner = { is_relentless_industrialist_empire = yes }
+				}
+				text = extreme_frontiers.2005.desc.industrialist
+			}
+		}
+	}
+
+	picture = GFX_evt_georadiation_bell
+	show_sound = event_georadiation_terraforming
+	situation = this
+	location = target
+
+	is_triggered_only = yes
+
+	immediate = {
+		target = {
+			finish_world_toxification = {
+				SEND_MESSAGE = no
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				owner = {
+					is_gestalt = no
+				}
+			}
+			text = extreme_frontiers.2005.a.default
+		}
+		name = {
+			trigger = {
+				owner = {
+					is_gestalt = yes
+				}
+			}
+			text = ACKNOWLEDGED
+		}
+		hidden_effect = {
+			owner = {
+				set_country_flag = georadiation_first_use
+			}
+		}
+	}
+
+	after = { destroy_situation = this }
+}
+
+# Device Used (subsequent times)
+situation_event = {
+	id = extreme_frontiers.2010
+	hide_window = yes
+	is_triggered_only = yes
+	situation = this
+
+	immediate = {
+		target = {
+			finish_world_toxification = {
+				SEND_MESSAGE = yes
+			}
+		}
+	}
+
+	after = { destroy_situation = this }
+}

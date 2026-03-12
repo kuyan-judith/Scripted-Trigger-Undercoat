@@ -1,0 +1,508 @@
+# hyperthermia_system is for generic checks
+# hyperthermia_systemX is for wormhole & hyperlane events
+spawn_hyperthermia_systems = {
+	no_scope = {
+		set_spawn_system_batch = begin
+
+		spawn_system = {
+			min_distance >= 25
+			max_distance <= 25
+			min_orientation_angle = 210
+			max_orientation_angle = 210
+			initializer = hyperthermia_system
+			hyperlane = no
+			effect = {
+				save_global_event_target_as = hyperthermia_system
+				save_global_event_target_as = hyperthermia_system1
+				set_surveyed = { surveyed = yes surveyor = root }
+			}
+		}
+		spawn_system = {
+			min_distance >= 25
+			max_distance <= 25
+			min_orientation_angle = 270
+			max_orientation_angle = 270
+			initializer = hyperthermia_system
+			hyperlane = no
+			effect = {
+				save_global_event_target_as = hyperthermia_system
+				save_global_event_target_as = hyperthermia_system2
+				set_surveyed = { surveyed = yes surveyor = root }
+			}
+		}
+		spawn_system = {
+			min_distance >= 25
+			max_distance <= 25
+			min_orientation_angle = 330
+			max_orientation_angle = 330
+			initializer = hyperthermia_system
+			hyperlane = no
+			effect = {
+				save_global_event_target_as = hyperthermia_system
+				save_global_event_target_as = hyperthermia_system3
+				set_surveyed = { surveyed = yes surveyor = root }
+			}
+		}
+		spawn_system = {
+			min_distance >= 25
+			max_distance <= 25
+			min_orientation_angle = 30
+			max_orientation_angle = 30
+			initializer = hyperthermia_system
+			hyperlane = no
+			effect = {
+				save_global_event_target_as = hyperthermia_system
+				save_global_event_target_as = hyperthermia_system4
+				set_surveyed = { surveyed = yes surveyor = root }
+			}
+		}
+		spawn_system = {
+			min_distance >= 25
+			max_distance <= 25
+			min_orientation_angle = 90
+			max_orientation_angle = 90
+			initializer = hyperthermia_system
+			hyperlane = no
+			effect = {
+				save_global_event_target_as = hyperthermia_system
+				save_global_event_target_as = hyperthermia_system5
+				set_surveyed = { surveyed = yes surveyor = root }
+			}
+		}
+		spawn_system = {
+			min_distance >= 25
+			max_distance <= 25
+			min_orientation_angle = 150
+			max_orientation_angle = 150
+			initializer = hyperthermia_system
+			hyperlane = no
+			effect = {
+				save_global_event_target_as = hyperthermia_system
+				save_global_event_target_as = hyperthermia_system6
+				set_surveyed = { surveyed = yes surveyor = root }
+			}
+		}
+
+		add_hyperlane = {
+			from = event_target:hyperthermia_system1
+			to = event_target:hyperthermia_system2
+		}
+		add_hyperlane = {
+			from = event_target:hyperthermia_system2
+			to = event_target:hyperthermia_system3
+		}
+		add_hyperlane = {
+			from = event_target:hyperthermia_system3
+			to = event_target:hyperthermia_system4
+		}
+		add_hyperlane = {
+			from = event_target:hyperthermia_system4
+			to = event_target:hyperthermia_system5
+		}
+		add_hyperlane = {
+			from = event_target:hyperthermia_system5
+			to = event_target:hyperthermia_system6
+		}
+		add_hyperlane = {
+			from = event_target:hyperthermia_system6
+			to = event_target:hyperthermia_system1
+		}
+
+		set_spawn_system_batch = end
+	}
+}
+
+spawn_hyperthermia_wormholes = {
+	set_star_flag = hyperthermia_nexus
+	spawn_natural_wormhole = {
+		bypass_type = entropy_wormhole
+		random_pos = yes
+	}
+	if = {
+		limit = { NOT = { has_global_flag = Hyperthermia_portals_spawned } }
+		set_global_flag = Hyperthermia_portals_spawned # In case of multiple crisis
+		event_target:hyperthermia_system2 = {
+			spawn_natural_wormhole = {
+				bypass_type = entropy_wormhole
+				orbit_angle = 240
+			}
+		}
+		event_target:hyperthermia_system4 = {
+			spawn_natural_wormhole = {
+				bypass_type = entropy_wormhole
+				orbit_angle = 0
+			}
+		}
+		event_target:hyperthermia_system6 = {
+			spawn_natural_wormhole = {
+				bypass_type = entropy_wormhole
+				orbit_angle = 120
+			}
+		}
+	}
+}
+
+spawn_hyperthermia_lanes = {
+	random_neighbor_system_euclidean = {
+		limit = {
+			NOR = {
+				has_star_flag = hyperthermia_system
+				has_star_flag = hyperthermia_system_entrance
+				has_hyperlane_to = prev
+			}
+		}
+		add_hyperlane = { from = this to = prev }
+		set_star_flag = hyperthermia_system_entrance
+	}
+}
+
+hyperthermia_galaxy_effect = {
+	optimize_memory
+	every_system_planet = {
+		limit = {
+			is_star = yes
+			NOR = {
+				planet_is_black_hole = yes # undercoat: moved to scripted trigger
+				is_planet_class = pc_m_star
+				is_planet_class = pc_m_giant_star
+			}
+		}
+		create_ambient_object = {
+			type = "red_giant_supernova"
+			play_animation_once = yes
+			location = this
+		}
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 0
+				angle = random
+			}
+		}
+		change_pc = pc_m_giant_star
+		solar_system = { set_star_class = sc_m_giant }
+	}
+	# Handle Contingency Machine Worlds
+	every_system_planet = {
+		limit = {
+			is_planet_class = pc_ai
+			NOT = { has_planet_flag = machine_lair }
+		}
+		destroy_machine_world = yes
+	}
+	random_system_planet = {
+		limit = {
+			is_planet_class = pc_ai
+			has_planet_flag = machine_lair
+		}
+		from.owner = { save_event_target_as = final_machine_world_destroyer }
+		stop_crisis_sound = yes
+		planet_event = { id = crisis.2046 }
+	}
+	every_system_planet = {
+		limit = {
+			OR = {
+				is_colonizable = yes
+				is_colony = yes
+			}
+			is_city_world = no # undercoat: moved to scripted trigger
+			is_artificial = no
+		}
+		change_pc = pc_volcanic
+		reroll_planet_modifiers = yes
+		reroll_deposits = yes
+		add_deposit = d_volcanic_mineral_layers
+		add_deposit = d_volcanic_stable_plateaus
+	}
+	every_system_colony = {
+		limit = {
+			owner = {
+				NOR = {
+					is_infernal_empire = yes
+					has_ascension_perk = ap_galactic_hyperthermia
+				}
+			}
+		}
+		remove_all_buildings = yes
+		destroy_colony = yes
+	}
+}
+
+hyperthermia_target_effect = {
+	random_system_within_border = {
+		limit = {
+			is_conduit_target = yes
+		}
+		save_event_target_as = friendly_target
+	}
+	if = {
+		limit = {
+			NOT = { exists = event_target:friendly_target }
+			has_menace_perk = menp_hyperthermia_solarflare
+		}
+		random_system_within_border = {
+			limit = {
+				is_on_border = yes
+				any_neighbor_system = {
+					exists = owner
+					owner = { is_at_war_with = root }
+					is_conduit_target = yes
+				}
+			}
+			random_neighbor_system = {
+				limit = {
+					exists = owner
+					owner = { is_at_war_with = root }
+					is_conduit_target = yes
+				}
+				save_event_target_as = hostile_target
+			}
+		}
+	}
+}
+
+create_red_giant_miners = {
+	create_country = {
+		name = "NAME_red_giant_miners"
+		species = random
+		flag = random
+		type = dummy_miners
+		effect = {
+			set_country_flag = red_giant_miner_country@prev.owner
+			save_event_target_as = red_giant_miner_country
+			establish_communications_no_message = prev.owner
+			set_faction_hostility = {
+				target = prev.owner
+				set_hostile = yes
+				set_neutral = no
+				set_friendly = no
+			}
+		}
+	}
+}
+
+planet_smelter_effect = {
+	set_variable = { which = mining_var value = value:mining_districts_value }
+	change_pc = pc_volcanic
+	reroll_deposits = yes
+	reroll_planet_modifiers = yes
+	if = {
+		limit = {
+			count_deposits = { category = deposit_cat_minerals count < 6 }
+		}
+		while = {
+			limit = {
+				count_deposits = { category = deposit_cat_minerals count < 6 }
+			}
+			random_list = {
+				5 = { add_deposit = d_volcanic_rich_mountain }
+				5 = { add_deposit = d_volcanic_ore_caverns }
+				5 = { add_deposit = d_volcanic_mineral_fields }
+				5 = { add_deposit = d_volcanic_mineral_layers }
+				1 = { add_deposit = d_volcanic_lava_river }
+			}
+		}
+	}
+	if = {
+		limit = {
+			count_deposits = { category = deposit_cat_misc count < 4 }
+		}
+		while = {
+			limit = {
+				count_deposits = { category = deposit_cat_misc count < 4 }
+			}
+			random_list = {
+				1 = { add_deposit = d_volcanic_stable_plateaus }
+				1 = { add_deposit = d_volcanic_tranquil_flatlands }
+				1 = { add_deposit = d_volcanic_intraplate }
+				1 = { add_deposit = d_volcanic_basalt_plains }
+				1 = { add_deposit = d_volcanic_dried_lavariver }
+			}
+		}
+	}
+	while = {
+		count = mining_var
+		add_district = { district_type = district_melting }
+	}
+	validate_planet_buildings_and_districts = yes
+	clear_variable = mining_var
+}
+
+set_friendly_conduit_spawn = {
+	random_owned_megastructure = {
+		limit = { has_megastructure_flag = galactic_crucible }
+		solar_system = {
+			create_fleet = {
+				settings = { spawn_debris = no }
+				effect = {
+					set_owner = prev
+					set_location = prev.star
+					create_ship = {
+						name = "NAME_Entropy_Conduit"
+						design = "NAME_Entropy_Conduit"
+					}
+					last_created_ship = { set_ship_flag = entropy_conduit }
+					queue_actions = {
+						find_closest_system = {
+						trigger = {
+							id = conduit.f1@this
+							is_same_value = event_target:friendly_target
+						}
+						found_system = {
+							move_to = this
+								find_closest_planet = {
+									trigger = {
+										id = conduit.f2@this
+										is_star = yes
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = this
+										terraform_fleet = this
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+set_hostile_conduit_spawn = {
+	random_owned_megastructure = {
+	limit = { has_megastructure_flag = galactic_crucible }
+		solar_system = {
+			create_fleet = {
+				settings = { spawn_debris = no }
+				effect = {
+					set_owner = prev
+					set_location = prev.star
+					create_ship = {
+						name = "NAME_Entropy_Conduit"
+						design = "NAME_Entropy_Conduit"
+					}
+					last_created_ship = { set_ship_flag = entropy_conduit }
+					queue_actions = {
+						find_closest_system = {
+							trigger = {
+							id = conduit.h1@this
+							is_same_value = event_target:hostile_target
+						}
+						found_system = {
+							move_to = this
+								find_closest_planet = {
+									trigger = {
+										id = conduit.h2@this
+										is_star = yes
+									}
+									found_planet = {
+										move_to = this
+										orbit_planet = this
+										terraform_fleet = this
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+create_infernal_primitives = {
+	set_planet_flag = pre_ftl_default
+	create_species = {
+		name = random
+		class = INF
+		portrait = random # infernals
+		homeworld = this
+		traits = {
+			trait = "trait_infernal"
+			trait = random_traits
+		}
+	}
+	create_country = {
+		name = random
+		authority = random
+		day_zero_contact = no
+		species = last_created_species
+		origin = origin_default
+		flag = random
+		type = primitive
+	}
+	set_pre_ftl_origin = yes
+	last_created_country = {
+		set_graphical_culture = industrial_01
+		set_country_flag = early_space_age
+		set_pre_ftl_age = early_space_age
+		copy_ethos_and_authority = from
+		establish_communications = from
+		add_awareness = 100
+		add_tech_progress_situation = yes
+		random_situation = {
+			limit = { is_situation_type = pre_ftl_tech_progress_situation }
+			set_situation_progress = 1750
+		}
+	}
+	setup_pre_ftl_planet = yes
+}
+
+hyperthermia_fe_effect = {
+	random_country = {
+		limit = {
+			is_fallen_empire = yes
+			NOR = {
+				is_at_war_with = root
+				is_infernal_empire = yes
+				has_country_flag = anti_hyperthermia_fe
+				# Divided Hive Mind
+				has_country_flag = first_hive_fe_fragment
+				has_country_flag = second_hive_fe_fragment
+				has_country_flag = third_hive_fe_fragment
+			}
+		}
+		set_country_flag = anti_hyperthermia_fe
+		country_event = { id = infernals.1040 }
+	}
+}
+
+hyperthermia_deposit_effect = {
+	if = {
+		limit = { has_deposit_for = shipclass_research_station }
+		random_list = {
+			5 = { add_deposit = d_physics_3 }
+			5 = { add_deposit = d_physics_4 }
+			4 = { add_deposit = d_physics_6 }
+			3 = { add_deposit = d_physics_8 }
+			1 = { add_deposit = d_dark_matter_deposit_1 }
+		}
+	}
+	else = {
+		random_list = {
+			2 = { add_deposit = d_energy_2 }
+			2 = { add_deposit = d_energy_3 }
+			1 = { add_deposit = d_energy_4 }
+			1 = { add_deposit = d_energy_6 }
+		}
+	}
+	# Fixes deposit stations
+	if = {
+		limit = {
+			has_research_station = yes
+			NOT = { has_deposit_for = shipclass_research_station }
+		}
+		orbital_station = { dismantle = yes }
+		create_mining_station = { owner = owner_or_space_owner }
+	}
+	else_if = {
+		limit = {
+			has_mining_station = yes
+			NOT = { has_deposit_for = shipclass_mining_station }
+		}
+		orbital_station = { dismantle = yes }
+		create_research_station = { owner = owner_or_space_owner }
+	}
+}

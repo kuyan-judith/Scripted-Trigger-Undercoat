@@ -4,6 +4,7 @@
 
 military_service_full = {
 	potential = {
+		exists = from
 		if = {
 			limit = {
 				from = { is_machine_empire = yes }
@@ -12,6 +13,14 @@ military_service_full = {
 				has_trait = trait_machine_unit
 				has_trait = trait_mechanical
 				has_trait = trait_cybernetic
+			}
+		}
+		if = {
+			limit = {
+				has_citizenship_type = { country = from type = citizenship_shroud_touched }
+			}
+			from = {
+				has_country_flag = finish_shroud_forged_liberation_flag
 			}
 		}
 		is_disconnected_drone_pop = no
@@ -67,10 +76,7 @@ military_service_full = {
 					}
 				}
 				from = {
-					NOR = {
-						has_ethic = ethic_xenophobe
-						has_ethic = ethic_fanatic_xenophobe
-					}
+					is_xenophobe = no
 				}
 				from = {
 					is_synthetic_fertility_empire = yes # undercoat: moved to scripted trigger
@@ -198,10 +204,13 @@ military_service_none = {
 			}
 		}
 		custom_tooltip = {
-			fail_text = MACHINE_SPECIES_NOT_MACHINE
+			fail_text = MACHINE_SPECIES_CANNOT_MACHINE
 			if = {
 				limit = {
-					from = { is_machine_empire = yes }
+					from = {
+						is_machine_empire = yes
+						is_shroud_forged_empire = no # undercoat: moved to scripted trigger
+					}
 				}
 				OR = {
 					NOR = {
@@ -210,6 +219,18 @@ military_service_none = {
 					}
 					has_trait = trait_robot_suppressed
 				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = MECHANICAL_SPECIES_CANNOT_MACHINE
+			if = {
+				limit = {
+					from = {
+						is_machine_empire = yes # undercoat: moved to scripted trigger
+						is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+					}
+				}
+				NOT = { has_trait = trait_machine_unit }
 			}
 		}
 	}

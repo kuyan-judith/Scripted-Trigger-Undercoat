@@ -3,14 +3,15 @@
 @low_hab_maintenance = 0.25
 @hab_time = 360
 
-# NOTE: district_hab_energy_max, district_hab_mining_max and district_hab_science_max
+# NOTE: district_hab_energy_max_add, district_hab_mining_max_add and district_hab_science_max_add
 # are provided by habitat_modifiers on orbital deposits
 # These modifiers are equal to 1 + FLOOR(n/2), where n is the deposit size.
 
 district_hab_housing = {
 	base_buildtime = @hab_time
-	is_capped_by_modifier = no
+
 	exempt_from_ai_planet_specialization = yes
+	overlay_icon = GFX_district_government
 
 	zone_slots = {
 		slot_city_government
@@ -52,6 +53,18 @@ district_hab_housing = {
 		mult = value:hab_housing_district_housing_stu
 	}
 
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_tankbound_empire = yes
+			}
+		}
+		modifier = {
+			job_production_overseer_add = 100
+		}
+	}
+
 	inline_script = {
 		script = districts/ai_urban_district_extra_weighting
 	}
@@ -59,7 +72,8 @@ district_hab_housing = {
 
 district_hab_energy = {
 	base_buildtime = @hab_time
-	is_capped_by_modifier = yes
+	is_uncapped = {	always = no }
+	overlay_icon = GFX_district_energy
 
 	zone_slots = {
 		slot_habitat_energy
@@ -77,7 +91,7 @@ district_hab_energy = {
 	}
 
 	resources = {
-		category = planet_districts_hab
+		category = planet_districts_hab_energy
 		cost = {
 			alloys = @hab_cost
 		}
@@ -85,20 +99,22 @@ district_hab_energy = {
 			energy = @hab_maintenance
 			alloys = @low_hab_maintenance
 		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_edict = industrial_maintenance
-				}
-			}
-			energy = 2
-		}
 	}
 
 	triggered_planet_modifier = {
 		planet_housing_add = 1
 		mult = value:hab_energy_district_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_technician_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
 	}
 
 	inline_script = {
@@ -111,11 +127,16 @@ district_hab_energy = {
 			id = megastructures.200		# Spawn an energy orbital
 		}
 	}
+
+	inline_script = {
+		script = districts/district_triggered_name_generator
+	}
 }
 
 district_hab_mining = {
 	base_buildtime = @hab_time
-	is_capped_by_modifier = yes
+	is_uncapped = {	always = no }
+	overlay_icon = GFX_district_minerals
 
 	zone_slots = {
 		slot_habitat_minerals
@@ -130,7 +151,7 @@ district_hab_mining = {
 	}
 
 	resources = {
-		category = planet_districts_hab
+		category = planet_districts_hab_mining
 		cost = {
 			alloys = @hab_cost
 		}
@@ -145,6 +166,17 @@ district_hab_mining = {
 		mult = value:hab_energy_district_housing_stu
 	}
 
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_miner_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
+	}
+
 	inline_script = {
 		script = jobs/habitat_miners_add
 		AMOUNT = @habitat_rural_district_jobs
@@ -155,11 +187,16 @@ district_hab_mining = {
 			id = megastructures.210		# Spawn a mining orbital
 		}
 	}
+
+	inline_script = {
+		script = districts/district_triggered_name_mining
+	}
 }
 
 district_hab_science = {
 	base_buildtime = @hab_time
-	is_capped_by_modifier = yes
+	is_uncapped = {	always = no }
+	overlay_icon = GFX_district_research
 
 	zone_slots = {
 		slot_habitat_research
@@ -208,12 +245,15 @@ district_hab_science = {
 	inline_script = {
 		script = jobs/habitat_researchers_add
 		AMOUNT = @habitat_research_district_jobs
-		LARGE_AMOUNT = @habitat_rural_district_jobs
 	}
 
 	on_built = {
 		planet_event = {
 			id = megastructures.220		# Spawn a research orbital
 		}
+	}
+
+	triggered_name = {
+		text = city_research_1
 	}
 }

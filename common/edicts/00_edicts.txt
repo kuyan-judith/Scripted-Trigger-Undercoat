@@ -111,6 +111,7 @@ nutritional_plenitude = {
 		lithoid_pop_happiness = 0.05
 		planet_pops_organics_food_upkeep_mult = 0.25
 		planet_pops_organics_minerals_upkeep_mult = 0.25
+		planet_pops_organics_alloys_upkeep_mult = 0.25
 	}
 
 	potential = {
@@ -150,6 +151,7 @@ nutritional_plenitude_hive = {
 		logistic_growth_mult = 0.1
 		planet_pops_organics_food_upkeep_mult = 0.25
 		planet_pops_organics_minerals_upkeep_mult = 0.25
+		planet_pops_organics_alloys_upkeep_mult = 0.25
 	}
 
 	potential = {
@@ -191,6 +193,7 @@ expanded_breeding_program_servitor = {
 		lithoid_pop_happiness = 0.05
 		planet_pops_organics_food_upkeep_mult = 0.25
 		planet_pops_organics_minerals_upkeep_mult = 0.25
+		planet_pops_organics_alloys_upkeep_mult = 0.25
 	}
 
 	potential = {
@@ -550,6 +553,7 @@ thought_enforcement = {
 	}
 
 	modifier = {
+		custom_tooltip = edict_thought_enforcement_effect
 		intel_encryption_add = 1
 		pop_happiness = -0.10
 		pop_government_ethic_attraction = 0.25
@@ -582,7 +586,48 @@ thought_enforcement = {
 			is_egalitarian = yes
 		}
 	}
-	modifier = { custom_tooltip = edict_thought_enforcement_effect }
+}
+
+thought_enforcement_gestalt = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+
+	resources = {
+		category = edicts
+		cost = {
+			unity = @Edict3Cost
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			unity = @Edict3Cost
+			multiplier = value:edict_size_effect
+		}
+	}
+
+	modifier = {
+		custom_tooltip = edict_thought_enforcement_gestalt_effect
+		intel_encryption_add = 1
+		planet_stability_add = -5
+		planet_jobs_upkeep_mult = -0.1
+	}
+
+	potential = {
+		has_shroud_dlc = yes
+		is_gestalt = yes
+	}
+
+	prerequisites = {
+		tech_thought_enforcement
+	}
+
+	show_tech_unlock_if = {
+		has_shroud_dlc = yes
+		is_gestalt = yes
+	}
+
+	ai_weight = {
+		weight = @EdictMedPrio
+	}
 }
 
 extended_shifts = {
@@ -603,7 +648,7 @@ extended_shifts = {
 
 	modifier = {
 		planet_jobs_worker_produces_mult = 0.10
-		planet_jobs_slave_produces_mult = 0.10
+		pop_slave_bonus_workforce_mult = 0.10
 		pop_cat_worker_happiness = -0.10
 		pop_cat_slave_happiness = -0.10
 	}
@@ -641,9 +686,8 @@ synaptic_reinforcement = {
 		}
 	}
 
-	# Synapse Nodes provide an extra Maintenance Drone job
 	modifier = {
-		custom_tooltip = edict_synaptic_reinforcement_tooltip
+		planet_maintenance_drones_trade_produces_add = 1
 	}
 
 	potential = {
@@ -675,9 +719,8 @@ industrial_maintenance = {
 		}
 	}
 
-	# Industrial Districts also provide an extra Maintenance Drone job
 	modifier = {
-		custom_tooltip = edict_industrial_maintenance_tooltip
+		planet_maintenance_drones_trade_produces_add = 1
 	}
 
 	potential = {
@@ -686,7 +729,7 @@ industrial_maintenance = {
 	}
 
 	ai_weight = {
-		weight = 0
+		weight = @EdictLowPrio
 	}
 }
 
@@ -2315,5 +2358,95 @@ auto_hunker_down = {
 
 	prerequisites = {
 		"tech_advanced_industrial_storm_protection"
+	}
+}
+
+centrifugal_siphoning = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+	resources = {
+		category = edicts
+		cost = {
+			unity = 15
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			unity = 5
+			multiplier = value:edict_size_effect
+		}
+	}
+	potential = { is_galvanic_empire = yes }
+	modifier = {
+		# Adjust concept_inf_lm_edicts if this changes
+		planet_metallurgists_alloys_produces_add = -0.5
+		planet_metallurgists_sr_living_metal_produces_add = 1
+	}
+	ai_weight = {
+		weight = @EdictHighPrio
+	}
+}
+
+modular_growth_compounds = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+	resources = {
+		category = edicts
+		cost = {
+			sr_living_metal = 10
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			sr_living_metal = 5
+			multiplier = value:edict_size_effect
+		}
+	}
+	potential = { is_galvanic_empire = yes }
+	modifier = {
+		founder_species_growth_mult = @inf_modular_growth
+	}
+	ai_weight = {
+		weight = @EdictHighPrio
+		modifier = {
+			factor = 0
+			resource_income_compare = {
+				resource = sr_living_metal
+				value < 50
+			}
+			resource_stockpile_compare = {
+				resource = sr_living_metal
+				value < 500
+			}
+		}
+	}
+}
+
+entropy_harnessing = {
+	length = @EdictPerpetual
+	icon = "GFX_edict_type_policy"
+	resources = {
+		category = edicts
+		cost = {
+			unity = 5
+			multiplier = value:edict_size_effect
+		}
+		upkeep = {
+			unity = 5
+			multiplier = value:edict_size_effect
+		}
+	}
+	potential = { has_menace_perk = menp_hyperthermia_harnessing }
+	modifier = {
+		planet_technician_energy_produces_add = -2.5
+		planet_technician_entropy_crystals_produces_add = 0.4
+	}
+	ai_weight = {
+		weight = @EdictHighPrio
+		modifier = {
+			add = 5
+			resource_income_compare = {
+				resource = entropy_crystals
+				value < 250
+			}
+		}
 	}
 }

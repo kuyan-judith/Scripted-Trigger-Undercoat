@@ -3,7 +3,7 @@
 #############
 building_military_academy = {
 	base_buildtime = @b2_time
-	planet_limit = 1
+	empire_limit = 1
 	can_be_ruined = no
 	category = army
 
@@ -57,15 +57,31 @@ building_military_academy = {
 		mult = owner.value:tactical_algorithms_enclave_scaling_mult
 	}
 
-	planet_modifier = {
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = no
+			}
+		}
 		pop_soldier_bonus_workforce_mult = 0.15
 	}
 
-	triggered_planet_modifier = {
+	triggered_country_modifier = {
 		potential = {
-			OR = {
-				has_active_building = building_order_keep
-				has_active_building = building_order_castle
+			exists = owner
+			owner = {
+				is_gestalt = yes
+			}
+		}
+		pop_warrior_drone_bonus_workforce_mult = 0.15
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_toxic_knights_empire = yes # undercoat: moved to scripted trigger
 			}
 		}
 		pop_knight_bonus_workforce_mult = 0.05
@@ -144,7 +160,17 @@ building_dread_encampment = {
 
 	inline_script = {
 		script = jobs/soldiers_add
-		AMOUNT = @building_static_jobs
+		AMOUNT = @building_static_jobs_high
+	}
+
+	planet_modifier = {
+		planet_soldiers_society_research_produces_add = 2
+		planet_soldiers_engineering_research_produces_add = 2
+		planet_soldiers_consumer_goods_upkeep_add = 1
+	}
+
+	triggered_desc = {
+		text = building_dread_encampment_tt
 	}
 }
 
@@ -165,6 +191,19 @@ building_stronghold = {
 		exists = owner
 		NOT = { has_modifier = resort_colony }
 		owner = { is_wilderness_empire = no } # see 'building_planetary_carapace'
+		OR = {
+			has_planet_flag = ignore_ai_building_limitations
+			owner = {
+				is_ai = no
+			}
+
+			# AI is allowed to build up to three of these unless they have a fortress zone. (This can result in three under certain upgrade sequences.)
+			has_any_fortress_zone = yes
+			AND = {
+				num_buildings = { type = building_stronghold value < 2 }
+				num_buildings = { type = building_fortress value < 2 }
+			}
+		}
 	}
 
 	resources = {
@@ -208,6 +247,7 @@ building_fortress = {
 	}
 
 	potential = {
+		exists = owner
 		owner = { is_wilderness_empire = no } # see 'building_planetary_carapace_2'
 	}
 	allow = {
@@ -252,6 +292,7 @@ building_planetary_shield_generator = {
 	}
 
 	potential = {
+		exists = owner
 		owner = { is_wilderness_empire = no } # see 'building_ozone_thickener'
 	}
 	allow = {

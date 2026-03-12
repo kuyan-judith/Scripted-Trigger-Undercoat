@@ -246,8 +246,8 @@ situation_cybernetic_creed_cyberization = {
 			desc = situation_augmentation_center_needed_desc
 			AND = {
 				situation_progress >= 900
-				owner = {
-					NOT = {
+				NOT = {
+					owner = {
 						any_owned_planet = {
 							has_active_building = building_augmentation_center
 						}
@@ -264,8 +264,8 @@ situation_cybernetic_creed_cyberization = {
 	triggered_blocked_desc = {
 		trigger = {
 			situation_progress >= 900
-			owner = {
-				NOT = {
+			NOT = {
+				owner = {
 					any_owned_planet = {
 						has_active_building = building_augmentation_center
 					}
@@ -288,16 +288,30 @@ situation_synthetic_fertility_digitization = {
 	category = negative
 	fail_icon_frame = GFX_situation_outcome_frame_red
 	fail_icon = GFX_situation_outcome_unknown
-	category = negative
-	on_fail = {
+
+	on_progress_complete = {
 		custom_tooltip = situation_synthetic_fertility_complete
 		hidden_effect = {
+			# Upload all remaining pops
+			situation_event = {
+				id = machine_age.3326
+			}
 			situation_event = {
 				id = machine_age.3200
 			}
 		}
 	}
-	initial_progress = 5700
+
+	on_monthly = {
+		events = {
+			machine_age.3325 #Monthly Progress
+		}
+	}
+
+	initial_progress = 300
+	monthly_progress = {
+		base = 30
+	}
 	stages = {
 		stage_1 = {
 			icon = GFX_situation_stage_1
@@ -309,6 +323,7 @@ situation_synthetic_fertility_digitization = {
 			}
 		}
 	}
+
 	approach = {
 		name = situation_synthetic_fertility_approach_none
 		icon = GFX_situation_approach_balance_sheet
@@ -392,14 +407,6 @@ situation_synthetic_fertility_digitization = {
 			country_unity_produces_mult = 0.2
 			country_energy_produces_mult = -0.4
 		}
-	}
-	on_monthly = {
-		events = {
-			machine_age.3324 #Monthly Check if random pop dies or is added by events
-		}
-	}
-	monthly_progress = {
-		base = -0.1
 	}
 	triggered_blocked_desc = {
 		trigger = {
@@ -979,9 +986,12 @@ situation_cyberization = {
 		modifier = {
 			mult = 0
 			desc = "situation_augmentation_center_needed_desc"
-			situation_progress >= 250
-			owner = {
-				NOT = {
+			OR = {
+				owner = { has_country_flag = augmentation_center_needed }
+				situation_progress >= 250
+			}
+			NOT = {
+				owner = {
 					any_owned_planet = {
 						has_active_building = building_augmentation_center
 					}
@@ -1016,14 +1026,12 @@ situation_cyberization = {
 		trigger = {
 			OR = {
 				owner = { has_country_flag = augmentation_center_needed }
-				AND = {
-					situation_progress >= 250
-					owner = {
-						NOT = {
-							any_owned_planet = {
-								has_active_building = building_augmentation_center
-							}
-						}
+				situation_progress >= 250
+			}
+			NOT = {
+				owner = {
+					any_owned_planet = {
+						has_active_building = building_augmentation_center
 					}
 				}
 			}
@@ -1220,13 +1228,14 @@ situation_cyberization_hive = {
 		modifier = {
 			mult = 0
 			desc = situation_augmentation_center_needed_desc
-			AND = {
+			OR = {
+				owner = { has_country_flag = augmentation_center_needed }
 				situation_progress >= 250
+			}
+			NOT = {
 				owner = {
-					NOT = {
-						any_owned_planet = {
-							has_active_building = building_augmentation_center
-						}
+					any_owned_planet = {
+						has_active_building = building_augmentation_center
 					}
 				}
 			}
@@ -1253,14 +1262,12 @@ situation_cyberization_hive = {
 		trigger = {
 			OR = {
 				owner = { has_country_flag = augmentation_center_needed }
-				AND = {
-					situation_progress >= 250
-					owner = {
-						NOT = {
-							any_owned_planet = {
-								has_active_building = building_augmentation_center
-							}
-						}
+				situation_progress >= 250
+			}
+			NOT = {
+				owner = {
+					any_owned_planet = {
+						has_active_building = building_augmentation_center
 					}
 				}
 			}

@@ -69,6 +69,33 @@ country_event = {
 		}
 		if = {
 			limit = {
+				country_uses_bio_ships = no
+			}
+			set_variable = {
+				which = focus_built_battleship
+				value = 0
+			}
+		}
+		if = {
+			limit = {
+				country_uses_bio_ships = no
+			}
+			set_variable = {
+				which = focus_built_titans
+				value = 0
+			}
+		}
+		if = {
+			limit = {
+				country_uses_bio_ships = no
+			}
+			set_variable = {
+				which = focus_built_juggernaut
+				value = 0
+			}
+		}
+		if = {
+			limit = {
 				country_uses_bio_ships = yes
 			}
 			set_variable = {
@@ -105,11 +132,6 @@ country_event = {
 				value = 0
 			}
 		}
-		# Requires on_action code support TODO AUG-50161
-#		set_variable = {
-#			which = focus_goal_favors
-#			value = 0
-#		}
 	}
 }
 
@@ -838,17 +860,17 @@ planet_event = {
 				}
 				set_country_flag = built_generator_district
 			}
+			if = { # Generator District - Volcanic
+				limit = {
+					NOT = { has_country_flag = built_generator_district }
+					prev = { last_district_changed = district_geothermal }
+				}
+				set_country_flag = built_generator_district
+			}
 			if = { # Habitat Energy District - Energy variant for Habitats
 				limit = {
 					NOT = { has_country_flag = built_generator_district }
 					prev = { last_district_changed = district_hab_energy }
-				}
-				set_country_flag = built_generator_district
-			}
-			if = { # Generator District - Uncapped
-				limit = {
-					NOT = { has_country_flag = built_generator_district }
-					prev = { last_district_changed = district_generator_uncapped }
 				}
 				set_country_flag = built_generator_district
 			}
@@ -866,17 +888,17 @@ planet_event = {
 				}
 				set_country_flag = built_mining_district
 			}
+			if = { # Mining District - Volcanic
+				limit = {
+					NOT = { has_country_flag = built_mining_district }
+					prev = { last_district_changed = district_melting }
+				}
+				set_country_flag = built_mining_district
+			}
 			if = { # Mining District - Habitat Variant
 				limit = {
 					NOT = { has_country_flag = built_mining_district }
 					prev = { last_district_changed = district_hab_mining }
-				}
-				set_country_flag = built_mining_district
-			}
-			if = { # Mining District - Uncapped
-				limit = {
-					NOT = { has_country_flag = built_mining_district }
-					prev = { last_district_changed = district_mining_uncapped }
 				}
 				set_country_flag = built_mining_district
 			}
@@ -891,13 +913,6 @@ planet_event = {
 				limit = {
 					NOT = { has_country_flag = built_farming_district }
 					prev = { last_district_changed = district_rw_farming }
-				}
-				set_country_flag = built_farming_district
-			}
-			if = { # Agriculture District - Uncapped
-				limit = {
-					NOT = { has_country_flag = built_farming_district }
-					prev = { last_district_changed = district_farming_uncapped }
 				}
 				set_country_flag = built_farming_district
 			}
@@ -922,13 +937,6 @@ planet_event = {
 				}
 				set_country_flag = built_district_photosynthesis_fields
 			}
-			if = { # Photosynthesis Fields District Uncapped
-				limit = {
-					NOT = { has_country_flag = built_district_photosynthesis_fields }
-					prev = { last_district_changed = district_photosynthesis_fields_uncapped }
-				}
-				set_country_flag = built_district_photosynthesis_fields
-			}
 			if = { # Hollow Mountains
 				limit = {
 					NOT = { has_country_flag = built_district_hollow_mountains }
@@ -936,24 +944,10 @@ planet_event = {
 				}
 				set_country_flag = built_district_hollow_mountains
 			}
-			if = { # Hollow Mountains Uncapped
-				limit = {
-					NOT = { has_country_flag = built_district_hollow_mountains }
-					prev = { last_district_changed = district_hollow_mountains_uncapped }
-				}
-				set_country_flag = built_district_hollow_mountains
-			}
 			if = { # Orchard Forests
 				limit = {
 					NOT = { has_country_flag = built_district_orchard_forests }
 					prev = { last_district_changed = district_orchard_forests }
-				}
-				set_country_flag = built_district_orchard_forests
-			}
-			if = { # Hollow Mountains
-				limit = {
-					NOT = { has_country_flag = built_district_orchard_forests }
-					prev = { last_district_changed = district_orchard_forests_uncapped }
 				}
 				set_country_flag = built_district_orchard_forests
 			}
@@ -1148,6 +1142,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = from
 		from = {
 			NOT = { has_country_flag = has_won_war }
 		}
@@ -1508,32 +1503,6 @@ country_event = {
 	}
 }
 
-#Requires on_action code support TODO AUG-50161
-#country_event = {
-#	id = focus.541
-#	hide_window = yes
-#
-#	trigger = {
-#		NOT = {
-#			has_country_flag = gained_favor_5
-#		}
-#	}
-#
-#	immediate = {
-#		change_variable = {
-#			which = focus_goal_favors
-#			value = 1
-#		}
-#		if = {
-#			change_variable = {
-#				which = focus_goal_favors
-#				value >= 5
-#			}
-#		set_country_flag = gained_favor
-#		}
-#	}
-#}
-
 country_event = {
 	id = focus.545
 	hide_window = yes
@@ -1594,7 +1563,7 @@ country_event = {
 		NOT = { has_country_flag = has_excellent_relations }
 		count_relation = {
 			limit = {
-				opinion = { who = root value >= 200}
+				opinion = { who = root value >= 200 }
 			}
 			count >= 10
 		}
@@ -1840,6 +1809,7 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = from
 		NOT = {
 			from = {
 				has_country_flag = defeated_fallen_empire
@@ -1880,7 +1850,7 @@ planet_event = {
 		from = {
 			check_variable = {
 				which = focus_conquered_worlds
-				value < focus_goal_conquered_worlds
+				value < @focus_goal_conquered_worlds
 			}
 		}
 	}
@@ -2035,6 +2005,96 @@ country_event = {
 		from = {
 			change_variable = {
 				which = conquest_subjects
+				value = 1
+			}
+		}
+	}
+}
+
+# Build 10 Battleships
+# Called from on_ship_built
+# Root = Ship
+# From = Planet
+ship_event = {
+	id = focus.705
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_ship_size = battleship
+		owner = {
+			check_variable = {
+				which = focus_built_battleship
+				value < @focus_goal_built_battleships
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			change_variable = {
+				which = focus_built_battleship
+				value = 1
+			}
+		}
+	}
+}
+
+# Build 2 Titans
+# Called from on_ship_built
+# Root = Ship
+# From = Planet
+ship_event = {
+	id = focus.710
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_ship_size = titan
+		owner = {
+			check_variable = {
+				which = focus_built_titan
+				value < @focus_goal_built_titans
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			change_variable = {
+				which = focus_built_titans
+				value = 1
+			}
+		}
+	}
+}
+
+# Build 1 Juggernaut
+# Called from on_ship_built
+# Root = Ship
+# From = Planet
+ship_event = {
+	id = focus.715
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_ship_size = juggernaut
+		owner = {
+			check_variable = {
+				which = focus_built_juggernut
+				value < @focus_goal_built_juggernaut
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			change_variable = {
+				which = focus_built_juggernaut
 				value = 1
 			}
 		}

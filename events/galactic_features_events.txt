@@ -373,6 +373,7 @@ ship_event = {
 			event_target:tuborek_country = {
 				create_leader = {
 					class = commander
+					tier = leader_tier_renowned
 					species = event_target:fallen_4_species
 					name = NAME_Tuborek
 					skill = 10
@@ -387,14 +388,31 @@ ship_event = {
 					effect = {
 						set_age = 65
 						save_event_target_as = tuborek_leader
-						set_leader_flag = renowned_leader
 						set_leader_flag = is_in_recruit_window
-						add_trait = subclass_commander_admiral
-						add_trait = leader_trait_master_gunner
-						add_trait = leader_trait_aggressive
-						add_trait = leader_trait_wrecker_2
-						add_trait = leader_trait_commanding_presence_2
-						add_trait = leader_trait_resilient
+						add_trait = {
+							trait = subclass_commander_admiral
+							consume_selection = yes
+						}
+						add_trait = {
+							trait = leader_trait_master_gunner
+							consume_selection = yes
+						}
+						add_trait = {
+							trait = leader_trait_aggressive
+							consume_selection = yes
+						}
+						add_trait = {
+							trait = leader_trait_wrecker_2
+							consume_selection = yes
+						}
+						add_trait = {
+							trait = leader_trait_commanding_presence_2
+							consume_selection = yes
+						}
+						add_trait = {
+							trait = leader_trait_resilient
+							consume_selection = yes
+						}
 					}
 				}
 			}
@@ -440,6 +458,15 @@ country_event = {
 		tag = hire_leader
 		name = "galactic_features.304.c"
 		hidden_effect = {
+			if = {
+				limit = {
+					is_variable_set = paragon_memory_vault
+				}
+				change_variable = {
+					which = paragon_memory_vault
+					value = 1
+				}
+			}
 			hire_event_leader_effect = {
 				LEADER = tuborek_leader
 			}
@@ -876,15 +903,14 @@ country_event = {
 		name = galactic_features.361.a
 		trigger = {
 			OR = {
-				has_ethic = ethic_fanatic_pacifist
-				NOR = {
-					has_ethic = ethic_fanatic_pacifist
-					has_ethic = ethic_fanatic_militarist
-					has_ethic = ethic_fanatic_xenophobe
-					has_ethic = ethic_fanatic_xenophile
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_fanatic_materialist
-					is_machine_empire = yes
+				is_fanatic_pacifist = yes
+				AND = {
+					is_fanatic_militarist = no
+					is_fanatic_xenophobe = no
+					is_fanatic_xenophile = no
+					is_fanatic_spiritualist = no
+					is_fanatic_materialist = no
+					is_machine_empire = no
 				}
 			}
 		}
@@ -892,29 +918,29 @@ country_event = {
 
 	option = {
 		name = galactic_features.361.a.milit
-		trigger = {	has_ethic = ethic_fanatic_militarist }
+		trigger = {	is_fanatic_militarist = yes }
 	}
 
 	option = {
 		name = galactic_features.361.a.phobe
-		trigger = { OR = { has_ethic = ethic_fanatic_xenophobe has_civic = civic_machine_terminator } }
+		trigger = { OR = { is_fanatic_xenophobe = yes has_civic = civic_machine_terminator } }
 	}
 
 	option = {
 		name = galactic_features.361.a.phile
-		trigger = { has_ethic = ethic_fanatic_xenophile }
+		trigger = { is_fanatic_xenophile = yes }
 	}
 
 	option = {
 		name = galactic_features.361.a.spiri
-		trigger = { has_ethic = ethic_fanatic_spiritualist }
+		trigger = { is_fanatic_spiritualist = yes }
 	}
 
 	option = {
 		name = galactic_features.361.a.mater
 		trigger = {
 			OR = {
-				has_ethic = ethic_fanatic_materialist
+				is_fanatic_materialist = yes
 				AND = {
 					is_machine_empire = yes
 					NOT = { has_civic = civic_machine_terminator }
@@ -3347,6 +3373,13 @@ country_event = {
 		is_playable = yes # undercoat: moved to scripted trigger
 		from = {
 			is_tiyanki_country_type = yes
+		}
+		fromfrom = {
+			NOT = {
+				any_owned_ship = {
+					is_ship_size = gravity_snare
+				}
+			}
 		}
 		NOT = {
 			fromfrom = {

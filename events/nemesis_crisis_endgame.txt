@@ -15,21 +15,50 @@ country_event = {
 	desc = {
 		trigger = {
 			is_gestalt = no
-			NOT = { owner_species = { has_trait = trait_psionic } }
+			owner_species = { is_psionic_species = no }
 		}
 		text = "crisis.6000.a.desc"
 	}
 	desc = {
-		trigger = { owner_species = { has_trait = trait_psionic } }
-		text = "crisis.6000.b.desc"
+		trigger = {
+			owner_species = { is_psionic_species = yes }
+			is_robot_empire = no
+			is_gestalt = no
+		}
+		text = "crisis.6000.b.desc.organic_non_gestalt"
 	}
 	desc = {
-		trigger = { is_machine_empire = yes }
+		trigger = {
+			owner_species = { is_psionic_species = yes }
+			is_robot_empire = no
+			is_gestalt = yes
+		}
+		text = "crisis.6000.b.desc.organic_gestalt"
+	}
+	desc = {
+		trigger = {
+			owner_species = { is_psionic_species = yes }
+			is_robot_empire = yes
+		}
+		text = "crisis.6000.b.desc.machine"
+	}
+	desc = {
+		trigger = { 
+			is_machine_empire = yes
+			is_shroud_forged_empire = no # undercoat: moved to scripted trigger
+		}
 		text = "crisis.6000.c.desc"
 	}
 	desc = {
 		trigger = { is_hive_empire = yes }
 		text = "crisis.6000.d.desc"
+	}
+	desc = {
+		trigger = { 
+			is_machine_empire = yes
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		text = "crisis.6000.e.desc"
 	}
 	picture = GFX_evt_megastructure_construction
 	show_sound = event_death_cult
@@ -61,7 +90,7 @@ country_event = {
 		name = crisis.6000.a
 		trigger = {
 			is_gestalt = no
-			NOT = { owner_species = { has_trait = trait_psionic } }
+			owner_species = { is_psionic_species = no }
 		}
 		custom_tooltip = crisis.6000.tooltip
 		hidden_effect = {
@@ -70,7 +99,7 @@ country_event = {
 	}
 	option = {
 		name = crisis.6000.b
-		trigger = { owner_species = { has_trait = trait_psionic } }
+		trigger = { owner_species = { is_psionic_species = yes } }
 		custom_tooltip = crisis.6000.tooltip
 		hidden_effect = {
 			country_event = { id = crisis.6001 days = 5 }
@@ -78,7 +107,10 @@ country_event = {
 	}
 	option = {
 		name = crisis.6000.c
-		trigger = { is_machine_empire = yes }
+		trigger = { 
+			is_machine_empire = yes
+			is_shroud_forged_empire = no # undercoat: moved to scripted trigger
+		}
 		custom_tooltip = crisis.6000.tooltip
 		hidden_effect = {
 			country_event = { id = crisis.6001 days = 5 }
@@ -87,6 +119,17 @@ country_event = {
 	option = {
 		name = crisis.6000.d
 		trigger = { is_hive_empire = yes }
+		custom_tooltip = crisis.6000.tooltip
+		hidden_effect = {
+			country_event = { id = crisis.6001 days = 5 }
+		}
+	}
+	option = {
+		name = crisis.6000.e
+		trigger = { 
+			is_machine_empire = yes
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
 		custom_tooltip = crisis.6000.tooltip
 		hidden_effect = {
 			country_event = { id = crisis.6001 days = 5 }
@@ -231,7 +274,7 @@ country_event = {
 				is_ai = no
 				NOT = { is_same_value = root }
 				OR = {
-					owner_species = { has_trait = trait_psionic }
+					owner_species = { is_psionic_species = yes }
 					has_country_flag = built_crisis_sphere
 				}
 			}
@@ -372,8 +415,19 @@ country_event = {
 				has_country_flag = crisis_psionic_alert
 				has_country_flag = built_crisis_sphere
 			}
+			is_gestalt = no
 		}
-		text = "crisis.6010.a.desc"
+		text = "crisis.6010.a.desc.non_gestalt"
+	}
+	desc = {
+		trigger = {
+			NOR = {
+				has_country_flag = crisis_psionic_alert
+				has_country_flag = built_crisis_sphere
+			}
+			is_gestalt = yes
+		}
+		text = "crisis.6010.a.desc.gestalt"
 	}
 	desc = {
 		trigger = { has_country_flag = crisis_psionic_alert }
@@ -401,7 +455,17 @@ country_event = {
 	}
 
 	option = {
-		name = crisis.6010.a
+		name = {
+			trigger = {
+				if = {
+					limit = { is_robot_empire = yes }
+					text = crisis.6010.a.machine
+				}
+				else = {
+					text = crisis.6010.a.organic
+				}
+			}
+		}
 	}
 }
 
@@ -411,16 +475,14 @@ country_event = {
 	title = "crisis.6005.name"
 	desc = {
 		trigger = {
-			NOR = {
-				owner_species = { has_trait = trait_psionic }
-				has_country_flag = crisis_general_alert
-			}
+			owner_species = { is_psionic_species = no }
+			NOT = { has_country_flag = crisis_general_alert }
 		}
 		text = "crisis.6015.a.desc"
 	}
 	desc = {
 		trigger = {
-			owner_species = { has_trait = trait_psionic }
+			owner_species = { is_psionic_species = yes }
 			NOT = { has_country_flag = crisis_general_alert }
 		}
 		text = "crisis.6015.b.desc"
@@ -457,8 +519,18 @@ country_event = {
 		text = "crisis.6050.a.desc"
 	}
 	desc = {
-		trigger = { is_gestalt = yes }
+		trigger = { 
+			is_gestalt = yes
+			is_shroud_forged_empire = no # undercoat: moved to scripted trigger
+		}
 		text = "crisis.6050.b.desc"
+	}
+	desc = {
+		trigger = { 
+			is_gestalt = yes
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		text = "crisis.6050.c.desc"
 	}
 	picture = GFX_evt_vortex
 	show_sound = event_default
@@ -1014,7 +1086,7 @@ country_event = {
 	immediate = {
 		every_playable_country = {
 			limit = {
-				any_owned_pop_group = { has_trait = trait_psionic }
+				any_owned_pop_group = { is_psionic_species = yes }
 			}
 			country_event = { id = crisis.6171 }
 		}
@@ -1028,12 +1100,48 @@ country_event = {
 	desc = {
 		trigger = {
 			NOT = { is_same_value = from }
+			is_robot_empire = no
+			is_gestalt = no
 		}
-		text = "crisis.6171.a.desc"
+		text = "crisis.6171.a.desc.organic_non_gestalt"
 	}
 	desc = {
-		trigger = { is_same_value = from }
-		text = "crisis.6171.b.desc"
+		trigger = {
+			NOT = { is_same_value = from }
+			is_robot_empire = yes
+			is_gestalt = no
+		}
+		text = "crisis.6171.a.desc.machine_non_gestalt"
+	}
+	desc = {
+		trigger = {
+			NOT = { is_same_value = from }
+			is_gestalt = yes
+		}
+		text = "crisis.6171.a.desc.gestalt"
+	}
+	desc = {
+		trigger = {
+			is_same_value = from
+			is_robot_empire = no
+			is_gestalt = no
+		}
+		text = "crisis.6171.b.desc.organic_non_gestalt"
+	}
+	desc = {
+		trigger = {
+			is_same_value = from
+			is_robot_empire = yes
+			is_gestalt = no
+		}
+		text = "crisis.6171.b.desc.machine_non_gestalt"
+	}
+	desc = {
+		trigger = {
+			is_same_value = from
+			is_gestalt = yes
+		}
+		text = "crisis.6171.b.desc.gestalt"
 	}
 	picture = GFX_evt_psionics
 	show_sound = event_default
@@ -1043,34 +1151,47 @@ country_event = {
 	trigger = { is_ai = no }
 
 	option = {
-		name = crisis.6171.a
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						is_robot_empire = no
+						is_gestalt = no
+					}
+					text = crisis.6171.a.organic_non_gestalt
+				}
+				else = {
+					text = crisis.6171.a.machine_or_gestalt
+				}
+			}
+		}
 		trigger = {
 			NOT = { is_same_value = from }
 		}
 
 		# While loop messes up tooltip so doing it old school
 		random_owned_pop_group = {
-			limit = { has_trait = trait_psionic }
+			limit = { is_psionic_species = yes }
 			kill_single_pop = yes
 		}
 		random_owned_pop_group = {
-			limit = { has_trait = trait_psionic }
+			limit = { is_psionic_species = yes }
 			kill_single_pop = yes
 		}
 		random_owned_pop_group = {
-			limit = { has_trait = trait_psionic }
+			limit = { is_psionic_species = yes }
 			kill_single_pop = yes
 		}
 		random_owned_pop_group = {
-			limit = { has_trait = trait_psionic }
+			limit = { is_psionic_species = yes }
 			kill_single_pop = yes
 		}
 		random_owned_pop_group = {
-			limit = { has_trait = trait_psionic }
+			limit = { is_psionic_species = yes }
 			kill_single_pop = yes
 		}
 		random_owned_pop_group = {
-			limit = { has_trait = trait_psionic }
+			limit = { is_psionic_species = yes }
 			kill_single_pop = yes
 		}
 		random_owned_leader = {

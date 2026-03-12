@@ -15,11 +15,7 @@ building_mote_harvesters = {
 
 	potential = {
 		owner = { is_wilderness_empire = no }
-		OR = {
-			has_deposit = d_dust_caverns
-			has_deposit = d_dust_desert
-			has_deposit = d_industrial_sector
-		}
+		has_volatile_motes_deposit = yes
 	}
 
 	prerequisites = {
@@ -54,12 +50,7 @@ building_gas_extractors = {
 
 	potential = {
 		owner = { is_wilderness_empire = no }
-		OR = {
-			has_deposit = d_bubbling_swamp
-			has_deposit = d_fuming_bog
-			has_deposit = d_industrial_sector
-			has_deposit = d_exotic_mountain
-		}
+		has_exotic_gases_deposit = yes
 	}
 
 	prerequisites = {
@@ -93,12 +84,7 @@ building_crystal_mines = {
 
 	potential = {
 		owner = { is_wilderness_empire = no }
-		OR = {
-			has_deposit = d_crystalline_caverns
-			has_deposit = d_crystal_forest
-			has_deposit = d_crystal_reef
-			has_deposit = d_industrial_sector
-		}
+		has_rare_crystals_deposit = yes
 	}
 
 	prerequisites = {
@@ -282,9 +268,7 @@ building_xeno_zoo = {
 	inline_script = {
 		script = stu/jobs_add
 		job_type = biologists
-		trigger = "has_modifier = resort_colony"
-		AMOUNT = 200
-		desc = 0 # building changes job, so desc needs to be separate
+		mult_line = "mult = value:xeno_zoo_biologists_stu"
 	}
 
 	triggered_planet_modifier = {
@@ -371,63 +355,55 @@ building_xeno_zoo = {
 		}
 	}
 
-	prerequisites = {
-		"tech_alien_life_studies"
-	}
-
 	triggered_desc = {
-		text = job_xeno_zoo_keeper_effect_desc
+		trigger = {
+			exists = owner
+			owner = {
+				has_warrior_culture = no # undercoat: moved to scripted trigger
+			}
+		}
+		text = pre_sapient_job_xeno_zoo_animal_tt
 	}
 
 	triggered_desc = {
 		trigger = {
-			planet = {
-				any_owned_pop_group = {
-					is_sapient = no
-				}
-			}
 			exists = owner
-			owner = { has_warrior_culture = no } # undercoat: moved to scripted trigger
+			owner = {
+				has_warrior_culture = yes # undercoat: moved to scripted trigger
+			}
+		}
+		text = pre_sapient_job_xeno_zoo_beast_tt
+	}
+
+	triggered_desc = {
+		text = biologist_is_xeno_zoo_keeper_tt
+	}
+
+	triggered_desc = {
+		text = NEW_LINE
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				has_warrior_culture = no # undercoat: moved to scripted trigger
+			}
 		}
 		text = job_xeno_zoo_animal_effect_desc
 	}
 
 	triggered_desc = {
 		trigger = {
-			planet = {
-				any_owned_pop_group = {
-					is_livestock = yes
-				}
-			}
 			exists = owner
-			owner = { has_warrior_culture = no } # undercoat: moved to scripted trigger
-		}
-		text = job_livestock_zoo_animal_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			planet = {
-				any_owned_pop_group = {
-					is_sapient = no
-				}
+			owner = {
+				has_warrior_culture = yes # undercoat: moved to scripted trigger
 			}
-			exists = owner
-			owner = { has_warrior_culture = yes } # undercoat: moved to scripted trigger
 		}
 		text = job_xeno_zoo_beast_effect_desc
 	}
 
-	triggered_desc = {
-		trigger = {
-			planet = {
-				any_owned_pop_group = {
-					is_livestock = yes
-				}
-			}
-			exists = owner
-			owner = { has_warrior_culture = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_livestock_zoo_beast_effect_desc
+	prerequisites = {
+		"tech_alien_life_studies"
 	}
 }

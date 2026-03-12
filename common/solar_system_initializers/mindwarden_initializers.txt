@@ -1,0 +1,154 @@
+
+### MINDWARDEN SYSTEMS
+
+#####################
+### Home System I ###
+#####################
+
+mindwarden_enclave_initializer = {
+	class = "rl_standard_stars"
+	usage = misc_system_init
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 230
+	}
+
+	max_instances = 1
+	usage_odds = {
+		base = 0
+		modifier = {
+			has_shroud_dlc = yes
+			add = @spawn_system_extreme
+		}
+		modifier = {
+			factor = 0
+			any_country = {
+				is_mindwarden_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+	}
+	spawn_chance = 100
+
+	flags = {
+		mindwarden_enclave_system
+		enclave
+	}
+
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 20 max = 30 }
+		has_ring = no
+
+		init_effect = {
+			prevent_anomaly = yes
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			create_ambient_object = {
+				type = "nebula_L10_entity"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 0
+					angle = random
+				}
+			}
+		}
+	}
+
+	change_orbit = 60
+
+	planet = {
+		class = pc_shrouded
+		orbit_distance = 50
+		orbit_angle = { min = 90 max = 270 }
+		size = 20
+		has_ring = no
+
+		init_effect = {
+			set_planet_flag = mindwarden_enclave_planet
+			save_event_target_as = mindwarden_enclave_planet
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			prevent_anomaly = yes
+			create_species = {
+				homeworld = this
+				name = MINDWARDEN
+				class = MINDWARDEN_ENCLAVE
+				namelist = HUM2
+				blocked_archetypes = {
+					MACHINE
+					ROBOT
+					LITHOID
+				}
+				portrait = mindwarden_01
+				traits = {
+					trait = "trait_organic"
+					trait = "trait_resilient"
+					trait = "trait_natural_engineers"
+					trait = "trait_nomadic"
+					trait = "trait_solitary"
+					trait = "trait_humanoid_psychological_infertility"
+				}
+				effect = {
+					save_event_target_as = mindwarden_enclave_species
+				}
+			}
+			create_country = {
+				name = random
+				species = event_target:mindwarden_enclave_species
+				type = mindwarden_enclave
+				origin = "origin_default"
+				civics = {
+					civic = civic_mindwarden_enclave
+				}
+				flag = {
+					icon = {
+						category = "special"
+						file = "mindwardens.dds"
+					}
+					background = {
+						category = "backgrounds"
+						file = "stripe.dds"
+					}
+					colors = {
+						"black"
+						"purple"
+						"null"
+						"null"
+					}
+				}
+				ethos = {
+					ethic = ethic_militarist
+					ethic = ethic_fanatic_materialist
+				}
+				ignore_initial_colony_error = yes
+			}
+			last_created_country = {
+				set_graphical_culture = mindwarden_01
+				save_global_event_target_as = mindwarden_enclave_country
+				set_country_flag = mindwarden_enclave_country
+				create_mindwarden_enclave = yes
+				set_custom_capital_location = prev
+			}
+			solar_system = {
+				save_global_event_target_as = mindwarden_enclave_system
+			}
+		}
+	}
+
+	init_effect = {
+		spawn_megastructure = {
+			type = shroud_seal
+			orbit_angle = 0
+			orbit_distance = 60
+			owner = event_target:mindwarden_enclave_country
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}

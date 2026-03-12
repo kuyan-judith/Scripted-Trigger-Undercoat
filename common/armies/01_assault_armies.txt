@@ -44,22 +44,27 @@ assault_army = {
 		OR = {
 			is_machine_empire = no
 			is_machine_assimilator = yes # undercoat: moved to scripted trigger
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
 		}
 	}
 	potential_country = {
 		OR = {
 			is_machine_empire = no
 			is_machine_assimilator = yes # undercoat: moved to scripted trigger
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
 		}
 		is_wilderness_empire = no
 	}
 	potential = {
 		from = {
-			NOR = {
-				has_trait = "trait_mechanical"
-				has_trait = "trait_machine_unit"
-				has_trait = "trait_limited_cybernetic"
-				is_sapient = no
+			OR = {
+				has_trait = trait_shroud_forged
+				NOR = {
+					has_trait = "trait_mechanical"
+					has_trait = "trait_machine_unit"
+					has_trait = "trait_limited_cybernetic"
+					is_sapient = no
+				}
 			}
 		}
 	}
@@ -73,10 +78,7 @@ assault_army = {
 				has_technology = tech_telepathy
 				has_technology = tech_gene_seed_purification
 				AND = {
-					OR = {
-						has_ethic = ethic_militarist
-						has_ethic = ethic_fanatic_militarist
-					}
+					is_militarist = yes
 					has_technology = tech_gene_banks
 				}
 			}
@@ -189,10 +191,7 @@ slave_army = {
 				has_technology = tech_telepathy
 				has_technology = tech_gene_seed_purification
 				AND = {
-					OR = {
-						has_ethic = ethic_militarist
-						has_ethic = ethic_fanatic_militarist
-					}
+					is_militarist = yes
 					has_technology = tech_gene_banks
 				}
 				AND = {
@@ -276,10 +275,7 @@ clone_army = {
 				has_technology = tech_telepathy
 				has_technology = tech_gene_seed_purification
 				NAND = {
-					OR = {
-						has_ethic = ethic_militarist
-						has_ethic = ethic_fanatic_militarist
-					}
+					is_militarist = yes
 					has_technology = tech_gene_banks
 				}
 			}
@@ -360,7 +356,7 @@ robotic_army = {
 		modifier = {
 			set = 0
 			is_fallen_empire = yes
-			NOT = { has_ethic = ethic_fanatic_materialist }
+			NOT = { is_fanatic_materialist = yes }
 		}
 	}
 }
@@ -403,23 +399,26 @@ psionic_army = {
 
 	prerequisites = { "tech_telepathy" }
 	potential_country = {
-		is_machine_empire = no
+		OR = {
+			is_machine_empire = no
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
 		is_wilderness_empire = no
 	}
 	potential = {
 		from = {
 			OR = {
 				NOT = { host_has_dlc = "Utopia" }
-				OR = {
-					has_trait = trait_latent_psionic
-					has_trait = trait_psionic
-				}
+				has_psionic_species_trait = yes
 			}
-			NOR = {
-				has_trait = "trait_mechanical"
-				has_trait = "trait_machine_unit"
-				has_trait = "trait_limited_cybernetic"
-				is_sapient = no
+			OR = {
+				has_trait = trait_shroud_forged
+				NOR = {
+					has_trait = "trait_mechanical"
+					has_trait = "trait_machine_unit"
+					has_trait = "trait_limited_cybernetic"
+					is_sapient = no
+				}
 			}
 		}
 	}
@@ -436,7 +435,7 @@ psionic_army = {
 		modifier = {
 			set = 0
 			is_fallen_empire = yes
-			NOT = { has_ethic = ethic_fanatic_spiritualist }
+			NOT = { is_fanatic_spiritualist = yes }
 		}
 	}
 }
@@ -559,7 +558,7 @@ gene_warrior_army = {
 		modifier = {
 			set = 0
 			is_fallen_empire = yes
-			NOT = { has_ethic = ethic_fanatic_xenophile }
+			is_fanatic_xenophile = no
 		}
 	}
 }
@@ -595,6 +594,100 @@ wilderness_pre_sapient_assault_army = {
 		exists = owner
 		owner = {
 			is_wilderness_empire = yes
+		}
+	}
+}
+
+# Abominations
+abomination_army = {
+	damage = 1.33334 			# 2.00 - 4.00
+	health = 1.5				# 300
+	morale = 1.5				# 300
+	morale_damage = 1.5			# 3.00 - 6.00
+	collateral_damage = 2.50
+	war_exhaustion = 0.50
+	time = 100
+	icon = GFX_army_type_slave
+
+	resources = {
+		category = armies
+		cost = {
+			minerals = 50
+		}
+
+		upkeep = {
+			energy = 0.5
+		}
+	}
+
+	prerequisites = { "tech_neural_implants" }
+
+	show_tech_unlock_if = {
+		is_twisted_experimenters_empire = yes
+	}
+
+	potential_country = {
+		is_twisted_experimenters_empire = yes
+		OR = {
+			has_policy_flag = slavery_allowed
+			has_exploited_disconnected_drones = yes
+		}
+		is_machine_empire = no
+	}
+	potential = {
+		owner = {
+			any_owned_pop_group = {
+				is_enslaved = yes
+				is_same_species = from
+			}
+		}
+		from = {
+			NOR = {
+				has_trait = "trait_mechanical"
+				has_trait = "trait_machine_unit"
+				has_trait = "trait_limited_cybernetic"
+				is_sapient = no
+			}
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_slave_processing_facility"
+			OR = {
+				has_building = building_slave_processing
+				AND = {
+					exists = orbital_defence
+					orbital_defence = {
+						exists = starbase
+						starbase = {
+							has_starbase_building = ring_slave_processing_facility
+						}
+					}
+				}
+			}
+		}
+		any_owned_pop_group = { is_enslaved = yes }
+	}
+
+	ai_weight = {
+		base = 100
+		modifier = {
+			set = 0
+			OR = {
+				is_fallen_empire = yes
+				NOT = { has_ai_personality_behaviour = slaver }
+				has_technology = tech_telepathy
+				has_technology = tech_gene_seed_purification
+				AND = {
+					is_militarist = yes
+					has_technology = tech_gene_banks
+				}
+				AND = {
+					has_ai_personality_behaviour = robot_liberator
+					has_technology = tech_droid_workers
+				}
+			}
 		}
 	}
 }
@@ -1120,6 +1213,107 @@ perfected_clone_army = {
 		modifier = {
 			factor = 2
 			is_clone_army_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+}
+
+# Ember Legion
+ember_legion = {
+	damage = 2.0
+	morale_damage = 2.25
+	collateral_damage = 1.25
+	war_exhaustion = 0.25
+	health = 2.5
+	has_morale = yes
+	time = 180
+	icon = GFX_army_type_ember
+	has_species = yes
+
+	resources = {
+		category = armies
+		cost = { minerals = 250 }
+		upkeep = { energy = 2 }
+	}
+
+	potential_country = { is_pyrolatry_empire = yes } # undercoat: moved to scripted trigger
+	potential = {
+		from = {
+			NOR = {
+				has_trait = "trait_mechanical"
+				has_trait = "trait_machine_unit"
+				has_trait = "trait_limited_cybernetic"
+				is_sapient = no
+			}
+		}
+		planet = { # If habitability changes, adjust civic_pyrolatry_effects
+			habitability = { who = from value <= 0.2 }
+		}
+	}
+
+	ai_weight = {
+		base = 10
+		modifier = {
+			factor = 10
+			has_ethic = ethic_fanatic_xenophobe
+		}
+		modifier = {
+			set = 0
+			OR = {
+				is_pacifist = yes
+				is_xenophile = yes
+			}
+		}
+	}
+}
+
+# Living Metal Imbued Army
+# Note: This army is available for regular and machine empires
+lm_imbued_army = {
+	damage = 2.0
+	morale_damage = 2.0
+	collateral_damage = 1.25
+	war_exhaustion = 0.25
+	health = 2.5
+	has_morale = no
+	time = 180
+	icon = GFX_army_type_robot
+	has_species = yes
+
+	resources = {
+		category = armies
+		cost = { sr_living_metal = 150 }
+		upkeep = {
+			energy = 2
+			minerals = 1
+		}
+	}
+
+	potential_country = { is_galvanic_empire = yes }
+	potential = {
+		OR = {
+			from = { has_trait = "trait_infernal" }
+			owner = { has_valid_civic = civic_machine_galvanic_symbiosis }
+		}
+	}
+
+	ai_weight = {
+		base = 10
+		modifier = {
+			factor = 5
+			has_ethic = ethic_fanatic_xenophobe
+		}
+		modifier = {
+			factor = 2
+			owner = {
+				has_monthly_income = {
+					resource = sr_living_metal
+					value > 30
+				}
+			}
+		}
+		modifier = {
+			factor = 5
+			is_genocidal_infernal = yes
 		}
 	}
 }

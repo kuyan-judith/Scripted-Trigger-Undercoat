@@ -2267,7 +2267,7 @@ first_contact_event = {
 				owner = {
 					OR = {
 						is_homicidal = yes
-						has_ethic = ethic_fanatic_xenophobe
+						is_fanatic_xenophobe = yes
 					}
 				}
 			}
@@ -3611,12 +3611,6 @@ first_contact_event = {
 	}
 
 	after = {
-		set_site_progress_locked = no
-	}
-
-	option = {
-		name = first_contact.290.A
-
 		finish_first_contact_effect = yes
 
 		owner = {
@@ -3686,9 +3680,19 @@ first_contact_event = {
 				INTEL = 15
 			}
 		}
+		set_site_progress_locked = no
 	}
 
-	option = { #Seperate option just to get the little icon on the left
+	option = {
+		trigger = {
+			owner = {
+				is_evolutionary_predators_empire = no # undercoat: moved to scripted trigger
+			}
+		}
+		name = first_contact.290.A
+	}
+
+	option = { #Separate option just to get the little icon on the left
 		exclusive_trigger = {
 			contact_country = {
 				is_machine_empire = no
@@ -3700,39 +3704,6 @@ first_contact_event = {
 		name = first_contact.290.A
 
 		owner = {
-			hidden_effect = {
-				set_country_flag = they_come_in_pieces_achievement
-			}
-			if = {
-				limit = {
-					can_copy_random_tech_from = {
-						who = root.contact_country
-						category = biology
-					}
-				}
-				copy_random_tech_from = {
-					who = root.contact_country
-					category = biology
-					progress = 0.5
-				}
-			}
-			else = {
-				add_monthly_resource_mult = {
-					resource = society_research
-					value = @tier3researchreward
-					min = @tier3researchmin
-				}
-			}
-			if = {
-				limit = { has_nemesis = yes }
-				custom_tooltip = gain_asset_internal_organs
-				hidden_effect = {
-					random_spynetwork = {
-						limit = { target = { is_same_value = root.contact_country } }
-						create_espionage_asset = { type = asset_internal_organs }
-					}
-				}
-			}
 			root.contact_country.species = {
 				switch = {
 					trigger = is_species_class
@@ -3772,10 +3743,10 @@ first_contact_event = {
 					TOX = {
 						root.owner = { give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = toxoid } }
 					}
+					MINDWARDEN = {
+						root.owner = { give_evolutionary_predator_situation_progress_and_dna = { AMOUNT = small TYPE = reptilian } }
+					}
 				}
-			}
-			first_contact_add_intel = {
-				INTEL = 15
 			}
 		}
 	}
@@ -4107,7 +4078,7 @@ first_contact_event = {
 				owner = {
 					OR = {
 						is_homicidal = yes
-						has_ethic = ethic_fanatic_xenophobe
+						is_fanatic_xenophobe = yes
 					}
 				}
 			}
@@ -5475,7 +5446,7 @@ first_contact_event = {
 	title = first_contact.385.name
 	desc = {
 		trigger = {
-			owner = { 
+			owner = {
 				NOR = {
 					has_valid_civic = civic_hive_devouring_swarm
 					is_wilderness_empire = yes

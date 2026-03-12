@@ -1,99 +1,18 @@
 ###################
 # Basic Jobs
 ###################
+
 colonist = {
-	category = worker
-	exempt_from_ai_amenity_prioritization = yes
-
-	swappable_data = {
-		default = {
-			condition_string = WORKER_JOB_TRIGGER
-			building_icon = building_colony_shelter
-		}
+	inline_script = {
+		script = shroud/jobs/colonist_job
+		CATEGORY = worker
+		CONDITION_STRING = WORKER_JOB_TRIGGER
+		POSSIBLE_PRECALC = can_fill_worker_job
 	}
 
-	tags = { amenities }
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_worker_job
-
-	planet_modifier = {
-		planet_building_build_speed_mult = 0.10
-		planet_stability_add = 5
-		pop_happiness = 0.05
-		planet_resettlement_unemployed_destination_mult = 0.10
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			always = yes
-		}
-		planet_amenities_add = 500
-		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
-	}
-
-	resources = {
-		category = planet_jobs
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = no
-					is_individual_machine = no
-				}
-			}
-			food = 1
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_lithoid_empire = yes
-				}
-			}
-			minerals = 1
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = {
-					is_individual_machine = yes
-				}
-			}
-			energy = 1
-		}
-	}
-
-	weight = {
-		weight = @colonist_job_weight # Higher prio
-		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-	}
-
-	inline_script = "jobs/automodding_priority_amenities"
-
-	promotion = {
-		time = @standard_promotion_time
-		effect = {
-			pop_amount_change_category = {
-				CATEGORY = worker
-				AMOUNT = local_pop_amount
-			}
-		}
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = { is_tankbound_empire = no }
 	}
 }
 
@@ -196,6 +115,16 @@ technician = {
 		default = {
 			condition_string = WORKER_JOB_TRIGGER
 			building_icon = building_energy_grid
+		}
+		swap_type = {
+			trigger = {
+				technician_is_mote_harvester_trigger = yes
+			}
+			icon = mote_harvester
+			name = mote_harvester
+			desc = mote_harvester
+			building_icon = building_mote_harvesting_traps
+			weight = 20
 		}
 	}
 
@@ -360,6 +289,25 @@ miner = {
 			desc = turtle_miner
 			weight = 20
 		}
+		swap_type = {
+			trigger = {
+				miner_is_crystal_miner_trigger = yes
+			}
+			icon = crystal_miner
+			name = crystal_miner
+			desc = crystal_miner
+			building_icon = building_crystal_mines
+			weight = 20
+		}
+		swap_type = {
+			trigger = {
+				miner_is_thermoforger_trigger = yes
+			}
+			icon = miner
+			name = melt_extractor
+			desc = melt_extractor
+			weight = 35
+		}
 	}
 
 	tags = { minerals strategic_resource }
@@ -434,6 +382,26 @@ miner = {
 				}
 			}
 			minerals = @requisitorium_minerals_reduction
+		}
+		# Job Swap - Thermoforger
+		produces = {
+			trigger = {
+				exists = planet
+				planet = {
+					miner_is_thermoforger_trigger = yes
+				}
+			}
+			minerals = 1
+			alloys = 0.5
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = {
+					miner_is_thermoforger_trigger = yes
+				}
+			}
+			energy = 1
 		}
 	}
 
@@ -805,6 +773,16 @@ farmer = {
 		}
 		swap_type = {
 			trigger = {
+				farmer_is_gas_extractor_trigger = yes
+			}
+			name = gas_extractor
+			desc = gas_extractor
+			icon = gas_extractor
+			building_icon = building_gas_extractors
+			weight = 20
+		}
+		swap_type = {
+			trigger = {
 				farmer_is_angler_trigger = yes
 			}
 			name = angler
@@ -993,6 +971,19 @@ farmer = {
 			}
 		}
 		modifier = {
+			factor = 0.5
+			has_trait = trait_infernal
+
+			owner = {
+				is_infernal_empire = yes
+				country_uses_food = no
+				has_monthly_income = {
+					resource = food
+					value >= 0
+				}
+			}
+		}
+		modifier = {
 			factor = 5
 			has_trait = trait_cyborg_creed_of_labor
 		}
@@ -1038,19 +1029,18 @@ soldier = {
 
 	resources = {
 		category = planet_soldiers
-		inline_script = "output/soldier_output"
 		produces = {
 			trigger = {
 				soldier_is_necromancer = yes
 			}
-			physics_research = 2
-			society_research = 2
+			society_research = 1
+			engineering_research = 1
 		}
 		upkeep = {
 			trigger = {
 				soldier_is_necromancer = yes
 			}
-			consumer_goods = 1
+			consumer_goods = 0.5
 		}
 	}
 
@@ -1164,7 +1154,6 @@ battle_thrall = {
 
 	resources = {
 		category = planet_soldiers
-		inline_script = "output/soldier_output"
 	}
 
 	inline_script = "output/soldier_triggered_modifiers"
@@ -1413,6 +1402,7 @@ squire = {
 	triggered_planet_modifier = {
 		planet_defense_armies_add = 1
 		pop_knight_bonus_workforce_mult = 0.025
+		planet_knights_upkeep_mult = 0.005
 		pop_knight_commander_bonus_workforce_mult = 0.0125
 	}
 	triggered_planet_modifier = {
@@ -1506,8 +1496,6 @@ squire = {
 		weight = @worker_job_weight
 		factor = 1.2
 	}
-
-	inline_script = "jobs/automodding_priority_amenities"
 
 	promotion = {
 		time = @standard_promotion_time

@@ -42,38 +42,88 @@ create_mercenary_enclave_country = {
 				}
 			}
 			set_custom_capital_location = event_target:mercenary_enclave_planet
-			#Create ruler
+			# Create ruler
 			set_leader = event_target:mercenary_enclave_leader
 			establish_communications_no_message = root.from
+			start_situation = {
+				type = mercenary_dividends
+				target = root
+			}
+			# Check for active resolutions and give associated modifiers to mercenary enclave
+			if = {
+				limit = {
+					is_active_resolution = resolution_defenseprivatization_defense_contracts
+				}
+				add_modifier = {
+					modifier = resolution_defenseprivatization_defense_contracts_merc_naval_cap
+				}
+			}
+			if = {
+				limit = {
+					is_active_resolution = resolution_defenseprivatization_private_support_troops
+				}
+				add_modifier = {
+					modifier = resolution_defenseprivatization_private_support_troops_merc_naval_cap
+				}
+			}
+			if = {
+				limit = {
+					is_active_resolution = resolution_defenseprivatization_condottieri
+				}
+				add_modifier = {
+					modifier = resolution_defenseprivatization_condottieri_merc_naval_cap
+				}
+			}
+			if = {
+				limit = {
+					is_active_resolution = resolution_defenseprivatization_security_business
+				}
+				add_modifier = {
+					modifier = resolution_defenseprivatization_security_business_merc_naval_cap
+				}
+			}
+			if = {
+				limit = {
+					is_active_resolution = resolution_defenseprivatization_corporate_warlords
+				}
+				add_modifier = {
+					modifier = resolution_defenseprivatization_corporate_warlords_merc_naval_cap
+				}
+			}
+			# Set a flag to prevent the AI from instantly hiring them
+			set_timed_country_flag = {
+				flag = merc_ai_delay
+				years = 1
+			}
 		}
 	}
 }
 
-upgrade_mercenary_starbase = {
+upgrade_enclave_starbase = {
 	random_owned_fleet = {
 		limit = {
-			is_ship_size = enclave_mercenary_station
+			is_ship_size = enclave_$PREFIX$_station
 		}
 		solar_system = {
 			random_system_planet = {
 				limit = {
-					has_planet_flag = mercenary_enclave_planet
+					has_planet_flag = $PREFIX$_enclave_planet
 				}
-				save_event_target_as = mercenary_enclave_planet
+				save_event_target_as = $PREFIX$_enclave_planet
 			}
 		}
 		create_fleet = {
 			settings = { spawn_debris = no }
 			effect = {
-				save_event_target_as = upgraded_mercenary_enclave
+				save_event_target_as = $PREFIX$_mercenary_enclave
 				set_owner = prev
 				create_ship = {
 					name = random
-					design = NAME_Mercenary_Enclave_Station_$TIER$
+					design = $DESIGN$_$TIER$
 					graphical_culture = prev
 				}
 				set_location = {
-					target = event_target:mercenary_enclave_planet
+					target = event_target:$PREFIX$_enclave_planet
 					distance = 90
 				}
 			}
@@ -162,8 +212,8 @@ create_salvager_enclave_country = {
 				species = event_target:salvager_enclave_species
 				skill = 5
 				traits = {
-					trait = leader_trait_spark_of_genius
-					trait = leader_trait_expertise_voidcraft
+					1 = leader_trait_spark_of_genius
+					2 = leader_trait_expertise_voidcraft
 				}
 			}
 			set_leader = last_created_leader
@@ -232,7 +282,7 @@ create_shroudwalker_enclave_country = {
 				species = event_target:shroudwalker_enclave_species
 				skill = 5
 				traits = {
-					trait = leader_trait_expertise_psionics
+					1 = leader_trait_expertise_psionics
 				}
 			}
 			set_leader = last_created_leader

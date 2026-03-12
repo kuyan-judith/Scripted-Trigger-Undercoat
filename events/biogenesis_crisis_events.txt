@@ -1542,10 +1542,7 @@ country_event = {
 	}
 
 	after = {
-		add_modifier = {
-			modifier = voidslayers
-			days = -1
-		}
+		add_relic = r_voidspawn_myocardium
 	}
 }
 
@@ -1621,6 +1618,15 @@ country_event = {
 		}
 	}
 
+	option = { #We're not ready just yet
+		name = biocrisis.190.b
+		custom_tooltip = biocrisis.190.b.tt
+		enable_special_project = {
+			name = BEHEMOTH_TRANSFERENCE_PROJECT
+			owner = root
+		}
+	}
+
 	after = {
 		every_playable_country = {
 			limit = {
@@ -1644,6 +1650,7 @@ country_event = {
 
 	option = { #Stay a while
 		name = biocrisis.191.a
+		custom_tooltip = biocrisis.191.a.tt
 		hidden_effect = {
 			#Turn the country into a hatchling country and buff it
 			set_country_type = behemoth_hatchling
@@ -1667,7 +1674,7 @@ country_event = {
 				}
 				delete_fleet = this
 			}
-			
+
 			#Find the tier IV behemoth and save it
 			random_owned_fleet = {
 				limit = {
@@ -1716,12 +1723,22 @@ country_event = {
 
 	option = { #Depart the Galaxy
 		name = biocrisis.191.b
+		custom_tooltip = biocrisis.191.b.tt
 	}
 
 	option = { #Go confront the [REDACTED]
 		name = biocrisis.191.c
+		custom_tooltip = biocrisis.191.b.tt
 		trigger = {
 			has_country_flag = learned_about_redacted
+		}
+		hidden_effect = {
+			every_playable_country = {
+				limit = {
+					NOT = { is_same_value = root }
+				}
+				country_event = { id = biocrisis.196 days = 720 }
+			}
 		}
 	}
 
@@ -1920,7 +1937,7 @@ country_event = {
 					}
 				}
 				#Remove the megastructure
-				planet =  { 
+				planet =  {
 					save_event_target_as = target_planet
 					remove_planet_flag = has_megastructure
 				}
@@ -2082,6 +2099,61 @@ country_event = {
 	}
 }
 
+country_event = {
+	id = biocrisis.196
+	title = "biocrisis.196.name"
+	desc = biocrisis.196.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.196.a
+		enable_special_project = {
+			name = BEHEMOTH_FATE_PROJECT
+			owner = root
+		}
+	}
+
+	option = {
+		name = UNSETTLING
+	}
+}
+
+country_event = {
+	id = biocrisis.197
+	title = "biocrisis.197.name"
+	desc = biocrisis.197.desc
+	picture = GFX_evt_behemoth_fight
+	show_sound = event_dangerous_animals
+
+	is_triggered_only = yes
+
+	option = {
+		name = biocrisis.197.a
+		trigger = {
+			NOT = {
+				has_ascension_perk = ap_cosmogenesis
+				has_relic = r_prethoryn_queen
+			}
+		}
+	}
+	option = {
+		name = FASCINATING
+		trigger = {
+			has_ascension_perk = ap_cosmogenesis
+		}
+		add_resource = { advanced_logic = 1000 }
+	}
+	option = {
+		name = biocrisis.197.b
+		trigger = {
+			has_relic = r_prethoryn_queen
+		}
+	}
+}
+
 #200 Behemoth devours planet (from on_destroy_planet_with_BEHEMOTH_MAW) this = planet from = behemoth
 planet_event = {
 	id = biocrisis.200
@@ -2105,14 +2177,14 @@ planet_event = {
 					value = 0
 				}
 			}
-	
+
 			#add the planet value
 			change_variable = {
 				which = growth_factor_variable
 				value = @growth_factor_planet_mult
 			}
 		}
-	
+
 		set_variable = {  #add 1 per pop too - has to go through a second variable as to not 	overwrite the first when using export_trigger_to_var
 			which = pops_devoured
 			value = 0
@@ -2636,7 +2708,7 @@ country_event = {
 							type = variable
 							varname = num_transference_jobs_var
 							localization = VALUE
-							scope = root
+							scope = capital_scope
 						}
 					}
 				}
@@ -2786,8 +2858,8 @@ fleet_event = {
 	hide_window = yes
 
 	trigger = {
-		owner = { 
-			is_country_type = behemoth_hatchling 
+		owner = {
+			is_country_type = behemoth_hatchling
 			NOT = { has_country_flag = behemoth_victory }
 		}
 		from = {
@@ -2846,11 +2918,12 @@ country_event = {
 	option = {
 		name = biocrisis.280.psi
 		trigger = {
-			has_tradition = tr_psionics_adopt
+			has_adopted_psionic_tradition = yes
 		}
 
 		icon = {
 			icon = GFX_tradition_category_icon_tradition_psionics
+			text = tradition_psionics
 		}
 		add_modifier = {
 			modifier = behemoth_mutation_psi
@@ -2874,6 +2947,7 @@ country_event = {
 		}
 		icon = {
 			icon = GFX_tradition_category_icon_tradition_genetics
+			text = ap_engineered_evolution
 		}
 		add_modifier = {
 			modifier = behemoth_mutation_bio
@@ -2887,6 +2961,7 @@ country_event = {
 		}
 		icon = {
 			icon = GFX_tradition_category_icon_tradition_cybernetics
+			text = tradition_cybernetics
 		}
 		add_modifier = {
 			modifier = behemoth_mutation_cyber
@@ -2904,6 +2979,7 @@ country_event = {
 		}
 		icon = {
 			icon = GFX_tradition_category_icon_tradition_synthetics
+			text = tradition_synthetics
 		}
 		add_modifier = {
 			modifier = behemoth_mutation_synth
@@ -2932,6 +3008,7 @@ country_event = {
 		}
 		icon = {
 			icon = GFX_tradition_category_icon_tradition_synthetics
+			text = tradition_synthetics
 		}
 		custom_tooltip  = biocrisis.280.machine_tt
 		hidden_effect = {

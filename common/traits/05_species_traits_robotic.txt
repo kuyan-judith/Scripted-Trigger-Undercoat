@@ -220,7 +220,7 @@ trait_robot_domestic_protocols = {
 	}
 	forbidden_ethics = { ethic_gestalt_consciousness }
 	modifier = {
-		entertainer_jobs_bonus_workforce_mult = 0.20
+		influential_jobs_bonus_workforce_mult = 0.20
 	}
 	slave_cost = {
 		energy = 750
@@ -301,7 +301,7 @@ trait_robot_emotion_emulators = {
 	}
 	tags = { machine positive pop_output amenities }
 	modifier = {
-		entertainer_jobs_bonus_workforce_mult = 0.20
+		influential_jobs_bonus_workforce_mult = 0.20
 	}
 	slave_cost = {
 		energy = 750
@@ -315,7 +315,7 @@ trait_robot_uncanny = {
 	allowed_archetypes = { ROBOT MACHINE }
 	tags = { machine negative pop_output amenities }
 	modifier = {
-		entertainer_jobs_bonus_workforce_mult = -0.20
+		influential_jobs_bonus_workforce_mult = -0.20
 	}
 	ai_weight = {
 		factor = 0
@@ -1025,7 +1025,7 @@ trait_robot_history_artbot = {
 	opposites = { "trait_robot_history_warbot" "trait_robot_history_explorebot" "trait_robot_history_researchbot" "trait_robot_history_resourcebot" "trait_robot_history_chatbot"}
 
 	modifier = {
-		entertainer_jobs_bonus_workforce_mult = 0.05
+		influential_jobs_bonus_workforce_mult = 0.05
 	}
 	slave_cost = {
 		energy = 750
@@ -1166,6 +1166,7 @@ trait_robot_digital_1 = {
 	randomized = no
 	allowed_archetypes = { ROBOT MACHINE }
 	tags = { machine positive habitability housing special }
+	opposites = { "trait_robot_latent_psionic" "trait_robot_psionic" }
 
 	species_potential_add = {
 		always = no
@@ -1178,6 +1179,22 @@ trait_robot_digital_1 = {
 	modifier = {
 		habitability_floor_add = 0.25
 		pop_housing_usage_mult = -0.9
+	}
+
+	resources = {
+		category = planet_pops
+		# Energy Upkeep
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					has_tradition = tr_virtuality_1
+				}
+				is_sapient = yes
+			}
+			energy = 1	# All the maths is done in the script value
+			mult = value:virtuality_num_colonies
+		}
 	}
 
 	custom_tooltip = trait_robot_digital_1_tt
@@ -1195,6 +1212,7 @@ trait_robot_digital_2 = {
 	randomized = no
 	allowed_archetypes = { ROBOT MACHINE }
 	tags = { machine positive pop_output habitability housing special }
+	opposites = { "trait_robot_latent_psionic" "trait_robot_psionic" }
 
 	species_potential_add = {
 		always = no
@@ -1218,6 +1236,22 @@ trait_robot_digital_2 = {
 		}
 		pop_bonus_workforce_mult = 1
 		mult = value:virtuality_concentrated_production_mult
+	}
+
+	resources = {
+		category = planet_pops
+		# Energy Upkeep
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					has_tradition = tr_virtuality_1
+				}
+				is_sapient = yes
+			}
+			energy = 1	# All the maths is done in the script value
+			mult = value:virtuality_num_colonies
+		}
 	}
 
 	custom_tooltip = trait_robot_digital_2_tt
@@ -1253,6 +1287,7 @@ trait_robot_suppressed = {
 	modifier = {
 		pop_bonus_workforce_mult = 0.1
 		species_leader_exp_gain = -1
+		civilian_and_maintenance_drone_cat_bonus_workforce_mult = -0.85
 	}
 
 	slave_cost = {
@@ -1389,6 +1424,9 @@ trait_robot_ceaseless_symmetric_annihilation_engine = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			sr_dark_matter = 0.02
 		}
 	}
@@ -1449,6 +1487,9 @@ trait_robot_ferro_viscosity_augmentation = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			sr_living_metal = 0.01
 		}
 	}
@@ -1489,6 +1530,9 @@ trait_robot_biomimetic_assembly = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			food = 1
 			exotic_gases = 0.02
 		}
@@ -1536,6 +1580,9 @@ trait_robot_matrix_trading = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			energy = 1
 			rare_crystals = 0.01
 		}
@@ -1594,6 +1641,9 @@ trait_robot_mote_powered_tools = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			minerals = 1
 			volatile_motes = 0.01
 		}
@@ -1636,6 +1686,9 @@ trait_robot_exotic_fuel_consumption = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			exotic_gases = 0.04
 		}
 	}
@@ -1688,6 +1741,9 @@ trait_robot_rare_crystal_exterior = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			rare_crystals = 0.02
 		}
 	}
@@ -1729,6 +1785,9 @@ trait_robot_volatile_mote_reactor = {
 	resources = {
 		category = planet_pops
 		upkeep = {
+			trigger = {
+				is_sapient = yes
+			}
 			volatile_motes = 0.02
 		}
 	}
@@ -1806,4 +1865,54 @@ trait_robot_synthetic_dawn = {
 	slave_cost = {
 		energy = 1000
 	}
+}
+
+trait_robot_latent_psionic = {
+	cost = 0
+	category = robotic
+	icon = "gfx/interface/icons/traits/trait_latent_psionic_species.dds"
+
+	opposites = { "trait_robot_digital_1" "trait_robot_digital_2" }
+
+	initial = no
+	randomized = no
+	species_potential_add = {
+		always = no
+	}
+	species_possible_remove = {
+		always = no
+	}
+	species_possible_merge_add = {
+		always = no
+	}
+	allowed_archetypes = { ROBOT MACHINE }
+	tags = { machine positive pop_output research unity psionic }
+
+	inline_script = "traits/latent_psionic_effects"
+}
+
+trait_robot_psionic = {
+	cost = 0
+	category = robotic
+	icon = "gfx/interface/icons/traits/trait_psionic_species.dds"
+
+	opposites = { "trait_robot_digital_1" "trait_robot_digital_2" }
+
+	improves_leaders = yes
+	initial = no
+	randomized = no
+	species_potential_add = {
+		always = no
+	}
+	species_possible_remove = {
+		always = no
+	}
+	species_possible_merge_add = {
+		always = no
+	}
+
+	allowed_archetypes = { ROBOT MACHINE }
+	tags = { machine positive pop_output research unity happiness psionic }
+
+	inline_script = "traits/psionic_effects"
 }

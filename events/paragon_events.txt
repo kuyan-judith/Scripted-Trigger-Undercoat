@@ -24,6 +24,10 @@ planet_event = {
 				exists = owner
 				owner = { has_country_flag = beholder_chain_owner }
 			}
+			set_timed_planet_flag = {
+				flag = ignore_ai_building_limitations
+				days = 1
+			}
 			root = { add_building = building_the_beholder }
 		}
 		else = {
@@ -558,6 +562,7 @@ country_event = {
 				species = event_target:beholder_species
 				event_leader = yes
 				class = commander
+				tier = leader_tier_legendary
 				name = "NAME_The_Beholder"
 				skill = 10
 				immortal = yes
@@ -568,18 +573,17 @@ country_event = {
 				custom_catch_phrase = beholder_catch_phrase
 				custom_description = beholder_backstory
 				traits = {
-					trait = leader_trait_scout
-					trait = leader_trait_energy_weapon_specialist
-					trait = leader_trait_cautious
-					trait = leader_trait_psionic
-					trait = subclass_commander_admiral
+					1 = leader_trait_scout
+					2 = leader_trait_energy_weapon_specialist
+					3 = leader_trait_cautious
+					0 = leader_trait_psionic
+					4 = subclass_commander_admiral
 				}
 				gender = indeterminable
 				set_age = 0
 				hide_age = yes
 				effect = {
 					save_global_event_target_as = beholder_leader
-					set_leader_flag = legendary_leader
 					set_leader_flag = beholder
 					set_leader_flag = immune_to_negative_traits
 					set_leader_flag = leader_death_events_blocked
@@ -601,10 +605,10 @@ country_event = {
 
 			clone_leader = {
 				target = event_target:beholder_leader
+				tier = leader_tier_legendary
 			}
 			last_created_leader = {
 				save_global_event_target_as = beholder_leader
-				set_leader_flag = legendary_leader
 				set_leader_flag = beholder
 				set_leader_flag = immune_to_negative_traits
 				set_leader_flag = leader_death_events_blocked
@@ -732,6 +736,10 @@ planet_event = {
 			# Add building if applicable
 			if = {
 				limit = { NOT = { has_building = building_the_beholder } }
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
+				}
 				add_building = building_the_beholder
 			}
 			# Change leader into a official
@@ -742,11 +750,31 @@ planet_event = {
 				remove_trait = leader_trait_psionic
 				remove_trait = subclass_commander_admiral
 				change_leader_class = official
-				add_trait_no_notify = subclass_official_governor
-				add_trait_no_notify = leader_trait_governor_psionic_communion
-				add_trait_no_notify = leader_trait_mediator
-				add_trait_no_notify = leader_trait_generator_focus_2
-				add_trait_no_notify = leader_trait_intellectual
+				add_trait = {
+					trait = subclass_official_governor
+					show_message = no
+					consume_selection = yes
+				}
+				add_trait = {
+					trait = leader_trait_governor_psionic_communion
+					show_message = no
+					consume_selection = yes
+				}
+				add_trait = {
+					trait = leader_trait_mediator
+					show_message = no
+					consume_selection = yes
+				}
+				add_trait = {
+					trait = leader_trait_generator_focus_2
+					show_message = no
+					consume_selection = yes
+				}
+				add_trait = {
+					trait = leader_trait_intellectual
+					show_message = no
+					consume_selection = yes
+				}
 			}
 			# Delete ship
 			every_fleet_in_orbit = {
@@ -834,17 +862,14 @@ planet_event = {
 				is_organic_species = yes
 				is_being_assimilated = no
 				is_being_purged = no
+				is_psionic_species = no
 				NOR = {
 					has_trait = trait_cybernetic
-					has_trait = trait_psionic
 					has_trait = trait_hive_mind
 					has_trait = trait_malleable_genes
 				}
 			}
-			modify_species = {
-				remove_trait = trait_latent_psionic
-				add_trait = trait_psionic
-			}
+			add_psionic_trait = yes
 		}
 		create_message = {
 			type = MESSAGE_POPS_INOCULATED
@@ -865,9 +890,9 @@ planet_event = {
 						is_organic_species = yes
 						is_being_assimilated = no
 						is_being_purged = no
+						is_psionic_species = no
 						NOR = {
 							has_trait = trait_cybernetic
-							has_trait = trait_psionic
 							has_trait = trait_hive_mind
 						}
 					}
@@ -1543,6 +1568,7 @@ country_event = {
 					species = event_target:azaryn_species
 					event_leader = yes
 					class = scientist
+					tier = leader_tier_legendary
 					name = "NAME_Astrocreator_Azaryn"
 					skill = 7
 					randomize_traits = no
@@ -1552,18 +1578,17 @@ country_event = {
 					custom_description = astrocreator_azaryn_backstory
 					can_manually_change_location = no
 					traits = {
-						trait = leader_trait_legendary_terraformation_nucleus_3_buds
-						trait = leader_trait_xeno_cataloger
-						trait = leader_trait_educator
-						trait = leader_trait_spark_of_genius
-						trait = subclass_scientist_scholar
+						1 = leader_trait_legendary_terraformation_nucleus_3_buds
+						2 = leader_trait_xeno_cataloger
+						3 = leader_trait_educator
+						4 = leader_trait_spark_of_genius
+						5 = subclass_scientist_scholar
 					}
 					gender = female
 					set_age = 229
 					immortal = yes
 					effect = {
 						save_global_event_target_as = azaryn_leader
-						set_leader_flag = legendary_leader
 						set_leader_flag = azaryn
 						set_owner = root
 						exile_leader_as = azaryn_leader
@@ -1608,7 +1633,7 @@ country_event = {
 		sound = par_azaryn_hire
 
 		hidden_effect = {
-			random_owned_planet = {
+			if = {
 				limit = {
 					is_variable_set = paragon_memory_vault
 				}
@@ -1619,9 +1644,9 @@ country_event = {
 			}
 			clone_leader = {
 				target = event_target:azaryn_leader
+				tier = leader_tier_legendary
 			}
 			last_created_leader = {
-				set_leader_flag = legendary_leader
 				save_global_event_target_as = azaryn_leader
 				set_leader_flag = immune_to_negative_traits
 				set_leader_flag = azaryn
@@ -2089,13 +2114,17 @@ planet_event = {
 				}
 				leader_trait_legendary_terraformation_nucleus_2_buds = {
 					remove_trait = leader_trait_legendary_terraformation_nucleus_2_buds
-					add_trait = leader_trait_legendary_terraformation_nucleus_1_bud
+					add_trait = {
+						trait = leader_trait_legendary_terraformation_nucleus_1_bud
+					}
 					change_leader_portrait = paragon_azaryn_1_bud
 					leader_event = { id = paragon.235 days = 90 random = 30 }
 				}
 				leader_trait_legendary_terraformation_nucleus_3_buds = {
 					remove_trait = leader_trait_legendary_terraformation_nucleus_3_buds
-					add_trait = leader_trait_legendary_terraformation_nucleus_2_buds
+					add_trait = {
+						trait = leader_trait_legendary_terraformation_nucleus_2_buds
+					}
 					change_leader_portrait = paragon_azaryn_2_buds
 					leader_event = { id = paragon.232 days = 60 random = 30 }
 				}
@@ -2785,16 +2814,16 @@ country_event = {
 		exists = from
 		from = {
 			is_pool_leader = no
-			leader_is_envoy_stu = no # undercoat: moved to scripted trigger
 			leader_years_of_service >= 2
-			NOT = {
+			NOR = {
+				leader_is_envoy_stu = yes # undercoat: moved to scripted trigger
 				has_leader_flag = leader_death_events_blocked
 			}
 			OR = {
 				has_base_skill >= 4
 				is_ruler = yes
-				has_leader_flag = renowned_leader
-				has_leader_flag = legendary_leader
+				is_leader_tier = leader_tier_renowned
+				is_leader_tier = leader_tier_legendary
 			}
 		}
 	}
@@ -2827,11 +2856,11 @@ country_event = {
 				}
 				modifier = {
 					add = 10
-					from = { has_leader_flag = renowned_leader }
+					from = { is_leader_tier = leader_tier_renowned }
 				}
 				modifier = {
 					add = 20
-					from = { has_leader_flag = legendary_leader }
+					from = { is_leader_tier = leader_tier_legendary }
 				}
 
 				# Increase chance for leaders of higher level
@@ -3518,7 +3547,9 @@ country_event = {
 			}
 			else = {
 				ruler = {
-					add_trait = random_common
+					add_trait = {
+						trait = random_common
+					}
 				}
 			}
 		}
@@ -4660,11 +4691,8 @@ leader_event = {
 
 	trigger = {
 		is_ruler = no
-		NOR = {
-			has_leader_flag = renowned_leader
-			has_leader_flag = legendary_leader
-			is_exploring_astral_rift = yes
-		}
+		is_leader_tier = leader_tier_default
+		is_exploring_astral_rift = no
 		species = {
 			OR = {
 				is_species_class = ROBOT

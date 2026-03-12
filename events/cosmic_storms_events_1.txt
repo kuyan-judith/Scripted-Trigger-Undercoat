@@ -92,6 +92,9 @@ system_event = {
 		NOR = {
 			has_star_flag = extradimensional_origin_system
 			has_star_flag = formless_system
+			any_ship_in_system = {
+				is_constructing = megastructure
+			}
 		}
 	}
 
@@ -153,7 +156,7 @@ system_event = {
 						orbit_angle = { min = 0 max = 360 }
 						flags = { asteroid_triplet }
 						init_effect = {
-							clear_deposits_stu = yes
+							clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 							# Undercoat on_action
 							fire_on_action = { on_action = on_planet_spawned }
 						}
@@ -166,7 +169,7 @@ system_event = {
 					orbit_angle = { min = 0 max = 360 }
 					flags = { asteroid_triplet }
 					init_effect = {
-						clear_deposits_stu = yes
+						clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 						# Undercoat on_action
 						fire_on_action = { on_action = on_planet_spawned }
 					}
@@ -2073,12 +2076,16 @@ ship_event = {
 			}
 
 			leader = {
-				add_trait = leader_trait_emotional_support_pet
+				add_trait = {
+					trait = leader_trait_emotional_support_pet
+				}
 			}
 		}
 		else = {
 			leader = {
-				add_trait = leader_trait_eager
+				add_trait = {
+					trait = leader_trait_eager
+				}
 			}
 		}
 		owner = {
@@ -2125,7 +2132,9 @@ ship_event = {
 		}
 
 		leader = {
-			add_trait = leader_trait_melancholic
+			add_trait = {
+				trait = leader_trait_melancholic
+			}
 		}
 	}
 
@@ -2232,8 +2241,8 @@ ship_event = {
 				custom_catch_phrase = the_imitator_catch_phrase
 				custom_description = the_imitator_leader_desc
 				traits = {
-					trait = leader_trait_adaptable
-					trait = leader_trait_melancholic
+					1 = leader_trait_adaptable
+					2 = leader_trait_melancholic
 				}
 				skip_background_generation = yes
 			}
@@ -2969,12 +2978,20 @@ planet_event = {
 				limit = {
 					owner = {
 						OR = {
-							owner_species = { has_trait = trait_psionic }
+							owner_species = { is_psionic_species = yes }
 							has_psionic_ascension = yes
 						}
 					}
 				}
-				text = cstorms.1725.desc.psionic
+				if = {
+					limit = {
+						owner = { is_robot_empire = yes }
+					}
+					text = cstorms.1725.desc.psionic_robot
+				}
+				else = {
+					text = cstorms.1725.desc.psionic
+				}
 			}
 			else_if = {
 				limit = { owner = { is_spiritualist = yes } }
@@ -3829,7 +3846,11 @@ ship_event = {
 			90 = {}
 			10 = {
 				set_ship_flag = event_traumatized_leader
-				leader = { add_trait = leader_trait_traumatized }
+				leader = {
+					add_trait = {
+						trait = leader_trait_traumatized
+					}
+				}
 			}
 		}
 	}
@@ -3907,7 +3928,11 @@ ship_event = {
 		if = {
 			limit = { has_ship_flag = event_traumatized_leader }
 			tooltip = {
-				leader = { add_trait = leader_trait_traumatized }
+				leader = {
+					add_trait = {
+						trait = leader_trait_traumatized
+					}
+				}
 			}
 		}
 	}
@@ -4344,7 +4369,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_mining_station
 							 	}
-							 	clear_deposits_stu = yes
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 							}
 							random_list = {
 								20 = { add_deposit = d_zro_deposit_1 }
@@ -4360,7 +4385,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_research_station
 							 	}
-							 	clear_deposits_stu = yes
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 							}
 							random_list = {
 								20 = { add_deposit = d_alloys_1 }
@@ -4376,7 +4401,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_research_station
 							 	}
-							 	clear_deposits_stu = yes
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 							}
 							random_list = {
 								20 = { add_deposit = d_minerals_1 }
@@ -4392,7 +4417,7 @@ planet_event = {
 								limit = {
 							 		has_deposit_for = shipclass_mining_station
 							 	}
-							 	clear_deposits_stu = yes
+							 	clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 							}
 							add_deposit = d_nanites_deposit
 						}
@@ -4417,6 +4442,11 @@ planet_event = {
 					is_star = yes
 					is_binary_star = no
 					is_trinary_star = no
+					NOR = {
+						is_star_class = sc_black_hole
+						is_star_class = sc_toxoid_star
+						is_star_class = sc_rift_star
+					}
 				}
 				random_list = {
 					20 = {

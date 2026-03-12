@@ -1796,7 +1796,6 @@ ship_event = {
 					module = trading_hub
 				}
 			}
-			set_graphical_culture = owner
 		}
 	}
 }
@@ -2378,8 +2377,14 @@ country_event = { # Random leader pool variations
 			random_list = {
 				90 = { }
 				10 = {
-					add_trait_no_notify = "random_common"
-					add_trait_no_notify = "random_negative"
+					add_trait = {
+						trait = random_common
+						show_message = no
+					}
+					add_trait = {
+						trait = random_negative
+						show_message = no
+					}
 					# Variable "leader_pending_negative_traits_unmodified" doesn't exist yet, can't reduce it yet. Checked now made in paragon_2.2200.
 				}
 			}
@@ -2395,6 +2400,9 @@ country_event = { # Random leader pool variations
 				}
 			}
 		}
+
+		# Additional effects from modifier
+		from = { add_age = value:leader_recruitment_age|OWNER|root| }
 	}
 }
 
@@ -2710,28 +2718,6 @@ agreement_event = {
 	}
 }
 
-# Unlock Memorialist buildings for hive-minds that reform into the civic.
-country_event = {
-	id = action.455
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_civic = civic_hive_memorialist
-		NOT = {
-			has_technology = tech_cultural_heritage
-		}
-	}
-
-	immediate = {
-		give_technology = {
-			tech = tech_cultural_heritage
-			message = no
-		}
-	}
-}
-
 # On country created, set up Imperial Ruler
 country_event = {
 	id = action.501
@@ -2748,7 +2734,10 @@ country_event = {
 				limit = {
 					NOT = { has_trait = trait_imperial_heir }
 				}
-				add_trait_no_notify = trait_imperial_heir
+				add_trait = {
+					trait = trait_imperial_heir
+					show_message = no
+				}
 			}
 
 			set_variable_to_random_value = {
@@ -2762,8 +2751,14 @@ country_event = {
 			random_list = {
 				95 = { }
 				5 = {
-					add_trait_no_notify = "random_common"
-					add_trait_no_notify = "random_negative"
+					add_trait = {
+						trait = random_common
+						show_message = no
+					}
+					add_trait = {
+						trait = random_negative
+						show_message = no
+					}
 					# Variable "leader_pending_negative_traits_unmodified" doesn't exist yet, can't reduce it yet. Checked now made in paragon_2.2200.
 					modifier = {
 						factor = 0
@@ -2804,7 +2799,10 @@ country_event = {
 				limit = {
 					root = { is_treasure_hunter_empire = yes } # undercoat: moved to scripted trigger
 				}
-				add_trait_no_notify = leader_trait_adventurous_spirit_3
+				add_trait = {
+					trait = leader_trait_adventurous_spirit_3
+					show_message = no
+				}
 			}
 		}
 	}
@@ -2825,6 +2823,7 @@ country_event = {
 			has_modifier = covenant_instrument_of_desire
 			has_modifier = covenant_eater_of_worlds
 			has_modifier = covenant_end_of_the_cycle
+			has_any_covenant = yes # Shroud DLC check
 		}
 		has_country_flag = has_built_or_repaired_megastructure
 	}
@@ -3302,6 +3301,9 @@ country_event = {
 		}
 		any_owned_fleet = {
 			is_cloaked = yes
+			any_owned_ship = {
+				is_ship_class = shipclass_military
+			}
 			exists = solar_system
 			solar_system = {
 				is_capital_system = yes

@@ -571,6 +571,7 @@ planet_event = {
 			num_assigned_jobs = {
 				job = spawning_drone
 				value >= 100
+				automated_workforce = yes
 			}
 		}
 		days_passed > 5
@@ -609,6 +610,7 @@ country_event = {
 					num_assigned_jobs = {
 						job = spawning_drone
 						value >= 100
+						automated_workforce = yes
 					}
 				}
 			}
@@ -624,6 +626,7 @@ country_event = {
 					num_assigned_jobs = {
 						job = spawning_drone
 						value >= 100
+						automated_workforce = yes
 					}
 					has_deposit = d_progenitor
 				}
@@ -784,7 +787,6 @@ planet_event = {
 	immediate = {
 		remove_modifier = missing_offspring_modifier
 	}
-
 }
 
 # This = owner of ship 1 (destroyed)
@@ -2686,7 +2688,10 @@ country_event = { # Get Scientist
 			}
 		}
 		last_created_leader = {
-			add_trait_no_notify = leader_trait_fotd_scientist
+			add_trait = {
+				trait = leader_trait_fotd_scientist
+				show_message = no
+			}
 			save_event_target_as = fotd_Leader
 			exile_leader_as = fotd_Leader_exile
 		}
@@ -2777,7 +2782,10 @@ country_event = { # Get Admiral
 			}
 		}
 		last_created_leader = {
-			add_trait_no_notify = leader_trait_fotd_commander
+			add_trait = {
+				trait = leader_trait_fotd_commander
+				show_message = no
+			}
 			save_event_target_as = fotd_Leader
 			exile_leader_as = fotd_Leader_exile
 		}
@@ -2862,7 +2870,9 @@ country_event = { # Return the Leader
 			}
 		}
 		event_target:fotd_Leader_accepted = {
-			add_trait = leader_trait_stubborn
+			add_trait = {
+				trait = leader_trait_stubborn
+			}
 		}
 		owner = {
 			add_resource = { unity = -500 }
@@ -2912,7 +2922,9 @@ country_event = { # Return the Leader Escalated
 				limit = {
 					NOT = { has_trait_tier1or2 = { TRAIT = leader_trait_substance_abuser } }
 				}
-				add_trait = leader_trait_substance_abuser
+				add_trait = {
+					trait = leader_trait_substance_abuser
+				}
 				owner = {
 					add_resource = { unity = -1000 }
 					hidden_effect = {
@@ -2929,7 +2941,9 @@ country_event = { # Return the Leader Escalated
 				limit = {
 					NOT = { has_trait = leader_trait_arrested_development }
 				}
-				add_trait = leader_trait_arrested_development
+				add_trait = {
+					trait = leader_trait_arrested_development
+				}
 				owner = {
 					add_resource = { unity = -1000 }
 					hidden_effect = {
@@ -4343,7 +4357,23 @@ country_event = { # Psionic Ascenion: Start Tree
 country_event = { # Psionic Ascenion: Finish Tree
 	id = origin.6110
 	title = origin.6110.name
-	desc = origin.6110.desc
+	desc = {
+		trigger = {
+			text = origin.6110.desc
+			text = newline
+			if = {
+				limit = { is_gestalt = yes }
+				text = origin.6110.desc_2.gestalt
+			}
+			else_if = {
+				limit = { is_robot_empire = yes }
+				text = origin.6110.desc_2.robot
+			}
+			else = {
+				text = origin.6110.desc_2.default
+			}
+		}
+	}
 
 	picture = GFX_evt_fear_of_the_dark
 	show_sound = evn_fc_disunity_origin
@@ -4713,6 +4743,11 @@ country_event = { # We have found them
 						}
 						set_owner = last_created_country
 						set_capital = yes
+
+						set_timed_planet_flag = {
+							flag = ignore_ai_building_limitations
+							days = 1
+						}
 
 						remove_building = building_colony_shelter
 						add_primitive_farm_or_mine = yes
@@ -6037,7 +6072,10 @@ country_event = {
 				skill = 5
 			}
 			last_created_leader = {
-				add_trait_no_notify = leader_trait_fotd_commander
+				add_trait = {
+					trait = leader_trait_fotd_commander
+					show_message = no
+				}
 				save_event_target_as = fotd_patrol_admiral_target
 				set_leader_flag = fotd_patrol_admiral
 			}
@@ -6164,6 +6202,10 @@ country_event = {
 			capital_scope = {
 				create_pop_group = {
 					species = root.species
+				}
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
 				}
 				if = {
 					limit = {
@@ -6425,8 +6467,16 @@ country_event = {
 				from = {
 					switch = {
 						trigger = leader_class
-						commander = { add_trait = leader_trait_fotd_commander }
-						scientist = { add_trait = leader_trait_fotd_scientist }
+						commander = {
+							add_trait = {
+								trait = leader_trait_fotd_commander
+							}
+						}
+						scientist = {
+							add_trait = {
+								trait = leader_trait_fotd_scientist
+							}
+						}
 					}
 				}
 			}
@@ -6525,6 +6575,30 @@ country_event = {
 						tech_akx_worm_2
 						tech_akx_worm_3
 					}
+				}
+				IF = {
+					limit = {
+						root = {
+							has_technology = tech_weavers
+						}
+					}
+					give_technology = { tech = tech_destroyers }
+				}
+				IF = {
+					limit = {
+						root = {
+							has_technology = tech_stingers
+						}
+					}
+					give_technology = { tech = tech_battleships }
+				}
+				IF = {
+					limit = {
+						root = {
+							has_technology = tech_harbingers
+						}
+					}
+					give_technology = { tech = tech_cruisers }
 				}
 				add_resource = { minerals = 10000 }
 				add_resource = { energy = 10000 }
@@ -6631,10 +6705,7 @@ country_event = {
 	}
 	option = { #Stay on your rock
 		trigger = {
-			OR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-			}
+			is_xenophobe = yes
 		}
 		name = origin.6275.c
 		custom_tooltip = origin.6275.c.tt

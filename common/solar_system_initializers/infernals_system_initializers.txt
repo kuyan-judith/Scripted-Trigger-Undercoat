@@ -1,0 +1,498 @@
+@jumps = 3
+@base_moon_distance = 10
+
+# Red Giant Origin
+red_giant_start = {
+	class = "sc_m_giant"
+	flags = { empire_home_system conduit_excluded }
+	usage = origin
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 60
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 65
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 155
+	}
+	init_effect = {
+		every_neighbor_system = {
+			set_star_flag = empire_cluster
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+			}
+		}
+		generate_home_system_resources = yes
+		if = {
+			limit = { is_inside_nebula = no }
+			create_nebula = { radius = 25 }
+		}
+	}
+	planet = {
+		class = star
+		orbit_distance = 0
+		orbit_angle = 0
+		size = 50
+		has_ring = no
+		flags = {
+			has_megastructure
+		}
+	}
+	change_orbit = 45
+	planet = {
+		class = pc_shattered
+		orbit_angle = 50
+		orbit_distance = 0
+		size = 10
+		init_effect = {
+			prevent_anomaly = yes
+			set_planet_flag = red_giant_innerplanet		# used for origin
+		}
+	}
+	change_orbit = 20
+	planet = {
+		class = pc_broken
+		orbit_angle = 120
+		orbit_distance = 0
+		size = 16
+		init_effect = {
+			prevent_anomaly = yes
+			set_planet_flag = red_giant_second_innerplanet		# used for origin
+		}
+	}
+	change_orbit = 35
+	planet = {
+		class = "pc_volcanic"
+		orbit_angle = 95
+		orbit_distance = 0
+		size = 20
+		modifiers = none
+		starting_planet = yes
+		flags = { ignore_startup_effect }
+		init_effect = {
+			prevent_anomaly = yes
+		}
+	}
+	planet = {
+		class = pc_molten
+		orbit_angle = 80
+		orbit_distance = 25
+		size = 16
+	}
+	change_orbit = 35
+	planet = {
+		count = 5
+		class = pc_asteroid
+		orbit_distance = 0
+		orbit_angle = 72
+		size = { min = 2 max = 4 }
+	}
+	planet = {
+		class = pc_barren
+		orbit_distance = { min = 30 max = 45 }
+		orbit_angle = 90
+		size = { min = 14 max = 20 }
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 2 }
+		hyperlane_jumps = { min = 1 max = 3 }
+		initializer = "neighbor_t1"
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 1 }
+		hyperlane_jumps = { min = 1 max = 3 }
+		# TODO: Infernals use for now a Volcanic one
+		# Otherwise replace with neighbor_t1_first_colony
+		initializer = "neighbor_t1_first_inf_colony"
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+red_giant_lusus = {
+	class = "sc_black_hole"
+	flags = { red_giant_lusus_system }
+	usage = misc_system_init
+	usage_odds = 0
+	name = red_giant_lusus_name
+	planet = {
+		class = star
+		orbit_distance = 0
+		orbit_angle = 0
+		size = 35
+		has_ring = no
+		init_effect = {
+			prevent_anomaly = yes
+		}
+	}
+	change_orbit = 35
+	planet = {
+		count = { min = 1 max = 1 }
+		orbit_distance = 30
+		class = pc_gas_giant
+		orbit_angle = { min = 90 max = 270 }
+		change_orbit = 10
+		init_effect = {
+			prevent_anomaly = yes
+		}
+
+		moon = {
+			count = { min = 0 max = 1 }
+			class = random_non_colonizable
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+			init_effect = {
+				prevent_anomaly = yes
+			}
+		}
+	}
+	init_effect = {
+		create_ambient_object = {
+			type = "nebula_L8_entity"
+			entity_offset_height = -5
+			location = this
+		}
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 0
+				angle = random
+			}
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+
+# Neighbor Tier 1 First Colony - Volcanic for Infernals
+neighbor_t1_first_inf_colony = {
+	class = "rl_standard_stars"
+	flags = { neighbor_t1_first_colony }
+	init_effect = {
+		every_neighbor_system = { set_star_flag = empire_cluster }
+	}
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 20 max = 30 }
+		has_ring = no
+	}
+	change_orbit = 45
+	planet = {
+		count = { min = 0 max = 2 }
+		orbit_distance = 20
+		change_orbit = @base_moon_distance
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_distance = 5
+		}
+	}
+	planet = {
+		count = 1
+		orbit_distance = 25
+		class = pc_volcanic
+		modifiers = none
+		anomaly = none
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 12 max = 18 }
+		init_effect = {
+			prevent_anomaly = yes
+			set_planet_flag = prescripted_ideal		# used by code, do not remove
+		}
+	}
+	planet = {
+		count = { min = 2 max = 5 }
+		orbit_distance = 25
+		change_orbit = @base_moon_distance
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_distance = 5
+		}
+	}
+	neighbor_system = {
+		hyperlane_jumps = { min = 1 max = @jumps }
+		initializer = "neighbor_t2"
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+# Cosmic Dawn Origin
+cosmic_dawn_start = {
+	class = "sc_a"
+	flags = { empire_home_system }
+	usage = origin
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 100
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 170
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 230
+	}
+	init_effect = {
+		every_neighbor_system = {
+			set_star_flag = empire_cluster
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+			}
+		}
+		generate_home_system_resources = yes
+		create_ambient_object = {
+			type = "nebula_L8_entity"
+			entity_offset_height = -5 # Set to spawn far below the planets
+			location = this
+		}
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 0
+				angle = random
+			}
+		}
+	}
+	planet = {
+		class = star
+		orbit_distance = 0
+		orbit_angle = 0
+		size = 30
+		has_ring = no
+	}
+	change_orbit = 80
+	planet = {
+		class = "pc_volcanic"
+		orbit_angle = 0
+		orbit_distance = 0
+		size = 14
+		modifiers = none
+		starting_planet = yes
+		flags = { ignore_startup_effect }
+		init_effect = {
+			prevent_anomaly = yes
+		}
+	}
+	change_orbit = 20
+	planet = {
+		class = pc_asteroid
+		count = 4
+		orbit_angle = { min = 65 max = 90 }
+		orbit_distance = 0
+	}
+	change_orbit = 17
+	planet = {
+		class = pc_gas_giant
+		orbit_angle = 160
+		has_ring = yes
+		size = 21
+		moon = {
+			class = pc_frozen
+			orbit_distance = 14
+			size = 12
+		}
+	}
+	change_orbit = 38
+	planet = {
+		class = pc_rare_crystal_asteroid
+		count = 5
+		orbit_angle = { min = 80 max = 135 }
+		orbit_distance = 0
+	}
+	change_orbit = 15
+	planet = {
+		class = pc_broken
+		orbit_angle = 55
+		has_ring = yes
+		size = 23
+	}
+	change_orbit = 46
+	planet = {
+		class = pc_barren_cold
+		orbit_angle = 170
+		has_ring = no
+		size = 20
+		moon = {
+			class = pc_toxic
+			orbit_angle = 180
+			orbit_distance = 15
+			size = 13
+		}
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 2 }
+		hyperlane_jumps = { min = 1 max = 3 }
+		initializer = "neighbor_t1"
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 1 }
+		hyperlane_jumps = { min = 1 max = 3 }
+		initializer = "neighbor_t1_first_inf_colony"
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+hyperthermia_system = {
+	class = "sc_m"
+	flags = { hyperthermia_system }
+	usage = misc_system_init
+	usage_odds = 0
+	planet = {
+		class = star
+		orbit_distance = 0
+		orbit_angle = 0
+		size = 35
+		has_ring = no
+		init_effect = {
+			set_planet_entity = { entity = infernal_system_crisis_star_entity }
+		}
+	}
+	init_effect = {
+		create_ambient_object = {
+			type = "nebula_L8_entity"
+			entity_offset_height = -5
+			location = this
+		}
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 0
+				angle = random
+			}
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+oasis_system = {
+	name = "NAME_Kira"
+	class = "sc_m"
+	usage = misc_system_init
+	usage_odds = {
+		base = 0
+		modifier = {
+			add = 15
+			host_has_dlc = "Infernals Species Pack"
+		}
+		modifier = {
+			factor = 0
+			has_star_flag = empire_cluster
+		}
+	}
+	max_instances = 1
+	flags = { unique_system }
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 60
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 65
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 180
+	}
+	init_effect = {
+		create_ambient_object = {
+			type = "nebula_L8_entity"
+			entity_offset_height = -4
+			location = this
+		}
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 0
+				angle = random
+			}
+		}
+	}
+	planet = {
+		class = pc_m_giant_star
+		orbit_distance = 0
+		orbit_angle = 0
+		size = 30
+		has_ring = no
+		init_effect = { prevent_anomaly = yes }
+	}
+	change_orbit = 95
+	planet = {
+		name = "NAME_Vermilion"
+		class = pc_volcanic
+		orbit_angle = 0
+		has_ring = yes
+		size = 20
+		init_effect = {
+			add_anomaly = { category = infernal_oasis_category }
+		}
+		moon = {
+			class = pc_molten
+			orbit_distance = 12
+			orbit_angle = 0
+			size = 11
+			init_effect = { prevent_anomaly = yes }
+		}
+		moon = {
+			class = pc_broken
+			orbit_distance = 9
+			orbit_angle = 170
+			size = 11
+			init_effect = { prevent_anomaly = yes }
+		}
+	}
+	change_orbit = 30
+	planet = {
+		class = pc_barren
+		orbit_angle = 125
+		has_ring = no
+		size = 24
+		init_effect = { prevent_anomaly = yes }
+	}
+	change_orbit = 23
+	planet = {
+		class = pc_asteroid
+		orbit_angle = { min = 45 max = 55 }
+		orbit_distance = 0
+		size = { min = 5 max = 6 }
+		count = 6
+		init_effect = { prevent_anomaly = yes }
+	}
+	change_orbit = 25
+	planet = {
+		class = pc_gas_giant
+		orbit_angle = 190
+		has_ring = yes
+		size = 23
+		init_effect = { prevent_anomaly = yes }
+		moon = {
+			class = pc_frozen
+			orbit_distance = 14
+			orbit_angle = 0
+			size = 12
+			init_effect = { prevent_anomaly = yes }
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}

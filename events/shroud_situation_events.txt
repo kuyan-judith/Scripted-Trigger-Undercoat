@@ -1,0 +1,4391 @@
+#########################################
+# 2000-2999 Breaching the Shroud events #
+#########################################
+
+namespace = shroud
+
+#==================================
+# 1000-1499 Experimental Testing
+#==================================
+
+# First Experimental Testing Situation
+country_event = {
+	id = shroud.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_twisted_experimenters_empire = yes
+		NOR = {
+			country_has_situation = { SITUATION = situation_experimental_testing }
+			has_country_flag = choosing_next_situation_experimental_testing
+		}
+	}
+
+	immediate = {
+		start_situation = {
+			type = situation_experimental_testing
+			target = root
+		}
+	}
+}
+
+# Experimental Testing Situation Finished
+situation_event = {
+	id = shroud.1010
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				exists = owner
+				owner = { is_twisted_experimenters_empire = yes }
+			}
+
+			# Random tech insight
+			if = {
+				limit = {
+					current_situation_approach = situation_experimental_testing_physics
+				}
+				owner = {
+					give_twisted_experimenters_physics_tech_insight = yes
+					set_country_flag = twisted_experimenters_physics_tech_insight_received
+				}
+			}
+			else_if = {
+				limit = {
+					current_situation_approach = situation_experimental_testing_society
+				}
+				owner = {
+					give_twisted_experimenters_society_tech_insight = yes
+					set_country_flag = twisted_experimenters_society_tech_insight_received
+				}
+			}
+			else_if = {
+				limit = {
+					current_situation_approach = situation_experimental_testing_engineering
+				}
+				owner = {
+					give_twisted_experimenters_engineering_tech_insight = yes
+					set_country_flag = twisted_experimenters_engineering_tech_insight_received
+				}
+			}
+
+			owner = {
+				# Test Subjects death
+				if = {
+					limit = {
+						NOT = { has_country_flag = this_is_the_part_where_we_kill_you }
+					}
+					if = {
+						limit = {
+							check_variable_arithmetic = {
+								which = value:count_killed_test_subjects
+								value > 999
+							}
+						}
+						set_country_flag = this_is_the_part_where_we_kill_you
+					}
+				}
+				every_owned_pop_job = {
+					limit = {
+						OR = {
+							has_job_type = test_subject
+							has_job_type = test_subject_drone
+						}
+					}
+					sacrifice_assigned_pop_amount = {
+						percentage = value:test_subjects_loss_percent
+					}
+				}
+
+				# Choose next cycle
+				country_event = {
+					id = shroud.1015
+				}
+			}
+		}
+		destroy_situation = this
+	}
+}
+
+# Choose next Experimental Testing Situation
+country_event = {
+	id = shroud.1015
+	title = shroud.1015.name
+	desc = {
+		trigger = {
+			if = {
+				limit = { has_country_flag = test_subjects_escaped_recently }
+				text = shroud.1015.desc.escaped
+			}
+			else = {
+				text = shroud.1015.desc.default
+			}
+		}
+	}
+	picture = GFX_evt_experimental_testing
+	is_triggered_only = yes
+
+	trigger = {
+		is_twisted_experimenters_empire = yes
+	}
+
+	immediate = {
+		set_country_flag = choosing_next_situation_experimental_testing
+	}
+
+	option = {
+		name = shroud.1015.a
+		if = {
+			limit = { has_country_flag = twisted_experimenters_physics_tech_insight_received }
+			custom_tooltip = shroud.1015.physics_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_society_tech_insight_received }
+			custom_tooltip = shroud.1015.society_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_engineering_tech_insight_received }
+			custom_tooltip = shroud.1015.engineering_reward
+		}
+		custom_tooltip = shroud.1015.a.tt
+		hidden_effect = {
+			start_situation = {
+				type = situation_experimental_testing
+				target = root
+				effect = {
+					set_situation_approach = situation_experimental_testing_physics
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud.1015.b
+		if = {
+			limit = { has_country_flag = twisted_experimenters_physics_tech_insight_received }
+			custom_tooltip = shroud.1015.physics_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_society_tech_insight_received }
+			custom_tooltip = shroud.1015.society_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_engineering_tech_insight_received }
+			custom_tooltip = shroud.1015.engineering_reward
+		}
+		custom_tooltip = shroud.1015.b.tt
+		hidden_effect = {
+			start_situation = {
+				type = situation_experimental_testing
+				target = root
+				effect = {
+					set_situation_approach = situation_experimental_testing_society
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud.1015.c
+		if = {
+			limit = { has_country_flag = twisted_experimenters_physics_tech_insight_received }
+			custom_tooltip = shroud.1015.physics_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_society_tech_insight_received }
+			custom_tooltip = shroud.1015.society_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_engineering_tech_insight_received }
+			custom_tooltip = shroud.1015.engineering_reward
+		}
+		custom_tooltip = shroud.1015.c.tt
+		hidden_effect = {
+			start_situation = {
+				type = situation_experimental_testing
+				target = root
+				effect = {
+					set_situation_approach = situation_experimental_testing_engineering
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud.1015.d
+		default_hide_option = yes
+		if = {
+			limit = { has_country_flag = twisted_experimenters_physics_tech_insight_received }
+			custom_tooltip = shroud.1015.physics_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_society_tech_insight_received }
+			custom_tooltip = shroud.1015.society_reward
+		}
+		else_if = {
+			limit = { has_country_flag = twisted_experimenters_engineering_tech_insight_received }
+			custom_tooltip = shroud.1015.engineering_reward
+		}
+		custom_tooltip = shroud.1015.d.tt
+		hidden_effect = {
+			start_situation = {
+				type = situation_experimental_testing
+				target = root
+				effect = {
+					set_situation_approach = situation_experimental_testing_hold
+				}
+			}
+		}
+	}
+
+	after = {
+		remove_country_flag = choosing_next_situation_experimental_testing
+		remove_country_flag = twisted_experimenters_physics_tech_insight_received
+		remove_country_flag = twisted_experimenters_society_tech_insight_received
+		remove_country_flag = twisted_experimenters_engineering_tech_insight_received
+	}
+}
+
+# Experimental Testing - Test subjects escape
+planet_event = {
+	id = shroud.1100
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_twisted_experimenters_empire = yes
+			country_has_situation = { SITUATION = situation_experimental_testing }
+			years_passed >= 3
+			NOR = {
+				has_country_flag = test_subjects_escaped_recently
+				has_country_flag = test_subjects_executed
+			}
+		}
+		check_variable_arithmetic = {
+			which = value:count_test_subjects_planet
+			value >= 500
+		}
+	}
+
+	immediate = {
+		random_list = {
+			1 = {
+				planet_event = { id = shroud.1105 }
+			}
+			99 = {}
+		}
+	}
+}
+
+planet_event = {
+	id = shroud.1105
+	title = shroud.1105.title
+	desc = {
+		trigger = {
+			text = shroud.1105.desc.intro
+			text = newline
+			if = {
+				limit = {
+					owner = { has_country_flag = test_subjects_escaped }
+				}
+				text = shroud.1105.desc.escaped
+			}
+			else = {
+				text = shroud.1105.desc.outro
+			}
+		}
+	}
+
+	is_triggered_only = yes
+	picture = GFX_evt_experimental_testing
+	show_sound = event_dig_site
+
+	location = root
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_twisted_experimenters_empire = yes
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = {
+				flag = test_subjects_escaped_recently
+				days = 3600
+			}
+			set_country_flag = test_subjects_escaped
+		}
+	}
+
+	option = {
+		name = shroud.1105.a
+		allow = {
+			custom_tooltip = {
+				fail_text = shroud_is_homicidal
+				owner = { is_homicidal = no }
+			}
+		}
+		custom_tooltip = shroud.1105.a.tt
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+		hidden_effect = {
+			every_owned_pop_job = {
+				limit = {
+					OR = {
+						has_job_type = test_subject
+						has_job_type = test_subject_drone
+					}
+				}
+				every_job_pop_group = {
+					limit = {
+						pop_group_size > 1
+					}
+					# Save the pop group as an event target
+					save_event_target_as = old_pop_group
+					# Save their species as an event target
+					species = {
+						save_event_target_as = old_species
+					}
+					# If a modified species hasn't been created, create one
+					# and save them as an event target
+					if = {
+						limit = {
+							NOT = {
+								any_galaxy_species = {
+									has_species_flag = refugee_species_of_species@event_target:old_species
+									has_species_flag = refugee_species_of_empire@root.owner
+								}
+							}
+						}
+						create_species = {
+							is_mod = yes
+							name = this
+							plural = this
+							class = this
+							portrait = this
+							traits = this
+							can_be_modified = this
+							homeworld = this
+							namelist = this
+							gender = this
+							effect = {
+								modify_species = {
+									species = this
+									change_scoped_species = no
+									
+									effect = {
+										set_species_flag = refugee_species_of_species@event_target:old_species
+										set_species_flag = refugee_species_of_empire@root.owner
+										save_event_target_as = target_species
+									}
+								}
+							}
+						}
+					}
+					# If a modified species does exist, save them as the event target
+					else = {
+						random_galaxy_species = {
+							limit = {
+								has_species_flag = refugee_species_of_species@event_target:old_species
+								has_species_flag = refugee_species_of_empire@root.owner
+							}
+							save_event_target_as = target_species
+						}
+					}
+					# Scope back to the planet
+					# Create the empty pop group
+					# and move pops into it
+					planet = {
+						create_pop_group = {
+							pop_group = event_target:old_pop_group
+							species = event_target:target_species
+							size = 0
+							effect = {
+								transfer_pop_amount = {
+									source = event_target:old_pop_group
+									target = this
+									percentage = 0.5
+								}
+								save_event_target_as = new_pop_group
+							}
+						}
+					}
+					event_target:new_pop_group = {
+						if = {
+							limit = { 
+								exists = owner
+								is_valid_refugee_pop = yes
+							}
+							save_event_target_as = refugee_pop #Must be saved for refugee_pop_effect to work
+							refugee_pop_effect = yes
+						}
+						else = {
+							kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+								pop_group = this
+								percentage = 1
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud.1105.b
+		custom_tooltip = shroud.1105.b.tt
+		owner = {
+			add_modifier = {
+				modifier = testing_lockdown
+				days = 360
+			}
+		}
+	}
+
+	option = {
+		name = shroud.1105.c
+		custom_tooltip = shroud.1105.c.tt
+		owner = {
+			add_modifier = {
+				modifier = example_set
+			}
+		}
+		hidden_effect = {
+			every_owned_pop_job = {
+				limit = {
+					OR = {
+						has_job_type = test_subject
+						has_job_type = test_subject_drone
+					}
+				}
+				kill_assigned_pop_amount = {
+					percentage = 1
+				}
+			}
+			owner = {
+				set_country_flag = test_subjects_executed
+				every_situation = {
+					limit = { is_situation_type = situation_experimental_testing }
+					situation_event = { id = shroud.1010 }
+				}
+			}
+		}
+	}
+}
+
+#==================================
+# 2000-2999 Breaching the Shroud
+#==================================
+
+# Breaching the Shroud situation - handle approaches upgrade
+country_event = {
+	id = shroud.2150
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			last_increased_tech = tech_mine_zro
+			last_increased_tech = tech_astral_harvesting
+		}
+		any_situation = {
+			is_situation_type = situation_breach_shroud
+			OR = {
+				current_situation_approach = approach_situation_breach_shroud_commune_resources
+				current_situation_approach = approach_situation_breach_shroud_commune_planes
+			}
+		}
+	}
+
+	immediate = {
+		every_situation = {
+			limit = {
+				is_situation_type = situation_breach_shroud
+				OR = {
+					AND = {
+						current_situation_approach = approach_situation_breach_shroud_commune_resources
+						root = { last_increased_tech = tech_mine_zro }
+					}
+					AND = {
+						current_situation_approach = approach_situation_breach_shroud_commune_planes
+						root = { last_increased_tech = tech_astral_harvesting }
+					}
+				}
+			}
+			set_situation_approach = approach_situation_breach_shroud_nothing
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.2160
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		current_situation_approach = approach_situation_breach_shroud_commune_resources
+		owner = {
+			has_country_flag = zro_found
+			NOT = { has_technology = tech_mine_zro }
+		}
+	}
+
+	immediate = {
+		owner = {
+			add_tech_progress = {
+				tech = tech_mine_zro
+				progress = 0.01
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.2165
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		current_situation_approach = approach_situation_breach_shroud_commune_planes
+		owner = {
+			has_country_flag = astral_threads_found
+			NOT = { has_technology = tech_astral_harvesting }
+		}
+	}
+
+	immediate = {
+		owner = {
+			add_tech_progress = {
+				tech = tech_astral_harvesting
+				progress = 0.01
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.2170
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		current_situation_approach = approach_situation_breach_shroud_commune_resources
+		NOT = { has_situation_flag = zro_deposit_spawned }
+	}
+
+	immediate = {
+		if = {
+			limit = { NOT = { is_variable_set = commune_resources_progress } }
+			set_variable = {
+				which = commune_resources_progress
+				value = 0
+			}
+		}
+		change_variable = {
+			which = commune_resources_progress
+			value = trigger:situation_monthly_progress
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = commune_resources_progress
+					value >= 100
+				}
+			}
+			owner = {
+				ordered_planet_within_border = {
+					limit = {
+						is_colony = no
+						is_star = no
+						has_anomaly = no
+						NOT = { has_deposit_for = shipclass_mining_station }
+					}
+					position = 0
+					order_by = trigger:distance_to_capital
+					inverse = yes
+					add_deposit = d_zro_deposit_1
+					save_event_target_as = selected_zro_planet
+				}
+			}
+			if = {
+				limit = { exists = event_target:selected_zro_planet }
+				owner = {
+					# To set zro as discovered
+					random_owned_ship = {
+						ship_event = {
+							id = action.941
+							days = 1
+							scopes = {
+								from = event_target:selected_zro_planet
+							}
+						}
+					}
+				}
+				set_situation_flag = zro_deposit_spawned
+				clear_variable = commune_resources_progress
+			}
+		}
+	}
+}
+
+situation_event = {
+	id = shroud.2175
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		current_situation_approach = approach_situation_breach_shroud_commune_planes
+		NOT = { has_situation_flag = astral_scar_spawned }
+	}
+
+	immediate = {
+		if = {
+			limit = { NOT = { is_variable_set = commune_planes_progress } }
+			set_variable = {
+				which = commune_planes_progress
+				value = 0
+			}
+		}
+		change_variable = {
+			which = commune_planes_progress
+			value = trigger:situation_monthly_progress
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = commune_planes_progress
+					value >= 100
+				}
+			}
+			owner = {
+				random_system_within_border = {
+					limit = {
+						can_spawn_astral_rift = yes
+					}
+					weights = {
+						inline_script = "astral_rift/spawn_weights"
+						modifier = {
+							factor = 10
+							can_spawn_astral_rift_natural_generation = yes
+						}
+					}
+					spawn_astral_scar = yes
+					random_system_planet = {
+						limit = { is_astral_scar = yes }
+						save_event_target_as = spawned_scar
+					}
+				}
+				if = {
+					limit = { exists = event_target:spawned_scar }
+					# To set astral threads as discovered
+					random_owned_ship = {
+						ship_event = {
+							id = action.941
+							days = 1
+							scopes = {
+								from = event_target:spawned_scar
+							}
+						}
+					}
+				}
+			}
+			set_situation_flag = astral_scar_spawned
+		}
+	}
+}
+
+# Mid-Stage event type choice
+situation_event = {
+	id = shroud.2200
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			AND = {
+				has_situation_flag = breach_shroud_stage_1_started
+				situation_progress >= @[( breach_shroud_stage_1_end - breach_shroud_start_value ) * 0.3 + breach_shroud_start_value ] # Social event at 33% & Attunement event at 66%
+			}
+			AND = {
+				has_situation_flag = breach_shroud_stage_2_started
+				situation_progress >= @[ ( breach_shroud_stage_2_end - breach_shroud_stage_1_end ) * 0.5 + breach_shroud_stage_1_end ] # Attunement event halfway through
+			}
+			AND = {
+				has_situation_flag = breach_shroud_stage_3_started
+				situation_progress >= @[ ( breach_shroud_end_value - breach_shroud_stage_2_end ) * 0.5 + breach_shroud_stage_2_end ] # Attunement event halfway through
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_situation_flag = breach_shroud_stage_1_started
+				situation_progress < @[ ( breach_shroud_stage_1_end - breach_shroud_start_value ) * 0.65 + breach_shroud_start_value ]
+			}
+			if = {
+				limit = {
+					NOT = { has_situation_flag = breach_shroud_social_event_triggered }
+				}
+				set_situation_flag = breach_shroud_social_event_triggered
+				fire_on_action = {
+					on_action = on_breach_the_shroud_situation_random_social_events_list
+				}
+			}
+			break = yes
+		}
+
+		# Attunement events (called once per stage)
+		remove_situation_flag = breach_shroud_social_event_triggered
+		remove_situation_flag = breach_shroud_stage_1_started
+		remove_situation_flag = breach_shroud_stage_2_started
+		remove_situation_flag = breach_shroud_stage_3_started
+		random_list = {
+			1 = { # Beneficial events
+				modifier = {
+					factor = @breach_shroud_approach_mult
+					has_situation_flag = beneficial_approach
+				}
+				fire_on_action = {
+					on_action = on_breach_the_shroud_situation_random_beneficial_events_list
+				}
+			}
+			1 = { # Balanced events
+				fire_on_action = {
+					on_action = on_breach_the_shroud_situation_random_balanced_events_list
+				}
+			}
+			1 = { # Chaotic events
+				modifier = {
+					factor = @breach_shroud_approach_mult
+					has_situation_flag = chaotic_approach
+				}
+				fire_on_action = {
+					on_action = on_breach_the_shroud_situation_random_chaotic_events_list
+				}
+			}
+		}
+	}
+}
+
+# Beneficial Event A1
+situation_event = {
+	id = shroud.2300
+	title = shroud.2300.name
+	desc = shroud.2300.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = yes
+			}
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_machine = yes
+			}
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				founder_species_is_machine = no
+			}
+		}
+		picture = GFX_evt_psionics
+	}
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2300_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2300_fired
+	}
+
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						owner = { is_robot_empire = yes }
+					}
+					text = shroud.2300.a.robot
+				}
+				else = {
+					text = shroud.2300.a.organic
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2300.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						owner = {
+							OR = {
+								is_gestalt = yes
+								is_dictatorial_authority = yes
+								is_imperial_authority = yes
+							}
+						}
+					}
+					text = shroud.2300.c.variant
+				}
+				else = {
+					text = shroud.2300.c.organic
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_split_attunement
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_cradle_of_souls
+						is_preferred_patron = the_instrument_of_desire
+					}
+				}
+			}
+		}
+	}
+}
+
+# Beneficial Event A2
+situation_event = {
+	id = shroud.2305
+	title = shroud.2305.name
+	desc = shroud.2305.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+	picture = GFX_evt_astral_rift_psionic_stranger
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2305_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2305_fired
+	}
+
+	option = {
+		name = {
+			trigger = {
+				owner = {
+					is_spiritualist = yes
+				}
+			}
+			text = shroud.2305.a_spiritualist
+		}
+		name = {
+			trigger = {
+				owner = {
+					is_spiritualist = no
+				}
+			}
+			text = shroud.2305.a
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = {
+			trigger = {
+				owner = {
+					is_spiritualist = yes
+				}
+			}
+			text = shroud.2305.b_spiritualist
+		}
+		name = {
+			trigger = {
+				owner = {
+					is_spiritualist = no
+				}
+			}
+			text = shroud.2305.b
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2305.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_instrument_of_desire
+						is_preferred_patron = the_eater_of_worlds
+					}
+				}
+			}
+		}
+	}
+}
+
+# Beneficial Event A3
+situation_event = {
+	id = shroud.2310
+	title = shroud.2310.name
+	desc = shroud.2310.desc
+	is_triggered_only = yes
+	show_sound = evn_ove_shroudwalker_apprentice
+	situation = this
+	picture = GFX_evt_microscopic_life
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2310_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2310_fired
+	}
+
+	option = {
+		name = shroud.2310.a
+		trigger = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = {
+			text = shroud.2310.b_machine
+			trigger = {
+				owner = {
+					founder_species_is_machine = yes
+				}
+			}
+		}
+		name = { # Default
+			text = shroud.2310.b_organic
+			trigger = {
+				owner = {
+					founder_species_is_machine = no
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					founder_species_is_machine = yes
+				}
+				add_monthly_resource_mult = {
+					resource = energy
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else_if = {
+				limit = {
+					founder_species_is_lithoid = yes
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else_if = {
+				limit = {
+					founder_species_is_biological = yes
+				}
+				add_monthly_resource_mult = {
+					resource = food
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2310.c
+		trigger = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 10
+				owner = {
+					OR = {
+						is_preferred_patron = the_instrument_of_desire
+						is_preferred_patron = the_eater_of_worlds
+					}
+				}
+			}
+		}
+	}
+}
+
+# Beneficial Event A4
+situation_event = {
+	id = shroud.2315
+	title = shroud.2315.name
+	desc = shroud.2315.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = yes
+			}
+		}
+		picture = GFX_evt_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_machine = yes
+			}
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				founder_species_is_machine = no
+			}
+		}
+		picture = GFX_evt_psionics
+	}
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2315_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2315_fired
+	}
+
+	option = {
+		name = shroud.2315.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2315.b
+		owner = {
+			if = {
+				limit = {
+					founder_species_is_machine = yes
+				}
+				add_monthly_resource_mult = {
+					resource = energy
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else_if = {
+				limit = {
+					founder_species_is_lithoid = yes
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			else_if = {
+				limit = {
+					founder_species_is_biological = yes
+				}
+				add_monthly_resource_mult = {
+					resource = food
+					value = @tier2materialreward
+					min = @tier2materialmin
+					max = @tier2materialmax
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = shroud.2315.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+				the_composer_of_strands = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_eater_of_worlds
+						is_preferred_patron = the_composer_of_strands
+					}
+				}
+			}
+		}
+	}
+}
+
+# Beneficial Event A5a
+situation_event = {
+	id = shroud.2320
+	title = shroud.2320.name
+	desc = shroud.2320.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = yes
+			}
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_machine = yes
+			}
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				founder_species_is_machine = no
+			}
+		}
+		picture = GFX_evt_psionics
+	}
+
+	trigger = {
+		exists = owner
+		NOR = {
+			has_situation_flag = shroud.2320_fired
+			owner = {
+				has_tradition = tr_psionics_shroud_clairvoyance
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2320_fired
+	}
+
+	option = {
+		name = shroud.2320.a
+		trigger = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2320.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2320.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2320.d
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+}
+
+# Beneficial Event A5b
+situation_event = {
+	id = shroud.2325
+	title = shroud.2325.name
+	desc = shroud.2325.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+	picture = GFX_evt_surreal_visions
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2325_fired
+		}
+		owner = {
+			has_tradition = tr_psionics_shroud_clairvoyance
+			count_relation = {
+				limit = { has_communications = prev }
+				count >= 1
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2325_fired
+	}
+
+	option = {
+		name = shroud.2325.a
+		trigger = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		custom_tooltip = shroud.2325.a_tt
+		hidden_effect = {
+			owner = {
+				every_relation = {
+					limit = { has_communications = prev }
+					prev = {
+						add_intel = {
+							amount = 10
+							who = prev
+						}
+					}
+				}
+			}
+		}
+		owner = {
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2325.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2325.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = influence
+				value = @tier1influencereward
+				min = @tier1influencemin
+				max = @tier1influencemax
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2325.d
+		owner = {
+			random_owned_fleet = {
+				limit = {
+					is_ship_size = mining_station
+					exists = orbit
+				}
+				orbit = {
+					add_deposit = d_minerals_5
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+}
+
+# Balanced Event B1
+situation_event = {
+	id = shroud.2400
+	title = shroud.2400.name
+	desc = shroud.2400.desc
+	is_triggered_only = yes
+	show_sound = event_construction
+	situation = this
+	picture = GFX_evt_engineering_bay
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2400_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2400_fired
+	}
+
+	option = {
+		name = shroud.2400.a
+		owner = {
+			add_modifier = {
+				modifier = erratic_dematerialization
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2400.b
+		owner = {
+			add_modifier = {
+				modifier = teleportation_research
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2400.c
+		owner = {
+			add_modifier = {
+				modifier = psionic_caution
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_split_attunement
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_cradle_of_souls
+						is_preferred_patron = the_instrument_of_desire
+					}
+				}
+			}
+		}
+	}
+}
+
+# Balanced Event B2
+situation_event = {
+	id = shroud.2405
+	title = shroud.2405.name
+	desc = shroud.2405.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+	picture = GFX_evt_undertaker
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2405_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2405_fired
+	}
+
+	option = {
+		name = shroud.2405.a
+		owner = {
+			add_modifier = {
+				modifier = necrocognition_research
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2405.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2405.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_modifier = {
+				modifier = resurrectionism
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_instrument_of_desire
+						is_preferred_patron = the_eater_of_worlds
+					}
+				}
+			}
+		}
+	}
+}
+
+# Balanced Event B3a
+situation_event = {
+	id = shroud.2410
+	title = shroud.2410.name
+	desc = shroud.2410.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_machine = yes
+			}
+		}
+		picture = GFX_evt_circuitry_modification
+	}
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_organic = yes
+			}
+		}
+		picture = GFX_evt_genetic_modification
+	}
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_machine = no
+				founder_species_is_organic = no
+			}
+		}
+		picture = GFX_evt_genetic_modification
+	}
+
+	trigger = {
+		exists = owner
+		NOR = {
+			owner = {
+				has_tradition = tr_psionics_shroud_telekinesis
+			}
+			has_situation_flag = shroud.2410_fired
+			has_situation_flag = shroud.2415_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2410_fired
+	}
+
+	option = {
+		name = shroud.2410.a
+		owner = {
+			add_modifier = {
+				modifier = regulated_transformation
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = shroud.2410.b
+		owner = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+					}
+				}
+				add_modifier = {
+					modifier = forced_amputation_gestalt
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = forced_amputation
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2410.c
+		owner = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+					}
+				}
+				add_modifier = {
+					modifier = unregulated_transformation_gestalt
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = unregulated_transformation
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_split_attunement
+				the_composer_of_strands = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_cradle_of_souls
+						is_preferred_patron = the_composer_of_strands
+					}
+				}
+			}
+		}
+	}
+}
+
+# Balanced Event B3b
+situation_event = {
+	id = shroud.2415
+	title = shroud.2415.name
+	desc = shroud.2415.desc
+	is_triggered_only = yes
+	show_sound = event_construction
+	situation = this
+	picture = GFX_evt_physics_research
+
+	trigger = {
+		exists = owner
+		owner = {
+			has_tradition = tr_psionics_shroud_telekinesis
+		}
+		NOR = {
+			has_situation_flag = shroud.2415_fired
+			has_situation_flag = shroud.2410_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2415_fired
+	}
+
+	option = {
+		name = shroud.2415.a
+		owner = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+					}
+				}
+				add_modifier = {
+					modifier = telekinetic_displacement
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = telekinetic_resentment
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = shroud.2415.b
+		owner = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+					}
+				}
+				add_modifier = {
+					modifier = telekinetic_assembly_gestalt
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = telekinetic_assembly
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2415.c
+		owner = {
+			if = {
+				limit = {
+					owner = {
+						is_gestalt = yes
+					}
+				}
+				add_modifier = {
+					modifier = telekinetic_skepticism_gestalt
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = telekinetic_skepticism
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_split_attunement
+				the_composer_of_strands = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_cradle_of_souls
+						is_preferred_patron = the_composer_of_strands
+					}
+				}
+			}
+		}
+	}
+}
+
+# Balanced Event B4
+situation_event = {
+	id = shroud.2420
+	title = shroud.2420.name
+	desc = shroud.2420.desc
+	is_triggered_only = yes
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	situation = this
+	picture = GFX_evt_emergency_workers
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2420_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2420_fired
+	}
+
+	option = {
+		name = shroud.2420.a
+		owner = {
+			add_modifier_psionic_migraines = {
+				YEARS = 10
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = {
+			text = shroud.2420.b_machine
+			trigger = {
+				owner = {
+					founder_species_is_machine = yes
+				}
+			}
+		}
+		name = { # Default
+			text = shroud.2420.b
+			trigger = {
+				owner = {
+					founder_species_is_machine = no
+				}
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_modifier_psionic_painkillers = {
+				YEARS = 10
+			}
+			add_resource = {
+				energy = -1000
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = {
+			text = shroud.2420.c_machine
+			trigger = {
+				owner = {
+					founder_species_is_machine = yes
+				}
+			}
+		}
+		name = { # Default
+			text = shroud.2420.c
+			trigger = {
+				owner = {
+					founder_species_is_machine = no
+				}
+			}
+		}
+		owner = {
+			add_modifier_psionic_migraines = {
+				YEARS = 10
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+				the_composer_of_strands = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_eater_of_worlds
+						is_preferred_patron = the_composer_of_strands
+					}
+				}
+			}
+		}
+	}
+}
+
+# Balanced Event B5
+situation_event = {
+	id = shroud.2425
+	title = shroud.2425.name
+	desc = shroud.2425.desc
+	is_triggered_only = yes
+	show_sound = event_assembly_fight
+	situation = this
+	picture = GFX_evt_psionic_battle
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2425_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2425_fired
+		owner = {
+			capital_scope = {
+				solar_system = {
+					save_event_target_as = spawn_system
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud.2425.a
+		tooltip = {
+			owner = {
+				add_modifier = {
+					modifier = psi_fighting_conscription
+					years = 10	
+				}
+			}
+		}
+		custom_tooltip = shroud.2425.a.tt
+		owner = {
+			hidden_effect = {
+				if = {
+					limit = {
+						is_gestalt = yes
+					}
+					add_modifier = {
+						modifier = psi_fighting_conscription_gestalt
+						years = 10
+					}
+				}
+				else = {
+					add_modifier = {
+						modifier = psi_fighting_conscription
+						years = 10	
+					}
+				}
+				event_target:spawn_system = {
+					create_fleet = {
+						effect = {
+							set_owner = root.owner
+							while = {
+								count = 3
+								create_army_transport = {
+									ship_name = random
+									army_type = "psionic_army"
+									species = root.owner
+								}
+								set_location = {
+									target = event_target:spawn_system
+									distance = 45
+									angle = random
+								}
+							}
+						}
+					}
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2425.b
+		owner = {
+			add_modifier = {
+				modifier = psi_fighting_research
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2425.c
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = psi_fighting_prohibition
+				years = 10
+			}
+			add_resource = {
+				energy = -1000
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = {
+			text = shroud.2425.d_gestalt
+			trigger = {
+				owner = {
+					is_gestalt = yes
+				}
+			}
+		}
+		name = { # Default
+			text = shroud.2425.d
+			trigger = {
+				owner = {
+					is_gestalt = no
+				}
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					is_gestalt = yes
+				}
+				add_modifier = {
+					modifier = psi_fighting_competitions_gestalt
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = psi_fighting_competitions
+					years = 10
+				}
+			}
+			add_resource = {
+				energy = -1000
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+}
+
+# Chaotic Event C1
+situation_event = {
+	id = shroud.2500
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		situation_progress >= @breach_shroud_stage_2_end
+		NOT = {
+			has_situation_flag = shroud.2502_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2502_fired
+
+		owner = {
+			if = {
+				limit = {
+					num_owned_planets > 1
+				}
+				random_owned_planet = {
+					limit = {
+						is_capital = no
+					}
+					planet_event = {
+						id = shroud.2502
+					}
+				}
+			}
+			else = {
+				capital_scope = {
+					planet_event = {
+						id = shroud.2502
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = shroud.2502
+	title = shroud.2502.name
+	desc = shroud.2502.desc
+	is_triggered_only = yes
+	show_sound = evn_ove_shroudwalker_enclave
+	situation = from
+	picture = GFX_evt_shrouded_planet
+
+	option = {
+		name = shroud.2502.a
+		add_shroudfall_blocker = yes
+		owner = {
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2502.b
+		add_modifier = {
+			modifier = shroudfall
+			years = 10
+		}
+		owner = {
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2502.c
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 3000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -3000
+			}
+			add_monthly_resource_mult = {
+				resource = sr_zro
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_split_attunement
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_cradle_of_souls
+						is_preferred_patron = the_instrument_of_desire
+					}
+				}
+			}
+		}
+	}
+}
+
+# Chaotic Event C2
+situation_event = {
+	id = shroud.2505
+	title = shroud.2505.name
+	desc = shroud.2505.desc
+	is_triggered_only = yes
+	show_sound = event_assembly_fight
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				is_robot_empire = no
+			}
+		}
+		picture = GFX_evt_assembly_fight
+	}
+	picture = {
+		trigger = {
+			owner = { is_hive_empire = yes }
+		}
+		picture = GFX_evt_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = { is_robot_empire = yes }
+		}
+		picture = GFX_evt_individualistic_machines_2
+	}
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2505_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2505_fired
+	}
+
+	option = {
+		name = shroud.2505.a
+		allow = {
+			owner = {
+				is_homicidal = no
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = impulse_mitigation
+				years = 10
+			}
+			add_resource = {
+				energy = -1000
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2505.b
+		allow = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		owner = {
+			add_modifier = {
+				modifier = shroud_influence
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+	option = {
+		name = shroud.2505.c
+		owner = {
+			add_modifier = {
+				modifier = shroud_suppression
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+				the_instrument_of_desire = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_eater_of_worlds
+						is_preferred_patron = the_instrument_of_desire
+					}
+				}
+			}
+		}
+	}
+}
+
+# Chaotic Event C3
+situation_event = {
+	id = shroud.2510
+	title = shroud.2510.name
+	desc = shroud.2510.desc
+	is_triggered_only = yes
+	show_sound = event_bad_omen
+	situation = this
+	picture = GFX_evt_emergency_workers
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2510_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2510_fired
+	}
+
+	option = {
+		name = shroud.2510.a
+		owner = {
+			custom_tooltip = shroud.2510.a_tt
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+			hidden_effect = {
+				every_owned_planet = {
+					random_list = {
+						67 = { } # Do nothing
+						33 = {
+							random_owned_pop_group = {
+								limit = {
+									NOR = {
+										is_pop_category = bio_trophy
+										is_pop_category = bio_trophy_unemployment
+									}
+								}
+								kill_single_pop = yes
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2510.b
+		owner = {
+			if = {
+				limit = {
+					founder_species_is_machine = yes
+				}
+				add_modifier = {
+					modifier = psionic_inhibitors_machine
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = psionic_inhibitors
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = {
+			text = shroud.2510.c_corporate
+			trigger = {
+				owner = {
+					is_megacorp = yes
+				}
+			}
+		}
+		name = { # Default
+			text = shroud.2510.c
+			trigger = {
+				owner = {
+					is_megacorp = no
+				}
+			}
+		}
+		owner = {
+			add_modifier_psionic_meditation = {
+				YEARS = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_split_attunement
+				the_composer_of_strands = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_cradle_of_souls
+						is_preferred_patron = the_composer_of_strands
+					}
+				}
+			}
+		}
+	}
+}
+
+# Chaotic Event C4
+situation_event = {
+	id = shroud.2515
+	title = shroud.2515.name
+	desc = shroud.2515.desc
+	is_triggered_only = yes
+	show_sound = event_bad_omen
+	situation = this
+	picture = GFX_evt_zro_3
+
+	trigger = {
+		exists = owner
+		NOT = {
+			has_situation_flag = shroud.2515_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2515_fired
+	}
+
+	option = {
+		name = {
+			text = shroud.2515.a_machine
+			trigger = {
+				owner = {
+					founder_species_is_machine = yes
+				}
+			}
+		}
+		name = { # Default
+			text = shroud.2515.a_organic
+			trigger = {
+				owner = {
+					founder_species_is_machine = no
+				}
+			}
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -1000
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = shroud.2515.b
+		owner = {
+			add_modifier = {
+				modifier = sleep_disturbance_research
+				years = 10
+			}
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2515.c
+		owner = {
+			if = {
+				limit = {
+					is_gestalt = yes
+				}
+				add_modifier = {
+					modifier = night_terrors_gestalt
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = night_terrors
+					years = 10
+				}
+			}
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_split_attunement
+				the_composer_of_strands = @breach_the_shroud_split_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = {
+					OR = {
+						is_preferred_patron = the_eater_of_worlds
+						is_preferred_patron = the_composer_of_strands
+					}
+				}
+			}
+		}
+	}
+}
+
+# Chaotic Event C5
+situation_event = {
+	id = shroud.2520
+	title = shroud.2520.name
+	desc = shroud.2520.desc
+	is_triggered_only = yes
+	show_sound = event_dangerous_animals
+	situation = this
+	picture = GFX_evt_alien_wildlife
+
+	trigger = {
+		exists = owner
+		situation_progress >= @breach_shroud_stage_2_end
+		NOT = {
+			has_situation_flag = shroud.2520_fired
+		}
+	}
+
+	immediate = {
+		set_situation_flag = shroud.2520_fired
+	}
+
+	option = {
+		name = shroud.2520.a
+		owner = {
+			capital_scope = {
+				add_planet_devastation = 25
+				random_owned_pop_group = {
+					kill_single_pop = yes
+				}
+			}
+			add_monstrous_attacks_option_cost = yes
+			add_attunement = { # Last displayed effect
+				the_eater_of_worlds = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_eater_of_worlds }
+			}
+		}
+	}
+	option = {
+		name = shroud.2520.b
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 1000
+				}
+			}
+		}
+		owner = {
+			capital_scope = {
+				add_blocker = {
+					type = d_shroudgate
+				}
+			}
+			add_monstrous_attacks_option_cost = yes
+			add_resource = {
+				energy = -1000
+			}
+			add_attunement = { # Last displayed effect
+				the_instrument_of_desire = @breach_the_shroud_full_attunement
+			}
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_instrument_of_desire }
+			}
+		}
+	}
+	option = {
+		name = shroud.2520.c
+		custom_tooltip = shroud.2520.c_tt
+		owner = {
+			add_monstrous_attacks_option_cost = yes
+			add_attunement = { # Last displayed effect
+				the_cradle_of_souls = @breach_the_shroud_full_attunement
+			}
+		}
+		hidden_effect = {
+			set_situation_flag = shroud.2520.slowness
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_cradle_of_souls }
+			}
+		}
+	}
+	option = {
+		name = shroud.2520.d
+		allow = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		owner = {
+			capital_scope = {
+				if = {
+					limit = {
+						prev = {
+							is_gestalt = yes
+						}
+					}
+					add_modifier = {
+						modifier = shroud_portal_gestalt
+						years = 10
+					}
+				}
+				else = {
+					add_modifier = {
+						modifier = shroud_portal
+						years = 10
+					}
+				}
+			}
+			add_monstrous_attacks_option_cost = yes
+			add_attunement = { # Last displayed effect
+				the_composer_of_strands = @breach_the_shroud_full_attunement
+			}
+		}
+		hidden_effect = {
+			set_situation_flag = shroud.2520.slowness
+		}
+		ai_chance = {
+			modifier = {
+				factor = 100
+				owner = { is_preferred_patron = the_composer_of_strands }
+			}
+		}
+	}
+}
+
+# Social Event S1
+situation_event = {
+	id = shroud.2600
+	title = shroud.2600.name
+	desc = shroud.2600.desc
+	is_triggered_only = yes
+	show_sound = event_factions
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = { is_individual_machine = yes }
+		}
+		picture = GFX_evt_cyber_creed_2
+	}
+	picture = {
+		trigger = {
+			owner = { is_individual_machine = no }
+		}
+		picture = GFX_evt_smear_campaign
+	}
+
+	trigger = {
+		exists = owner
+		owner = { is_gestalt = no }
+	}
+
+	option = {
+		name = shroud.2600.a
+		owner = {
+			add_modifier = {
+				modifier = dissidents_silenced_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2600.b
+		owner = {
+			add_modifier = {
+				modifier = psionic_superiority_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S2
+situation_event = {
+	id = shroud.2605
+	title = shroud.2605.name
+	desc = shroud.2605.desc
+	is_triggered_only = yes
+	show_sound = event_factions
+	situation = this
+	picture = GFX_evt_announcement
+
+	trigger = {
+		exists = owner
+		owner = { is_gestalt = no }
+	}
+
+	option = {
+		name = shroud.2605.a
+		add_situation_progress = 50
+		owner = {
+			add_modifier = {
+				modifier = dissenters_repressed_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2605.b
+		owner = {
+			add_modifier = {
+				modifier = performative_pluralism_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S3
+situation_event = {
+	id = shroud.2610
+	title = shroud.2610.name
+	desc = shroud.2610.desc
+	is_triggered_only = yes
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = { is_individual_machine = yes }
+		}
+		picture = GFX_evt_individualistic_machines_2
+	}
+	picture = {
+		trigger = {
+			owner = { is_individual_machine = no }
+		}
+		picture = GFX_evt_smugglers_in_bar
+	}
+
+	show_sound = {
+		trigger = {
+			owner = { is_individual_machine = yes }
+		}
+		sound = event_robot_encounter
+	}
+	show_sound = {
+		trigger = {
+			owner = { is_individual_machine = no }
+		}
+		sound = event_hand_shake
+	}
+
+	trigger = {
+		exists = owner
+		owner = { is_gestalt = no }
+	}
+
+	option = {
+		name = shroud.2610.a
+		add_situation_progress = 100
+		owner = {
+			add_modifier = {
+				modifier = psionic_crime_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2610.b
+		add_situation_progress = -50
+		owner = {
+			add_modifier = {
+				modifier = psionic_crime_crackdown_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S4
+situation_event = {
+	id = shroud.2615
+	title = shroud.2615.name
+	desc = shroud.2615.desc
+	is_triggered_only = yes
+	show_sound = event_laboratory_sound
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = { is_individual_machine = yes }
+		}
+		picture = GFX_evt_cybernetics
+	}
+	picture = {
+		trigger = {
+			owner = { is_individual_machine = no }
+		}
+		picture = GFX_evt_scientific_experiments
+	}
+
+	trigger = {
+		exists = owner
+		owner = { is_gestalt = no }
+	}
+
+	option = {
+		name = shroud.2615.a
+		add_situation_progress = 50
+		owner = {
+			add_modifier = {
+				modifier = psionic_experimentation_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2615.b
+		owner = {
+			add_modifier = {
+				modifier = self_experimentation_controls_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S5 (gestalt)
+situation_event = {
+	id = shroud.2620
+	title = shroud.2620.name
+	desc = shroud.2620.desc
+	is_triggered_only = yes
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		picture = GFX_evt_synth_life
+	}
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = no }
+		}
+		picture = GFX_evt_alien_segregation
+	}
+
+	show_sound = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = {
+			owner = { founder_species_is_machine = no }
+		}
+		sound = event_psionic
+	}
+
+	trigger = {
+		exists = owner
+		owner = { is_gestalt = yes }
+	}
+
+	option = {
+		name = shroud.2620.a
+		add_situation_progress = 50
+		owner = {
+			add_modifier = {
+				modifier = psionic_cluster_gestalt_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2620.b
+		add_situation_progress = -50
+		owner = {
+			add_modifier = {
+				modifier = restricted_movements_gestalt_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S5 (non-gestalt)
+situation_event = {
+	id = shroud.2621
+	title = shroud.2621.name
+	desc = shroud.2621.desc
+	is_triggered_only = yes
+	situation = this
+
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		picture = GFX_evt_synth_life
+	}
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = no }
+		}
+		picture = GFX_evt_alien_segregation
+	}
+
+	show_sound = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = {
+			owner = { founder_species_is_machine = no }
+		}
+		sound = event_psionic
+	}
+
+	trigger = {
+		exists = owner
+		owner = { is_gestalt = no }
+	}
+
+	option = {
+		name = shroud.2621.a
+		add_situation_progress = 50
+		owner = {
+			add_modifier = {
+				modifier = psionic_cluster_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2621.b
+		add_situation_progress = -50
+		owner = {
+			add_modifier = {
+				modifier = restricted_movements_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S6 (organic)
+situation_event = {
+	id = shroud.2625
+	title = shroud.2625.name
+	desc = shroud.2625.desc
+	is_triggered_only = yes
+	situation = this
+	picture = GFX_evt_emergency_workers
+	show_sound = event_life_support_fail
+
+	trigger = {
+		exists = owner
+		owner = { founder_species_is_organic = yes }
+	}
+
+	option = {
+		name = shroud.2625.a
+		owner = {
+			if = {
+				limit = { is_wilderness_empire = no }
+				random_owned_pop_group = {
+					kill_single_pop = yes
+				}
+			}
+			add_modifier = {
+				modifier = therapeutic_psionics_organic_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2625.b
+		owner = {
+			if = {
+				limit = { is_wilderness_empire = no }
+				random_owned_pop_group = {
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						amount = 200
+					}
+				}
+			}
+			if = {
+				limit = { is_gestalt = yes }
+				add_modifier = {
+					modifier = weaponized_psionics_gestalt_modifier
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = weaponized_psionics_modifier
+					years = 10
+				}
+			}
+		}
+	}
+}
+
+# Social Event S6 (machine)
+situation_event = {
+	id = shroud.2626
+	title = shroud.2626.name
+	desc = shroud.2626.desc
+	is_triggered_only = yes
+	situation = this
+	picture = GFX_evt_synth_situation
+	show_sound = event_laboratory_sound
+
+	trigger = {
+		exists = owner
+		owner = { founder_species_is_machine = yes }
+	}
+
+	option = {
+		name = shroud.2626.a
+		owner = {
+			if = {
+				limit = { is_wilderness_empire = no }
+				random_owned_pop_group = {
+					limit = {
+						NOR = {
+							is_pop_category = bio_trophy
+							is_pop_category = bio_trophy_unemployment
+						}
+					}
+					kill_single_pop = yes
+				}
+			}
+			add_modifier = {
+				modifier = therapeutic_psionics_machine_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2626.b
+		owner = {
+			if = {
+				limit = { is_wilderness_empire = no }
+				random_owned_pop_group = {
+					limit = {
+						NOR = {
+							is_pop_category = bio_trophy
+							is_pop_category = bio_trophy_unemployment
+						}
+					}
+					kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+						pop_group = this
+						amount = 200
+					}
+				}
+			}
+			if = {
+				limit = { is_gestalt = yes }
+				add_modifier = {
+					modifier = weaponized_psionics_gestalt_modifier
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = weaponized_psionics_modifier
+					years = 10
+				}
+			}
+		}
+	}
+}
+
+# Social Event S7
+situation_event = {
+	id = shroud.2630
+	title = shroud.2630.name
+	desc = {
+		trigger = {
+			owner = { is_machine_empire = yes }
+		}
+		text = shroud.2630.desc.machine
+	}
+	desc = {
+		trigger = {
+			owner = { is_hive_empire = yes }
+		}
+		text = shroud.2630.desc.hive
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_machine_empire = no
+				is_hive_empire = no
+			}
+		}
+		text = shroud.2630.desc.default
+	}
+
+	is_triggered_only = yes
+	situation = this
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		picture = GFX_evt_cybernetics
+	}
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = no }
+		}
+		picture = GFX_evt_scientific_experiments
+	}
+
+	trigger = {
+		exists = owner
+	}
+
+	option = {
+		name = shroud.2630.a
+		owner = {
+			add_modifier = {
+				modifier = psionic_roll_chance_modifier
+				years = 10
+			}
+		}
+	}
+	option = {
+		name = shroud.2630.b
+		owner = {
+			add_modifier = {
+				modifier = population_protections_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# Social Event S8
+situation_event = {
+	id = shroud.2635
+	title = shroud.2635.name
+	desc = {
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		text = shroud.2635.desc.gestalt
+	}
+	desc = {
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		text = shroud.2635.desc.default
+	}
+
+	is_triggered_only = yes
+	situation = this
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+
+	picture = {
+		trigger = {
+			owner = { is_hive_empire = yes }
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				founder_species_is_machine = no
+			}
+		}
+		picture = GFX_evt_psionics
+	}
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_homicidal = no
+		}
+	}
+
+	option = {
+		name = shroud.2635.a
+		add_situation_progress = 100
+		owner = {
+			add_modifier = {
+				modifier = empathetic_initiative_modifier
+				years = 10
+			}
+		}
+		hidden_effect = {
+			every_country = {
+				limit = { has_communications = root }
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_empathetic_initiative
+				}
+				country_event = {
+					id = shroud.2636
+					years = 10
+					scopes = { from = root }
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud.2635.b
+		add_situation_progress = -50
+		owner = {
+			add_modifier = {
+				modifier = cautious_progress_modifier
+				years = 10
+			}
+		}
+	}
+}
+
+# from = psionic country
+country_event = {
+	id = shroud.2636
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_opinion_modifier = {
+			who = from
+			modifier = opinion_empathetic_initiative
+		}
+	}
+
+	immediate = {
+		remove_opinion_modifier = {
+			modifier = opinion_empathetic_initiative
+			who = from
+		}
+	}
+}
+
+# Social Event S9
+situation_event = {
+	id = shroud.2640
+	title = shroud.2640.name
+	desc = {
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		text = shroud.2640.desc.gestalt
+	}
+	desc = {
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		text = shroud.2640.desc.default
+	}
+
+	is_triggered_only = yes
+	situation = this
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+
+	picture = {
+		trigger = {
+			owner = { is_hive_empire = yes }
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = { founder_species_is_machine = yes }
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				founder_species_is_machine = no
+			}
+		}
+		picture = GFX_evt_psionics
+	}
+
+	trigger = {
+		exists = owner
+	}
+
+	option = {
+		name = shroud.2640.a
+		custom_tooltip = shroud.2640.a.tt
+		add_situation_progress = 100
+		owner = {
+			add_modifier = {
+				modifier = psionic_specialization_modifier
+				years = 10
+			}
+			hidden_effect = {
+				every_owned_planet = {
+					limit = {
+						is_colony = yes
+						is_capital = no
+					}
+					ruin_building = random_no_capital
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud.2640.b
+		add_situation_progress = -50
+		owner = {
+			if = {
+				limit = { is_gestalt = yes }
+				add_modifier = {
+					modifier = psionic_suppression_gestalt_modifier
+					years = 10
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = psionic_suppression_modifier
+					years = 10
+				}
+			}
+		}
+	}
+}
+
+# Stage Events
+# Mind over Matter
+country_event = {
+	id = shroud.2750
+	title = shroud.2750.name
+	show_sound = event_mind_over_matter
+	is_triggered_only = yes
+
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					founder_species_is_machine = yes
+				}
+				text = shroud.2750.desc_p1_machine
+			}
+			else_if = {
+				limit = {
+					founder_species_is_machine = no
+					is_gestalt = yes
+				}
+				text = shroud.2750.desc_p1_hive_mind
+			}
+			else_if = {
+				limit = {
+					is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				}
+				text = shroud.2750.desc_p1_unplugged
+			}
+			else = {
+				text = shroud.2750.desc_p1
+			}
+			text = newline
+			if = {
+				limit = {
+					is_unplugged_empire = yes # undercoat: moved to scripted trigger
+				}
+				text = shroud.2750.desc_p2_unplugged
+			}
+			else = {
+				text = shroud.2750.desc_p2
+			}
+			text = newline
+			text = shroud.2750.desc_p3
+		}
+	}
+
+	picture = {
+		trigger = {
+			is_hive_empire = yes
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			OR = {
+				founder_species_is_machine = yes
+				is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			is_hive_empire = no
+			founder_species_is_machine = no
+		}
+		picture = GFX_evt_psionics
+	}
+
+	trigger = {
+		is_psionic = yes
+	}
+
+	immediate = {
+		mind_over_matter_immediate = yes
+		start_situation = {
+			type = situation_breach_shroud
+			target = root
+		}
+	}
+
+	option = {
+		name = shroud.2750.a
+		trigger = {
+			is_shroudwalker_apprentice_empire = no # undercoat: moved to scripted trigger
+		}
+		tooltip = {
+			modify_species = {
+				species = this
+				add_trait = trait_latent_psionic
+			}
+		}
+	}
+
+	option = {
+		name = shroud.2750.a
+		trigger = {
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	after = {
+		custom_tooltip = shroud.2750.a.tt
+		hidden_effect = {
+			open_shroud_tab = yes
+		}
+	}
+}
+
+# Psi Corps
+situation_event = {
+	id = shroud.2760
+	title = shroud.2760.name
+	picture = GFX_evt_spymaster
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	desc = {
+		trigger = {
+			text = shroud.2760.desc_p1
+			text = newline
+			if = {
+				limit = {
+					owner = {
+						num_buildings = { type = building_psi_corps value < 1 }
+					}
+				}
+				text = shroud.2760.desc_p2_no_psi_corps
+			}
+			else = {
+				text = shroud.2760.desc_p2_psi_corps
+			}
+		}
+	}
+
+	situation = this
+
+	trigger = {
+		exists = owner
+	}
+
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						owner = {
+							num_buildings = { type = building_psi_corps value < 1 }
+						}
+					}
+					text = shroud.2760.a_no_psi_corps
+				}
+				else = {
+					if = {
+						limit = {
+							owner = {
+								is_gestalt = yes
+							}
+						}
+						text = shroud.2760.a_gestalt
+					}
+					else = {
+						text = shroud.2760.a
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					num_buildings = { type = building_psi_corps value < 1 }
+				}
+			}
+			custom_tooltip = shroud.2760.a_tt_no_psi_corps
+		}
+		else = {
+			custom_tooltip = shroud.2760.a_tt
+		}
+	}
+}
+
+# The Great Awakening
+situation_event = {
+	id = shroud.2780
+	title = shroud.2780.name
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	situation = this
+
+	desc = {
+		trigger = {
+			if = {
+				limit = {
+					owner = {
+						OR = {
+							is_gestalt = yes
+							founder_species_is_machine = yes
+						}
+					}
+				}
+				if = {
+					limit = {
+						owner = {
+							has_tradition = tr_psionics_shroud_great_awakening
+						}
+					}
+					text = shroud.2780.desc_1_gestalt_machine_trad
+				}
+				else = {
+					text = shroud.2780.desc_1_gestalt_machine
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						owner = {
+							has_tradition = tr_psionics_shroud_great_awakening
+						}
+					}
+					text = shroud.2780.desc_1_trad
+				}
+				else = {
+					text = shroud.2780.desc_1
+				}
+			}
+			text = newline
+			if = {
+				limit = {
+					owner = {
+						OR = {
+							AND = {
+								has_ascension_perk = ap_become_the_crisis
+								OR = {
+									has_crisis_level = crisis_level_4
+									has_crisis_level = crisis_level_5
+								}
+							}
+							is_chosen_empire = yes
+						}
+					}
+				}
+				text = shroud.2780.desc_2_crisis
+			}
+			else = {
+				text = shroud.2780.desc_2
+			}
+			text = newline
+			if = {
+				limit = {
+					owner = {
+						is_chosen_empire = yes
+					}
+				}
+				text = shroud.2780.desc_3_chosen
+			}
+			else = {
+				text = shroud.2780.desc_3
+			}
+		}
+	}
+
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = yes
+			}
+		}
+		picture = GFX_evt_shroud_psionic_hive_mind
+	}
+	picture = {
+		trigger = {
+			owner = {
+				founder_species_is_machine = yes
+			}
+		}
+		picture = GFX_evt_machine_sapience
+	}
+	picture = {
+		trigger = {
+			owner = {
+				is_hive_empire = no
+				founder_species_is_machine = no
+			}
+		}
+		picture = GFX_evt_psionics
+	}
+
+	immediate = {
+		owner = {
+			if = {
+				limit = { has_tradition = tr_psionics_shroud_great_awakening }
+				turn_main_species_to_psionic = yes
+				update_node_portraits_if_gestalt_effect = yes
+				update_every_leader_from_psionic_countries = yes
+				refresh_portraits = character
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						owner = {
+							has_tradition = tr_psionics_shroud_great_awakening
+						}
+					}
+					text = shroud.2780.a_trad
+				}
+				else = {
+					text = shroud.2780.a
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					has_tradition = tr_psionics_shroud_great_awakening
+				}
+			}
+			custom_tooltip = shroud.2780.a_tt_trad
+		}
+		else = {
+			custom_tooltip = shroud.2780.a_tt
+		}
+	}
+}
+
+# Breach the Shroud
+situation_event = {
+	id = shroud.2800
+	title = shroud.2800.name
+	desc = shroud.2800.desc
+	picture = GFX_evt_shroudwalker_enclave
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	situation = this
+
+	immediate = {
+		random_country = {
+			limit = {
+				is_country_type = shroud
+				has_country_flag = animator_of_clay_country_flag
+			}
+			save_event_target_as = the_animator_of_clay
+		}
+	}
+
+	option = {
+		name = shroud.2800.a
+		custom_tooltip = situation_breach_shroud_finish_effects
+		owner = {
+			if = {
+				limit = {
+					is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+				}
+				custom_tooltip = situation_breach_shroud_finish_animator_contact
+				establish_communications = event_target:the_animator_of_clay
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			owner = {
+				if = {
+					limit = {
+						is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+					}
+					set_patron_first_contact_state = { patron = the_animator_of_clay state = completed }
+					country_event = {
+						id = shroud.2810
+					}
+				}
+				else = {
+					breach_shroud = yes
+				}
+				set_country_flag = psionic_traditions_unlocked
+				open_shroud_tab = yes
+			}
+		}
+		destroy_situation = this
+	}
+}
+
+# Shroud Forged breaching the Shroud
+country_event = {
+	id = shroud.2810
+	diplomatic_title = shroud.3.diplo_title
+	title = the_animator_of_clay
+	desc = shroud.2810.desc
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+	show_sound = {
+		trigger = { is_robot_empire = yes }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { is_robot_empire = no }
+		sound = event_psionic
+	}
+
+	option = {
+		name = shroud.2810.a
+		enable_patron_first_contact_project = {
+			name = THE_COMPOSER_OF_STRANDS_CLAY_FC_PROJECT
+			patron = the_composer_of_strands
+			owner = this
+		}
+		random_country = {
+			limit = {
+				is_country_type = shroud
+				has_country_flag = animator_of_clay_country_flag
+			}
+			establish_communications_no_message = root
+		}
+	}
+
+	after = {
+		breach_shroud = yes
+	}
+}
+
+# Endbringers - Chamber of Silence
+situation_event = {
+	id = shroud.2820
+	title = shroud.2820.name
+	picture = GFX_evt_shroud_spacemadness
+	show_sound = event_endbringers_madness
+	is_triggered_only = yes
+
+	desc = {
+		trigger = {
+			text = shroud.2820.desc.1
+			text = newline
+			if = {
+				limit = {
+					owner = {
+						num_buildings = { type = building_chamber_of_silence value < 1 }
+					}
+				}
+				text = shroud.2820.desc.2.no_chamber
+			}
+			else = {
+				text = shroud.2820.desc.2.chamber
+			}
+		}
+	}
+
+	situation = this
+
+	trigger = {
+		exists = owner
+	}
+
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						owner = {
+							num_buildings = { type = building_chamber_of_silence value < 1 }
+						}
+					}
+					text = shroud.2820.a.no_chamber
+				}
+				else = {
+					text = shroud.2820.a.chamber
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					num_buildings = { type = building_chamber_of_silence value < 1 }
+				}
+			}
+			custom_tooltip = shroud.2820.a.tt_no_chamber
+		}
+		else = {
+			custom_tooltip = shroud.2820.a.tt
+		}
+	}
+}
+
+# The Great Awakening
+situation_event = {
+	id = shroud.2830
+	title = shroud.2830.name
+	picture = GFX_evt_psionics
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	situation = this
+
+	desc = {
+		trigger = {
+			text = shroud.2830.desc
+			text = newline
+			if = {
+				limit = {
+					owner = {
+						has_tradition = tr_psionics_shroud_great_awakening
+					}
+				}
+				text = shroud.2830.desc.outro.awakening
+			}
+			else = {
+				text = shroud.2830.desc.outro.no_awakening
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			if = {
+				limit = { has_tradition = tr_psionics_shroud_great_awakening }
+				turn_main_species_to_psionic = yes
+				update_node_portraits_if_gestalt_effect = yes
+				update_every_leader_from_psionic_countries = yes
+				refresh_portraits = character
+			}
+		}
+	}
+
+	option = {
+		name = {
+			trigger = {
+				if = {
+					limit = {
+						owner = {
+							has_tradition = tr_psionics_shroud_great_awakening
+						}
+					}
+					text = shroud.2830.a.awakening
+				}
+				else = {
+					text = shroud.2830.a.no_awakening
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					has_tradition = tr_psionics_shroud_great_awakening
+				}
+			}
+			custom_tooltip = shroud.2830.a.tt
+		}
+		else = {
+			custom_tooltip = shroud.2830.a.tt_no_awakening
+		}
+	}
+}
+
+# Endbringers - Breach the Shroud
+situation_event = {
+	id = shroud.2840
+	title = shroud.2840.name
+	desc = shroud.2840.desc
+	picture = GFX_evt_shroudwalker_enclave
+	show_sound = {
+		trigger = { owner = { is_robot_empire = yes } }
+		sound = event_psionic_robot
+	}
+	show_sound = {
+		trigger = { owner = { is_robot_empire = no } }
+		sound = event_psionic
+	}
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	situation = this
+
+	option = {
+		name = shroud.2840.a
+		custom_tooltip = situation_breach_shroud_finish_effects
+	}
+
+	after = {
+		hidden_effect = {
+			owner = {
+				enable_patron_first_contact_project = {
+					name = ENDBRINGERS_COMMUNE_WITH_THE_VOICE
+					patron = end_of_the_cycle
+					owner = this
+				}
+				set_country_flag = psionic_traditions_unlocked
+				breach_shroud = yes
+				open_shroud_tab = yes
+			}
+		}
+		destroy_situation = this
+	}
+}

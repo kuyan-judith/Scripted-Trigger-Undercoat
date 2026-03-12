@@ -30,7 +30,7 @@ add_random_trait_evopred = {
 			species = species
 			add_random_species_trait = {
 				trait_has_all_tags = { $TAG$ organic positive }
-				NOT = { trait_has_any_tag = { special cybernetic psionic presapient drawbacks } }
+				NOT = { trait_has_any_tag = { special cybernetic presapient drawbacks } }
 				OR = {
 					NOT = { trait_has_any_tag = { genetic_ascension } }
 					root = {
@@ -82,7 +82,7 @@ add_random_trait_evopred = {
 			species = species
 			add_random_species_trait = {
 				trait_has_all_tags = { $TAG$ organic positive }
-				NOT = { trait_has_any_tag = { special species cybernetic psionic presapient drawbacks } }
+				NOT = { trait_has_any_tag = { special species cybernetic presapient drawbacks } }
 				OR = {
 					NOT = { trait_has_any_tag = { genetic_ascension } }
 					root = {
@@ -121,12 +121,15 @@ add_random_trait_evopred = {
 #Expected Scope: Country
 #Expected Values: AMOUNT & TYPE
 give_evolutionary_predator_situation_progress_and_dna = {
-	random_situation = {
-		limit = {
-			is_situation_type = evolutionary_predators_situation
+	hidden_effect = {
+		random_situation = {
+			limit = {
+				is_situation_type = evolutionary_predators_situation
+			}
+			add_situation_progress = value:evopred_$AMOUNT$_progress
 		}
-		add_situation_progress = @evopred_$AMOUNT$_progress
 	}
+	custom_tooltip = evopred_$AMOUNT$_progress
 	#If the TYPE is set this will set a country flag, if it's not set it will do nothing
 	[[TYPE]
 		set_country_flag = consumed_$TYPE$_dna
@@ -147,6 +150,8 @@ set_evopred_flags = {
 	set_evopred_flag_check = { TYPE = necroid TYPE_ABR = NECROID }
 	set_evopred_flag_check = { TYPE = aquatic TYPE_ABR = AQUATIC }
 	set_evopred_flag_check = { TYPE = toxoid TYPE_ABR = TOX }
+	set_evopred_flag_check = { TYPE = psionic }
+	set_evopred_flag_check = { TYPE = infernal TYPE_ABR = INF }
 }
 
 set_evopred_flag_check = {
@@ -155,10 +160,22 @@ set_evopred_flag_check = {
 			OR = {
 				any_owned_leader = {
 					is_councilor = yes
-					species = { is_species_class = $TYPE_ABR$ }
+					species = {
+						[[TYPE_ABR]
+							is_species_class = $TYPE_ABR$
+						]
+						[[!TYPE_ABR] # Adapt trigger if more non-species based triggers are added
+							is_psionic_portrait = yes
+						]
+					}
 				}
 				any_owned_pop_group = {
-					is_species_class = $TYPE_ABR$
+					[[TYPE_ABR]
+						is_species_class = $TYPE_ABR$
+					]
+					[[!TYPE_ABR]
+						is_psionic_portrait = yes
+					]
 				}
 				any_subject = {
 					any_agreement = {
@@ -167,13 +184,27 @@ set_evopred_flag_check = {
 							value = subject_gives_evopred_dna
 						}
 					}
-					species = { is_species_class = $TYPE_ABR$ }
+					species = {
+						[[TYPE_ABR]
+							is_species_class = $TYPE_ABR$
+						]
+						[[!TYPE_ABR]
+							is_psionic_portrait = yes
+						]
+					}
 				}
 				AND = {
 					is_megacorp = yes
 					any_relation = {
 						has_commercial_pact = root
-						species = { is_species_class = $TYPE_ABR$ }
+						species = {
+							[[TYPE_ABR]
+								is_species_class = $TYPE_ABR$
+							]
+							[[!TYPE_ABR]
+								is_psionic_portrait = yes
+							]
+						}
 					}
 				}
 			}
@@ -469,6 +500,40 @@ generate_evolutionary_predator_choices = {
 		}
 		0 = {
 			modifier = {
+				add = 30
+				has_country_flag = consumed_infernal_dna
+				NOT = { has_country_flag = infernal_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = infernal
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = infernal_evopred
+		}
+		0 = {
+			modifier = {
+				add = 30
+				has_country_flag = consumed_psionic_dna
+				NOT = { has_country_flag = psionic_evopred }
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					any_available_random_trait_by_tag_evopred = {
+						TAG = psionic
+						SPECIES = yes
+					}
+				}
+			}
+			set_country_flag = psionic_evopred
+		}
+		0 = {
+			modifier = {
 				add = 60
 				has_country_flag = consumed_plasmic_dna
 				NOR = {
@@ -662,6 +727,13 @@ apex_predator_switch = {
 			$COUNTRY$ = {
 				set_apex_predator_flag = {
 					SPECIES = toxoid
+				}
+			}
+		}
+		INF = {
+			$COUNTRY$ = {
+				set_apex_predator_flag = {
+					SPECIES = infernal
 				}
 			}
 		}
@@ -1419,6 +1491,7 @@ give_backup_clones_effect = {
 				is_robotic_species = yes
 				has_trait = leader_trait_ruler_hive_mind
 				has_trait = leader_trait_has_backup_clone
+				has_leader_flag = paragon_origin_legendary_leader
 			}
 		}
 		give_trait_no_notify_ignore_autocracy_restriction = {
@@ -1444,7 +1517,10 @@ give_backup_clones_effect = {
 				}
 			}
 			25 = {
-				add_trait_no_notify = leader_trait_has_backup_clone
+				add_trait = {
+					trait = leader_trait_has_backup_clone
+					show_message = no
+				}
 			}
 		}
 	}
@@ -2193,6 +2269,7 @@ activate_behemoth_superweapon = {
 		limit = {
 			is_city_world = yes # undercoat: moved to scripted trigger
 		}
+		change_pc = pc_relic
 		relic_world_deposits = yes
 		validate_planet_buildings_and_districts = yes
 	}
@@ -2641,6 +2718,12 @@ global_biomass_spender = { #Called in the owner scope if you want to spend bioma
 		}
 		while = {
 			count = global_spent_biomass
+			limit = {
+				check_variable = {
+					which = global_spent_biomass
+					value > 0
+				}
+			}
 			if = { #At the start oi the loop we check if there is any one group big enough to end this now
 				limit = {
 					any_owned_pop_group = {
@@ -2694,15 +2777,6 @@ global_biomass_spender = { #Called in the owner scope if you want to spend bioma
 					}
 				}
 			}
-			if = {
-				limit = {
-					check_variable = {
-						which = global_spent_biomass
-						value <= 0
-					}
-				}
-				break = yes
-			}
 		}
 	}
 }
@@ -2718,7 +2792,7 @@ unqueue_biomass_effect = { #Used on the planet scope
 						AND = {
 							has_country_flag = has_bloomed_pops
 							prev = {
-								is_gaia_world = no # undercoat - moved to scripted trigger
+								is_gaia_world = no # undercoat: moved to scripted trigger
 							}
 						}
 					}

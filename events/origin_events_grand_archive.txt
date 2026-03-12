@@ -513,7 +513,7 @@ ship_event = {
 		owner = { is_primal_calling_empire = yes } # undercoat: moved to scripted trigger
 		from = {
 			OR = {
-				is_starting_planet_type = yes # undercoat: moved to scripted trigger
+				is_standard_starting_planet_type_stu = yes # undercoat: moved to scripted trigger
 				
 				
 				
@@ -922,11 +922,26 @@ country_event = {
 			CATCH_PHRASE = primal_hunter_catchphrase
 		}
 		event_target:primal_leader = {
-			add_trait = subclass_commander_admiral
-			add_trait = leader_trait_trophy_hunter
-			add_trait = leader_trait_void_hunter
-			add_trait = leader_trait_cautious
-			add_trait = leader_trait_scout
+			add_trait = {
+				trait = subclass_commander_admiral
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_trophy_hunter
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_void_hunter
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_cautious
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_scout
+				consume_selection = yes
+			}
 			set_age = 39
 		}
 	}
@@ -1040,11 +1055,26 @@ country_event = {
 			CATCH_PHRASE = primal_rancher_catchphrase
 		}
 		event_target:primal_leader = {
-			add_trait = subclass_scientist_explorer
-			add_trait = leader_trait_gifted_trapper
-			add_trait = leader_trait_emotional_support_pet
-			add_trait = leader_trait_void_tracker
-			add_trait = leader_trait_slippery
+			add_trait = {
+				trait = subclass_scientist_explorer
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_gifted_trapper
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_emotional_support_pet
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_void_tracker
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_slippery
+				consume_selection = yes
+			}
 			set_age = 39
 		}
 	}
@@ -1905,8 +1935,8 @@ ship_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		owner = {
-			is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		exists = controller
+		controller = {
 			check_variable_arithmetic = {
 				which = value:deposit_increase_on_survey_chance
 				value > 0
@@ -1916,7 +1946,6 @@ ship_event = {
 
 	immediate = {
 		# We wait a day in order to check if any anomalies or dig sites have spawned.
-		# Treasure Hoarder Council position effect
 		ship_event = {
 			id = grand_archive.2241
 			scopes = { from = from }
@@ -1925,17 +1954,15 @@ ship_event = {
 	}
 }
 
-# Treasure Hoarder Council position effect
 ship_event = {
 	id = grand_archive.2241
 	hide_window = yes
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			NOT = {
-				has_planet_flag = hoarded_by@root.owner
-			}
+		exists = controller
+		from = {
+			NOT = { has_planet_flag = scavenged_by@root.controller }
 			OR = {
 				has_deposit_for = shipclass_mining_station
 				has_deposit_for = shipclass_research_station
@@ -1944,9 +1971,7 @@ ship_event = {
 	}
 
 	immediate = {
-		FROM = {
-			set_planet_flag = hoarded_by@root.owner
-		}
+		from = { set_planet_flag = scavenged_by@root.controller }
 		scientist_prospector_effect = { CHANCE = value:deposit_increase_on_survey_chance }
 	}
 }
@@ -2673,6 +2698,42 @@ country_event = {
 	}
 }
 
+# Unprotect black needle planet when country integrated
+country_event = {
+	id = grand_archive.8065
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = {
+			country_event = { id = grand_archive.8067 }
+		}
+	}
+}
+
+# Unprotect black needle planet when country destroyed
+country_event = {
+	id = grand_archive.8067
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_treasure_hunter_empire = yes # undercoat: moved to scripted trigger
+		exists = event_target:black_needle_base_system_for@this
+	}
+
+	immediate = {
+		event_target:black_needle_base_system_for@this = {
+			every_system_planet = {
+				limit = {
+					has_planet_flag = planet_defended_forbid_colonization
+				}
+				remove_planet_flag = planet_defended_forbid_colonization
+			}
+		}
+	}
+}
+
 # Ytterite Specimen handling
 country_event = {
 	id = grand_archive.8070
@@ -3237,7 +3298,7 @@ ship_event = {
 			}
 		}
 		hidden_effect = {
-			fromfrom = {
+			fromfromfrom = {
 				remove_planet_flag = planet_defended_forbid_colonization
 			}
 			ship_event = {
@@ -3254,39 +3315,38 @@ ship_event = {
 	title = grand_archive.8115.name
 	desc = {
 		trigger = {
-			leader = {
-				NOR = {
-					has_trait_tier1or2 = { TRAIT = leader_trait_slippery }
-					has_trait_tier1or2 = { TRAIT = trait_ruler_charismatic }
-					has_trait = leader_trait_psionic
+			text = grand_archive.8115.desc.1
+			if = {
+				limit = { leader = { has_psionic_leader_trait = yes } }
+				text = newline
+				if = {
+					limit = {
+						owner = {
+							OR = {
+								is_mechanical_species = yes
+								is_gestalt = yes
+							}
+						}
+					}
+					text = grand_archive.8115.desc.psionic_machine
+				}
+				else = {
+					text = grand_archive.8115.desc.psionic_organic
 				}
 			}
-		}
-		text = grand_archive.8115.desc.default
-	}
-	desc = {
-		trigger = {
-			leader = {
-				has_trait_tier1or2 = { TRAIT = leader_trait_slippery }
+			else_if = {
+				limit = { leader = { has_trait_tier1or2 = { TRAIT = trait_ruler_charismatic } } }
+				text = newline
+				text = grand_archive.8115.desc.charismatic
 			}
-		}
-		text = grand_archive.8115.desc.slippery
-	}
-	desc = {
-		trigger = {
-			leader = {
-				has_trait_tier1or2 = { TRAIT = trait_ruler_charismatic }
+			else_if = {
+				limit = { leader = { has_trait_tier1or2 = { TRAIT = leader_trait_slippery } } }
+				text = newline
+				text = grand_archive.8115.desc.slippery
 			}
+			text = newline
+			text = grand_archive.8115.desc.2
 		}
-		text = grand_archive.8115.desc.charismatic
-	}
-	desc = {
-		trigger = {
-			leader = {
-				has_trait = leader_trait_psionic
-			}
-		}
-		text = grand_archive.8115.desc.psionic
 	}
 	picture = GFX_evt_intelligence_report
 	show_sound = event_espionage_concluded
@@ -3375,11 +3435,11 @@ ship_event = {
 	picture = GFX_evt_black_needle_base
 	show_sound = ga_event_black_needle_muted
 
-	location = fromfromfrom
+	location = FromFromFromFrom
 	is_triggered_only = yes
 
 	immediate = {
-		fromfromfrom = {
+		FromFromFromFrom = {
 			remove_deposit = d_black_needle_base
 			add_deposit = d_abandoned_black_needle_base
 		}
@@ -3392,7 +3452,7 @@ ship_event = {
 		name = grand_archive.8125.a
 		custom_tooltip = grand_archive.8125.a.custom_tooltip
 		hidden_effect = {
-			fromfromfrom = {
+			FromFromFromFrom = {
 				remove_planet_flag = planet_defended_forbid_colonization
 			}
 		}
@@ -5705,7 +5765,7 @@ country_event = {
 					}
 					NOR = {
 						has_leader_flag = leader_death_events_blocked
-						has_leader_flag = legendary_leader
+						is_leader_tier = leader_tier_legendary
 					}
 				}
 			}
@@ -5727,7 +5787,7 @@ country_event = {
 					}
 					NOR = {
 						has_leader_flag = leader_death_events_blocked
-						has_leader_flag = legendary_leader
+						is_leader_tier = leader_tier_legendary
 					}
 				}
 				save_event_target_as = traitor_leader
@@ -6018,21 +6078,27 @@ country_event = {
 									factor = 0
 									has_trait = leader_trait_fallible_2
 								}
-								add_trait = leader_trait_fallible_2
+								add_trait = {
+									trait = leader_trait_fallible_2
+								}
 							}
 							1 = {
 								modifier = {
 									factor = 0
 									has_trait = leader_trait_destructive_2
 								}
-								add_trait = leader_trait_destructive_2
+								add_trait = {
+									trait = leader_trait_destructive_2
+								}
 							}
 							1 = {
 								modifier = {
 									factor = 0
 									has_trait = leader_trait_melancholic_2
 								}
-								add_trait = leader_trait_melancholic_2
+								add_trait = {
+									trait = leader_trait_melancholic_2
+								}
 							}
 							1 = {
 								modifier = {
@@ -6043,7 +6109,9 @@ country_event = {
 										has_trait = leader_trait_resilient
 									}
 								}
-								add_trait = leader_trait_substance_abuser_2
+								add_trait = {
+									trait = leader_trait_substance_abuser_2
+								}
 							}
 						}
 					}
@@ -6056,21 +6124,27 @@ country_event = {
 										factor = 0
 										has_trait_tier1or2 = { TRAIT = leader_trait_fallible }
 									}
-									add_trait = leader_trait_fallible
+									add_trait = {
+										trait = leader_trait_fallible
+									}
 								}
 								1 = {
 									modifier = {
 										factor = 0
 										has_trait_tier1or2 = { TRAIT = leader_trait_destructive }
 									}
-									add_trait = leader_trait_destructive
+									add_trait = {
+										trait = leader_trait_destructive
+									}
 								}
 								1 = {
 									modifier = {
 										factor = 0
 										has_trait_tier1or2 = { TRAIT = leader_trait_melancholic }
 									}
-									add_trait = leader_trait_melancholic
+									add_trait = {
+										trait = leader_trait_melancholic
+									}
 								}
 								1 = {
 									modifier = {
@@ -6081,7 +6155,9 @@ country_event = {
 											has_trait = leader_trait_resilient
 										}
 									}
-									add_trait = leader_trait_substance_abuser
+									add_trait = {
+										trait = leader_trait_substance_abuser
+									}
 								}
 							}
 						}
@@ -6173,21 +6249,27 @@ country_event = {
 							factor = 0
 							has_trait_tier1or2 = { TRAIT = leader_trait_fallible }
 						}
-						add_trait = leader_trait_fallible
+						add_trait = {
+							trait = leader_trait_fallible
+						}
 					}
 					1 = {
 						modifier = {
 							factor = 0
 							has_trait_tier1or2 = { TRAIT = leader_trait_destructive }
 						}
-						add_trait = leader_trait_destructive
+						add_trait = {
+							trait = leader_trait_destructive
+						}
 					}
 					1 = {
 						modifier = {
 							factor = 0
 							has_trait_tier1or2 = { TRAIT = leader_trait_melancholic }
 						}
-						add_trait = leader_trait_melancholic
+						add_trait = {
+							trait = leader_trait_melancholic
+						}
 					}
 					1 = {
 						modifier = {
@@ -6197,7 +6279,9 @@ country_event = {
 								has_trait = leader_trait_resilient
 							}
 						}
-						add_trait = leader_trait_substance_abuser
+						add_trait = {
+							trait = leader_trait_substance_abuser
+						}
 					}
 				}
 			}
@@ -6947,10 +7031,10 @@ country_event = {
 			clone_leader = {
 				target = event_target:captain_ness_leader
 				skip_background_generation = yes
+				tier = leader_tier_legendary
 				effect = {
 					set_gender = female
 					change_background_job = captain
-					set_leader_flag = legendary_leader
 					set_leader_flag = immune_to_negative_traits
 					set_leader_flag = leader_death_events_blocked
 					fire_on_action = {

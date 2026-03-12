@@ -394,6 +394,7 @@ ethic_leader_creator = {
 		}
 		create_leader = {
 			class = $CLASS$
+			tier = $TIER$
 			species = event_target:leader_species
 			name = $NAME$
 			skill = $LEVEL$
@@ -410,7 +411,6 @@ ethic_leader_creator = {
 			effect = {
 				set_skill = $LEVEL$
 				save_event_target_as = ethic_leader
-				set_leader_flag = renowned_leader
 				set_leader_flag = is_in_recruit_window
 				set_variable = { which = leader_pending_negative_traits_unmodified value = 1 }
 			}
@@ -426,7 +426,7 @@ ethic_leader_creator = {
 }
 
 ethic_leader_hire_effect = {
-	random_owned_planet = {
+	if = {
 		limit = {
 			is_variable_set = paragon_memory_vault
 		}
@@ -442,11 +442,11 @@ ethic_leader_hire_effect = {
 	clone_leader = {
 		target = event_target:ethic_leader
 		skip_background_generation = yes
+		tier = leader_tier_renowned
 	}
 	last_created_leader = {
 		save_global_event_target_as = $GLOBAL_EVENT_TARGET$
 		set_leader_flag = $GLOBAL_EVENT_TARGET$
-		set_leader_flag = renowned_leader
 	}
 
 	remove_country_flag = spawning_renowned_leader
@@ -491,22 +491,9 @@ ethic_leader_kill_effect = {
 }
 
 hire_event_leader_effect = {
-
-	event_target:$LEADER$ = {
-		set_owner = root
-	}
-
-	if = {
-		limit = {
-			has_astral_planes_dlc = yes
-			has_relic = r_eternal_throne
-			event_target:$LEADER$ = {
-				is_immortal = no
-			}
-		}
-		event_target:$LEADER$ = {
-			set_immortal = yes
-		}
+	clone_leader = {
+		target = event_target:$LEADER$
+		skip_background_generation = yes
 	}
 
 	hire_event_leader_message = {
@@ -566,7 +553,11 @@ country_create_gestalt_councilor = {
 			}
 			assign_node_subclass_traits = yes
 		}
-		add_trait_no_notify = random_common
+		add_trait = {
+			trait = random_common
+			consume_selection = yes
+			show_message = no
+		}
 		add_skill_without_trait_selection = owner.modifier:leader_initial_skill
 		switch = {
 			trigger = leader_class
@@ -587,16 +578,28 @@ assign_node_subclass_traits = {
 	switch = {
 		trigger = is_councilor_type
 		councilor_gestalt_legion = {
-			add_trait_no_notify = subclass_commander_councilor
+			add_trait = {
+				trait = subclass_commander_councilor
+				show_message = no
+			}
 		}
 		councilor_gestalt_cognitive = {
-			add_trait_no_notify = subclass_scientist_councilor
+			add_trait = {
+				trait = subclass_scientist_councilor
+				show_message = no
+			}
 		}
 		councilor_gestalt_regulatory = {
-			add_trait_no_notify = subclass_official_diplomacy_councilor
+			add_trait = {
+				trait = subclass_official_diplomacy_councilor
+				show_message = no
+			}
 		}
 		councilor_gestalt_growth = {
-			add_trait_no_notify = subclass_official_economy_councilor
+			add_trait = {
+				trait = subclass_official_economy_councilor
+				show_message = no
+			}
 		}
 	}
 }
@@ -605,13 +608,22 @@ assign_gestalt_ruler_subclass_trait = {
 	switch = {
 		trigger = leader_class
 		commander = {
-			add_trait_no_notify = subclass_commander_councilor
+			add_trait = {
+				trait = subclass_commander_councilor
+				show_message = no
+			}
 		}
 		scientist = {
-			add_trait_no_notify = subclass_scientist_councilor
+			add_trait = {
+				trait = subclass_scientist_councilor
+				show_message = no
+			}
 		}
 		official = {
-			add_trait_no_notify = subclass_official_economy_councilor
+			add_trait = {
+				trait = subclass_official_economy_councilor
+				show_message = no
+			}
 		}
 	}
 }
@@ -717,7 +729,10 @@ restore_gestalt_councilor_effect = {
 					COUNCIL_POS = $COUNCIL_POS$
 				}
 				last_created_leader = {
-					add_trait_no_notify = random_common
+					add_trait = {
+						trait = random_common
+						show_message = no
+					}
 					add_skill_without_trait_selection = value:restored_node_additional_skills
 					if = {
 						limit = {
@@ -1459,7 +1474,11 @@ paragon_origin_bad_trait_giver = {
 					is_pacifist = yes
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_warmonger }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_warmonger
+				}
+			}
 		}
 		1 = {
 			modifier = {
@@ -1473,7 +1492,11 @@ paragon_origin_bad_trait_giver = {
 					is_materialist = yes
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_dreamlike }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_dreamlike
+				}
+			}
 		}
 		1 = {
 			modifier = {
@@ -1487,7 +1510,11 @@ paragon_origin_bad_trait_giver = {
 					is_egalitarian = yes #Impossible to get, but to keep the structure
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_harsh_ruler }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_harsh_ruler
+				}
+			}
 		}
 		1 = {
 			modifier = {
@@ -1501,7 +1528,11 @@ paragon_origin_bad_trait_giver = {
 					ruler = { has_trait = leader_trait_legendary_too_open }
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_too_open }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_too_open
+				}
+			}
 		}
 		1 = {
 			modifier = {
@@ -1515,7 +1546,11 @@ paragon_origin_bad_trait_giver = {
 					ruler = { has_trait = leader_trait_legendary_hoplofobia }
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_hoplofobia }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_hoplofobia
+				}
+			}
 		}
 		1 = {
 			modifier = {
@@ -1529,7 +1564,11 @@ paragon_origin_bad_trait_giver = {
 					ruler = { has_trait = leader_trait_legendary_bad_meritocracy }
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_bad_meritocracy }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_bad_meritocracy
+				}
+			}
 		}
 		1 = {
 			modifier = {
@@ -1543,7 +1582,11 @@ paragon_origin_bad_trait_giver = {
 					ruler = { has_trait = leader_trait_legendary_unfriendly }
 				}
 			}
-			ruler = { add_trait = leader_trait_legendary_unfriendly }
+			ruler = {
+				add_trait = {
+					trait = leader_trait_legendary_unfriendly
+				}
+			}
 		}
 	}
 }
@@ -1805,7 +1848,9 @@ paragon_origin_gain_delusion = { #Use on leader scope
 		}
 	}
 	else = {
-		add_trait = leader_trait_legendary_delusional
+		add_trait = {
+			trait = leader_trait_legendary_delusional
+		}
 	}
 }
 
@@ -2134,7 +2179,9 @@ paragon_origin_trait_giver_authoritarian = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_commanding_presence } }
 				}
 			}
-			add_trait = leader_trait_legendary_commanding_presence
+			add_trait = {
+				trait = leader_trait_legendary_commanding_presence
+			}
 		}
 		0 = {
 			modifier = {
@@ -2144,7 +2191,9 @@ paragon_origin_trait_giver_authoritarian = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_high_king } }
 				}
 			}
-			add_trait = leader_trait_legendary_high_king
+			add_trait = {
+				trait = leader_trait_legendary_high_king
+			}
 		}
 	}
 }
@@ -2158,7 +2207,9 @@ paragon_origin_trait_giver_xenophile = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_scientific_diplomacy } }
 				}
 			}
-			add_trait = leader_trait_legendary_scientific_diplomacy
+			add_trait = {
+				trait = leader_trait_legendary_scientific_diplomacy
+			}
 		}
 		0 = {
 			modifier = {
@@ -2168,7 +2219,9 @@ paragon_origin_trait_giver_xenophile = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_gunboat_diplomacy } }
 				}
 			}
-			add_trait = leader_trait_legendary_gunboat_diplomacy
+			add_trait = {
+				trait = leader_trait_legendary_gunboat_diplomacy
+			}
 		}
 	}
 }
@@ -2182,7 +2235,9 @@ paragon_origin_trait_giver_xenophobe = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_genetic_purist } }
 				}
 			}
-			add_trait = leader_trait_legendary_genetic_purist
+			add_trait = {
+				trait = leader_trait_legendary_genetic_purist
+			}
 		}
 		0 = {
 			modifier = {
@@ -2192,7 +2247,9 @@ paragon_origin_trait_giver_xenophobe = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_evervigilant } }
 				}
 			}
-			add_trait = leader_trait_legendary_evervigilant
+			add_trait = {
+				trait = leader_trait_legendary_evervigilant
+			}
 		}
 	}
 }
@@ -2206,7 +2263,9 @@ paragon_origin_trait_giver_militarist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_military_knowledge } }
 				}
 			}
-			add_trait = leader_trait_legendary_military_knowledge
+			add_trait = {
+				trait = leader_trait_legendary_military_knowledge
+			}
 		}
 		0 = {
 			modifier = {
@@ -2216,7 +2275,9 @@ paragon_origin_trait_giver_militarist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_foe_hammer } }
 				}
 			}
-			add_trait = leader_trait_legendary_foe_hammer
+			add_trait = {
+				trait = leader_trait_legendary_foe_hammer
+			}
 		}
 	}
 }
@@ -2230,7 +2291,9 @@ paragon_origin_trait_giver_pacifist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_natural_ruler } }
 				}
 			}
-			add_trait = leader_trait_legendary_natural_ruler
+			add_trait = {
+				trait = leader_trait_legendary_natural_ruler
+			}
 		}
 		0 = {
 			modifier = {
@@ -2240,7 +2303,9 @@ paragon_origin_trait_giver_pacifist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_autarky } }
 				}
 			}
-			add_trait = leader_trait_legendary_autarky
+			add_trait = {
+				trait = leader_trait_legendary_autarky
+			}
 		}
 	}
 }
@@ -2254,7 +2319,9 @@ paragon_origin_trait_giver_spiritualist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_pious_ascet } }
 				}
 			}
-			add_trait = leader_trait_legendary_pious_ascet
+			add_trait = {
+				trait = leader_trait_legendary_pious_ascet
+			}
 		}
 		0 = {
 			modifier = {
@@ -2264,7 +2331,9 @@ paragon_origin_trait_giver_spiritualist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_teacher } }
 				}
 			}
-			add_trait = leader_trait_legendary_great_teacher
+			add_trait = {
+				trait = leader_trait_legendary_great_teacher
+			}
 		}
 	}
 }
@@ -2278,7 +2347,9 @@ paragon_origin_trait_giver_materialist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_industry_titan } }
 				}
 			}
-			add_trait = leader_trait_legendary_industry_titan
+			add_trait = {
+				trait = leader_trait_legendary_industry_titan
+			}
 		}
 		0 = {
 			modifier = {
@@ -2288,7 +2359,9 @@ paragon_origin_trait_giver_materialist = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_inventor } }
 				}
 			}
-			add_trait = leader_trait_legendary_great_inventor
+			add_trait = {
+				trait = leader_trait_legendary_great_inventor
+			}
 		}
 	}
 }
@@ -2304,7 +2377,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_commanding_presence } }
 				}
 			}
-			add_trait = leader_trait_legendary_commanding_presence
+			add_trait = {
+				trait = leader_trait_legendary_commanding_presence
+			}
 		}
 		0 = {
 			modifier = {
@@ -2314,7 +2389,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_genetic_purist } }
 				}
 			}
-			add_trait = leader_trait_legendary_genetic_purist
+			add_trait = {
+				trait = leader_trait_legendary_genetic_purist
+			}
 		}
 		0 = {
 			modifier = {
@@ -2324,7 +2401,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_scientific_diplomacy } }
 				}
 			}
-			add_trait = leader_trait_legendary_scientific_diplomacy
+			add_trait = {
+				trait = leader_trait_legendary_scientific_diplomacy
+			}
 		}
 		0 = {
 			modifier = {
@@ -2334,7 +2413,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_natural_ruler } }
 				}
 			}
-			add_trait = leader_trait_legendary_natural_ruler
+			add_trait = {
+				trait = leader_trait_legendary_natural_ruler
+			}
 		}
 		0 = {
 			modifier = {
@@ -2344,7 +2425,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_military_knowledge } }
 				}
 			}
-			add_trait = leader_trait_legendary_military_knowledge
+			add_trait = {
+				trait = leader_trait_legendary_military_knowledge
+			}
 		}
 		0 = {
 			modifier = {
@@ -2354,7 +2437,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_pious_ascet } }
 				}
 			}
-			add_trait = leader_trait_legendary_pious_ascet
+			add_trait = {
+				trait = leader_trait_legendary_pious_ascet
+			}
 		}
 		0 = {
 			modifier = {
@@ -2364,7 +2449,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_industry_titan } }
 				}
 			}
-			add_trait = leader_trait_legendary_industry_titan
+			add_trait = {
+				trait = leader_trait_legendary_industry_titan
+			}
 		}
 		0 = {
 			modifier = {
@@ -2374,7 +2461,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_high_king } }
 				}
 			}
-			add_trait = leader_trait_legendary_high_king
+			add_trait = {
+				trait = leader_trait_legendary_high_king
+			}
 		}
 		0 = {
 			modifier = {
@@ -2384,7 +2473,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_evervigilant } }
 				}
 			}
-			add_trait = leader_trait_legendary_evervigilant
+			add_trait = {
+				trait = leader_trait_legendary_evervigilant
+			}
 		}
 		0 = {
 			modifier = {
@@ -2394,7 +2485,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_gunboat_diplomacy } }
 				}
 			}
-			add_trait = leader_trait_legendary_gunboat_diplomacy
+			add_trait = {
+				trait = leader_trait_legendary_gunboat_diplomacy
+			}
 		}
 		0 = {
 			modifier = {
@@ -2404,7 +2497,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_autarky } }
 				}
 			}
-			add_trait = leader_trait_legendary_autarky
+			add_trait = {
+				trait = leader_trait_legendary_autarky
+			}
 		}
 		0 = {
 			modifier = {
@@ -2414,7 +2509,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_foe_hammer } }
 				}
 			}
-			add_trait = leader_trait_legendary_foe_hammer
+			add_trait = {
+				trait = leader_trait_legendary_foe_hammer
+			}
 		}
 		0 = {
 			modifier = {
@@ -2424,7 +2521,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_teacher } }
 				}
 			}
-			add_trait = leader_trait_legendary_great_teacher
+			add_trait = {
+				trait = leader_trait_legendary_great_teacher
+			}
 		}
 		0 = {
 			modifier = {
@@ -2434,7 +2533,9 @@ paragon_origin_legendary_leader_trait_giver = {
 					NOT = { has_trait_tier1or2or3 = { TRAIT = leader_trait_legendary_great_inventor } }
 				}
 			}
-			add_trait = leader_trait_legendary_great_inventor
+			add_trait = {
+				trait = leader_trait_legendary_great_inventor
+			}
 		}
 	}
 }
@@ -2482,17 +2583,72 @@ create_random_species = {
 
 add_random_expertise_trait_effect = {
 	random_list = {
-		10 = { add_trait_no_notify = leader_trait_expertise_materials }
-		10 = { add_trait_no_notify = leader_trait_expertise_propulsion }
-		10 = { add_trait_no_notify = leader_trait_expertise_voidcraft }
-		10 = { add_trait_no_notify = leader_trait_expertise_industry }
-		10 = { add_trait_no_notify = leader_trait_expertise_field_manipulation }
-		10 = { add_trait_no_notify = leader_trait_expertise_particles }
-		10 = { add_trait_no_notify = leader_trait_expertise_computing }
-		10 = { add_trait_no_notify = leader_trait_expertise_new_worlds }
-		10 = { add_trait_no_notify = leader_trait_expertise_statecraft }
-		10 = { add_trait_no_notify = leader_trait_expertise_biology }
-		10 = { add_trait_no_notify = leader_trait_expertise_military_theory }
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_materials
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_propulsion
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_voidcraft
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_industry
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_field_manipulation
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_particles
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_computing
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_new_worlds
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_statecraft
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_biology
+				show_message = no
+			}
+		}
+		10 = {
+			add_trait = {
+				trait = leader_trait_expertise_military_theory
+				show_message = no
+			}
+		}
 		1 = {
 			modifier = {
 				add = 4
@@ -2511,7 +2667,10 @@ add_random_expertise_trait_effect = {
 					}
 				}
 			}
-			add_trait_no_notify = leader_trait_expertise_archaeostudies
+			add_trait = {
+				trait = leader_trait_expertise_archaeostudies
+				show_message = no
+			}
 		}
 		1 = {
 			modifier = {
@@ -2523,7 +2682,10 @@ add_random_expertise_trait_effect = {
 					}
 				}
 			}
-			add_trait_no_notify = leader_trait_expertise_psionics
+			add_trait = {
+				trait = leader_trait_expertise_psionics
+				show_message = no
+			}
 		}
 	}
 }
@@ -2538,13 +2700,17 @@ add_expertise_trait_effect = {
 				}
 			}
 		}
-		add_trait = $TRAIT$
+		add_trait = {
+			trait = $TRAIT$
+		}
 	}
 	else_if = {
 		limit = {
 			has_trait = $TRAIT$
 		}
-		add_trait = $TRAIT$_2
+		add_trait = {
+			trait = $TRAIT$_2
+		}
 	}
 	else = {
 		add_experience = 200
@@ -2560,16 +2726,22 @@ add_or_level_up_veteran_trait_effect = {
 				}
 			}
 		}
-		add_trait = $TRAIT$
+		add_trait = {
+			trait = $TRAIT$
+		}
 	}
 	else_if = {
 		limit = {
 			has_trait = $TRAIT$
 		}
-		add_trait = $TRAIT$_2
+		add_trait = {
+			trait = $TRAIT$_2
+		}
 	}
 	else = {
-		add_trait = $TRAIT$_3
+		add_trait = {
+			trait = $TRAIT$_3
+		}
 	}
 }
 
@@ -2713,16 +2885,13 @@ set_starting_governor_effect = {
 							class = $GOVERNOR$
 							name = random
 							species = owner_main_species
+							randomize_traits = no
+							traits = {
+								1 = random_common
+							}
 						}
 						last_created_leader = {
 							save_event_target_as = governor_leader
-							if = {
-								limit = {
-									has_base_skill > 1
-									num_traits = 0
-								}
-								add_trait_no_notify = random_common
-							}
 						}
 					}
 
@@ -2735,7 +2904,10 @@ set_starting_governor_effect = {
 
 give_trait_no_notify_ignore_autocracy_restriction = {
 	set_leader_flag = ignore_autocracy_ruler_trait_restriction
-	add_trait_no_notify = $TRAIT$
+	add_trait = {
+		trait = $TRAIT$
+		show_message = no
+	}
 	remove_leader_flag = ignore_autocracy_ruler_trait_restriction
 }
 

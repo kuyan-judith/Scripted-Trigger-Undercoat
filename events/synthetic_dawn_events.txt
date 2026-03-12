@@ -1407,10 +1407,7 @@ planet_event = { # does this unit have a soul
 	option = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-				}
+				is_materialist = yes
 			}
 		}
 		name = syndaw.545.c
@@ -1583,10 +1580,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-				}
+				is_materialist = yes
 			}
 		}
 		text = syndaw.1020.desc.mater
@@ -1594,10 +1588,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_spiritualist
-					has_ethic = ethic_fanatic_spiritualist
-				}
+				is_spiritualist = yes
 			}
 		}
 		text = syndaw.1020.desc.spiri
@@ -1605,10 +1596,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_militarist
-					has_ethic = ethic_fanatic_militarist
-				}
+				is_militarist = yes
 			}
 		}
 		text = syndaw.1020.desc.milit
@@ -1616,10 +1604,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_pacifist
-					has_ethic = ethic_fanatic_pacifist
-				}
+				is_pacifist = yes
 			}
 		}
 		text = syndaw.1020.desc.pacif
@@ -1627,10 +1612,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
+				is_egalitarian = yes
 			}
 		}
 		text = syndaw.1020.desc.egali
@@ -1638,10 +1620,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_authoritarian
-					has_ethic = ethic_fanatic_authoritarian
-				}
+				is_authoritarian = yes
 			}
 		}
 		text = syndaw.1020.desc.autho
@@ -1649,10 +1628,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-				}
+				is_xenophile = yes
 			}
 		}
 		text = syndaw.1020.desc.phile
@@ -1660,10 +1636,7 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				OR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-				}
+				is_xenophobe = yes
 			}
 		}
 		text = syndaw.1020.desc.phobe
@@ -1671,24 +1644,14 @@ planet_event = { #uprising
 	desc = {
 		trigger = {
 			owner = {
-				NOR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
-					has_ethic = ethic_authoritarian
-					has_ethic = ethic_fanatic_authoritarian
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-					has_ethic = ethic_pacifist
-					has_ethic = ethic_fanatic_pacifist
-					has_ethic = ethic_militarist
-					has_ethic = ethic_fanatic_militarist
-					has_ethic = ethic_spiritualist
-					has_ethic = ethic_fanatic_spiritualist
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-				}
+				is_xenophobe = no
+				is_xenophile = no
+				is_authoritarian = no
+				is_egalitarian = no
+				is_pacifist = no
+				is_militarist = no
+				is_spiritualist = no
+				is_materialist = no
 			}
 		}
 		text = syndaw.1020.desc
@@ -2590,7 +2553,10 @@ country_event = {
 
 	immediate = {
 		from = {
-			add_trait_no_notify = leader_trait_ruler_machine_intelligence
+			add_trait = {
+				trait = leader_trait_ruler_machine_intelligence
+				show_message = no
+			}
 		}
 	}
 }
@@ -2750,24 +2716,14 @@ country_event = {
 	}
 	desc = {
 		trigger = {
-			NOR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_xenophile
-				has_ethic = ethic_fanatic_xenophile
-				has_ethic = ethic_authoritarian
-				has_ethic = ethic_fanatic_authoritarian
-				has_ethic = ethic_egalitarian
-				has_ethic = ethic_fanatic_egalitarian
-				has_ethic = ethic_pacifist
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_xenophobe = no
+			is_xenophile = no
+			is_authoritarian = no
+			is_egalitarian = no
+			is_pacifist = no
+			is_militarist = no
+			is_spiritualist = no
+			is_materialist = no
 		}
 		text = syndaw.1205.desc
 	}
@@ -3192,14 +3148,59 @@ planet_event = {
 	}
 
 	immediate = {
-		while = {
-			count = value:per_100_local_pop_amount
-			FROM = {
-				add_monthly_resource_mult = {
-					resource = unity
-					value = 2
-					min = 5
-					max = 100
+		if = {
+			limit = {
+				exists = leader
+				leader = {
+					has_trait = leader_trait_judicial_execution
+				}
+			}
+			while = {
+				count = value:per_100_local_pop_amount
+				FROM = {
+					add_monthly_resource_mult = {
+						resource = unity
+						value = 4
+						min = 10
+						max = 200
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				is_sector_capital = no
+				NOT = { exists = leader }
+				exists = sector
+				sector.sector_capital = {
+					exists = leader
+					leader = {
+						has_trait = leader_trait_judicial_execution
+					}
+				}
+			}
+			while = {
+				count = value:per_100_local_pop_amount
+				FROM = {
+					add_monthly_resource_mult = {
+						resource = unity
+						value = 3
+						min = 7
+						max = 150
+					}
+				}
+			}
+		}
+		else = {
+			while = {
+				count = value:per_100_local_pop_amount
+				FROM = {
+					add_monthly_resource_mult = {
+						resource = unity
+						value = 2
+						min = 5
+						max = 100
+					}
 				}
 			}
 		}

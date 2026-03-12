@@ -1,0 +1,6118 @@
+namespace = infernals
+
+@firestorm_unity_per_fleetsize = 0.01
+
+# Adds technology to Infernal civics, on_game_start_country
+country_event = {
+	id = infernals.10
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			is_world_forger_empire = yes
+			is_galvanic_empire = yes
+			is_red_giant_empire = yes # undercoat: moved to scripted trigger
+			is_cosmic_dawn_empire = yes # undercoat: moved to scripted trigger
+			is_pyrolatry_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { is_world_forger_empire = yes }
+			add_research_option = tech_volcanic_forge
+			capital_scope = { # Guaranteed dry worlds
+				closest_system = {
+					min_steps = 1
+					max_steps = 3
+					limit = { has_star_flag = neighbor_t1_first_colony }
+					random_system_planet = {
+						limit = { has_planet_flag = prescripted_ideal }
+						change_pc = pc_arid
+						reroll_planet = yes
+						clear_blockers = yes
+					}
+				}
+				closest_system = {
+					min_steps = 1
+					max_steps = 3
+					limit = { has_star_flag = neighbor_t2_second_colony }
+					random_system_planet = {
+						limit = { has_planet_flag = prescripted_ideal }
+						change_pc = pc_desert
+						reroll_planet = yes
+						clear_blockers = yes
+					}
+				}
+			}
+		}
+		if = {
+			limit = { is_galvanic_empire = yes }
+			give_technology = {
+				tech = tech_mine_living_metal
+				message = no
+			}
+			capital_scope = {
+				add_deposit = d_galvanic_living_metal
+			}
+		}
+		if = {
+			limit = { is_pyrolatry_empire = yes } # undercoat: moved to scripted trigger
+			give_technology = {
+				tech = tech_volcano
+				message = no
+			}
+		}
+		if = {
+			limit = { is_red_giant_empire = yes } # undercoat: moved to scripted trigger
+			capital_star = {
+				set_deposit = d_red_giant_unstable
+				set_planet_entity = { entity = red_giant_tunnel_faint_class_star_entity }
+				solar_system = {
+					random_system_planet = {
+						limit = { has_planet_flag = red_giant_innerplanet }
+						add_deposit = d_minerals_10
+					}
+					random_system_planet = {
+						limit = { has_planet_flag = red_giant_second_innerplanet }
+						add_deposit = d_alloys_5
+					}
+				}
+			}
+			country_event = { id = infernals.45 days = 45 }
+			capital_scope = {
+				save_global_event_target_as = red_giant_homeworld@owner
+			}
+		}
+		if = {
+			limit = { is_cosmic_dawn_empire = yes } # undercoat: moved to scripted trigger
+			country_event = { id = infernals.2500 days = 1 }
+			capital_scope = {
+				set_planet_flag = cosmic_dawn_homeworld
+			}
+		}
+	}
+}
+
+# Scorched Earth Civic - A planet is bombed with the Firestorm stance, generates Unity.
+# This = Planet, From = Bombarder, on_planet_bombarded (daily)
+planet_event = {
+	id = infernals.20
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_orbital_bombardment_stance = firestorm
+		planet_devastation < 100
+	}
+
+	immediate = {
+		every_fleet_in_orbit = {
+			limit = { owner = { is_genocidal_infernal = yes } }
+			owner = {
+				add_resource = {
+					unity = @firestorm_unity_per_fleetsize
+					mult = prev.trigger:fleet_size
+				}
+			}
+		}
+	}
+}
+
+# Scorched Earth Civic - A planet is bombed with the Seismic Bombing stance, generates blockers.
+# This = Planet, From = Bombarder, on_planet_bombarded (daily)
+planet_event = {
+	id = infernals.25
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_orbital_bombardment_stance = seismic_bombing
+		is_artificial = no
+		count_deposits = { type = d_seismic_bombing_crater count < 5 }
+		OR = {
+			AND = {
+				planet_devastation >= 15
+				NOT = { is_variable_set = seismic_bombing_var }
+			}
+			AND = {
+				is_variable_set = seismic_bombing_var
+				check_variable_arithmetic = {
+					which = seismic_bombing_var
+					add = 1
+					divide = trigger:planet_devastation
+					value <= 0.12
+				}
+			}
+		}
+	}
+
+	immediate = {
+		# From 0 to 1
+		if = {
+			limit = { NOT = { is_variable_set = seismic_bombing_var } }
+			set_variable = { which = seismic_bombing_var value = 1 }
+		}
+		else = {
+			change_variable = { which = seismic_bombing_var value = 1 }
+		}
+		# From 1 to 5
+		add_blocker = {
+			type = d_seismic_bombing_crater
+			blocked_deposit = random
+		}
+	}
+}
+
+# World Forger empire - on_monthly_pulse_country
+# Not in on_colony_monthly_pulse for fewer calls in the trigger (no building check)
+country_event = {
+	id = infernals.30
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = { is_world_forger_empire = yes }
+
+	immediate = {
+		every_owned_planet = {
+			limit = {
+				has_anvil_building = yes
+				is_volcanic_world = no # undercoat: moved to scripted trigger
+			}
+			if = {
+				limit = { NOT = { has_planet_flag = volcanic_terraforming_ongoing } }
+				set_planet_flag = volcanic_terraforming_ongoing
+				start_terraform_progress = {
+					class = pc_volcanic
+					required_progress = 20
+				}
+			}
+			planet_event = { id = infernals.31 }
+		}
+		# In case the building is lost/removed by an event or effect that doesnt trigger the on_actions
+		every_owned_planet = {
+			limit = {
+				has_anvil_building = no
+				is_scripted_terraforming = yes
+			}
+			stop_terraform_process = yes
+			remove_planet_flag = volcanic_terraforming_ongoing
+		}
+	}
+}
+
+# World Forger empire - automatic terraforming
+# Note: If variables here change, adjust tooltips of civics / concepts / building
+planet_event = {
+	id = infernals.31
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+
+		# Mining districts can not be converted without deposits, so it is saved before
+		set_variable = { which = mining_var value = value:mining_districts_value }
+
+		# Monthly progress
+		if = {
+			limit = { has_active_building = building_volcanic_forge_1 }
+			# Default scaling
+			add_terraform_progress = 0.1
+			# Scaling with Miners / Metallurgists
+			set_variable = { which = job_var value = 0 }
+			change_variable = {
+				which = job_var
+				value = value:num_weighted_jobs_with_tag|TAG|minerals|WEIGHT|0.05|
+			}
+			change_variable = {
+				which = job_var
+				value = value:num_weighted_jobs_with_tag|TAG|alloys|WEIGHT|0.05|
+			}
+			add_terraform_progress = job_var
+		}
+		else_if = {
+			limit = { has_active_building = building_volcanic_forge_2 }
+			# Default scaling
+			add_terraform_progress = 0.2
+			# Scaling with Miners / Metallurgists
+			set_variable = { which = job_var value = 0 }
+			change_variable = {
+				which = job_var
+				value = value:num_weighted_jobs_with_tag|TAG|minerals|WEIGHT|0.10|
+			}
+			change_variable = {
+				which = job_var
+				value = value:num_weighted_jobs_with_tag|TAG|alloys|WEIGHT|0.10|
+			}
+			add_terraform_progress = job_var
+		}
+
+		# Terraforming completed
+		if = {
+			limit = { is_volcanic_world = yes } # undercoat: moved to scripted trigger
+			reroll_planet_modifiers = yes
+			remove_modifier = "migrating_forests"
+			clear_blockers = yes
+			remove_deposit = d_bogplants
+			remove_deposit = d_dangerous_wildlife_blocker
+			remove_deposit = d_titanic_life_blocker
+			remove_deposit = d_venomous_insects
+			remove_deposit = d_wandering_forests
+			remove_deposit = d_migrating_forests
+			remove_deposit = d_migrating_forest_reserve
+
+			# Volcanic Worlds use a different set
+			# To avoid bad deposit RNG for the player, lets add some more
+			if = {
+				limit = {
+					count_deposits = { category = deposit_cat_minerals count < 6 }
+				}
+				while = {
+					limit = {
+						count_deposits = { category = deposit_cat_minerals count < 6 }
+					}
+					random_list = {
+						5 = { add_deposit = d_volcanic_rich_mountain }
+						5 = { add_deposit = d_volcanic_ore_caverns }
+						5 = { add_deposit = d_volcanic_mineral_fields }
+						5 = { add_deposit = d_volcanic_mineral_layers }
+						1 = { add_deposit = d_volcanic_lava_river }
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					count_deposits = { category = deposit_cat_misc count < 4 }
+				}
+				while = {
+					limit = {
+						count_deposits = { category = deposit_cat_misc count < 4 }
+					}
+					random_list = {
+						1 = { add_deposit = d_volcanic_stable_plateaus }
+						1 = { add_deposit = d_volcanic_tranquil_flatlands }
+						1 = { add_deposit = d_volcanic_intraplate }
+						1 = { add_deposit = d_volcanic_basalt_plains }
+						1 = { add_deposit = d_volcanic_dried_lavariver }
+					}
+				}
+			}
+
+			while = {
+				count = mining_var
+				add_district = {
+					district_type = district_melting
+					ignore_cap = yes
+				}
+			}
+
+			validate_planet_buildings_and_districts = yes
+			clear_variable = job_var
+			clear_variable = mining_var
+			remove_planet_flag = volcanic_terraforming_ongoing
+			remove_planet_flag = titanic_life_colony_flag
+			planet_event = { id = infernals.35 }
+		}
+	}
+}
+
+# Stops scripted terraforming
+# on_building_demolished , on_destroy
+# on_colony_destroyed, on_planet_transfer
+planet_event = {
+	id = infernals.32
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_scripted_terraforming = yes
+		has_planet_flag = volcanic_terraforming_ongoing
+	}
+
+	immediate = {
+		clear_variable = job_var
+		clear_variable = mining_var
+		stop_terraform_process = yes
+		remove_building = building_volcanic_forge_1
+		remove_building = building_volcanic_forge_2
+		remove_planet_flag = volcanic_terraforming_ongoing
+	}
+}
+
+# Stops scripted terraforming
+# on_building_ruined, on_building_downgraded, on_building_replaced
+planet_event = {
+	id = infernals.33
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_scripted_terraforming = yes
+		has_planet_flag = volcanic_terraforming_ongoing
+	}
+	immediate = {
+		clear_variable = job_var
+		clear_variable = mining_var
+		stop_terraform_process = yes
+		remove_planet_flag = volcanic_terraforming_ongoing
+	}
+}
+
+# Planet Forgers terraform a planet into a Volcanic World
+planet_event = {
+	id = infernals.35
+	title = infernals.35.name
+	desc = infernals.35.desc
+	picture = GFX_evt_molten
+	show_sound = event_mystic_reveal
+	location = from
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			if = {
+				limit = { has_ascension_perk = ap_galactic_hyperthermia }
+				complete_crisis_objective = crisobj_create_volcanics
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+	}
+	option = {
+		name = ACKNOWLEDGED
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	after = {
+		hidden_effect = {
+			owner = { 
+				if = {
+					limit = {
+						OR = {
+							has_special_project = MIGRATING_FORESTS_1_PROJECT
+							has_special_project = MIGRATING_FORESTS_2_PROJECT
+						}
+					}
+					abort_special_project = { type = MIGRATING_FORESTS_1_PROJECT }
+					abort_special_project = { type = MIGRATING_FORESTS_2_PROJECT }
+					end_event_chain = "migrating_forests_chain"
+				}
+			}
+		}
+	}
+}
+
+# Planet Smelter PK
+planet_event = {
+	id = infernals.36
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+
+# Dismantle observation post
+		if = {
+			limit = { has_observation_outpost = yes }
+			observation_outpost_owner = {
+				country_event = { id = planet_destruction.1000 days = 1 }
+			}
+		}
+
+# Contingency
+		if = {
+			limit = {
+				is_planet_class = pc_ai
+				NOT = { has_planet_flag = machine_lair }
+			}
+			set_planet_flag = planet_burned
+			planet_event = { id = crisis.2040 }
+			create_ambient_object = {
+				location = this
+				type = habitat_cracker_object
+				play_animation_once = yes
+				duration = 5
+				use_3d_location = yes
+				base_angle_towards = star
+				entity_face_object = star
+				entity_offset = { min = 0 max = 0 }
+				entity_scale_to_size = yes
+				scale = 0.5
+			}
+		}
+
+		# Final Machine World
+		if = {
+			limit = {
+				is_planet_class = pc_ai
+				has_planet_flag = machine_lair
+			}
+			set_planet_flag = planet_burned
+			from.owner = { save_event_target_as = final_machine_world_destroyer }
+			stop_crisis_sound = yes
+			planet_event = { id = crisis.2046 }
+			create_ambient_object = {
+				location = this
+				type = habitat_cracker_object
+				play_animation_once = yes
+				duration = 5
+				use_3d_location = yes
+				base_angle_towards = star
+				entity_face_object = star
+				entity_offset = { min = 0 max = 0 }
+				entity_scale_to_size = yes
+				scale = 0.5
+			}
+		}
+
+# Swarm
+		if = {
+			limit = {
+				exists = owner
+				owner = { is_country_type = swarm }
+			}
+			every_country = {
+				limit = { has_event_chain = "prethoryn_scourge_chain" }
+				add_event_chain_counter = {
+					event_chain = "prethoryn_scourge_chain"
+					counter = "infested_worlds"
+					amount = -1
+				}
+				add_event_chain_counter = {
+					event_chain = "prethoryn_scourge_chain"
+					counter = "infested_worlds_cleansed"
+					amount = 1
+				}
+			}
+			destroy_colony = yes
+		}
+
+# GalCom resolutions
+		if = {
+			limit = {
+				exists = owner
+				owner = { NOT = { is_same_value = from.owner } }
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_smelter days = 3600 }
+			}
+		}
+		if = { # Terraforming rules
+			limit = {
+				exists = space_owner
+				space_owner = { is_same_value = from.owner }
+				OR = {
+					NOT = { exists = owner }
+					owner = { is_same_value = from.owner }
+				}
+				OR = {
+					is_active_resolution = "resolution_ecology_environmental_control_board"
+					is_active_resolution = "resolution_ecology_paradise_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+			}
+		}
+
+# Threat
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = from.owner }
+					is_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			# Generate threat
+			add_threat = { who = from.owner amount = 3 }
+			# modifier for allies + those upset by robots
+			every_country = {
+				limit = {
+					NOR = {
+						is_same_value = from.owner
+						is_same_value = root.owner
+						AND = {
+							has_federation = yes
+							is_in_federation_with = from.owner
+						}
+					}
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_burned_a_world
+					who = from.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_burned_my_world
+					who = from.owner
+				}
+				if = {
+					limit = { is_gestalt = no } # undercoat: moved to scripted trigger
+					add_modifier = {
+						modifier = colossus_victim
+						days = 10800 # 30 years
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				exists = owner
+				owner = { is_country_type = primitive }
+			}
+			# modifier for allies + those upset by genocide
+			every_country = {
+				limit = {
+					NOR = { is_same_value = from.owner }
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					is_playable = yes # undercoat: moved to scripted trigger
+					NOR = {
+						is_xenophobe = yes
+						is_homicidal = yes
+						is_xenophile = yes
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_burned_a_primitive_world
+					who = from.owner
+				}
+			}
+			every_country = {
+				limit = {
+					NOR = { is_same_value = from.owner }
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						has_ai_personality = awakened_fallen_empire_xenophile
+						AND = {
+							is_playable = yes # undercoat: moved to scripted trigger
+							is_xenophile = yes
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_burned_a_primitive_world_phile
+					who = from.owner
+				}
+			}
+		}
+
+# Add war exhaustion to planet owner
+		if = {
+			limit = {
+				exists = owner
+				owner = { NOT = { is_same_value = from.owner } }
+			}
+			owner = {
+				if = {
+					limit = { #isn't the case when the crisis bombards planets, for instance
+						is_at_war_with = from.owner
+					}
+					add_static_war_exhaustion = {
+						attacker = from.owner
+						location = root
+						value_for_planet_destruction = 1.0
+					}
+				}
+			}
+		}
+
+# Smelter effects
+		if = {
+			limit = {
+				is_colonizable = no
+				is_colony = no
+			}
+			change_pc = pc_molten
+		}
+		else = {
+			planet_smelter_effect = yes # Adjusts districts & deposits, because Volcanic Worlds use a different set
+			every_owned_pop_group = {
+				limit = {
+					NOR = {
+						is_infernal = yes
+						is_lithoid = yes
+						is_mechanical_species = yes
+					}
+				}
+				kill_all_pop = yes
+				from.owner = {
+					if = {
+						limit = { has_ascension_perk = ap_become_the_crisis }
+						complete_crisis_objective = crisobj_purge_pops
+					}
+				}
+			}
+			from.owner = {
+				if = {
+					limit = { has_ascension_perk = ap_galactic_hyperthermia }
+					complete_crisis_objective = crisobj_create_volcanics
+				}
+			}
+		}
+
+# Ownership fix if Infernal pops exist, otherwise the colony is lost
+		if = {
+			limit = {
+				any_owned_pop_group = {
+					is_scope_valid = yes
+					exists = this
+				}
+				owner = { NOT = { is_same_value = from.owner } }
+			}
+			set_owner = from.owner
+		}
+	}
+}
+
+# Red Giant Origin Setup soon after gamestart
+country_event = {
+	id = infernals.45
+	title = infernals.45.name
+	picture = GFX_evt_inf_red_giant_growth
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+
+	desc = {
+		text = infernals.45.desc
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+	}
+	desc = {
+		text = infernals.45.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+
+	immediate = {
+		set_country_flag = situation_red_giant_expansion_approach1
+		start_situation = {
+			type = situation_red_giant_expansion
+			target = root.capital_star
+			effect = {
+				save_global_event_target_as = situation_red_giant_expansion@root
+			}
+		}
+	}
+	option = {
+		name = infernals.45.a
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		custom_tooltip = infernals.45.public.tt
+		hidden_effect = {
+			event_target:situation_red_giant_expansion@root = {
+				set_situation_approach = approach_reassure_public
+			}
+		}
+	}
+	option = {
+		name = infernals.45.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		custom_tooltip = infernals.45.cause.tt
+		hidden_effect = {
+			event_target:situation_red_giant_expansion@root = {
+				set_situation_approach = approach_find_the_cause
+			}
+		}
+	}
+	option = {
+		name = infernals.45.c
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		custom_tooltip = infernals.45.public.tt
+		hidden_effect = {
+			event_target:situation_red_giant_expansion@root = {
+				set_situation_approach = approach_reassure_public
+			}
+		}
+	}
+	option = {
+		name = infernals.45.d
+		trigger = {
+			owner = { is_megacorp = yes }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 200
+				}
+			}
+		}
+		owner = {
+			add_resource = { energy = -200 }
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		custom_tooltip = infernals.45.public.tt
+		hidden_effect = {
+			event_target:situation_red_giant_expansion@root = {
+				set_situation_approach = approach_reassure_public
+			}
+		}
+	}
+	after = {
+		begin_event_chain = {
+			event_chain = red_giant_event_chain
+			target = this
+		}
+	}
+}
+
+# Red Giant BOOM Event 12
+situation_event = {
+	id = infernals.50
+	title = infernals.50.name
+	desc = infernals.50.desc
+	picture = GFX_evt_supernova
+	show_sound = event_ship_explosion
+	location = target
+	is_triggered_only = yes
+
+	trigger = {
+		owner = {
+			NOT = { has_country_flag = situation_red_giant_ended }
+		}
+	}
+	immediate = {
+		target = {
+			remove_planet_flag = has_megastructure
+			set_deposit = d_red_giant_dm
+			planet_event = { id = infernals.9000 days = 1 } #trigger explosion
+			if = {
+				limit = {
+					has_mining_station = yes
+				}
+				mining_station = {
+					set_location = {
+						target = prev
+						distance = 15
+						angle = 60
+					}
+				}
+			}
+			solar_system = {
+				every_system_colony = {
+					remove_modifier = red_giant_stage_5
+					add_modifier = {
+						modifier = "red_giant_exploded"
+						days  = -1
+					}
+					add_planet_devastation = 70
+					every_owned_pop_group = {
+						kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+							pop_group = this
+							percentage = 0.20
+						}
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 63
+					orbit_angle_offset = 30
+					init_effect = {
+						add_deposit = d_minerals_3
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 57
+					orbit_angle_offset = 70
+					init_effect = {
+						add_deposit = d_engineering_4
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 123
+					orbit_angle_offset = 140
+					init_effect = {
+						add_deposit = d_minerals_2
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 143
+					orbit_angle_offset = 20
+					init_effect = {
+						add_deposit = d_minerals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 155
+					orbit_angle_offset = 220
+					init_effect = {
+						add_deposit = d_minerals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 158
+					orbit_angle_offset = 70
+					init_effect = {
+						add_deposit = d_rare_crystals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 160
+					orbit_angle_offset = 80
+					init_effect = {
+						add_deposit = d_alloys_2
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 163
+					orbit_angle_offset = 160
+					init_effect = {
+						add_deposit = d_minerals_5
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 173
+					orbit_angle_offset = 300
+					init_effect = {
+						add_deposit = d_minerals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 177
+					orbit_angle_offset = 40
+					init_effect = {
+						add_deposit = d_minerals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 185
+					orbit_angle_offset = 70
+					init_effect = {
+						add_deposit = d_minerals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+			}
+		}
+		event_target:red_giant_homeworld@owner = {
+			save_global_event_target_as = red_giant_homeworld_tmp #must save this as global to work through scripted loc (local event scope gets lost in the string)
+		}
+		owner = {
+			add_timeline_event = {
+				type = timeline_origin_specific
+				override_id = timeline_red_giant_end_nova
+				override_tooltip = "TIMELINE_EVENT_ORIGIN_RG_END_NOVA_TOOLTIP"
+				override_types = { country }
+				override_text = { "text:TIMELINE_EVENT_ORIGIN_RG_END_NOVA" }
+				override_texture = { "background:GFX_evt_supernova" }
+				targets = { root.owner }
+			}
+			set_country_flag = INF_A_lost_red_giant # Cosmic Confetti Achievement
+			set_country_flag = lusus_contact_completed	#make sure we cancel all special projects etc
+			remove_country_flag = lusus_contact_parlay
+			remove_country_flag = lusus_contact_board_station
+			end_event_chain = red_giant_event_chain
+			set_country_flag = situation_red_giant_ended
+			remove_point_of_interest = red_giant_lusus_event_poi
+		}
+	}
+	option = {
+		name = ACKNOWLEDGED
+		hidden_effect = {
+			target.solar_system = {
+				every_system_colony = {
+					planet_event = { id = infernals.51 months = 24 }
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.50.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 15000
+				}
+			}
+		}
+		owner = {
+			add_resource = { energy = -15000 }
+		}
+		hidden_effect = {
+			target.solar_system = {
+				every_system_colony = {
+					planet_event = { id = infernals.51 months = 3 }
+				}
+			}
+		}
+	}
+	after = {
+		clear_global_event_target = red_giant_homeworld_tmp
+		destroy_situation = this
+		hidden_effect = {
+			owner = {
+				country_event = { id = infernals.2160 months = 12 }
+			}
+		}
+		owner = {
+			set_country_flag = starfire_cannon_unlocked
+			add_research_option = tech_starfire_cannon
+		}
+	}
+}
+
+# Red Giant Mitigated
+planet_event = {
+	id = infernals.51
+	title = infernals.51.name
+	desc = infernals.51.desc
+	picture = GFX_evt_supernova
+	show_sound = event_ship_explosion
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = ACKNOWLEDGED
+	}
+	after = {
+		remove_modifier = red_giant_exploded
+		add_modifier = {
+			modifier = "red_giant_exploded_mitigated"
+			days  = -1
+		}
+	}
+}
+
+# Red Giant KALM Event 13 Return to Normal
+situation_event = {
+	id = infernals.60
+	title = infernals.60.name
+	desc = infernals.60.desc
+	picture = GFX_evt_inf_science_ship
+	show_sound = event_ship_explosion
+	location = target
+
+	is_triggered_only = yes
+
+	immediate = {
+		target.solar_system = {
+			every_system_colony = { remove_modifier = red_giant_stage_1 }
+		}
+		if = {
+			limit = { exists = event_target:lusus_miner_vfx@owner } #otherwise the vfx will stay even after the station gets destroyed
+			event_target:lusus_miner_vfx@owner = {
+				destroy_ambient_object = this
+			}
+		}
+		owner = {
+			add_timeline_event = {
+				type = timeline_origin_specific
+				override_id = timeline_red_giant_end_normal
+				override_tooltip = "TIMELINE_EVENT_ORIGIN_RG_END_NORMAL_TOOLTIP"
+				override_types = { country }
+				override_text = { "text:TIMELINE_EVENT_ORIGIN_RG_END_NORMAL" }
+				override_texture = { "background:GFX_evt_inf_red_giant_growth" }
+				targets = { root.owner }
+			}
+			set_country_flag = lusus_contact_completed	#make sure we cancel all special projects etc
+			remove_country_flag = lusus_contact_parlay
+			remove_country_flag = lusus_contact_board_station
+			end_event_chain = red_giant_event_chain
+			set_country_flag = situation_red_giant_ended
+			remove_point_of_interest = red_giant_lusus_event_poi
+		}
+		target = {
+			remove_planet_flag = has_megastructure #allow placing megastructures again
+		}
+	}
+	option = {
+		name = infernals.60.a #dismantle
+		trigger = {
+			owner = { NOT = { has_country_flag = lusus_station_destroyed } }
+		}
+		#station go boom
+		if = {
+			limit = { exists = event_target:lusus_miner_station@owner }
+			event_target:lusus_miner_station@owner = {
+				destroy_fleet = this
+			}
+		}
+		target = {
+			set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+		}
+		clear_global_event_target = lusus_miner_vfx@owner
+		clear_global_event_target = lusus_miner_station@owner
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier4materialreward
+				min = @tier4materialmin
+				max = @tier4materialmax
+			}
+		}
+	}
+	option = {
+		name = infernals.60.b #Study the station
+		trigger = {
+			owner = { NOT = { has_country_flag = lusus_station_destroyed } }
+		}
+		target = {
+			set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+		}
+		clear_global_event_target = lusus_miner_vfx@owner
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+	option = {
+		name = infernals.60.c #monument to our victory
+		trigger = {
+			owner = { NOT = { has_country_flag = lusus_station_destroyed } }
+		}
+		target = {
+			set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+		}
+		clear_global_event_target = lusus_miner_vfx@owner
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+	option = {
+		name = infernals.60.d #station gone
+		trigger = {
+			owner = { has_country_flag = lusus_station_destroyed }
+		}
+		target = {
+			set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+		}
+		clear_global_event_target = lusus_miner_vfx@owner
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+
+	after = {
+		#trigger relaxation
+		target.solar_system = {
+			every_system_colony = {
+				add_modifier = {
+					modifier = "red_giant_calmed_mod"
+					days  = -1
+				}
+			}
+		}
+		#Spawn deposits based on how far the red giant has receded:
+		if = {
+			limit = { owner = { has_country_flag = red_giant_reached_stage_2 } }
+			target.solar_system = {
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 63
+					orbit_angle_offset = 30
+					init_effect = {
+						add_deposit = d_minerals_5
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_country_flag = red_giant_reached_stage_3 } }
+			target.solar_system = {
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 57
+					orbit_angle_offset = 70
+					init_effect = {
+						add_deposit = d_engineering_4
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_country_flag = red_giant_reached_stage_4 } }
+			target.solar_system = {
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 162
+					orbit_angle_offset = 70
+					init_effect = {
+						add_deposit = d_rare_crystals_1
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_country_flag = red_giant_reached_stage_5 } }
+			target.solar_system = {
+				spawn_planet = {
+					class = pc_asteroid
+					location = target
+					orbit_distance_offset = 160
+					orbit_angle_offset = 80
+					init_effect = {
+						add_deposit = d_alloys_2
+						set_name = red_giant_asteroid
+						# Undercoat
+						fire_on_action = { on_action = on_planet_spawned }
+					}
+				}
+			}
+		}
+		target = {
+			set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+		}
+		destroy_situation = this
+		hidden_effect = {
+			owner = {
+				country_event = { id = infernals.2160 months = 12 }
+			}
+		}
+		owner = {
+			set_country_flag = starfire_cannon_unlocked
+			add_research_option = tech_starfire_cannon
+		}
+	}
+}
+
+#reach stage 2
+situation_event = {
+	id = infernals.65
+	title = infernals.65.name
+	desc = infernals.65.desc
+	picture = GFX_evt_molten
+	show_sound = event_ship_explosion
+	is_triggered_only = yes
+	location = target
+
+	immediate = {
+		owner = {
+			set_country_flag = red_giant_reached_stage_2
+		}
+		target = {
+			if = {
+				limit = {
+					has_mining_station = yes
+				}
+				mining_station = {
+					set_location = {
+						target = prev
+						distance = 35
+						angle = 60
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.65.a
+		enable_special_project = {
+			name = "INF_ORIGIN_RED_GIANT_PROTECT_HOMEWORLD"
+			location = root.target
+			owner = this
+		}
+	}
+	option = {
+		name = infernals.65.b
+		enable_special_project = {
+			name = "INF_ORIGIN_RED_GIANT_EXPLOIT"
+			location = root.target
+			owner = this
+		}
+	}
+}
+#reach stage 3
+situation_event = {
+	id = infernals.70
+	title = infernals.70.name
+	desc = infernals.70.desc
+	picture = GFX_evt_inf_overheating_intensifies
+	show_sound = event_ship_explosion
+	is_triggered_only = yes
+	location = target
+	
+	event_chain = red_giant_event_chain
+
+	immediate = {
+		owner = {
+			set_country_flag = red_giant_reached_stage_3
+		}
+		target.solar_system = {
+			every_system_planet = {
+				limit = {
+					has_planet_flag = red_giant_innerplanet
+				}
+				if = {
+					limit = {
+						has_orbital_station = yes
+					}
+					orbital_station = {
+						dismantle = yes
+					}
+				}
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				remove_planet = yes
+				create_ambient_object = {
+					location = this
+					type = habitat_cracker_object
+					play_animation_once = yes
+					duration = 5
+
+					use_3d_location = yes
+					base_angle_towards = star
+					entity_face_object = star
+
+					entity_offset = { min = 0 max = 0 }
+
+					entity_scale_to_size = yes
+					scale = 0.15
+				}
+			}
+		}
+		target = {
+			if = {
+				limit = {
+					has_mining_station = yes
+				}
+				mining_station = {
+					set_location = {
+						target = prev
+						distance = 65
+						angle = 60
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = WORRYING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+#reach stage 4
+situation_event = {
+	id = infernals.75
+	title = infernals.75.name
+	desc = infernals.75.desc
+	picture = GFX_evt_asteroid_field
+	show_sound = event_ship_explosion
+	is_triggered_only = yes
+	location = target
+	
+	event_chain = red_giant_event_chain
+
+	immediate = {
+		owner = {
+			set_country_flag = red_giant_reached_stage_4
+		}
+		target.solar_system = {
+			every_system_planet = {
+				limit = {
+					has_planet_flag = red_giant_second_innerplanet
+				}
+				if = {
+					limit = {
+						has_orbital_station = yes
+					}
+					orbital_station = {
+						dismantle = yes
+					}
+				}
+				clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+				remove_planet = yes
+				create_ambient_object = {
+					location = this
+					type = habitat_cracker_object
+					play_animation_once = yes
+					duration = 5
+
+					use_3d_location = yes
+					base_angle_towards = star
+					entity_face_object = star
+
+					entity_offset = { min = 0 max = 0 }
+
+					entity_scale_to_size = yes
+					scale = 0.15
+				}
+			}
+		}
+		target = {
+			if = {
+				limit = {
+					has_mining_station = yes
+				}
+				mining_station = {
+					set_location = {
+						target = prev
+						distance = 75
+						angle = 60
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = DISCONCERTING
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+#reach stage 5
+planet_event = {
+	id = infernals.80
+	hide_window = yes
+	is_triggered_only = yes
+	
+	event_chain = red_giant_event_chain
+
+	immediate = {
+		space_owner = {
+			set_country_flag = red_giant_reached_stage_5
+		}
+		if = {
+			limit = {
+				has_mining_station = yes
+			}
+			mining_station = {
+				set_location = {
+					target = prev
+					distance = 95
+					angle = 60
+				}
+			}
+		}
+	}
+}
+
+#update red giant global progress variable counter
+situation_event = {
+	id = infernals.85
+	hide_window = yes
+	picture = GFX_evt_molten
+	show_sound = event_ship_explosion
+	is_triggered_only = yes
+	immediate = {
+		# Update progress to keep track of status
+		owner = {
+			set_variable = {
+				which = red_giant_progress
+				value = root.trigger:situation_progress
+			}
+			divide_variable = {
+				which = red_giant_progress
+				value = 15		#1500 is max situation progress -> 100 max extra size, portal+red giant entity is also 1.25x scale so it doesnt get pushed down below the plane at high scale
+			}
+			change_variable = {
+				which = red_giant_progress
+				value = 50	#base size in infernals_system_initializers is 50
+			}
+
+			#investigation progress for early on
+			if = {
+				limit = {
+					root = {
+						current_situation_approach = approach_find_the_cause
+					}
+				}
+				change_variable = {
+					which = red_giant_investigation_progress
+					value = 2
+				}
+			}
+			if = {
+				limit = {
+					root = {
+						current_situation_approach = approach_reassure_public
+					}
+				}
+				change_variable = {
+					which = red_giant_investigation_progress
+					value = 0.5
+				}
+			}
+
+			###check for plot triggers:
+			#if we are in approach1 and investigation has progressed enough to continue to approach2
+			if = {
+				limit = {
+					has_country_flag = situation_red_giant_expansion_approach1
+					check_variable = {
+						which = red_giant_investigation_progress
+						value >= 8	#chance to trigger after 16 months or 4 months of approach_find_the_cause
+					}
+				}
+				random_list = {
+					40 = { country_event = { id = infernals.95 days = 1 } }
+					60 = {
+						if = {
+							limit = {
+								check_variable = {
+									which = red_giant_investigation_progress
+									value >= 10 #guaranteed after 20 months or 5 months of approach_find_the_cause
+								}
+							}
+							country_event = { id = infernals.95 days = 1 }
+						}
+					}
+				}
+			}
+		}
+		target = {
+			set_planet_size = root.owner.red_giant_progress
+		}
+	}
+}
+
+#Event 4 Stellar Tunneling
+country_event = {
+	id = infernals.95
+	title = infernals.95.name
+	picture = GFX_evt_inf_subspace_interference
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+	location = capital_scope.solar_system.star
+	trackable = yes
+	desc = infernals.95.desc
+
+	immediate = {
+		add_timeline_event = {
+			type = timeline_origin_specific
+			override_id = timeline_red_giant_start
+			override_tooltip = "TIMELINE_EVENT_ORIGIN_RG_START_TOOLTIP"
+			override_types = { country }
+			override_text = { "text:TIMELINE_EVENT_ORIGIN_RG_START" }
+			override_texture = { "background:GFX_evt_inf_red_giant_growth" }
+			targets = { root }
+		}
+		set_country_flag = situation_red_giant_expansion_approach2
+		remove_country_flag = situation_red_giant_expansion_approach1
+		from = {
+			set_situation_approach = approach_suppress_unrest2
+		}
+	}
+
+	option = {
+		name = infernals.95.a
+		custom_tooltip = infernals.95.a.tt
+		hidden_effect = {
+			while = {
+				count = 8
+				capital_scope.solar_system = {
+					closest_system = {
+						limit = {
+							any_system_planet = { is_gas_giant = yes } # undercoat: moved to scripted trigger
+							NOT = {
+								has_star_flag = red_giant_triangulation_system
+							}
+							OR = {
+								has_owner = no
+								owner = { is_same_value = root }
+							}
+						}
+						min_steps = 4
+						max_steps = 8
+							#is not the capital (minstep 3)
+							#has a Gas giant
+							#has no owner
+							#not already tagged for another triangulation situation
+						random_system_planet = {
+							limit = { is_gas_giant = yes } # undercoat: moved to scripted trigger
+							save_event_target_as = red_giant_triangulation_planet
+						}
+					}
+
+					#if we didnt find a viable system, try again with less restriction
+					if = {
+						limit = {
+							NOT = { exists = event_target:red_giant_triangulation_planet }
+						}
+						closest_system = {
+							min_steps = 3
+							max_steps = 7
+							#is not the capital (minstep 3)
+							#has a Gas giant
+							#MAY be owned by anyone, except fallen empires
+							#not already tagged for another triangulation situation
+							limit = {
+								any_system_planet = { is_gas_giant = yes } # undercoat: moved to scripted trigger
+								has_owner = yes
+								space_owner = {
+									is_fallen_empire = no # undercoat: moved to scripted trigger
+								}
+								NOT = {
+									has_star_flag = red_giant_triangulation_system
+								}
+							}
+							# effect
+							random_system_planet = {
+								limit = { is_gas_giant = yes } # undercoat: moved to scripted trigger
+								save_event_target_as = red_giant_triangulation_planet
+							}
+						}
+					}
+					if = {	#if we STILL didnt find a viable system, try again with less restriction
+						limit = {
+							NOT = { exists = event_target:red_giant_triangulation_planet }
+						}
+						closest_system = {
+							min_steps = 2
+							max_steps = 7
+							#is not the capital (minstep 2)
+							#MAY be owned by anyone, except fallen empires
+							#not already tagged for another triangulation situation
+							limit = {
+								has_owner = yes
+								owner = {
+									is_fallen_empire = no # undercoat: moved to scripted trigger
+								}
+								NOT = {
+									has_star_flag = red_giant_triangulation_system
+								}
+							}
+							# effect
+							random_system_planet = {
+								save_event_target_as = red_giant_triangulation_planet
+							}
+						}
+					}
+				}
+
+				if = {
+					limit = { exists = event_target:red_giant_triangulation_planet }
+					event_target:red_giant_triangulation_planet = {
+						solar_system = { 
+							set_star_flag = red_giant_triangulation_system
+							root.owner = { set_visited = prev }
+						}
+						enable_special_project = {
+							name = "INF_ORIGIN_RED_GIANT_TRIANGULATION"
+							location = this
+							owner = root
+						}
+					}
+				}
+				else = {
+					enable_special_project = {
+						name = "INF_ORIGIN_RED_GIANT_TRIANGULATION"
+						location = capital_scope
+						owner = root
+					}
+				}
+			}
+		}
+	}
+}
+
+
+#abstract triangulation event check, triggered 3x
+ship_event = {
+	id = infernals.100
+	hide_window = yes
+	location = from
+	show_sound = event_ship_bridge
+	is_triggered_only = yes
+
+	immediate = {
+
+		owner = {
+			change_variable = {
+				which = red_giant_triangulation_progress
+				value = 1
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = red_giant_triangulation_progress
+						value = 1	#first event
+					}
+				}
+				prev = { ship_event = { id = infernals.105 } }
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = red_giant_triangulation_progress
+						value = 2	#second event
+					}
+				}
+				prev = { ship_event = { id = infernals.110 } }
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = red_giant_triangulation_progress
+						value = 3	#final event
+					}
+				}
+				prev = { ship_event = { id = infernals.115 } }
+			}
+		}
+	}
+}
+#first triangulation
+ship_event = {
+	id = infernals.105
+	title = infernals.105.name
+	desc = infernals.105.desc
+	picture = GFX_evt_inf_science_ship
+	location = from
+	show_sound = event_ship_bridge
+	is_triggered_only = yes
+	event_chain = red_giant_event_chain
+
+	option = {
+		name = infernals.105.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+#second triangulation
+#FromFromFromFrom = situation
+#FromFromFrom = special project
+ship_event = {
+	id = infernals.110
+	title = infernals.110.name
+	desc = infernals.110.desc
+	picture = GFX_evt_astral_rift_ancient_battlegrounds
+	location = from
+	show_sound = event_ship_bridge
+	is_triggered_only = yes
+	event_chain = red_giant_event_chain
+
+	option = {
+		name = UNDERSTOOD
+		FromFromFromFrom.Target = {
+			add_deposit = d_energy_5
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+	option = {
+		name = infernals.110.a
+		trigger = {
+			owner = { is_megacorp = yes }
+		}
+		FromFromFromFrom.Target = {
+			add_deposit = d_energy_5
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier1materialreward
+				min = @tier1materialmin
+				max = @tier1materialmax
+			}
+		}
+	}
+}
+
+#third triangulation
+ship_event = {
+	id = infernals.115
+	title = infernals.115.name
+	desc = infernals.115.desc
+	picture = GFX_evt_black_hole
+	location = event_target:lusus_miner_system_tmp
+	show_sound = event_ship_bridge
+	is_triggered_only = yes
+	event_chain = red_giant_event_chain
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { exists = event_target:red_giant_miner_country }
+			}
+			create_red_giant_miners = yes
+		}
+		event_target:red_giant_miner_country = {
+			establish_communications_no_message = prev.owner
+			set_faction_hostility = {
+				target = prev.owner
+				set_hostile = yes
+				set_neutral = no
+				set_friendly = no
+			}
+		}
+		FromFromFromFrom.Target = {
+			set_planet_entity = { entity = red_giant_tunnel_class_star_entity }
+
+			spawn_system = {
+				min_distance = 10
+				max_distance = 30
+				max_jumps = 0
+				initializer = "red_giant_lusus"
+			}
+			last_created_system = {
+				save_event_target_as = lusus_miner_system_tmp
+
+				random_system_planet = {
+					limit = { is_gas_giant = yes } # undercoat: moved to scripted trigger
+					create_mining_station = {
+						owner = event_target:red_giant_miner_country
+					}
+					if = {
+						limit = { exists = mining_station }
+						mining_station = {
+							set_fleet_flag = lusus_miner_station
+							save_global_event_target_as = lusus_miner_station@root.owner
+							set_event_locked = yes
+
+							create_ambient_object = {
+								type = subspace_ship_to_tunnel
+								location = this
+							}
+							last_created_ambient_object = {
+								set_location = {
+									target = prev
+									distance = 0
+									angle = 270
+								}
+								save_global_event_target_as = lusus_miner_vfx@root.owner
+							}
+						}
+					}
+					create_fleet = {
+						name = "NAME_Ancient_Mining_Drones"
+						effect = {
+							set_owner = event_target:red_giant_miner_country
+							while = {
+								count = 4
+								create_ship = {
+									name = ""
+									design = "NAME_Ancient_Mining_Drone"
+								}
+							}
+							while = {
+								count = 1
+								create_ship = {
+									name = ""
+									design = "NAME_Ancient_Combat_Drone"
+								}
+							}
+							set_location = PREV.mining_station
+							set_fleet_stance = passive
+							set_fleet_flag = lusus_miner_guards
+							set_aggro_range_measure_from = return_point
+							set_aggro_range = 150
+							queue_actions = {
+								repeat = {
+									wait = {
+										duration = 19
+										random = 10
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	after = {
+		custom_tooltip = red_giant_lusus_triangulated_tt
+		root.owner = {
+			hidden_effect = { # remove the unfinished triangulation projects.
+				abort_special_project = INF_ORIGIN_RED_GIANT_TRIANGULATION
+			}
+			create_point_of_interest = {
+				id = red_giant_lusus_event_poi
+				name = infernals.115.name
+				desc = red_giant_lusus_triangulated_tt
+				location = event_target:lusus_miner_system_tmp
+				event_chain = red_giant_event_chain
+			}
+		}
+	}
+	option = {
+		name = infernals.115.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+	option = {
+		name = infernals.115.b
+		owner = {
+			add_modifier = { modifier = red_giant_fire_rate months = 3 }
+		}
+	}
+	option = {
+		name = infernals.115.c
+		trigger = {
+			owner = { has_ethic = ethic_spiritualist }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+	option = {
+		name = infernals.115.c
+		trigger = {
+			owner = { is_fanatic_spiritualist = yes }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+}
+
+### Anomaly: Spires of Light
+# On Anomaly complete
+# Scope = Ship
+# From = Planet
+ship_event = {
+	id = infernals.500
+	title = infernals.500.name
+	desc = infernals.500.desc
+	picture = GFX_evt_inf_crystal_spires
+	location = from
+	show_sound = event_ship_bridge
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = EXCELLENT
+		fromfromfrom = {
+			add_rare_crystals = yes
+		}
+	}
+	option = {
+		name = infernals.500.a
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+			}
+		}
+		FROM = {
+			add_deposit = d_vast_unity_deposit
+		}
+	}
+	option = {
+		name = infernals.500.b
+		trigger = {
+			owner = {
+				OR = {
+					is_materialist = yes
+					is_megacorp = yes
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+	}
+	option = {
+		name = infernals.500.c
+		trigger = {
+			owner = {
+				OR = {
+					is_authoritarian = yes
+					is_militarist = yes
+				}
+			}
+		}
+		owner = {
+			every_owned_leader = {
+				limit = {
+					leader_is_commander_stu = yes # undercoat: moved to scripted trigger
+				}
+				add_experience = 500
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = infernals.1001
+	title = "infernals.1001.name"
+	desc = "infernals.1001.desc"
+	picture = GFX_evt_gas_giant_station
+	show_sound = event_space_cloud
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = "infernals.1001.a"
+		FROM = {
+			add_deposit = d_exotic_gases_1
+		}
+	}
+}
+
+### Anomaly: Crystal Lava Lakes
+ship_event = {
+	id = infernals.1002
+	title = "infernals.1002.name"
+	desc = "infernals.1002.desc"
+	picture = GFX_evt_crystal_mining
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = "infernals.1002.a"
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		FROM = {
+			add_modifier = {
+				modifier = crystal_lava_resort
+			}
+		}
+	}
+
+	option = {
+		name = "infernals.1002.b"
+		FROM = {
+			add_deposit = d_energy_4
+		}
+	}
+}
+
+### Anomaly: Bioadaptive Flora
+ship_event = {
+	id = infernals.1003
+	title = "infernals.1003.name"
+	desc = "infernals.1003.desc"
+	picture = GFX_evt_aggressive_flora
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = "infernals.1003.a"
+		FROM = {
+			add_modifier = {
+				modifier = bioadaptive_flora_modifier
+			}
+		}
+		custom_tooltip = infernals.1003.tooltip_a
+	}
+}
+
+### Anomaly: Tectonic Icebreaker
+ship_event = {
+	id = infernals.1004
+	title = "infernals.1004.name"
+	desc = "infernals.1004.desc"
+	picture = GFX_evt_molten
+	show_sound = event_mystic_reveal
+	location = FROM
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = "infernals.1004.a"
+		FROM = {
+			if = {
+				limit = {
+					NOT = { has_deposit = d_physics_5 }
+				}
+				add_deposit = d_physics_5
+			}
+		}
+	}
+
+	option = {
+		name = "infernals.1004.b"
+		FROM = {
+			start_terraform_process = pc_arid
+		}
+	}
+}
+
+### Anomaly: Infernal Oasis
+ship_event = {
+	id = infernals.505
+	title = infernals.505.name
+	desc = infernals.505.desc
+	picture = GFX_evt_animal_wildlife
+	show_sound = event_alien_nature
+	location = from
+
+	is_triggered_only = yes
+
+		trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = infernals.505.a
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		from = { add_modifier = { modifier = volcanic_oasis } }
+	}
+	option = {
+		name = FASCINATING
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		from = { add_modifier = { modifier = volcanic_oasis } }
+	}
+}
+
+## Lava Whirlpool
+# Adds a living metal deposit to molten planet after survey
+ship_event = {
+	id = infernals.56
+	title = infernals.56.name
+	desc = infernals.56.desc
+	picture = GFX_evt_molten
+	location = ROOT
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = infernals.56.a
+		FROM = {
+			add_deposit = d_living_metal_deposit
+		}
+	}
+}
+
+# Anomaly: Fractalized Entropy
+ship_event = {
+	id = infernals.3205
+	title = infernals.3205.name
+	desc = infernals.3205.desc
+	picture = GFX_evt_mining_station
+	show_sound = event_ship_bridge
+	location = from
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = infernals.3205.a
+		FROM = {
+			add_deposit = d_physics_3
+		}
+	}
+}
+
+## Mysterious Ringing anomaly
+ship_event = {
+	id = infernals.3210
+	title = infernals.3210.name
+	desc = infernals.3210.desc
+	picture = GFX_evt_molten
+	location = ROOT
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+	}
+
+	option = {
+		name = infernals.3210.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+	option = {
+		name = infernals.3210.b
+		trigger = {
+			owner = {
+				is_homicidal = no
+			}
+		}
+		owner = {
+			create_species = {
+				name = random
+				class = random_non_machine
+				portrait = random
+				traits = random
+			}
+			create_leader = {
+				class = scientist
+				species = last_created_species
+				name = random
+				skill = 4
+				traits = {
+					trait = leader_trait_hibernating
+				}
+				event_leader = yes
+			}
+		}
+		custom_tooltip = infernals.3210.btt
+	}
+	option = {
+		name = infernals.3210.c
+		trigger = {
+			owner = {
+				OR ={
+					is_authoritarian = yes
+					is_megacorp = yes
+				}
+			}
+		}
+		owner = {
+			set_country_flag = planetary_workshift_ready
+		}
+		custom_tooltip = infernals.3210.ctt
+	}
+}
+
+# Origin Cosmic Dawn: 2500-3000
+
+# Intro
+country_event = {
+	id = infernals.2500
+	title = infernals.2500.name
+	desc = infernals.2500.desc
+	picture = GFX_evt_inf_planetary_crust_drilling
+	location = capital_scope
+	show_sound = event_sensor_ping
+
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			add_timeline_event = {
+				type = timeline_origin_specific
+				override_id = timeline_cosmic_dawn_start
+				override_tooltip = "TIMELINE_EVENT_ORIGIN_CD_START_TOOLTIP"
+				override_types = { country }
+				override_text = { "text:TIMELINE_EVENT_ORIGIN_CD_START" }
+				override_texture = { "background:GFX_evt_inf_underground_cavern" }
+				targets = { root.owner }
+			}
+		}
+	}
+
+	option = {
+		name = infernals.2500.a
+		enable_special_project = {
+			name = INF_ORIGIN_COSMIC_DAWN_DRILLING
+			owner = root
+			location = capital_scope
+		}
+	}
+}
+
+# First project done
+country_event = {
+	id = infernals.2505
+	title = infernals.2505.name
+	desc = {
+		trigger = { is_gestalt = no }
+		text = infernals.2505.desc.a
+	}
+	desc = {
+		trigger = { is_gestalt = yes }
+		text = infernals.2505.desc.b
+	}
+	picture = GFX_evt_inf_underground_cavern
+	show_sound = event_ancient_drone
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2505.a
+		start_situation = {
+			type = situation_cosmic_dawn
+			target = root.capital
+		}
+		hidden_effect = {
+			random_situation = {
+				limit = { is_situation_type = situation_cosmic_dawn }
+				set_situation_approach = approach_cd_mining
+			}
+		}
+	}
+	option = {
+		name = infernals.2505.b
+		start_situation = {
+			type = situation_cosmic_dawn
+			target = root.capital
+		}
+		hidden_effect = {
+			random_situation = {
+				limit = { is_situation_type = situation_cosmic_dawn }
+				set_situation_approach = approach_cd_drilling
+			}
+		}
+	}
+	option = {
+		name = infernals.2505.c
+		trigger = { is_megacorp = yes }
+		start_situation = {
+			type = situation_cosmic_dawn
+			target = root.capital
+		}
+		hidden_effect = {
+			random_situation = {
+				limit = { is_situation_type = situation_cosmic_dawn }
+				set_situation_approach = approach_cd_financial
+			}
+		}
+	}
+	after = {
+		capital_scope = {
+			create_pop_group = { species = owner }
+		}
+	}
+}
+
+# Stage 2 - Amnesia and Data
+situation_event = {
+	id = infernals.2510
+	title = infernals.2510.name
+	desc = {
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		text = infernals.2510.desc.a
+	}
+	desc = {
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		text = infernals.2510.desc.b
+	}
+	picture = GFX_evt_inf_out_of_the_ground
+	show_sound = event_activating_unknown_technology
+	situation = this
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2510.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+	option = {
+		name = infernals.2510.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+	after = {
+		if = {
+			limit = {
+				owner = {
+					any_owned_planet = { has_planet_flag = cosmic_dawn_homeworld }
+				}
+			}
+			owner = {
+				random_owned_planet = {
+					limit = { has_planet_flag = cosmic_dawn_homeworld }
+					if = {
+						limit = { NOT = { has_deposit = d_cd_ancient_tunnels } }
+						add_deposit = d_cd_ancient_tunnels
+					}
+					hidden_effect = {
+						change_variable = { which = cd_pods_var value = 1 }
+					}
+					custom_tooltip = cosmic_dawn_districtsize
+				}
+			}
+		}
+		else = {
+			owner.capital_scope = {
+				change_planet_size = 1
+			}
+		}
+	}
+}
+
+# Stage 3 - Life Support Failure
+situation_event = {
+	id = infernals.2515
+	title = infernals.2515.name
+	desc = infernals.2515.desc
+	picture = GFX_evt_emergency_workers
+	show_sound = event_life_support_fail
+	situation = this
+
+	is_triggered_only = yes
+
+	immediate = {
+		# In case the player lost the original homeworld or changed the capital
+		if = {
+			limit = {
+				owner = {
+					any_owned_planet = { has_planet_flag = cosmic_dawn_homeworld }
+				}
+			}
+			owner = {
+				random_owned_planet = {
+					limit = { has_planet_flag = cosmic_dawn_homeworld }
+					save_event_target_as = homeworld
+				}
+			}
+		}
+		else = {
+			owner.capital_scope = {
+				save_event_target_as = homeworld
+			}
+		}
+	}
+
+	option = {
+		name = infernals.2515.a
+		custom_tooltip = infernals.2515.a.tt
+		owner = {
+			create_leader = {
+				name = random
+				class = scientist
+				species = owner_main_species
+				skill = 3
+				randomize_traits = yes
+				effect = {
+					set_leader_flag = life_support_survivor
+					leader_event = { id = paragon.450 }
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2515.b
+		custom_tooltip = infernals.2515.b.tt
+		owner = {
+			create_leader = {
+				name = random
+				class = official
+				species = owner_main_species
+				skill = 3
+				randomize_traits = yes
+				effect = {
+					leader_event = { id = paragon.450 }
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2515.c
+		custom_tooltip = infernals.2515.c.tt
+
+		event_target:homeworld = {
+			hidden_effect = {
+				change_variable = { which = cd_pods_var value = 1 }
+			}
+			custom_tooltip = cosmic_dawn_districtsize
+		}
+	}
+	after = {
+		hidden_effect = {
+			owner = {
+				country_event = {
+					id = infernals.2520
+					months = 4
+				}
+			}
+		}
+	}
+}
+
+# Interstellar Refugia
+country_event = {
+	id = infernals.2520
+	title = infernals.2520.name
+	desc = infernals.2520.desc
+	picture = GFX_evt_inf_science_ship
+	show_sound = event_inhabited_solar_system
+	event_chain = cosmic_dawn_anomalies_event_chain
+
+	is_triggered_only = yes
+	trigger = {
+		has_infernals = yes
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_owned_leader = {
+						has_leader_flag = life_support_survivor
+						is_ruler = no
+						NOR = {
+							has_trait = leader_trait_carefree
+							has_trait = leader_trait_carefree_2
+						}
+					}
+			}
+			random_owned_leader = {
+				limit = {
+					has_leader_flag = life_support_survivor
+					is_ruler = no
+					NOR = {
+						has_trait = leader_trait_carefree
+						has_trait = leader_trait_carefree_2
+					}
+				}
+				save_event_target_as = leader
+			}
+		}
+		# Just in case the previously hired event leader dies or is removed by the player
+		else_if = {
+			limit = {
+				any_owned_leader = {
+						is_ruler = no
+						leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+						NOR = {
+							has_trait = leader_trait_carefree
+							has_trait = leader_trait_carefree_2
+						}
+					}
+			}
+			random_owned_leader = {
+				limit = {
+					is_ruler = no
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+					NOR = {
+						has_trait = leader_trait_carefree
+						has_trait = leader_trait_carefree_2
+					}
+				}
+				save_event_target_as = leader
+			}
+		}
+		else = {
+			random_owned_leader = {
+				limit = {
+					leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+				}
+				save_event_target_as = leader
+			}
+		}
+		begin_event_chain = {
+			event_chain = cosmic_dawn_anomalies_event_chain
+			target = this
+		}
+	}
+	option = {
+		name = infernals.2520.a
+		# grants Carefree to a random scientist
+		if = { #make a new scientist to give carefree to if there was somehow none available
+			limit = {
+				NOT = {
+					exists = event_target:leader
+				}
+			}
+			create_leader = {
+					class = scientist
+					species = owner_main_species
+					name = random
+				}
+				last_created_leader = {
+					save_event_target_as = leader
+				}
+		}
+		event_target:leader = {
+			add_trait = {
+				trait = leader_trait_carefree
+				show_message = yes
+			}
+		}
+	}
+	option = {
+		name = infernals.2520.b
+		# extra unity
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+	after = {
+		hidden_effect = {
+			capital_scope.solar_system = {
+				closest_system = {
+					limit = {
+						is_fe_cluster = no
+						is_marauder_cluster = no
+						NOR = {
+							has_star_flag = hostile_system
+							has_star_flag = empire_cluster
+							has_star_flag = has_inf_cd_anomaly
+						}
+						OR = {
+							AND = {
+								exists = owner
+								owner = { is_same_empire = root }
+							}
+							NOT = { exists = owner }
+						}
+					}
+					min_steps = 4
+					max_steps = 8
+					set_star_flag = has_inf_cd_anomaly
+					random_system_planet = {
+						limit = {
+							is_star = no
+							is_asteroid = no
+							has_anomaly = no
+							is_colony = no
+							NOR = {
+								is_gas_giant = yes # undercoat: moved to scripted trigger
+								is_molten_world = yes # undercoat: moved to scripted trigger
+								is_toxic_world = yes # undercoat: moved to scripted trigger
+								is_volcanic_world = yes # undercoat: moved to scripted trigger
+							}
+							is_astral_scar = no
+							is_capital = no
+						}
+						save_event_target_as = inf_cd_anomaly1_system
+					}
+				}
+				if = {
+					limit = { exists = event_target:inf_cd_anomaly1_system }
+					event_target:inf_cd_anomaly1_system = {
+						add_anomaly = {
+							category = cosmic_dawn_sleepers_category
+							target = prevprev
+						}
+						root.owner = {
+							create_point_of_interest = {
+								id = cosmic_dawn_anomalies1_event_poi
+								name = cosmic_dawn_sleepers_category
+								desc = cosmic_dawn_sleepers_category_desc
+								event_chain = cosmic_dawn_anomalies_event_chain
+								location = prev
+							}
+						}
+					}
+				}
+				#if we didnt find a viable system, drop the anomaly inside empire borders
+				else = {
+					root.owner = {
+						random_planet_within_border = {
+							limit = {
+								is_star = no
+								is_asteroid = no
+								has_anomaly = no
+								is_colony = no
+								NOR = {
+									is_gas_giant = yes # undercoat: moved to scripted trigger
+									is_molten_world = yes # undercoat: moved to scripted trigger
+									is_toxic_world = yes # undercoat: moved to scripted trigger
+									is_volcanic_world = yes # undercoat: moved to scripted trigger
+								}
+								is_astral_scar = no
+								is_capital = no
+							}
+							add_anomaly = {
+								category = cosmic_dawn_sleepers_category
+								target = prev
+							}
+							root.owner = {
+								hidden_effect = {
+									create_point_of_interest = {
+										id = cosmic_dawn_anomalies1_event_poi
+										name = cosmic_dawn_sleepers_category
+										desc = cosmic_dawn_sleepers_category_desc
+										event_chain = cosmic_dawn_anomalies_event_chain
+										location = prev
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Second Anomaly
+ship_event = {
+	id = infernals.2525
+	title = infernals.2525.name
+	desc = infernals.2525.desc
+	picture = GFX_evt_inf_underground_cavern
+	location = from
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+
+	event_chain = cosmic_dawn_anomalies_event_chain
+
+	option = {
+		name = infernals.2525.a
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		owner = {
+			capital_scope = {
+				while = {
+					count = 2
+					create_pop_group = { species = owner }
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+	option = {
+		name = infernals.2525.b
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+	}
+	option = {
+		name = infernals.2525.c
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		owner = {
+			capital_scope = {
+				while = {
+					count = 2
+					create_pop_group = { species = owner }
+				}
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+	after = {
+		owner = {
+			hidden_effect = {
+				capital_scope.solar_system = {
+					closest_system = {
+						limit = {
+							is_fe_cluster = no
+							is_marauder_cluster = no
+							NOR = {
+								has_star_flag = hostile_system
+								has_star_flag = empire_cluster
+								has_star_flag = has_inf_cd_anomaly
+							}
+							OR = {
+								AND = {
+									exists = owner
+									owner = { is_same_empire = root }
+								}
+								NOT = { exists = owner }
+							}
+						}
+						min_steps = 4
+						max_steps = 10
+						set_star_flag = has_inf_cd_anomaly
+						random_system_planet = {
+							limit = {
+								is_star = no
+								is_asteroid = no
+								has_anomaly = no
+								is_colony = no
+								NOR = {
+									is_gas_giant = yes # undercoat: moved to scripted trigger
+									is_molten_world = yes # undercoat: moved to scripted trigger
+									is_toxic_world = yes # undercoat: moved to scripted trigger
+									is_volcanic_world = yes # undercoat: moved to scripted trigger
+								}
+								is_astral_scar = no
+								is_capital = no
+							}
+							save_event_target_as = inf_cd_anomaly2_system
+						}
+					}
+
+					if = {
+						limit = { exists = event_target:inf_cd_anomaly2_system }
+						event_target:inf_cd_anomaly2_system = {
+							add_anomaly = {
+								category = cosmic_dawn_sleepers2_category
+								target = prev
+							}
+							root.owner = {
+								remove_point_of_interest = cosmic_dawn_anomalies1_event_poi
+								create_point_of_interest = {
+									id = cosmic_dawn_anomalies2_event_poi
+									name = cosmic_dawn_sleepers2_category
+									desc = cosmic_dawn_sleepers2_category_desc
+									event_chain = cosmic_dawn_anomalies_event_chain
+									location = prev
+								}
+							}
+						}
+					}
+					#if we didnt find a viable system, drop the anomaly inside empire borders
+					else = {
+						root.owner = {
+							random_planet_within_border = {
+								limit = {
+									is_star = no
+									is_asteroid = no
+									has_anomaly = no
+									is_colony = no
+									NOR = {
+										exists = event_target:inf_cd_anomaly2_system
+										is_gas_giant = yes # undercoat: moved to scripted trigger
+										is_molten_world = yes # undercoat: moved to scripted trigger
+										is_toxic_world = yes # undercoat: moved to scripted trigger
+										is_volcanic_world = yes # undercoat: moved to scripted trigger
+									}
+									is_astral_scar = no
+									is_capital = no
+								}
+								add_anomaly = {
+									category = cosmic_dawn_sleepers2_category
+									target = prev
+								}
+								root.owner = {
+									remove_point_of_interest = cosmic_dawn_anomalies1_event_poi
+									create_point_of_interest = {
+										id = cosmic_dawn_anomalies2_event_poi
+										name = cosmic_dawn_sleepers2_category
+										desc = cosmic_dawn_sleepers2_category_desc
+										event_chain = cosmic_dawn_anomalies_event_chain
+										location = prev
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Third Anomaly
+ship_event = {
+	id = infernals.2530
+	title = infernals.2530.name
+	desc = infernals.2530.desc
+	picture = GFX_evt_ancient_records
+	location = from
+	show_sound = event_dig_site
+
+	is_triggered_only = yes
+
+	event_chain = cosmic_dawn_anomalies_event_chain
+
+	option = {
+		name = infernals.2530.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = alloys
+					value >= 150
+				}
+			}
+		}
+		owner = {
+			add_resource = { alloys = -150 }
+			country_event = { id = infernals.2531 years = 2 }
+		}
+	}
+	option = {
+		name = infernals.2530.b
+		custom_tooltip = infernals.2530.b.tt
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		owner = {
+			hidden_effect = {
+				capital_scope = {
+					while = {
+						count = 2
+						create_pop_group = { species = owner }
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2530.c
+		custom_tooltip = infernals.2530.b.tt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		owner = {
+			hidden_effect = {
+				capital_scope = {
+					while = {
+						count = 2
+						create_pop_group = { species = owner }
+					}
+				}
+			}
+		}
+	}
+	after = {
+		owner = {
+			hidden_effect = {
+				capital_scope.solar_system = {
+					closest_system = {
+						limit = {
+							is_fe_cluster = no
+							is_marauder_cluster = no
+							NOR = {
+								has_star_flag = hostile_system
+								has_star_flag = empire_cluster
+								has_star_flag = has_inf_cd_anomaly
+							}
+							OR = {
+								AND = {
+									exists = owner
+									owner = { is_same_empire = root }
+								}
+								NOT = { exists = owner }
+							}
+						}
+						min_steps = 4
+						max_steps = 15
+						set_star_flag = has_inf_cd_anomaly
+						random_system_planet = {
+							limit = {
+								is_star = no
+								is_asteroid = no
+								has_anomaly = no
+								is_colony = no
+								NOR = {
+									is_gas_giant = yes # undercoat: moved to scripted trigger
+									is_molten_world = yes # undercoat: moved to scripted trigger
+									is_toxic_world = yes # undercoat: moved to scripted trigger
+									is_volcanic_world = yes # undercoat: moved to scripted trigger
+								}
+								is_astral_scar = no
+								is_capital = no
+							}
+							save_event_target_as = inf_cd_anomaly3_system
+						}
+					}
+					if = {
+						limit = { exists = event_target:inf_cd_anomaly3_system }
+						event_target:inf_cd_anomaly3_system = {
+							add_anomaly = {
+								category = cosmic_dawn_sleepers3_category
+								target = prev
+							}
+							root.owner = {
+								remove_point_of_interest = cosmic_dawn_anomalies2_event_poi
+								create_point_of_interest = {
+									id = cosmic_dawn_anomalies3_event_poi
+									name = cosmic_dawn_sleepers3_category
+									desc = cosmic_dawn_sleepers3_category_desc
+									event_chain = cosmic_dawn_anomalies_event_chain
+									location = prev
+								}
+							}
+						}
+					}
+					#if we didnt find a viable system, drop the anomaly inside empire borders
+					else = {
+						root.owner = {
+							random_planet_within_border = {
+								limit = {
+									is_star = no
+									is_asteroid = no
+									has_anomaly = no
+									is_colony = no
+									NOR = {
+										is_gas_giant = yes # undercoat: moved to scripted trigger
+										is_molten_world = yes # undercoat: moved to scripted trigger
+										is_toxic_world = yes # undercoat: moved to scripted trigger
+										is_volcanic_world = yes # undercoat: moved to scripted trigger
+									}
+									is_astral_scar = no
+									is_capital = no
+								}
+								add_anomaly = {
+									category = cosmic_dawn_sleepers3_category
+									target = prev
+								}
+								root.owner = {
+									remove_point_of_interest = cosmic_dawn_anomalies2_event_poi
+									create_point_of_interest = {
+										id = cosmic_dawn_anomalies3_event_poi
+										name = cosmic_dawn_sleepers3_category
+										desc = cosmic_dawn_sleepers3_category_desc
+										event_chain = cosmic_dawn_anomalies_event_chain
+										location = prev
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# The ship returns
+country_event = {
+	id = infernals.2531
+	title = infernals.2531.name
+	desc = infernals.2531.desc
+	picture = GFX_evt_big_landing_ship
+	show_sound = event_ship_bridge
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2531.a
+		custom_tooltip = infernals.2531.a.tt
+		create_fleet = {
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					design = "NAME_Void_Champion"
+					prefix = no
+					graphical_culture = "pirate_01"
+					upgradable = no
+				}
+				set_location = root.capital_scope
+			}
+		}
+	}
+
+	option = {
+		name = infernals.2531.b
+		custom_tooltip = infernals.2531.b.tt
+		create_fleet = {
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					random_existing_design = colonizer
+					colonizer_species = owner_main_species
+					graphical_culture = "mammalian_01"
+					prefix = no
+					upgradable = no
+				}
+				set_location = root.capital_scope
+			}
+		}
+	}
+	option = {
+		name = infernals.2531.c
+		custom_tooltip = infernals.2531.c.tt
+		owner = {
+			hidden_effect = {
+				capital_scope = {
+					while = {
+						count = 2
+						create_pop_group = { species = owner }
+					}
+				}
+			}
+		}
+	}
+}
+
+# Fourth Anomaly
+ship_event = {
+	id = infernals.2535
+	title = infernals.2535.name
+	desc = infernals.2535.desc
+	picture = GFX_evt_ancient_databank
+	location = from
+	show_sound = event_door_opening
+
+	is_triggered_only = yes
+
+	event_chain = cosmic_dawn_anomalies_event_chain
+
+	option = {
+		name = infernals.2535.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			give_specimen = {
+				key = infernal_stasispod
+			}
+		}
+	}
+	option = {
+		name = infernals.2535.b
+		trigger = {
+			owner = {
+				has_country_flag = first_contact_protocol_event_happened
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+	}
+	option = {
+		name = infernals.2535.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+	after = {
+		owner = {
+			end_event_chain = cosmic_dawn_anomalies_event_chain
+			hidden_effect = {
+				remove_point_of_interest = cosmic_dawn_anomalies3_event_poi
+				while = {
+					count = 3
+					capital_scope.solar_system = {
+						closest_system = {
+							limit = { has_star_flag = has_inf_cd_anomaly }
+							min_steps = 4
+							max_steps = 15
+							remove_star_flag = has_inf_cd_anomaly
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Stage 4 - An Ancient Prison
+situation_event = {
+	id = infernals.2540
+	title = infernals.2540.name
+	desc = infernals.2540.desc
+	picture = GFX_evt_clones
+	show_sound = event_laboratory_sound
+	situation = this
+
+	is_triggered_only = yes
+
+	immediate = {
+		# Stops situation
+		# The other flags stop it too but are needed for the tooltips
+		owner = { set_country_flag = CD_situation_trigger }
+	}
+
+	option = {
+		name = infernals.2540.a
+		owner = {
+			enable_special_project = {
+				name = INF_ORIGIN_COSMIC_DAWN_STORM
+				owner = prev
+				location = capital_scope
+			}
+			hidden_effect = {
+				set_country_flag = has_cd_storm_project
+			}
+		}
+	}
+	option = {
+		name = infernals.2540.b
+		owner = {
+			enable_special_project = {
+				name = INF_ORIGIN_COSMIC_DAWN_BRIBE
+				owner = prev
+			}
+			hidden_effect = {
+				set_country_flag = has_cd_bribe_project
+			}
+		}
+	}
+}
+
+# Project Storm done
+country_event = {
+	id = infernals.2545
+	title = infernals.2545.name
+	desc = infernals.2545.desc
+	picture = GFX_evt_archaeologists_escaping
+	show_sound = event_planetary_riot
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2545.a
+		custom_tooltip = infernals.2545.a.tt
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 100
+				mult = value:maxed_years_passed
+			}
+		}
+		add_resource = {
+			energy = -100
+			mult = value:maxed_years_passed
+		}
+		hidden_effect = {
+			capital_scope = {
+				create_pop_group = { species = owner }
+			}
+			remove_country_flag = CD_situation_trigger
+			remove_country_flag = has_cd_storm_project
+		}
+		if = {
+			limit = {
+				any_owned_planet = { has_planet_flag = cosmic_dawn_homeworld }
+			}
+			random_owned_planet = {
+				limit = { has_planet_flag = cosmic_dawn_homeworld }
+				hidden_effect = {
+					change_variable = { which = cd_pods_var value = 1 }
+				}
+				custom_tooltip = cosmic_dawn_districtsize
+			}
+		}
+		else = {
+			capital_scope = {
+				change_planet_size = 1
+			}
+		}
+	}
+	option = {
+		name = infernals.2545.b
+		custom_tooltip = infernals.2545.b.tt
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		hidden_effect = {
+			capital_scope = {
+				while = {
+					count = 1
+					create_pop_group = { species = owner }
+				}
+			}
+			remove_country_flag = CD_situation_trigger
+			remove_country_flag = has_cd_storm_project
+			set_country_flag = has_infernals_2545
+		}
+	}
+}
+
+# Project Bribe done
+country_event = {
+	id = infernals.2550
+	title = infernals.2550.name
+	desc = infernals.2550.desc
+	picture = GFX_evt_discovered_hidden_door
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2550.a
+		custom_tooltip = infernals.2550.a.tt
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+		hidden_effect = {
+			capital_scope = {
+				while = {
+					count = 3
+					create_pop_group = { species = owner }
+				}
+			}
+			remove_country_flag = CD_situation_trigger
+			remove_country_flag = has_cd_bribe_project
+		}
+	}
+	after = {
+		if = {
+			limit = {
+				any_owned_planet = { has_planet_flag = cosmic_dawn_homeworld }
+			}
+			random_owned_planet = {
+				limit = { has_planet_flag = cosmic_dawn_homeworld }
+				hidden_effect = {
+					change_variable = { which = cd_pods_var value = 1 }
+				}
+				custom_tooltip = cosmic_dawn_districtsize
+			}
+		}
+		else = {
+			capital_scope = {
+				change_planet_size = 1
+			}
+		}
+	}
+}
+
+# Stage 5
+situation_event = {
+	id = infernals.2555
+	title = infernals.2555.name
+	desc = {
+		trigger = {
+			owner = { NOT = { has_country_flag = has_infernals_2545 } }
+		}
+		text = infernals.2555.desc.a
+	}
+	desc = {
+		trigger = {
+			owner = { has_country_flag = has_infernals_2545 }
+		}
+		text = infernals.2555.desc.b
+	}
+	picture = GFX_evt_archaeologists_escaping
+	show_sound = event_yellow_alert
+	situation = this
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2555.a
+		trigger = {
+			# A Hive Mind doesnt have individual drones, usually
+			owner = { is_gestalt = no }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = minerals
+					value >= 40
+					mult = value:maxed_years_passed
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				minerals = -40
+				mult = value:maxed_years_passed
+			}
+			country_event = {
+				id = infernals.2560
+				days = 7
+			}
+		}
+	}
+	option = {
+		name = infernals.2555.b
+		trigger = {
+			# A Hive Mind doesnt pay themselves
+			owner = { is_gestalt = no }
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 50
+					mult = value:maxed_years_passed
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -50
+				mult = value:maxed_years_passed
+			}
+			country_event = {
+				id = infernals.2565
+				days = 7
+			}
+		}
+	}
+	option = {
+		name = infernals.2555.c
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = influence
+					value >= 5
+					mult = value:maxed_years_passed
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				influence = -5
+				mult = value:maxed_years_passed
+			}
+			country_event = {
+				id = infernals.2570
+				days = 7
+			}
+		}
+	}
+	option = {
+		name = infernals.2555.d
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = unity
+					value >= 25
+					mult = value:maxed_years_passed
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				unity = -25
+				mult = value:maxed_years_passed
+			}
+			country_event = {
+				id = infernals.2575
+				days = 7
+			}
+		}
+	}
+	after = {
+		if = {
+			limit = {
+				owner = {
+					any_owned_planet = { has_planet_flag = cosmic_dawn_homeworld }
+				}
+			}
+			owner = {
+				random_owned_planet = {
+					limit = { has_planet_flag = cosmic_dawn_homeworld }
+					hidden_effect = {
+						change_variable = { which = cd_pods_var value = 1 }
+					}
+					custom_tooltip = cosmic_dawn_districtsize
+				}
+			}
+		}
+		else = {
+			owner.capital_scope = {
+				change_planet_size = 1
+			}
+		}
+	}
+}
+
+# Option A
+country_event = {
+	id = infernals.2560
+	title = infernals.2560.name
+	desc = infernals.2560.desc
+	picture = GFX_evt_laser_grid
+	show_sound = event_collapsing_ruins
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2560.a
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+}
+
+# Option B
+country_event = {
+	id = infernals.2565
+	title = infernals.2565.name
+	desc = infernals.2565.desc
+	picture = GFX_evt_scanning_remains
+	show_sound = event_assembly_fight
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2565.a
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+}
+
+# Option C
+country_event = {
+	id = infernals.2570
+	title = infernals.2570.name
+	desc = {
+		trigger = { NOT = { has_country_flag = has_infernals_2545 } }
+		text = infernals.2570.desc.a
+	}
+	desc = {
+		trigger = { has_country_flag = has_infernals_2545 }
+		text = infernals.2570.desc.b
+	}
+	picture = GFX_evt_society_research
+	show_sound = event_celebration
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2570.a
+		custom_tooltip = infernals.2570.a.tt
+		trigger = { is_gestalt = no }
+		add_resource = {
+			unity = 35
+			mult = value:maxed_years_passed
+		}
+		hidden_effect = {
+			capital_scope = {
+				while = {
+					count = 4
+					create_pop_group = { species = owner }
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2570.b
+		custom_tooltip = infernals.2570.b.tt
+		trigger = { is_gestalt = no }
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+		hidden_effect = {
+			capital_scope = {
+				while = {
+					count = 4
+					create_pop_group = { species = owner }
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2570.c
+		custom_tooltip = infernals.2570.c.tt
+		trigger = { is_gestalt = yes }
+		hidden_effect = {
+			capital_scope = {
+				while = {
+					count = 4
+					create_pop_group = { species = owner }
+				}
+			}
+		}
+	}
+}
+
+# Option D
+country_event = {
+	id = infernals.2575
+	title = infernals.2575.name
+	desc = infernals.2575.desc
+	picture = GFX_evt_scanning_remains
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.2575.a
+		trigger = { is_gestalt = no }
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+	option = {
+		name = infernals.2575.b
+		trigger = { is_gestalt = yes }
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+}
+
+# Situation completed
+situation_event = {
+	id = infernals.2580
+	title = infernals.2580.name
+	desc = infernals.2580.desc
+	picture = GFX_evt_clocks
+	show_sound = event_kaleidoscopic_lights
+	situation = this
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				owner = { any_owned_planet = { has_planet_flag = cosmic_dawn_homeworld } }
+			}
+			owner = {
+				random_owned_planet = {
+					limit = { has_planet_flag = cosmic_dawn_homeworld }
+					save_event_target_as = homeworld
+				}
+			}
+		}
+		else = {
+			owner.capital_scope = { save_event_target_as = homeworld }
+		}
+		owner = {
+			add_timeline_event = {
+				type = timeline_origin_specific
+				override_id = timeline_cosmic_dawn_end
+				override_tooltip = "TIMELINE_EVENT_ORIGIN_CD_END_TOOLTIP"
+				override_types = { country }
+				override_text = { "text:TIMELINE_EVENT_ORIGIN_CD_END" }
+				override_texture = { "background:GFX_evt_inf_out_of_the_ground" }
+				targets = { root.owner }
+			}
+		}
+		event_target:homeworld = {
+			add_deposit = d_volcanic_tunnels
+			add_deposit = d_volcanic_intraplate
+			add_deposit = d_volcanic_ore_caverns
+			add_deposit = d_volcanic_weak_crust
+		}
+	}
+
+	option = {
+		name = infernals.2580.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier2materialreward
+				min = @tier2materialmin
+				max = @tier2materialmax
+			}
+		}
+		event_target:homeworld = {
+			hidden_effect = {
+				set_planet_flag = cosmic_dawn_tunnel_foundry_flag
+			}
+		}
+		custom_tooltip = cosmic_dawn_tunnel_foundry
+	}
+	option = {
+		name = infernals.2580.b
+		custom_tooltip = infernals.2580.b.tt
+		owner = {
+			hidden_effect = {
+				create_leader = {
+					name = random
+					class = commander
+					species = owner_main_species
+					sub_type = subclass_commander_admiral
+					skill = 5
+					effect = {
+						leader_event = { id = paragon.450 }
+					}
+				}
+			}
+		}
+		event_target:homeworld = {
+			hidden_effect = {
+				set_planet_flag = cosmic_dawn_tunnel_bureaucrat_flag
+			}
+		}
+		custom_tooltip = cosmic_dawn_tunnel_bureaucrat
+	}
+	option = {
+		name = infernals.2580.c
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+		event_target:homeworld = {
+			hidden_effect = {
+				set_planet_flag = cosmic_dawn_tunnel_researcher_flag
+			}
+		}
+		custom_tooltip = cosmic_dawn_tunnel_researcher
+	}
+	option = {
+		name = infernals.2580.d
+		owner = {
+			add_resource = {
+				unity = 350
+				mult = value:maxed_years_passed
+			}
+		}
+		event_target:homeworld = {
+			hidden_effect = {
+				set_planet_flag = cosmic_dawn_tunnel_worker_flag
+			}
+		}
+		custom_tooltip = cosmic_dawn_tunnel_worker
+	}
+	after = {
+		owner = {
+			add_relic = r_pyroglyphic_codex
+		}
+		event_target:homeworld = {
+			hidden_effect = {
+				change_variable = { which = cd_pods_var value = 2 }
+			}
+			custom_tooltip = cosmic_dawn_districtsize2
+		}
+		destroy_situation = this
+	}
+}
+# on_planet_class_changed
+planet_event = {
+	id = infernals.2585
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = { has_planet_flag = cosmic_dawn_homeworld }
+	immediate = {
+		if = {
+			limit = {
+				owner = { is_cosmic_dawn_empire = yes } # undercoat: moved to scripted trigger
+				NOT = { has_deposit = d_cd_ancient_tunnels }
+			}
+			add_deposit = d_cd_ancient_tunnels
+		}
+	}
+}
+
+######## Volcanic Colony Events
+# on_colony_1_year_old + on_monthly_pulse_pre_ftl_observation
+
+### Imminent Eruption
+planet_event = {
+	id = infernals.3000
+	title = infernals.3000.name
+	desc = infernals.3000.desc
+	picture = GFX_evt_inf_imminent_eruption
+	show_sound = event_air_raid_siren
+
+	location = this
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+		is_volcanic_world = yes # undercoat: moved to scripted trigger
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_imminent_erruption }
+		}
+		NOT = { has_planet_flag = colony_event }
+	}
+
+	immediate = {
+		owner = { set_country_flag = triggered_imminent_erruption }
+	}
+
+	option = {
+		name = infernals.3000.a
+		allow = {
+			custom_tooltip = infernals.3000.a.tt
+			hidden_trigger = {
+				owner = {
+					resource_stockpile_compare = {
+						resource = energy
+						value >= 500
+					}
+				}
+			}
+		}
+		owner = { add_resource = { energy = -500 } }
+		hidden_effect = {
+			planet_event = { id = infernals.3005 days = 5 }
+		}
+	}
+	option = {
+		name = infernals.3000.b
+		hidden_effect = {
+			random_list = {
+				50 = { planet_event = { id = infernals.3010 days = 5 } }
+				50 = { planet_event = { id = infernals.3015 days = 5 } }
+			}
+		}
+	}
+	option = {
+		name = infernals.3000.c
+		hidden_effect = {
+			planet_event = { id = infernals.3020 days = 5 }
+		}
+	}
+	option = {
+		name = infernals.3000.d
+		hidden_effect = {
+			planet_event = { id = infernals.3025 days = 5 }
+		}
+	}
+}
+
+# A
+planet_event = {
+	id = infernals.3005
+	title = infernals.3005.name
+	desc = infernals.3005.desc
+	picture = GFX_evt_burning_settlement
+	show_sound = event_celebration
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+# B 1
+planet_event = {
+	id = infernals.3010
+	title = infernals.3010.name
+	desc = infernals.3010.desc
+	picture = GFX_evt_inf_cataclysmic_eruption
+	show_sound = event_burning_city
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = UNFORTUNATE
+		random_owned_pop_group = {
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+				pop_group = this
+				amount = 200
+			}
+		}
+	}
+}
+
+# B 2
+planet_event = {
+	id = infernals.3015
+	title = infernals.3015.name
+	desc = infernals.3015.desc
+	picture = GFX_evt_molten
+	show_sound = event_mystic_reveal
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3015.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+}
+
+# C
+planet_event = {
+	id = infernals.3020
+	title = infernals.3020.name
+	desc = infernals.3020.desc
+	picture = GFX_evt_generator_powerup
+	show_sound = event_mystic_reveal
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			add_monthly_resource_mult = {
+				resource = energy
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+	}
+}
+
+# D
+planet_event = {
+	id = infernals.3025
+	title = infernals.3025.name
+	desc = infernals.3025.desc
+	picture = GFX_evt_mining_operations
+	show_sound = event_dig_site
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier4materialreward
+				min = @tier4materialmin
+				max = @tier4materialmax
+			}
+		}
+	}
+}
+
+### Lava Sports
+planet_event = {
+	id = infernals.3030
+	title = infernals.3030.name
+	desc = infernals.3030.desc
+	picture = GFX_evt_molten
+	show_sound = event_public_unrest
+
+	location = this
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+		is_volcanic_world = yes # undercoat: moved to scripted trigger
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			is_gestalt = no
+			NOT = { has_country_flag = triggered_lava_sports }
+		}
+		NOT = { has_planet_flag = colony_event }
+	}
+
+	immediate = {
+		owner = { set_country_flag = triggered_lava_sports }
+	}
+
+	option = {
+		name = infernals.3030.a
+		hidden_effect = {
+			planet_event = { id = infernals.3035 days = 5 }
+			owner = { set_country_flag = had_lava_sports }
+		}
+		owner = {
+			give_specimen = { key = lava_surfboard }
+		}
+	}
+	option = {
+		name = infernals.3030.b
+		hidden_effect = {
+			planet_event = { id = infernals.3040 days = 5 }
+		}
+		owner = {
+			give_specimen = { key = lava_surfboard }
+		}
+	}
+	option = {
+		name = infernals.3030.c
+		hidden_effect = {
+			planet_event = { id = infernals.3045 days = 5 }
+		}
+	}
+}
+
+# A
+planet_event = {
+	id = infernals.3035
+	title = infernals.3035.name
+	desc = infernals.3035.desc
+	picture = GFX_evt_civil_action
+	show_sound = event_celebration
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3035.a
+		add_modifier = {
+			modifier = lava_sports_flow
+			years = 5
+		}
+	}
+}
+
+# B
+planet_event = {
+	id = infernals.3040
+	title = infernals.3040.name
+	desc = infernals.3040.desc
+	picture = GFX_evt_announcement
+	show_sound = event_announcement
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3040.a
+		add_modifier = {
+			modifier = lava_sports_regulated
+			years = 5
+		}
+	}
+}
+
+# C
+planet_event = {
+	id = infernals.3045
+	title = infernals.3045.name
+	desc = infernals.3045.desc
+	picture = GFX_evt_open_revolt
+	show_sound = event_public_unrest
+
+	location = this
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3045.a
+		add_modifier = {
+			modifier = lava_sports_banned
+			years = 5
+		}
+	}
+}
+
+### Kindled Myths (pre ftl)
+# triggered_kindled_myths used twice to make it unique for both sides
+situation_event = {
+	id = infernals.3050
+	hide_window = yes
+	is_triggered_only = yes
+	location = this
+
+	trigger = {
+		has_infernals = yes
+		owner = {
+			is_regular_pre_ftl = yes
+			NOT = { has_country_flag = triggered_kindled_myths }
+			capital_scope = {
+				is_volcanic_world = yes # undercoat: moved to scripted trigger
+				has_observation_outpost = yes
+				observation_outpost_owner = {
+					is_infernal_empire = yes
+					is_homicidal = no
+					NOT = { has_country_flag = triggered_kindled_myths }
+				}
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = triggered_kindled_myths
+			save_event_target_as = pre_ftl_country
+			capital_scope = {
+				save_event_target_as = pre_ftl_planet
+				observation_outpost_owner = {
+					country_event = { id = infernals.3055 }
+					set_country_flag = triggered_kindled_myths
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = infernals.3055
+	title = infernals.3055.name
+	desc = infernals.3055.desc
+	picture = GFX_evt_medieval_alien_civilization
+	show_sound = event_pre_ftl_civilization
+	location = event_target:pre_ftl_planet
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:pre_ftl_planet
+		exists = event_target:pre_ftl_country
+	}
+
+	immediate = {
+		set_observation_events_locked = yes
+	}
+
+	option = {
+		name = infernals.3055.a
+		hidden_effect = {
+			country_event = { id = infernals.3060 days = 5 }
+		}
+	}
+	option = {
+		name = infernals.3055.b
+		hidden_effect = {
+			random_list = {
+				50 = { country_event = { id = infernals.3065 days = 5 } }
+				50 = { country_event = { id = infernals.3070 days = 5 } }
+			}
+		}
+	}
+
+	after = {
+		set_observation_events_unlocked = yes
+	}
+}
+
+# A
+country_event = {
+	id = infernals.3060
+	title = infernals.3060.name
+	desc = infernals.3060.desc
+	picture = GFX_evt_medieval_alien_civilization
+	show_sound = event_pre_ftl_civilization
+	location = event_target:pre_ftl_planet
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3060.a
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier2researchreward
+			min = @tier2researchmin
+			max = @tier2researchmax
+		}
+	}
+}
+
+# B 1
+country_event = {
+	id = infernals.3065
+	title = infernals.3065.name
+	desc = infernals.3065.desc
+	picture = GFX_evt_open_revolt
+	show_sound = event_public_unrest
+	location = event_target:pre_ftl_planet
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3065.a
+		add_resource = { energy = -450 }
+		event_target:pre_ftl_country = {
+			add_awareness = 10
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+}
+
+# B 2
+country_event = {
+	id = infernals.3070
+	title = infernals.3070.name
+	desc = infernals.3070.desc
+	picture = GFX_evt_medieval_alien_civilization
+	show_sound = event_pre_ftl_civilization
+	location = event_target:pre_ftl_planet
+	is_triggered_only = yes
+
+	option = {
+		name = infernals.3070.a
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+			max = @tier3unitymax
+		}
+	}
+}
+
+#result of Event 2 special project
+country_event = {
+	id = infernals.2105
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				exists = event_target:situation_red_giant_expansion@root
+			}
+			event_target:situation_red_giant_expansion@root = {
+				target.solar_system = {
+					every_system_colony = {
+						add_modifier = {
+							modifier = "red_giant_protect_mod"
+							days = -1
+						}
+					}
+				}
+			}
+		}
+		else = {
+			capital_scope = {
+				add_modifier = {
+					modifier = "red_giant_protect_mod"
+					days = -1
+				}
+			}
+		}
+	}
+}
+
+#other result of Event 2 special project
+country_event = {
+	id = infernals.2110
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = {
+				exists = event_target:situation_red_giant_expansion@root
+			}
+			event_target:situation_red_giant_expansion@root = {
+				target.solar_system = {
+					every_system_colony = {
+						add_modifier = {
+							modifier = "red_giant_exploit_mod"
+							days = -1
+						}
+					}
+				}
+			}
+		}
+		else = {
+			capital_scope = {
+				add_modifier = {
+					modifier = "red_giant_protect_mod"
+					days = -1
+				}
+			}
+		}
+	}
+}
+
+#Event 6 Boarding Party, triggers 5, 7, 8
+ship_event = {
+	id = infernals.2115
+	is_triggered_only = yes
+	title = infernals.2115.name
+	desc = infernals.2115.desc
+	picture = GFX_evt_salute
+
+	option = {
+		name = infernals.2115.a #blow it up
+		if = {
+			limit = { exists = event_target:lusus_miner_station@owner }
+			event_target:lusus_miner_station@owner = {
+				destroy_fleet = this
+			}
+		}
+		if = {
+			limit = { exists = event_target:lusus_miner_vfx@owner } #otherwise the vfx will stay even after the station gets destroyed
+			event_target:lusus_miner_vfx@owner = {
+				destroy_ambient_object = this
+			}
+		}
+		clear_global_event_target = lusus_miner_vfx@owner
+		clear_global_event_target = lusus_miner_station@owner
+		owner = {
+			set_country_flag = lusus_station_destroyed
+			set_country_flag = situation_red_giant_expansion_approach3
+			remove_country_flag = situation_red_giant_expansion_approach4	#in case the station is destroyed even after being controlled
+			remove_country_flag = situation_red_giant_expansion_approach2
+			remove_country_flag = situation_red_giant_expansion_approach1
+			remove_country_flag = situation_red_giant_continue_siphoning
+			remove_country_flag = situation_red_giant_reverse_inflation
+			remove_country_flag = situation_red_giant_stabilize_the_star	#also remove the locked in final approach flags
+			country_event = { id = infernals.2121 }
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+	option = {
+		name = infernals.2115.b #Interrogate
+		trigger = {
+			owner = {
+				is_pacifist = no
+				is_egalitarian = no
+				is_homicidal = no	#they dont negotiate with filth
+				values_others = no
+			}
+		}
+		ship_event = { id = infernals.2125 days = 20 }
+	}
+	option = {
+		name = infernals.2115.c #Enslave
+		trigger = {
+			owner = {
+				allows_slavery = yes
+				is_homicidal = no
+			}
+		}
+		hidden_effect = {
+			owner.capital_scope = {
+				custom_tooltip = infernals.400pops
+				event_target:lusus_miner_station@owner = {
+					owner_species = {
+						save_event_target_as = lusus_species
+					}
+				}
+				create_pop_group = {
+					size = 400
+					species = event_target:lusus_species
+					effect = {
+						save_event_target_as = last_created_pop_group
+					}
+				}
+				event_target:last_created_pop_group = {
+					set_citizenship_type = {
+						country = root.owner
+						type = citizenship_slavery
+						cooldown = no
+					}
+				}
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2115.d	#Eliminate
+		trigger = {
+			owner = {
+				OR = {
+					allows_purge = yes
+					is_homicidal = yes
+				}
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					is_gestalt = no
+				}
+				capital_scope = {
+					add_modifier = {
+						modifier = "red_giant_venting"	#authoritarianism
+						months = 12
+					}
+				}
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2115.e #Speak, same as interrogate
+		trigger = {
+			owner = {
+				OR = {
+					is_pacifist = yes
+					is_egalitarian = yes
+					values_others = yes
+				}
+			}
+		}
+		ship_event = { id = infernals.2125 days = 15 }
+	}
+	option = {
+		name = infernals.2115.f	#Purge
+		trigger = {
+			owner = {
+				is_homicidal = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2115.g	#Eat -> Must be hive or necrophage, lusus miners must be edible
+		trigger = {
+			owner = {
+				OR = {
+					is_hive_empire = yes
+					is_current_or_former_necrophage_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			OR = {
+				NOT = { exists = event_target:lusus_miner_station@owner }
+				AND = {
+					exists = event_target:lusus_miner_station@owner
+					event_target:lusus_miner_station@owner = {
+						owner_species = {
+							NOR = {
+								has_trait = trait_lithoid
+								has_trait = trait_machine_unit
+								has_trait = trait_mechanical
+							}
+						}
+					}
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+}
+
+# Wrapper for Destruction of lusus miner station Aliens Terminated
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = infernals.2120
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		FromFromFrom = { has_fleet_flag = lusus_miner_station }
+	}
+	immediate = {
+		if = {
+			limit = {
+				exists = event_target:lusus_miner_station@root
+				FromFromFrom = {
+					is_same_value = event_target:lusus_miner_station@root
+				}
+			} #if the red giant player killed his station, most likely killer is the intended player, otherwise must search all countries.
+			if = {
+				limit = { #if we are already past the narrative locked into the final stretch, destroying the station wont allow you to regain extra options
+					OR = {
+						has_country_flag = situation_red_giant_reverse_inflation
+						has_country_flag = situation_red_giant_add_fuel
+						has_country_flag = situation_red_giant_stabilize_the_star
+						has_country_flag = situation_red_giant_continue_siphoning
+					}
+				}
+				country_event = { id = infernals.2122 }
+			}
+			else = {
+				country_event = { id = infernals.2121 }
+			}
+		}
+		else_if = { #start search for the correct player
+			every_playable_country = {
+				limit = {
+					is_red_giant_empire = yes # undercoat: moved to scripted trigger
+				}
+				if = {
+					limit = {
+						FromFromFrom = {
+							exists = event_target:lusus_miner_station@prev
+							is_same_value = event_target:lusus_miner_station@prev	#check if this country had the destroyed mining station as its assigned lusus station
+						}
+					}
+					if = {
+						limit = { #if we are already past the narrative locked into the final stretch, destroying the station wont allow you to regain extra options
+							OR = {
+								has_country_flag = situation_red_giant_reverse_inflation
+								has_country_flag = situation_red_giant_add_fuel
+								has_country_flag = situation_red_giant_stabilize_the_star
+								has_country_flag = situation_red_giant_continue_siphoning
+							}
+						}
+						country_event = { id = infernals.2122 }
+					}
+					else = {
+						country_event = { id = infernals.2121 }
+					}
+				}
+			}
+		}
+
+	}
+}
+#Event 5 Destruction of lusus miner station
+# This = Red Giant player
+# From = destruction event
+country_event = {
+	id = infernals.2121
+	is_triggered_only = yes
+	title = infernals.2121.name
+	desc = infernals.2121.desc
+	picture = GFX_evt_exploding_ship
+	show_sound = event_ship_explosion
+	location = from
+
+	trigger = {
+		exists = event_target:situation_red_giant_expansion@root #if the situation is already wrapped up theres no point in nuking the station
+	}
+	immediate = {
+		set_country_flag = lusus_station_destroyed
+		set_country_flag = situation_red_giant_expansion_approach3
+		remove_country_flag = situation_red_giant_expansion_approach4	#in case the station is destroyed even after being controlled
+		remove_country_flag = situation_red_giant_expansion_approach2
+		remove_country_flag = situation_red_giant_expansion_approach1
+		remove_country_flag = situation_red_giant_continue_siphoning
+		remove_country_flag = situation_red_giant_reverse_inflation
+		remove_country_flag = situation_red_giant_stabilize_the_star	#also remove the locked in final approach flags
+		if = {
+			limit = { exists = event_target:lusus_miner_vfx@root }
+			event_target:lusus_miner_vfx@root = {
+				destroy_ambient_object = this
+			}
+		}
+		clear_global_event_target = lusus_miner_vfx@root
+		clear_global_event_target = lusus_miner_station@root
+		event_target:situation_red_giant_expansion@root = {
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm	#saving this into non-dynamic event target for desc
+				set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+			}
+		}
+	}
+	option = {
+		name = infernals.2121.a
+		event_target:situation_red_giant_expansion@root = {
+			set_situation_approach = approach_wait_and_see3
+			if = {
+				limit = {
+					situation_progress < 1290
+				}
+				add_situation_progress = 200
+			}
+			else_if = {
+				limit = {
+					situation_progress < 1390
+				}
+				add_situation_progress = 100
+			}
+		}
+	}
+}
+#Event 5 Destruction of lusus miner station IF we were already locked into a final approach
+# This = Red Giant player
+# From = destruction event
+country_event = {
+	id = infernals.2122
+	is_triggered_only = yes
+	title = infernals.2122.name
+	desc = infernals.2122.desc
+	picture = GFX_evt_exploding_ship
+	show_sound = event_ship_explosion
+	location = from
+
+	immediate = {
+		set_country_flag = lusus_station_destroyed
+		set_country_flag = situation_red_giant_expansion_approach3
+		remove_country_flag = situation_red_giant_expansion_approach4	#in case the station is destroyed even after being controlled
+		remove_country_flag = situation_red_giant_expansion_approach2
+		remove_country_flag = situation_red_giant_expansion_approach1
+		remove_country_flag = situation_red_giant_continue_siphoning
+		remove_country_flag = situation_red_giant_reverse_inflation
+		remove_country_flag = situation_red_giant_stabilize_the_star	#also remove the locked in final approach flags
+		if = {
+			limit = { exists = event_target:lusus_miner_vfx@root }
+			event_target:lusus_miner_vfx@root = {
+				destroy_ambient_object = this
+			}
+		}
+		clear_global_event_target = lusus_miner_vfx@root
+		clear_global_event_target = lusus_miner_station@root
+		event_target:situation_red_giant_expansion@root = {
+			set_situation_approach = approach_wait_and_see3
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm	#saving this into non-dynamic event target for desc
+				set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal (if it wasnt already)
+			}
+		}
+	}
+	option = {
+		name = ACKNOWLEDGED
+	}
+}
+
+#Event 7 Alien Negotiations
+ship_event = {
+	id = infernals.2125
+	is_triggered_only = yes
+	title = infernals.2125.name
+	desc = infernals.2125.desc
+	picture = GFX_evt_astral_rift_desert_ruins_third_chamber
+
+	option = {
+		trigger = {
+			owner = {
+				NOT = { is_homicidal = yes} #we would only purge them anyways
+			}
+		}
+		name = infernals.2125.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			owner.capital_scope = {
+				custom_tooltip = infernals.400pops
+				event_target:lusus_miner_station@owner = {
+					owner_species = {
+						save_event_target_as = lusus_species
+					}
+				}
+				create_pop_group = {
+					size = 400
+					species = event_target:lusus_species
+					effect = {
+						save_event_target_as = last_created_pop_group
+					}
+				}
+			}
+		}
+		ship_event = { id = infernals.2131 days = 30 }
+	}
+	option = {
+		name = infernals.2125.b #send them off
+		owner = {
+			add_resource = { alloys = -200 }
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+		ship_event = { id = infernals.2131 days = 30 }
+	}
+	option = {
+		name = infernals.2115.c #Enslave (same as 2115)
+		trigger = {
+			owner = {
+				allows_slavery = yes
+			}
+		}
+		hidden_effect = {
+			owner.capital_scope = {
+				custom_tooltip = infernals.400pops
+				event_target:lusus_miner_station@owner = {
+					owner_species = {
+						save_event_target_as = lusus_species
+					}
+				}
+				create_pop_group = {
+					size = 400
+					species = event_target:lusus_species
+					effect = {
+						save_event_target_as = last_created_pop_group
+					}
+				}
+				event_target:last_created_pop_group = {
+					set_citizenship_type = {
+						country = root.owner
+						type = citizenship_slavery
+						cooldown = no
+					}
+				}
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2125.c #Vent them
+		trigger = {
+			owner = {
+				allows_purge = yes
+			}
+		}
+		owner = {
+			if = {
+				limit = {
+					is_gestalt = no
+				}
+				capital_scope = {
+					add_modifier = {
+						modifier = "red_giant_venting"	#authoritarianism
+						months = 12
+					}
+				}
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2125.d
+		trigger = {
+			owner = {
+				is_pacifist = yes
+			}
+		}
+		ship_event = { id = infernals.2135 days = 30 }
+	}
+}
+#Event 8 Subspace Mining Operation Interrogation
+ship_event = {
+	id = infernals.2130
+	is_triggered_only = yes
+	title = infernals.2130.name
+	desc = infernals.2130.desc
+	picture = GFX_evt_gas_giant
+
+	immediate = {
+		owner = {
+			set_country_flag = red_giant_controlled_lusus_station
+			set_country_flag = situation_red_giant_expansion_approach4
+			remove_country_flag = situation_red_giant_expansion_approach2
+			remove_country_flag = situation_red_giant_expansion_approach1
+			country_event = { id = infernals.2140 months = 24 }
+		}
+		event_target:situation_red_giant_expansion@owner = {
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm #tmp save for desc
+			}
+			set_situation_approach = approach_stabilize_the_star4 #so theres always an approach selected even if players dont accept the option
+		}
+	}
+	option = {
+		name = infernals.2130.a
+		event_target:situation_red_giant_expansion@owner = {
+			set_situation_approach = approach_stabilize_the_star4
+		}
+	}
+}
+#Event 8b  Subspace Mining Operation COOPERATIVE (coming from Event 7, unless vented)
+ship_event = {
+	id = infernals.2131
+	is_triggered_only = yes
+	title = infernals.2130.name
+	desc = infernals.2131.desc
+	picture = GFX_evt_vortex
+
+	immediate = {
+		event_target:situation_red_giant_expansion@owner = {
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm
+			}
+		}
+		owner = {
+			set_country_flag = red_giant_controlled_lusus_station
+			set_country_flag = situation_red_giant_expansion_approach4
+			remove_country_flag = situation_red_giant_expansion_approach2
+			remove_country_flag = situation_red_giant_expansion_approach1
+			country_event = { id = infernals.2140 months = 24 }
+		}
+	}
+	option = {
+		name = infernals.2130.a
+		event_target:situation_red_giant_expansion@owner = {
+			set_situation_approach = approach_stabilize_the_star4
+		}
+	}
+}
+#Event 9 An End to the Threat
+ship_event = {
+	id = infernals.2135
+	is_triggered_only = yes
+	title = infernals.2135.name
+	desc = infernals.2135.desc
+	picture = GFX_evt_ruined_system
+
+	immediate = {
+		event_target:situation_red_giant_expansion@owner = {
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm
+			}
+		}
+	}
+	option = {
+		name = infernals.2135.a
+		trigger = {
+			owner = {
+				NOR = {
+					is_fanatic_xenophobe = yes
+					is_homicidal = yes
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier4materialreward
+				min = @tier4materialmin
+				max = @tier4materialmax
+			}
+		}
+		hidden_effect = {
+			owner.capital_scope = {
+				custom_tooltip = infernals.400pops
+				event_target:lusus_miner_station@owner = {
+					owner_species = {
+						save_event_target_as = lusus_species
+					}
+				}
+				create_pop_group = {
+					size = 400
+					species = event_target:lusus_species
+					effect = {
+						save_event_target_as = last_created_pop_group
+					}
+				}
+				event_target:last_created_pop_group = {
+					set_citizenship_type = {
+						country = root.owner
+						type = citizenship_slavery
+						cooldown = no
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2135.b
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier4materialreward
+				min = @tier4materialmin
+				max = @tier4materialmax
+			}
+		}
+	}
+	option = {
+		name = infernals.2135.c
+		trigger = {
+			owner = {
+				allows_slavery = yes
+				NOT = { is_homicidal = yes} #we would only purge them anyways
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = @tier4materialreward
+				min = @tier4materialmin
+				max = @tier4materialmax
+			}
+			add_monthly_resource_mult = {
+				resource = minerals
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+		}
+		hidden_effect = {
+			owner.capital_scope = {
+				custom_tooltip = infernals.300pops
+				event_target:lusus_miner_station@owner = {
+					owner_species = {
+						save_event_target_as = lusus_species
+					}
+				}
+				create_pop_group = {
+					size = 300
+					species = event_target:lusus_species
+					effect = {
+						save_event_target_as = last_created_pop_group
+					}
+				}
+				event_target:last_created_pop_group = {
+					set_citizenship_type = {
+						country = root.owner
+						type = citizenship_slavery
+						cooldown = no
+					}
+				}
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2115.f	#Purge
+		trigger = {
+			owner = {
+				is_homicidal = yes
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	option = {
+		name = infernals.2115.g	#Eat -> Must be hive or necrophage, lusus miners must be edible
+		trigger = {
+			OR = {
+				owner = {
+					is_hive_empire = yes
+					is_current_or_former_necrophage_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			OR = {
+				NOT = { exists = event_target:lusus_miner_station@owner }
+				AND = {
+					exists = event_target:lusus_miner_station@owner
+					event_target:lusus_miner_station@owner = {
+						owner_species = {
+							NOR = {
+								has_trait = trait_lithoid
+								has_trait = trait_machine_unit
+								has_trait = trait_mechanical
+							}
+						}
+					}
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier3unityreward
+				min = @tier3unitymin
+				max = @tier3unitymax
+			}
+		}
+		ship_event = { id = infernals.2130 days = 30 }
+	}
+	after = {
+		if = {
+			limit = { exists = event_target:lusus_miner_station@owner }
+			event_target:lusus_miner_station@owner = {
+				destroy_fleet = this
+			}
+		}
+		if = {
+			limit = { exists = event_target:lusus_miner_vfx@owner }
+			event_target:lusus_miner_vfx@owner = {
+				destroy_ambient_object = this
+			}
+		}
+		clear_global_event_target = lusus_miner_vfx@owner
+		clear_global_event_target = lusus_miner_station@owner
+		owner = {
+			set_country_flag = lusus_station_destroyed
+			set_country_flag = situation_red_giant_expansion_approach3
+			remove_country_flag = situation_red_giant_expansion_approach4	#in case the station is destroyed even after being controlled
+			remove_country_flag = situation_red_giant_expansion_approach2
+			remove_country_flag = situation_red_giant_expansion_approach1
+			remove_country_flag = situation_red_giant_continue_siphoning
+			remove_country_flag = situation_red_giant_reverse_inflation
+			remove_country_flag = situation_red_giant_stabilize_the_star	#also remove the locked in final approach flags
+		}
+		event_target:situation_red_giant_expansion@owner = {
+			set_situation_approach = approach_wait_and_see3
+			target = {
+				set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+			}
+		}
+	}
+}
+#Event 10 Prospect of Stability
+country_event = {
+	id = infernals.2140
+	is_triggered_only = yes
+	title = infernals.2140.name
+	desc = infernals.2140.desc
+	picture = GFX_evt_clocks
+	location = capital_scope
+
+	trigger = {
+		exists = event_target:situation_red_giant_expansion@root #if the situation is already wrapped theres no stability left to achieve
+		NOR = {
+			has_country_flag = situation_red_giant_ended
+			has_country_flag = red_giant_prospect
+			has_country_flag = lusus_station_destroyed #if we destroyed the station we cannot gain value from keeping the situation active, so we dont need to force a conclusion
+		}
+	}
+	immediate = {
+		set_country_flag = red_giant_prospect
+		set_country_flag = situation_red_giant_stabilize_the_star
+		remove_country_flag = situation_red_giant_expansion_approach4
+		remove_country_flag = situation_red_giant_expansion_approach3
+		remove_country_flag = situation_red_giant_expansion_approach2
+		remove_country_flag = situation_red_giant_expansion_approach1
+		event_target:situation_red_giant_expansion@root = {
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm
+			}
+			set_situation_locked = yes
+		}
+	}
+	option = {
+		name = infernals.2140.a
+		hidden_effect = {
+			set_country_flag = situation_red_giant_stabilize_the_star
+			event_target:situation_red_giant_expansion@root = { 	#removing all approaches, only allow stability
+				set_situation_approach = approach_stabilize_the_star4
+				situation_event = { id = infernals.2145 days = 30 }
+			}
+		}
+	}
+	option = {
+		name = infernals.2140.b
+		custom_tooltip = infernals.2140.bdesc
+		hidden_effect = {
+			remove_country_flag = situation_red_giant_stabilize_the_star
+			set_country_flag = situation_red_giant_continue_siphoning
+			event_target:situation_red_giant_expansion@root = { 	#removing all approaches, only allow maximum expansion
+				set_situation_locked = no
+				set_situation_approach = approach_continue_siphoning4
+			}
+		}
+	}
+	option = {
+		name = infernals.2140.c
+		custom_tooltip = infernals.2140.cdesc
+		hidden_effect = {
+			remove_country_flag = situation_red_giant_stabilize_the_star
+			set_country_flag = situation_red_giant_reverse_inflation
+			event_target:situation_red_giant_expansion@root = { 	#removing all approaches, only allow reverse inflation
+				set_situation_locked = no
+				set_situation_approach = approach_reverse_inflation4
+			}
+		}
+	}
+}
+#Event 11 Stability Achieved
+situation_event = {
+	id = infernals.2145
+	is_triggered_only = yes
+	title = infernals.2145.name
+	desc = infernals.2145.desc
+	picture = GFX_evt_space_funeral
+
+	trigger = {
+		exists = this #if the situation is already wrapped theres no stability left to achieve
+		NOR = {
+			owner = {
+				has_country_flag = situation_red_giant_ended
+				has_country_flag = lusus_station_destroyed #we cannot achieve stability if we destroyed the station
+			}
+		}
+	}
+
+	immediate = {
+		set_situation_approach = approach_stabilize_the_star4
+		set_situation_locked = yes
+		target = {
+			remove_planet_flag = has_megastructure #allow placing megastructures again
+		}
+		owner = {
+			add_timeline_event = {
+				type = timeline_origin_specific
+				override_id = timeline_red_giant_end_stable
+				override_tooltip = "TIMELINE_EVENT_ORIGIN_RG_END_STABLE_TOOLTIP"
+				override_types = { country }
+				override_text = { "text:TIMELINE_EVENT_ORIGIN_RG_END_STABLE" }
+				override_texture = { "background:GFX_evt_inf_early_warm_galaxy" }
+				targets = { root.owner }
+			}
+			set_country_flag = situation_red_giant_stabilize_the_star
+			remove_country_flag = situation_red_giant_expansion_approach4
+			remove_country_flag = situation_red_giant_expansion_approach3
+			remove_country_flag = situation_red_giant_expansion_approach2
+			remove_country_flag = situation_red_giant_expansion_approach1
+			set_country_flag = lusus_contact_completed	#make sure we cancel all special projects etc
+			remove_country_flag = lusus_contact_parlay
+			remove_country_flag = lusus_contact_board_station
+			end_event_chain = red_giant_event_chain
+			set_country_flag = situation_red_giant_ended
+			remove_point_of_interest = red_giant_lusus_event_poi
+		}
+	}
+	option = {
+		name = infernals.2145.a
+	}
+	after = {
+		if = {
+			limit = { current_stage = stage_1 }
+			#Spawn deposits based on how far the red giant has receded:
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_2 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 63
+						orbit_angle_offset = 30
+						init_effect = {
+							add_deposit = d_minerals_5
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_3 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 57
+						orbit_angle_offset = 270
+						init_effect = {
+							add_deposit = d_engineering_4
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_4 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 162
+						orbit_angle_offset = 130
+						init_effect = {
+							add_deposit = d_rare_crystals_1
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_5 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 160
+						orbit_angle_offset = 190
+						init_effect = {
+							add_deposit = d_alloys_2
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { current_stage = stage_2 }
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_3 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 57
+						orbit_angle_offset = 270
+						init_effect = {
+							add_deposit = d_engineering_4
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_4 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 162
+						orbit_angle_offset = 130
+						init_effect = {
+							add_deposit = d_rare_crystals_1
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_5 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 160
+						orbit_angle_offset = 190
+						init_effect = {
+							add_deposit = d_alloys_2
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { current_stage = stage_3 }
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_4 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 162
+						orbit_angle_offset = 130
+						init_effect = {
+							add_deposit = d_rare_crystals_1
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_5 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 160
+						orbit_angle_offset = 190
+						init_effect = {
+							add_deposit = d_alloys_2
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { current_stage = stage_4 }
+			if = {
+				limit = { owner = { has_country_flag = red_giant_reached_stage_5 } }
+				target.solar_system = {
+					spawn_planet = {
+						class = pc_asteroid
+						location = target
+						orbit_distance_offset = 160
+						orbit_angle_offset = 190
+						init_effect = {
+							add_deposit = d_alloys_2
+							set_name = red_giant_asteroid
+							# Undercoat
+							fire_on_action = { on_action = on_planet_spawned }
+						}
+					}
+				}
+			}
+		}
+		target = {
+			set_planet_entity = { entity = m_star_class_star_entity } #remove subspace portal
+		}
+		destroy_situation = this
+		hidden_effect = {
+			owner = {
+				country_event = { id = infernals.2160 months = 12 }
+			}
+		}
+		owner = {
+			set_country_flag = starfire_cannon_unlocked
+			add_research_option = tech_starfire_cannon
+		}
+	}
+}
+
+# Wrapper to determine correct Origin country for Destruction of lusus guards A Mysterious Station
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = infernals.2150
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		FromFromFrom = { has_fleet_flag = lusus_miner_guards }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				exists = event_target:lusus_miner_station@root
+				FromFromFrom.solar_system = {
+					event_target:lusus_miner_station@root = {
+						solar_system = {
+							is_same_value = prevprev # Check if our mining station is in the same system as the destroyed guards
+						}
+					}
+				}
+			} #if the red giant player killed his station, most likely killer is the intended player, otherwise must search all countries.
+			country_event = { id = infernals.2151 }
+		}
+		else_if = { #start search for the correct player
+			every_playable_country = {
+				limit = {
+					is_red_giant_empire = yes # undercoat: moved to scripted trigger
+				}
+				if = {
+					limit = {
+						exists = event_target:lusus_miner_station@this #make sure this red giant player still has a lusus mining station
+						FromFromFrom.solar_system = {
+							event_target:lusus_miner_station@prev = {
+								solar_system = {
+									is_same_value = prevprev # Check if our mining station is in the same system as the destroyed guards
+								}
+							}
+						}
+					}
+					country_event = { id = infernals.2151 } #we have identified the correct country
+				}
+			}
+		}
+	}
+}
+#Event 4b Destruction of lusus guards A Mysterious Station
+# From = Destruction event
+country_event = {
+	id = infernals.2151
+	is_triggered_only = yes
+	title = infernals.2151.name
+	desc = infernals.2151.desc
+	picture = GFX_evt_unknown_ships
+
+	immediate = {
+		event_target:situation_red_giant_expansion@root = {
+			target = {
+				save_event_target_as = situation_red_giant_target_shortterm
+			}
+		}
+		event_target:lusus_miner_station@root = {
+			owner = {
+				set_faction_hostility = {
+					target = root
+					set_hostile = no
+					set_neutral = yes
+					set_friendly = no
+				}
+				root = {
+					set_faction_hostility = {
+						target = prev
+						set_hostile = no
+						set_neutral = yes
+						set_friendly = no
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2151.a
+		event_target:lusus_miner_station@root = {
+
+			enable_special_project = {
+				name = "INF_ORIGIN_RED_GIANT_PARLAY"
+				location = this
+				owner = root
+			}
+			hidden_effect = {
+				enable_special_project = {
+					name = "INF_ORIGIN_RED_GIANT_BOARD_STATION"
+					location = this
+					owner = root
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2151.b
+		event_target:lusus_miner_station@root = {
+			owner = {
+				set_faction_hostility = {
+					target = root
+					set_hostile = no
+					set_neutral = yes
+					set_friendly = no
+				}
+				root = {
+					set_faction_hostility = {
+						target = prev
+						set_hostile = no
+						set_neutral = yes
+						set_friendly = no
+					}
+				}
+			}
+			enable_special_project = {
+				name = "INF_ORIGIN_RED_GIANT_BOARD_STATION"
+				location = this
+				owner = root
+			}
+			hidden_effect = {
+				enable_special_project = {
+					name = "INF_ORIGIN_RED_GIANT_PARLAY"
+					location = this
+					owner = root
+				}
+			}
+		}
+	}
+	option = {
+		name = infernals.2151.c
+		event_target:lusus_miner_station@root = {
+			owner = {
+				set_faction_hostility = {
+					target = root
+					set_hostile = yes
+					set_neutral = no
+					set_friendly = no
+				}
+				root = {
+					set_faction_hostility = {
+						target = prev
+						set_hostile = yes
+						set_neutral = no
+						set_friendly = no
+					}
+				}
+			}
+		}
+	}
+	after = {
+		event_target:lusus_miner_station@root = {
+			set_event_locked = no
+		}
+	}
+}
+
+#Final cleanup to delete any targets that might be left if everything is wrapped up
+country_event = {
+	id = infernals.2155
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = { exists = event_target:lusus_miner_vfx@root } #otherwise the vfx will stay even after the station gets destroyed
+			event_target:lusus_miner_vfx@root = {
+				destroy_ambient_object = this
+			}
+		}
+		clear_global_event_target = red_giant_homeworld@root
+		clear_global_event_target = lusus_miner_station@root
+		clear_global_event_target = lusus_miner_vfx@root
+		clear_global_event_target = situation_red_giant_expansion@root
+		#will not clear red_giant_miner_country as it is shared with any other red giant origin players
+	}
+}
+
+# Event 14 Red Giant guide towards Hyperthermia
+country_event = {
+	id = infernals.2160
+	title = infernals.2160.name
+	desc = infernals.2160.desc
+	picture = GFX_evt_inf_overheating_intensifies
+	is_triggered_only = yes
+	trigger = {
+		has_country_flag = red_giant_controlled_lusus_station	# if you never took control of the station you never found Crystallized Entropy
+	}
+	immediate = {
+		country_event = { id = infernals.2155 months = 12 } #clean up any leftovers once the origin is for sure done
+	}
+	option = {
+		name = infernals.2160.a
+		custom_tooltip = infernals.2160.a.tt
+
+		trigger = {
+			NOR = {
+				has_country_flag = red_giant_discovered_crystallized_entropy
+				is_pacifist = yes
+				is_xenophile = yes
+				is_familiar_face_empire = yes # undercoat: moved to scripted trigger
+				is_galactic_emperor = yes
+				is_galactic_custodian = yes
+				is_subject = yes
+			}
+		}
+		set_country_flag = red_giant_discovered_crystallized_entropy
+		give_specimen = { # "Entropy Crystal Shard" Grand Archives Specimen.
+			key = infernal_burning_gem
+		}
+	}
+	option = {
+		name = infernals.2160.b
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier2unityreward
+			min = @tier2unitymin
+			max = @tier2unitymax
+		}
+	}
+	option = {
+		name = infernals.2160.c
+		trigger = {
+			has_country_flag = red_giant_discovered_crystallized_entropy
+		}
+		add_monthly_resource_mult = {
+			resource =  entropy_crystals
+			value = @tier2materialreward
+			min = @tier2materialreward
+			max = @tier2materialreward
+		}
+	}
+}
+
+# Archaeological Sites - 2700 and beyond
+
+## From the Ashes
+fleet_event = {
+	id = infernals.2700
+	title = infernals.2700.name
+	desc = infernals.2700.desc
+	picture = GFX_evt_alien_hieroglyphics
+	show_sound = event_dig_site
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = FASCINATING
+		small_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+fleet_event = {
+	id = infernals.2705
+	title = infernals.2705.name
+	desc = infernals.2705.desc
+	picture = GFX_evt_ancient_records
+	show_sound = event_dig_site
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = KEEP_SEARCHING
+		small_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+fleet_event = {
+	id = infernals.2710
+	title = infernals.2710.name
+	desc = infernals.2710.desc
+	picture = GFX_evt_burning_settlement
+	show_sound = event_dig_site
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = DIG
+		medium_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+fleet_event = {
+	id = infernals.2715
+	title = infernals.2715.name
+	desc = infernals.2715.desc
+	picture = GFX_evt_molten
+	show_sound = event_dig_site
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = infernals.2715.a
+		trigger = {
+			owner = { is_infernal_empire = no }
+		}
+		large_artifact_reward = yes
+		owner = {
+			give_specimen = { key = infernal_figurine }
+		}
+	}
+	option = {
+		name = infernals.2715.b
+		trigger = {
+			owner = { is_infernal_empire = yes }
+		}
+		large_artifact_reward = yes
+		owner = {
+			give_specimen = { key = infernal_figurine }
+		}
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+## Inferno Temple
+fleet_event = {
+	id = infernals.2720
+	title = infernals.2720.name
+	desc = infernals.2720.desc
+	picture = GFX_evt_ancient_records
+	show_sound = evn_ove_scientific_experiments
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INTERESTING
+		small_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+fleet_event = {
+	id = infernals.2725
+	title = infernals.2725.name
+	desc = infernals.2725.desc
+	picture = GFX_evt_astral_rift_volcano_obelisk
+	show_sound = evn_ove_scientific_experiments
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = infernals.2725.a
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+		small_artifact_reward = yes
+	}
+	option = {
+		name = infernals.2725.b
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		small_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+fleet_event = {
+	id = infernals.2730
+	title = infernals.2730.name
+	desc = infernals.2730.desc
+	picture = GFX_evt_bone_building
+	show_sound = evn_ove_scientific_experiments
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = INCREDIBLE
+		medium_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+fleet_event = {
+	id = infernals.2735
+	title = infernals.2735.name
+	desc = infernals.2735.desc
+	picture = GFX_evt_clocks
+	show_sound = evn_ove_scientific_experiments
+
+	archaeology = yes
+	is_triggered_only = yes
+
+	immediate = {
+		from = { set_site_progress_locked = yes }
+	}
+
+	option = {
+		name = infernals.2735.a
+		custom_tooltip = infernals.2735.a.tt
+		trigger = {
+			FROM = {
+				exists = owner
+				owner = { is_primitive = yes }
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = "infernals.2735.a.fail"
+				owner = {
+					NOT = { has_policy_flag = interference_not_allowed }
+				}
+			}
+		}
+		large_artifact_reward = yes
+		hidden_effect = {
+			FROM = {
+				owner = { copy_ethos_and_authority = root.owner }
+			}
+		}
+	}
+	option = {
+		name = infernals.2735.b
+		trigger = {
+			FROM = {
+				exists = owner
+				owner = { is_primitive = yes }
+			}
+		}
+		large_artifact_reward = yes
+	}
+	# In case the primitives have been resettled to the afterlife
+	option = {
+		name = infernals.2735.c
+		trigger = {
+			FROM = {
+				exists = owner
+				owner = { is_primitive = no }
+			}
+		}
+		large_artifact_reward = yes
+	}
+
+	after = { from = { set_site_progress_locked = no } }
+}
+
+# "Molten Core" Grand Archives Specimen. Triggers as random Volcanic Colony event
+# This = Planet
+planet_event = {
+	id = infernals.3200
+	title = infernals.3200.name
+	desc = infernals.3200.desc
+	picture = GFX_evt_molten
+	show_sound = event_mystic_reveal
+
+	location = this
+	is_triggered_only = yes
+
+	trigger = {
+		has_infernals = yes
+		is_volcanic_world = yes # undercoat: moved to scripted trigger
+		owner = {
+			is_playable = yes # undercoat: moved to scripted trigger
+			NOT = { has_country_flag = triggered_molten_core }
+		}
+		NOT = { has_planet_flag = colony_event }
+	}
+
+	immediate = {
+		owner = { set_country_flag = triggered_molten_core }
+	}
+
+	option = {
+		name = infernals.3200.a
+		custom_tooltip = infernals.3200.a.accept
+		owner = {
+			give_specimen = {
+				key = infernal_molten_core
+			}
+		}
+	}
+	option = {
+		name = infernals.3200.b
+		custom_tooltip = infernals.3200.b.deny
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier2unityreward
+				min = @tier2unitymin
+				max = @tier2unitymax
+			}
+		}
+	}
+}
+
+# Fire_Cult 5-year timer
+# Called by Terraforming to Volcanic on_planet_class_changed
+planet_event = {
+	id = infernals.3215
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_volcanic_world = yes # undercoat: moved to scripted trigger
+		exists = owner
+		owner = { is_pyrolatry_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = {
+				flag = recent_volcanic_terraform_timed
+				years = 5
+			}
+		}
+	}
+}
+
+# Fire_Cult 10-year timer
+# Called by using Blazing Scourge Decision
+planet_event = {
+	id = infernals.3220
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_timed_country_flag = {
+				flag = recent_blazing_decision_timed
+				years = 10
+			}
+		}
+	}
+}
+
+# Removing the Blazing Scourge blockers var in case of a terraform
+planet_event = {
+	id = infernals.3225
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		clear_variable = pyrolatry_var
+	}
+}
+
+# Burning Heaven + Volcanic Empire achievements
+planet_event = {
+	id = infernals.3230
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_volcanic_world = yes # undercoat: moved to scripted trigger
+		has_infernals = yes
+		exists = owner
+		owner = {
+			# Matters for infernals.1055
+			NOT = { has_country_flag = hyperthermia_effect_wave }
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { is_holy_world = yes }
+			owner = { set_country_flag = INF_A_burning_heaven }
+		}
+		owner = {
+			create_variable_if_not_exists = { VARIABLE = INF_A_10_volcanics_var VALUE_IF_CREATED = 0 }
+			change_variable = { which = INF_A_10_volcanics_var value = 1 }
+			if = {
+				limit = { check_variable = { which = INF_A_10_volcanics_var value = 10 } }
+				set_country_flag = INF_A_10_volcanics
+			}
+		}
+	}
+}

@@ -1,0 +1,251 @@
+income = {
+	energy = @economic_plan_energy_target
+	minerals = @economic_plan_mineral_target
+	alloys = @economic_plan_alloy_target
+	physics_research = @economic_plan_research_target
+	society_research = @economic_plan_research_target
+	engineering_research = @economic_plan_research_target
+	unity = @economic_plan_unity_target
+	trade = @economic_plan_trade_target
+}
+
+subplan = {
+	optional = yes
+	set_name = "Base Pops"
+	pops = @economic_plan_pops_target
+}
+
+### SCALING SUBPLANS
+
+subplan = {
+	scaling = yes
+	set_name = "Base Energy Scaling"
+	potential = {
+		OR = {
+			NOR = {
+				has_monthly_income = { resource = energy value >= @economic_plan_scaling_energy_limit }
+				resource_stockpile_compare = {
+					resource = energy
+					value > @economic_plan_stockpile_threshold_high
+				}
+			}
+		}
+	}
+
+	income = {
+		energy = 10
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Base Minerals Scaling"
+	potential = {
+		NOR = {
+			has_monthly_income = { resource = minerals value >= @economic_plan_scaling_minerals_limit }
+			resource_stockpile_compare = {
+				resource = minerals
+				value > @economic_plan_stockpile_threshold_high
+			}
+		}
+	}
+
+	income = {
+		minerals = 10
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Base Alloy Scaling"
+	potential = {
+		country_uses_bio_ships = no
+		NOT = { has_ascension_perk = ap_become_the_crisis }
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = alloys value < @economic_plan_scaling_alloy_limit }
+	}
+
+	income = {
+		alloys = 10
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Bioship Alloy Scaling"
+	potential = {
+		country_uses_bio_ships = yes
+		NOT = { has_ascension_perk = ap_become_the_crisis }
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = alloys value < @economic_plan_scaling_alloy_bioship_limit }
+	}
+
+	income = {
+		alloys = 10
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Galactic Nemesis Minerals Scaling"
+	potential = {
+		has_ascension_perk = ap_become_the_crisis
+		has_monthly_income = { resource = minerals value < 1000 }
+	}
+
+	income = {
+		minerals = 50
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Scaling Physics"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = physics_research value < @economic_plan_scaling_research_base_limit }
+	}
+
+	income = {
+		physics_research = @economic_plan_scaling_research_target
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Scaling Society"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = society_research value < @economic_plan_scaling_research_base_limit }
+	}
+
+	income = {
+		society_research = @economic_plan_scaling_research_target
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Scaling Engineering"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = engineering_research value < @economic_plan_scaling_research_base_limit }
+	}
+
+	income = {
+		engineering_research = @economic_plan_scaling_research_target
+	}
+}
+
+### OPTIONAL SUBPLANS
+
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Naval Cap Scaling"
+	potential = {
+		used_naval_capacity_percent > 0.90
+		meets_basic_resource_thresholds = yes
+	}
+
+	naval_cap = 20
+}
+	
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Scaling Unity"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = unity value < @economic_plan_scaling_unity_limit }
+	}
+
+	income = {
+		unity = @economic_plan_scaling_unity_target
+	}
+}
+
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Scaling Pops"
+
+	pops = @economic_plan_scaling_pops_target
+}
+
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Scaling Trade"
+	potential = {
+		OR = {
+			years_passed > 30
+			is_megacorp = yes
+		}
+		has_monthly_income = { resource = trade value < @economic_plan_scaling_trade_limit }
+		resource_stockpile_compare = {
+			resource = trade
+			value < @economic_plan_stockpile_threshold_very_high
+		}
+	}
+
+	income = {
+		trade = @economic_plan_scaling_trade_target
+	}
+}
+
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Additional Scaling Physics"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = physics_research value >= @economic_plan_scaling_research_base_limit }
+	}
+
+	income = {
+		physics_research = @economic_plan_scaling_research_target
+	}
+}
+
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Additional Scaling Society"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = society_research value >= @economic_plan_scaling_research_base_limit }
+	}
+
+	income = {
+		society_research = @economic_plan_scaling_research_target
+	}
+}
+
+subplan = {
+	optional = yes
+	scaling = yes
+	set_name = "Additional Scaling Engineering"
+	potential = {
+		meets_basic_resource_thresholds = yes
+		has_monthly_income = { resource = engineering_research value >= @economic_plan_scaling_research_base_limit }
+	}
+
+	income = {
+		engineering_research = @economic_plan_scaling_research_target
+	}
+}
+
+subplan = {
+	scaling = yes
+	set_name = "Base Obsessional CG Scaling"
+	potential = {
+		is_obsessional_directive_empire = yes # undercoat: moved to scripted trigger
+		has_monthly_income = { resource = consumer_goods value < @economic_plan_scaling_obsessional_consumer_goods_limit_base }
+	}
+	income = {
+		consumer_goods = 20
+	}
+}
+
+inline_script = "ai/ai_strategic_resources"

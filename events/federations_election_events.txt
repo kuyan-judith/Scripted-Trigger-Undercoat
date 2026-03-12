@@ -382,7 +382,7 @@ country_event = {
 					### Fanatic Pacifist
 					if = {
 						limit = {
-							prev = { has_ethic = ethic_fanatic_pacifist }
+							prev = { is_fanatic_pacifist = yes }
 						}
 						subtract_variable = { which = leader_ability value = 10 }
 					}
@@ -1059,8 +1059,19 @@ country_event = {
 			NOT = {
 				event_target:winning_leader = { has_trait = leader_trait_chosen }
 			}
+			is_robot_empire = no
 		}
-		text = "fedel.15.10.desc"
+		text = "fedel.15.10.desc.organic"
+	}
+	desc = {
+		trigger = {
+			leader = { has_trait = leader_trait_psionic }
+			NOT = {
+				event_target:winning_leader = { has_trait = leader_trait_chosen }
+			}
+			is_robot_empire = yes
+		}
+		text = "fedel.15.10.desc.machine"
 	}
 	picture = GFX_evt_gladiators
 	show_sound = event_trap_spikes
@@ -1075,7 +1086,17 @@ country_event = {
 	}
 
 	option = {
-		name = fedel.15.a
+		name = {
+			trigger = {
+				if = {
+					limit = { is_robot_empire = no }
+					text = fedel.15.a.organic
+				}
+				else = {
+					text = fedel.15.a.machine
+				}
+			}
+		}
 		custom_tooltip = tooltip_arena_lost
 		hidden_effect = {
 			country_event = { id = fedel.16 }
@@ -1570,14 +1591,30 @@ country_event = {
 	desc = {
 		trigger = {
 			event_target:winning_leader = { has_trait = leader_trait_psionic }
+			is_robot_empire = no
 		}
-		text = "fedel.16.31.desc"
+		text = "fedel.16.31.desc.organic"
 	}
 	desc = {
 		trigger = {
 			event_target:winning_leader = { has_trait = leader_trait_psionic }
+			is_robot_empire = yes
 		}
-		text = "fedel.16.32.desc"
+		text = "fedel.16.31.desc.machine"
+	}
+	desc = {
+		trigger = {
+			event_target:winning_leader = { has_trait = leader_trait_psionic }
+			is_robot_empire = no
+		}
+		text = "fedel.16.32.desc.organic"
+	}
+	desc = {
+		trigger = {
+			event_target:winning_leader = { has_trait = leader_trait_psionic }
+			is_robot_empire = yes
+		}
+		text = "fedel.16.32.desc.machine"
 	}
 	desc = {
 		trigger = {
@@ -1729,10 +1766,7 @@ country_event = {
 			limit = {
 				OR = {
 					is_subject = yes
-					NOR = {
-						any_owned_pop_group = { has_trait = trait_latent_psionic }
-						any_owned_pop_group = { has_trait = trait_psionic }
-					}
+					any_owned_pop_group = { has_psionic_species_trait = no }
 				}
 			}
 			set_country_flag = no_psi_battle
@@ -1825,13 +1859,13 @@ country_event = {
 				}
 				set_variable = { which = psionic_ability value = 0 }
 				every_owned_pop_group = {
-					limit = { has_trait = trait_latent_psionic }
+					limit = { is_latent_psionic_species = yes }
 					prev = {
 						change_variable = { which = psionic_ability value = 1 }
 					}
 				}
 				every_owned_pop_group = {
-					limit = { has_trait = trait_psionic }
+					limit = { is_psionic_species = yes }
 					prev = {
 						change_variable = { which = psionic_ability value = 3 }
 					}
@@ -2047,8 +2081,25 @@ country_event = {
 					has_country_flag = psi_battle
 				}
 			}
+			is_robot_empire = no
 		}
-		text = "fedel.510.1.desc"
+		text = "fedel.510.1.desc.organic"
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = psionic_ability
+				value <= 300
+			}
+			federation = {
+				any_member = {
+					NOT = { is_same_value = root }
+					has_country_flag = psi_battle
+				}
+			}
+			is_robot_empire = yes
+		}
+		text = "fedel.510.1.desc.machine"
 	}
 	desc = {
 		trigger = {
@@ -2062,8 +2113,25 @@ country_event = {
 					has_country_flag = psi_battle
 				}
 			}
+			is_robot_empire = no
 		}
-		text = "fedel.510.2.desc"
+		text = "fedel.510.2.desc.organic"
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = psionic_ability
+				value >= 301
+			}
+			federation = {
+				any_member = {
+					NOT = { is_same_value = root }
+					has_country_flag = psi_battle
+				}
+			}
+			is_robot_empire = yes
+		}
+		text = "fedel.510.2.desc.machine"
 	}
 	desc = {
 		trigger = {
@@ -2101,8 +2169,20 @@ country_event = {
 				which = psionic_ability
 				value <= 100
 			}
+			is_robot_empire = no
 		}
-		text = "fedel.515.1.desc"
+		text = "fedel.515.1.desc.organic"
+	}
+	desc = {
+		trigger = {
+			has_country_flag = psi_battle
+			check_variable = {
+				which = psionic_ability
+				value <= 100
+			}
+			is_robot_empire = yes
+		}
+		text = "fedel.515.1.desc.machine"
 	}
 	desc = {
 		trigger = {
@@ -2110,8 +2190,19 @@ country_event = {
 				which = psionic_ability
 				value >= 101
 			}
+			is_robot_empire = no
 		}
-		text = "fedel.515.2.desc"
+		text = "fedel.515.2.desc.organic"
+	}
+	desc = {
+		trigger = {
+			check_variable = {
+				which = psionic_ability
+				value >= 101
+			}
+			is_robot_empire = yes
+		}
+		text = "fedel.515.2.desc.machine"
 	}
 	desc = {
 		trigger = {
@@ -2122,8 +2213,22 @@ country_event = {
 					NOT = { is_same_value = event_target:winning_country }
 				}
 			}
+			is_robot_empire = no
 		}
-		text = "fedel.515.3.desc"
+		text = "fedel.515.3.desc.organic"
+	}
+	desc = {
+		trigger = {
+			has_country_flag = no_psi_battle
+			federation = {
+				any_member = {
+					has_country_flag = psi_battle
+					NOT = { is_same_value = event_target:winning_country }
+				}
+			}
+			is_robot_empire = yes
+		}
+		text = "fedel.515.3.desc.machine"
 	}
 	desc = {
 		trigger = {

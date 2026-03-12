@@ -19,6 +19,9 @@ country_event = {
 	}
 
 	immediate = {
+		set_global_flag = ai_invasion_happened
+		set_global_flag = ai_ghost_signal
+		set_global_flag = galactic_crisis_happened
 		# The Arrival
 		every_country = {
 			limit = {
@@ -95,11 +98,11 @@ country_event = {
 			limit = { is_playable = yes } # undercoat: moved to scripted trigger
 			if = {
 				limit = {
+					owner_species = { is_psionic_species = no }
 					NOR = {
 						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
-						owner_species = { has_trait = trait_psionic }
 					}
 				}
 				country_event = { id = crisis.2085 days = 260 random = 20 }
@@ -109,7 +112,7 @@ country_event = {
 				country_event = { id = crisis.2086 days = 260 random = 20 }
 			}
 			if = {
-				limit = { owner_species = { has_trait = trait_psionic } }
+				limit = { owner_species = { is_psionic_species = yes } }
 				country_event = { id = crisis.2087 days = 260 random = 20 }
 			}
 			if = {
@@ -135,6 +138,7 @@ country_event = {
 	immediate = {
 		set_global_flag = ai_invasion_happened
 		set_global_flag = ai_ghost_signal
+		set_global_flag = galactic_crisis_happened
 		endgame_telemetry = ai_revolt
 
 		observer_event = { id = observer.41 }
@@ -178,36 +182,18 @@ country_event = {
 			limit = { is_playable = yes } # undercoat: moved to scripted trigger
 			country_event = { id = crisis.2022 days = 1400 }
 		}
-		# First Machine World
-		random_galaxy_planet = {
-			limit = { has_planet_flag = machine_world_1 }
-			planet_event = { id = crisis.2025 days = 1450 random = 10 }
-		}
-		# Second Machine World
-		random_galaxy_planet = {
-			limit = { has_planet_flag = machine_world_2 }
-			planet_event = { id = crisis.2026 days = 1500 random = 10 }
-		}
-		# Third Machine World
-		random_galaxy_planet = {
-			limit = { has_planet_flag = machine_world_3 }
-			planet_event = { id = crisis.2027 days = 1550 random = 10 }
-		}
-		# Fourth Machine World
-		random_galaxy_planet = {
-			limit = { has_planet_flag = machine_world_4 }
-			planet_event = { id = crisis.2028 days = 1600 random = 10 }
-		}
+		# Machine Worlds
+		country_event = { id = crisis.2024 days = 1450 random = 10 }
 		# Synth Infiltration
 		every_country = {
 			limit = { is_playable = yes } # undercoat: moved to scripted trigger
 			if = {
 				limit = {
+					owner_species = { is_psionic_species = no }
 					NOR = {
 						is_hive_empire = yes
 						is_machine_empire = yes
 						is_individual_machine = yes
-						owner_species = { has_trait = trait_psionic }
 					}
 				}
 				country_event = { id = crisis.2085 days = 1800 random = 100 }
@@ -217,7 +203,7 @@ country_event = {
 				country_event = { id = crisis.2086 days = 1800 random = 100 }
 			}
 			if = {
-				limit = { owner_species = { has_trait = trait_psionic } }
+				limit = { owner_species = { is_psionic_species = yes } }
 				country_event = { id = crisis.2087 days = 1800 random = 100 }
 			}
 			if = {
@@ -794,6 +780,188 @@ country_event = {
 	}
 }
 
+# Machine Worlds Gatekeeper (HIDDEN)
+country_event = {
+	id = crisis.2024
+	hide_window = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# First Machine World
+		if = {
+			limit = {
+				any_galaxy_planet = {
+					has_planet_flag = machine_world_1
+				}
+			}
+			random_galaxy_planet = {
+				limit = { has_planet_flag = machine_world_1 }
+				planet_event = { id = crisis.2025 }
+			}
+		}
+		else = {
+			random_system = {
+				limit = {
+					has_star_flag = AI_system_1
+				}
+				remove_star_flag = AI_hub
+				remove_star_flag = AI_system_1
+			}
+			random_galaxy_planet = {
+				limit = {
+					is_barren_dry_world = yes # undercoat: moved to scripted trigger
+					NOT = {
+						solar_system = {
+							any_system_planet = {
+								has_planet_flag = machine_world_2
+								has_planet_flag = machine_world_3
+								has_planet_flag = machine_world_4
+							}
+						}
+					}
+				}
+				set_planet_flag = machine_world_1
+				set_planet_flag = crisis_vital_planet
+				solar_system = {
+					set_star_flag = AI_hub
+					set_star_flag = AI_system_1
+				}
+				planet_event = { id = crisis.2025 }
+			}
+		}
+
+		# Second Machine World
+		if = {
+			limit = {
+				any_galaxy_planet = {
+					has_planet_flag = machine_world_1
+				}
+			}
+			random_galaxy_planet = {
+				limit = { has_planet_flag = machine_world_2 }
+				planet_event = { id = crisis.2026 days = 50 random = 10 }
+			}
+		}
+		else = {
+			random_system = {
+				limit = {
+					has_star_flag = AI_system_1
+				}
+				remove_star_flag = AI_hub
+				remove_star_flag = AI_system_1
+			}
+			random_galaxy_planet = {
+				limit = {
+					is_barren_dry_world = yes # undercoat: moved to scripted trigger
+					NOT = {
+						solar_system = {
+							any_system_planet = {
+								has_planet_flag = machine_world_1
+								has_planet_flag = machine_world_3
+								has_planet_flag = machine_world_4
+							}
+						}
+					}
+				}
+				set_planet_flag = machine_world_2
+				set_planet_flag = crisis_vital_planet
+				solar_system = {
+					set_star_flag = AI_hub
+					set_star_flag = AI_system_2
+				}
+				planet_event = { id = crisis.2026 days = 50 random = 10 }
+			}
+		}
+
+		# Third Machine World
+		if = {
+			limit = {
+				any_galaxy_planet = {
+					has_planet_flag = machine_world_1
+				}
+			}
+			random_galaxy_planet = {
+				limit = { has_planet_flag = machine_world_3 }
+				planet_event = { id = crisis.2027 days = 100 random = 10 }
+			}
+		}
+		else = {
+			random_system = {
+				limit = {
+					has_star_flag = AI_system_1
+				}
+				remove_star_flag = AI_hub
+				remove_star_flag = AI_system_1
+			}
+			random_galaxy_planet = {
+				limit = {
+					is_barren_dry_world = yes # undercoat: moved to scripted trigger
+					NOT = {
+						solar_system = {
+							any_system_planet = {
+								has_planet_flag = machine_world_1
+								has_planet_flag = machine_world_2
+								has_planet_flag = machine_world_4
+							}
+						}
+					}
+				}
+				set_planet_flag = machine_world_3
+				set_planet_flag = crisis_vital_planet
+				solar_system = {
+					set_star_flag = AI_hub
+					set_star_flag = AI_system_3
+				}
+				planet_event = { id = crisis.2027 days = 100 random = 10 }
+			}
+		}
+
+		# Fourth Machine World
+		if = {
+			limit = {
+				any_galaxy_planet = {
+					has_planet_flag = machine_world_1
+				}
+			}
+			random_galaxy_planet = {
+				limit = { has_planet_flag = machine_world_4 }
+				planet_event = { id = crisis.2028 days = 150 random = 10 }
+			}
+		}
+		else = {
+			random_system = {
+				limit = {
+					has_star_flag = AI_system_1
+				}
+				remove_star_flag = AI_hub
+				remove_star_flag = AI_system_1
+			}
+			random_galaxy_planet = {
+				limit = {
+					is_barren_dry_world = yes # undercoat: moved to scripted trigger
+					NOT = {
+						solar_system = {
+							any_system_planet = {
+								has_planet_flag = machine_world_1
+								has_planet_flag = machine_world_2
+								has_planet_flag = machine_world_3
+							}
+						}
+					}
+				}
+				set_planet_flag = machine_world_4
+				set_planet_flag = crisis_vital_planet
+				solar_system = {
+					set_star_flag = AI_hub
+					set_star_flag = AI_system_4
+				}
+				planet_event = { id = crisis.2028 days = 150 random = 10 }
+			}
+		}
+	}
+}
+
 # First Machine World (HIDDEN)
 planet_event = {
 	id = crisis.2025
@@ -859,6 +1027,7 @@ planet_event = {
 				create_leader = {
 					class = commander
 					species = event_target:contingency_bot
+					skill = 10
 					name = random
 					effect = {
 						save_event_target_as = contingency_ruler
@@ -1631,6 +1800,7 @@ planet_event = {
 			has_planet_flag = planet_godrayed
 			has_planet_flag = planet_drenched
 			has_planet_flag = planet_devolved
+			has_planet_flag = planet_burned
 		}
 	}
 
@@ -1703,8 +1873,13 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		fromfrom = {
-			pop_group_size > 1	# Last Pop is still alive when this event is fired
+		count_owned_pop_amount = {
+			limit = {
+				NOT = {
+					is_same_species = event_target:custodian_bot
+				}
+			}
+			count <= 100
 		}
 		exists = controller
 		controller = { is_country_type = "ai_empire" }
@@ -1716,6 +1891,14 @@ planet_event = {
 		create_pop_group = { species = event_target:custodian_bot }
 		create_pop_group = { species = event_target:custodian_bot }
 		create_pop_group = { species = event_target:custodian_bot }
+		every_owned_pop_group = {
+			limit = {
+				NOT = {
+					is_same_species = event_target:custodian_bot
+				}
+			}
+			kill_all_pop = yes
+		}
 		create_army = {
 			owner = event_target:contingency
 			type = "robotic_defense_army"
@@ -1891,6 +2074,7 @@ planet_event = {
 					has_planet_flag = planet_godrayed
 					has_planet_flag = planet_drenched
 					has_planet_flag = planet_devolved
+					has_planet_flag = planet_burned
 				}
 			}
 			destroy_colony = yes
@@ -2340,7 +2524,6 @@ planet_event = {
 	}
 
 	immediate = {
-		# TODO: [AUG-48753] This is currently triggered in on_pop_assembled. Update it to work with the new growth system.
 		fromfrom = {
 			if = {
 				limit = { owner = { has_notification_modifier = "ghost_signal_5_machine" } }
@@ -2461,10 +2644,7 @@ country_event = {
 	option = {
 		name = crisis.2300.e
 		trigger = {
-			OR = {
-				has_ethic = ethic_materialist
-				has_ethic = ethic_fanatic_materialist
-			}
+			is_materialist = yes
 		}
 		is_dialog_only = yes
 		response_text = crisis.2300.e.response
@@ -2596,6 +2776,7 @@ event = {
 
 	trigger = {
 		any_country = {
+			has_global_flag = ai_ghost_signal
 			OR = {
 				has_notification_modifier = ghost_signal_4_machine
 				has_notification_modifier = ghost_signal_5_machine
@@ -2973,10 +3154,10 @@ event = {
 				is_playable = yes # undercoat: moved to scripted trigger
 				has_country_flag = synth_terror_country
 				NOT = { has_country_flag = synth_detector }
+				owner_species = { is_psionic_species = no }
 				NOR = {
 					is_hive_empire = yes
 					is_machine_empire = yes
-					owner_species = { has_trait = trait_psionic }
 				}
 			}
 			random_list = {
@@ -3106,7 +3287,18 @@ country_event = {
 country_event = {
 	id = crisis.2087
 	title = "crisis.2085.name"
-	desc = "crisis.2087.desc"
+	desc = {
+		trigger = {
+			is_robot_empire = no
+		}
+		text = crisis.2087.desc.organic
+	}
+	desc = {
+		trigger = {
+			is_robot_empire = yes
+		}
+		text = crisis.2087.desc.machine
+	}
 	picture = GFX_evt_robot_assembly_plant
 	show_sound = event_robo
 
@@ -3349,9 +3541,8 @@ country_event = {
 	trigger = {
 		any_owned_leader = {
 			leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+			is_leader_tier = leader_tier_default
 			NOR = {
-				has_leader_flag = renowned_leader
-				has_leader_flag = legendary_leader
 				has_leader_flag = leader_death_events_blocked
 			}
 		}
@@ -3363,9 +3554,8 @@ country_event = {
 		random_owned_leader = {
 			limit = {
 				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
+				is_leader_tier = leader_tier_default
 				NOR = {
-					has_leader_flag = renowned_leader
-					has_leader_flag = legendary_leader
 					has_leader_flag = leader_death_events_blocked
 				}
 			}
@@ -3393,10 +3583,7 @@ country_event = {
 	trigger = {
 		any_owned_leader = {
 			leader_is_commander_stu = yes # undercoat: moved to scripted trigger
-			NOR = {
-				has_leader_flag = renowned_leader
-				has_leader_flag = legendary_leader
-			}
+			is_leader_tier = leader_tier_default
 		}
 		NOT = { has_country_flag = synth_admiral_exposure }
 	}
@@ -3406,10 +3593,7 @@ country_event = {
 		random_owned_leader = {
 			limit = {
 				leader_is_commander_stu = yes # undercoat: moved to scripted trigger
-				NOR = {
-					has_leader_flag = renowned_leader
-					has_leader_flag = legendary_leader
-				}
+				is_leader_tier = leader_tier_default
 			}
 			save_event_target_as = admiral
 			kill_leader = { show_notification = no }
@@ -3926,7 +4110,7 @@ country_event = {
 			name = random
 			skill = 5
 			traits = {
-				trait = leader_trait_cybrex
+				1 = leader_trait_cybrex
 			}
 		}
 		last_created_leader = { set_age = 0 }
@@ -3991,7 +4175,7 @@ country_event = {
 			name = random
 			skill = 5
 			traits = {
-				trait = leader_trait_cybrex
+				1 = leader_trait_cybrex
 			}
 		}
 		last_created_leader = { set_age = 0 }

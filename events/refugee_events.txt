@@ -181,13 +181,27 @@ pop_group_event = {
 	hide_window = yes
 	is_triggered_only = yes
 
+	trigger = {
+		check_variable = {
+			which = local_pop_amount
+			value > 0
+		}
+	}
+
 	immediate = {
 		if = {
-			limit = { is_valid_refugee_pop = yes }
+			limit = { 
+				is_valid_refugee_pop = yes
+			}
 			save_event_target_as = refugee_pop #Must be saved for refugee_pop_effect to work
 			refugee_pop_effect = yes
 		}
-		else = { kill_all_pop = yes }
+		else = {
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+				pop_group = this
+				amount = local_pop_amount
+			}
+		}
 	}
 }
 

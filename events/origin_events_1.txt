@@ -819,7 +819,10 @@ country_event = {
 					has_paragon_dlc = yes
 				}
 				event_target:fe_gifted_leader = {
-					add_trait_no_notify = leader_trait_volatile
+					add_trait = {
+						trait = leader_trait_volatile
+						show_message = no
+					}
 				}
 			}
 		}
@@ -977,6 +980,12 @@ country_event = {
 					owner_species = { is_lithoid = yes }
 				}
 				add_resource = { minerals = 200 }
+			}
+			else_if = {
+				limit = {
+					owner_species = { is_infernal = yes }
+				}
+				add_resource = { alloys = 100 }
 			}
 			else = {
 				add_resource = { food = 200 }
@@ -1579,6 +1588,27 @@ country_event = {
 			}
 			generate_start_deposits_and_blockers = yes
 			generate_start_buildings_and_districts = yes
+			if = {
+				limit = {
+					owner = {
+						any_owned_planet = {
+							has_building = building_hive_capital
+						}
+					}
+				}
+				owner = {
+					every_owned_planet = {
+						remove_building = building_hive_capital
+					}
+				}
+			}
+			else = {
+				owner = {
+					every_owned_planet = {
+						remove_building = building_colony_shelter
+					}
+				}
+			}
 			generate_start_pops = yes
 			event_target:fed_member_1 = {
 				country_event = { id = game_start.8 }
@@ -1698,6 +1728,27 @@ country_event = {
 			}
 			generate_start_deposits_and_blockers = yes
 			generate_start_buildings_and_districts = yes
+			if = {
+				limit = {
+					owner = {
+						any_owned_planet = {
+							has_building = building_hive_capital
+						}
+					}
+				}
+				owner = {
+					every_owned_planet = {
+						remove_building = building_hive_capital
+					}
+				}
+			}
+			else = {
+				owner = {
+					every_owned_planet = {
+						remove_building = building_colony_shelter
+					}
+				}
+			}
 			generate_start_pops = yes
 			event_target:fed_member_2 = {
 				country_event = { id = game_start.8 }
@@ -2449,7 +2500,7 @@ planet_event = {
 		remove_modifier = doomsday_5
 		destroy_colony = yes
 		change_pc = pc_shattered
-		clear_deposits_stu = yes
+		clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 		random_list = {
 			1 = {
 				add_deposit = d_minerals_10
@@ -2981,13 +3032,6 @@ country_event = {
 				}
 			}
 			check_planet_employment = yes
-			# Add civilians
-			while = {
-				count = 4
-				weighted_random_owned_pop_group = {
-					add_pop_amount = 500
-				}
-			}
 		}
 		random_country = {
 			limit = {

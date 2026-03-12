@@ -1397,7 +1397,7 @@ planet_event = {
 						}
 						count_used_naval_cap = {
 							limit = { always = yes }
-							count <= @voidworms_max_naval_cap
+							value <= @voidworms_max_naval_cap
 						}
 					}
 				}
@@ -2255,7 +2255,9 @@ country_event = {
 				}
 				1 = {
 					event_target:infected_leader = {
-						add_trait = leader_trait_maimed
+						add_trait = {
+							trait = leader_trait_maimed
+						}
 					}
 					add_monthly_resource_mult = {
 						resource = unity
@@ -2350,9 +2352,8 @@ country_event = {
 				limit = {
 					is_colony = yes
 					is_under_colonization = no
-					count_owned_pop_amount = {
-						limit = { is_organic_species = yes }
-						count > 0
+					any_owned_pop_group = {
+						is_organic_species = yes
 					}
 				}
 				random_owned_pop_group = {
@@ -3391,7 +3392,11 @@ fleet_event = {
 			limit = {
 				controller = { has_country_flag = leader_digested_by_cutholoid }
 			}
-			leader = { add_trait = leader_trait_cutholoid_victim }
+			leader = {
+				add_trait = {
+					trait = leader_trait_cutholoid_victim
+				}
+			}
 			controller = { remove_country_flag = leader_digested_by_cutholoid }
 		}
 	}
@@ -3402,7 +3407,9 @@ fleet_event = {
 			if = {
 				limit = { has_trait = leader_trait_cutholoid_victim }
 				tooltip = {
-					add_trait = leader_trait_cutholoid_victim
+					add_trait = {
+						trait = leader_trait_cutholoid_victim
+					}
 				}
 			}
 		}
@@ -3635,6 +3642,9 @@ fleet_event = {
 	trigger = {
 		has_grand_archive_dlc = yes
 		exists = event_target:cutholoids_country
+		from = {
+			has_star_flag = hidden_cutholoid
+		}
 		controller = {
 			is_playable = yes # undercoat: moved to scripted trigger
 			has_communications = event_target:cutholoids_country
@@ -5926,12 +5936,19 @@ country_event = {
 
 	option = {
 		name = grand_archive.4580.b
-		allow = { has_technology = tech_gravity_wells }
-		inline_script = {
-			script = events/resource_cost_with_allow
-			RESOURCE = energy
-			AMOUNT = repopulate_cost
+		allow = {
+			has_technology = tech_gravity_wells
+			resource_stockpile_compare = {
+				resource = energy
+				value >= repopulate_cost
+			}
 		}
+
+		add_resource = {
+			energy = -1
+			mult = repopulate_cost
+		}
+
 		hidden_effect = {
 			if = {
 				limit = { has_dna = { ship_category = space_amoeba } }
@@ -6473,7 +6490,7 @@ country_event = {
 			}
 			random_fleet_in_system = {
 				limit = { has_fleet_flag = treasure_trove_pirate_fleet }
-				set_mia = mia_emergency_ftl
+				#set_mia = mia_emergency_ftl
 				fleet_event = {
 					id = grand_archive.6040
 					days = 1
@@ -6614,6 +6631,7 @@ first_contact_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = event_target:tiyanki_country
 		from = {
 			is_same_value = event_target:tiyanki_country
 		}
@@ -7880,6 +7898,26 @@ ship_event = {
 				PROGRESS = 0.25
 				CATEGORY = society_research
 			}
+		}
+	}
+}
+
+# Domestication Traditions
+
+country_event = {
+	id = grand_archive.10500
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_tradition = tr_domestication_astrozoology
+	}
+
+	immediate = {
+		give_culling_rewards = {
+			design = from
+			mult = 2
 		}
 	}
 }

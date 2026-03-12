@@ -100,6 +100,10 @@ select_pre_ftl_origin = {
 				5 = {
 					modifier = {
 						factor = 0
+						is_volcanic_world = yes # undercoat: moved to scripted trigger
+					}
+					modifier = {
+						factor = 0
 						NOT = {
 							host_has_dlc = "Apocalypse"
 						}
@@ -123,6 +127,10 @@ select_pre_ftl_origin = {
 
 				# Ocean Paradise (Requires Aquatics)
 				5 = {
+					modifier = {
+						factor = 0
+						is_volcanic_world = yes # undercoat: moved to scripted trigger
+					}
 					modifier = {
 						factor = 0
 						OR = {
@@ -1384,6 +1392,7 @@ set_species_graphical_culture = {
 		NECROID = { set_graphical_culture = necroid_01 }
 		AQUATIC = { set_graphical_culture = aquatic_01 }
 		TOX = { set_graphical_culture = toxoid_01 }
+		INF = { set_graphical_culture = infernal_01 }
 		default =  { set_graphical_culture = mammalian_01  }
 	}
 }
@@ -2345,6 +2354,10 @@ spawn_presapient_species_randomizer_effect = {
 			modifier = { factor = 0 has_toxoids = no }
 			create_generic_presapient_species = { UPLIFT_TO = TOX }
 		}
+		1 = {
+			modifier = { factor = 0 has_infernals = no }
+			create_generic_presapient_species = { UPLIFT_TO = INF }
+		}
 	}
 }
 
@@ -2359,7 +2372,30 @@ create_generic_presapient_species = {
 		traits = { trait = random_presapient_trait }
 		homeworld = event_target:pre_sapient_planet
 		sapient = no
-		effect = { save_event_target_as = latest_presapient }
+		effect = {
+			save_event_target_as = latest_presapient
+			if = {
+				limit = {
+					is_species_class = PRE_LITHOID
+				}
+				change_species_characteristics = {
+					add_trait = trait_lithoid
+				}
+			}
+			else_if = {
+				limit = {
+					is_species_class = PRE_INF
+				}
+				change_species_characteristics = {
+					add_trait = trait_infernal
+				}
+			}
+			else = {
+				change_species_characteristics = {
+					add_trait = trait_organic
+				}
+			}
+		}
 	}
 	while = {
 		count = 3
@@ -2399,6 +2435,10 @@ spawn_presapient_species_randomizer_homeworld_effect = {
 			modifier = { factor = 0 has_toxoids = no }
 			create_generic_presapient_species_homeworld = { UPLIFT_TO = TOX }
 		}
+		1 = {
+			modifier = { factor = 0 has_infernals = no }
+			create_generic_presapient_species_homeworld = { UPLIFT_TO = INF }
+		}
 	}
 }
 
@@ -2413,6 +2453,29 @@ create_generic_presapient_species_homeworld = {
 		traits = { trait = random_presapient_trait }
 		homeworld = this
 		sapient = no
+		effect = {
+			if = {
+				limit = {
+					is_species_class = PRE_LITHOID
+				}
+				change_species_characteristics = {
+					add_trait = trait_lithoid
+				}
+			}
+			else_if = {
+				limit = {
+					is_species_class = PRE_INF
+				}
+				change_species_characteristics = {
+					add_trait = trait_infernal
+				}
+			}
+			else = {
+				change_species_characteristics = {
+					add_trait = trait_organic
+				}
+			}
+		}
 	}
 	while = {
 		count = 3
@@ -3087,10 +3150,22 @@ achieve_ftl_effect = {
 	}
 	if = {
 		limit = {
-			is_lithoid_empire = no
+			NOR = {
+				is_lithoid_empire = yes
+				is_infernal_empire = yes
+			}
 		}
 		add_resource = {
 			food = 500
+			mult = trigger:years_passed
+		}
+	}
+	else_if = {
+		limit = {
+			is_infernal_empire = yes
+		}
+		add_resource = {
+			alloys = 250
 			mult = trigger:years_passed
 		}
 	}
@@ -3175,7 +3250,10 @@ achieve_ftl_effect = {
 			if = {
 				limit = {
 					owner = {
-						is_lithoid_empire = no
+						NOR = {
+							is_lithoid_empire = yes
+							is_infernal_empire = yes
+						}
 					}
 				}
 				add_building = building_hydroponics_farm
@@ -3301,6 +3379,7 @@ spawn_old_foes_effect = {
 			portrait = humanoid_02
 			namelist = "HUM3"
 			traits = {
+				trait = trait_organic
 				trait = trait_survivor
 				trait = trait_intelligent
 				trait = trait_quarrelsome
@@ -3375,6 +3454,7 @@ spawn_old_foes_effect = {
 			portrait = humanoid_03
 			namelist = "HUM2"
 			traits = {
+				trait = trait_organic
 				trait = trait_survivor
 				trait = trait_strong
 				trait = trait_quarrelsome
@@ -3619,7 +3699,26 @@ add_primitive_farm_or_mine = {
 	if = {
 		limit = {
 			owner = {
+				is_infernal_empire = yes
+				is_hive_empire = no
+			}
+		}
+		add_building = building_primitive_factory
+	}
+	else_if = {
+		limit = {
+			owner = {
+				is_infernal_empire = yes
+				is_hive_empire = yes
+			}
+		}
+		add_building = building_hive_primitive_factory
+	}
+	if = {
+		limit = {
+			owner = {
 				is_lithoid_empire = no
+				is_infernal_empire = no
 				is_hive_empire = no
 			}
 		}
@@ -3629,6 +3728,7 @@ add_primitive_farm_or_mine = {
 		limit = {
 			owner = {
 				is_lithoid_empire = yes
+				is_infernal_empire = no
 				is_hive_empire = no
 			}
 		}
@@ -3638,12 +3738,144 @@ add_primitive_farm_or_mine = {
 		limit = {
 			owner = {
 				is_lithoid_empire = no
+				is_infernal_empire = no
 				is_hive_empire = yes
 			}
 		}
 		add_building = building_hive_primitive_farm
 	}
-	else = {
+	else_if = {
+		limit = {
+			owner = {
+				is_lithoid_empire = yes
+				is_hive_empire = yes
+			}
+		}
 		add_building = building_hive_primitive_mine
+	}
+}
+
+# Volcanic World pre-ftls
+
+generate_pre_ftls_on_volcanic = {
+	optimize_memory
+	select_pre_ftl_origin = yes
+	create_pre_ftl_species_inf = yes
+	create_pre_ftl_empire = yes
+	setup_pre_ftl_planet = yes
+	pre_ftl_clean_up_effect = yes
+}
+
+generate_pre_ftl_hive_on_volcanic = {
+	optimize_memory
+	select_pre_ftl_origin = yes
+	create_pre_ftl_species_inf = yes
+	create_pre_ftl_hive_empire = yes
+	setup_pre_ftl_hive_planet = yes
+}
+
+create_pre_ftl_species_inf = {
+	# Hive
+	if = {
+		limit = { has_planet_flag = pre_ftl_hive_mind }
+		if = {
+			limit = { has_planet_flag = pre_ftl_subterranean }
+			create_species = {
+				name = random
+				class = INF
+				set_pre_ftl = yes
+				portrait = random
+				homeworld = THIS
+				traits = {
+					trait = trait_hive_mind
+					trait = trait_infernal
+					trait = trait_cave_dweller
+					trait = random_traits
+				}
+				effect = {
+					set_habitability_trait = { trait = trait_pc_volcanic_preference }
+				}
+			}
+		}
+		else = {
+			create_species = {
+				name = random
+				class = INF
+				set_pre_ftl = yes
+				portrait = random
+				homeworld = THIS
+				traits = {
+					trait = trait_hive_mind
+					trait = trait_infernal
+					trait = random_traits
+				}
+				effect = {
+					set_habitability_trait = { trait = trait_pc_volcanic_preference }
+				}
+			}
+		}
+	}
+	# Regular
+	else = {
+		if = {
+			limit = { has_planet_flag = pre_ftl_subterranean }
+			create_species = {
+				name = random
+				class = INF
+				set_pre_ftl = yes
+				portrait = random
+				homeworld = THIS
+				traits = {
+					trait = trait_infernal
+					trait = trait_cave_dweller
+					trait = random_traits
+				}
+				effect = {
+					set_habitability_trait = { trait = trait_pc_volcanic_preference }
+				}
+			}
+		}
+		else = {
+			random_list = {
+				99 = {
+					create_species = {
+						name = random
+						class = INF
+						set_pre_ftl = yes
+						portrait = random
+						homeworld = THIS
+						traits = {
+							trait = trait_infernal
+							trait = random_traits
+						}
+						effect = {
+							set_habitability_trait = { trait = trait_pc_volcanic_preference }
+						}
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_global_flag = forcefully_devolved_pre_ftl_rolled
+					}
+					set_global_flag = forcefully_devolved_pre_ftl_rolled
+					create_species = {
+						name = random
+						class = INF
+						set_pre_ftl = yes
+						portrait = random
+						homeworld = THIS
+						traits = {
+							trait = trait_infernal
+							trait = random_traits
+							trait = "trait_presapient_forcefully_devolved"
+						}
+						effect = {
+							set_habitability_trait = { trait = trait_pc_volcanic_preference }
+						}
+					}
+				}
+			}
+		}
 	}
 }

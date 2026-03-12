@@ -683,7 +683,7 @@ planet_event = {
 			}
 			else_if = {
 				limit = {
-					owner = { has_food_upkeep = yes }
+					owner.species = { has_trait = trait_organic }
 				}
 				text = strange_worlds.65.desc.food
 			}
@@ -1095,10 +1095,10 @@ planet_event = {
 				tech_telepathy = { add_tech_progress = { tech = tech_telepathy progress = 0.25 } }
 				default = {
 					add_monthly_resource_mult = {
-					resource = society_research
-					value = @tier2researchreward
-					min = @tier2researchmin
-					max = @tier2researchmax
+						resource = society_research
+						value = @tier2researchreward
+						min = @tier2researchmin
+						max = @tier2researchmax
 					}
 				}
 			}
@@ -1209,7 +1209,10 @@ planet_event = {
 			}
 		}
 		is_artificial = no
-		NOT = { has_planet_flag = colony_event }
+		NOR = { 
+			has_planet_flag = colony_event
+			is_volcanic_world = yes  # undercoat: moved to scripted trigger
+		}
 	}
 
 	immediate = {
@@ -1565,6 +1568,7 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
+		exists = owner
 		owner = {
 			OR = {
 				has_country_flag = dark_matter_found
@@ -1600,9 +1604,9 @@ planet_event = {
 				limit = { has_technology = tech_mine_dark_matter }
 				add_monthly_resource_mult = {
 					resource = sr_dark_matter
-					value = @tier2materialreward
-					min = @tier2materialmin
-					max = @tier2materialmax
+					value = @tier5materialreward
+					min = @tier5researchmin				# We want this reward to feel meaningful!
+					max = @tier5materialmax
 				}
 			}
 		}
@@ -1762,9 +1766,9 @@ planet_event = {
 			}
 			add_monthly_resource_mult = {
 				resource = sr_dark_matter
-				value = @tier3materialreward
-				min = @tier3materialmin
-				max = @tier3materialmax
+				value = @tier5materialreward
+				min = @tier5researchmin				# We want this reward to feel meaningful!
+				max = @tier5materialmax
 			}
 			add_monthly_resource_mult = {
 				resource = unity
@@ -2504,11 +2508,12 @@ planet_event = {
 		custom_tooltip = strange_worlds.195.a_ct.evopred
 		hidden_effect = {
 			owner = {
-				species = {
-					modify_species = {
-						species = this
-						add_trait = trait_psionic_ephapse
-					}
+				modify_species = {
+					species = this
+					add_trait = trait_psionic_ephapse
+				}
+				change_dominant_species = {
+					species = last_created_species
 				}
 				update_node_portraits_if_gestalt_effect = yes
 			}
@@ -2971,14 +2976,19 @@ planet_event = {
 									set_random_toxoid_portrait_effect = yes
 								}
 								prevprevprev = {
-									leader = {
-										if = {
-											limit = {
-												species = {
-													is_same_species = prevprevprevprev
+									if = {
+										limit = {
+											exists = leader
+										}
+										leader = {
+											if = {
+												limit = {
+													species = {
+														is_same_species = prevprevprevprev
+													}
 												}
+												change_leader_portrait = prevprevprevprev
 											}
-											change_leader_portrait = prevprevprevprev
 										}
 									}
 								}
@@ -2988,15 +2998,21 @@ planet_event = {
 				}
 			}
 			hidden_effect = {
-				weighted_random_owned_pop_group = {
-					kill_single_pop = yes
+				if = {
+					limit = {
+						pop_amount > 100
+					}
+					weighted_random_owned_pop_group = {
+						kill_single_pop = yes
+					}
 				}
+
 				while = {
 					count = value:num_pop_to_kill_every_X|COUNT|@macrophage_kill_pop_every_x|
 					limit = {
 						pop_amount > 100
 					}
-					weighted_random_owned_pop_group = { # TODO Victor this seems like it can handle percentages
+					weighted_random_owned_pop_group = {
 						kill_single_pop = yes
 					}
 				}
@@ -3317,10 +3333,17 @@ fleet_event = {
 				NOT = { is_at_war_with = event_target:anomalous_cube_fallen_empire }
 			}
 		}
-		event_target:anomalous_cube_fallen_empire = {
-			add_opinion_modifier = {
-				who = root.owner
-				modifier = opinion_gift_given
+		if = {
+			limit = {
+				event_target:anomalous_cube_fallen_empire = {
+					is_fallen_empire_machine = no
+				}
+			}
+			event_target:anomalous_cube_fallen_empire = {
+				add_opinion_modifier = {
+					who = root.owner
+					modifier = opinion_gift_given
+				}
 			}
 		}
 		owner = {
@@ -3373,7 +3396,7 @@ fleet_event = {
 			planet = {
 				if = {
 					limit = { has_deposit_for = shipclass_research_station }
-					clear_deposits_stu = yes
+					clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
 				}
 				add_deposit = d_living_metal_deposit
 				if = {

@@ -1,0 +1,110 @@
+# Note: Volcanic Worlds use a different district_set and deposits
+# file scope = planet
+
+
+# In case the homeworld has too many blockers
+if = {
+    limit = {
+        num_uncleared_blockers > 3
+    }
+    while = {
+        limit = { num_uncleared_blockers > 3 }
+        random_deposit = {
+            limit = { is_blocker = yes }
+            remove_deposit = yes
+        }
+    }
+}
+
+# Cosmic Dawn origin
+if = {
+	limit = { owner = { is_cosmic_dawn_empire = yes } } # undercoat: moved to scripted trigger
+	while = {
+		count = 6
+		random_owned_pop_group = {
+			kill_pops_stu = { # undercoat: moved to scripted effect with on_action
+                pop_group = this
+                amount = 100
+            }
+		}
+	}
+	while = {
+        count = 5
+        add_deposit = d_stasis_pods
+    }
+    set_variable = { which = cd_pods_var value = 0 }
+}
+
+# Setup for organic empires starting on Volcanic Worlds
+if = { #200 farmers
+    limit = {
+		check_variable = {
+			which = farming_districts
+			value = 1
+		}
+	}
+	owner = {
+		add_resource = { food = 200 }
+	}
+	add_building = building_hydroponics_farm
+}
+if = { #400 farmers
+    limit = {
+		check_variable = {
+			which = farming_districts
+			value = 2
+		}
+	}
+	owner = {
+		add_resource = { food = 200 }
+	}
+	add_deposit = d_andisol_soil
+
+}
+if = { #600 farmers
+    limit = {
+		check_variable = {
+			which = farming_districts
+			value >= 3
+		}
+	}
+	owner = {
+		add_resource = { food = 200 }
+	}
+	add_building = building_hydroponics_farm
+	add_deposit = d_andisol_soil
+}
+
+if = { # extra housing district to replace the lack of farming districts
+    limit = {
+        owner = { is_regular_empire = yes }
+    }
+    add_district_if_possible_effect = {
+        district = district_city
+    }
+}
+
+else_if = {
+    limit = {
+        owner = { is_hive_empire = yes }
+    }
+    add_district_if_possible_effect = {
+        district = district_hive
+    }
+}
+
+# Transform all energy+mining districts into their respective volcanic variants
+
+add_district_and_planet_size_if_needed_effect_amount = {
+    amount = energy_districts
+    district = district_geothermal
+}
+add_district_and_planet_size_if_needed_effect_amount = {
+    amount = mining_districts
+    district = district_melting
+}
+
+# Clear variables and flags
+clear_variable = energy_districts
+clear_variable = mining_districts
+clear_variable = farming_districts

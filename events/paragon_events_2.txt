@@ -241,7 +241,9 @@ leader_event = {
 			}
 
 			# Add a Negative trait and reduce Pending negative traits counter here, so it matches negative traits actually added.
-			add_trait = "random_negative"
+			add_trait = {
+				trait = random_negative
+			}
 			subtract_variable = { which = leader_pending_negative_traits_unmodified value = 1 }
 		}
 	}
@@ -362,15 +364,10 @@ event = {
 						limit = {
 							is_organic_species = yes
 							is_being_assimilated = no
-							NOR = {
-								has_trait = trait_cybernetic
-								has_trait = trait_latent_psionic
-								has_trait = trait_psionic
-							}
+							has_psionic_species_trait = no
+							NOT = { has_trait = trait_cybernetic }
 						}
-						modify_species = {
-							add_trait = trait_latent_psionic
-						}
+						add_latent_psionic_trait = yes
 					}
 				}
 			}
@@ -552,14 +549,9 @@ country_event = { # Memorial Valuts Civic Paragon Level Tick / FROM = Leader
 		FROM = {
 			set_leader_flag = memory_vault_contributed
 		}
-		random_owned_planet = {
-			limit = {
-				is_variable_set = paragon_memory_vault
-			}
-			change_variable = {
-				which = paragon_memory_vault
-				value = 1
-			}
+		change_variable = {
+			which = paragon_memory_vault
+			value = 1
 		}
 	}
 }
@@ -727,8 +719,7 @@ country_event = { #Xeno-Linguistic researched
 		custom_tooltip = paragon_2.2105.tt
 		trigger = {
 			NOR = {
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
+				is_xenophobe = yes
 				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -856,14 +847,8 @@ country_event = {
 					leader = { save_event_target_as = attacking_general }
 				}
 			}
-			while = {
-				count = value:perc_of_planet_pop
-				weighted_random_owned_pop_group = { # Pick a pop
-					limit = {
-						planet = { is_same_value = ROOT.FROMFROM }
-					}
-					save_event_target_as = kidnapped_pop
-				}
+			every_owned_pop_group = {
+				save_event_target_as = kidnapped_pop # Pick the pop
 				ROOT = { # Pick a planet
 					reroll_random = yes
 					random_owned_planet = {
@@ -871,11 +856,11 @@ country_event = {
 					}
 				}
 				resettle_pop_group = {
-					POP_GROUP = event_target:kidnapped_pop
+					POP_GROUP = this
 					PLANET = event_target:target_planet
-					AMOUNT = 100
+					PERCENTAGE = 0.3
 				}
-				event_target:kidnapped_pop = {
+				event_target:resettled_pop_group = {
 					set_citizenship_type = {
 						country = ROOT
 						type = citizenship_slavery

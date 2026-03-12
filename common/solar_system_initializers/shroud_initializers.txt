@@ -1,0 +1,561 @@
+@asteroid_min_size = 2
+@asteroid_max_size = 4
+
+mindwarden_system_init = {
+	class = "sc_a"
+	usage = origin
+	flags = { empire_home_system empire_cluster mindwarden_system }
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 120
+	}
+
+	planet = {
+		class = "pc_a_star"
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 32
+		has_ring = no
+	}
+
+	planet = {
+		class = ideal_planet_class
+		orbit_distance = 60
+		size = 18
+		has_ring = no
+		starting_planet = yes
+		deposit_blockers = none
+		modifiers = none
+
+		init_effect = {
+			prevent_anomaly = yes
+			generate_empire_home_planet = yes
+		}
+	}
+
+	planet = {
+		class = pc_barren
+		orbit_distance = 25
+		size = 9
+	}
+
+	change_orbit = 32
+	planet = {
+		count = 10
+		class = pc_asteroid
+		orbit_distance = { min = 0 max = 1 }
+		size = { min = 2 max = 4 }
+	}
+
+	planet = {
+		class = pc_gas_giant
+		orbit_distance = 55
+		size = 30
+		has_ring = yes
+
+		moon = {
+			class = pc_barren_cold
+			size = 7
+			orbit_distance = 20
+		}
+	}
+
+	planet = {
+		class = pc_frozen
+		orbit_distance = { min = 35 max = 50 }
+		size = { min = 9 max = 20 }
+	}
+
+	init_effect = {
+		# empire_cluster flags are manually added by shroud.6000
+		generate_home_system_resources = yes
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+mindwarden_buffer_system = {
+	class = "sc_g"
+	flags = { empire_cluster mindwarden_buffer_system }
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 115
+	}
+
+	planet = {
+		class = "pc_g_star"
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 30
+		has_ring = no
+	}
+
+	change_orbit = 115
+	planet = {
+		count = 3
+		class = pc_asteroid
+		orbit_distance = { min = 0 max = 1 }
+		orbit_angle = { min = 10 max = 210 }
+		size = { min = @asteroid_min_size max = @asteroid_max_size }
+	}
+	change_orbit = 20
+
+	planet = {
+		class = pc_toxic
+		size = 20
+	}
+
+	planet = {
+		count = 1
+		class = pc_gas_giant
+		orbit_distance = 40
+		orbit_angle = { min = 10 max = 210 }
+		size = 30
+		has_ring = yes
+		change_orbit = 7
+
+		moon = {
+			count = 1
+			class = pc_barren
+			size = 8
+			orbit_distance = 12
+			orbit_angle = 320
+		}
+	}
+
+	init_effect = {
+		save_global_event_target_as = exiled_system_border@event_target:current_mindwarden_country
+		spawn_system = {
+			min_distance >= 10
+			max_distance <= 15
+			direction = rimwards
+			initializer = "exiled_system_1"
+			hyperlane = no
+			is_discovered = no
+			effect = {
+				add_hyperlane = {
+					from = prev
+					to = this
+				}
+			}
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+exiled_system_1 = {
+	namelist = "exiled_star_names"
+	class = "sc_m"
+	flags = { exiled_system exiled_system_1 empire_cluster hostile_system crisis_spawn_exclude }
+	prevent_anomalies = yes
+
+	planet = {
+		class = "pc_m_star"
+		orbit_distance = 0
+		size = 32
+	}
+
+	change_orbit = 60
+
+	planet = {
+		count = { min = 2 }
+		class = "pc_gas_giant"
+		orbit_distance = 10
+		has_ring = no
+		size = { min = 30 max = 45 }
+	}
+
+	change_orbit = 50
+
+	planet = {
+		class = "pc_broken"
+		size = { min = 10 max = 20 }
+	}
+
+	init_effect = {
+		create_starbase = {
+			size = starbase_outpost
+			owner = event_target:current_exiled_country
+		}
+
+		save_event_target_as = exiled_system_1
+		save_global_event_target_as = exiled_center_system@event_target:current_mindwarden_country
+		spawn_system = {
+			min_distance >= 10
+			max_distance <= 15
+			direction = right
+			initializer = "exiled_system_2"
+			hyperlane = no
+			is_discovered = no
+			effect = {
+				save_event_target_as = exiled_system_2
+				add_hyperlane = {
+					from = event_target:exiled_system_1
+					to = this
+				}
+			}
+		}
+		reroll_random = yes
+		spawn_system = {
+			min_distance >= 10
+			max_distance <= 15
+			direction = rimwards
+			initializer = "exiled_system_3"
+			hyperlane = no
+			is_discovered = no
+			effect = {
+				save_event_target_as = exiled_system_3
+				add_hyperlane = {
+					from = event_target:exiled_system_1
+					to = this
+				}
+				add_hyperlane = {
+					from = event_target:exiled_system_2
+					to = this
+				}
+				reroll_random = yes
+				spawn_system = {
+					min_distance >= 10
+					max_distance <= 15
+					direction = left
+					initializer = "exiled_system_4"
+					hyperlane = no
+					is_discovered = no
+					effect = {
+						save_event_target_as = exiled_system_4
+						add_hyperlane = {
+							from = event_target:exiled_system_1
+							to = this
+						}
+						add_hyperlane = {
+							from = event_target:exiled_system_3
+							to = this
+						}
+					}
+				}
+			}
+		}
+		reroll_random = yes
+		spawn_system = {
+			min_distance >= 10
+			max_distance <= 15
+			direction = left
+			initializer = "exiled_system_5"
+			hyperlane = no
+			is_discovered = no
+			effect = {
+				save_event_target_as = exiled_system_5
+				add_hyperlane = {
+					from = event_target:exiled_system_1
+					to = this
+				}
+				add_hyperlane = {
+					from = event_target:exiled_system_4
+					to = this
+				}
+			}
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+exiled_system_2 = {
+	namelist = "exiled_star_names"
+	class = "sc_g"
+	flags = { exiled_system exiled_system_2 empire_cluster hostile_system crisis_spawn_exclude }
+	prevent_anomalies = yes
+
+	planet = {
+		class = "pc_g_star"
+		orbit_distance = 0
+		size = 30
+	}
+
+	change_orbit = 90
+
+	planet = {
+		namelist = "exiled_colony_names"
+		class = random_colonizable
+		size = 21
+
+		init_effect = {
+			set_owner = event_target:current_exiled_country
+			change_pc = owner_main_species
+			set_capital = yes
+			event_target:current_exiled_country = {
+				create_starting_leaders = yes
+				owner_species = { set_species_homeworld = prevprev }
+				refresh_leader_pool = yes
+				create_leader = {
+					class = commander
+					species = owner_main_species
+					effect = {
+						save_event_target_as = commander_leader
+					}
+				}
+			}
+			event_target:current_mindwarden_country = {
+				save_global_event_target_as = matching_mindwarden_country@prev
+			}
+
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			generate_start_deposits_and_blockers = yes
+
+			add_district = { district_type = district_mining ignore_cap = yes }
+			add_district = { district_type = district_mining ignore_cap = yes }
+			while = {
+				count = 3
+				add_district = { district_type = district_city ignore_cap = yes }
+				add_district = { district_type = district_generator ignore_cap = yes }
+				add_district = { district_type = district_farming ignore_cap = yes }
+			}
+
+			add_building = building_capital
+			add_building = building_temple
+			add_building = building_holo_theatres
+			add_building = building_temple
+
+			create_pop_group = {
+				size = 2800
+				species = owner_main_species
+			}
+			set_colony_type = col_capital
+			save_global_event_target_as = exiled_planet_1@event_target:current_mindwarden_country
+			set_planet_flag = exiled_planet_1
+
+			create_fleet = {
+				effect = {
+					set_owner = event_target:current_exiled_country
+					while = {
+						count = 10
+						create_ship = {
+							name = random
+							design = "NAME_Exiled"
+							upgradable = no
+						}
+					}
+					set_location = {
+						target = prev
+						distance = 10
+						angle = random
+					}
+					assign_leader = event_target:commander_leader
+				}
+			}
+		}
+	}
+
+	change_orbit = 50
+
+	planet = {
+		class = "pc_gas_giant"
+		size = { min = 30 max = 45 }
+		init_effect = {
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			add_deposit = d_zro_deposit_1
+		}
+	}
+
+	change_orbit = 50
+
+	planet = {
+		class = "pc_barren_cold"
+		size = { min = 7 max = 15 }
+	}
+
+	init_effect = {
+		save_global_event_target_as = exiled_capital@event_target:current_mindwarden_country
+		create_exiled_starhold = yes
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+exiled_system_3 = {
+	namelist = "exiled_star_names"
+	class = "sc_k"
+	flags = { exiled_system exiled_system_3 empire_cluster hostile_system crisis_spawn_exclude }
+	prevent_anomalies = yes
+
+	planet = {
+		class = "pc_k_star"
+		orbit_distance = 0
+		size = 27
+	}
+
+	change_orbit = 60
+
+	planet = {
+		namelist = "exiled_colony_names"
+		class = random_colonizable
+		size = 12
+		init_effect = {
+			set_owner = event_target:current_exiled_country
+			change_pc = owner_main_species
+
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			generate_start_deposits_and_blockers = yes
+
+			add_district = { district_type = district_city ignore_cap = yes }
+			add_district = { district_type = district_city ignore_cap = yes }
+			add_district = { district_type = district_mining ignore_cap = yes }
+			add_district = { district_type = district_farming ignore_cap = yes }
+			add_district = { district_type = district_farming ignore_cap = yes }
+			add_district = { district_type = district_farming ignore_cap = yes }
+
+			add_building = building_capital
+			add_building = building_temple
+
+			create_pop_group = {
+				size = 1000
+				species = owner_main_species
+			}
+			set_colony_type = col_city
+			save_global_event_target_as = exiled_planet_2@event_target:current_mindwarden_country
+			event_target:current_mindwarden_country = {
+				save_global_event_target_as = matching_mindwarden_country@prev
+			}
+			set_planet_flag = exiled_planet_2
+		}
+	}
+
+	change_orbit = 50
+
+	planet = {
+		class = "pc_toxic"
+		size = { min = 15 max = 30 }
+		init_effect = {
+			clear_deposits_stu = yes # undercoat: moved to scripted effect with possibility of protecting certain deposits
+			add_deposit = d_zro_deposit_1
+		}
+	}
+
+	init_effect = {
+		create_exiled_starhold = yes
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+exiled_system_4 = {
+	namelist = "exiled_star_names"
+	class = "sc_b"
+	flags = { exiled_system exiled_system_4 empire_cluster hostile_system crisis_spawn_exclude }
+	prevent_anomalies = yes
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 160
+	}
+	asteroid_belt = {
+		type = icy_asteroid_belt
+		radius = 180
+	}
+	asteroid_belt = {
+		type = crystal_asteroid_belt
+		radius = 200
+	}
+
+	planet = {
+		class = "pc_b_star"
+		orbit_distance = 0
+		size = { min = 30 max = 40 }
+	}
+
+	planet = {
+		class = "pc_shattered"
+		orbit_distance = 40
+		size = { min = 15 max = 25 }
+		has_ring = no
+	}
+
+	change_orbit = 50
+
+	planet = {
+		class = "pc_shrouded"
+		size = 35
+		has_ring = no
+	}
+
+	change_orbit = 20
+
+	planet = {
+		class = "pc_toxic"
+		size = { min = 15 max = 30 }
+	}
+
+	init_effect = {
+		create_starbase = {
+			size = starbase_outpost
+			owner = event_target:current_exiled_country
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}
+
+exiled_system_5 = {
+	namelist = "exiled_star_names"
+	class = "sc_m"
+	flags = { exiled_system exiled_system_5 empire_cluster hostile_system crisis_spawn_exclude }
+	prevent_anomalies = yes
+
+	planet = {
+		class = "pc_m_star"
+		orbit_distance = 0
+		size = 32
+	}
+
+	change_orbit = 60
+
+	planet = {
+		class = "pc_shrouded"
+		size = 35
+		has_ring = no
+	}
+
+	change_orbit = 40
+
+	planet = {
+		class = "pc_gas_giant"
+		size = { min = 30 max = 45 }
+	}
+
+	change_orbit = 30
+
+	planet = {
+		class = "pc_barren"
+		size = { min = 7 max = 15 }
+	}
+
+	change_orbit = 50
+
+	planet = {
+		class = "pc_frozen"
+		size = { min = 5 max = 12 }
+	}
+
+	init_effect = {
+		create_starbase = {
+			size = starbase_outpost
+			owner = event_target:current_exiled_country
+		}
+	}
+	init_effect = { # undercoat
+		every_system_planet = { fire_on_action = { on_action = on_planet_spawned } }
+		fire_on_action = { on_action = on_system_spawned }
+	}
+}

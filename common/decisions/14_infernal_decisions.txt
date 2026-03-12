@@ -1,0 +1,280 @@
+decision_blazing_scourge = {
+	owned_planets_only = yes
+	icon = decision_molten_planet
+	enactment_time = 260
+	resources = {
+		category = decisions
+		cost = { minerals = 300 }
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_pyrolatry_empire = yes } # undercoat: moved to scripted trigger
+		is_artificial = no
+		NOR = {
+			is_city_world = yes # undercoat: moved to scripted trigger
+			is_machine_world = yes # undercoat: moved to scripted trigger
+			is_hive_world = yes # undercoat: moved to scripted trigger
+			is_ideal = yes # Habitability reduction doesnt work there
+		}
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "decision_blazing_scourge_limit"
+			check_variable = { which = pyrolatry_var value < 5 }
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_blazing_scourge_effect
+		hidden_effect = {
+			# Setup
+			if = {
+				limit = { NOT = { is_variable_set = pyrolatry_var } }
+				set_variable = { which = pyrolatry_var value = 0 }
+			}
+			change_variable = { which = pyrolatry_var value = 1 }
+
+			# Should only add blockers that arent on the planet yet.
+			locked_random_list = {
+				10 = {
+					modifier = {
+						factor = 0
+						has_deposit = d_large_volcano
+					}
+					add_blocker = { type = d_large_volcano }
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						has_deposit = d_ash_storms
+					}
+					add_blocker = { type = d_ash_storms }
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						has_deposit = d_charged_atmosphere
+					}
+					add_blocker = { type = d_charged_atmosphere }
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						has_deposit = d_lava_flooding
+					}
+					add_blocker = { type = d_lava_flooding }
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						has_deposit = d_toxic_atmosphere
+					}
+					add_blocker = { type = d_toxic_atmosphere }
+				}
+			}
+			planet_event = { id = infernals.3220 }
+			# From Bad To Worse achievement
+			if = {
+				limit = {
+					is_nuked_world = yes # undercoat: moved to scripted trigger
+					check_variable = { which = pyrolatry_var value = 5 }
+				}
+				owner = { set_country_flag = INF_A_blazing_tomb_world }
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+		modifier = {
+			add = 2
+			pop_amount > 4000
+		}
+		modifier = {
+			add = 3
+			space_owner = {
+				any_owned_species = {
+					prevprev = { habitability = { who = prev value > 0.20 }	}
+				}
+			}
+		}
+		modifier = {
+			add = 5
+			OR = {
+				has_designation = col_bureau
+				has_designation = col_bureau_spiritualist
+			}
+		}
+		modifier = {
+			add = 3
+			is_nuked_world = yes # undercoat: moved to scripted trigger
+		}
+		modifier = {
+			factor = 0
+			is_capital = yes
+		}
+		modifier = {
+			factor = 0
+			is_volcanic_world = yes # undercoat: moved to scripted trigger
+		}
+	}
+}
+
+decision_gh_life_seeding = {
+	icon = decision_colony_settlement
+	enactment_time = 30
+	resources = {
+		category = decisions
+		cost = { entropy_crystals = 2500 }
+	}
+
+	potential = {
+		exists = from
+		from = {
+			has_ascension_perk = ap_galactic_hyperthermia
+			check_variable = { which = gh_life_seeder_var value > 0 }
+		}
+		exists = space_owner
+		space_owner = { is_same_value = from }
+		is_colonizable = yes
+		is_artificial = no
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "decision_gh_life_seeding_limit"
+			NOT = { has_planet_flag = decision_gh_life_seeding_ongoing }
+		}
+		custom_tooltip = {
+			fail_text = "decision_gh_life_seeding_colony"
+			solar_system = {
+				NOT = { any_system_planet = { exists = owner } }
+			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_gh_life_seeding_effect
+		hidden_effect = {
+			from = {
+				change_variable = { which = gh_life_seeder_var value = -1 }
+			}
+			set_planet_flag = gh_life_seeding_ongoing
+			create_infernal_primitives = yes
+		}
+	}
+}
+
+decision_starfire_cannon = {
+	icon = decision_ship_in_orbit
+	enactment_time = @battleship_build_time
+	owned_planets_only = yes
+	resources = {
+		category = decisions
+		cost = { alloys = 1000 }
+	}
+
+	prerequisites = { "tech_starfire_cannon" }
+
+	potential = {
+		exists = from
+		from = {
+			has_technology = tech_starfire_cannon
+			is_playable = yes # FEs unlock all techs # undercoat: moved to scripted trigger
+		}
+		exists = space_owner
+		space_owner = { is_same_value = from }
+	}
+
+	allow = {
+		from = { has_technology = tech_cruisers }
+		custom_tooltip = {
+			fail_text = "decision_starfire_cannon_limit"
+			solar_system = {
+				count_ship_in_system = {
+					limit = { is_ship_size = starfire_cannon }
+					count < 3
+				}
+			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = decision_starfire_cannon_effects
+		hidden_effect = {
+			create_fleet = {
+				settings = { spawn_debris = no }
+				effect = {
+					set_owner = from
+					set_location = {
+						target = root
+						distance = 7
+						angle = random
+					}
+					create_ship = { design = "NAME_Starfire_Cannon" }
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+		modifier = {
+			add = 3
+			pop_amount > 7500
+		}
+		modifier = {
+			add = 10
+			is_capital = yes
+		}
+		modifier = {
+			add = 5
+			solar_system = { is_bottleneck_system = yes }
+		}
+		modifier = {
+			factor = 0
+			# Should otherwise focus on ships
+			owner = {
+				resource_income_compare = {
+					resource = alloys
+					value < 350
+				}
+				resource_stockpile_compare = {
+					resource = alloys
+					value < 7500
+				}
+			}
+		}
+	}
+}
+
+decision_living_metal_distribution = {
+	owned_planets_only = yes
+	sound = event_administrative_work
+	icon = decision_distribute_living_metal
+
+	resources = {
+		category = decisions
+		cost = { sr_living_metal = 700 }
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_galvanic_empire = yes }
+		is_artificial = no
+	}
+
+	allow = {
+		NOT = { has_modifier = living_metal_distribution_effect }
+	}
+
+	effect = {
+		add_modifier = { modifier = living_metal_distribution_effect years = 5 }
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}

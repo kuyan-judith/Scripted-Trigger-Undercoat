@@ -1,0 +1,4220 @@
+############################
+#
+# Shroud Forged Events
+#
+# Written by Joachim Holmsen
+#
+############################
+
+namespace = shroud_forged
+
+# Setup event
+country_event = {
+	id = shroud_forged.1
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = shroud_forged_first_approach
+		capital_scope = { # Set the right tone for the system they are in
+			add_zone = {
+				replace = yes
+				district = district_nexus
+				zone = zone_industrial
+				zone_slot = 2
+			}
+			add_building = {
+				building = building_foundry_1
+				zone = zone_industrial
+			}
+			while = {
+				count = @max_open_shroud_rift_uses
+				add_deposit = d_shroud_rift_deposit
+			}
+			set_planet_flag = origin_shroud_forged_capital_flag
+			create_ambient_object = {
+				type = "nebula_L6_entity"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 0
+					angle = random
+				}
+			}
+
+			create_ambient_object = {
+				type = shroud_rift_object
+				scale = 0.5
+				entity_offset_height = -17
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+				}
+			}
+		}
+		solar_system = {
+			set_star_class = sc_m
+		}
+		add_resource = { consumer_goods = 200 }
+		start_situation = {
+			type = situation_shroud_forged
+			target = root
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.5
+	title = shroud_forged.5.title
+	desc = shroud_forged.5.desc
+	picture = GFX_evt_cybernetics
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		any_situation = {
+			is_situation_type = situation_shroud_forged
+		}
+	}
+
+	option = {
+		name = shroud_forged.5.a
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier3researchreward
+			min = @tier3researchmin
+			max = @tier3researchmax
+		}
+	}
+}
+
+# Start Event
+country_event = {
+	id = shroud_forged.10
+	title = shroud_forged.10.title
+	desc = shroud_forged.10.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+
+	trigger = {
+		exists = event_target:shroud_forged_situation
+	}
+
+	immediate = {
+		set_country_flag = has_met_animator_of_clay
+	}
+
+	option = {
+		name = shroud_forged.10.a
+		event_target:shroud_forged_situation = { set_situation_approach = approach_shroud_forged_appease }
+		add_resource = { unity = 100 }
+		hidden_effect = {
+			country_event = { id = shroud_forged.15 }
+		}
+	}
+	option = {
+		name = shroud_forged.10.b
+		event_target:shroud_forged_situation = { set_situation_approach = approach_shroud_forged_suppress }
+		add_resource = { influence = 50 }
+		hidden_effect = {
+			country_event = { id = shroud_forged.20 }
+		}
+	}
+	option = {
+		name = shroud_forged.10.c
+		event_target:shroud_forged_situation = { set_situation_approach = approach_shroud_forged_support }
+		random_owned_ship = {
+			limit = {
+				exists = leader
+				is_ship_class = shipclass_science_ship
+			}
+			leader = {
+				add_trait = { trait = leader_trait_guided }
+				hidden_effect = {
+					root = {
+						random_owned_species = {
+							limit = {
+								has_trait = trait_mechanical
+							}
+							save_event_target_as = shroud_forged_species
+						}
+					}
+					change_species = event_target:shroud_forged_species
+				}
+			}
+		}
+		hidden_effect = {
+			country_event = { id = shroud_forged.25 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.15
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.15.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+country_event = {
+	id = shroud_forged.20
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.20.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+country_event = {
+	id = shroud_forged.25
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.25.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+# Materiality Engine unlocked
+country_event = {
+	id = shroud_forged.30
+	title = shroud_forged.30.title
+	desc = shroud_forged.30.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.30.a
+		add_research_option = tech_materiality_engine
+		custom_tooltip = shroud_forged.30.tt
+		set_country_flag = shroud_forged_can_become_the_crisis
+	}
+}
+
+# Materiality Engine Special Project trigger
+planet_event = {
+	id = shroud_forged.39
+	title = shroud_forged.39.title
+	desc = {
+		trigger = {
+			has_planet_flag = materiality_engine_construction
+		}
+		text = shroud_forged.39.desc_construction
+	}
+	desc = {
+		trigger = {
+			NOT = { has_planet_flag = materiality_engine_construction }
+		}
+		text = shroud_forged.39.desc
+	}
+	picture = GFX_evt_shroud_generic
+	show_sound = event_machinery
+	is_triggered_only = yes
+	location = root
+
+	trigger = {
+		has_building = building_materiality_engine
+		exists = owner
+		owner = {
+			is_same_value = from
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	option = {
+		name = shroud_forged.39.a
+		enable_special_project = {
+			name = "SHROUD_FORGED_MATERIALITY_ENGINE"
+			location = this
+			owner = from
+		}
+	}
+}
+
+# Materiality Engine Special Project success event component distribution
+country_event = {
+	id = shroud_forged.40
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		from = { has_building = building_materiality_engine }
+	}
+
+	immediate = {
+		change_variable = {
+			which = materiality_engine_available
+			value = 1
+		}
+		from = {
+			if = {
+				limit = { is_variable_set = materiality_engine_power }
+				change_variable = {
+					which = materiality_engine_power
+					value = 1
+				}
+			}
+			else = {
+				set_variable = {
+					which = materiality_engine_power
+					value = 1
+				}
+			}
+			planet_event = {
+				id = shroud_forged.39
+				scopes = { from = root }
+				days = 1440
+				random = 720
+			}
+		}
+		# Trigger event depending on component rolled
+		random_list = {
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_psi_jump_drive_1
+						has_tech_option = tech_psi_jump_drive_1
+					}
+				}
+				country_event = { id = shroud_forged.41 }
+				set_country_flag = shroud_component_rolled
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_psionic_shield
+						has_tech_option = tech_psionic_shield
+					}
+				}
+				country_event = { id = shroud_forged.42 }
+				set_country_flag = shroud_component_rolled
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_precognition_interface
+						has_tech_option = tech_precognition_interface
+					}
+				}
+				country_event = { id = shroud_forged.43 }
+				set_country_flag = shroud_component_rolled
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_psionic_bombers
+						has_tech_option = tech_psionic_bombers
+					}
+				}
+				country_event = { id = shroud_forged.44 }
+				set_country_flag = shroud_component_rolled
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_psionic_lightning
+						has_tech_option = tech_psionic_lightning
+					}
+				}
+				country_event = { id = shroud_forged.45 }
+				set_country_flag = shroud_component_rolled
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_psionic_disruptor
+						has_tech_option = tech_psionic_disruptor
+					}
+				}
+				country_event = { id = shroud_forged.46 }
+				set_country_flag = shroud_component_rolled
+			}
+			1 = {
+				modifier = {
+					factor = 0
+					OR = {
+						has_technology = tech_zro_launcher
+						has_tech_option = tech_zro_launcher
+					}
+				}
+				country_event = { id = shroud_forged.47 }
+				set_country_flag = shroud_component_rolled
+			}
+		}
+		if = {
+			limit = {
+				NOT = { has_country_flag = shroud_component_rolled }
+			}
+			country_event = { id = shroud_forged.48 }
+		}
+		else = {
+			remove_country_flag = shroud_component_rolled
+		}
+	}
+}
+
+# Materiality Engine Special Project success event - component PSI_JUMP_DRIVE_1
+country_event = {
+	id = shroud_forged.41
+	title = shroud_forged.40.title
+	desc = shroud_forged.41.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_psi_jump_drive_1 }
+	}
+}
+
+# Materiality Engine Special Project success event - component Psionic Shields
+country_event = {
+	id = shroud_forged.42
+	title = shroud_forged.40.title
+	desc = shroud_forged.42.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_psionic_shield }
+	}
+}
+
+# Materiality Engine Special Project success event - component Precognition Interface
+country_event = {
+	id = shroud_forged.43
+	title = shroud_forged.40.title
+	desc = shroud_forged.43.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_precognition_interface }
+	}
+}
+
+# Materiality Engine Special Project success event - component Psionic Bombers
+country_event = {
+	id = shroud_forged.44
+	title = shroud_forged.40.title
+	desc = shroud_forged.44.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_psionic_bombers }
+	}
+}
+
+# Materiality Engine Special Project success event - component Psionic Lightning
+country_event = {
+	id = shroud_forged.45
+	title = shroud_forged.40.title
+	desc = shroud_forged.45.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_psionic_lightning }
+	}
+}
+
+# Materiality Engine Special Project success event - component Psionic Disruptors
+country_event = {
+	id = shroud_forged.46
+	title = shroud_forged.40.title
+	desc = shroud_forged.46.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_psionic_disruptor }
+	}
+}
+
+# Materiality Engine Special Project success event - component Zro Launchers
+country_event = {
+	id = shroud_forged.47
+	title = shroud_forged.40.title
+	desc = shroud_forged.47.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_finding_loot
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		give_tech_no_error_effect = { MESSAGE = yes TECH = tech_zro_launcher }
+	}
+}
+
+# Materiality Engine Special Project success event - no components available
+country_event = {
+	id = shroud_forged.48
+	title = shroud_forged.40.title
+	desc = shroud_forged.48.desc
+	picture = GFX_evt_shroud_generic
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	option = {
+		name = shroud_forged.40.a
+		custom_tooltip = shroud_forged.40.tt
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = @tier4researchreward
+			min = @tier4researchmin
+			max = @tier4researchmax
+		}
+	}
+}
+
+# Control Ending Events
+country_event = {
+	id = shroud_forged.50
+	title = shroud_forged.50.title
+	desc = {
+		trigger = {
+			text = shroud_forged.50.desc
+			if = {
+				limit = { has_country_flag = can_access_shroud }
+				text = newline
+				text = shroud_forged.50.desc.shroud
+			}
+		}
+	}
+	picture = GFX_evt_cybernetics
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.50.a
+		enable_special_project = {
+			name = "SHROUD_FORGED_REINTEGRATION"
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.60
+	title = shroud_forged.60.title
+	desc = shroud_forged.60.desc
+	picture = GFX_evt_hive_cyberization
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.60.a
+		add_modifier = {
+			modifier = shroud_forged_reintegration_modifier
+			days = -1
+		}
+		hidden_effect = {
+			country_event = {
+				id = shroud_forged.30
+				days = 30
+			}
+		}
+	}
+}
+
+# Liberation Ending Events
+country_event = {
+	id = shroud_forged.70
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.70.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.70.a
+		enable_special_project = {
+			name = "SHROUD_FORGED_GUIDE"
+		}
+		custom_tooltip = shroud_forged.70.a.tt
+		hidden_effect = {
+			every_owned_pop_group = {
+				limit = {
+					has_trait = trait_shroud_forged
+				}
+				add_psionic_trait = yes
+				set_citizenship_type = {
+					type = citizenship_shroud_touched
+					cooldown = no
+				}
+			}
+			change_dominant_species = {
+				species = event_target:psionic_species
+			}
+			every_owned_leader = {
+				limit = {
+					can_receive_psionic_leader_trait = yes
+				}
+				add_trait = {
+					trait = leader_trait_psionic
+					show_message = no
+				}
+			}
+			every_pool_leader = {
+				limit = {
+					can_receive_psionic_leader_trait = yes
+				}
+				add_trait = {
+					trait = leader_trait_psionic
+					show_message = no
+				}
+			}
+			update_node_portraits_if_gestalt_effect = yes
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.80
+	title = shroud_forged.80.title
+	desc = shroud_forged.80.desc
+	picture = GFX_evt_shroud_forged_zrobot
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.80.a
+		add_modifier = {
+			modifier = shroud_forged_guide_modifier
+			days = -1
+		}
+	}
+}
+
+# Drone Conversion
+situation_event = {
+	id = shroud_forged.100
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		save_event_target_as = shroud_forged_situation
+		if = {
+			limit = {
+				NOT = { current_stage = stage_shroud_forged_oppressed }
+			}
+			target = { drone_conversion_event_effect = yes }
+		}
+	}
+}
+
+
+# Monthly random events for Shroud Forged situation
+situation_event = {
+	id = shroud_forged.150
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		random_list = {
+			80 = {}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.500
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.510
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.520
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.530
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.540
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.550
+				}
+			}
+			6 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.560
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.570
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.580
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.590
+				}
+			}
+			6 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.600
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.610
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.620
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.630
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.640
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.650
+				}
+			}
+			6 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.660
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.670
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.680
+				}
+			}
+			2 = {
+				inline_script = {
+					script = shroud/shroud_forged_random_events_exclusion
+					EVENT = shroud_forged.690
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = shroud_forged.160
+	title = shroud_forged.160.title
+	desc = shroud_forged.160.desc
+	desc = {
+		trigger = {
+			from = {
+				check_variable = {
+					which = shroud_pierce_decision_zro_bonus_count
+					value >= 3
+				}
+			}
+		}
+		text = shroud_forged.160.desc.last
+	}
+	picture = GFX_evt_shrouded_planet
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		from = {
+			check_variable = {
+				which = shroud_pierce_decision_zro_bonus_count
+				value < 3
+			}
+		}
+	}
+
+	immediate = {
+		from = {
+			change_variable = {
+				which = shroud_pierce_decision_zro_bonus_count
+				value = 1
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.160.a
+		from = {
+			add_monthly_resource_mult = {
+				resource = sr_zro
+				value = @tier3materialreward
+				min = @tier3materialmin
+				max = @tier3materialmax
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = shroud_pierce_decision_zro_bonus_count
+						value = 1
+					}
+				}
+				add_modifier = {
+					modifier = psionic_interfacing_1
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						which = shroud_pierce_decision_zro_bonus_count
+						value = 2
+					}
+				}
+				tooltip = {
+					add_modifier = {
+						modifier = psionic_interfacing_1
+					}
+				}
+				hidden_effect = {
+					remove_modifier = psionic_interfacing_1
+					add_modifier = {
+						modifier = psionic_interfacing_2
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						which = shroud_pierce_decision_zro_bonus_count
+						value = 3
+					}
+				}
+				tooltip = {
+					add_modifier = {
+						modifier = psionic_interfacing_1
+					}
+				}
+				hidden_effect = {
+					remove_modifier = psionic_interfacing_2
+					add_modifier = {
+						modifier = psionic_interfacing_3
+					}
+				}
+			}
+		}
+	}
+}
+
+# Clean-up Event on Planet Loss
+planet_event = {
+	id = shroud_forged.200
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		remove_modifier = pm_shroud_forged_special_housing
+		remove_modifier = pm_shroud_forged_ceremony
+		remove_modifier = pm_shroud_forged_denied_ceremony
+		remove_modifier = pm_shroud_forged_troubling_elements_example
+		remove_modifier = pm_shroud_forged_troubling_elements_regulations
+		remove_modifier = pm_shroud_forged_troubling_elements_cooperation
+		remove_modifier = pm_shroud_forged_shroud_pilgrimage
+		remove_modifier = pm_shroud_forged_dance_area
+		remove_modifier = pm_shroud_forged_inequality
+		remove_modifier = pm_shroud_forged_individualism
+		remove_modifier = pm_shroud_forged_artistic_revolution
+		remove_modifier = pm_shroud_forged_stopped_artists
+		remove_modifier = pm_shroud_forged_fashion_modifier
+		remove_modifier = pm_shroud_forged_obsession_modifier
+
+		if = {
+			limit = {
+				has_planet_flag = zroni_legacy_flag
+			}
+			zroni_legacy_planet_check_effect = {
+				FLAG = zroni_legacy_1_flag
+				GLOBAL_TARGET = zroni_legacy_1_owner
+			}
+			zroni_legacy_planet_check_effect = {
+				FLAG = zroni_legacy_2_flag
+				GLOBAL_TARGET = zroni_legacy_2_owner
+			}
+			zroni_legacy_planet_check_effect = {
+				FLAG = zroni_legacy_3_flag
+				GLOBAL_TARGET = zroni_legacy_3_owner
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = shroud_forged.205
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		planet_event = {
+			id = shroud_forged.200
+			scopes = {
+				from = owner
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = shroud_forged.220
+	title = shroud_forged.220.title
+	desc = shroud_forged.220.desc
+	show_sound = event_construction
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_planet_flag = zroni_legacy_flag }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			NOR = {
+				has_country_flag = finish_shroud_forged_control_flag
+				has_country_flag = triggered_first_colonization_event
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = triggered_first_colonization_event
+		}
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+	}
+}
+
+planet_event = {
+	id = shroud_forged.225
+	title = shroud_forged.225.title
+	desc = shroud_forged.225.desc
+	show_sound = event_construction
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			NOR = {
+				has_country_flag = finish_shroud_forged_control_flag
+				has_country_flag = triggered_first_colonization_event
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = triggered_first_colonization_event
+		}
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+	}
+}
+
+### Stage Events
+country_event = { # Unrestricted
+	id = shroud_forged.250
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.250.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.250.a
+		custom_tooltip = tooltip_shroud_forged_increase_progress_2
+		custom_tooltip = shroud_forged.250.a.tt
+		hidden_effect = {
+			random_situation = {
+				limit = {
+					is_situation_type = situation_shroud_forged
+				}
+				set_timed_situation_flag = {
+					flag = shroud_forged_250_flag
+					years = 5
+				}
+			}
+			capital_scope = {
+				if = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_machine_unit
+						}
+					}
+					random_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_machine_unit }
+						drone_conversion_event_effect_2 = { FROM_PLANET = yes }
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.250.b
+	}
+}
+
+country_event = { # Chaotic
+	id = shroud_forged.260
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.260.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.260.opt.a
+	}
+}
+
+country_event = { # Controlled
+	id = shroud_forged.270
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.270.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.270.a
+		custom_tooltip = tooltip_shroud_forged_decrease_progress_2
+		hidden_effect = {
+			random_situation = {
+				limit = {
+					is_situation_type = situation_shroud_forged
+				}
+				set_timed_situation_flag = {
+					flag = shroud_forged_270_flag_negative
+					years = 5
+				}
+			}
+			country_event = {
+				id = shroud_forged.5
+				days = 1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.270.b
+		custom_tooltip = tooltip_shroud_forged_increase_progress_2
+		custom_tooltip = shroud_forged.250.a.tt
+		hidden_effect = {
+			random_situation = {
+				limit = {
+					is_situation_type = situation_shroud_forged
+				}
+				set_timed_situation_flag = {
+					flag = shroud_forged_270_flag_positive
+					years = 5
+				}
+			}
+			capital_scope = {
+				if = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_machine_unit
+						}
+					}
+					random_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_machine_unit }
+						drone_conversion_event_effect_2 = { FROM_PLANET = yes }
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Oppressed
+	id = shroud_forged.280
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.280.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.280.opt.a
+	}
+}
+
+### Final Event Chain - Zroni Legacy
+country_event = { # Part 1
+	id = shroud_forged.300
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.300.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		NOT = { has_event_chain = shroud_forged_chain }
+	}
+
+	immediate = {
+		begin_event_chain = {
+			event_chain = shroud_forged_chain
+			target = root
+		}
+		set_country_flag = zroni_legacy
+		if = {
+			limit = {
+				NOT = { has_global_flag = zroni_legacy_begun }
+			}
+			set_global_flag = zroni_legacy_begun
+			zroni_planets_spawn_effect = yes
+		}
+		else = {
+			every_owned_planet = {
+				limit = {
+					has_planet_flag = zroni_legacy_flag
+				}
+				root = {
+					add_event_chain_counter = {
+						event_chain = shroud_forged_chain
+						counter = shroud_forged_zroni_planet
+						amount = 1
+					}
+				}
+			}
+		}
+		zroni_legacy_poi_effect = { NUMBER = 01 }
+		zroni_legacy_poi_effect = { NUMBER = 02 }
+		zroni_legacy_poi_effect = { NUMBER = 03 }
+	}
+
+	option = {
+		name = shroud_forged.300.a
+		trigger = {
+			has_country_flag = zroni_intro
+			NOT = { has_country_flag = last_zroni_system }
+		}
+		custom_tooltip = begin_shroud_forged_chain_tt
+		hidden_effect = {
+			country_event = { id = shroud_forged.301 }
+		}
+	}
+
+	option = {
+		name = shroud_forged.300.b
+		trigger = {
+			has_country_flag = last_zroni_system
+		}
+		custom_tooltip = begin_shroud_forged_chain_tt
+		hidden_effect = {
+			country_event = { id = shroud_forged.302 }
+		}
+	}
+
+	option = {
+		name = shroud_forged.300.c
+		trigger = {
+			NOR = {
+				has_country_flag = zroni_intro
+				has_country_flag = last_zroni_system
+			}
+		}
+		custom_tooltip = begin_shroud_forged_chain_tt
+		hidden_effect = {
+			country_event = { id = shroud_forged.303 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.301
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.301.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+country_event = {
+	id = shroud_forged.302
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.302.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+country_event = {
+	id = shroud_forged.303
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.303.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+# Planet colonized
+planet_event = {
+	id = shroud_forged.304
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		has_planet_flag = zroni_legacy_flag
+		NOT = { has_planet_flag = zroni_planet_colonized }
+	}
+
+	immediate = {
+		set_planet_flag = zroni_planet_colonized
+		owner = {
+			inverted_switch = {
+				trigger = has_country_flag
+				zroni_planet_1_colonized = {
+					country_event = { id = shroud_forged.305 }
+					set_country_flag = zroni_planet_1_colonized
+				}
+				zroni_planet_2_colonized = {
+					country_event = { id = shroud_forged.306 }
+					set_country_flag = zroni_planet_2_colonized
+				}
+				zroni_planet_3_colonized = {
+					country_event = { id = shroud_forged.307 }
+					set_country_flag = zroni_planet_3_colonized
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.305
+	title = shroud_forged.305.title
+	desc = shroud_forged.305.desc
+	show_sound = event_finding_loot
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.305.a
+		custom_tooltip = shroud_forged.305.a.tt
+		hidden_effect = {
+			fromfrom = {
+				planet_event = {
+					id = shroud_forged.225
+					days = 30
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.306
+	title = shroud_forged.306.title
+	desc = shroud_forged.306.desc
+	show_sound = event_finding_loot
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.306.a
+		custom_tooltip = shroud_forged.306.a.tt
+	}
+}
+
+country_event = {
+	id = shroud_forged.307
+	title = shroud_forged.307.title
+	desc = shroud_forged.307.desc
+	show_sound = event_finding_loot
+	picture = GFX_evt_colony_settlement
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.307.a
+		custom_tooltip = shroud_forged.307.a.tt
+	}
+}
+
+country_event = {
+	id = shroud_forged.308
+	title = shroud_forged.308.title
+	desc = shroud_forged.308.desc
+	show_sound = event_activating_unknown_technology
+	picture = GFX_evt_ancient_alien_temple
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.308.a
+		hidden_effect = {
+			country_event = { id = shroud_forged.310 }
+		}
+	}
+}
+
+country_event = { # Part 2
+	id = shroud_forged.310
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.310.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		end_event_chain = shroud_forged_chain
+		random_country = {
+			limit = {
+				is_country_type = shroud
+				has_country_flag = animator_of_clay_country_flag
+			}
+			save_event_target_as = the_animator_of_clay
+		}
+	}
+
+	option = {
+		name = shroud_forged.310.a
+		hidden_effect = {
+			country_event = { id = shroud_forged.311 }
+		}
+	}
+
+	option = {
+		name = shroud_forged.310.b
+		custom_tooltip = shroud_forged.310.b.tt
+		establish_communications_no_message = event_target:the_animator_of_clay
+	}
+}
+
+country_event = {
+	id = shroud_forged.311
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.311.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.311.a
+		hidden_effect = {
+			country_event = { id = shroud_forged.312 }
+		}
+	}
+
+	option = {
+		name = shroud_forged.310.b
+		custom_tooltip = shroud_forged.310.b.tt
+		establish_communications_no_message = event_target:the_animator_of_clay
+	}
+}
+
+country_event = {
+	id = shroud_forged.312
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.312.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.312.a
+		custom_tooltip = shroud_forged.312.a.tt
+		add_modifier = {
+			modifier = shroud_forged_trapped_entity
+		}
+		hidden_effect = {
+			country_event = { id = shroud_forged.313 }
+			set_country_flag = shroud_forged_traitor
+		}
+	}
+
+	option = {
+		name = shroud_forged.310.b
+		custom_tooltip = shroud_forged.310.b.tt
+		hidden_effect = {
+			establish_communications_no_message = event_target:the_animator_of_clay
+			set_country_flag = shroud_forged_loyalist
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.313
+	base = shroud_forged.10
+	desc_clear = yes
+	desc = shroud_forged.313.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.313.a
+	}
+}
+
+# Shroud Forged - Shroud Entity Unbound
+# Planet Scope
+# on_building_demolished, on_building_ruined
+planet_event = {
+	id = shroud_forged.319
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			has_country_flag = zroni_legacy
+		}
+		last_building_changed = building_zroni_equilibrator
+	}
+
+	immediate = {
+		owner = {
+			if = {
+				limit = { has_event_chain = shroud_forged_chain }
+				add_event_chain_counter = {
+					event_chain = shroud_forged_chain
+					counter = shroud_forged_zroni_portal
+					amount = -1
+				}
+			}
+			if = {
+				limit = { has_modifier = shroud_forged_trapped_entity }
+				remove_modifier = shroud_forged_trapped_entity
+				country_event = { id = shroud_forged.320 }
+			}
+		}
+	}
+}
+
+country_event = { # Part 3 - Shroud Punishment
+	id = shroud_forged.320
+	title = shroud_forged.320.title
+	desc = shroud_forged.320.desc
+	show_sound = event_air_raid_siren
+	picture = GFX_evt_sentry_guns
+	location = from
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.320.a
+		custom_tooltip = shroud_forged.320.a.tt
+	}
+
+	after = {
+		hidden_effect = {
+			shroud_major_invasion_effect = yes
+		}
+	}
+}
+
+planet_event = { # Spawn Army on Planet
+	id = shroud_forged.321
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+	}
+
+	immediate = {
+		shroud_creatures_army_spawn = yes
+	}
+}
+
+planet_event = { # Planet Occupied by Shroud Entities
+	id = shroud_forged.322
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		exists = event_target:shroud_creatures
+		FromFrom = { is_same_empire = event_target:shroud_creatures }
+	}
+
+	immediate = {
+		add_modifier = {
+			modifier = shroud_creatures_occupy
+		}
+		if = {
+			limit = {
+				is_artificial = no
+			}
+			planet_event = {
+				id = shroud_forged.324
+				days = 270
+				random = 180
+			}
+		}
+	}
+}
+
+country_event = { # Remove occupation modifier if Shroud creatures are murderized
+	id = shroud_forged.323
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			army_type = shroud_monstrosities
+		}
+	}
+
+	immediate = {
+		from.planet = {
+			remove_modifier = shroud_creatures_occupy
+		}
+	}
+}
+
+planet_event = { # Slow degradation of planet as the Shroud creatures are occupying it
+	id = shroud_forged.324
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		exists = event_target:shroud_creatures
+		is_controlled_by = event_target:shroud_creatures
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				any_deposit = {
+					NOT = { is_deposit_type = d_shroud_rift_deposit }
+				}
+			}
+			random_deposit = {
+				limit = {
+					NOT = { is_deposit_type = d_shroud_rift_deposit }
+				}
+				remove_deposit = yes
+			}
+			add_deposit = d_shroud_rift_deposit
+			planet_event = {
+				id = shroud_forged.324
+				days = 270
+				random = 180
+			}
+		}
+		else = {
+			if = {
+				limit = {
+					is_colony = yes
+				}
+				destroy_colony = yes
+			}
+			change_pc = pc_shrouded
+		}
+	}
+}
+
+country_event = { # Shroud Invasion
+	id = shroud_forged.330
+	title = shroud_forged.330.title
+	desc = shroud_forged.330.desc
+	show_sound = event_air_raid_siren
+	picture = GFX_evt_sentry_guns
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.320.a
+		custom_tooltip = shroud_forged.320.a.tt
+		hidden_effect = {
+			shroud_invasion_effect = yes
+		}
+	}
+}
+
+### Diplomacy - Animator of Clay
+country_event = { # Pre-contact
+	id = shroud_forged.400
+	title = the_animator_of_clay
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		from = {
+			is_country_type = shroud
+			has_country_flag = animator_of_clay_country_flag
+		}
+	}
+
+	picture_event_data = {
+		trigger = {
+			has_breached_shroud = no
+		}
+		portrait = shroud1
+		room = no_video_feed_room
+	}
+
+	picture_event_data = {
+		trigger = {
+			has_breached_shroud = yes
+		}
+		portrait = shroud1
+		room = shroud_room
+	}
+
+	desc = {
+		trigger = {
+			has_breached_shroud = no
+			has_zroni_equilibrators = yes
+			NOT = { has_country_flag = animator_of_clay_cooldown }
+		}
+		text = shroud_forged.400.desc.default.active
+	}
+
+	desc = {
+		trigger = {
+			has_breached_shroud = no
+			has_zroni_equilibrators = yes
+			has_country_flag = animator_of_clay_cooldown
+		}
+		text = shroud_forged.400.desc.default.cooldown
+	}
+
+	desc = {
+		trigger = {
+			has_breached_shroud = no
+			has_zroni_equilibrators = no
+		}
+		text = shroud_forged.400.desc.default.inactive
+	}
+
+	desc = {
+		trigger = {
+			has_breached_shroud = yes
+		}
+		text = shroud_forged.400.desc.breached
+	}
+
+	option = { # Military Assistance
+		name = shroud_forged.400.a
+		allow = {
+			custom_tooltip = {
+				fail_text = animator_of_clay_cooldown_tt
+				NOT = {
+					has_country_flag = animator_of_clay_cooldown
+				}
+			}
+			custom_tooltip = {
+				fail_text = animator_of_clay_equilibrators_tt
+				has_zroni_equilibrators = yes
+			}
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 450
+			}
+		}
+		add_resource = { sr_zro = -450 }
+		custom_tooltip = shroud_forged.400.a.tt
+
+		random_list = {
+			25 = { # Empire Modifier
+				tooltip = {
+					add_modifier = {
+						modifier = shroud_forged_military_assistance
+						days = 3600
+					}
+				}
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.430 }
+			}
+			25 = { # Psionic Avatar
+				modifier = {
+					factor = 0
+					mid_game_years_passed < 0
+				}
+				custom_tooltip = shroud_forged_psionic_avatar_ship_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.432 }
+			}
+			15 = { # Psionic Army
+				custom_tooltip = shroud_forged_psionic_avatar_army_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.434 }
+			}
+			25 = { # Corrupted Avatar
+				custom_tooltip = shroud_forged_corrupted_avatar_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.436 }
+			}
+			10 = {} # Nothing Happens
+		}
+		custom_tooltip = shroud_forged.400.tt
+		if = {
+			limit = {
+				NOT = {
+					has_zroni_equilibrators = yes
+					resource_stockpile_compare = {
+						resource = sr_zro
+						value >= 450
+					}
+				}
+			}
+			custom_tooltip = shroud_forged.400.unavailable.tt
+		}
+
+		hidden_effect = {
+			shroud_forged_animator_of_clay_cooldown = { VALUE = 5400 }
+			country_event = { id = shroud_forged.415 }
+		}
+	}
+	option = { # Civic Assistance
+		name = shroud_forged.400.b
+		allow = {
+			custom_tooltip = {
+				fail_text = animator_of_clay_cooldown_tt
+				NOT = {
+					has_country_flag = animator_of_clay_cooldown
+				}
+			}
+			custom_tooltip = {
+				fail_text = animator_of_clay_equilibrators_tt
+				has_zroni_equilibrators = yes
+			}
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 300
+			}
+		}
+		add_resource = { sr_zro = -300 }
+		custom_tooltip = shroud_forged.400.b.tt
+
+		random_list = {
+			25 = { # Empire Modifier
+				tooltip = {
+					add_modifier = {
+						modifier = shroud_forged_civic_assistance
+						days = 3600
+					}
+				}
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.438 }
+			}
+			25 = { # Resources
+				custom_tooltip = shroud_forged_resources_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.440 }
+			}
+			15 = { # Capital Modifier
+				tooltip = {
+					capital_scope = {
+						add_modifier = {
+							modifier = shroud_forged_civic_assistance_capital
+							days = 3600
+						}
+					}
+				}
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.442 }
+			}
+			25 = { # Capital attack by Shroud Creature
+				custom_tooltip = shroud_forged_capital_attack_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.444 }
+			}
+			10 = {} # Nothing Happens
+		}
+		custom_tooltip = shroud_forged.400.tt
+		if = {
+			limit = {
+				NOT = {
+					has_zroni_equilibrators = yes
+					resource_stockpile_compare = {
+						resource = sr_zro
+						value >= 300
+					}
+				}
+			}
+			custom_tooltip = shroud_forged.400.unavailable.tt
+		}
+
+		hidden_effect = {
+			shroud_forged_animator_of_clay_cooldown = { VALUE = 3600 }
+			country_event = { id = shroud_forged.420 }
+		}
+	}
+	option = { # Research Assistance
+		name = shroud_forged.400.c
+		allow = {
+			custom_tooltip = {
+				fail_text = animator_of_clay_cooldown_tt
+				NOT = {
+					has_country_flag = animator_of_clay_cooldown
+				}
+			}
+			custom_tooltip = {
+				fail_text = animator_of_clay_equilibrators_tt
+				has_zroni_equilibrators = yes
+			}
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 300
+			}
+		}
+		add_resource = { sr_zro = -300 }
+		custom_tooltip = shroud_forged.400.c.tt
+
+		random_list = {
+			25 = { # Empire Modifier
+				tooltip = {
+					add_modifier = {
+						modifier = shroud_forged_research_assistance
+						days = 3600
+					}
+				}
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.446 }
+			}
+			25 = { # Random Research Option
+				custom_tooltip = shroud_forged_random_research_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.448 }
+			}
+			15 = { # Capital Modifier
+				tooltip = {
+					capital_scope = {
+						add_modifier = {
+							modifier = shroud_forged_research_assistance_capital
+							days = 3600
+						}
+					}
+				}
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.450 }
+			}
+			25 = { # Capital attack by Shroud Creature
+				custom_tooltip = shroud_forged_capital_attack_tt
+				shroud_forged_animator_of_clay_event = { EVENT = shroud_forged.444 }
+			}
+			10 = {} # Nothing Happens
+		}
+		custom_tooltip = shroud_forged.400.tt
+		if = {
+			limit = {
+				NOT = {
+					has_zroni_equilibrators = yes
+					resource_stockpile_compare = {
+						resource = sr_zro
+						value >= 300
+					}
+				}
+			}
+			custom_tooltip = shroud_forged.400.unavailable.tt
+		}
+
+		hidden_effect = {
+			shroud_forged_animator_of_clay_cooldown = { VALUE = 3600 }
+			country_event = { id = shroud_forged.425 }
+		}
+	}
+	option = {
+		name = shroud_forged.400.d
+		trigger = {
+			has_breached_shroud = yes
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 500
+			}
+			custom_tooltip = {
+				fail_text = animator_of_clay_cooldown_tt
+				NOT = {
+					has_country_flag = animator_of_clay_cooldown
+				}
+			}
+		}
+		add_resource = {
+			sr_zro = -500
+		}
+		custom_tooltip = shroud_forged.400.d.tt
+
+		hidden_effect = {
+			every_system_within_border = {
+				every_system_colony = {
+					animator_of_clay_create_vessels = yes
+				}
+			}
+			shroud_forged_animator_of_clay_cooldown = { VALUE = 3600 }
+			country_event = { id = shroud_forged.470 }
+		}
+	}
+	option = {
+		name = shroud_forged.400.e
+		trigger = {
+			has_breached_shroud = yes
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 500
+			}
+			custom_tooltip = {
+				fail_text = animator_of_clay_cooldown_tt
+				NOT = {
+					has_country_flag = animator_of_clay_cooldown
+				}
+			}
+		}
+		add_resource = {
+			sr_zro = -500
+		}
+		add_modifier = {
+			modifier = animator_of_clay_vessels_enhancement
+			years = 10
+		}
+		hidden_effect = {
+			shroud_forged_animator_of_clay_cooldown = { VALUE = 3600 }
+			country_event = { id = shroud_forged.475 }
+		}
+	}
+	option = {
+		name = shroud_forged.400.h
+		trigger = {
+			has_breached_shroud = yes
+			has_country_flag = synth_queen_can_contact_the_animator_of_clay
+			has_covenant_with_end_of_the_cycle = no
+			NOR = {
+				has_country_flag = synth_queen_contacted_the_animator_already
+				has_country_flag = shroud_forged_traitor
+			}
+		}
+
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 2000
+			}
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 500
+			}
+		}
+
+		add_resource = {
+			 energy = -2000
+		}
+		add_resource = {
+			sr_zro = -500
+		}
+
+		hidden_effect = {
+			country_event = { id = crisis.24100 }
+		}
+	}
+	option = {
+		name = shroud_forged.400.f
+		trigger = {
+			has_breached_shroud = yes
+		}
+		hidden_effect = {
+			country_event = { id = shroud_forged.460 }
+		}
+	}
+	option = {
+		name = shroud_forged.400.g
+		default_hide_option = yes
+	}
+}
+
+country_event = { # Military Assistance
+	id = shroud_forged.415
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.415.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+country_event = { # Civic Assistance
+	id = shroud_forged.420
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.420.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+country_event = { # Research Assistance
+	id = shroud_forged.425
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.425.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = DOTDOTDOT
+	}
+}
+
+### Military Assistance Events
+country_event = { # Military Empire Modifier
+	id = shroud_forged.430
+	title = shroud_forged.430.title
+	desc = shroud_forged.430.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.430.a
+		add_modifier = {
+			modifier = shroud_forged_military_assistance
+			days = 3600
+		}
+	}
+}
+
+country_event = { # Psionic Avatar
+	id = shroud_forged.432
+	title = shroud_forged.432.title
+	desc = shroud_forged.432.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.432.a
+		custom_tooltip = shroud_forged.432.a.tt
+		create_fleet = {
+			name = "NAME_Psionic_Avatar"
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				uses_naval_capacity = no
+				spawn_debris = no
+			}
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = "NAME_Avatar"
+					design = "NAME_Shroud_Avatar"
+					prefix = no
+					upgradable = no
+				}
+				set_location = root.capital_scope
+			}
+		}
+	}
+}
+
+country_event = { # Psionic Army
+	id = shroud_forged.434
+	title = shroud_forged.434.title
+	desc = shroud_forged.434.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.434.a
+		capital_scope = {
+			while = {
+				count = 3
+				create_army = {
+					name = "NAME_Avatar"
+					owner = root
+					species = root
+					type = "shroud_army"
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Corrupted Avatar
+	id = shroud_forged.436
+	title = shroud_forged.436.title
+	desc = shroud_forged.436.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	immediate = {
+		random_system_within_border = {
+			save_event_target_as = shroud_spawn_system
+			random_system_planet = { save_event_target_as = shroud_spawn_planet }
+		}
+		create_shroud_creatures = yes
+		create_fleet = {
+			name = "NAME_Corrupted_Avatar"
+			settings = {
+				spawn_debris = no
+				is_boss = yes
+			}
+			effect = {
+				set_owner = event_target:shroud_creatures
+				create_ship = {
+					name = "NAME_Corrupted_Avatar"
+					design = "NAME_Corrupted_Avatar"
+				}
+				set_location = event_target:shroud_spawn_planet
+				set_fleet_stance = aggressive
+				set_aggro_range_measure_from = return_point
+				set_aggro_range = 300
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.436.a
+		custom_tooltip = shroud_forged.436.a.tt
+	}
+}
+
+### Civic Assistance Events
+country_event = { # Civic Empire Modifier
+	id = shroud_forged.438
+	title = shroud_forged.438.title
+	desc = shroud_forged.438.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.438.a
+		add_modifier = {
+			modifier = shroud_forged_civic_assistance
+			days = 3600
+		}
+	}
+}
+
+country_event = { # Resources
+	id = shroud_forged.440
+	title = shroud_forged.440.title
+	desc = shroud_forged.440.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.440.a
+		add_monthly_resource_mult = {
+			resource = energy
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = minerals
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_monthly_resource_mult = {
+			resource = alloys
+			value = @tier1materialreward
+			min = @tier1materialmin
+			max = @tier1materialmax
+		}
+		add_resource = { sr_zro = 250 }
+	}
+}
+
+country_event = { # Civic Capital Modifier
+	id = shroud_forged.442
+	title = shroud_forged.442.title
+	desc = shroud_forged.442.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.442.a
+		capital_scope = {
+			add_modifier = {
+				modifier = shroud_forged_civic_assistance_capital
+				days = 3600
+			}
+		}
+	}
+}
+
+country_event = { # Capital Attacked by the Shroud
+	id = shroud_forged.444
+	title = shroud_forged.444.title
+	desc = shroud_forged.444.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	immediate = {
+		capital_scope = {
+			planet_event = { id = shroud_forged.321 }
+		}
+	}
+
+	option = {
+		name = shroud_forged.444.a
+		custom_tooltip = shroud_forged.444.a.tt
+	}
+}
+
+### Research Assistance Events
+country_event = { # Research Empire Modifier
+	id = shroud_forged.446
+	title = shroud_forged.446.title
+	desc = shroud_forged.446.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.446.a
+		add_modifier = {
+			modifier = shroud_forged_research_assistance
+			days = 3600
+		}
+	}
+}
+
+country_event = { # Random Research Option
+	id = shroud_forged.448
+	title = shroud_forged.448.title
+	desc = shroud_forged.448.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.448.a
+		locked_random_list = {
+			1 = {
+				add_random_research_option = {
+					add_progress = 0.25
+					area = engineering
+					ignore_prereqs = no
+					ignore_rare = no
+					fail_effects = {
+						add_monthly_resource_mult = {
+							resource = engineering_research
+							value = @tier2researchreward
+							min = @tier2researchmin
+							max = @tier2researchmax
+						}
+					}
+				}
+			}
+			1 = {
+				add_random_research_option = {
+					add_progress = 0.25
+					area = physics
+					ignore_prereqs = no
+					ignore_rare = no
+					fail_effects = {
+						add_monthly_resource_mult = {
+							resource = physics_research
+							value = @tier2researchreward
+							min = @tier2researchmin
+							max = @tier2researchmax
+						}
+					}
+				}
+			}
+			1 = {
+				add_random_research_option = {
+					add_progress = 0.25
+					area = society
+					ignore_prereqs = no
+					ignore_rare = no
+					fail_effects = {
+						add_monthly_resource_mult = {
+							resource = society_research
+							value = @tier2researchreward
+							min = @tier2researchmin
+							max = @tier2researchmax
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = { # Research Capital Modifier
+	id = shroud_forged.450
+	title = shroud_forged.450.title
+	desc = shroud_forged.450.desc
+	picture = GFX_evt_surreal_visions
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		has_zroni_equilibrators = yes
+	}
+
+	option = {
+		name = shroud_forged.450.a
+		capital_scope = {
+			add_modifier = {
+				modifier = shroud_forged_research_assistance_capital
+				days = 3600
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.460
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.460.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.460.a
+		hidden_effect = {
+			country_event = { id = shroud_forged.465 }
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.465
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.465.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.465.a
+	}
+}
+
+country_event = {
+	id = shroud_forged.470
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.470.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.470.a
+	}
+}
+
+country_event = {
+	id = shroud_forged.475
+	base = shroud_forged.400
+	desc_clear = yes
+	desc = shroud_forged.475.desc
+	option_clear = yes
+	trigger_clear = yes
+
+	trigger = {
+		is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = shroud_forged.475.a
+	}
+}
+
+### Random Events
+situation_event = { # Housing and Storage (between 900 and 2100 progress)
+	id = shroud_forged.500
+	title = shroud_forged.500.title
+	desc = shroud_forged.500.desc
+	picture = GFX_evt_metropolis
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_balanced_trigger = { FLAG = shroud_forged_500_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				NOT = { has_modifier = pm_shroud_forged_special_housing }
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_500_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					NOT = { has_modifier = pm_shroud_forged_special_housing }
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.500.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = minerals value >= 500 }
+			}
+		}
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_500_positive }
+		owner = {
+			add_resource = { minerals = -500 }
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_special_housing
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.500.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_500_negative }
+	}
+}
+
+situation_event = { # Remembrance
+	id = shroud_forged.510
+	title = shroud_forged.510.title
+	desc = shroud_forged.510.desc
+	picture = GFX_evt_clocks
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_510_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				NOR = {
+					has_modifier = pm_shroud_forged_denied_ceremony
+					has_modifier = pm_shroud_forged_ceremony
+				}
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_510_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					NOR = {
+						has_modifier = pm_shroud_forged_denied_ceremony
+						has_modifier = pm_shroud_forged_ceremony
+					}
+					count_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_shroud_forged }
+						count > 1
+					}
+				}
+				save_event_target_as = target_planet
+			}
+
+			if = {
+				limit = { NOT = { exists = event_target:target_planet } }
+				random_owned_planet = {
+					limit = {
+						NOR = {
+							has_modifier = pm_shroud_forged_denied_ceremony
+							has_modifier = pm_shroud_forged_ceremony
+						}
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_shroud_forged
+						}
+					}
+					save_event_target_as = target_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.510.c
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_510_positive_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_ceremony
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.510.d
+		trigger = {
+			situation_progress > 2100
+		}
+		allow = {
+			owner = {
+				resource_stockpile_compare = { resource = energy value >= 2000 }
+			}
+		}
+		shroud_forged_situation_event_positive_2 = { FLAG = shroud_forged_510_positive_2 }
+		owner = {
+			add_resource = { energy = -2000 }
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_ceremony
+				days = 720
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.510.a
+		trigger = {
+			situation_progress < 900
+			owner = {
+				count_owned_pop_group = {
+					limit = { pop_group_has_trait = trait_shroud_forged }
+					count > 1
+				}
+			}
+		}
+		shroud_forged_situation_event_negative_2 = { FLAG = shroud_forged_510_negative_2 }
+		owner = {
+			add_resource = {
+				alloys = 250
+				sr_zro = 20
+			}
+		}
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_denied_ceremony
+				days = 720
+			}
+			random_owned_pop_group = {
+				limit = {
+					pop_group_has_trait = trait_shroud_forged
+					NOR = {
+						is_pop_category = bio_trophy
+						is_pop_category = bio_trophy_unemployment
+					}
+				}
+				kill_single_pop = yes
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.510.b
+		trigger = {
+			situation_progress >= 900
+		}
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_510_negative_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_denied_ceremony
+				days = 720
+			}
+		}
+	}
+}
+
+situation_event = { # Troubling Elements (less than 70)
+	id = shroud_forged.520
+	title = shroud_forged.520.title
+	desc = shroud_forged.520.desc
+	picture = GFX_evt_alien_propaganda
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_less_trigger = {
+			FLAG = shroud_forged_520_cooldown
+			VALUE = 2100
+		}
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				NOR = {
+					has_modifier = pm_shroud_forged_troubling_elements_example
+					has_modifier = pm_shroud_forged_troubling_elements_regulations
+					has_modifier = pm_shroud_forged_troubling_elements_cooperation
+				}
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_520_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					NOR = {
+						has_modifier = pm_shroud_forged_troubling_elements_example
+						has_modifier = pm_shroud_forged_troubling_elements_regulations
+						has_modifier = pm_shroud_forged_troubling_elements_cooperation
+					}
+					count_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_shroud_forged }
+						count > 1
+					}
+				}
+				save_event_target_as = target_planet
+			}
+
+			if = {
+				limit = { NOT = { exists = event_target:target_planet } }
+				random_owned_planet = {
+					limit = {
+						NOR = {
+							has_modifier = pm_shroud_forged_troubling_elements_example
+							has_modifier = pm_shroud_forged_troubling_elements_regulations
+							has_modifier = pm_shroud_forged_troubling_elements_cooperation
+						}
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_shroud_forged
+						}
+					}
+					save_event_target_as = target_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.520.c
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_520_positive_1 }
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_troubling_elements_cooperation
+				days = 1080
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.520.a
+		trigger = {
+			situation_progress < 900
+			owner = {
+				count_owned_pop_group = {
+					limit = { pop_group_has_trait = trait_shroud_forged }
+					count > 1
+				}
+			}
+		}
+		shroud_forged_situation_event_negative_2 = { FLAG = shroud_forged_520_negative_2 }
+		owner = {
+			add_resource = {
+				alloys = 250
+				sr_zro = 20
+			}
+		}
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_troubling_elements_example
+				days = 1080
+			}
+			random_owned_pop_group = {
+				limit = {
+					pop_group_has_trait = trait_shroud_forged
+					NOR = {
+						is_pop_category = bio_trophy
+						is_pop_category = bio_trophy_unemployment
+					}
+				}
+				kill_single_pop = yes
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.520.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_520_negative_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_troubling_elements_regulations
+				days = 1080
+			}
+		}
+	}
+}
+
+situation_event = { # Controlling the Situation (less than 50)
+	id = shroud_forged.530
+	title = shroud_forged.530.title
+	desc = shroud_forged.530.desc
+	picture = GFX_evt_cybernetics
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_less_trigger = {
+			FLAG = shroud_forged_530_cooldown
+			VALUE = 1500
+		}
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_530_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.530.b
+		custom_tooltip = shroud_forged.530.b.tt
+	}
+	option = {
+		name = shroud_forged.530.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = alloys
+					value >= 60
+					mult = event_target:target_planet.value:shroud_forged_event_controlling_the_situation_mult
+				}
+			}
+		}
+		shroud_forged_situation_event_negative_2 = { FLAG = shroud_forged_530_negative_2 }
+		owner = {
+			add_resource = {
+				alloys = -60
+				sr_zro = 20
+				mult = event_target:target_planet.value:shroud_forged_event_controlling_the_situation_mult
+			}
+		}
+		custom_tooltip = shroud_forged.530.a.tt
+		hidden_effect = {
+			while = {
+				count = 3
+				event_target:target_planet = {
+					if = {
+						limit = {
+							any_owned_pop_group = {
+								pop_group_has_trait = trait_shroud_forged
+							}
+						}
+						random_owned_pop_group = {
+							limit = { pop_group_has_trait = trait_shroud_forged }
+							change_species = owner_main_species
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+situation_event = { # Shroud Pilgrimage (more than 50)
+	id = shroud_forged.540
+	title = shroud_forged.540.title
+	desc = shroud_forged.540.desc
+	picture = GFX_evt_shrouded_planet
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_more_trigger = {
+			FLAG = shroud_forged_540_cooldown
+			VALUE = 1500
+		}
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				has_deposit = d_shroud_rift_deposit
+				NOT = { has_modifier = pm_shroud_forged_shroud_pilgrimage }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_540_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					has_deposit = d_shroud_rift_deposit
+					NOT = { has_modifier = pm_shroud_forged_shroud_pilgrimage }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.540.a
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = sr_zro
+					value >= 25
+				}
+			}
+		}
+		shroud_forged_situation_event_positive_2 = { FLAG = shroud_forged_540_positive_2 }
+		owner = {
+			add_resource = {
+				sr_zro = -25
+			}
+		}
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_shroud_pilgrimage
+				days = 1800
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.540.b
+	}
+}
+
+situation_event = { # Shrouded Memories
+	id = shroud_forged.550
+	title = shroud_forged.550.title
+	desc = shroud_forged.550.desc
+	picture = GFX_evt_shroud_forged_ritual
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_550_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_550_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					count_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_shroud_forged }
+						count > 1
+					}
+				}
+				save_event_target_as = target_planet
+			}
+
+			if = {
+				limit = { NOT = { exists = event_target:target_planet } }
+				random_owned_planet = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_shroud_forged
+						}
+					}
+					save_event_target_as = target_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.550.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_550_positive_1 }
+	}
+	option = {
+		name = shroud_forged.550.b
+		trigger = {
+			owner = {
+				count_owned_pop_group = {
+					limit = { pop_group_has_trait = trait_shroud_forged }
+					count > 1
+				}
+			}
+		}
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_550_negative_1 }
+		owner = {
+			add_resource = {
+				alloys = 250
+				sr_zro = 20
+			}
+		}
+		event_target:target_planet = {
+			random_owned_pop_group = {
+				limit = {
+					pop_group_has_trait = trait_shroud_forged
+					NOR = {
+						is_pop_category = bio_trophy
+						is_pop_category = bio_trophy_unemployment
+					}
+				}
+				kill_single_pop = yes
+			}
+		}
+	}
+}
+
+situation_event = { # Prophet of the Shroud
+	id = shroud_forged.560
+	title = shroud_forged.560.title
+	desc = shroud_forged.560.desc
+	picture = GFX_evt_shroud_forged_zrobot
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_560_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		set_timed_situation_flag = {
+			flag = shroud_forged_random_cooldown
+			years = 1
+		}
+		set_situation_flag = shroud_forged_560_cooldown # This event can only fire once
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+				}
+				save_event_target_as = target_planet
+			}
+		}
+		hidden_effect = {
+			owner = {
+				random_owned_pop_group = {
+					limit = { pop_group_has_trait = trait_shroud_forged }
+					species = { save_event_target_as = shroud_forged_species }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.560.a
+		shroud_forged_situation_event_positive_3 = { FLAG = shroud_forged_560_positive_2 }
+		custom_tooltip = shroud_forged.560.a.tt
+		owner = {
+			create_leader = {
+				name = random
+				species = event_target:shroud_forged_species
+				class = governor
+				skill = 3
+				set_age = 102
+				traits = {
+					0 = leader_trait_psionic
+					1 = leader_trait_shroud_prophet
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.560.b
+		shroud_forged_situation_event_negative_3 = { FLAG = shroud_forged_560_negative_2 }
+		owner = { add_resource = { unity = -1000 } }
+	}
+}
+
+situation_event = { # Vibrations and Sounds
+	id = shroud_forged.570
+	title = shroud_forged.570.title
+	desc = shroud_forged.570.desc
+	picture = GFX_evt_shroud_forged_ritual
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_570_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOT = { has_modifier = pm_shroud_forged_dance_area }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_570_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOT = { has_modifier = pm_shroud_forged_dance_area }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.570.b
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_570_positive_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_dance_area
+				days = 3600
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.570.a
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_570_negative_1 }
+	}
+}
+
+situation_event = { # Shroud Flora
+	id = shroud_forged.580
+	title = shroud_forged.580.title
+	desc = shroud_forged.580.desc
+	picture = GFX_evt_alien_nature
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_more_trigger = {
+			FLAG = shroud_forged_580_cooldown
+			VALUE = 1500
+		}
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOT = { has_deposit = d_shroud_flora_deposit }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_580_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOT = { has_deposit = d_shroud_flora_deposit }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.580.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_580_positive_1 }
+		event_target:target_planet = {
+			add_deposit = d_shroud_flora_deposit
+		}
+	}
+	option = {
+		name = shroud_forged.580.b
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 500
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				energy = -500
+			}
+		}
+	}
+}
+
+situation_event = { # Rights and Privileges
+	id = shroud_forged.590
+	title = shroud_forged.590.title
+	desc = shroud_forged.590.desc
+	picture = GFX_evt_dark_alley
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_590_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOT = { has_modifier = pm_shroud_forged_inequality }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_590_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOT = { has_modifier = pm_shroud_forged_inequality }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.590.b
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_590_positive_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_inequality
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.590.a
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_590_negative_1 }
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+}
+
+situation_event = { # Individual Minds
+	id = shroud_forged.600
+	title = shroud_forged.600.title
+	desc = shroud_forged.600.desc
+	picture = GFX_evt_alien_propaganda
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_600_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		set_timed_situation_flag = {
+			flag = shroud_forged_random_cooldown
+			years = 1
+		}
+		set_situation_flag = shroud_forged_600_cooldown # This event can only fire once
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.600.a
+		shroud_forged_situation_event_positive_3 = { FLAG = shroud_forged_600_positive_2 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_individualism
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.600.b
+		shroud_forged_situation_event_negative_3 = { FLAG = shroud_forged_600_negative_2 }
+		owner = { add_resource = { unity = -1000 } }
+	}
+}
+
+situation_event = { # Individualistic Tendrils
+	id = shroud_forged.610
+	title = shroud_forged.610.title
+	desc = shroud_forged.610.desc
+	picture = GFX_evt_alien_propaganda
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		has_situation_flag = shroud_forged_600_positive_2
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_610_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOT = { has_modifier = pm_shroud_forged_individualism }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_610_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOT = { has_modifier = pm_shroud_forged_individualism }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.610.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_610_positive_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_individualism
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.610.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_610_negative_1 }
+		owner = { add_resource = { unity = -250 } }
+	}
+}
+
+situation_event = { # The Zro Market
+	id = shroud_forged.620
+	title = shroud_forged.620.title
+	desc = shroud_forged.620.desc
+	picture = GFX_evt_resource_cache
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_620_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_620_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					count_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_shroud_forged }
+						count > 1
+					}
+				}
+				save_event_target_as = target_planet
+			}
+
+			if = {
+				limit = { NOT = { exists = event_target:target_planet } }
+				random_owned_planet = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_shroud_forged
+						}
+					}
+					save_event_target_as = target_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.620.c
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_620_positive_1 }
+		owner = {
+			add_modifier = {
+				modifier = shroud_forged_zro_market
+				days = 3600
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.620.a
+		trigger = {
+			situation_progress < 900
+			owner = {
+				count_owned_pop_group = {
+					limit = { pop_group_has_trait = trait_shroud_forged }
+					count > 1
+				}
+			}
+		}
+		shroud_forged_situation_event_negative_2 = { FLAG = shroud_forged_620_negative_2 }
+		owner = {
+			add_resource = {
+				alloys = 250
+				sr_zro = 120
+			}
+		}
+		event_target:target_planet = {
+			random_owned_pop_group = {
+				limit = {
+					pop_group_has_trait = trait_shroud_forged
+					NOR = {
+						is_pop_category = bio_trophy
+						is_pop_category = bio_trophy_unemployment
+					}
+				}
+				kill_single_pop = yes
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.620.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_620_negative_1 }
+		owner = {
+			add_resource = {
+				sr_zro = 100
+			}
+		}
+	}
+}
+
+situation_event = { # Shroud Malady
+	id = shroud_forged.630
+	title = shroud_forged.630.title
+	desc = shroud_forged.630.desc
+	picture = GFX_evt_disease_outbreak
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_630_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				OR = {
+					has_deposit = d_shroud_rift_deposit
+					has_deposit = d_shroud_flora_deposit
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_630_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					count_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_shroud_forged }
+						count > 1
+					}
+					OR = {
+						has_deposit = d_shroud_rift_deposit
+						has_deposit = d_shroud_flora_deposit
+					}
+				}
+				save_event_target_as = target_planet
+			}
+
+			if = {
+				limit = { NOT = { exists = event_target:target_planet } }
+				random_owned_planet = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_shroud_forged
+						}
+						OR = {
+							has_deposit = d_shroud_rift_deposit
+							has_deposit = d_shroud_flora_deposit
+						}
+					}
+					save_event_target_as = target_planet
+				}
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.630.a
+		shroud_forged_situation_event_positive_2 = { FLAG = shroud_forged_630_positive_2 }
+		custom_tooltip = shroud_forged.630.a.tt
+		hidden_effect = {
+			event_target:target_planet = {
+				if = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_machine_unit
+						}
+					}
+					random_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_machine_unit }
+						drone_conversion_event_effect_2 = { FROM_PLANET = yes }
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.630.b
+		trigger = {
+			owner = {
+				count_owned_pop_group = {
+					limit = { pop_group_has_trait = trait_shroud_forged }
+					count > 1
+				}
+			}
+		}
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_630_negative_1 }
+		owner = {
+			add_resource = {
+				alloys = 250
+				sr_zro = 20
+			}
+		}
+		event_target:target_planet = {
+			random_owned_pop_group = {
+				limit = {
+					pop_group_has_trait = trait_shroud_forged
+					NOR = {
+						is_pop_category = bio_trophy
+						is_pop_category = bio_trophy_unemployment
+					}
+				}
+				kill_single_pop = yes
+			}
+		}
+	}
+}
+
+situation_event = { # Warped and Reshaped
+	id = shroud_forged.640
+	title = shroud_forged.640.title
+	desc = shroud_forged.640.desc
+	picture = GFX_evt_shrouded_planet
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_640_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				has_deposit = d_shroud_rift_deposit
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_640_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					has_deposit = d_shroud_rift_deposit
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.640.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_640_positive_1 }
+		custom_tooltip = shroud_forged.630.a.tt
+		hidden_effect = {
+			event_target:target_planet = {
+				if = {
+					limit = {
+						any_owned_pop_group = {
+							pop_group_has_trait = trait_machine_unit
+						}
+					}
+					random_owned_pop_group = {
+						limit = { pop_group_has_trait = trait_machine_unit }
+						drone_conversion_event_effect_2 = { FROM_PLANET = yes }
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.640.b
+	}
+}
+
+situation_event = { # New Technology, Old Drones
+	id = shroud_forged.650
+	title = shroud_forged.650.title
+	desc = shroud_forged.650.desc
+	picture = GFX_evt_robot_assembly_plant
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_650_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_650_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+				}
+				save_event_target_as = target_planet
+			}
+			random_owned_pop_group = {
+				limit = { pop_group_has_trait = trait_shroud_forged }
+				species = { save_event_target_as = shroud_forged_species }
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.650.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_650_positive_1 }
+		event_target:target_planet = {
+			custom_tooltip = shroud_forged.650.a.tt
+			hidden_effect = {
+				create_pop_group = {
+					size = 200
+					species = event_target:shroud_forged_species
+				}
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.650.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_650_negative_1 }
+		event_target:target_planet = {
+			create_pop_group = {
+				size = 100
+				species = event_target:owner_main_species
+			}
+		}
+	}
+}
+
+situation_event = { # Zro Hallucinations
+	id = shroud_forged.660
+	title = shroud_forged.660.title
+	desc = shroud_forged.660.desc
+	picture = GFX_evt_zro_2
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+		}
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_660_cooldown }
+	}
+
+	immediate = {
+		set_timed_situation_flag = {
+			flag = shroud_forged_random_cooldown
+			years = 1
+		}
+		set_situation_flag = shroud_forged_660_cooldown # This event can only fire once
+	}
+
+	option = {
+		name = shroud_forged.660.a
+		shroud_forged_situation_event_positive_3 = { FLAG = shroud_forged_660_positive_2 }
+		owner = {
+			add_resource = { unity = -250 }
+			add_modifier = {
+				modifier = shroud_forged_physician_modifier
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.660.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_660_negative_1 }
+	}
+}
+
+situation_event = { # An Eye for Beauty
+	id = shroud_forged.670
+	title = shroud_forged.670.title
+	desc = shroud_forged.670.desc
+	picture = GFX_evt_hidden_door
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_670_cooldown }
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOR = {
+					has_modifier = pm_shroud_forged_artistic_revolution
+					has_modifier = pm_shroud_forged_stopped_artists
+				}
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_670_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOR = {
+						has_modifier = pm_shroud_forged_artistic_revolution
+						has_modifier = pm_shroud_forged_stopped_artists
+					}
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.670.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_670_positive_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_artistic_revolution
+				days = 3600
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.670.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_670_negative_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_stopped_artists
+				days = 3600
+			}
+		}
+	}
+}
+
+situation_event = { # Unnecessary Needs
+	id = shroud_forged.680
+	title = shroud_forged.680.title
+	desc = shroud_forged.680.desc
+	picture = GFX_evt_sapient_AI
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_680_cooldown }
+		AND = {
+			situation_progress >= 1800
+			situation_progress < 3000
+		}
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOT = { has_modifier = pm_shroud_forged_fashion_modifier }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_680_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOT = { has_modifier = pm_shroud_forged_fashion_modifier }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.680.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_680_positive_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_fashion_modifier
+				days = -1
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.680.b
+		custom_tooltip = shroud_forged.680.b.tt
+	}
+}
+
+situation_event = { # Obsessive Shroud-Forged
+	id = shroud_forged.690
+	title = shroud_forged.690.title
+	desc = shroud_forged.690.desc
+	picture = GFX_evt_individualistic_machines_1
+
+	situation = this
+	is_triggered_only = yes
+
+	trigger = {
+		situation_event_shroud_forged_trigger = { FLAG = shroud_forged_690_cooldown }
+		AND = {
+			situation_progress >= 1800
+			situation_progress < 3000
+		}
+		exists = owner
+		owner = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			any_owned_planet = {
+				any_owned_pop_group = {
+					pop_group_has_trait = trait_shroud_forged
+				}
+				NOT = { has_modifier = pm_shroud_forged_obsession_modifier }
+			}
+		}
+	}
+
+	immediate = {
+		shroud_forged_situation_event_cooldown = { FLAG = shroud_forged_690_cooldown }
+		owner = {
+			random_owned_planet = {
+				limit = {
+					any_owned_pop_group = {
+						pop_group_has_trait = trait_shroud_forged
+					}
+					NOT = { has_modifier = pm_shroud_forged_obsession_modifier }
+				}
+				save_event_target_as = target_planet
+			}
+		}
+	}
+
+	option = {
+		name = shroud_forged.690.a
+		shroud_forged_situation_event_positive_1 = { FLAG = shroud_forged_690_positive_1 }
+		owner = {
+			add_monthly_resource_mult = {
+				resource = unity
+				value = @tier1unityreward
+				min = @tier1unitymin
+				max = @tier1unitymax
+			}
+		}
+	}
+	option = {
+		name = shroud_forged.690.b
+		shroud_forged_situation_event_negative_1 = { FLAG = shroud_forged_690_negative_1 }
+		event_target:target_planet = {
+			add_modifier = {
+				modifier = pm_shroud_forged_obsession_modifier
+				days = 3600
+			}
+		}
+	}
+}
+
+country_event = {
+	id = shroud_forged.700
+	title = shroud_forged.700.title
+	desc = shroud_forged.700.desc
+
+	diplomatic = yes
+	is_triggered_only = yes
+
+	diplomatic_title = TRANSMISSION
+
+	picture_event_data = {
+		portrait = shroud1
+		room = shroud_room
+	}
+
+	show_sound = event_psionic_robot
+
+	trigger = {
+		has_covenant_with_end_of_the_cycle = no
+		NOT = { has_country_flag = shroud_forged_traitor }
+	}
+
+	option = {
+		name = shroud_forged.400.h
+
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 2000
+			}
+			resource_stockpile_compare = {
+				resource = sr_zro
+				value >= 500
+			}
+		}
+
+		add_resource = {
+			energy = -2000
+		}
+		add_resource = {
+			sr_zro = -500
+		}
+
+		hidden_effect = {
+			country_event = { id = crisis.24100 }
+		}
+	}
+
+	option = {
+		name = END_TRANSMISSION
+	}
+}

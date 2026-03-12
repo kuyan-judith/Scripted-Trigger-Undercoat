@@ -20,6 +20,7 @@ diplomatic_stance = {
 			is_country_type = primitive
 			is_country_type = awakened_marauders
 			is_country_type = mirrored_country
+			is_country_type = exiled
 		}
 	}
 
@@ -185,7 +186,7 @@ diplomatic_stance = {
 			# Cranky people:
 			modifier = {
 				factor = 0
-				has_ethic = ethic_fanatic_xenophobe
+				is_fanatic_xenophobe = yes
 			}
 			modifier = {
 				factor = 0.1
@@ -268,6 +269,7 @@ diplomatic_stance = {
 			OR = {
 				is_playable = yes # undercoat: moved to scripted trigger
 				is_country_type = awakened_fallen_empire
+				is_country_type = exiled
 			}
 		}
 
@@ -665,7 +667,7 @@ diplomatic_stance = {
 			modifier = {
 				factor = 0
 				OR = {
-					has_ethic = ethic_fanatic_xenophile
+					is_fanatic_xenophile = yes
 					has_valid_civic = civic_hive_empath
 				}
 			}
@@ -966,6 +968,31 @@ diplomatic_stance = {
 			weight = 100
 		}
 	}
+
+	option = {
+		name = "diplo_stance_devastators"
+		icon = "GFX_diplomatic_stance_devastators"
+
+		potential = {
+			is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+		}
+
+		valid = {
+			is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+		}
+
+		policy_flags = {
+			diplo_stance_devastators # Undercoat
+			diplo_stance_purification # TODO: Replace this later with a new one.
+		}
+
+		modifier = {
+		}
+
+		ai_weight = {
+			weight = 100
+		}
+	}
 }
 
 war_philosophy = {
@@ -1114,7 +1141,7 @@ war_philosophy = {
 
 		valid = {
 			NOR = {
-				has_ethic = "ethic_fanatic_militarist"
+				is_fanatic_militarist = yes
 				has_homicidal_civic = yes # undercoat: moved to scripted trigger
 				
 				
@@ -1140,14 +1167,27 @@ war_doctrine = {
 		OR = {
 			AND = {
 				is_playable = yes # undercoat: moved to scripted trigger
-				has_tradition = tr_supremacy_finish
+				OR = {
+					has_tradition = tr_supremacy_finish
+					has_country_flag = hunger_accord
+				}
 			}
-			is_country_type = enclave_mercenary
+			is_mercenary = yes
 		}
 	}
 
 	option = {
 		name = "defense_in_depth_doctrine"
+
+		potential = {
+			OR = {
+				AND = {
+					is_playable = yes # undercoat: moved to scripted trigger
+					has_tradition = tr_supremacy_finish
+				}
+				is_country_type = enclave_mercenary
+			}
+		}
 
 		# Undercoat
 		policy_flags = {
@@ -1165,6 +1205,16 @@ war_doctrine = {
 	option = {
 		name = "hit_and_run_doctrine"
 
+		potential = {
+			OR = {
+				AND = {
+					is_playable = yes # undercoat: moved to scripted trigger
+					has_tradition = tr_supremacy_finish
+				}
+				is_country_type = enclave_mercenary
+			}
+		}
+
 		# Undercoat
 		policy_flags = {
 			hit_and_run_doctrine
@@ -1179,16 +1229,23 @@ war_doctrine = {
 			factor = 10
 			modifier = {
 				factor = 0
-				NOR = {
-					has_ethic = ethic_pacifist
-					has_ethic = ethic_fanatic_pacifist
-				}
+				is_pacifist = no
 			}
 		}
 	}
 
 	option = {
 		name = "rapid_deployment_doctrine"
+
+		potential = {
+			OR = {
+				AND = {
+					is_playable = yes # undercoat: moved to scripted trigger
+					has_tradition = tr_supremacy_finish
+				}
+				is_country_type = enclave_mercenary
+			}
+		}
 
 		# Undercoat
 		policy_flags = {
@@ -1203,7 +1260,7 @@ war_doctrine = {
 			factor = 10
 			modifier = {
 				factor = 100
-				is_country_type = enclave_mercenary
+				is_mercenary = yes
 			}
 		}
 	}
@@ -1211,10 +1268,19 @@ war_doctrine = {
 	option = {
 		name = "no_retreat_doctrine"
 
+		potential = {
+			OR = {
+				AND = {
+					is_playable = yes # undercoat: moved to scripted trigger
+					has_tradition = tr_supremacy_finish
+				}
+				is_country_type = enclave_mercenary
+			}
+		}
+
 		valid = {
 			OR = {
-				has_ethic = ethic_militarist
-				has_ethic = ethic_fanatic_militarist
+				is_militarist = yes
 				is_gestalt = yes # undercoat: moved to scripted trigger
 				has_civic = civic_fanatic_purifiers
 			}
@@ -1239,6 +1305,49 @@ war_doctrine = {
 					has_ai_personality = devouring_swarm
 				}
 			}
+		}
+	}
+
+	option = {
+		name = "rip_and_tear"
+
+		potential = {
+			has_country_flag = hunger_accord
+		}
+
+		policy_flags = {
+			debris_destruction
+		}
+		modifier = {
+			ship_fire_rate_mult = 0.07
+			ship_weapon_damage = 0.07
+			ship_hull_mult = -0.15
+		}
+
+		AI_weight = {
+			factor = 1
+		}
+	}
+
+	option = {
+		name = "ravenous_onslaught"
+
+		potential = {
+			has_country_flag = hunger_accord
+		}
+
+		# Undercoat
+		policy_flags = {
+			ravenous_onslaught
+		}
+		modifier = {
+			ship_steal_defeated_ship_chance = 0.05
+			ship_disengage_chance_mult = 0.33
+			ship_weapon_range_mult = -0.25
+		}
+
+		AI_weight = {
+			factor = 1
 		}
 	}
 }
@@ -1728,6 +1837,43 @@ orbital_bombardment = {
 			}
 		}
 	}
+
+	option = {
+		name = "orbital_bombardment_devastation"
+
+		in_breach_of = {
+			{
+				key = resolution_rulesofwar_independent_tribunals
+			}
+			{
+				key = resolution_rulesofwar_last_resort_doctrine
+			}
+			{
+				key = resolution_rulesofwar_demobilization_initiative
+			}
+		}
+
+		potential = {
+			is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+		}
+
+		policy_flags = {
+			orbital_bombardment_devastation
+		}
+		modifier = {}
+
+		AI_weight = {
+			modifier = {
+				factor = 10
+				is_genocidal_infernal = yes # undercoat: moved to scripted trigger
+			}
+			modifier = {
+				factor = 10
+				has_ascension_perk = ap_become_the_crisis
+				# TODO: Add Infernals crisis path with OR={} or remove THIS line later.
+			}
+		}
+	}
 }
 
 orbital_bombardment_accept_surrender = {
@@ -2065,10 +2211,7 @@ enlightenment = {
 			}
 			modifier = {
 				factor = 0
-				OR = {
-					has_ethic = "ethic_xenophobe"
-					has_ethic = "ethic_fanatic_xenophobe"
-				}
+				is_xenophobe = yes
 			}
 		}
 	}
@@ -2085,6 +2228,10 @@ resettlement = {
 		policy_flags = {
 			resettlement_not_allowed
 		}
+
+		modifier = {
+			planet_resettlement_unemployed_mult = 1
+		}
 	}
 
 	option = {
@@ -2099,10 +2246,7 @@ resettlement = {
 			factor = 10
 			modifier = {
 				factor = 0
-				OR = {
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
+				is_egalitarian = yes
 			}
 		}
 	}
@@ -2442,10 +2586,7 @@ border_policy = {
 			modifier = {
 				factor = 0
 				has_valid_ai_personality = no
-				NOR = {
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
-				}
+				is_xenophobe = no
 			}
 			modifier = {
 				factor = 10
@@ -2575,21 +2716,23 @@ food_policy_gestalt = {
 	}
 }
 
-research_policy = {
-	potential = {
-		always = no
-	}
+@research_policy_speed = 0.10
+@research_policy_draw_chance = 0.25
 
+physics_research_policy = {
+	potential = {
+		has_ascension_perk = ap_technological_ascendancy
+	}
 	option = {
 		name = "research_policy_no_focus"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_no_focus
+			physics_research_policy_no_focus
 		}
 
 		modifier = {
-			all_technology_research_speed = 0.05
+			country_physics_tech_research_speed = @research_policy_speed
 		}
 
 		AI_weight = {
@@ -2600,14 +2743,14 @@ research_policy = {
 	option = {
 		name = "research_policy_field_manipulation"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_field_manipulation
+			physics_research_policy_field_manipulation
 		}
 
 		modifier = {
-			category_field_manipulation_research_speed_mult = 0.10
-			category_field_manipulation_draw_chance_mult = 0.25
+			category_field_manipulation_research_speed_mult = @research_policy_speed
+			category_field_manipulation_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2618,14 +2761,14 @@ research_policy = {
 	option = {
 		name = "research_policy_particles"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_particles
+			physics_research_policy_particles
 		}
 
 		modifier = {
-			category_particles_research_speed_mult = 0.10
-			category_particles_draw_chance_mult = 0.25
+			category_particles_research_speed_mult = @research_policy_speed
+			category_particles_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2636,32 +2779,55 @@ research_policy = {
 	option = {
 		name = "research_policy_computing"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_computing
+			physics_research_policy_computing
 		}
 
 		modifier = {
-			category_computing_research_speed_mult = 0.10
-			category_computing_draw_chance_mult = 0.25
+			category_computing_research_speed_mult = @research_policy_speed
+			category_computing_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
 			factor = 0
 		}
 	}
+}
+
+society_research_policy = {
+	potential = {
+		has_ascension_perk = ap_technological_ascendancy
+	}
+
+	option = {
+		name = "research_policy_no_focus"
+
+		# undercoat
+		policy_flags = {
+			society_research_policy_no_focus
+		}
+
+		modifier = {
+			country_society_tech_research_speed = @research_policy_speed
+		}
+
+		AI_weight = {
+			factor = 10
+		}
+	}
 
 	option = {
 		name = "research_policy_new_worlds"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_new_worlds
+			society_research_policy_new_worlds
 		}
 
 		modifier = {
-			category_new_worlds_research_speed_mult = 0.10
-			category_new_worlds_draw_chance_mult = 0.25
+			category_new_worlds_research_speed_mult = @research_policy_speed
+			category_new_worlds_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2672,14 +2838,14 @@ research_policy = {
 	option = {
 		name = "research_policy_statecraft"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_statecraft
+			society_research_policy_statecraft
 		}
 
 		modifier = {
-			category_statecraft_research_speed_mult = 0.10
-			category_statecraft_draw_chance_mult = 0.25
+			category_statecraft_research_speed_mult = @research_policy_speed
+			category_statecraft_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2690,14 +2856,14 @@ research_policy = {
 	option = {
 		name = "research_policy_biology"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_biology
+			society_research_policy_biology
 		}
 
 		modifier = {
-			category_biology_research_speed_mult = 0.10
-			category_biology_draw_chance_mult = 0.25
+			category_biology_research_speed_mult = @research_policy_speed
+			category_biology_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2708,31 +2874,55 @@ research_policy = {
 	option = {
 		name = "research_policy_military_theory"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_military_theory
+			society_research_policy_military_theory
 		}
+
 		modifier = {
-			category_military_theory_research_speed_mult = 0.10
-			category_military_theory_draw_chance_mult = 0.25
+			category_military_theory_research_speed_mult = @research_policy_speed
+			category_military_theory_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
 			factor = 0
 		}
 	}
+}
+
+engineering_research_policy = {
+	potential = {
+		has_ascension_perk = ap_technological_ascendancy
+	}
+
+	option = {
+		name = "research_policy_no_focus"
+
+		# undercoat
+		policy_flags = {
+			engineering_research_policy_no_focus
+		}
+
+		modifier = {
+			country_engineering_tech_research_speed = @research_policy_speed
+		}
+
+		AI_weight = {
+			factor = 10
+		}
+	}
 
 	option = {
 		name = "research_policy_materials"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_materials
+			engineering_research_policy_materials
 		}
 
 		modifier = {
-			category_materials_research_speed_mult = 0.10
-			category_materials_draw_chance_mult = 0.25
+			category_materials_research_speed_mult = @research_policy_speed
+			category_materials_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2743,14 +2933,14 @@ research_policy = {
 	option = {
 		name = "research_policy_propulsion"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_propulsion
+			engineering_research_policy_propulsion
 		}
 
 		modifier = {
-			category_propulsion_research_speed_mult = 0.10
-			category_propulsion_draw_chance_mult = 0.25
+			category_propulsion_research_speed_mult = @research_policy_speed
+			category_propulsion_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2761,14 +2951,14 @@ research_policy = {
 	option = {
 		name = "research_policy_voidcraft"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_voidcraft
+			engineering_research_policy_voidcraft
 		}
 
 		modifier = {
-			category_voidcraft_research_speed_mult = 0.10
-			category_voidcraft_draw_chance_mult = 0.25
+			category_voidcraft_research_speed_mult = @research_policy_speed
+			category_voidcraft_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
@@ -2779,17 +2969,94 @@ research_policy = {
 	option = {
 		name = "research_policy_industry"
 
-		# Undercoat
+		# undercoat
 		policy_flags = {
-			research_policy_industry
+			engineering_research_policy_industry
 		}
 
 		modifier = {
-			category_industry_research_speed_mult = 0.10
-			category_industry_draw_chance_mult = 0.25
+			category_industry_research_speed_mult = @research_policy_speed
+			category_industry_draw_chance_mult = @research_policy_draw_chance
 		}
 
 		AI_weight = {
+			factor = 0
+		}
+	}
+}
+
+research_restriction_policy = {
+	potential = {
+		is_empire = yes # undercoat: moved to scripted trigger
+	}
+
+	option = {
+		name = research_restriction_dangerous_encouraged
+		modifier = {
+			dangerous_tech_draw_chance_mult = @research_policy_draw_chance
+			rare_tech_draw_chance_mult = 0.05
+			planet_researchers_upkeep_mult = 0.10
+		}
+
+		potential = {
+			is_galactic_community_member = yes
+			OR = {
+				is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
+				is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+			}
+		}
+
+		policy_flags = {
+			research_restriction_dangerous_encouraged
+		}
+
+		ai_weight = {
+			factor = 1
+			modifier = {
+				factor = 10
+				has_valid_ai_personality = yes
+				is_ai = yes
+				is_galactic_community_member = yes
+				OR = {
+					is_active_resolution = "resolution_galacticstudies_ethical_guideline_refactoring"
+					is_active_resolution = "resolution_galacticstudies_extradimensional_experimentation"
+				}
+				OR = {
+					is_materialist = yes
+					has_ascension_perk = ap_cosmogenesis
+				}
+			}
+		}
+	}
+
+	option = {
+		name = research_restriction_no_restriction
+
+		policy_flags = {
+			research_restriction_no_restriction
+		}
+
+		modifier = {
+
+		}
+
+		ai_weight = {
+			factor = 5
+		}
+	}
+
+	option = {
+		name = research_restriction_dangerous_forbidden
+		modifier = {
+			dangerous_tech_draw_chance_mult = -1
+			rare_tech_draw_chance_mult = -0.20
+		}
+
+		policy_flags = {
+			research_restriction_dangerous_forbidden
+		}
+
+		ai_weight = {
 			factor = 0
 		}
 	}
@@ -2921,7 +3188,7 @@ trade_policy = {
 
 		on_enabled = {
 			set_trade_conversions = {
-				trade = 0.75
+				trade = 0.5
 				consumer_goods = 0.25
 			}
 		}
@@ -2958,7 +3225,7 @@ trade_policy = {
 
 		on_enabled = {
 			set_trade_conversions = {
-				trade = 0.75
+				trade = 0.50
 				unity = 0.25
 			}
 		}
@@ -2984,9 +3251,9 @@ trade_policy = {
 		on_enabled = {
 			set_trade_conversions = {
 				trade = 0.50
-				energy = 0.10
-				consumer_goods = 0.20
-				unity = 0.20
+				energy = 0.15
+				consumer_goods = 0.15
+				unity = 0.15
 			}
 		}
 
@@ -3011,8 +3278,8 @@ trade_policy = {
 
 		on_enabled = {
 			set_trade_conversions = {
-				trade = 0.60
-				unity = 0.40
+				trade = 0.50
+				unity = 0.375
 			}
 		}
 
@@ -3036,11 +3303,11 @@ trade_policy = {
 
 		on_enabled = {
 			set_trade_conversions = {
-				trade = 0.30
+				trade = 0.25
 				energy = 0.20
 				minerals = 0.20
 				food = 0.20
-				unity = 0.10
+				unity = 0.15
 			}
 		}
 
@@ -3472,6 +3739,7 @@ robot_pop_policy = {
 	}
 }
 
+# Specifically for pre_sapients policies, you can have a pre_sapient_purge = purge_type parameter to determine how a policy purges presapients
 pre_sapients = {
 	potential = {
 		OR = {
@@ -3539,6 +3807,7 @@ pre_sapients = {
 
 	option = {
 		name = "pre_sapients_eat"
+		pre_sapient_purge = purge_processing
 
 		potential = {
 			host_has_dlc = "Utopia"
@@ -3579,6 +3848,7 @@ pre_sapients = {
 
 	option = {
 		name = "pre_sapients_purge"
+		pre_sapient_purge = purge_normal
 
 		valid = {
 			NOR = {
@@ -3821,10 +4091,7 @@ refugees = {
 		}
 
 		valid = {
-			NOR = {
-				has_ethic = "ethic_xenophobe"
-				has_ethic = "ethic_fanatic_xenophobe"
-			}
+			is_xenophobe = no
 		}
 
 		AI_weight = {
@@ -3832,8 +4099,7 @@ refugees = {
 			modifier = {
 				factor = 0
 				NOR = {
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
+					is_xenophile = yes
 					is_servitor_empire = yes # undercoat: moved to scripted trigger
 					AND = {
 						has_valid_ai_personality = yes
@@ -3879,10 +4145,8 @@ population_controls = {
 			modifier = {
 				factor = 0
 				OR = {
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-					has_ethic = ethic_xenophile
-					has_ethic = ethic_fanatic_xenophile
+					is_egalitarian = yes
+					is_xenophile = yes
 				}
 			}
 		}
@@ -3928,10 +4192,8 @@ slavery = {
 				is_broken_shackles_empire = no # undercoat: moved to scripted trigger
 			}
 			OR = {
-				has_ethic = ethic_authoritarian
-				has_ethic = ethic_fanatic_authoritarian
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
+				is_authoritarian = yes
+				is_xenophobe = yes
 			}
 		}
 
@@ -3951,10 +4213,8 @@ slavery = {
 				factor = 0
 				has_valid_ai_personality = no
 				NOR = {
-					has_ethic = ethic_authoritarian
-					has_ethic = ethic_fanatic_authoritarian
-					has_ethic = ethic_xenophobe
-					has_ethic = ethic_fanatic_xenophobe
+					is_authoritarian = yes
+					is_xenophobe = yes
 				}
 			}
 			# special case for harmonious collectives
@@ -3963,10 +4223,8 @@ slavery = {
 				has_valid_ai_personality = no
 				is_ai = yes
 				NOR = {
-					has_ethic = "ethic_xenophobe"
-					has_ethic = "ethic_fanatic_xenophobe"
-					has_ethic = "ethic_militarist"
-					has_ethic = "ethic_fanatic_militarist"
+					is_xenophobe = yes
+					is_militarist = yes
 				}
 				OR = {
 					has_ethic = "ethic_pacifist"
@@ -3994,7 +4252,10 @@ purge = {
 
 		valid = {
 			is_gestalt = no # undercoat: moved to scripted trigger
-			NOT = { has_valid_civic = "civic_fanatic_purifiers" }
+			NOR = {
+				has_valid_civic = "civic_fanatic_purifiers"
+				has_valid_civic = "civic_scorched_earth"
+		}
 		}
 
 		policy_flags = {
@@ -4012,10 +4273,7 @@ purge = {
 		modifier = {}
 
 		valid = {
-			NOR = {
-				has_ethic = ethic_xenophile
-				has_ethic = ethic_fanatic_xenophile
-			}
+			is_xenophile = no
 			is_homicidal = no
 		}
 
@@ -4064,16 +4322,12 @@ purge = {
 			}
 			OR = {
 				is_gestalt = yes # undercoat: moved to scripted trigger
-				has_ethic = ethic_xenophobe
-				has_ethic = ethic_fanatic_xenophobe
+				is_xenophobe = yes
 				has_crisis_perk = menp_undertaker	# Unlocked with Crisis Level 1
 				AND = {
 					custom_tooltip = {
 						text = civic_tooltip_not_xenophile
-						NOR = {
-							has_ethic = ethic_xenophile
-							has_ethic = ethic_fanatic_xenophile
-						}
+						is_xenophile = no
 					}
 					has_purity_imperfection_remediation_tradition = yes
 				}
@@ -4089,10 +4343,7 @@ purge = {
 			}
 			modifier = {
 				factor = 0
-				OR = {
-					has_ethic = ethic_pacifist
-					has_ethic = ethic_fanatic_pacifist
-				}
+				is_pacifist = yes
 			}
 			modifier = {
 				factor = 0
@@ -4288,14 +4539,14 @@ eternal_vigilance_policy = {
 				factor = 5
 				has_monthly_income = {
 					resource = energy
-					value > 100
+					value > 500
 				}
 			}
-			modifier = { #Uhoh we are close to a defecit we probably shouldn't
+			modifier = { #Uhoh we are close to a deficit we probably shouldn't
 				factor = 0
 				has_monthly_income = {
 					resource = energy
-					value < 1
+					value < 50
 				}
 			}
 		}
@@ -4319,19 +4570,19 @@ eternal_vigilance_policy = {
 		}
 
 		AI_weight = {
-			weight = 1
+			weight = 20
 			modifier = { #Seems like a bad idea if you have the energy to spend
 				factor = 0
 				has_monthly_income = {
 					resource = energy
-					value > 100
+					value > 500
 				}
 			}
-			modifier = { #Uhoh we are close to a defecit we probably shouldn't spend more
+			modifier = { #Uhoh we are close to a deficit we probably shouldn't spend more
 				factor = 5
 				has_monthly_income = {
 					resource = energy
-					value < 1
+					value < 50
 				}
 			}
 		}

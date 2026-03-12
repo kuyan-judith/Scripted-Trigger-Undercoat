@@ -1,0 +1,51 @@
+
+# Subterranean Inital Setup
+# Flags Set:
+#	* Uncapped Mining Districts
+# # Zones Added:
+#	* Subterranean Urbanization
+
+
+if = {
+	limit = {
+		exists = owner
+		owner = {
+			is_subterranean_empire = yes
+		}
+	}
+	if = {
+		limit = {
+			is_volcanic_world = no # undercoat: moved to scripted trigger
+		}
+		set_planet_flag = uncapped_mining
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = 1
+			district = district_mining
+		}
+		add_zone = {
+			district = district_mining
+			zone = zone_subterranean_urban
+		}
+		# We`ve created a mining district, so reduce the count by 1
+		change_variable = {
+			which = mining_districts
+			value = -1
+		}
+	}
+	else = { # Subterranean Volcanic World start
+		set_planet_flag = uncapped_mining
+		add_district_and_planet_size_if_needed_effect_amount = {
+			amount = 1
+			district = district_melting
+		}
+		add_zone = {
+			district = district_melting
+			zone = zone_subterranean_urban
+		}
+		# We`ve created a mining district, so reduce the count by 1
+		change_variable = {
+			which = mining_districts
+			value = -1
+		}
+	}
+}

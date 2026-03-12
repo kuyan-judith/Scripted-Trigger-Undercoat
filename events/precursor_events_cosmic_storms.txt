@@ -997,13 +997,6 @@ country_event = {
 
 	is_triggered_only = yes
 
-	immediate = {
-		country_event = {
-			id = cstorms.179
-			days = 360
-		}
-	}
-
 	option = {
 		name = cstorms.176.a
 
@@ -1062,6 +1055,15 @@ country_event = {
 			give_technology = { tech = tech_storm_manipulation }
 		}
 	}
+
+	after = {
+		hidden_effect = {
+			country_event = {
+				id = cstorms.179
+				days = 30
+			}
+		}
+	}
 }
 
 country_event = {
@@ -1105,7 +1107,7 @@ country_event = {
 						}
 						any_system_planet = {
 							NOT = { has_planet_flag = precursor_world }
-						OR = {
+							OR = {
 								is_barren_dry_world = yes # undercoat: moved to scripted trigger
 								is_barren_cold_world = yes # undercoat: moved to scripted trigger
 							}
@@ -1113,7 +1115,8 @@ country_event = {
 					}
 
 					save_event_target_as = system_storm_formation
-					prevprev = { set_country_flag = wm_digsite_storm_formation_found } }
+					prevprev = { set_country_flag = wm_digsite_storm_formation_found }
+				}
 			}
 		}
 
@@ -1154,14 +1157,11 @@ country_event = {
 				}
 
 				save_event_target_as = wm_digsite_storm_formation
-				root = { set_visited = prevprev }
-				create_archaeological_site = site_weathermanipulators_storm_formation
-				mark_used_by_precursor = yes
+				
 			}
 		}
 
 		remove_country_flag = wm_digsite_storm_formation_found
-
 		country_event = {
 			id = cstorms.180
 		}
@@ -1182,9 +1182,15 @@ country_event = {
 
 	option = { ##no rewards this is a transition event
 		name = cstorms.180.a
+		event_target:wm_digsite_storm_formation = {
+			create_archaeological_site = site_weathermanipulators_storm_formation
+			hidden_effect = {
+				root = { set_visited = prevprev }
+				mark_used_by_precursor = yes
+			}
+		}
 	}
 }
-
 
 # Digsite 5
 fleet_event = {# Stage 1
@@ -1736,7 +1742,9 @@ ship_event = {
 					}
 				}
 
-				add_trait = leader_trait_expertise_statecraft
+				add_trait = {
+					trait = leader_trait_expertise_statecraft
+				}
 			}
 
 			else = {
@@ -1923,7 +1931,7 @@ fleet_event = { #2nd step From the Exalted Leadership
 	}
 }
 
-fleet_event = { #3rd step UniCom’s Ultimatum
+fleet_event = { #3rd step UniCom's Ultimatum
 	id = cstorms.225
 	title = "cstorms.225.name"
 	desc = "cstorms.225.desc"
@@ -2745,14 +2753,29 @@ fleet_event = { # Stage 4: Dead men tell tales
 	title = cstorms.2165.name
 
 	desc = {
-		trigger = { owner = { is_gestalt = yes } }
+		trigger = {
+			owner = { is_gestalt = yes }
+			leader = { has_psionic_leader_trait = no }
+		}
 		text = cstorms.2165.desc.gestalt
 	}
 	desc = {
 		trigger = {
-			leader = { has_psionic_leader_trait = yes }
+			leader = {
+				has_psionic_leader_trait = yes
+				is_robotic_species = no
+			}
 		}
 		text = cstorms.2165.desc.psio
+	}
+	desc = {
+		trigger = {
+			leader = {
+				has_psionic_leader_trait = yes
+				is_robotic_species = yes
+			}
+		}
+		text = cstorms.2165.desc.psio_robot
 	}
 	desc = {
 		trigger = {
@@ -3576,7 +3599,7 @@ fleet_event = {
 			}
 			has_psionic_leader = no
 		}
-		text = cstorms.desc.authgen.default
+		text = cstorms.2295.desc.authgen.default
 	}
 	desc = {
 		trigger = {
@@ -3584,24 +3607,53 @@ fleet_event = {
 				is_authoritarian_or_homicidal = yes
 				is_gestalt = no
 			}
-
 			has_psionic_leader = yes
+			leader = { is_robotic_species = no }
 		}
-		text = cstorms.desc.authgen.psionic
+		text = cstorms.2295.desc.authgen.psionic
 	}
 	desc = {
 		trigger = {
-			owner = { is_authoritarian_or_homicidal = no }
+			owner = {
+				is_authoritarian_or_homicidal = yes
+				is_gestalt = no
+			}
 			has_psionic_leader = yes
+			leader = { is_robotic_species = yes }
 		}
-		text = cstorms.desc.default.psionic
+		text = cstorms.2295.desc.authgen.psionic_individual_robot
 	}
 	desc = {
 		trigger = {
-			owner = { is_authoritarian_or_homicidal = no }
-			has_psionic_leader = no
+			owner = {
+				is_authoritarian_or_homicidal = yes
+				is_gestalt = yes
+			}
+			has_psionic_leader = yes
 		}
-		text = cstorms.desc.default.default
+		text = cstorms.2295.desc.authgen.psionic_gestalt
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = no
+				is_gestalt = no
+			}
+			has_psionic_leader = yes
+			leader = { is_robotic_species = no }
+		}
+		text = cstorms.2295.desc.default.psionic
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = no
+				is_gestalt = no
+			}
+			has_psionic_leader = yes
+			leader = { is_robotic_species = yes }
+		}
+		text = cstorms.2295.desc.default.psionic_individual_robot
 	}
 	desc = {
 		trigger = {
@@ -3609,8 +3661,39 @@ fleet_event = {
 				is_authoritarian_or_homicidal = no
 				is_gestalt = yes
 			}
+			has_psionic_leader = yes
 		}
-		text = cstorms.desc.default.gestalt
+		text = cstorms.2295.desc.default.psionic_gestalt
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = no
+				is_gestalt = no
+			}
+			has_psionic_leader = no
+		}
+		text = cstorms.2295.desc.default.default
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = no
+				is_gestalt = yes
+			}
+			has_psionic_leader = no
+		}
+		text = cstorms.2295.desc.default.gestalt
+	}
+	desc = {
+		trigger = {
+			owner = {
+				is_authoritarian_or_homicidal = yes
+				is_gestalt = yes
+			}
+			has_psionic_leader = no
+		}
+		text = cstorms.2295.desc.authgen.gestalt
 	}
 
 
@@ -3638,6 +3721,13 @@ fleet_event = {
 				owner = { is_gestalt = no }
 			}
 			text = cstorms.2295.a.psionic
+		}
+		name = {
+			trigger = {
+				has_psionic_leader = yes
+				owner = { is_gestalt = yes }
+			}
+			text = cstorms.2295.a.psionic_gestalt
 		}
 		name = {
 			trigger = {
@@ -3675,7 +3765,9 @@ fleet_event = {
 					limit = { has_trait = leader_trait_cyborg }
 					remove_trait = leader_trait_cyborg
 				}
-				add_trait = leader_trait_psionic
+				add_trait = {
+					trait = leader_trait_psionic
+				}
 			}
 		}
 	}
@@ -3691,7 +3783,6 @@ fleet_event = {
 		name = {
 			trigger = {
 				has_psionic_leader = yes
-				owner = { is_gestalt = no }
 			}
 			text = ACKNOWLEDGED
 		}
@@ -3753,8 +3844,28 @@ fleet_event = {
 			text = DISCONCERTING
 		}
 		name = {
-			trigger = { has_psionic_leader = yes }
+			trigger = {
+				has_psionic_leader = yes
+				owner = {
+					NOR = {
+						is_gestalt = yes
+						is_robot_empire = yes
+					}
+				}
+			}
 			text = cstorms.2300.a.psionic
+		}
+		name = {
+			trigger = {
+				has_psionic_leader = yes
+				owner = {
+					OR = {
+						is_gestalt = yes
+						is_robot_empire = yes
+					}
+				}
+			}
+			text = cstorms.2300.a.psionic_hive_robot
 		}
 
 		owner = {
@@ -3772,8 +3883,28 @@ fleet_event = {
 			text = cstorms.2300.b
 		}
 		name = {
-			trigger = { has_psionic_leader = yes }
+			trigger = {
+				has_psionic_leader = yes
+				owner = {
+					NOR = {
+						is_gestalt = yes
+						is_robot_empire = yes
+					}
+				}
+			}
 			text = cstorms.2300.b.psionic
+		}
+		name = {
+			trigger = {
+				has_psionic_leader = yes
+				owner = {
+					OR = {
+						is_gestalt = yes
+						is_robot_empire = yes
+					}
+				}
+			}
+			text = cstorms.2300.b.psionic_hive_robot
 		}
 
 		owner = {
@@ -3808,7 +3939,10 @@ fleet_event = {
 		text = cstorms.2305.desc.psionic
 	}
 	desc = {
-		trigger = { owner = { is_gestalt = yes } }
+		trigger = {
+			has_psionic_leader = no
+			owner = { is_gestalt = yes }
+		}
 		text = cstorms.2305.desc.gestalt
 	}
 
@@ -4131,6 +4265,10 @@ country_event = {
 			}
 			if = {
 				limit = { is_colony = yes }
+				set_timed_planet_flag = {
+					flag = ignore_ai_building_limitations
+					days = 1
+				}
 
 				add_building = building_adakkaria_patriotic_institute
 				# This is duplicated from the patriotic institute's 'on_built', because that doesn't trigger when using 'add_building'.
@@ -4158,6 +4296,11 @@ planet_event = {
 	}
 
 	immediate = {
+		set_timed_planet_flag = {
+			flag = ignore_ai_building_limitations
+			days = 1
+		}
+
 		remove_modifier = has_patriotic_institute
 		add_building = building_adakkaria_patriotic_institute
 		# This is duplicated from the patriotic institute's 'on_built', because that doesn't trigger when using 'add_building'.

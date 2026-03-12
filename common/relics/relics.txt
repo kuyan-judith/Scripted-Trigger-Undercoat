@@ -587,7 +587,9 @@ r_odryskan_crystal = {
 							has_trait = leader_trait_maniacal_3
 						}
 					}
-					add_trait = leader_trait_maniacal
+					add_trait = {
+						trait = leader_trait_maniacal
+					}
 				}
 			}
 		}
@@ -673,6 +675,80 @@ r_the_rulerchip = {
 		inline_script = {
 			script = relics/activation_checks
 			RELIC = r_the_rulerchip
+		}
+	}
+}
+
+r_voidspawn_myocardium = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_voidspawn_heart"
+	sound = "relic_activation_scales_of_the_worm"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			unity = @activation_cost
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		ship_fire_rate_mult = 0.1
+		ship_damage_reduction_mult = 0.05
+	}
+
+	score = 1000
+
+	active_effect = {
+		if = {
+			limit = {
+				any_owned_ship = {
+					is_ship_size = behemoth_04
+				}
+			}
+			#eat the relic
+			custom_tooltip = eat_the_voidspawn
+			hidden_effect = {
+				remove_relic = r_voidspawn_myocardium
+			}
+			#apply turbobuff to Behemoth
+			random_owned_ship = {
+				limit = {
+					is_ship_size = behemoth_04
+				}
+				add_modifier = {
+					modifier = voidspawn_devourer
+					days = -1
+				}
+			}
+		}
+		else = {
+			add_modifier = {
+				modifier = "voidslayers"
+				days = @triumph_duration
+			}
+			custom_tooltip = relic_triumph_cooldown
+			hidden_effect = {
+				add_modifier = {
+					modifier = "relic_activation_cooldown"
+					days = @triumph_duration
+				}
+			}
+		}
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_worm_scales
 		}
 	}
 }
@@ -1647,6 +1723,28 @@ r_vacuum_flower = {
 					}
 				}
 			}
+			if = {
+				limit = { has_star_flag = gh_crisis_star }
+				if = {
+					limit = {
+						owner = { has_ascension_perk = ap_galactic_hyperthermia }
+					}
+					owner = {
+						add_modifier = {
+							modifier = "relic_vacuum_flower_crisis_empire_star"
+							days = @triumph_duration
+						}
+					}
+				}
+				else = {
+					owner = {
+						add_modifier = {
+							modifier = "relic_vacuum_flower_crisis_star"
+							days = @triumph_duration
+						}
+					}
+				}
+			}
 		}
 		custom_tooltip = relic_vacuum_flower_active
 		custom_tooltip = relic_triumph_cooldown
@@ -1871,6 +1969,63 @@ r_wormhole_key = {
 	}
 }
 
+r_core_of_the_reckoning = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_core_of_the_reckoning"
+	sound = "relic_activation_core_of_the_reckoning"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			sr_zro = 500
+		}
+	}
+
+	ai_weight = {
+		weight = 100
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_jobs_produces_mult = 0.25
+		station_gatherers_produces_mult = 0.25
+		station_researchers_produces_mult = 0.25
+		country_naval_cap_mult = 0.25
+		ships_upkeep_mult = -0.25
+		country_base_influence_produces_add = 1
+		country_starbase_capacity_add = 1
+		mult = value:core_of_the_reckoning_mult
+	}
+
+	score = 5000
+
+	active_effect = {
+		custom_tooltip = core_of_reckoning_active_effect_tt
+		custom_tooltip = relic_triumph_cooldown
+		hidden_effect = {
+			change_variable = {
+				which = available_banish_decisions
+				value = 1
+			}
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+		}
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_core_of_the_reckoning
+		}
+	}
+}
+
 ##########################
 ### Astral Planes Relics
 ##########################
@@ -2019,9 +2174,15 @@ r_plasmic_core = {
 			custom_tooltip = machine_plasmic_core_effect
 			hidden_effect = {
 				random_owned_leader = {
-					add_trait = "random_common"
-					add_trait = "random_common"
-					add_trait = "random_common"
+					add_trait = {
+						trait = random_common
+					}
+					add_trait = {
+						trait = random_common
+					}
+					add_trait = {
+						trait = random_common
+					}
 				}
 			}
 		}
@@ -2172,8 +2333,8 @@ r_infinity_root = {
 			randomize_traits = no
 			custom_description = infinity_root_leader_desc
 			traits = {
-				trait = leader_trait_eager
-				trait = leader_trait_adaptable
+				1 = leader_trait_eager
+				2 = leader_trait_adaptable
 			}
 			effect = {
 				set_skill = 3
@@ -2356,6 +2517,68 @@ r_daedalus_seal = {
 				}
 			}
 		}
+	}
+}
+
+r_the_lost_patron = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_the_lost_patron"
+	sound = "relic_activation_lost_patron"
+
+	resources = {
+		category = relics
+		# Activation cost
+		cost = {
+			sr_zro = 500
+		}
+	}
+
+	score = 3000
+
+	triggered_country_modifier = {
+		potential = {
+			always = yes
+		}
+		custom_tooltip = the_lost_patron_passive_effect
+	}
+
+	active_effect = {
+		if = {
+			limit = {
+				NOT = { has_country_flag = has_activated_the_lost_patron }
+			}
+			custom_tooltip = the_lost_patron_before_activation_tt
+			hidden_effect = {
+				set_country_flag = has_activated_the_lost_patron
+				country_event = { id = shroud.6780 }
+			}
+		}
+		else = {
+			custom_tooltip = the_lost_patron_after_activation_effect_tt
+			custom_tooltip = relic_triumph_cooldown
+			hidden_effect = {
+				change_variable = {
+					which = available_dreamscaping_decisions
+					value = 1
+				}
+				add_modifier = {
+					modifier = "relic_activation_cooldown"
+					days = @triumph_duration
+				}
+			}
+		}
+	}
+
+	# Possible check for activation
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_the_lost_patron
+		}
+	}
+
+	ai_weight = {
+		weight = 100
 	}
 }
 
@@ -2741,6 +2964,124 @@ r_the_tempest_invocator = {
 			any_owned_leader = {
 				leader_is_scientist_stu = yes # undercoat: moved to scripted trigger
 			}
+		}
+	}
+}
+
+# Origin Cosmic Dawn
+r_pyroglyphic_codex = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_pyroglyphic_codex"
+	sound = "relic_activation_generic"
+	can_be_stolen = no
+
+	resources = {
+		category = relics
+		cost = {
+			energy = 10000
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = { always = yes }
+		country_unity_produces_mult = 0.10
+	}
+
+	score = 1000
+
+	active_effect = {
+		add_modifier = {
+			modifier = pyroglyphic_codex_mod
+			years = 10
+		}
+		custom_tooltip = r_pyroglyphic_codex_effect_tt
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = pyroglyphic_codex }
+				}
+				set_country_flag = pyroglyphic_codex
+				capital_scope = { #effects applied only the first time the relic is used
+					add_modifier = { modifier = infernal_library }
+				}
+			}
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+		}
+		custom_tooltip = relic_triumph_cooldown
+	}
+
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_pyroglyphic_codex
+		}
+	}
+}
+
+# Hyperthermia Crisis Path
+r_crystallized_singularity = {
+	activation_duration = @triumph_duration
+	portrait = "GFX_relic_crystallized_singularity"
+	sound = "relic_activation_generic"
+	can_be_stolen = no
+
+	resources = {
+		category = relics
+		cost = {
+			unity = @activation_cost
+		}
+		produces = {
+			trigger = { has_country_flag = relic_cs_trigger }
+			energy = 1
+			mult = value:percent_monthly_resource_income|RESOURCE|physics_research|PERCENT|10|
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = { always = yes }
+		country_physics_tech_research_speed = 0.10
+	}
+
+	score = 1500
+
+	active_effect = {
+		add_modifier = {
+			modifier = crystallized_singularity_mod
+			years = 10
+		}
+		custom_tooltip = r_crystallized_singularity_effect_tt
+		if = {
+			limit = {
+				has_homicidal_civic = no # undercoat: moved to scripted trigger
+			}
+			custom_tooltip = r_crystallized_singularity_ls_effect_tt
+		}
+		hidden_effect = {
+			set_timed_country_flag = {
+				flag = relic_cs_trigger
+				days = @triumph_duration
+			}
+			add_modifier = {
+				modifier = "relic_activation_cooldown"
+				days = @triumph_duration
+			}
+			if = {
+				limit = {
+					has_homicidal_civic = no # undercoat: moved to scripted trigger
+				}
+				set_variable = { which = gh_life_seeder_var value = 3 }
+			}
+		}
+		custom_tooltip = relic_triumph_cooldown
+	}
+
+	possible = {
+		inline_script = {
+			script = relics/activation_checks
+			RELIC = r_crystallized_singularity
 		}
 	}
 }

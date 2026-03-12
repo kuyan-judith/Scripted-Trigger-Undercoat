@@ -1,0 +1,1520 @@
+#patron_example = {
+#	category = major_patron 					# / minor_patron / great_patron
+#	color = { 0.1 0.2 0.3 0.4 }					# Color of the Patron { Red Green Blue Alpha }
+#	text_color_code = "P"						# Text color character used for its localization
+#	first_contact_event = shroud.x				# First contact event launched in code when the patron is discovered naturally in the Shroud (delving, attunement position)
+#	covenant_event = shroud.x
+#	covenant_confirmation_time = 360
+#	add_modifier = yes/no 						# (default: no) Generates patron-specific attunement modifiers (i.e. add_attunement_<patron>, <patron>_attunement_mult)
+#
+#	potential = { 								# Can be empty
+#		has_shroud_dlc = yes
+#	}
+#
+#	# GFX Files needed:
+#	# All:
+#	# - "GFX_patron_example_icon"
+#
+#	# Minor patron:
+#	# - "GFX_patron_example_icon_hovered"
+#
+#	# Can be a cardinal patron (with his own quadrant):
+#	# - "GFX_patron_example_bg"
+#	# - "GFX_patron_example_quadrant_1"
+#	# - "GFX_patron_example_quadrant_2"
+#	# - "GFX_patron_example_quadrant_3"
+#	# - "GFX_patron_example_quadrant_selected_1"
+#	# - "GFX_patron_example_quadrant_selected_2"
+#	# - "GFX_patron_example_quadrant_selected_3"
+#	# - "GFX_patron_example_calling_anim"
+#	# - "GFX_patron_example_calling_X_bg" (one for each possible tier with X = tier)
+#	# - "GFX_patron_example_active_accords_bg" (if 1 or more active accords)
+#
+#	# Can end cycle:
+#	# - "GFX_patron_example_background"
+#	# - "GFX_patron_example_quadrant"
+#	# - "GFX_patron_example_active_accords_bg"
+#	# - "GFX_patron_example_active_accords_bg_potential"
+#
+#	# Shroud plane position, must be contained within the circle of radius 1 centered at (0, 0)
+#	# Major Patrons represent one end of an axis (they must be positioned at the end of one (1, 0) (-1, 0) (0, 1) (0, -1))
+#	# Here are some examples on the border of this circle:
+#	position = { x = -1 y = 0 } 			# Full left (FL)
+#	position = { x = -0.707 y = 0.707 }	# Top left (TL)
+#	position = { x = 0 y = 1 }				# Full top (FT)
+#	position = { x = 0.707 y = 0.707 }		# Top right	(TR)
+#	position = { x = 1 y = 0 }				# Full right (FR)
+#	position = { x = 0.707 y = -0.707 }	# Bottom right (BR)
+#	position = { x = 0 y = -1 }			# Full bottom (FB)
+#	position = { x = -0.707 y = -0.707 }	# Bottom left (BL)
+#
+#	# If eligible patron, you can add Callings: (to create callings, see 00_callings.txt)
+#
+#	callings = {
+#		calling_example_1
+#		calling_example_2
+#		calling_example_...
+#	}
+#
+#	# If eligible patron, you can add Deeds: (to create deeds, see 00_deeds.txt)
+#	deeds = {
+#		deed_example_1
+#		deed_example_2
+#		deed_example_...
+#	}
+#
+#	covenant = {
+#		name = "COVENANT_NAME"				# Covenant name
+#		icon = "GFX_X"						# Icon (will need a large version "icon_large" and a background "icon_bg")
+#		desc = covenant_desc				# Lore description
+#		custom_tooltip = covenant_tt		# Custom tooltip for modifiers
+#		show_only_custom_tooltip = yes		# If true, will only show custom tooltips (and not triggered modifiers)
+#		triggered_modifier = {
+#			potential = { }
+#			modifier = { }
+#		}
+#	}
+#
+#	passive_accord = {
+#		name = "ACCORD_NAME"				# Name used for accord localization
+#		triggered_modifier = {
+#			army_damage_mult = 0.15			# Given conutry modifier when accord is unlocked
+#		}
+#		on_unlock = { }						# Effect executed when accord is unlocked
+#	}
+#
+#	active_accord = {
+#		name = "ACCORD_NAME"				# Name used for accord localization
+#		cooldown = 3600						# Cooldown between accord activations
+#		first_cooldown = 7200				# First cooldown when making the covenant
+#		activation_cost = {					# Accord activation cost
+#			cost = { }
+#		}
+#		cost_override_key = "CUSTOM_COST"	# Will override what is displayed in the UI Frame
+#		effect = { }						# Effect that will execute when accord is activated
+#		possible = { }						# Trigger for activating the accord
+#		potential = { }						# Trigger for obtaining the accord
+#		ai_will_do = { }					# Trigger for AIs to activate the accord (must be activable in the first place)
+#	}
+#}
+
+#################
+# Major Patrons #
+#################
+
+the_eater_of_worlds = {
+	category = major_patron
+	color = { 0.951 0.353 0.486 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4000
+	covenant_event = shroud.4500
+	covenant_confirmation_time = @covenant_confirmation_time_days
+	add_modifier = yes
+
+	pre_communications_name_format = "{<eater_adj> {<patron_noun>}}"
+
+	position = { x = -1 y = 0 }
+
+	callings = {
+		calling_conquer_planet
+		calling_claim_systems
+		calling_warmonger
+		calling_build_armies
+		calling_build_ships
+	}
+
+	deeds = {
+		deed_claim_system
+		deed_pick_supremacy_or_enmity_tradition
+		deed_destroy_army
+		deed_conquer_planet
+		deed_ruin_enemy_building
+		deed_hunt_space_fauna
+		deed_destroy_ship
+		deed_kill_pop
+		deed_conquer_system
+		deed_declare_war
+	}
+
+	covenant = {
+		name = "COVENANT_EATER"
+		icon = "GFX_eater_covenant"
+		desc = covenant_eater_desc
+		triggered_modifier = {
+			potential = { has_country_flag = eater_covenant_confirmed }
+			custom_tooltip = covenant_eater_telepath_tt
+		}
+		# Fanatic Pacifists
+		triggered_modifier = {
+			potential = { is_fanatic_pacifist = yes }
+			modifier = {
+				pop_happiness = -0.2
+			}
+		}
+		# Pacifists
+		triggered_modifier = {
+			potential = { has_ethic = ethic_pacifist }
+			modifier = {
+				pop_happiness = -0.15
+			}
+		}
+		# Non-Pacifists
+		triggered_modifier = {
+			potential = {
+				is_gestalt = no
+				is_pacifist = no
+			}
+			modifier = {
+				pop_happiness = -0.05
+			}
+		}
+		triggered_modifier = {
+			potential = { is_gestalt = yes }
+			modifier = {
+				country_unity_produces_mult = -0.1
+			}
+		}
+		triggered_modifier = {
+			modifier = {
+				planet_stability_add = -5
+			}
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_FRENZY"
+		icon = "GFX_accord_frenzy"
+		triggered_modifier = {
+			army_damage_mult = 0.50
+			ship_fire_rate_mult = 0.15
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_HUNGER"
+		icon = "GFX_accord_hunger"
+		on_unlock = {
+			custom_tooltip = hunger_accord_tt
+			set_country_flag = hunger_accord
+		}
+		on_revert = {
+			remove_country_flag = hunger_accord
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_DOOM"
+		icon = "GFX_accord_doom"
+		sound = "accord_activation_eater_doom"
+
+		cooldown = 3600
+		first_cooldown = 3600
+		activation_cost = {
+			cost = {
+				sr_zro = 50
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				text = requires_valid_devour_target
+				any_neighbor_country = {
+					can_declare_devour_war = yes
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_DOOM_TT
+			hidden_effect = {
+				country_event = { id = shroud.4800 }
+			}
+		}
+		on_revert = {
+			remove_country_flag = devour_war_active
+			refresh_species_rights = yes
+		}
+
+		ai_will_do = {
+			any_neighbor_country = {
+				can_declare_devour_war = yes
+				fleet_power < root.trigger:fleet_power
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_DIGEST"
+		icon = "GFX_accord_digest"
+		sound = "accord_activation_eater_digest"
+
+		cooldown = 3600
+		first_cooldown = 7200
+		activation_cost = {
+			cost = {
+				sr_zro = 150
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				text = requires_valid_digest_target
+				count_system_with_aura = {
+					count > 0
+					limit = {
+						exists = owner
+						owner = { is_at_war_with = root }
+					}
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_DIGEST_TT
+			hidden_effect = {
+				country_event = { id = shroud.4810 }
+			}
+		}
+
+		ai_will_do = {
+			any_system_with_aura = {
+				OR = {
+					any_fleet_in_system = {
+						fleet_power > 10000
+						controller = { is_at_war_with = root }
+					}
+					any_system_colony = {
+						owner = { is_at_war_with = root }
+					}
+				}
+			}
+		}
+	}
+}
+
+the_cradle_of_souls = {
+	category = major_patron
+	color = { 0.223 0.737 0.847 1 }
+	text_color_code = "C"
+	first_contact_event = shroud.4010
+	covenant_event = shroud.4600
+	covenant_confirmation_time = @covenant_confirmation_time_days
+	add_modifier = yes
+
+	pre_communications_name_format = "{<cradle_adj> {<patron_noun>}}"
+
+	position = { x = 1 y = 0 }
+
+	callings = {
+		calling_pass_resolution_galcom
+		calling_establish_commercial_pact
+		calling_establish_research_agreement
+		calling_establish_migration_treaty
+		calling_establish_defensive_pact
+	}
+
+	deeds = {
+		deed_galcom_vote
+		deed_pick_diplomacy_or_politics_tradition
+		deed_pass_resolution_galcom
+		deed_form_or_upgrade_federation
+		deed_pass_law_federation
+		deed_reach_excellent_relations
+		deed_build_defense_platform
+		deed_earn_favor
+		deed_complete_operation
+		deed_establish_diplomatic_pact
+	}
+
+	covenant = {
+		name = "COVENANT_CRADLE"
+		icon = "GFX_cradle_covenant"
+		desc = covenant_cradle_desc
+		custom_tooltip = covenant_cradle_tt
+		show_only_custom_tooltip = yes
+
+		triggered_modifier = {
+			potential = {
+				any_system_with_aura = {
+					exists = owner
+					owner = {
+						NOT = { is_same_value = root }
+						is_playable = yes # undercoat: moved to scripted trigger
+						has_communications = root
+						opinion_level = { who = root level < neutral }
+					}
+				}
+			}
+			planet_jobs_upkeep_mult = 1
+			mult = value:cradle_covenant_upkeep_mult
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_CHARITY"
+		icon = "GFX_accord_charity"
+		triggered_modifier = {
+			country_trust_growth = 0.5
+			diplo_weight_mult = 0.1
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_TRUST"
+		icon = "GFX_accord_trust"
+		on_unlock = {
+			custom_tooltip = trust_accord_tt
+			set_country_flag = trust_accord
+			hidden_effect = {
+				country_event = { id = shroud.4835 }
+			}
+		}
+		triggered_modifier = {
+			envoys_add = 2
+		}
+		on_revert = {
+			remove_country_flag = trust_accord
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_THOUGHTBOND"
+		icon = "GFX_accord_thoughtbond"
+		sound = "accord_activation_cradle_thoughtbond"
+
+		cooldown = 3600
+		first_cooldown = 3600
+		activation_cost = {
+			cost = {
+				sr_zro = 50
+			}
+		}
+
+		effect = {
+			if = {
+				limit = { is_gestalt = yes }
+				custom_tooltip = ACCORD_THOUGHTBOND_TT_gestalt
+			}
+			else = {
+				custom_tooltip = ACCORD_THOUGHTBOND_TT
+			}
+			hidden_effect = {
+				country_event = { id = shroud.4820 }
+			}
+		}
+		on_revert = {
+			remove_modifier = thoughtbond_accord
+			remove_modifier = thoughtbond_accord_gestalt
+		}
+
+		ai_will_do = {
+			OR = {
+				is_gestalt = yes
+				AND = { # Every pop faction (except secret societies) produces unity unless you're crowdsourcing
+					count_pop_faction = {
+						count > 0
+					}
+					NOR = {
+						is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+						
+						is_secret_societies_empire = yes
+					}
+				}
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_FAVOR"
+		icon = "GFX_accord_favor"
+		sound = "accord_activation_cradle_favor"
+
+		cooldown = 3600
+		first_cooldown = 7200
+		activation_cost = {
+			cost = {
+				sr_zro = 150
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_FAVOR_TT
+			hidden_effect = {
+				country_event = { id = shroud.4830 }
+			}
+		}
+
+		ai_will_do = {
+			any_system_with_aura = {
+				any_system_colony = {
+					owner = {
+						NOT = { is_same_value = root }
+					}
+					root = {
+						num_favors = {
+							target = prev.owner
+							value < 3
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+the_instrument_of_desire = {
+	category = major_patron
+	color = { 0.933 0.835 0.345 1 }
+	text_color_code = "H"
+	first_contact_event = shroud.4030
+	covenant_event = shroud.4550
+	covenant_confirmation_time = @covenant_confirmation_time_days
+	add_modifier = yes
+
+	pre_communications_name_format = "{<instrument_adj> {<patron_noun>}}"
+
+	position = { x = 0 y = 1 }
+
+	callings = {
+		calling_upgrade_buildings
+		calling_planetary_ascension
+		calling_construct_district
+		calling_construct_buildings
+		calling_clear_blocker
+	}
+
+	deeds = {
+		deed_ascend_planet
+		deed_pick_mercantile_or_domination_tradition
+		deed_pick_logistics_or_domination_tradition
+		deed_clear_blocker
+		deed_upgrade_building_non_capital
+		deed_uplift_species
+		deed_upgrade_building_capital
+		deed_destroy_pirates
+		deed_establish_trade_agreement
+		deed_pass_commerce_resolution
+		deed_pass_industry_resolution
+	}
+
+	covenant = {
+		name = "COVENANT_INSTRUMENT"
+		icon = "GFX_instrument_covenant"
+		desc = covenant_instrument_desc
+		triggered_modifier = {
+			potential = { has_country_flag = instrument_covenant_confirmed }
+			custom_tooltip = covenant_instrument_telepath_tt
+		}
+		triggered_modifier = {
+			planet_pops_upkeep_mult = 0.25
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_PROGRESS"
+		icon = "GFX_accord_progress"
+		triggered_modifier = {
+			planet_jobs_produces_mult = 0.10
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_BLISS"
+		icon = "GFX_accord_bliss"
+		on_unlock = {
+			potential = {
+				exists = owner
+				owner = { is_gestalt = no }
+			}
+			custom_tooltip = bliss_accord_tt
+			set_country_flag = bliss_accord
+			if = {
+				limit = { NOT = { has_technology = tech_resort_colonies } }
+				give_technology = { tech = tech_resort_colonies }
+			}
+		}
+		on_unlock = {
+			potential = {
+				exists = owner
+				owner = { is_gestalt = yes }
+			}
+			custom_tooltip = bliss_accord_gestalt_tt
+			set_country_flag = bliss_accord
+		}
+		triggered_modifier = {
+			potential = {
+				exists = owner
+				owner = { is_gestalt = yes }
+			}
+			planet_jobs_simple_drone_produces_mult = 0.15
+			planet_jobs_trade_produces_mult = 0.15
+		}
+		on_revert = {
+			remove_country_flag = bliss_accord
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_ASCENSION"
+		icon = "GFX_accord_ascension"
+		sound = "accord_activation_instrument_ascension"
+
+		cooldown = 3600
+		first_cooldown = 3600
+		activation_cost = {
+			cost = {
+				sr_zro = 50
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_ASCENSION_FAIL_TT
+				NOT = { has_country_flag = free_planetary_ascension }
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_ASCENSION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4840 }
+			}
+		}
+
+		ai_will_do = {
+			NOT = { has_country_flag = free_planetary_ascension }
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_EXPLOITATION"
+		icon = "GFX_accord_exploitation"
+		sound = "accord_activation_instrument_exploitation"
+
+		cooldown = 3600
+		first_cooldown = 7200
+		activation_cost = {
+			cost = {
+				sr_zro = 150
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					exists = owner
+					owner = { is_gestalt = yes }
+				}
+				custom_tooltip = ACCORD_EXPLOITATION_TT_gestalt
+			}
+			else = {
+				custom_tooltip = ACCORD_EXPLOITATION_TT
+			}
+			hidden_effect = {
+				country_event = { id = shroud.4850 }
+			}
+		}
+		on_revert = {
+			remove_modifier = exploitation_accord
+			remove_modifier = exploitation_accord_gestalt
+		}
+
+		ai_will_do = {
+			OR = {
+				AND = {
+					is_gestalt = yes
+					any_owned_pop_group = { is_pop_category = complex_drone }
+				}
+				AND = {
+					is_gestalt = no
+					any_owned_pop_group = { can_work_specific_job = entertainer }
+				}
+			}
+		}
+	}
+}
+
+the_composer_of_strands = {
+	category = major_patron
+	color = { 0.125 0.608 0.208 1 }
+	text_color_code = "G"
+	first_contact_event = shroud.4020
+	covenant_event = shroud.4650
+	covenant_confirmation_time = @covenant_confirmation_time_days
+	add_modifier = yes
+
+	pre_communications_name_format = "{<composer_adj> {<patron_noun>}}"
+
+	position = { x = 0 y = -1 }
+
+	callings = {
+		calling_establish_colony
+		calling_terraform_planet
+		calling_grow_pops
+		calling_construct_outposts
+		calling_apply_pops_template
+		calling_clone_space_fauna_naval_capacity
+	}
+
+	deeds = {
+		deed_clone_space_fauna
+		deed_consecrate_planet
+		deed_pick_adaptability_or_expansion_tradition
+		deed_pick_versatility_or_expansion_tradition
+		deed_apply_species_template
+		deed_host_new_species
+		deed_pass_ecology_resolution
+		deed_pass_divinity_resolution
+		deed_terraform_planet
+		deed_colonize_gaia_world
+		deed_psionically_assimilate_pop
+		deed_sector_as_vassal
+		deed_colonize_tomb_world
+	}
+
+	covenant = {
+		name = "COVENANT_COMPOSER"
+		icon = "GFX_composer_covenant"
+		desc = covenant_composer_desc
+		triggered_modifier = {
+			potential = { has_country_flag = composer_covenant_confirmed }
+			custom_tooltip = covenant_composer_telepath_tt
+			show_only_custom_tooltip = no
+		}
+		triggered_modifier = {
+			BIOLOGICAL_species_trait_picks_add = -2
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_LIFE"
+		icon = "GFX_accord_life"
+		triggered_modifier = {
+			founder_species_growth_mult = 0.20
+			country_base_influence_produces_add = 0.15
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_FERTILITY"
+		icon = "GFX_accord_fertility"
+		on_unlock = {
+			custom_tooltip = fertility_accord_tt
+			set_country_flag = fertility_accord
+		}
+		on_revert = {
+			remove_country_flag = fertility_accord
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_TRANSFORMATION"
+		icon = "GFX_accord_transformation"
+		sound = "accord_activation_composer_transformation"
+
+		cooldown = 3600
+		first_cooldown = 3600
+		activation_cost = {
+			cost = {
+				sr_zro = 50
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_TRANSFORMATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4860 }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_GENERATION"
+		icon = "GFX_accord_generation"
+		sound = "accord_activation_composer_generation"
+
+		cooldown = 3600
+		first_cooldown = 7200
+		activation_cost = {
+			cost = {
+				sr_zro = 150
+			}
+		}
+
+		possible = {
+			has_technology = tech_psionic_aura
+			any_system_with_aura = {
+				any_system_colony = {
+					has_owner = yes
+					is_owned_by = root
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_GENERATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4870 }
+			}
+		}
+
+		ai_will_do = {
+			NOT = {
+				any_system_with_aura = {
+					any_system_colony = {
+						has_owner = yes
+						is_owned_by = root
+						free_housing < 0
+					}
+				}
+			}
+		}
+	}
+}
+
+#################
+# Great Patrons #
+#################
+
+whisperers_in_the_void = {
+	category = great_patron
+	color = { 0.647 0.052 0.858 1 }
+	text_color_code = "M"
+	covenant_event = shroud.4700
+	covenant_confirmation_time = @covenant_confirmation_time_days
+	add_modifier = yes
+
+	pre_communications_name_format = "{<whisperers_adj> {<patron_noun>}}"
+
+	position = { x = 0 y = 0 }
+
+	callings = {
+		calling_build_research_lab
+		calling_finish_megastructure
+		calling_launch_agenda
+		calling_complete_arc_site
+		calling_complete_arc_rift
+		calling_research_special_project
+	}
+
+	deeds = {
+		deed_upgrade_megastructure
+		deed_scientist_level_up
+		deed_explore_wormhole
+		deed_wormhole_locks_mastery
+		deed_activate_relic
+		deed_arc_site_stage
+		deed_arc_rift_stage
+		deed_research_rare_tech
+		deed_pick_tradition
+		deed_change_policy
+		deed_reform_council
+		deed_research_repeatable_tech
+	}
+
+	covenant = {
+		name = "COVENANT_WITV"
+		icon = "GFX_whisperers_covenant"
+		desc = covenant_whisperers_desc
+		triggered_modifier = {
+			potential = { has_country_flag = whisperers_covenant_confirmed }
+			custom_tooltip = covenant_whisperers_telepath_tt
+		}
+		triggered_modifier = {
+			country_unity_produces_mult = -0.15
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_KNOWLEDGE"
+		icon = "GFX_accord_knowledge"
+		on_unlock = {
+			custom_tooltip = knowledge_accord_tt
+			set_country_flag = knowledge_accord
+		}
+		triggered_modifier = {
+			all_technology_research_speed = 0.15
+		}
+	}
+
+	passive_accord = {
+		name = "ACCORD_WISDOM"
+		icon = "GFX_accord_wisdom"
+		on_unlock = {
+			custom_tooltip = wisdom_accord_tt
+			set_country_flag = wisdom_accord
+		}
+		triggered_modifier = {
+			rare_tech_draw_chance_mult = 0.5
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_FORESIGHT"
+		icon = "GFX_accord_foresight"
+		sound = "accord_activation_whisperers_foresight"
+
+		cooldown = 3600
+		first_cooldown = 3600
+		activation_cost = {
+			cost = {
+				sr_zro = 150
+			}
+		}
+
+		possible = {
+			is_researching_any_technology = yes
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_FORESIGHT_TT
+			hidden_effect = {
+				country_event = { id = shroud.4880 }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_HINDSIGHT"
+		icon = "GFX_accord_hindsight"
+		sound = "accord_activation_whisperers_hindsight"
+
+		cooldown = 3600
+		first_cooldown = 7200
+		activation_cost = {
+			cost = {
+				sr_zro = 300
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				text = requires_valid_hindsight_target
+				count_system_with_aura = {
+					count > 0
+					limit = {
+						count_system_colony = {
+							count > 0
+							limit = { can_be_chosen_for_hindsight = yes }
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_HINDSIGHT_TT
+			hidden_effect = {
+				country_event = { id = shroud.4890 }
+			}
+		}
+	}
+}
+
+end_of_the_cycle = {
+	category = great_patron
+	color = { 0.79 0.27 0.22 1 }
+	text_color_code = "R"
+
+	pre_communications_name_format = "{<end_cycle_adj> {<patron_noun>}}"
+
+	position = { x = 0 y = 0 }
+
+	covenant = {
+		name = "COVENANT_EOTC"
+		icon = "GFX_end_of_the_cycle_covenant"
+		desc = covenant_end_of_the_cycle_desc
+		triggered_modifier = {
+			country_naval_cap_mult = 1
+			country_starbase_capacity_add = 10
+			country_covenant_influence_produces_add = 5
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_CREATION"
+		icon = "GFX_accord_creation"
+		sound = "accord_activation_eotc_creation"
+
+		cooldown = 5400
+		activation_cost = {
+			cost = {
+				energy = 10000
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_CREATION_TRIGGER
+				has_country_flag = unlock_accord_creation
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_CREATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4935 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_precognition_interface } }
+				give_technology = { tech = tech_precognition_interface }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_ANNIHILATION"
+		icon = "GFX_accord_annihilation"
+		sound = "accord_activation_endbringers_annihilation"
+
+		cooldown = 0
+		activation_cost = {
+			cost = {
+				energy = @annihilation_cost
+				minerals = @annihilation_cost
+				food = @annihilation_cost
+				alloys = @annihilation_cost
+			}
+		}
+		cost_override_key = "ACCORD_ANNIHILATION_COST"
+
+		potential = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_ANNIHILATION_TRIGGER_ONCE
+				NOT = { has_country_flag = annihilation_activated }
+			}
+			if = {
+				limit = {
+					NOT = { has_country_flag = annihilation_activated }
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_ANNIHILATION_TRIGGER
+					has_country_flag = unlock_accord_annihilation
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_ANNIHILATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4910 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_psionic_disruptor } }
+				give_technology = { tech = tech_psionic_disruptor }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_FRACTALIZATION"
+		icon = "GFX_accord_fractalization"
+		sound = "accord_activation_eotc_fractalization"
+
+		cooldown = 7200
+		activation_cost = {
+			cost = {
+				energy = 5000
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_FRACTALIZATION_TRIGGER
+				has_country_flag = unlock_accord_fractalization
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_FRACTALIZATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4930 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_psionic_shield } }
+				give_technology = { tech = tech_psionic_shield }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_EXTERMINATION"
+		icon = "GFX_accord_extermination"
+		sound = "accord_activation_endbringers_extermination"
+
+		cost_override_key = "ACCORD_EXTERMINATION_COST"
+		cooldown = 0
+
+		potential = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_EXTERMINATION_TRIGGER_ONCE
+				NOT = { has_country_flag = extermination_activated }
+			}
+			if = {
+				limit = {
+					NOT = { has_country_flag = extermination_activated }
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_EXTERMINATION_TRIGGER
+					has_country_flag = unlock_accord_extermination
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_EXTERMINATION_TRIGGER_POP
+					pop_amount >= 3000
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_EXTERMINATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4915 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_psionic_bombers } }
+				give_technology = { tech = tech_psionic_bombers }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_DISTORTION"
+		icon = "GFX_accord_distortion"
+		sound = "accord_activation_eotc_distortion"
+
+		cooldown = 3600
+		activation_cost = {
+			cost = {
+				energy = 15000
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_DISTORTION_TRIGGER
+				has_country_flag = unlock_accord_distortion
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_DISTORTION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4940 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_psi_jump_drive_1 } }
+				give_technology = { tech = tech_psi_jump_drive_1 }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_DESTRUCTION"
+		icon = "GFX_accord_destruction"
+		sound = "accord_activation_endbringers_destruction"
+
+		cost_override_key = "ACCORD_DESTRUCTION_COST"
+		cooldown = 0
+
+		potential = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_DESTRUCTION_TRIGGER_ONCE
+				NOT = { has_country_flag = destruction_activated }
+			}
+			if = {
+				limit = {
+					NOT = { has_country_flag = destruction_activated }
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_DESTRUCTION_TRIGGER
+					has_country_flag = unlock_accord_destruction
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_DESTRUCTION_TRIGGER_PLANET
+					any_owned_planet = {
+						pop_amount >= @destruction_planet_pop_min
+						is_capital = no
+					}
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_DESTRUCTION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4920 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_zro_launcher } }
+				give_technology = { tech = tech_zro_launcher }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_INTENSIFICATION"
+		icon = "GFX_accord_intensification"
+		sound = "accord_activation_eotc_intensification"
+
+		cooldown = 0
+		activation_cost = {
+			cost = {
+				energy = 20000
+			}
+		}
+
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_INTENSIFICATION_TRIGGER_COOLDOWN
+				NOT = { has_country_flag = intensification_activated }
+			}
+			if = {
+				limit = {
+					NOT = { has_country_flag = intensification_activated }
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_INTENSIFICATION_TRIGGER
+					has_country_flag = unlock_accord_intensification
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_INTENSIFICATION_TT
+			hidden_effect = {
+				set_timed_country_flag = {
+					flag = intensification_activated
+					years = @intensification_accord_cooldown
+				}
+				set_saved_date = {
+					key = intensification_cooldown_timer
+					days_from_present = @[ intensification_accord_cooldown * 360 ]
+					expires = @[ intensification_accord_cooldown * 360 ]
+				}
+				country_event = { id = shroud.4945 }
+			}
+			if = {
+				limit = { NOT = { has_technology = tech_psionic_lightning } }
+				give_technology = { tech = tech_psionic_lightning }
+			}
+		}
+	}
+
+	active_accord = {
+		name = "ACCORD_ERADICATION"
+		icon = "GFX_accord_eradication"
+		sound = "accord_activation_endbringers_eradication"
+
+		cooldown = 0
+		cost_override_key = "ACCORD_ERADICATION_COST"
+
+		potential = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		possible = {
+			custom_tooltip = {
+				fail_text = ACCORD_ERADICATION_TRIGGER_ONCE
+				NOT = { has_country_flag = eradication_activated }
+			}
+			if = {
+				limit = {
+					NOT = { has_country_flag = eradication_activated }
+				}
+				custom_tooltip = {
+					fail_text = ACCORD_ERADICATION_TRIGGER
+					has_country_flag = unlock_accord_eradication
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = ACCORD_ERADICATION_TT
+			hidden_effect = {
+				country_event = { id = shroud.4925 }
+			}
+		}
+	}
+}
+
+#################
+# Minor Patrons #
+#################
+
+the_animator_of_clay = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4050
+
+	pre_communications_name_format = "{$code_name_animator$}"
+
+	potential = {
+		OR = {
+			is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+			NOR = {
+				any_country = { is_shroud_forged_empire = yes } # undercoat: moved to scripted trigger
+				allowed_crisis_type = synth_queen
+				allowed_crisis_type = all
+			}
+		}
+	}
+
+	position = { x = 0.7 y = -0.7 }
+
+	passive_accord = {
+		name = the_animator_of_clay
+		desc = {
+			text = BLANK_STRING
+			trigger = {
+				OR = {
+					NOT = { exists = owner }
+					owner = {
+						NOT = { has_country_flag = finish_shroud_forged_control_flag }
+					}
+				}
+			}
+		}
+		desc = {
+			text = the_animator_of_clay_bound_desc
+			trigger = {
+				exists = owner
+				owner = {
+					has_country_flag = finish_shroud_forged_control_flag
+				}
+			}
+		}
+		triggered_modifier = {
+			potential = {
+				OR = {
+					NOT = { exists = owner }
+					owner = {
+						NOT = { has_country_flag = finish_shroud_forged_control_flag }
+					}
+				}
+			}
+			planet_telepaths_sr_zro_produces_add = 0.05
+			show_only_custom_tooltip = no
+			custom_tooltip = animator_of_clay_modifier_tt
+		}
+		triggered_modifier = {
+			potential = {
+				exists = owner
+				owner = {
+					has_country_flag = finish_shroud_forged_control_flag
+				}
+			}
+			planet_telepaths_sr_zro_produces_add = 0.1
+			show_only_custom_tooltip = no
+			custom_tooltip = animator_of_clay_modifier_tt
+		}
+		on_unlock = {
+			custom_tooltip = animator_of_clay_accord_tt
+			set_country_flag = animator_of_clay_accord
+		}
+	}
+}
+
+the_outsider = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4060
+
+	pre_communications_name_format = "{$code_name_outsider$}"
+
+	potential = {
+		is_shroud_forged_empire = no # undercoat: moved to scripted trigger
+	}
+
+	position = { x = 0.7 y = -0.7 }
+
+	passive_accord = {
+		name = the_outsider
+		hide_desc = yes
+		triggered_modifier = {
+			planet_telepaths_sr_zro_produces_add = 0.15
+		}
+		on_unlock = {
+			custom_tooltip = outsider_accord_tt
+			set_country_flag = outsider_accord
+		}
+	}
+}
+
+the_endless_tide = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4070
+
+	pre_communications_name_format = "{$code_name_tide$}"
+
+	position = { x = -0.7 y = -0.7 }
+
+	passive_accord = {
+		name = the_endless_tide
+		hide_desc = yes
+		triggered_modifier = {
+			show_only_custom_tooltip = no
+			custom_tooltip = endless_sands_modifier_tt
+			planet_telepaths_sr_zro_produces_add = 0.05
+		}
+		on_unlock = {
+			custom_tooltip = endless_sands_accord_tt
+			set_country_flag = endless_sands_accord
+		}
+	}
+}
+
+the_pale_mountain = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4080
+
+	pre_communications_name_format = "{$code_name_mountain$}"
+
+	position = { x = -0.7 y = -0.7 }
+
+	passive_accord = {
+		name = the_pale_mountain
+		hide_desc = yes
+		triggered_modifier = {
+			planet_telepaths_sr_zro_produces_add = 0.05
+			show_only_custom_tooltip = no
+			custom_tooltip = pale_mountain_modifier_tt
+		}
+		on_unlock = {
+			custom_tooltip = pale_mountain_accord_tt
+			set_country_flag = pale_mountain_accord
+		}
+	}
+}
+
+the_golden_dream = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4090
+
+	pre_communications_name_format = "{$code_name_dream$}"
+
+	position = { x = 0.7 y = 0.7 }
+
+	passive_accord = {
+		name = the_golden_dream
+		hide_desc = yes
+		triggered_modifier = {
+			potential = { is_gestalt = yes }
+			show_only_custom_tooltip = no
+			custom_tooltip = golden_dream_modifier_gestalt_tt
+			planet_telepaths_sr_zro_produces_add = 0.05
+		}
+		triggered_modifier = {
+			potential = { is_gestalt = no }
+			show_only_custom_tooltip = no
+			custom_tooltip = golden_dream_modifier_non_gestalt_tt
+			planet_telepaths_sr_zro_produces_add = 0.05
+		}
+		on_unlock = {
+			custom_tooltip = golden_dream_accord_tt
+			set_country_flag = golden_dream_accord
+		}
+	}
+}
+
+the_hollow_point = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4100
+
+	pre_communications_name_format = "{$code_name_point$}"
+
+	position = { x = 0.7 y = 0.7 }
+
+	passive_accord = {
+		name = the_hollow_point
+		hide_desc = yes
+		triggered_modifier = {
+			show_only_custom_tooltip = no
+			custom_tooltip = bladeless_sword_modifier_tt
+			planet_telepaths_sr_zro_produces_add = 0.05
+		}
+		on_unlock = {
+			potential = { is_gestalt = yes }
+			custom_tooltip = bladeless_sword_accord_gestalt_tt
+		}
+		on_unlock = {
+			potential = { is_gestalt = no }
+			custom_tooltip = bladeless_sword_accord_tt
+		}
+		on_unlock = {
+			set_country_flag = bladeless_sword_accord
+		}
+	}
+}
+
+the_vacant_throne = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4110
+
+	pre_communications_name_format = "{$code_name_throne$}"
+
+	position = { x = -0.7 y = 0.7 }
+
+	passive_accord = {
+		name = the_vacant_throne
+		hide_desc = yes
+		triggered_modifier = {
+			show_only_custom_tooltip = no
+			custom_tooltip = throne_shadow_modifier_tt
+			planet_telepaths_sr_zro_produces_add = 0.05
+		}
+		on_unlock = {
+			potential = { is_gestalt = yes }
+			custom_tooltip = throne_shadow_accord_gestalt_tt
+			set_country_flag = throne_shadow_accord
+		}
+		on_unlock = {
+			potential = { is_gestalt = no }
+			custom_tooltip = throne_shadow_accord_tt
+			set_country_flag = throne_shadow_accord
+		}
+	}
+}
+
+the_black_river = {
+	category = minor_patron
+	color = { 0 0 0 1 }
+	text_color_code = "P"
+	first_contact_event = shroud.4120
+
+	pre_communications_name_format = "{$code_name_river$}"
+
+	position = { x = -0.7 y = 0.7 }
+
+	passive_accord = {
+		name = the_black_river
+		hide_desc = yes
+		triggered_modifier = {
+			planet_telepaths_sr_zro_produces_add = 0.05
+			planet_telepaths_sr_dark_matter_produces_add = 0.05
+		}
+		on_unlock = {
+			custom_tooltip = black_river_accord_tt
+			set_country_flag = black_river_accord
+		}
+	}
+}

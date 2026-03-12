@@ -137,6 +137,7 @@ create_MSI_effect = {
 		portrait = random
 		traits = {
 			trait = "trait_pc_nuked_preference"
+			trait = "trait_organic"
 			trait = "trait_charismatic"
 			trait = "trait_intelligent"
 			trait = "trait_decadent"
@@ -219,6 +220,10 @@ create_MSI_effect = {
 }
 
 generate_slaver_bonus = {
+	set_timed_planet_flag = {
+		flag = ignore_ai_building_limitations
+		days = 1
+	}
 	while = {
 		count = 2
 		add_district_and_planet_size_if_needed_effect = {
@@ -361,10 +366,15 @@ generate_slaver_bonus = {
 			tech = tech_power_hub_1
 		}
 	}
-	add_building = building_slave_processing
-	add_building = building_precinct_house
-	add_building = building_medical_2
-
+	add_building_if_not_present = {
+		BUILDING = building_slave_processing
+	}
+	add_building_if_not_present = {
+		BUILDING = building_precinct_house
+	}
+	add_building_if_not_present = {
+		BUILDING = building_medical_2
+	}
 	owner = {
 		add_resource = {
 			minerals = 2400
@@ -1302,6 +1312,11 @@ fotd_tech_cost = {
 						defensive_pact
 					}
 				}
+				# Undercoat
+				fire_on_action = {
+					on_action = on_defensive_pact_broken_victim
+					scopes = { from = root }
+				}
 			}
 		}
 		break_migration_pact = {
@@ -1314,6 +1329,11 @@ fotd_tech_cost = {
 					relations = {
 						migration_access
 					}
+				}
+				# Undercoat
+				fire_on_action = {
+					on_action = on_migration_pact_broken_victim
+					scopes = { from = root }
 				}
 			}
 		}
@@ -1386,6 +1406,10 @@ create_fear_of_the_dark_country = {
 setup_fear_of_the_dark_pre_ftl = {
 	set_owner = event_target:fotd_seperatist_country
 	set_capital = yes
+	set_timed_planet_flag = {
+		flag = ignore_ai_building_limitations
+		days = 1
+	}
 	owner.species = {
 		switch = {
 			trigger = is_species_class
@@ -1662,7 +1686,7 @@ set_predictive_observation_insight = {
 	}
 	if = {
 		limit = {
-			has_ethic = ethic_fanatic_xenophile
+			is_fanatic_xenophile = yes
 		}
 		multiply_variable = {
 			which = observation_predictive_insight_change
@@ -1758,7 +1782,7 @@ add_observation_insight_effect = {
 		}
 		if = {
 			limit = {
-				has_ethic = ethic_fanatic_xenophile
+				is_fanatic_xenophile = yes
 			}
 			multiply_variable = {
 				which = observation_insight_change
@@ -3128,6 +3152,10 @@ infiltrate_government_annexation_effect = {
 		root = { set_country_flag = reverse_v } # "Payback" achievement
 	}
 	capital_scope = {
+		set_timed_planet_flag = {
+			flag = ignore_ai_building_limitations
+			days = 1
+		}
 		save_event_target_as = annexed_planet
 		if = {
 			limit = {
@@ -3336,6 +3364,10 @@ infiltrate_government_annexation_effect = {
 
 populate_solarpunk_planet = {
 	clear_blockers = yes
+	set_timed_planet_flag = {
+		flag = ignore_ai_building_limitations
+		days = 1
+	}
 	set_owner = event_target:solarpunk_country
 	add_building = building_primitive_capital
 	add_building = building_solarpunk_organic_paradise
@@ -3441,6 +3473,10 @@ populate_solarpunk_planet = {
 industrialize_solarpunk = {
 	remove_all_buildings = yes
 	remove_all_districts = yes
+	set_timed_planet_flag = {
+		flag = ignore_ai_building_limitations
+		days = 1
+	}
 	add_building = building_capital
 	add_building = building_holo_theatres
 	if = {

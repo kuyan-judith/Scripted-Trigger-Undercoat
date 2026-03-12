@@ -8,6 +8,7 @@ building_ancient_control_center = {
 	can_build = no
 	can_demolish = yes
 	position_priority = 0
+	capital_tier = 5
 
 	icon = building_maintenance_depot
 
@@ -59,6 +60,7 @@ building_ancient_hive_capital = {
 	can_build = no
 	can_demolish = yes
 	position_priority = 0
+	capital_tier = 5
 
 	icon = building_hive_major_capital
 
@@ -121,6 +123,7 @@ building_ancient_palace = {
 	can_build = no
 	can_demolish = yes
 	position_priority = 0
+	capital_tier = 5
 
 	icon = building_palace
 
@@ -193,6 +196,7 @@ building_fe_xeno_zoo = {
 	can_build = no
 	can_demolish = yes
 	position_priority = 0
+	capital_tier = 5
 
 	category = amenity
 
@@ -242,6 +246,7 @@ building_hab_fe_capital = {
 	can_build = no
 	can_demolish = yes
 	position_priority = 0
+	capital_tier = 5
 
 	icon = building_capital
 
@@ -353,52 +358,12 @@ building_master_archive = {
 		AMOUNT = @fe_jobs
 	}
 
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_head_researcher_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		modifier = {
-			job_calculator_physicist_add = @fe2_jobs
-			job_calculator_biologist_add = @fe2_jobs
-			job_calculator_engineer_add = @fe2_jobs
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-		}
-		text = job_brain_drone_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		modifier = {
-			job_calculator_physicist_add = @fe2_jobs
-			job_calculator_biologist_add = @fe2_jobs
-			job_calculator_engineer_add = @fe2_jobs
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		text = job_calculator_effect_desc
+	# undercoat
+	inline_script = {
+		script = stu/jobs_add
+		job_type = researchers
+		AMOUNT = @fe2_jobs
+		trigger = "owner = { is_gestalt = yes }"
 	}
 
 	resources = {
@@ -446,13 +411,33 @@ building_empyrean_shrine = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_tradition = tr_psionics_psi_corps	}
+			owner = {
+				OR = {
+					has_tradition = tr_psionics_psi_corps
+					has_tradition = tr_psionics_shroud_psi_corps
+				}
+				is_gestalt = no
+			}
 		}
 		job_telepath_add = @fe_jobs
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					has_tradition = tr_psionics_psi_corps
+					has_tradition = tr_psionics_shroud_psi_corps
+				}
+				is_gestalt = yes
+			}
+		}
+		job_telepath_drone_add = @fe_jobs
 	}
 
 	triggered_country_modifier = {
 		potential = {
+			has_shroud_dlc = no
 			exists = owner
 			owner = {
 				has_country_flag = breached_shroud
@@ -460,11 +445,26 @@ building_empyrean_shrine = {
 		}
 		shroud_delve_cost = -0.25
 	}
+	triggered_country_modifier = {
+		potential = {
+			has_shroud_dlc = yes
+			exists = owner
+			owner = {
+				has_country_flag = breached_shroud
+			}
+		}
+		shroud_delve_cooldown = -0.1 # Delving doesn't cost anything in Shroud so it's changed
+	}
 
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { NOT = { has_tradition = tr_psionics_psi_corps } }
+			owner = {
+				NOR = {
+					has_tradition = tr_psionics_psi_corps
+					has_tradition = tr_psionics_shroud_psi_corps
+				}
+			}
 		}
 		planet_bureaucrats_produces_mult = 0.25
 	}
@@ -533,13 +533,6 @@ building_affluence_emporium = {
 	can_build = yes
 	can_demolish = yes
 	icon = building_affluence_emporium
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = affluence_emporium
-		TECH = tech_fe_affluence_1
-		FLAG = affluence_emporium_can_build
-	}
 
 	category = manufacturing
 
@@ -645,10 +638,16 @@ building_affluence_emporium = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = affluence_emporium_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = affluence_emporium_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -774,10 +773,16 @@ building_affluence_center = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = affluence_emporium_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = affluence_emporium_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_affluence_2
@@ -787,13 +792,6 @@ building_nourishment_complex = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = nourishment_complex
-		TECH = tech_fe_nourishment_1
-		FLAG = nourishment_complex_can_build
-	}
 
 	category = resource
 
@@ -898,10 +896,16 @@ building_nourishment_complex = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = nourishment_complex_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = nourishment_complex_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -1023,10 +1027,16 @@ building_nourishment_center = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = nourishment_complex_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = nourishment_complex_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_nourishment_2
@@ -1037,13 +1047,6 @@ building_dimensional_replicator = {
 	can_build = yes
 	can_demolish = yes
 	icon = building_dimensional_replicator
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = dimensional_replicator
-		TECH = tech_fe_fabricator_1
-		FLAG = dimensional_replicator_can_build
-	}
 
 	category = manufacturing
 
@@ -1090,16 +1093,16 @@ building_dimensional_replicator = {
 	resources = {
 		category = planet_buildings
 		produces = {
-			rare_crystals = 3
-			exotic_gases = 3
-			volatile_motes = 3
+			rare_crystals = 5
+			exotic_gases = 5
+			volatile_motes = 5
 		}
 		cost = {
 			alloys = @b3_minerals
 		}
 		upkeep = {
 			alloys = @b3_alloy_upkeep
-			energy = 30
+			energy = 50
 		}
 		cost = {
 			trigger = {
@@ -1147,10 +1150,16 @@ building_dimensional_replicator = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = dimensional_replicator_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = dimensional_replicator_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -1211,20 +1220,20 @@ building_dimensional_fabricator = {
 	resources = {
 		category = planet_buildings
 		produces = {
-			rare_crystals = 4
-			exotic_gases = 4
-			volatile_motes = 4
-			sr_zro = 1
-			sr_dark_matter = 1
-			sr_living_metal = 1
-			nanites = 1
+			rare_crystals = 10
+			exotic_gases = 10
+			volatile_motes = 10
+			sr_zro = 2
+			sr_dark_matter = 2
+			sr_living_metal = 2
+			nanites = 2
 		}
 		cost = {
 			alloys = @b3_minerals
 		}
 		upkeep = {
 			alloys = @b3_alloy_upkeep
-			energy = 30
+			energy = 50
 		}
 		cost = {
 			trigger = {
@@ -1272,10 +1281,16 @@ building_dimensional_fabricator = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = dimensional_replicator_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = dimensional_replicator_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_fabricator_2
@@ -1285,13 +1300,6 @@ building_class_3_singularity = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = class_3_singularity
-		TECH = tech_fe_singularity_1
-		FLAG = class_3_singularity_can_build
-	}
 
 	category = resource
 
@@ -1397,10 +1405,16 @@ building_class_3_singularity = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = class_3_singularity_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = class_3_singularity_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -1518,10 +1532,16 @@ building_class_4_singularity = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = class_3_singularity_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = class_3_singularity_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_singularity_2
@@ -1531,13 +1551,6 @@ building_micro_forge = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = micro_forge
-		TECH = tech_fe_forge_1
-		FLAG = micro_forge_can_build
-	}
 
 	category = manufacturing
 
@@ -1645,10 +1658,16 @@ building_micro_forge = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = micro_forge_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = micro_forge_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_forge_1
@@ -1767,10 +1786,16 @@ building_nano_forge = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = micro_forge_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = micro_forge_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_forge_2
@@ -1781,18 +1806,13 @@ building_fe_sky_dome = {
 	can_build = yes
 	can_demolish = yes
 
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_sky_dome
-		TECH = tech_fe_dome_1
-		FLAG = fe_sky_dome_can_build
-	}
-
 	category = amenity
 
 	building_sets = {
 		fallen_empire
+		bio_trophy
 		urban
+		resort
 	}
 
 	potential = {
@@ -1829,7 +1849,7 @@ building_fe_sky_dome = {
 
 	planet_modifier = {
 		planet_housing_add = 2500
-		planet_amenities_add = 5000
+		planet_amenities_add = 3750
 	}
 
 	triggered_planet_modifier = {
@@ -1896,10 +1916,16 @@ building_fe_sky_dome = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_sky_dome_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_sky_dome_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -1917,7 +1943,9 @@ building_fe_dome = {
 
 	building_sets = {
 		fallen_empire
+		bio_trophy
 		urban
+		resort
 	}
 
 	potential = {
@@ -1955,7 +1983,7 @@ building_fe_dome = {
 
 	planet_modifier = {
 		planet_housing_add = 5000
-		planet_amenities_add = 10000
+		planet_amenities_add = 7500
 		planet_pops_upkeep_mult = -0.05
 	}
 
@@ -2024,10 +2052,16 @@ building_fe_dome = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_sky_dome_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_sky_dome_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_dome_2
@@ -2037,13 +2071,6 @@ building_fe_fortress = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_fortress
-		TECH = tech_fe_fortress_1
-		FLAG = fe_fortress_can_build
-	}
 
 	category = army
 
@@ -2151,10 +2178,16 @@ building_fe_fortress = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_fortress_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_fortress_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_fortress_1
@@ -2272,10 +2305,16 @@ building_fe_stronghold = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_fortress_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_fortress_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_fortress_2
@@ -2285,13 +2324,6 @@ building_fe_administration_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_administration_1
-		TECH = tech_fe_administration_1
-		FLAG = fe_administration_1_can_build
-	}
 
 	category = unity
 
@@ -2303,8 +2335,7 @@ building_fe_administration_1 = {
 	potential = {
 		exists = owner
 		owner = {
-			is_hive_empire = no
-			is_machine_empire = no
+			is_gestalt = no
 			is_spiritualist = no
 			has_make_spiritualist_perk = no
 			OR = {
@@ -2314,6 +2345,7 @@ building_fe_administration_1 = {
 			}
 		}
 		NOT = {
+			has_modifier = resort_colony
 			has_modifier = slave_colony
 			has_modifier = penal_colony
 		}
@@ -2416,10 +2448,16 @@ building_fe_administration_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_1
@@ -2559,10 +2597,16 @@ building_fe_administration_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_2
@@ -2579,13 +2623,6 @@ building_fe_administration_hive_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_administration_hive_1
-		TECH = tech_fe_administration_1
-		FLAG = fe_administration_hive_1_can_build
-	}
 
 	category = unity
 
@@ -2621,7 +2658,7 @@ building_fe_administration_hive_1 = {
 				OR = {
 					check_variable = { which = fe_administration_hive_1_build_count value >= 1 }
 					is_fallen_empire = yes
-					has_technology = tech_fe_administration_2
+					has_technology = tech_fe_administration_1
 				}
 			}
 		}
@@ -2705,10 +2742,16 @@ building_fe_administration_hive_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_hive_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_hive_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_1
@@ -2843,10 +2886,16 @@ building_fe_administration_hive_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_hive_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_hive_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_2
@@ -2860,13 +2909,6 @@ building_fe_administration_machine_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_administration_machine_1
-		TECH = tech_fe_administration_1
-		FLAG = fe_administration_machine_1_can_build
-	}
 
 	category = unity
 
@@ -2983,10 +3025,16 @@ building_fe_administration_machine_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_machine_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_machine_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_1
@@ -3120,10 +3168,16 @@ building_fe_administration_machine_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_machine_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_machine_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_2
@@ -3137,13 +3191,6 @@ building_fe_temple_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_temple_1
-		TECH = tech_fe_administration_1
-		FLAG = fe_administration_1_can_build
-	}
 
 	category = unity
 
@@ -3259,10 +3306,16 @@ building_fe_temple_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_1
@@ -3398,10 +3451,16 @@ building_fe_temple_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_administration_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_administration_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_administration_2
@@ -3418,13 +3477,6 @@ building_fe_assembly_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_assembly_1
-		TECH = tech_fe_assembly_1
-		FLAG = fe_assembly_1_can_build
-	}
 
 	category = pop_assembly
 
@@ -3618,10 +3670,16 @@ building_fe_assembly_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_assembly_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_assembly_1_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -3826,10 +3884,16 @@ building_fe_assembly_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_assembly_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_assembly_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_assembly_2
@@ -3839,13 +3903,6 @@ building_fe_clinic_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_clinic_1
-		TECH = tech_fe_clinic_1
-		FLAG = fe_clinic_1_can_build
-	}
 
 	category = amenity
 
@@ -3935,14 +3992,16 @@ building_fe_clinic_1 = {
 		AMOUNT = 150
 	}
 
-	# undercoat
-	inline_script = {
-		script = stu/jobs_add
-		job_type = healthcare
-		trigger = "
-			owner = { is_regular_empire = yes }
-		"
-		AMOUNT = 150
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+			}
+		}
+		modifier = {
+			job_healthcare_add = 150
+		}
 	}
 
 	triggered_planet_modifier = {
@@ -3997,7 +4056,7 @@ building_fe_clinic_1 = {
 				}
 			}
 		}
-		pop_bonus_workforce_mult = @medical_workforce_mult
+		organic_pop_bonus_workforce_mult = @medical_workforce_mult
 	}
 
 	on_queued = {
@@ -4026,10 +4085,16 @@ building_fe_clinic_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_clinic_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_clinic_1_build_count value = 1 }
+		}
 	}
 
 	upgrades = {
@@ -4195,18 +4260,8 @@ building_fe_clinic_2 = {
 				}
 			}
 		}
-		pop_bonus_workforce_mult = @medical_workforce_mult
+		organic_pop_bonus_workforce_mult = @medical_workforce_mult
 		mult = 2
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-			}
-		}
-		text = job_healthcare_effect_desc
 	}
 
 	on_queued = {
@@ -4235,10 +4290,16 @@ building_fe_clinic_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_clinic_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_clinic_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_clinic_2
@@ -4248,13 +4309,6 @@ building_fe_security_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_security_1
-		TECH = tech_fe_security_1
-		FLAG = tech_fe_security_1
-	}
 
 	category = government
 
@@ -4272,10 +4326,8 @@ building_fe_security_1 = {
 				has_country_flag = fe_security_1_can_build
 			}
 		}
-		NOR = {
+		NOT = {
 			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = penal_colony
 		}
 	}
 
@@ -4328,57 +4380,10 @@ building_fe_security_1 = {
 		planet_decision_enact_speed_mult = 0.03
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-			}
-		}
-		modifier = {
-			job_enforcer_add = @fe_jobs
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-				is_civil_education_empire = no # undercoat: moved to scripted trigger
-			}
-		}
-		text = job_enforcer_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_civil_education_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_educator_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		modifier = {
-			job_patrol_drone_add = @fe_jobs
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_patrol_drone_desc
+	# undercoat
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = @fe_jobs
 	}
 
 	upgrades = {
@@ -4411,10 +4416,16 @@ building_fe_security_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_security_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_security_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_security_1
@@ -4440,10 +4451,8 @@ building_fe_security_2 = {
 				has_country_flag = fe_security_1_can_build
 			}
 		}
-		NOR = {
+		NOT = {
 			has_modifier = resort_colony
-			has_modifier = slave_colony
-			has_modifier = penal_colony
 		}
 	}
 
@@ -4536,57 +4545,10 @@ building_fe_security_2 = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-			}
-		}
-		modifier = {
-			job_enforcer_add = @fe_jobs
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-				is_civil_education_empire = no # undercoat: moved to scripted trigger
-			}
-		}
-		text = job_enforcer_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_civil_education_empire = yes } # undercoat: moved to scripted trigger
-		}
-		text = job_educator_effect_desc
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		modifier = {
-			job_patrol_drone_add = @fe_jobs
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = {
-				is_gestalt = yes
-			}
-		}
-		text = job_patrol_drone_desc
+	# undercoat
+	inline_script = {
+		script = jobs/enforcers_add
+		AMOUNT = @fe_jobs
 	}
 
 	on_queued = {
@@ -4615,10 +4577,16 @@ building_fe_security_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_security_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_security_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_security_2
@@ -4628,13 +4596,6 @@ building_fe_market_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_market_1
-		TECH = tech_fe_market_1
-		FLAG = tech_fe_market_1
-	}
 
 	category = trade
 
@@ -4646,15 +4607,13 @@ building_fe_market_1 = {
 	potential = {
 		exists = owner
 		owner = {
-			is_hive_empire = no
-			is_machine_empire = no
 			OR = {
 				is_fallen_empire = yes
 				has_technology = tech_fe_market_1
-				has_country_flag = fe_market_1
+				has_country_flag = fe_market_1_can_build
 			}
 		}
-		NOT = {
+		NOR = {
 			has_modifier = slave_colony
 			has_modifier = penal_colony
 		}
@@ -4675,10 +4634,9 @@ building_fe_market_1 = {
 	}
 
 	destroy_trigger = {
-		exists = owner
-		owner = {
-			is_regular_empire = no
-			is_fallen_empire = no
+		OR = {
+			has_modifier = slave_colony
+			has_modifier = penal_colony
 		}
 	}
 
@@ -4748,10 +4706,16 @@ building_fe_market_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_market_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_market_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_market_1
@@ -4777,8 +4741,9 @@ building_fe_market_2 = {
 				has_country_flag = fe_market_1_can_build
 			}
 		}
-		NOT = {
+		NOR = {
 			has_modifier = slave_colony
+			has_modifier = penal_colony
 		}
 	}
 
@@ -4797,13 +4762,7 @@ building_fe_market_2 = {
 	}
 
 	destroy_trigger = {
-		exists = owner
-		owner = {
-			is_regular_empire = no
-			is_fallen_empire = no
-		}
 		OR = {
-			has_modifier = resort_colony
 			has_modifier = slave_colony
 			has_modifier = penal_colony
 		}
@@ -4889,10 +4848,16 @@ building_fe_market_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_market_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_market_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_market_2
@@ -4902,13 +4867,6 @@ building_fe_silo_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_silo_1
-		TECH = tech_fe_silo_1
-		FLAG = fe_silo_1_can_build
-	}
 
 	category = resource
 
@@ -5017,10 +4975,16 @@ building_fe_silo_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_silo_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_silo_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_silo_1
@@ -5133,10 +5097,16 @@ building_fe_silo_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_silo_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_silo_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_silo_2
@@ -5146,13 +5116,6 @@ building_fe_entertainment_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_entertainment_1
-		TECH = tech_fe_entertainment_1
-		FLAG = fe_entertainment_1_can_build
-	}
 
 	category = amenity
 
@@ -5164,8 +5127,7 @@ building_fe_entertainment_1 = {
 	potential = {
 		exists = owner
 		owner = {
-			is_hive_empire = no
-			is_machine_empire = no
+			is_gestalt = no
 			OR = {
 				is_fallen_empire = yes
 				has_technology = tech_fe_entertainment_1
@@ -5266,10 +5228,16 @@ building_fe_entertainment_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_entertainment_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_entertainment_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_entertainment_1
@@ -5354,7 +5322,7 @@ building_fe_entertainment_2 = {
 	}
 
 	planet_modifier = {
-		planet_amenities_add = 10000
+		planet_amenities_add = 5000
 	}
 
 	inline_script = {
@@ -5388,10 +5356,16 @@ building_fe_entertainment_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_entertainment_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_entertainment_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_entertainment_2
@@ -5482,18 +5456,6 @@ building_fe_lab_1 = {
 		AMOUNT = @building_static_jobs
 	}
 
-	inline_script = {
-		script = stu/jobs_add
-		job_type = physicists
-		trigger = "
-			owner = { is_galactic_community_member = yes }
-			is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
-			has_modifier = pm_extradimensional_experimentation
-		"
-		AMOUNT = 100
-		desc = 0
-	}
-
 	upgrades = {
 		building_fe_lab_2
 	}
@@ -5524,10 +5486,16 @@ building_fe_lab_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_lab_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_lab_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_lab_1
@@ -5620,18 +5588,6 @@ building_fe_lab_2 = {
 		AMOUNT = @building_static_jobs_high
 	}
 
-	inline_script = {
-		script = stu/jobs_add
-		job_type = physicists
-		trigger = "
-			owner = { is_galactic_community_member = yes }
-			is_active_resolution = resolution_galacticstudies_extradimensional_experimentation
-			has_modifier = pm_extradimensional_experimentation
-		"
-		AMOUNT = 200
-		desc = 0
-	}
-
 	on_queued = {
 		if = { # kill on the same planet
 			limit = {
@@ -5658,10 +5614,16 @@ building_fe_lab_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_lab_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_lab_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_lab_2
@@ -5671,13 +5633,6 @@ building_fe_mine_1 = {
 	base_buildtime = @b2_time
 	can_build = yes
 	can_demolish = yes
-
-	inline_script = {
-		script = buildings/fallen_empire_building_limits
-		BUILDING = fe_mine_1
-		TECH = tech_fe_mine_1
-		FLAG = fe_mine_1_can_build
-	}
 
 	category = resource
 
@@ -5771,16 +5726,6 @@ building_fe_mine_1 = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			is_shattered_ring_habitable = no # undercoat: moved to scripted trigger
-			exists = owner
-			owner = { is_fallen_empire_spiritualist = yes }
-		}
-		text = job_fe_acolyte_mine_effect_desc
-	}
-
-
 	upgrades = {
 		building_fe_mine_2
 	}
@@ -5811,10 +5756,16 @@ building_fe_mine_1 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_mine_1_build_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_mine_1_build_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_mine_1
@@ -5915,15 +5866,6 @@ building_fe_mine_2 = {
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			is_shattered_ring_habitable = no # undercoat: moved to scripted trigger
-			exists = owner
-			owner = { is_fallen_empire_spiritualist = yes }
-		}
-		text = job_fe_acolyte_mine_effect_desc
-	}
-
 	on_queued = {
 		if = { # kill on the same planet
 			limit = {
@@ -5950,10 +5892,16 @@ building_fe_mine_2 = {
 				global_biomass_spender = yes
 			}
 		}
+		owner = {
+			subtract_variable = { which = fe_mine_1_upgrade_count value = 1 }
+		}
 	}
 
 	on_unqueued = {
 		unqueue_biomass_effect = yes
+		owner = {
+			change_variable = { which = fe_mine_1_upgrade_count value = 1 }
+		}
 	}
 
 	show_in_tech = tech_fe_mine_2

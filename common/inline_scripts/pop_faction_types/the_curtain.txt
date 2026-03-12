@@ -1,0 +1,408 @@
+the_curtain_$ETHIC$ = {
+	name = "pft_the_curtain"
+	desc = "pft_the_curtain_desc"
+	icon = "GFX_faction_icon_the_curtain"
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_$ETHIC$
+	visual_ethic = $VISUAL_ETHIC$
+
+	persistent_faction = yes
+	use_guiding_ethic_as_pop_filter = no
+	can_rename = no
+	unique = yes
+	support_weight_exponent = 0.75
+
+	country_modifier = {
+		espionage_operation_speed_mult = 0.08
+	}
+
+	extortion_resource = {
+		category = pop_factions
+		produces = {
+			engineering_research = @faction_base_output
+			mult = @faction_extortion_research_ratio
+		}
+	}
+
+	is_potential = {
+		is_secret_societies_empire = yes
+		has_country_flag = the_curtain_$ETHIC$_selected
+	}
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		can_think = yes
+	}
+
+	attraction = {
+		base = 100
+
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { is_ruler = yes }
+			}
+		}
+
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+	}
+
+	leader = {
+		base = 100
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_READING_THE_ROOM"
+		unfulfilled_title = "THE_CURTAIN_READING_THE_ROOM"
+		desc = "THE_CURTAIN_READING_THE_ROOM_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+			owner = {
+				num_communications >= 1
+			}
+			count_playable_country = {
+				count < 2
+				limit = {
+					has_communications = root.owner
+					root.owner = {
+						intel = {
+							who = prev
+							value >= @the_curtain_min_intel
+						}
+					}
+				}
+			}
+		}
+
+		trigger = {
+			any_playable_country = {
+				has_communications = root.owner
+				root.owner = {
+					intel = {
+						who = prev
+						value >= @the_curtain_min_intel
+					}
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_READING_THE_ROOM2"
+		unfulfilled_title = "THE_CURTAIN_READING_THE_ROOM2"
+		desc = "THE_CURTAIN_READING_THE_ROOM2_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				num_communications >= 2
+			}
+			count_playable_country = {
+				count = 2
+				limit = {
+					has_communications = root.owner
+					root.owner = {
+						intel = {
+							who = prev
+							value >= @the_curtain_min_intel
+						}
+					}
+				}
+			}
+		}
+
+		trigger = {
+			count_playable_country = {
+				count > 1
+				limit = {
+					has_communications = root.owner
+					root.owner = {
+						intel = {
+							who = prev
+							value >= @the_curtain_min_intel
+						}
+					}
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_READING_THE_ROOM3"
+		unfulfilled_title = "THE_CURTAIN_READING_THE_ROOM3"
+		desc = "THE_CURTAIN_READING_THE_ROOM3_DESC"
+
+		fulfilled_effect = 15
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				num_communications >= 3
+			}
+			count_playable_country = {
+				count >= 3
+				limit = {
+					has_communications = root.owner
+					root.owner = {
+						intel = {
+							who = prev
+							value >= @the_curtain_min_intel
+						}
+					}
+				}
+			}
+		}
+
+		trigger = {
+			count_playable_country = {
+				count > 2
+				limit = {
+					has_communications = root.owner
+					root.owner = {
+						intel = {
+							who = prev
+							value >= @the_curtain_min_intel
+						}
+					}
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_BEHIND_THE_CURTAIN"
+		unfulfilled_title = "THE_CURTAIN_BEHIND_THE_CURTAIN"
+		desc = "THE_CURTAIN_BEHIND_THE_CURTAIN_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				num_communications >= 1
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = behind_the_curtain
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_EARS_TO_THE_WALL"
+		unfulfilled_title = "THE_CURTAIN_EARS_TO_THE_WALL"
+		desc = "THE_CURTAIN_EARS_TO_THE_WALL_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+			owner = {
+				num_communications >= 1
+			}
+		}
+
+		trigger = {
+			any_country = {
+				count_system_within_border = {
+					count >= 5
+					limit = { is_in_sensor_range_of_country = root.owner }
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_SMOKE_AND_MIRRORS"
+		unfulfilled_title = "THE_CURTAIN_SMOKE_AND_MIRRORS"
+		desc = "THE_CURTAIN_SMOKE_AND_MIRRORS_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				any_system_within_border = {
+					is_inside_nebula = yes
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_KEYS_TO_THE_LOCK"
+		unfulfilled_title = "THE_CURTAIN_KEYS_TO_THE_LOCK"
+		desc = "THE_CURTAIN_KEYS_TO_THE_LOCK_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				check_modifier_value = {
+					modifier = intel_decryption_add
+					value >= @the_curtain_min_codebreaking
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_IN_THE_SHADOWS"
+		unfulfilled_title = "THE_CURTAIN_IN_THE_SHADOWS"
+		desc = "THE_CURTAIN_IN_THE_SHADOWS_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			has_first_contact_dlc = yes
+			exists = owner
+			owner = {
+				num_communications >= 1
+				has_technology = tech_cloaking_1
+			}
+		}
+
+		trigger = {
+			owner = {
+				any_controlled_ship = {
+					is_cloaked = yes
+					fleet = {
+						exists = solar_system
+						solar_system = {
+							exists = owner
+							owner = { NOT = { is_same_value = root.owner } }
+						}
+					}
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_ALL_SEEING_EYE"
+		unfulfilled_title = "THE_CURTAIN_ALL_SEEING_EYE"
+		desc = "THE_CURTAIN_ALL_SEEING_EYE_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			host_has_dlc = "Utopia"
+			exists = owner
+			owner = {
+				has_technology = tech_mega_engineering
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = built_sentry_array
+			}
+		}
+	}
+
+	demand = {
+		title = "THE_CURTAIN_IN_PLAIN_SIGHT"
+		unfulfilled_title = "THE_CURTAIN_IN_PLAIN_SIGHT"
+		desc = "THE_CURTAIN_IN_PLAIN_SIGHT_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				any_owned_starbase = {
+					has_starbase_building = deep_space_black_site
+				}
+			}
+		}
+	}
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "paragon/global_faction_demands"
+		ETHIC = ethic_$ETHIC$
+		ETHIC_FANATIC = ethic_fanatic_$ETHIC$
+		ETHIC_OPPOSED = ethic_$ETHIC_OPPOSED$
+	}
+
+	on_destroy = {
+		remove_country_flag = the_curtain_$ETHIC$_selected
+		roll_curtain_secret_faction = yes
+		if = {
+			limit = {
+				has_modifier = promoted_$ETHIC$
+			}
+			remove_modifier = promoted_$ETHIC$
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_$ETHIC$
+			}
+			remove_modifier = suppressed_$ETHIC$
+		}
+	}
+
+	# Undercoat inline_script
+	inline_script = {
+		script = pop_faction_types/standard_action_block
+		faction = the_curtain_$ETHIC$
+		ethic = $ETHIC$
+		opposite = $ETHIC_OPPOSED$
+		apply_to_other_factions = "always = no"
+		extortion_resource = engineering_research
+		crowdsourced_extortion_tooltip = "crowdsourced_extortion_tt"
+	}
+}

@@ -1,0 +1,759 @@
+#########################################
+# Shadows in the Shroud - Psionic Auras #
+#########################################
+
+setup_aura_clashing = {
+	export_trigger_value_to_variable = {
+		trigger = monthly_intensity_increase
+		variable = monthly_increase
+	}
+	every_neighbor_system = {
+		limit = {
+			[[PRE_LOOP_CONDITIONS]
+				$PRE_LOOP_CONDITIONS$
+			]
+			has_psionic_aura = yes
+			aura_owner = { NOT = { is_same_value = root.aura_owner } }
+			check_aura_suppressors = no
+		}
+
+		[[PRE_LOOP_EFFECTS]
+			$PRE_LOOP_EFFECTS$
+		]
+
+		export_trigger_value_to_variable = {
+			trigger = monthly_intensity_increase
+			variable = monthly_increase
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = monthly_increase
+					value < root.monthly_increase
+				}
+			}
+			root = { save_event_target_as = winning_system }
+			save_event_target_as = losing_system
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = monthly_increase
+					value > root.monthly_increase
+				}
+			}
+			save_event_target_as = winning_system
+			root = { save_event_target_as = losing_system }
+		}
+		if = {
+			limit = { exists = event_target:losing_system }
+			if = {
+				limit = {
+					event_target:losing_system = {
+						aura_clash_can_attacker_spread_in_system = {
+							ATTACKER_SYSTEM = event_target:winning_system
+						}
+					}
+				}
+				event_target:winning_system = {
+					set_star_flag = aura_is_clashing_against_@event_target:losing_system
+					set_star_flag = aura_clash_winning_against_@event_target:losing_system
+					trigger_aura_clashing_event = { FROM = event_target:losing_system }
+				}
+				event_target:losing_system = {
+					set_star_flag = aura_is_clashing_against_@event_target:winning_system
+					trigger_aura_clashing_event = { FROM = event_target:winning_system }
+				}
+			}
+		}
+		else = {
+			save_event_target_as = tested_system
+			if = { # In case of tie, auras are clashing if any of them can spread
+				limit = {
+					OR = {
+						aura_clash_can_attacker_spread_in_system = {
+							ATTACKER_SYSTEM = root
+						}
+						root = {
+							aura_clash_can_attacker_spread_in_system = {
+								ATTACKER_SYSTEM = event_target:tested_system
+							}
+						}
+					}
+				}
+				set_star_flag = aura_is_clashing_against_@root
+				trigger_aura_clashing_event = { FROM = root }
+				root = {
+					set_star_flag = aura_is_clashing_against_@event_target:tested_system
+					trigger_aura_clashing_event = { FROM = event_target:tested_system }
+				}
+			}
+		}
+		clear_variable = monthly_increase
+	}
+	clear_variable = monthly_increase
+}
+
+setup_aura_clashing_monthly = {
+	set_timed_star_flag = {
+		flag = aura_clashing_on_monthly_check
+		days = 20 #to fit within on_monthly (can be changed for AIs if needed)
+	}
+	setup_aura_clashing = {
+		PRE_LOOP_CONDITIONS = "NOT = { has_star_flag = aura_clashing_on_monthly_check }"
+		PRE_LOOP_EFFECTS = "clear_aura_clashing_flags = yes"
+	}
+}
+
+clear_aura_clashing_flags = {
+	remove_star_flag = aura_is_clashing_against_@root
+	remove_star_flag = aura_clash_winning_against_@root
+	root = {
+		remove_star_flag = aura_is_clashing_against_@prev
+		remove_star_flag = aura_clash_winning_against_@prev
+	}
+}
+
+trigger_aura_clashing_event = {
+	aura_owner = {
+		set_visited = $FROM$
+		if = {
+			limit = {
+				NOT = { has_country_flag = aura_clashing_event_triggered }
+			}
+			set_country_flag = aura_clashing_event_triggered
+			country_event = { id = tutorial.2620 }
+			country_event = {
+				id = shroud.1510
+				scopes = {
+					from = prev
+					fromfrom = $FROM$
+				}
+			}
+		}
+	}
+}
+
+try_resolve_aura_clashing = {
+	every_neighbor_system = {
+		limit = {
+			has_star_flag = aura_is_clashing_against_@root
+		}
+		root = {
+			remove_star_flag = aura_is_clashing_against_@prev
+			remove_star_flag = aura_clash_winning_against_@prev
+		}
+		if = {
+			limit = { has_star_flag = aura_clash_winning_against_@root }
+			export_trigger_value_to_variable = {
+				trigger = monthly_intensity_increase
+				variable = winning_intensity_candidate
+			}
+			root = {
+				if = {
+					limit = {
+						OR = {
+							NOT = { is_variable_set = highest_winning_intensity }
+							check_variable = {
+								which = highest_winning_intensity
+								value < prev.winning_intensity_candidate
+							}
+						}
+					}
+					set_variable = {
+						which = highest_winning_intensity
+						value = prev.winning_intensity_candidate
+					}
+					prev = { save_event_target_as = current_winner }
+				}
+			}
+			clear_variable = winning_intensity_candidate
+			remove_star_flag = aura_clash_winning_against_@root
+		}
+		remove_star_flag = aura_is_clashing_against_@root
+	}
+	if = {
+		limit = { exists = event_target:current_winner }
+		if = {
+			limit = { can_aura_spread_in_system = { OWNER = event_target:current_winner.aura_owner } }
+			spawn_psionic_aura = { owner = event_target:current_winner.aura_owner }
+		}
+		clear_variable = highest_winning_intensity
+	}
+}
+
+try_spread_aura = {
+	custom_tooltip = try_spread_aura_tt
+	if = {
+		limit = {
+			has_psionic_aura = yes
+			aura_owner = { has_technology = tech_aura_intensification }
+		}
+		aura_owner = { save_event_target_as = current_aura_owner }
+		random_neighbor_system = {
+			limit = { can_aura_spread_in_system = { OWNER = event_target:current_aura_owner } }
+			spawn_psionic_aura = { owner = prev.aura_owner }
+			weights = {
+				base = 1
+				modifier = {
+					add = value:count_adjacent_psionic_auras
+					always = yes
+				}
+			}
+		}
+	}
+}
+
+spread_aura_endlessly = {
+	custom_tooltip = end_aura_effect_tt
+	if = {
+		limit = { has_psionic_aura = yes }
+		random_neighbor_system = {
+			limit = {
+				has_psionic_aura = no
+				check_aura_suppressors = no
+			}
+			spawn_psionic_aura = { owner = prev.aura_owner }
+			weights = {
+				base = 1
+				modifier = {
+					add = value:count_adjacent_psionic_auras
+					always = yes
+				}
+			}
+		}
+	}
+}
+
+on_psionic_aura_spawned = {
+	aura_owner = { set_visited = prev }
+	clear_psionic_aura_visuals = yes # Visual cleanup
+	spawn_psionic_aura_object = {
+		TYPE = $TYPE$
+		LEVEL = 1
+	}
+	[[!NO_IMMUNE]
+		set_timed_star_flag = {
+			flag = newly_spawned_psionic_aura
+			months = 6
+		}
+	]
+}
+
+on_psionic_aura_vanishing = {
+	clear_psionic_aura_visuals = yes
+	try_resolve_aura_clashing = yes
+}
+
+# scope = system w/ psionic aura
+check_psionic_suppression_eligibility = {
+	save_event_target_as = strange_aura_system
+	# check current system just in case
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				NOT = { is_same_value = root.aura_owner }
+				has_encountered_psionic_auras = no
+			}
+		}
+		owner = { set_psionic_aura_encounter = yes }
+	}
+	# check neighbor systems
+	every_neighbor_system = {
+		limit = {
+			exists = owner
+			owner = {
+				NOT = { is_same_value = root.aura_owner }
+				has_encountered_psionic_auras = no
+			}
+		}
+		owner = { set_psionic_aura_encounter = yes }
+	}
+}
+
+# scope = system
+set_psionic_aura_encounter = {
+	if = {
+		limit = {
+			event_target:strange_aura_system = {
+				NOT = { has_psionic_aura = end_aura }
+			}
+		}
+		set_country_flag = has_encountered_psionic_auras
+		if = {
+			limit = { has_psionic_ascension = yes }
+			country_event = {
+				id = shroud.4191
+				scopes = {
+					from = event_target:strange_aura_system
+					fromfrom = event_target:strange_aura_system.aura_owner
+				}
+			}
+		}
+		else = {
+			country_event = {
+				id = shroud.4190
+				scopes = { from = event_target:strange_aura_system }
+			}
+		}
+	}
+}
+
+# scope = system
+natural_spawn_psionic_aura = {
+	if = {
+		limit = {
+			$OWNER$ = {
+				NOT = { has_country_flag = exile_world }
+			}
+		}
+		if = {
+			limit = { has_psionic_aura = no }
+			spawn_psionic_aura = { owner = $OWNER$ }
+		}
+		else_if = {
+			limit = {
+				aura_owner = { NOT = { is_same_value = prev.$OWNER$ } }
+				NOT = { has_psionic_aura = end_aura }
+			}
+			destroy_psionic_aura = yes
+			spawn_psionic_aura = { owner = $OWNER$ }
+		}
+	}
+}
+
+spawn_psionic_aura_object = {
+	star = {
+		create_ambient_object = {
+			type = $TYPE$_level$LEVEL$
+		}
+		last_created_ambient_object = {
+			set_location = {
+				target = prev
+				distance = 0
+				angle = random
+			}
+			set_ambient_object_flag = psionic_aura_space_object
+			set_ambient_object_flag = psionic_aura_level$LEVEL$_entity
+		}
+	}
+}
+
+clear_psionic_aura_visuals = {
+	every_system_ambient_object = {
+		limit = {
+			has_ambient_object_flag = psionic_aura_space_object
+		}
+		destroy_ambient_object = this
+	}
+}
+ 
+update_psionic_aura_visuals = {
+	# Clear previous Psionic Aura ambient objects
+	clear_psionic_aura_visuals = yes
+	if = {
+		limit = { is_aura_intensity_level >= 1 }
+		spawn_psionic_aura_object = {
+			TYPE = $TYPE$
+			LEVEL = 1
+		}
+	}
+	if = {
+		limit = { is_aura_intensity_level >= 2 }
+		spawn_psionic_aura_object = {
+			TYPE = $TYPE$
+			LEVEL = 2
+		}
+	}
+	if = {
+		limit = { is_aura_intensity_level >= 3 }
+		spawn_psionic_aura_object = {
+			TYPE = $TYPE$
+			LEVEL = 3
+		}
+	}
+}
+
+add_psionic_aura_level_visual = {
+	switch = {
+		trigger = is_aura_intensity_level
+		2 = {
+			if = {
+				limit = {
+					NOT = {
+						any_system_ambient_object = {
+							has_ambient_object_flag = psionic_aura_level2_entity
+						}
+					}
+				}
+				spawn_psionic_aura_object = {
+					TYPE = $TYPE$
+					LEVEL = 2
+				}
+			}
+		}
+		3 = {
+			if = {
+				limit = {
+					NOT = {
+						any_system_ambient_object = {
+							has_ambient_object_flag = psionic_aura_level3_entity
+						}
+					}
+				}
+				spawn_psionic_aura_object = {
+					TYPE = $TYPE$
+					LEVEL = 3
+				}
+			}
+		}
+	}
+}
+
+remove_psionic_aura_level_visual = {
+	# Remove higher level ambient objects
+	if = {
+		limit = { is_aura_intensity_level = 1 }
+		every_system_ambient_object = {
+			limit = {
+				OR = {
+					has_ambient_object_flag = psionic_aura_level2_entity
+					has_ambient_object_flag = psionic_aura_level3_entity
+				}
+			}
+			destroy_ambient_object = this
+		}
+	}
+	else_if = {
+		limit = { is_aura_intensity_level = 2 }
+		every_system_ambient_object = {
+			limit = {
+				has_ambient_object_flag = psionic_aura_level3_entity
+			}
+			destroy_ambient_object = this
+		}
+	}
+}
+
+composer_aura_max_intensity_effect = {
+	set_variable = {
+		which = spawned_shroudstone
+		value = 0
+	}
+	every_system_colony = {
+		limit = {
+			has_owner = yes
+			is_owned_by = root.aura_owner
+			has_ground_combat = no
+			is_occupied_flag = no
+			is_cosmogenesis_world = no # undercoat: moved to scripted trigger
+		}
+		while = {
+			count = 2
+			add_deposit = d_shroudstone
+		}
+		prev = {
+			change_variable = {
+				which = spawned_shroudstone
+				value = 2
+			}
+		}
+		if = {
+			limit = {
+				NOT = { exists = event_target:selected_colony }
+			}
+			save_event_target_as = selected_colony
+		}
+	}
+	if = {
+		limit = { exists = event_target:selected_colony }
+		create_message = {
+			type = MESSAGE_PSIONIC_AURA_the_composer_of_strands
+			localization = MESSAGE_PSIONIC_AURA_MAX_INTENSITY_the_composer_of_strands_DESC
+			days = 30
+			target = event_target:selected_colony
+			variable = {
+				type = name
+				localization = SYSTEM
+				scope = this
+			}
+			variable = {
+				type = variable
+				localization = VALUE
+				varname = this.spawned_shroudstone
+				scope = this
+			}
+		}
+	}
+	clear_variable = spawned_shroudstone
+}
+
+desire_aura_max_intensity_effect = {
+	set_variable = {
+		which = ascensions_added
+		value = 0
+	}
+	every_system_colony = {
+		limit = {
+			has_owner = yes
+			is_owned_by = root.aura_owner
+			has_planetary_ascension_tier < 10
+			has_ground_combat = no
+			is_occupied_flag = no
+		}
+		set_planetary_ascension_tier = value:add_planet_ascension_tier
+		prev = {
+			change_variable = {
+				which = ascensions_added
+				value = 1
+			}
+		}
+		if = {
+			limit = {
+				NOT = { exists = event_target:selected_colony }
+			}
+			save_event_target_as = selected_colony
+		}
+	}
+	if = {
+		limit = {
+			exists = event_target:selected_colony
+			check_variable = { which = ascensions_added value > 0 }
+		}
+		create_message = {
+			type = MESSAGE_PSIONIC_AURA_the_instrument_of_desire
+			localization = MESSAGE_PSIONIC_AURA_MAX_INTENSITY_the_instrument_of_desire_DESC
+			days = 30
+			target = event_target:selected_colony
+			variable = {
+				type = name
+				localization = SYSTEM
+				scope = this
+			}
+			variable = {
+				type = variable
+				localization = VALUE
+				varname = this.ascensions_added
+				scope = this
+			}
+		}
+	}
+	clear_variable = ascensions_added
+}
+
+souls_aura_max_intensity_effect = {
+	random_fleet_in_system = {
+		limit = {
+			is_ship_class = shipclass_starbase
+			exists = controller
+			controller = { is_same_value = root.aura_owner }
+		}
+		while = {
+			count = 5
+			limit = {
+				starbase = { used_defense_platform_capacity_percent < 1.0 }
+			}
+			create_ship = {
+				name = "NAME_Cradle_Station"
+				random_existing_design = military_station_small
+				prefix = no
+				suffix = yes
+				effect = {
+					add_modifier = { modifier = chosen_by_souls_aura_modifier }
+				}
+			}
+		}
+		save_event_target_as = system_starbase
+	}
+	if = {
+		limit = { exists = event_target:system_starbase }
+		create_message = {
+			type = MESSAGE_PSIONIC_AURA_the_cradle_of_souls
+			localization = MESSAGE_PSIONIC_AURA_MAX_INTENSITY_the_cradle_of_souls_DESC
+			days = 30
+			target = event_target:system_starbase
+			variable = {
+				type = name
+				localization = SYSTEM
+				scope = this
+			}
+			variable = {
+				type = name
+				localization = STARBASE
+				scope = event_target:system_starbase
+			}
+		}
+	}
+}
+
+eater_aura_max_intensity_effect = {
+	create_fleet = {
+		name = "tooth_eater_plural"
+		settings = {
+			can_upgrade = no
+			uses_naval_capacity = no
+			spawn_debris = no
+		}
+		effect = {
+			set_owner = root.aura_owner
+			while = {
+				count = value:eater_teeth_count_scaling
+				create_ship = {
+					design = "NAME_Tooth_Eater"
+					prefix = no
+					upgradable = no
+				}
+			}
+			set_location = {
+				target = prev
+				distance = 120
+				angle = random
+			}
+			set_fleet_flag = tooth_eater_fleet
+			save_event_target_as = eater_fleet
+		}
+	}
+	root.aura_owner = {
+		ordered_owned_fleet = {
+			limit = {
+				has_fleet_flag = tooth_eater_fleet
+				exists = event_target:eater_fleet
+				NOT = { is_same_value = event_target:eater_fleet }
+			}
+			position = 0
+			order_by = value:distance_to_target|TARGET|event_target:eater_fleet|
+			inverse = yes
+			save_event_target_as = teeth_to_merge
+		}
+	}
+	event_target:eater_fleet = {
+		if = {
+			limit = { exists = event_target:teeth_to_merge }
+			queue_actions = {
+				merge_fleet = event_target:teeth_to_merge
+			}
+		}
+		else = {
+			queue_actions = {
+				move_to = root.aura_owner.capital_scope.solar_system
+			}
+		}
+	}
+	create_message = {
+		type = MESSAGE_PSIONIC_AURA_the_eater_of_worlds
+		localization = MESSAGE_PSIONIC_AURA_MAX_INTENSITY_the_eater_of_worlds_DESC
+		days = 30
+		target = event_target:eater_fleet
+		variable = {
+			type = name
+			localization = SYSTEM
+			scope = this
+		}
+	}
+}
+
+whisperers_aura_max_intensity_effect = {
+	aura_owner = {
+		random_list = {
+			1 = {
+				set_variable = {
+					which = research_before
+					value = trigger:stored_physics_points
+				}
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+				set_variable = {
+					which = research_after
+					value = trigger:stored_physics_points
+				}
+				subtract_variable = {
+					which = research_after
+					value = research_before
+				}
+			}
+			1 = {
+				set_variable = {
+					which = research_before
+					value = trigger:stored_society_points
+				}
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+				set_variable = {
+					which = research_after
+					value = trigger:stored_society_points
+				}
+				subtract_variable = {
+					which = research_after
+					value = research_before
+				}
+			}
+			1 = {
+				set_variable = {
+					which = research_before
+					value = trigger:stored_engineering_points
+				}
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier2researchreward
+					min = @tier2researchmin
+					max = @tier2researchmax
+				}
+				set_variable = {
+					which = research_after
+					value = trigger:stored_engineering_points
+				}
+				subtract_variable = {
+					which = research_after
+					value = research_before
+				}
+			}
+		}
+	}
+	create_message = {
+		type = MESSAGE_PSIONIC_AURA_whisperers_in_the_void
+		localization = MESSAGE_PSIONIC_AURA_MAX_INTENSITY_whisperers_in_the_void_DESC
+		days = 30
+		variable = {
+			type = name
+			localization = SYSTEM
+			scope = this
+		}
+		variable = {
+			type = variable
+			localization = VALUE
+			varname = this.research_after
+			scope = aura_owner
+		}
+	}
+	clear_variable = research_before
+	clear_variable = research_after
+}
+
+check_end_aura_win_condition = {
+	export_trigger_value_to_variable = {
+		trigger = count_systems_with_aura
+		variable = nb_conquered_systems
+	}
+	if = {
+		limit = {
+			count_end_cycle_systems <= nb_conquered_systems
+		}
+		if = {
+			limit = { is_endbringer_empire = yes } # undercoat: moved to scripted trigger
+			country_event = { id = shroud.8600 }
+		}
+		else = {
+			country_event = { id = shroud.4970 }
+		}
+	}
+}

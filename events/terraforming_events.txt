@@ -119,6 +119,9 @@ planet_event = {
 			pc_toxic = {
 				set_planet_flag = toxic_terraform
 			}
+			pc_volcanic = {
+				set_planet_flag = volcanic_terraform
+			}
 			default = {
 				set_planet_flag = no_terraform_event
 			}
@@ -183,6 +186,7 @@ planet_event = {
 							who = space_owner
 							status = no
 						}
+						is_homeworld = yes
 						space_owner = { has_country_flag = terraformed_homeworld_2 }
 					}
 				}
@@ -540,7 +544,9 @@ country_event = {
 	}
 	option = {
 		name = terra.15.c
-		trigger = {	From = { free_district_slots >= 2 } }
+		trigger = {
+			From = { num_free_districts = { type = district_generator value >= 2 } }
+		}
 		custom_tooltip = terra.15.c.tooltip
 		hidden_effect = {
 			From = {
@@ -551,7 +557,9 @@ country_event = {
 	}
 	option = {
 		name = terra.15.d
-		trigger = { From = { free_district_slots >= 2 } }
+		trigger = {
+			From = { num_free_districts = { type = district_mining value >= 2 } }
+		}
 		custom_tooltip = terra.15.d.tooltip
 		From = {
 			hidden_effect = {
@@ -564,7 +572,7 @@ country_event = {
 		name = terra.15.e
 		trigger = {
 			is_anglers_empire = no
-			From = { free_district_slots >= 2 }
+			From = { num_free_districts = { type = district_farming value >= 2 } }
 		}
 		custom_tooltip = terra.15.e.tooltip
 		From = {
@@ -1049,9 +1057,7 @@ country_event = {
 	}
 	option = {
 		exclusive_trigger = {
-			OR = {
-				is_subterranean_empire = yes # undercoat: moved to scripted trigger
-			}
+			is_subterranean_empire = yes # undercoat: moved to scripted trigger
 		}
 		name = terra.60.c
 		owner = {
@@ -1151,19 +1157,13 @@ country_event = {
 	title = terra.75.name
 	desc = {
 		trigger = {
-			NOR = {
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_spiritualist
-			}
+			is_spiritualist = no
 		}
 		text = terra.75.desc_regular
 	}
 	desc = {
 		trigger = {
-			OR = {
-				has_ethic = ethic_spiritualist
-				has_ethic = ethic_fanatic_spiritualist
-			}
+			is_spiritualist = yes
 		}
 		text = terra.75.desc_spirit
 	}
@@ -1610,91 +1610,5 @@ planet_event = {
 
 	immediate = {
 		add_modifier = { modifier = second_home days = -1 }
-	}
-}
-
-planet_event = {
-	id = terra.200
-	hide_window = yes
-	is_triggered_only = yes
-	trigger = {
-		uses_district_set = hive_world
-	}
-
-	immediate = {
-		# Hive Districts
-		if = {
-			limit = {
-				has_district = district_hive_1
-			}
-			add_zone = {
-				district = district_hive_1
-				zone = zone_energy
-				replace = yes
-			}
-		}
-		if = {
-			limit = {
-				has_district = district_hive_2
-			}
-			add_zone = {
-				district = district_hive_2
-				zone = zone_minerals
-				replace = yes
-			}
-		}
-		if = {
-			limit = {
-				has_district = district_hive_3
-			}
-			add_zone = {
-				district = district_hive_3
-				zone = zone_food
-				replace = yes
-			}
-		}
-	}
-}
-
-planet_event = {
-	id = terra.210
-	hide_window = yes
-	is_triggered_only = yes
-	trigger = {
-		uses_district_set = machine_world
-	}
-
-	immediate = {
-		# Machine Districts
-		if = {
-			limit = {
-				has_district = district_nexus_1
-			}
-			add_zone = {
-				district = district_nexus_1
-				zone = zone_energy
-				replace = yes
-			}
-		}
-		if = {
-			limit = {
-				has_district = district_nexus_2
-			}
-			add_zone = {
-				district = district_nexus_2
-				zone = zone_minerals
-				replace = yes
-			}
-		}
-		if = {
-			limit = {
-				has_district = district_nexus_3
-			}
-			add_zone = {
-				district = district_nexus_3
-				zone = zone_food
-				replace = yes
-			}
-		}
 	}
 }

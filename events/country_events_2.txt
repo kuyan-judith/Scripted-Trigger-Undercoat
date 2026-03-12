@@ -73,23 +73,29 @@ country_event = {
 	title = "country.999.name"
 	desc = {
 		trigger = {
-			switch = {
-				trigger = has_ethic
-				ethic_fanatic_materialist = { text = country.999.desc.material }
-				ethic_fanatic_spiritualist = { text = country.999.desc.spirit }
-				ethic_fanatic_militarist = { text = country.999.desc.mil }
-				ethic_fanatic_pacifist = { text = country.999.desc.pac }
-				ethic_fanatic_xenophile = { text = country.999.desc.phile }
-				ethic_fanatic_xenophobe = { text = country.999.desc.phobe }
-				ethic_fanatic_authoritarian = { text = country.999.desc.coll }
-				ethic_fanatic_egalitarian = { text = country.999.desc.ind }
-				ethic_gestalt_consciousness = {
-					if = {
-						limit = { is_machine_empire = yes }
-						text = country.999.desc.mach
+			if = {
+				limit = { is_superstitious_beliefs_empire = yes}
+				text = country.999.desc.belief
+			}
+			else_if = {
+				switch = {
+					trigger = has_ethic
+					ethic_fanatic_materialist = { text = country.999.desc.material }
+					ethic_fanatic_spiritualist = { text = country.999.desc.spirit }
+					ethic_fanatic_militarist = { text = country.999.desc.mil }
+					ethic_fanatic_pacifist = { text = country.999.desc.pac }
+					ethic_fanatic_xenophile = { text = country.999.desc.phile }
+					ethic_fanatic_xenophobe = { text = country.999.desc.phobe }
+					ethic_fanatic_authoritarian = { text = country.999.desc.coll }
+					ethic_fanatic_egalitarian = { text = country.999.desc.ind }
+					ethic_gestalt_consciousness = {
+						if = {
+							limit = { is_machine_empire = yes }
+							text = country.999.desc.mach
+						}
 					}
+					default = { text = country.999.desc.material }
 				}
-				default = { text = country.999.desc.material }
 			}
 
 		}
@@ -112,15 +118,9 @@ country_event = {
 	option = {
 		name = country.999.a
 		trigger = {
+			is_superstitious_beliefs_empire = no
 			NOR = {
-				has_ethic = ethic_fanatic_pacifist
-				has_ethic = ethic_fanatic_militarist
-				has_ethic = ethic_fanatic_authoritarian
-				has_ethic = ethic_fanatic_egalitarian
-				has_ethic = ethic_fanatic_materialist
-				has_ethic = ethic_fanatic_spiritualist
-				has_ethic = ethic_fanatic_xenophobe
-				has_ethic = ethic_fanatic_xenophile
+				is_fanatic = yes
 				is_gestalt = yes # undercoat: moved to scripted trigger
 			}
 		}
@@ -134,7 +134,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.pac
-		trigger = { has_ethic = ethic_fanatic_pacifist }
+		trigger = {
+			is_fanatic_pacifist = yes
+			is_superstitious_beliefs_empire = no
+		}
 		add_monthly_resource_mult = {
 			resource = unity
 			value = @tier1unityreward
@@ -145,7 +148,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.mil
-		trigger = { has_ethic = ethic_fanatic_militarist }
+		trigger = {
+			is_fanatic_militarist = yes
+			is_superstitious_beliefs_empire = no
+		}
 		capital_scope = {
 			add_modifier = {
 				modifier = comet_sighted_positive
@@ -156,7 +162,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.spirit
-		trigger = { has_ethic = ethic_fanatic_spiritualist }
+		trigger = {
+			is_fanatic_spiritualist = yes
+			is_superstitious_beliefs_empire = no
+		}
 		capital_scope = {
 			add_modifier = {
 				modifier = comet_sighted_positive
@@ -167,7 +176,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.material
-		trigger = { has_ethic = ethic_fanatic_materialist }
+		trigger = {
+			is_fanatic_materialist = yes
+			is_superstitious_beliefs_empire = no
+		}
 		add_monthly_resource_mult = {
 			resource = physics_research
 			value = @tier1researchreward
@@ -178,7 +190,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.phile
-		trigger = { has_ethic = ethic_fanatic_xenophile }
+		trigger = {
+			is_fanatic_xenophile = yes
+			is_superstitious_beliefs_empire = no
+		}
 		add_monthly_resource_mult = {
 			resource = unity
 			value = @tier1unityreward
@@ -189,7 +204,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.phobe
-		trigger = { has_ethic = ethic_fanatic_xenophobe }
+		trigger = {
+			is_fanatic_xenophobe = yes
+			is_superstitious_beliefs_empire = no
+		}
 		capital_scope = {
 			add_modifier = {
 				modifier = comet_sighted_negative
@@ -201,7 +219,8 @@ country_event = {
 	option = {
 		name = country.999.a.coll
 		trigger = {
-			has_ethic = ethic_fanatic_authoritarian
+			is_fanatic_authoritarian = yes
+			is_superstitious_beliefs_empire = no
 		}
 		capital_scope = {
 			add_modifier = {
@@ -213,7 +232,10 @@ country_event = {
 
 	option = {
 		name = country.999.a.ind
-		trigger = { has_ethic = ethic_fanatic_egalitarian }
+		trigger = {
+			is_fanatic_egalitarian = yes
+			is_superstitious_beliefs_empire = no
+		}
 		capital_scope = {
 			add_modifier = {
 				modifier = comet_sighted_positive
@@ -224,12 +246,94 @@ country_event = {
 
 	option = {
 		name = country.999.a.mach
-		trigger = { is_machine_empire = yes }
+		trigger = {
+			is_machine_empire = yes
+			is_superstitious_beliefs_empire = no
+		}
 		add_monthly_resource_mult = {
 			resource = unity
 			value = @tier1unityreward
 			min = 10
 			max = 40
+		}
+	}
+
+	option = {
+		name = utopia.2652.c.machine
+		trigger = {
+			is_superstitious_beliefs_empire = yes
+			has_cycle_of_omens = yes
+			is_gestalt = yes
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = 10
+			max = 40
+		}
+	}
+
+	option = {
+		name = country.999.a.phobe
+		trigger = {
+			is_superstitious_beliefs_empire = yes
+			has_cycle_of_omens = yes
+			is_gestalt = no
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = 10
+			max = 40
+		}
+	}
+
+	option = {
+		name = ACKNOWLEDGED
+		trigger = {
+			is_superstitious_beliefs_empire = yes
+			has_cycle_of_omens = no
+			is_gestalt = yes
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = 10
+			max = 40
+		}
+	}
+
+	option = {
+		name = country.999.a.ind
+		trigger = {
+			is_superstitious_beliefs_empire = yes
+			has_cycle_of_omens = no
+			is_gestalt = no
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier1unityreward
+			min = 10
+			max = 40
+		}
+	}
+
+	after = {
+		if = {
+			limit = { is_superstitious_beliefs_empire = yes }
+			if = {
+				limit = { has_cycle_of_omens = yes }
+				add_modifier = {
+					modifier = comet_sighted_omens
+					years = 13
+				}
+			}
+			else = {
+				add_modifier = {
+					modifier = comet_sighted_fortune
+					years = 13
+				}
+			}
 		}
 	}
 }
@@ -1201,10 +1305,7 @@ country_event = {
 	option = {
 		name = country.1040.a
 		trigger = {
-			OR = {
-				has_ethic = "ethic_fanatic_xenophobe"
-				has_ethic = "ethic_xenophobe"
-			}
+			is_xenophobe = yes
 		}
 		response_text = country.1040.a.response
 		is_dialog_only = yes
@@ -1255,10 +1356,7 @@ country_event = {
 	option = {
 		name = country.1041.a
 		trigger = {
-			OR = {
-				has_ethic = "ethic_fanatic_xenophobe"
-				has_ethic = "ethic_xenophobe"
-			}
+			is_xenophobe = yes
 		}
 		hidden_effect = { country_event = { id = country.1044 } }
 	}

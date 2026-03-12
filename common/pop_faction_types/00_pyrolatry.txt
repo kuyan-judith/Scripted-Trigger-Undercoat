@@ -1,0 +1,567 @@
+##############################
+# Pyrolatry Civic - Fire Cult
+##############################
+
+fire_cult = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_spiritualist
+	visual_ethic = "traditionalist_visual_ethic"
+	use_guiding_ethic_as_pop_filter = yes
+	can_rename = no
+	unique = yes
+	support_multiplier = 1.2
+
+	resources = {
+		category = pop_factions
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+			}
+			unity = @faction_base_output
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			physics_research = @faction_major_output
+			society_research = @faction_minor_output
+			mult = @crowdsourcing_multiplier
+		}
+	}
+
+	extortion_resource = {
+		category = pop_factions
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+				is_lithoid_or_infernal_empire = no
+			}
+			food = @faction_base_output
+			mult = @faction_extortion_food_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+				is_lithoid_empire = yes
+			}
+			minerals = @faction_base_output
+			mult = @faction_extortion_minerals_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+				is_infernal_empire = yes
+			}
+			alloys = @faction_base_output
+			mult = @faction_extortion_alloys_ratio
+		}
+		produces = {
+			trigger = {
+				owner = {
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+			}
+			physics_research = @faction_major_output
+			society_research = @faction_minor_output
+			mult = @faction_extortion_crowdsourcing_ratio
+		}
+	}
+
+	is_potential = { is_pyrolatry_empire = yes } # undercoat: moved to scripted trigger
+
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+
+	can_join_pre_triggers = {
+		is_enslaved = no
+		is_being_purged = no
+	}
+
+	can_join_faction = {
+		is_spiritualist = yes
+		is_shackled_robot = no
+		can_think = yes
+	}
+
+	attraction = {
+		base = 200
+
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { is_ruler = yes }
+			}
+		}
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+		modifier = {
+			factor = 1.5
+			OR = {
+				has_trait = trait_conformists
+				has_trait = trait_thrifty
+				has_trait = trait_traditional
+				is_spiritualist = yes
+			}
+		}
+	}
+
+	leader = {
+		base = 100
+		modifier = {
+			factor = 0
+			is_ruler = yes
+			owner = {
+				OR = {
+					is_imperial_authority = yes
+					is_dictatorial_authority = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			is_event_leader = yes
+		}
+	}
+
+	# DEMAND: Faction Outraged (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_outraged
+		FLAG = galcom_resolution_passed_anti_traditionalist
+	}
+
+	# DEMAND: Faction Pleased (by a GalCom Resolution)
+	inline_script = {
+		script = pop_faction_types/demand_faction_pleased
+		FLAG = galcom_resolution_passed_pro_traditionalist
+	}
+
+	# Used Blazing Scourge in the last 10 Years
+	demand = {
+		title = "FIRE_CULT_RECENT_BLAZING_DECISION"
+		unfulfilled_title = "FIRE_CULT_NO_RECENT_BLAZING_DECISION"
+		desc = "FIRE_CULT_RECENT_BLAZING_DECISION_DESC"
+
+		fulfilled_effect = 10
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = recent_blazing_decision_timed
+			}
+		}
+	}
+
+	# Terraformed to Volcanic World in the last 5 years
+	demand = {
+		title = "FIRE_CULT_VOLCANIC_TERRAFORM"
+		unfulfilled_title = "FIRE_CULT_NO_VOLCANIC_TERRAFORM"
+		desc = "FIRE_CULT_VOLCANIC_TERRAFORM_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -0.001
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = recent_volcanic_terraform_timed
+			}
+		}
+	}
+
+	demand = { # Allow Forced Resettlement
+		title = "FIRE_CULT_RESETTLEMENT"
+		unfulfilled_title = "FIRE_CULT_NO_RESETTLEMENT"
+		desc = "FIRE_CULT_RESETTLEMENT_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				OR = {
+					has_policy_flag = resettlement_allowed
+					any_owned_pop_group = {
+						has_migration_control = { type = yes }
+						is_sapient = yes
+						is_enslaved = no
+						is_being_purged = no
+						is_shackled_robot = no
+						is_robot_pop_group = no
+					}
+				}
+			}
+		}
+	}
+
+	demand = { # Have a planet with <20% habitability:
+		title = "FIRE_CULT_LOW_HABITABILITY"
+		unfulfilled_title = "FIRE_CULT_HIGH_HABITABILITY"
+		desc = "FIRE_CULT_LOW_HABITABILITY_DESC"
+
+		fulfilled_effect = 15
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				any_owned_planet = {
+					any_owned_species = {
+						prev = { habitability = { who = prev value <= 0.2 } }
+					}
+				}
+			}
+		}
+	}
+
+	demand = { # "VOLCANIC_WORLDS"
+		title = "FIRE_CULT_VOLCANIC_WORLDS"
+		unfulfilled_title = "FIRE_CULT_NO_VOLCANIC_WORLDS"
+		desc = "FIRE_CULT_VOLCANIC_WORLDS_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				count_owned_planet = {
+					count <= value:count_volcanic_planet_ratio
+				}
+			}
+		}
+	}
+
+
+	demand = { # "TRADITIONALIST_SPIRITUALIST_GOVERNMENT"
+		title = "TRADITIONALIST_SPIRITUALIST_GOVERNMENT"
+		unfulfilled_title = "TRADITIONALIST_SECULAR_GOVERNMENT"
+		desc = "TRADITIONALIST_SPIRITUALIST_GOVERNMENT_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				is_spiritualist = yes
+			}
+		}
+	}
+
+	demand = { # councillor check: pyro priest
+		title = "FIRE_CULT_PYROMANIC_PRIEST"
+		unfulfilled_title = "FIRE_CULT_NO_PYROMANIC_PRIEST"
+		desc = "FIRE_CULT_PYROMANIC_PRIEST_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			years_passed > 5 # No penalty unless 5 years passed.
+		}
+
+		trigger = {
+			exists = owner
+			owner = {
+				any_owned_leader = {
+					is_councilor_type = councilor_pyromanic_priest
+				}
+			}
+		}
+	}
+
+
+	demand = { # 5 years grace period to get 1000 Fire Dancers
+		title = "FIRE_CULT_FIRE_DANCERS"
+		unfulfilled_title = "FIRE_CULT_NO_FIRE_DANCERS"
+		desc = "FIRE_CULT_FIRE_DANCERS_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			years_passed > 5 # No penalty unless 5 years passed.
+		}
+
+		trigger = {
+			exists = owner
+			owner = {
+				num_assigned_jobs = {
+					job = bureaucrat
+					value > 1000
+				}
+			}
+		}
+	}
+
+	# Faction Demands for Ruler and Council positions.
+	inline_script = {
+		script = "paragon/global_faction_demands"
+		ETHIC = ethic_spiritualist
+		ETHIC_FANATIC = ethic_fanatic_spiritualist
+		ETHIC_OPPOSED = ethic_materialist
+	}
+
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	# Should never happen, just in case
+	on_destroy = {
+		if = {
+			limit = { has_modifier = promoted_spiritualist }
+			remove_modifier = promoted_spiritualist
+		}
+		if = {
+			limit = { has_modifier = suppressed_spiritualist }
+			remove_modifier = suppressed_spiritualist
+		}
+	}
+
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+
+			cost = {
+				unity = 5000
+			}
+
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { any_agreement = { agreement_preset = preset_dominion } }
+					}
+				}
+			}
+
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > 0.20
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_spiritualist" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = 3600 }
+				parameter:empire = {
+					shift_ethic = ethic_spiritualist
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = 3600 }
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = 3600 }
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								is_playable = yes # undercoat: moved to scripted trigger
+								has_communications = prev
+								has_intel_level = {
+									who = prev
+									category = government
+									level >= 1
+								}
+							}
+							country_event = { id = factions.2000 }
+						}
+					}
+				}
+			}
+
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = { has_valid_civic = civic_fanatic_purifiers }
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_faction = {
+							count < 4
+						}
+					}
+				}
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_spiritualist
+						has_modifier = promoted_spiritualist
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_spiritualist days = -1 }
+				}
+			}
+
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_spiritualist
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_spiritualist
+				}
+			}
+
+			ai_weight = {
+				base = 0
+			}
+		}
+		# Faction Extortion Buttons
+		extort_faction = {
+			title = "EXTORT_FACTION"
+			description = "EXTORT_FACTION_DESC"
+
+			potential = {
+				exists = owner
+				owner = {
+					has_auth_cyber_oligarchic_collectivist = yes # undercoat: moved to scripted trigger
+					
+					is_crowdsourcing_empire = no # undercoat: moved to scripted trigger
+				}
+				is_faction_extorted = no
+			}
+
+			effect = {
+				set_faction_extorted = yes
+				custom_tooltip = alloys_extortion_tt
+				custom_tooltip = ONLY_ONE_EXTORTED_FACTION_TT
+			}
+
+			ai_weight = {
+				base = 0
+			}
+		}
+		extort_faction_crowdsourcing = { #Crowdsourcing version
+			title = "EXTORT_FACTION"
+			description = "EXTORT_FACTION_DESC"
+
+			potential = {
+				exists = owner
+				owner = {
+					has_auth_cyber_oligarchic_collectivist = yes # undercoat: moved to scripted trigger
+					
+					is_crowdsourcing_empire = yes # undercoat: moved to scripted trigger
+				}
+				is_faction_extorted = no
+			}
+
+			effect = {
+				set_faction_extorted = yes
+				custom_tooltip = crowdsourced_extortion_tt
+				custom_tooltip = ONLY_ONE_EXTORTED_FACTION_TT
+			}
+
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_extort_faction = {
+			title = "CANCEL_EXTORT_FACTION"
+			description = "CANCEL_EXTORT_FACTION_DESC"
+
+			potential = {
+				exists = owner
+				owner = {
+					has_auth_cyber_oligarchic_collectivist = yes # undercoat: moved to scripted trigger
+					
+				}
+				is_faction_extorted = yes
+			}
+
+			effect = {
+				set_faction_extorted = no
+			}
+
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

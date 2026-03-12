@@ -1,0 +1,322 @@
+tr_psionics_shroud_adopt = {
+	possible = {
+		if = {
+			limit = {
+				OR = {
+					is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
+					is_endbringer_empire = yes # undercoat: moved to scripted trigger
+					has_country_flag = ratling_country
+					has_country_flag = finish_shroud_forged_liberation_flag
+				}
+			}
+			has_technology = tech_psionic_theory
+		}
+		else = {
+			has_ascension_perk = ap_mind_over_matter
+			has_technology = tech_psionic_theory
+			if = {
+				limit = {
+					is_shroud_forged_empire = yes # undercoat: moved to scripted trigger
+				}
+				custom_tooltip = tr_psionics_shroud_forged_requirement
+			}
+		}
+	}
+	unlocks_agenda = agenda_psionic_supremacy_shroud
+	custom_tooltip = tr_psionics_shroud_adopt_desc
+
+	on_enabled = {
+		if = {
+			limit = {
+				is_endbringer_empire = yes # undercoat: moved to scripted trigger
+			}
+			country_event = {
+				id = shroud.8310
+			}
+		}
+		else = {
+			country_event = {
+				id = shroud.2750
+			}
+		}
+	}
+	# Grants the Latent Psionic trait
+
+	tradition_swap = {
+		name = tr_psionics_adopt_shroudwalker
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			is_shroudwalker_apprentice_empire = yes # undercoat: moved to scripted trigger
+		}
+		custom_tooltip = tr_psionics_shroud_adopt_shroudwalker_desc
+		on_enabled = {
+			add_research_option = tech_telepathy
+			country_event = {
+				id = shroud.2750
+			}
+		}
+		weight = {
+			factor = 1
+		}
+	}
+}
+
+tr_psionics_shroud_finish = {
+	on_enabled = {
+		hidden_effect = {
+			if = {
+				limit = {
+					any_planet_within_border = {
+						has_planet_flag = fotd_seperatist_planet@root
+						owner = {
+							has_country_flag = fotd_seperatist_country@root
+						}
+					}
+				}
+				country_event = { id = origin.6110 days = 5 random = 2 }
+			}
+			if = {
+				limit = {
+					OR = {
+						has_origin = origin_legendary_leader_dictatorial
+						AND = {
+							has_country_flag = paragon_origin_reformists_gone
+							has_origin = origin_legendary_leader_imperial
+						}
+					}
+					NOT = { has_country_flag = luminary_ascension_path }
+					exists = ruler
+					ruler = { has_leader_flag = paragon_origin_legendary_leader }
+				}
+				country_event = {
+					id = paragon.5201 days = 3600 random = 7200
+				}
+			}
+		}
+	}
+	custom_tooltip_with_modifiers = tr_psionics_shroud_finish_desc
+	modifier = {
+		empire_size_penalty_mult = -0.1
+		ascension_perks_add = 1
+	}
+}
+
+tr_psionics_shroud_psi_corps = {
+	custom_tooltip = tr_psionics_psi_corps_desc
+	# Unlocks the Psi Corps building
+
+	tradition_swap = {
+		name = tr_psionics_shroud_psi_corps_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_breached_shroud = no
+		}
+		custom_tooltip = tr_psionics_shroud_psi_corps_situation_effects
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_psionics_endbringers_cult
+		trigger = {
+			is_endbringer_empire = yes # undercoat: moved to scripted trigger
+		}
+		custom_tooltip = tr_psionics_endbringers_cult_desc
+		weight = {
+			factor = 10
+		}
+	}
+}
+
+tr_psionics_shroud_great_awakening = {
+	possible = {
+		has_tradition = tr_psionics_shroud_psi_corps
+		custom_tooltip = {
+			fail_text = "require_breach_shroud_stage_2"
+			OR = {
+				any_situation = {
+					is_situation_type = situation_breach_shroud
+					NOT = { current_stage = stage_1 }
+				}
+				any_situation = {
+					is_situation_type = situation_breach_shroud_endbringers
+					NOT = { current_stage = stage_1 }
+				}
+				NOR = {
+					any_situation = {
+						is_situation_type = situation_breach_shroud
+					}
+					any_situation = {
+						is_situation_type = situation_breach_shroud_endbringers
+					}
+				}
+			}
+		}
+	}
+	custom_tooltip = tr_psionics_psionic_assimilation_desc
+	on_enabled = {
+		hidden_effect = {
+			turn_main_species_to_psionic = yes
+			update_node_portraits_if_gestalt_effect = yes
+			update_every_leader_from_psionic_countries = yes
+			refresh_portraits = character
+			country_event = {
+				id = enclave.7000
+				days = 360
+				random = 720
+			}
+		}
+	}
+	# Primary species gains the Psionic trait.
+	# Unlocks Psionic Assimilation.
+
+	tradition_swap = {
+		name = tr_psionics_shroud_great_awakening_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_breached_shroud = no
+		}
+		custom_tooltip = tr_psionics_shroud_great_awakening_situation_effects
+		on_enabled = {
+			hidden_effect = {
+				if = {
+					limit = {
+						any_situation = {
+							OR = {	
+								is_situation_type = situation_breach_shroud
+								is_situation_type = situation_breach_shroud_endbringers
+							}
+							current_stage = stage_3
+						}
+					}
+					turn_main_species_to_psionic = yes
+					update_node_portraits_if_gestalt_effect = yes
+					update_every_leader_from_psionic_countries = yes
+				}
+				refresh_portraits = character
+				country_event = {
+					id = enclave.7000
+					days = 360
+					random = 720
+				}
+			}
+		}
+	}
+}
+
+tr_psionics_shroud_telekinesis = {
+	possible = {
+		has_tradition = tr_psionics_shroud_great_awakening
+	}
+	custom_tooltip = tr_psionics_shroud_telekinesis_desc
+
+	tradition_swap = {
+		name = tr_psionics_shroud_telekinesis_gestalt
+		trigger = { is_gestalt = yes }
+		inherit_name = yes
+		inherit_icon = yes
+		custom_tooltip = tr_psionics_shroud_telekinesis_gestalt_desc
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_psionics_shroud_telekinesis_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			is_gestalt = no
+			NOT = { has_country_flag = psionic_traditions_unlocked }
+		}
+		custom_tooltip = tr_psionics_shroud_telekinesis_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_psionics_shroud_telekinesis_gestalt_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			is_gestalt = yes
+			NOT = { has_country_flag = psionic_traditions_unlocked }
+		}
+		custom_tooltip = tr_psionics_shroud_telekinesis_gestalt_situation_effects
+	}
+}
+
+tr_psionics_shroud_clairvoyance = {
+	possible = {
+		has_tradition = tr_psionics_shroud_great_awakening
+	}
+	custom_tooltip_with_modifiers = tr_psionics_shroud_clairvoyance_desc
+	modifier = {
+		add_base_country_intel = 10
+		intel_decryption_add = 2
+		intel_encryption_add = 2
+	}
+
+	tradition_swap = {
+		name = tr_psionics_shroud_clairvoyance_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			NOT = { has_country_flag = psionic_traditions_unlocked }
+		}
+		custom_tooltip = tr_psionics_shroud_clairvoyance_situation_effects
+	}
+}
+
+tr_psionics_shroud_psychometry = {
+	possible = {
+		has_tradition = tr_psionics_shroud_telekinesis
+		has_tradition = tr_psionics_shroud_clairvoyance
+	}
+	custom_tooltip_with_modifiers = tr_psionics_shroud_psychometry_desc
+	modifier = {
+		psionic_specialist_pop_bonus_workforce_mult = 0.05
+	}
+
+	tradition_swap = {
+		name = tr_psionics_shroud_psychometry_grand_archive
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_grand_archive_dlc = yes
+			has_country_flag = psionic_traditions_unlocked
+		}
+		custom_tooltip_with_modifiers = tr_psionics_shroud_psychometry_desc
+		modifier = {
+			psionic_specialist_pop_bonus_workforce_mult = 0.05
+			historical_item_specimens_produces_mult = 0.25
+		}
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_psionics_shroud_psychometry_situation
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_grand_archive_dlc = no
+			NOT = { has_country_flag = psionic_traditions_unlocked }
+		}
+		custom_tooltip = tr_psionics_shroud_psychometry_situation_effects
+	}
+
+	tradition_swap = {
+		name = tr_psionics_shroud_psychometry_situation_grand_achive
+		inherit_name = yes
+		inherit_icon = yes
+		trigger = {
+			has_grand_archive_dlc = yes
+			NOT = { has_country_flag = psionic_traditions_unlocked }
+		}
+		custom_tooltip = tr_psionics_shroud_psychometry_situation_grand_achive_effects
+	}
+}

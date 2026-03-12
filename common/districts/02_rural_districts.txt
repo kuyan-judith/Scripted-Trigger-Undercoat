@@ -1,10 +1,14 @@
 @base_cost = 300
 @city_cost = 500
+@rural_district_ai_coefficient = 0.75
 
 district_generator = {
 	expansion_planner = yes
-
 	base_buildtime = 240
+	overlay_icon = GFX_district_energy
+	is_uncapped = {
+		is_generator_district_uncapped = yes
+	}
 
 	min_for_deposits_on_planet = 3
 	max_for_deposits_on_planet = 15
@@ -14,14 +18,20 @@ district_generator = {
 	}
 
 	show_on_uncolonized = {
-		uses_district_set = standard
+		OR = {
+			uses_district_set = standard
+			uses_district_set = shattered_ring_world
+		}
 		exists = from
 		from = { is_wilderness_empire = no }
 		NOT = { has_modifier = resort_colony }
 	}
 
 	potential = {
-		uses_district_set = standard
+		OR = {
+			uses_district_set = standard
+			uses_district_set = shattered_ring_world
+		}
 		OR = {
 			NOT = { exists = owner }
 			AND = {
@@ -32,11 +42,17 @@ district_generator = {
 		NOT = { has_modifier = resort_colony }
 	}
 
+	allow = {
+		custom_tooltip = {
+			fail_text = arcology_project_construction_fail_tt
+			NOT = { has_planet_flag = arcology_project_construction }
+		}
+	}
+
 	conversion_ratio = 1
 	convert_to = {
-		district_generator_uncapped
 		district_photosynthesis_fields
-		district_photosynthesis_fields_uncapped
+		district_geothermal
 		district_nexus_1
 		district_hive_1
 	}
@@ -59,6 +75,17 @@ district_generator = {
 	triggered_planet_modifier = {
 		planet_housing_add = 1
 		mult = value:generator_district_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_technician_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
 	}
 
 	inline_script = {
@@ -72,84 +99,45 @@ district_generator = {
 	prerequisites = {
 		tech_power_plant_1
 	}
+
+	ai_weight_coefficient = @rural_district_ai_coefficient
 }
 
 district_generator_uncapped = {
+	expansion_planner = yes
 	base_buildtime = 240
 	icon = district_generator
-	is_capped_by_modifier = no
+	overlay_icon = GFX_district_energy
 
 	zone_slots = {
 		slot_energy
 	}
 
 	show_on_uncolonized = {
-		exists = from
-		from = {
-			is_wilderness_empire = no
-		}
-		uses_district_set = shattered_ring_world
-		NOT = { has_modifier = resort_colony }
+		always = no				# Kept for save compatibility
 	}
 
-
 	potential = {
-		uses_district_set = shattered_ring_world
-		OR = {
-			NOT = { exists = owner }
-			AND = {
-				exists = owner
-				owner = { is_wilderness_empire = no }
-			}
-		}
-		NOT = { has_modifier = resort_colony }
+		always = no				# Kept for save compatibility
 	}
 
 	conversion_ratio = 1
 	convert_to = {
 		district_generator
-		district_rw_generator
-		district_srw_commercial
-		district_rw_urban_1
 		district_photosynthesis_fields
-		district_photosynthesis_fields_uncapped
 		district_nexus_1
 		district_hive_1
-	}
-
-	resources = {
-		category = planet_districts_generator
-		cost = {
-			minerals = @base_cost
-		}
-		upkeep = {
-			energy = 1
-		}
-	}
-
-	inline_script = {
-		script = jobs/technicians_add
-		AMOUNT = @base_rural_district_jobs
-	}
-
-	triggered_planet_modifier = {
-		planet_housing_add = 1
-		mult = value:generator_district_housing_stu
-	}
-
-	inline_script = {
-		script = districts/district_triggered_name_generator
-	}
-
-	inline_script = {
-		script = districts/district_triggered_flavor_desc_generator
+		district_geothermal
 	}
 }
 
 district_mining = {
 	expansion_planner = yes
-
 	base_buildtime = 240
+	overlay_icon = GFX_district_minerals
+	is_uncapped = {
+		is_mining_district_uncapped = yes
+	}
 
 	min_for_deposits_on_planet = 1
 	max_for_deposits_on_planet = 15
@@ -158,25 +146,34 @@ district_mining = {
 		slot_minerals
 	}
 
-	show_on_uncolonized = {
-		uses_district_set = standard
-		NAND = {
-			exists = from
-			from = {
-				OR = {
-					is_subterranean_empire = yes
-					is_wilderness_empire = yes
-				}
-			}
+	desc = {
+		trigger = {
+			NOT = { uses_district_set = shattered_ring_world }
 		}
+		text = district_mining_desc
+	}
+
+	desc = {
+		trigger = {
+			uses_district_set = shattered_ring_world
+		}
+		text = district_srw_mining_desc
+	}
+
+	show_on_uncolonized = {
+		OR = {
+			uses_district_set = standard
+			uses_district_set = shattered_ring_world
+		}
+		exists = from
+		from = { is_wilderness_empire = no }
 		NOT = { has_modifier = resort_colony }
 	}
 
 	potential = {
-		uses_district_set = standard
-		NAND = {
-			exists = owner
-			owner = { is_subterranean_empire = yes }
+		OR = {
+			uses_district_set = standard
+			uses_district_set = shattered_ring_world
 		}
 		OR = {
 			NOT = { exists = owner }
@@ -188,13 +185,19 @@ district_mining = {
 		NOT = { has_modifier = resort_colony }
 	}
 
+	allow = {
+		custom_tooltip = {
+			fail_text = arcology_project_construction_fail_tt
+			NOT = { has_planet_flag = arcology_project_construction }
+		}
+	}
+
 	conversion_ratio = 1
 	convert_to = {
-		district_mining_uncapped
 		district_hollow_mountains
-		district_hollow_mountains_uncapped
 		district_nexus_2
 		district_hive_2
+		district_melting
 	}
 
 	resources = {
@@ -215,6 +218,17 @@ district_mining = {
 	triggered_planet_modifier = {
 		planet_housing_add = 1
 		mult = value:mining_district_housing_stu
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_miner_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
 	}
 
 	inline_script = {
@@ -228,114 +242,45 @@ district_mining = {
 	prerequisites = {
 		tech_mechanized_mining
 	}
+
+	ai_weight_coefficient = @rural_district_ai_coefficient
 }
 
 district_mining_uncapped = {
+	expansion_planner = yes
 	base_buildtime = 240
 	icon = district_mining
-	is_capped_by_modifier = no
+	overlay_icon = GFX_district_minerals
 
 	zone_slots = {
 		slot_minerals
 	}
 
-	desc = {
-		trigger = {
-			NOT = { uses_district_set = shattered_ring_world }
-		}
-		text = district_mining_uncapped_desc
-	}
-
-	desc = {
-		trigger = {
-			uses_district_set = shattered_ring_world
-			NOT = { owner = { is_subterranean_empire = yes } }
-		}
-		text = district_srw_mining_desc
-	}
-
 	show_on_uncolonized = {
-		OR = {
-			#uses_district_set = hive_world
-			#uses_district_set = machine_world
-			uses_district_set = shattered_ring_world
-			AND = {
-				exists = from
-				from = { is_subterranean_empire = yes }
-				uses_district_set = standard
-			}
-		}
-		exists = from
-		from = { is_wilderness_empire = no }
-		NOT = { has_modifier = resort_colony }
+		always = no				# Kept for save compatibility
 	}
 
 	potential = {
-		OR = {
-			#uses_district_set = hive_world
-			#uses_district_set = machine_world
-			uses_district_set = shattered_ring_world
-			AND = {
-				exists = owner
-				owner = { is_subterranean_empire = yes }
-				uses_district_set = standard
-			}
-		}
-		OR = {
-			NOT = { exists = owner }
-			AND = {
-				exists = owner
-				owner = { is_wilderness_empire = no }
-			}
-		}
-		NOT = { has_modifier = resort_colony }
+		always = no				# Kept for save compatibility
 	}
 
 	conversion_ratio = 1
 	convert_to = {
 		district_mining
-		district_rw_urban_2
 		district_hollow_mountains
-		district_hollow_mountains_uncapped
 		district_nexus_2
 		district_hive_2
-	}
-
-	resources = {
-		category = planet_districts_mining
-		cost = {
-			minerals = @base_cost
-		}
-		upkeep = {
-			energy = 1
-		}
-	}
-
-	inline_script = {
-		script = jobs/miners_add
-		AMOUNT = @base_rural_district_jobs
-	}
-
-	triggered_planet_modifier = {
-		planet_housing_add = 1
-		mult = value:mining_district_housing_stu
-	}
-
-	inline_script = {
-		script = districts/district_triggered_name_mining
-	}
-
-	inline_script = {
-		script = districts/district_triggered_flavor_desc_mining
-	}
-
-	prerequisites = {
+		district_melting
 	}
 }
 
 district_farming = {
 	expansion_planner = yes
 	base_buildtime = 240
+	overlay_icon = GFX_district_food
+	is_uncapped = {
+		is_farming_district_uncapped = yes
+	}
 
 	min_for_deposits_on_planet = 3
 	max_for_deposits_on_planet = 15
@@ -345,21 +290,19 @@ district_farming = {
 	}
 
 	show_on_uncolonized = {
+		OR = {
+			uses_district_set = standard
+			uses_district_set = shattered_ring_world
+		}
 		exists = from
 		from = { is_wilderness_empire = no }
-		uses_district_set = standard
 		NOT = { has_modifier = resort_colony }
 	}
 
 	potential = {
-		uses_district_set = standard
 		OR = {
-			NOT = { exists = owner }
-			NOT = { owner = { is_anglers_empire = yes } }
-			AND = {
-				owner = { is_anglers_empire = yes }
-				is_ocean_world = no # undercoat: moved to scripted trigger
-			}
+			uses_district_set = standard
+			uses_district_set = shattered_ring_world
 		}
 		NOT = {
 			AND = {
@@ -380,11 +323,16 @@ district_farming = {
 		NOT = { has_modifier = resort_colony }
 	}
 
+	allow = {
+		custom_tooltip = {
+			fail_text = arcology_project_construction_fail_tt
+			NOT = { has_planet_flag = arcology_project_construction }
+		}
+	}
+
 	conversion_ratio = 1
 	convert_to = {
-		district_farming_uncapped
 		district_orchard_forests
-		district_orchard_forests_uncapped
 		district_nexus_3
 		district_hive_3
 	}
@@ -429,6 +377,17 @@ district_farming = {
 		mult = value:farming_district_housing_stu
 	}
 
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_farmer_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
+	}
+
 	inline_script = {
 		script = districts/district_triggered_name_farming
 	}
@@ -448,107 +407,303 @@ district_farming = {
 			owner = { country_uses_food = no }
 		}
 	}
+
+	ai_weight_coefficient = @rural_district_ai_coefficient
 }
 
 district_farming_uncapped = {
+	expansion_planner = yes
 	base_buildtime = 240
 	icon = district_farming
-	is_capped_by_modifier = no
+	overlay_icon = GFX_district_food
 
 	zone_slots = {
-		slot_food
+		slot_minerals
 	}
 
 	show_on_uncolonized = {
-		OR = {
-			#uses_district_set = hive_world
-			uses_district_set = shattered_ring_world
-		}
-		NOT = { has_modifier = resort_colony }
+		always = no				# Kept for save compatibility
 	}
 
 	potential = {
-		OR = {
-			#uses_district_set = hive_world
-			uses_district_set = shattered_ring_world
-			AND = {
-				exists = owner
-				owner = { is_anglers_empire = yes }
-				planet = { is_ocean_world = yes } # undercoat: moved to scripted trigger
-			}
-		}
-		NOT = {
-			AND = {
-				exists = owner
-				owner = { is_ai = yes }
-				owner = { country_uses_food = no }
-			}
-		}
-		NOT = { has_modifier = resort_colony }
+		always = no				# Kept for save compatibility
 	}
 
 	conversion_ratio = 1
 	convert_to = {
 		district_farming
 		district_rw_farming
-		district_rw_urban_3
 		district_orchard_forests
-		district_orchard_forests_uncapped
-		district_nexus_3
 		district_hive_3
 	}
+}
 
-	resources = {
-		category = planet_districts_farming
-		cost = {
-			minerals = @base_cost
+district_geothermal = {
+	expansion_planner = yes
+	base_buildtime = 240
+	overlay_icon = GFX_district_energy
+
+	zone_slots = {
+		slot_energy
+	}
+	show_on_uncolonized = { uses_district_set = volcanic_world }
+	potential = { uses_district_set = volcanic_world }
+	allow = {
+		hidden_trigger = {
+			NOT = { has_modifier = resort_colony }
 		}
-		# Anglers Civic cost effect
-		cost = {
-			trigger = {
-				AND = {
-					exists = owner
-					owner = { is_anglers_empire = yes }
-					planet = { is_ocean_world = yes } # undercoat: moved to scripted trigger
-				}
-			}
-			minerals = -50
-		}
-		upkeep = {
-			energy = 1
+		custom_tooltip = {
+			fail_text = arcology_project_construction_fail_tt
+			NOT = { has_planet_flag = arcology_project_construction }
 		}
 	}
 
-	triggered_desc = {
-		trigger = {
-			farmer_is_angler_trigger = yes
-		}
-		text = zone_anglers_triggered_desc
+	conversion_ratio = 1
+	convert_to = {
+		district_generator
+	}
+	expansion_planner_type = district_generator
+
+	resources = {
+		category = planet_districts_generator
+		cost = { minerals = @base_cost }
+		upkeep = { energy = 1 }
 	}
 
 	inline_script = {
-		script = jobs/farmers_add
+		script = jobs/technicians_add
 		AMOUNT = @base_rural_district_jobs
 	}
 
+	planet_modifier = {
+		planet_housing_add = 200
+	}
+
 	triggered_planet_modifier = {
-		planet_housing_add = 1
-		mult = value:farming_district_housing_stu
-	}
-
-	inline_script = {
-		script = districts/district_triggered_name_farming
-	}
-
-	inline_script = {
-		script = districts/district_triggered_flavor_desc_farming
-	}
-
-	destroy_trigger = {
-		exists = owner
-		AND = {
-			owner = { is_ai = yes }
-			owner = { country_uses_food = no }
+		potential = {
+			exists = owner
+			owner = {
+				is_agrarian_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			planet_housing_add = 300
 		}
 	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			planet_housing_add = 100
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_technician_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_generator
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_generator
+	}
+
+	prerequisites = {
+		tech_power_plant_1
+	}
+
+	ai_weight_coefficient = @rural_district_ai_coefficient
+}
+
+district_melting = {
+	expansion_planner = yes
+	base_buildtime = 240
+	overlay_icon = GFX_district_minerals
+	is_uncapped = {
+		is_mining_district_uncapped = yes
+	}
+	min_for_deposits_on_planet = 5
+	max_for_deposits_on_planet = 15
+
+	# Volcanic Worlds build Magma Forges instead of "mining districts".
+	inherits_capped_modifiers_from = district_mining
+
+	zone_slots = {
+		slot_minerals
+	}
+
+	show_on_uncolonized = {
+		uses_district_set = volcanic_world
+		exists = from
+	}
+
+	potential = {
+		uses_district_set = volcanic_world
+	}
+
+	allow = {
+		hidden_trigger = {
+			NOT = { has_modifier = resort_colony }
+		}
+		custom_tooltip = {
+			fail_text = arcology_project_construction_fail_tt
+			NOT = { has_planet_flag = arcology_project_construction }
+		}
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_mining
+	}
+	expansion_planner_type = district_mining
+
+	resources = {
+		category = planet_districts_mining
+		cost = { minerals = @base_cost }
+		upkeep = { energy = 1 }
+	}
+
+	inline_script = {
+		script = jobs/miners_add
+		AMOUNT = @base_rural_district_jobs
+	}
+
+	planet_modifier = {
+		planet_housing_add = 200
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_agrarian_empire = yes # undercoat: moved to scripted trigger
+			}
+		}
+		modifier = {
+			planet_housing_add = 300
+		}
+	}
+	triggered_planet_modifier = {
+		potential = {
+			has_modifier = metal_planet
+		}
+		modifier = {
+			planet_housing_add = 500
+		}
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			planet_housing_add = 100
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_tankbound_empire = yes }
+		}
+		modifier = {
+			job_miner_automated_workforce_mult = 1.0
+			job_production_overseer_add = 100
+		}
+	}
+
+	inline_script = {
+		script = districts/district_triggered_name_mining
+	}
+
+	inline_script = {
+		script = districts/district_triggered_flavor_desc_mining
+	}
+
+	prerequisites = {
+		tech_mechanized_mining
+	}
+
+	ai_weight_coefficient = @rural_district_ai_coefficient
+}
+
+# Not a special district to ensure its shown after district_melting (planet view).
+district_polytechnic = {
+	expansion_planner = no
+	base_buildtime = 250
+	overlay_icon = GFX_district_research
+	is_uncapped = { always = no }
+
+	prerequisites = {
+		tech_basic_science_lab_1
+	}
+
+	allow = {
+		hidden_trigger = {
+			OR = {
+				NOT = { exists = owner }
+				owner = {
+					has_technology = tech_basic_science_lab_1
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = arcology_project_construction_fail_tt
+			NOT = { has_planet_flag = arcology_project_construction }
+		}
+	}
+
+	zone_slots = {
+		slot_polytechnic
+	}
+
+	show_on_uncolonized = { uses_district_set = volcanic_world }
+	potential = { uses_district_set = volcanic_world }
+
+	resources = {
+		category = planet_districts
+		cost = { minerals = 450 }
+		upkeep = { energy = 3 }
+	}
+
+	planet_modifier = { planet_housing_add = 200 }
+
+	inline_script = {
+		script = jobs/thermotechnic_add
+	}
+
+	triggered_name = {
+		trigger = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		text = thermotechnic_default
+	}
+	triggered_name = {
+		trigger = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		text = thermotechnic_hive
+	}
+	triggered_name = {
+		trigger = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		text = thermotechnic_machine
+	}
+	ai_weight_coefficient = 1.5
+	additional_ai_weight = 100
 }

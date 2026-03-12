@@ -36,8 +36,10 @@
 #	custom_starbase = x						#if this is set, country will defined ship size for constructed starbases instead of building outposts
 #	destroys_starbases = no					#if this is set to yes, country will destroy starbases instead of disabling them
 #	can_have_their_comms_shared				#if this is set to yes, other countries in contact with this one will be able to share that contact (for countries that use custom_diplomacy)
-#	observable = no						#Fairly self explanatory. Will not show up in list of observable countries, and cannot be tagged to as observer.
+#	observable = no							#Fairly self explanatory. Will not show up in list of observable countries, and cannot be tagged to as observer.
 #	can_use_invalid_technology = yes		#this this is set to no, there will be a hardcoded block on assigning tech whose potential trigger does not evaluate to the country
+#	ignore_ftl_inhibitors = yes				#Setting would to true, would enable the country to ignore FTL Inhibitors.
+#   prevent_automatic_genocidal_hostilities = yes #default no, if this is set then genocidal empires do not automatically attack the country before communications are established
 #
 #	faction = {							#these values are copied to the country and can be changed during the game
 #		neutral = no						#if yes, fleets will never attack anything and will never be attacked
@@ -143,7 +145,7 @@ default = {
 	}
 
 	trade_routes_available = {
-		is_gestalt = no
+		can_have_trade_routes = yes
 	}
 
 	modules = {
@@ -156,6 +158,7 @@ default = {
 		standard_expansion_module = {}
 		standard_species_rights_module = {}
 		standard_grand_archive_module = {}
+		standard_shroud_module = {}
 	}
 
 	resources = {
@@ -186,6 +189,7 @@ default = {
 					AND = {
 						is_individual_machine = no
 						is_lithoid_empire = no
+						is_infernal_empire = no
 						OR = {
 							is_regular_empire = yes
 							is_hive_empire = yes
@@ -254,6 +258,19 @@ default = {
 			}
 			food = 10
 			minerals = -10
+		}
+		produces = {
+			trigger = {
+				OR = {
+					is_infernal_empire = yes
+					# Or a machine with an infernal species
+					AND = {
+						has_country_flag = infernal_subspecies
+						is_machine_empire = yes
+					}
+				}
+			}
+			alloys = 10
 		}
 	}
 
@@ -931,6 +948,7 @@ enclave = {
 	can_have_their_comms_shared = yes
 	government = yes
 	is_enclave = yes
+	prevent_automatic_genocidal_hostilities = yes
 	observable = no
 	ai = {
 		enabled = no
@@ -951,13 +969,150 @@ enclave = {
 	}
 }
 
+mindwarden_enclave = {
+	blocks_piracy = yes
+	show_in_contacts_list = yes
+	can_have_their_comms_shared = yes
+	government = yes
+	is_enclave = yes
+	prevent_automatic_genocidal_hostilities = yes
+	observable = no
+	ai = {
+		enabled = yes
+		modules = {
+			enclave_mercenary_military_minister_module
+			interior_minister_module
+			standard_species_rights_module
+			enclave_mercenary_seller_minister_module
+		}
+
+		declare_war = no
+		colonizer = no
+		internal_policies = no
+		modification = no
+		construction = no
+		limited_military_construction = yes
+		limited_leaders = yes
+		tech = yes
+		espionage = no
+	}
+	faction = {
+		hostile = no
+		needs_border_access = no
+		generate_borders = no
+		needs_colony = no
+		auto_delete = no
+	}
+	custom_diplomacy = yes
+	custom_opinion = yes
+	modules = {
+		standard_technology_module = {}
+		standard_event_module = {}
+		standard_leader_module = {}
+		standard_economy_module = {}
+		exclusive_diplomacy_module = {} # Nothing is allowed, but we need this for relationships.
+	}
+
+	resources = {
+		category = country_base
+		produces = {
+			energy = 500
+			minerals = 500
+			food = 500
+			alloys = 250
+			consumer_goods = 100
+			rare_crystals = 1
+			exotic_gases = 1
+			volatile_motes = 1
+			sr_dark_matter = 1
+			sr_living_metal = 1
+			sr_zro = 1
+
+			physics_research = 100
+			engineering_research = 100
+			society_research = 100
+
+			unity = 50
+		}
+
+		produces = {
+			trigger = {
+				mid_game_years_passed > 0
+			}
+			energy = 500
+			minerals = 500
+			food = 500
+			alloys = 250
+			rare_crystals = 10
+			exotic_gases = 10
+			volatile_motes = 10
+
+			physics_research = 250
+			engineering_research = 250
+			society_research = 250
+		}
+
+		produces = {
+			trigger = {
+				end_game_years_passed > 0
+			}
+			energy = 500
+			minerals = 500
+			food = 500
+			alloys = 250
+			sr_dark_matter = 5
+			sr_living_metal = 5
+			sr_zro = 5
+
+			physics_research = 400
+			engineering_research = 400
+			society_research = 400
+		}
+
+		produces = {
+			trigger = {
+				has_technology = tech_rare_crystals
+			}
+			rare_crystals = 10
+		}
+
+		produces = {
+			trigger = {
+				has_technology = tech_exotic_gases
+			}
+			exotic_gases = 10
+		}
+
+		produces = {
+			trigger = {
+				has_technology = tech_volatile_motes
+			}
+			volatile_motes = 10
+		}
+
+		produces = {
+			trigger = {
+				has_technology = tech_mine_dark_matter
+			}
+			sr_dark_matter = 5
+		}
+
+		produces = {
+			trigger = {
+				has_technology = tech_mine_living_metal
+			}
+			sr_living_metal = 5
+		}
+	}
+}
+
 enclave_mercenary = {
 	blocks_piracy = yes
 	show_in_contacts_list = yes
 	can_have_their_comms_shared = yes
 	government = yes
 	is_enclave = yes
-	is_mercenary = yes
+	prevent_automatic_genocidal_hostilities = yes
 	observable = yes # no
 	playable = no
 	needs_survey = no
@@ -1828,6 +1983,33 @@ synth_queen_outposts = {
 	}
 }
 
+the_reckoning = {
+	scaled_difficulty_bonuses = 3.0	# scales to setting
+	destroys_starbases = yes
+	end_game_crisis = yes
+	is_space_critter = yes
+	blocks_piracy = yes
+	government = no
+	observable = no
+	uses_origins = no
+	ai = {
+		enabled = no
+	}
+	faction = {
+		hostile = yes
+		needs_border_access = no
+		generate_borders = no
+		needs_colony = no
+	}
+	modules = {
+		exclusive_diplomacy_module = {
+			contact_rule = on_action_only
+		}
+		basic_technology_module = {}
+		standard_event_module = {}
+	}
+}
+
 #################
 # SPACE MONSTERS
 #################
@@ -2515,5 +2697,32 @@ voidspawn_boss = {
 		exclusive_diplomacy_module = {
 			contact_rule = always
 		}
+	}
+}
+
+dummy_miners = { # This country type is only needed for the red_giant origin
+	attack_unarmed_orbital_stations = no
+	scaled_difficulty_bonuses = 1.0	# scales to setting
+	show_in_contacts_list = no
+	government = no
+	observable = no
+	share_communications = no
+	uses_origins = no
+	ai = {
+		enabled = no
+	}
+	faction = {
+		hostile = no
+		neutral = yes
+		needs_border_access = no
+		generate_borders = no
+		needs_colony = no
+		auto_delete = no
+	}
+	modules = {
+		exclusive_diplomacy_module = {
+			contact_rule = on_action_only
+		} # Nothing is allowed, but we need this for relationships.
+		all_technology_module = {}
 	}
 }

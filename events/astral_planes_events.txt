@@ -437,7 +437,7 @@ country_event = {
 				limit = {
 					NOT = { has_astral_rift_flag = description_latent_psionic }
 					leader.species = {
-						has_trait = trait_latent_psionic
+						is_latent_psionic_species = yes
 					}
 				}
 				set_astral_rift_flag = description_latent_psionic
@@ -1427,6 +1427,40 @@ country_event = {
 	}
 }
 
+# Fired when getting out of a Rift after empire was destroyed by End of the Cycle
+country_event = {
+	id = astral_planes.210
+	title = astral_planes.210.name
+	desc = astral_planes.210.desc
+	picture = GFX_evt_a_rift_in_space
+	show_sound = event_mind_over_matter
+	is_triggered_only = yes
+
+	trigger = {
+		has_astral_planes_dlc = yes
+		has_country_flag = end_of_the_cycle_reckoning
+		NOT = { has_country_flag = astral_planes_210_happened }
+	}
+
+	immediate = {
+		set_country_flag = astral_planes_210_happened
+		fromfrom.leader = {
+			add_trait = { trait = leader_trait_traumatized }
+			add_trait = { trait = leader_trait_rift_warped }
+		}
+	}
+
+	option = {
+		name = astral_planes.210.a
+		tooltip = {
+			fromfrom.leader = {
+				add_trait = { trait = leader_trait_traumatized }
+				add_trait = { trait = leader_trait_rift_warped }
+			}
+		}
+	}
+}
+
 ##########################
 # Astral Thread Actions #
 ##########################
@@ -1439,6 +1473,21 @@ fleet_event = {
 
 	immediate = {
 		delete_dimensional_fleet = this
+	}
+}
+
+country_event = {
+	id = astral_planes.1001
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_owned_fleet = {
+			limit = {
+				has_fleet_flag = dimensional_fleet
+			}
+			delete_dimensional_fleet = this
+		}
 	}
 }
 
@@ -1992,8 +2041,6 @@ country_event = {
 		}
 		allow = {
 			has_resource = { type = astral_threads amount >= 100 }
-		}
-		allow = {
 			custom_tooltip = {
 				fail_text = "number_formless_fleet_max_reached"
 				check_variable = {
@@ -2207,6 +2254,7 @@ country_event = {
 			LEADER_PORTRAIT = exd4_leader
 			NAME_LIST = Extradimensional
 			CLASS = commander
+			TIER = leader_tier_legendary
 			NAME = NAME_Formless_leader
 			LEVEL = 10
 			GENDER = indeterminable
@@ -2218,15 +2266,33 @@ country_event = {
 			CATCH_PHRASE = formless_leader_catch_phrase
 		}
 		last_created_leader = {
-			add_trait = leader_trait_spacebender
-			add_trait = subclass_commander_admiral
-			add_trait = leader_trait_psionic
-			add_trait = leader_trait_venerated_2
-			add_trait = leader_trait_scout_2
-			add_trait = leader_trait_commanding_presence_2
-			add_trait = leader_trait_energy_weapon_specialist
-			remove_leader_flag = renowned_leader
-			set_leader_flag = legendary_leader
+			add_trait = {
+				trait = leader_trait_spacebender
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = subclass_commander_admiral
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_psionic
+			}
+			add_trait = {
+				trait = leader_trait_venerated_2
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_scout_2
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_commanding_presence_2
+				consume_selection = yes
+			}
+			add_trait = {
+				trait = leader_trait_energy_weapon_specialist
+				consume_selection = yes
+			}
 		}
 	}
 
@@ -2315,12 +2381,21 @@ country_event = {
 		allow = {
 			is_homicidal = no
 		}
-		hire_event_leader_effect = {
-			LEADER = ethic_leader
+		hidden_effect = {
+			if = {
+				limit = {
+					is_variable_set = paragon_memory_vault
+				}
+				change_variable = {
+					which = paragon_memory_vault
+					value = 1
+				}
+			}
+			hire_event_leader_effect = {
+				LEADER = ethic_leader
+			}
 		}
 		last_created_leader = {
-			remove_leader_flag = renowned_leader
-			set_leader_flag = legendary_leader
 			set_leader_flag = immune_to_negative_traits
 			save_global_event_target_as = formless_leader
 		}
@@ -3519,77 +3594,6 @@ event = {
 				}
 				remove_modifier = celestial_tear_modifier
 			}
-		}
-	}
-}
-
-# Eternal Throne obtained
-event = {
-	id = astral_planes.5100
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_astral_planes_dlc = yes
-		last_received_relic = r_eternal_throne
-	}
-
-	immediate = {
-		every_owned_leader = {
-			limit = { is_immortal = no }
-			set_immortal = yes
-		}
-	}
-}
-
-# Eternal Throne Effect - leader acquired
-event = {
-	id = astral_planes.5110
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_astral_planes_dlc = yes
-		owner = { has_relic = r_eternal_throne }
-		is_immortal = no
-	}
-
-	immediate = {
-		set_immortal = yes
-	}
-}
-
-# Eternal Throne Effect - species modification complete
-event = {
-	id = astral_planes.5120
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		has_astral_planes_dlc = yes
-		owner = { has_relic = r_eternal_throne }
-		OR = {
-			any_owned_leader = {
-				is_immortal = no
-			}
-			any_pool_leader = {
-				is_immortal = no
-			}
-		}
-	}
-
-	immediate = {
-		every_owned_leader = {
-			limit = {
-				is_immortal = no
-			}
-			set_immortal = yes
-		}
-		every_pool_leader = {
-			limit = {
-				is_immortal = no
-			}
-			set_immortal = yes
 		}
 	}
 }
@@ -4912,6 +4916,7 @@ country_event = { # Mercedes
 			name = "NAME_Mercedes"
 			custom_description = "Mercedes_DESC"
 			class = official
+			tier = leader_tier_renowned
 			gender = indeterminable
 			event_leader = no # Leader is allowed to lead factions and win elections
 			background_ethic = ethic_fanatic_xenophile
@@ -4923,17 +4928,16 @@ country_event = { # Mercedes
 			immortal = yes
 			hide_age = no
 			traits = {
-				trait = leader_trait_blorg_insight
-				trait = subclass_official_diplomacy_councilor
-				trait = leader_trait_ambassador_ear_to_the_ground_2
-				trait = leader_trait_ambassador_favor_maker_2
+				1 = leader_trait_blorg_insight
+				2 = subclass_official_diplomacy_councilor
+				3 = leader_trait_ambassador_ear_to_the_ground_2
+				4 = leader_trait_ambassador_favor_maker_2
 			}
 			effect = {
 				save_event_target_as = mercedes_leader
 			}
 		}
 		last_created_leader = {
-			set_leader_flag = renowned_leader
 			set_leader_flag = is_in_recruit_window
 			set_age = 206
 		}
@@ -4972,6 +4976,15 @@ country_event = { # Mercedes
 		tag = hire_leader
 		custom_tooltip = astral_planes.6105.hire_custom_tooltip
 		hidden_effect = {
+			if = {
+				limit = {
+					is_variable_set = paragon_memory_vault
+				}
+				change_variable = {
+					which = paragon_memory_vault
+					value = 1
+				}
+			}
 			hire_event_leader_effect = {
 				LEADER = mercedes_leader
 			}
